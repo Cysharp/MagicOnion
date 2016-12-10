@@ -36,6 +36,8 @@ namespace MagicOnion.Client
         {
             var t = typeof(T);
             var ti = t.GetTypeInfo();
+            if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
+
             var resolverType = typeof(TTypeResolver);
             var module = AssemblyHolder.Module;
             var methodDefinitions = SearchDefinitions(t);
@@ -74,6 +76,7 @@ namespace MagicOnion.Client
                     }
                     return true;
                 })
+                .Where(x => !x.IsSpecialName)
                 .Select(x => new MethodDefinition
                 {
                     ServiceType = interfaceType,

@@ -76,8 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChainingAssertion.xUnit.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="UnaryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="_ServerFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

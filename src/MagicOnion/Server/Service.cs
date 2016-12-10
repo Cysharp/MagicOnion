@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
-    public abstract class Service<TServiceInterface> : IService<TServiceInterface>
+    public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>
     {
         public ServiceContext Context { get; set; }
 
         /// <summary>
         /// Get Grpc Logger.
         /// </summary>
-        public Grpc.Core.Logging.ILogger Logger => GrpcEnvironment.Logger;
+        protected Grpc.Core.Logging.ILogger Logger => GrpcEnvironment.Logger;
 
-        public Service()
+        public ServiceBase()
         {
 
         }
 
-        internal Service(ServiceContext context)
+        internal ServiceBase(ServiceContext context)
         {
             this.Context = context;
         }

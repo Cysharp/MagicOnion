@@ -9,6 +9,8 @@ namespace MagicOnion.ConsoleServer
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Server:::");
+
             var ttt = typeof(Sandbox.ConsoleServer.Services.MyFirstService);
             var interfaces = ttt.GetInterfaces();
 

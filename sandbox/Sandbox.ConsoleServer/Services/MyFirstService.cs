@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sandbox.ConsoleServer.Services
 {
-    public class MyFirstService : Service<IMyFirstService>, IMyFirstService
+    public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     {
         public async Task<UnaryResult<string>> SumAsync(int x, int y)
         {

@@ -13,6 +13,8 @@ namespace MagicOnion.ConsoleClient
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Client:::");
+
             Run().GetAwaiter().GetResult();
         }
 
