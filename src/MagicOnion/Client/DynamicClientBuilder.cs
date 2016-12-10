@@ -1,0 +1,390 @@
+﻿using Grpc.Core;
+using MagicOnion.Utils;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Threading;
+using System.Threading.Tasks;
+using ZeroFormatter.Formatters;
+using ZeroFormatter.Internal;
+
+namespace MagicOnion.Client
+{
+    internal static class AssemblyHolder
+    {
+        public const string ModuleName = "MagicOnion.Client.DynamicClient";
+
+        readonly static DynamicAssembly assembly;
+        public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
+
+        static AssemblyHolder()
+        {
+            assembly = new DynamicAssembly(ModuleName);
+        }
+    }
+
+    internal static class DynamicClientBuilder<TTypeResolver, T>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        public static readonly Type ClientType;
+        static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
+        static readonly FieldInfo byteArrayMarshaller = typeof(MagicOnionMarshallers).GetField("ByteArrayMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+        static DynamicClientBuilder()
+        {
+            var t = typeof(T);
+            var ti = t.GetTypeInfo();
+            var resolverType = typeof(TTypeResolver);
+            var module = AssemblyHolder.Module;
+            var methodDefinitions = SearchDefinitions(t);
+
+            // IRouteGuideCliet: MagicOnionClientBase<IRouteGuide>, IRouteGuide
+            var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
+            var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{resolverType.Name}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
+
+            DefineStaticFields(typeBuilder, methodDefinitions);
+            DefineStaticConstructor(typeBuilder, resolverType, t, methodDefinitions);
+            var emptyCtor = DefineConstructors(typeBuilder, methodDefinitions);
+            DefineMethods(typeBuilder, resolverType, t, methodDefinitions, emptyCtor);
+
+            ClientType = typeBuilder.CreateTypeInfo().AsType();
+        }
+
+        static MethodDefinition[] SearchDefinitions(Type interfaceType)
+        {
+            return interfaceType
+                .GetMethods()
+                .Where(x =>
+                {
+                    var methodName = x.Name;
+                    if (methodName == "Equals"
+                     || methodName == "GetHashCode"
+                     || methodName == "GetType"
+                     || methodName == "ToString"
+                     || methodName == "WithOption"
+                     || methodName == "WithHeaders"
+                     || methodName == "WithDeadline"
+                     || methodName == "WithCancellationToken"
+                     || methodName == "WithHost"
+                     )
+                    {
+                        return false;
+                    }
+                    return true;
+                })
+                .Select(x => new MethodDefinition
+                {
+                    ServiceType = interfaceType,
+                    MethodInfo = x,
+                })
+                .ToArray();
+        }
+
+        static void DefineStaticFields(TypeBuilder typeBuilder, MethodDefinition[] definitions)
+        {
+            foreach (var item in definitions)
+            {
+                item.FieldMethod = typeBuilder.DefineField(item.MethodInfo.Name + "Method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
+
+                item.RequestType = MagicOnionMarshallers.CreateRequestType(item.MethodInfo.GetParameters());
+                item.FieldRequestMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "RequestMarshaller", typeof(Marshaller<>).MakeGenericType(item.RequestType), FieldAttributes.Private | FieldAttributes.Static);
+
+                item.ResponseType = UnwrapResponseType(item, out item.MethodType, out item.ResponseIsTask);
+                item.FieldResponseMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "ResponseMarshaller", typeof(Marshaller<>).MakeGenericType(item.ResponseType), FieldAttributes.Private | FieldAttributes.Static);
+            }
+        }
+
+        static void DefineStaticConstructor(TypeBuilder typeBuilder, Type resolverType, Type interfaceType, MethodDefinition[] definitions)
+        {
+            var cctor = typeBuilder.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, Type.EmptyTypes);
+            var il = cctor.GetILGenerator();
+
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                il.DeclareLocal(typeof(object)); // object _marshaller
+            }
+
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var def = definitions[i];
+
+                il.EmitLdc_I4((int)def.MethodType);
+                il.Emit(OpCodes.Ldstr, def.ServiceType.Name);
+                il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
+                il.Emit(OpCodes.Ldsfld, byteArrayMarshaller);
+                il.Emit(OpCodes.Ldsfld, byteArrayMarshaller);
+                il.Emit(OpCodes.Newobj, bytesMethod.GetConstructors()[0]);
+                il.Emit(OpCodes.Stsfld, def.FieldMethod);
+
+                il.Emit(OpCodes.Ldtoken, resolverType);
+                il.Emit(OpCodes.Call, getTypeFromHandle);
+                il.Emit(OpCodes.Ldstr, def.Path);
+                il.Emit(OpCodes.Ldtoken, interfaceType);
+                il.Emit(OpCodes.Call, getTypeFromHandle);
+                il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
+                il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetMethod", new[] { typeof(string) }));
+                il.Emit(OpCodes.Callvirt, typeof(MethodBase).GetMethod("GetParameters"));
+                il.EmitLdloca(i);
+                il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateRequestTypeAndMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+                il.Emit(OpCodes.Pop);
+
+                il.EmitLdloc(i);
+                il.Emit(OpCodes.Castclass, def.FieldRequestMarshaller.FieldType);
+                il.Emit(OpCodes.Stsfld, def.FieldRequestMarshaller);
+
+                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, def.ResponseType).GetProperty("Default").GetGetMethod());
+                il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateZeroFormatterMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    .MakeGenericMethod(resolverType, def.ResponseType));
+                il.Emit(OpCodes.Stsfld, def.FieldResponseMarshaller);
+            }
+
+            il.Emit(OpCodes.Ret);
+        }
+
+        static ConstructorInfo DefineConstructors(TypeBuilder typeBuilder, MethodDefinition[] definitions)
+        {
+            ConstructorInfo emptyCtor;
+            // .ctor()
+            {
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Private, CallingConventions.Standard, Type.EmptyTypes);
+                var il = ctor.GetILGenerator();
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null));
+                il.Emit(OpCodes.Ret);
+
+                emptyCtor = ctor;
+            }
+
+            ConstructorInfo invokerCtor;
+            // .ctor(CallInvoker):base(callInvoker)
+            {
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker) });
+                var il = ctor.GetILGenerator();
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker) }, null));
+                il.Emit(OpCodes.Ret);
+
+                invokerCtor = ctor;
+            }
+            // .ctor(Channel):this(new DefaultCallInvoker(channel))
+            {
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(Channel) });
+                var il = ctor.GetILGenerator();
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Newobj, typeof(DefaultCallInvoker).GetConstructor(new[] { typeof(Channel) }));
+                il.Emit(OpCodes.Call, invokerCtor);
+                il.Emit(OpCodes.Ret);
+            }
+
+            return emptyCtor;
+        }
+
+        static void DefineMethods(TypeBuilder typeBuilder, Type resolverType, Type interfaceType, MethodDefinition[] definitions, ConstructorInfo emptyCtor)
+        {
+            var hostField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("host", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var optionField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("option", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var invokerField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("callInvoker", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            // Clone
+            {
+                var method = typeBuilder.DefineMethod("Clone", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType),
+                    Type.EmptyTypes);
+                var il = method.GetILGenerator();
+
+                il.Emit(OpCodes.Newobj, emptyCtor);
+
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, hostField);
+                il.Emit(OpCodes.Stfld, hostField);
+
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, optionField);
+                il.Emit(OpCodes.Stfld, optionField);
+
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, invokerField);
+                il.Emit(OpCodes.Stfld, invokerField);
+
+                il.Emit(OpCodes.Ret);
+            }
+            // Overrides
+            {
+                // TODO:Implement details.
+
+                // TSelf WithOption(CallOptions option)
+                {
+                    var method = typeBuilder.DefineMethod("WithOption", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CallOptions) });
+                    var il = method.GetILGenerator();
+
+                    il.EmitThrowNotimplemented();
+                }
+                // TSelf WithHeaders(Metadata headers);
+                {
+                    var method = typeBuilder.DefineMethod("WithHeaders", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(Metadata) });
+                    var il = method.GetILGenerator();
+
+                    il.EmitThrowNotimplemented();
+                }
+                // TSelf WithDeadline(DateTime deadline);
+                {
+                    var method = typeBuilder.DefineMethod("WithDeadline", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(DateTime) });
+                    var il = method.GetILGenerator();
+
+                    il.EmitThrowNotimplemented();
+                }
+                // TSelf WithCancellationToken(CancellationToken cancellationToken);
+                {
+                    var method = typeBuilder.DefineMethod("WithCancellationToken", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CancellationToken) });
+                    var il = method.GetILGenerator();
+
+                    il.EmitThrowNotimplemented();
+                }
+                // TSelf WithHost(string host);
+                {
+                    var method = typeBuilder.DefineMethod("WithHost", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(string) });
+                    var il = method.GetILGenerator();
+
+                    il.EmitThrowNotimplemented();
+                }
+            }
+            // Proxy Methods
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var def = definitions[i];
+                var parameters = def.MethodInfo.GetParameters().Select(x => x.ParameterType).ToArray();
+
+                var method = typeBuilder.DefineMethod(def.MethodInfo.Name, MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    def.MethodInfo.ReturnType,
+                    parameters);
+                var il = method.GetILGenerator();
+
+                switch (def.MethodType)
+                {
+                    case MethodType.Unary:
+                        il.DeclareLocal(typeof(byte[])); // request
+                        il.DeclareLocal(typeof(AsyncUnaryCall<byte[]>)); // callResult
+                        il.DeclareLocal(typeof(UnaryResult<>).MakeGenericType(def.ResponseType)); // result
+
+                        il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
+                        il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").GetGetMethod());
+                        for (int j = 0; j < parameters.Length; j++)
+                        {
+                            il.Emit(OpCodes.Ldarg, j + 1);
+                        }
+                        if (parameters.Length == 0)
+                        {
+                            // TODO:...
+                        }
+                        else if (parameters.Length == 1)
+                        {
+                            // TODO:...
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Newobj, def.RequestType.GetConstructors()[0]);
+                        }
+                        il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").PropertyType.GetMethod("Invoke"));
+                        il.Emit(OpCodes.Stloc_0);
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, invokerField);
+                        il.Emit(OpCodes.Ldsfld, def.FieldMethod);
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, hostField);
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, optionField);
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncUnaryCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        il.Emit(OpCodes.Stloc_1);
+
+                        il.Emit(OpCodes.Ldloc_1);
+                        il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
+                        il.Emit(OpCodes.Newobj, typeof(UnaryResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                        if (def.ResponseIsTask)
+                        {
+                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(UnaryResult<>).MakeGenericType(def.ResponseType)));
+                        }
+                        break;
+                    case MethodType.ClientStreaming:
+                        // TODO:others...
+                        break;
+                    case MethodType.ServerStreaming:
+                        break;
+                    case MethodType.DuplexStreaming:
+                        break;
+                    default:
+                        break;
+                }
+
+                il.Emit(OpCodes.Ret);
+            }
+        }
+
+        static Type UnwrapResponseType(MethodDefinition def, out MethodType methodType, out bool responseIsTask)
+        {
+            var t = def.MethodInfo.ReturnType;
+
+            if (!t.IsGenericType) throw new Exception($"Invalid ResponseType, Path:{def.Path} Type:{t.Name}");
+
+            // Task<Unary<T>>
+            if (t.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                responseIsTask = true;
+                t = t.GetGenericArguments()[0];
+            }
+            else
+            {
+                responseIsTask = false;
+            }
+
+            // Unary<T>
+            var returnType = t.GetGenericTypeDefinition();
+            if (returnType == typeof(UnaryResult<>))
+            {
+                methodType = MethodType.Unary;
+            }
+            methodType = MethodType.Unary; // TODO:others...
+
+            return t.GetGenericArguments()[0];
+        }
+
+        class MethodDefinition
+        {
+            public string Path => ServiceType.Name + "/" + MethodInfo.Name;
+
+            // set after search definitions
+            public Type ServiceType;
+            public MethodInfo MethodInfo;
+            public MethodType MethodType;
+
+            // set after define static fields
+            public bool ResponseIsTask;
+            public FieldInfo FieldMethod;
+            public Type RequestType;
+            public FieldInfo FieldRequestMarshaller;
+            public Type ResponseType;
+            public FieldInfo FieldResponseMarshaller;
+        }
+    }
+}

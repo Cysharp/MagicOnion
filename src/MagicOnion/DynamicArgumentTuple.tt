@@ -1,0 +1,141 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+using ZeroFormatter;
+using ZeroFormatter.Formatters;
+
+namespace MagicOnion
+{
+    internal static class FormatterLengthHelper
+    {
+        internal static int? GetLength(params IFormatter[] formatters)
+        {
+            int? sum = 0;
+            foreach (var item in formatters)
+            {
+                var len = item.GetLength();
+                if (len == null) return null;
+                sum += len;
+            }
+            return sum;
+        }
+    }
+
+    // T2 ~ T20
+
+<# for(var i = 2; i <= 20; i++) {
+    var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0}", x)));
+    var methodArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} item{0}", x)));
+    var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} default{0}", x)));
+    var formatterArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("formatter{0}", x)));
+    var nouseArgs = string.Join(" && ", Enumerable.Range(1, i).Select(x => string.Format("formatter{0}.NoUseDirtyTracker", x)));
+    Func<int, string> makeDefault = itemCount => 
+    {
+        var itemArg = string.Join(", ", Enumerable.Range(1, itemCount).Select(x => string.Format("item{0}", x)));
+        var defaultArg= string.Join(", ", Enumerable.Range(itemCount + 1, i - itemCount).Select(x => string.Format("default{0}", x)));
+        if(itemArg == "")
+        {
+            return defaultArg;
+        }
+        else if(defaultArg != "")
+        {
+            return itemArg + ", " + defaultArg;
+        }
+        else
+        {
+            return itemArg;
+        }
+    };
+ #>
+    
+    public struct DynamicArgumentTuple<<#= typeArgs #>>
+    {
+<# for(var j = 1; j <= i; j++) { #>
+        public readonly T<#= j#> Item<#= j #>;
+<# } #>
+
+        public DynamicArgumentTuple(<#= methodArgs #>)
+        {
+<# for(var j = 1; j <= i; j++) { #>
+            Item<#= j#> = item<#= j #>;
+<# } #>
+        }
+    }
+
+    public class DynamicArgumentTupleFormatter<TTypeResolver, <#= typeArgs #>> : Formatter<TTypeResolver, DynamicArgumentTuple<<#= typeArgs #>>>
+        where TTypeResolver : ITypeResolver, new()
+    {
+        readonly int? length;
+        readonly bool noUseDirtyTracker;
+<# for(var j = 1; j <= i; j++) { #>
+        readonly Formatter<TTypeResolver, T<#= j #>> formatter<#= j #>;
+<# } #>
+<# for(var j = 1; j <= i; j++) { #>
+        readonly T<#= j #> default<#= j #>;
+<# } #>
+
+        public DynamicArgumentTupleFormatter(<#= defaultArgs #>)
+        {
+<# for(var j = 1; j <= i; j++) { #>
+            this.formatter<#= j #> = Formatter<TTypeResolver, T<#= j #>>.Default;
+<# } #>
+<# for(var j = 1; j <= i; j++) { #>
+            this.default<#= j #> = default<#= j #>;
+<# } #>
+            this.length = FormatterLengthHelper.GetLength(<#= formatterArgs #>);
+            this.noUseDirtyTracker = <#= nouseArgs #>;
+        }
+
+        public override bool NoUseDirtyTracker
+        {
+            get
+            {
+                return noUseDirtyTracker;
+            }
+        }
+
+        public override int? GetLength()
+        {
+            return length;
+        }
+
+        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value)
+        {
+            if (length != null && bytes == null)
+            {
+                bytes = new byte[length.Value];
+            }
+            var startOffset = offset;
+<# for(var j = 1; j <= i; j++) { #>
+            offset += this.formatter<#= j #>.Serialize(ref bytes, offset, value.Item<#= j #>);
+<# } #>
+            return offset - startOffset;
+        }
+
+        public override DynamicArgumentTuple<<#= typeArgs #>> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        {
+            byteSize = 0;
+            int size;
+<# for(var j = 1; j <= i; j++) { #>
+
+<# if(j == 1) { #>
+            if (bytes.Length == byteSize) return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(0) #>);
+
+<# } #>
+            var item<#= j #> = this.formatter<#= j #>.Deserialize(ref bytes, offset, tracker, out size);
+            offset += size;
+            byteSize += size;
+<# if(j != i) { #>
+            if (bytes.Length == byteSize) return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(j) #>);
+<# } } #>
+
+            return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(i) #>);
+        }
+    }
+<# } #>
+}
