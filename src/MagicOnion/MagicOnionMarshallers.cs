@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MagicOnion.Server;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -10,7 +11,7 @@ using ZeroFormatter.Internal;
 
 namespace MagicOnion
 {
-    internal class MarshallingAsyncStreamReader<TRequest> : IAsyncStreamReader<TRequest>
+    internal class MarshallingAsyncStreamReader<TRequest, TResponse> : IAsyncStreamReader<TRequest>
     {
         readonly IAsyncStreamReader<byte[]> inner;
         readonly Marshaller<TRequest> marshaller;
@@ -67,6 +68,43 @@ namespace MagicOnion
         }
 
         public Task WriteAsync(TResponse message)
+        {
+            var bytes = marshaller.Serializer(message);
+            return inner.WriteAsync(bytes);
+        }
+    }
+
+
+    internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
+    {
+        readonly IClientStreamWriter<byte[]> inner;
+        readonly Marshaller<T> marshaller;
+
+        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, Marshaller<T> marshaller)
+        {
+            this.inner = inner;
+            this.marshaller = marshaller;
+        }
+
+        public WriteOptions WriteOptions
+        {
+            get
+            {
+                return inner.WriteOptions;
+            }
+
+            set
+            {
+                inner.WriteOptions = value;
+            }
+        }
+
+        public Task CompleteAsync()
+        {
+            return inner.CompleteAsync();
+        }
+
+        public Task WriteAsync(T message)
         {
             var bytes = marshaller.Serializer(message);
             return inner.WriteAsync(bytes);

@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientStreamingResult.cs" />
     <Compile Include="Client\DynamicClientBuilder.cs" />
     <Compile Include="Client\MagicOnionClient.cs" />
     <Compile Include="Client\MagicOnionClientBase.cs" />
@@ -68,6 +69,7 @@
     </Compile>
     <Compile Include="IService.cs" />
     <Compile Include="MagicOnionMarshallers.cs" />
+    <Compile Include="Nil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionOptions.cs" />

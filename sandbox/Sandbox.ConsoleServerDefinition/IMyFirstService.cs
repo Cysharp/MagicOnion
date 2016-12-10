@@ -11,5 +11,7 @@ namespace Sandbox.ConsoleServer
     {
         Task<UnaryResult<string>> SumAsync(int x, int y);
         UnaryResult<string> SumAsync2(int x, int y);
+
+        Task<ClientStreamingResult<int, string>> StreamingOne();
     }
 }

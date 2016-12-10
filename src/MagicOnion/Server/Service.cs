@@ -27,10 +27,27 @@ namespace MagicOnion.Server
             this.Context = context;
         }
 
-        // TODO:Result...
-        protected IAsyncStreamReader<T> GetStreamReader<T>()
+        // Unary
+
+        protected UnaryResult<TResponse> UnaryResult<TResponse>(TResponse result)
         {
-            return null;
+            var marshaller = Context.ResponseMarshaller;
+            if (marshaller == null) throw new Exception();
+
+            var serializer = marshaller as Marshaller<TResponse>;
+            if (serializer == null) throw new Exception();
+
+            var bytes = serializer.Serializer(result);
+            Context.Result = bytes;
+
+            return default(UnaryResult<TResponse>); // dummy
+        }
+
+        // ClientStreaming
+
+        protected ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>()
+        {
+            return new ClientStreamingContext<TRequest, TResponse>(Context);
         }
 
         protected IAsyncStreamWriter<T> GetStreamWriter<T>()
@@ -38,20 +55,6 @@ namespace MagicOnion.Server
             return null;
         }
 
-
-        protected UnaryResult<T> UnaryResult<T>(T result)
-        {
-            var marshaller = Context.UnaryMarshaller;
-            if (marshaller == null) throw new Exception();
-
-            var serializer = marshaller as Marshaller<T>;
-            if (serializer == null) throw new Exception();
-
-            var bytes = serializer.Serializer(result);
-            Context.UnaryResult = bytes;
-
-            return default(UnaryResult<T>); // dummy
-        }
 
         TServiceInterface IService<TServiceInterface>.WithOption(CallOptions option)
         {
@@ -76,6 +79,70 @@ namespace MagicOnion.Server
         TServiceInterface IService<TServiceInterface>.WithHost(string host)
         {
             throw new NotSupportedException("Invoke from client proxy only");
+        }
+    }
+
+    public class ClientStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>
+    {
+        readonly ServiceContext context;
+        readonly IAsyncStreamReader<byte[]> inner;
+        readonly Marshaller<TRequest> marshaller;
+
+        public ClientStreamingContext(ServiceContext context)
+        {
+            this.context = context;
+            this.marshaller = (Marshaller<TRequest>)context.RequestMarshaller;
+            this.inner = context.RequestStream;
+        }
+
+        public TRequest Current { get; private set; }
+
+        public async Task<bool> MoveNext(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (await inner.MoveNext(cancellationToken))
+            {
+                this.Current = marshaller.Deserializer(inner.Current);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Dispose()
+        {
+            inner.Dispose();
+        }
+
+        public async Task ForEachAsync(Action<TRequest> action)
+        {
+            while (await MoveNext(CancellationToken.None)) // ClientResponseStream is not supported CancellationToken.
+            {
+                action(Current);
+            }
+        }
+
+        public async Task ForEachAsync(Func<TRequest, Task> asyncAction)
+        {
+            while (await MoveNext(CancellationToken.None))
+            {
+                await asyncAction(Current);
+            }
+        }
+
+        public ClientStreamingResult<TRequest, TResponse> Result(TResponse result)
+        {
+            var marshaller = context.ResponseMarshaller;
+            if (marshaller == null) throw new Exception();
+
+            var serializer = marshaller as Marshaller<TResponse>;
+            if (serializer == null) throw new Exception();
+
+            var bytes = serializer.Serializer(result);
+            context.Result = bytes;
+
+            return default(ClientStreamingResult<TRequest, TResponse>); // dummy
         }
     }
 }

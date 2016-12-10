@@ -91,11 +91,14 @@ namespace MagicOnion.Client
             {
                 item.FieldMethod = typeBuilder.DefineField(item.MethodInfo.Name + "Method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
 
-                item.RequestType = MagicOnionMarshallers.CreateRequestType(item.MethodInfo.GetParameters());
-                item.FieldRequestMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "RequestMarshaller", typeof(Marshaller<>).MakeGenericType(item.RequestType), FieldAttributes.Private | FieldAttributes.Static);
-
-                item.ResponseType = UnwrapResponseType(item, out item.MethodType, out item.ResponseIsTask);
+                item.ResponseType = UnwrapResponseType(item, out item.MethodType, out item.ResponseIsTask, out item.RequestType);
                 item.FieldResponseMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "ResponseMarshaller", typeof(Marshaller<>).MakeGenericType(item.ResponseType), FieldAttributes.Private | FieldAttributes.Static);
+
+                if (item.RequestType == null)
+                {
+                    item.RequestType = MagicOnionMarshallers.CreateRequestType(item.MethodInfo.GetParameters());
+                }
+                item.FieldRequestMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "RequestMarshaller", typeof(Marshaller<>).MakeGenericType(item.RequestType), FieldAttributes.Private | FieldAttributes.Static);
             }
         }
 
@@ -121,19 +124,27 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Newobj, bytesMethod.GetConstructors()[0]);
                 il.Emit(OpCodes.Stsfld, def.FieldMethod);
 
-                il.Emit(OpCodes.Ldtoken, resolverType);
-                il.Emit(OpCodes.Call, getTypeFromHandle);
-                il.Emit(OpCodes.Ldstr, def.Path);
-                il.Emit(OpCodes.Ldtoken, interfaceType);
-                il.Emit(OpCodes.Call, getTypeFromHandle);
-                il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
-                il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetMethod", new[] { typeof(string) }));
-                il.Emit(OpCodes.Callvirt, typeof(MethodBase).GetMethod("GetParameters"));
-                il.EmitLdloca(i);
-                il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateRequestTypeAndMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
-                il.Emit(OpCodes.Pop);
-
-                il.EmitLdloc(i);
+                if (def.MethodType == MethodType.Unary)
+                {
+                    il.Emit(OpCodes.Ldtoken, resolverType);
+                    il.Emit(OpCodes.Call, getTypeFromHandle);
+                    il.Emit(OpCodes.Ldstr, def.Path);
+                    il.Emit(OpCodes.Ldtoken, interfaceType);
+                    il.Emit(OpCodes.Call, getTypeFromHandle);
+                    il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
+                    il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetMethod", new[] { typeof(string) }));
+                    il.Emit(OpCodes.Callvirt, typeof(MethodBase).GetMethod("GetParameters"));
+                    il.EmitLdloca(i);
+                    il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateRequestTypeAndMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+                    il.Emit(OpCodes.Pop);
+                    il.EmitLdloc(i);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, def.RequestType).GetProperty("Default").GetGetMethod());
+                    il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateZeroFormatterMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                        .MakeGenericMethod(resolverType, def.RequestType));
+                }
                 il.Emit(OpCodes.Castclass, def.FieldRequestMarshaller.FieldType);
                 il.Emit(OpCodes.Stsfld, def.FieldRequestMarshaller);
 
@@ -287,7 +298,6 @@ namespace MagicOnion.Client
                     case MethodType.Unary:
                         il.DeclareLocal(typeof(byte[])); // request
                         il.DeclareLocal(typeof(AsyncUnaryCall<byte[]>)); // callResult
-                        il.DeclareLocal(typeof(UnaryResult<>).MakeGenericType(def.ResponseType)); // result
 
                         il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
                         il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").GetGetMethod());
@@ -330,7 +340,27 @@ namespace MagicOnion.Client
                         }
                         break;
                     case MethodType.ClientStreaming:
-                        // TODO:others...
+                        il.DeclareLocal(typeof(AsyncClientStreamingCall<byte[], byte[]>)); // callResult
+
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, invokerField);
+                        il.Emit(OpCodes.Ldsfld, def.FieldMethod);
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, hostField);
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, optionField);
+                        il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncClientStreamingCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        il.Emit(OpCodes.Stloc_0);
+
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
+                        il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
+
+                        il.Emit(OpCodes.Newobj, typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                        if (def.ResponseIsTask)
+                        {
+                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType)));
+                        }
                         break;
                     case MethodType.ServerStreaming:
                         break;
@@ -344,11 +374,12 @@ namespace MagicOnion.Client
             }
         }
 
-        static Type UnwrapResponseType(MethodDefinition def, out MethodType methodType, out bool responseIsTask)
+        static Type UnwrapResponseType(MethodDefinition def, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
         {
-            var t = def.MethodInfo.ReturnType;
+            //if (!t.IsGenericType) throw new Exception($"Invalid ResponseType, Path:{def.Path} Type:{t.Name}");
 
-            if (!t.IsGenericType) throw new Exception($"Invalid ResponseType, Path:{def.Path} Type:{t.Name}");
+            var t = def.MethodInfo.ReturnType;
+            if (!t.IsGenericType) throw new Exception($"Invalid return type, path:{def.Path} type:{t.Name}");
 
             // Task<Unary<T>>
             if (t.GetGenericTypeDefinition() == typeof(Task<>))
@@ -366,10 +397,21 @@ namespace MagicOnion.Client
             if (returnType == typeof(UnaryResult<>))
             {
                 methodType = MethodType.Unary;
+                requestTypeIfExists = null;
+                return t.GetGenericArguments()[0];
             }
-            methodType = MethodType.Unary; // TODO:others...
-
-            return t.GetGenericArguments()[0];
+            else if (returnType == typeof(ClientStreamingResult<,>))
+            {
+                methodType = MethodType.ClientStreaming;
+                var genArgs = t.GetGenericArguments();
+                requestTypeIfExists = genArgs[0];
+                return genArgs[1];
+            }
+            else
+            {
+                //methodType = MethodType.Unary; // TODO:others...
+                throw new Exception($"Invalid return type, path:{def.Path} type:{t.Name}");
+            }
         }
 
         class MethodDefinition

@@ -32,9 +32,11 @@ namespace MagicOnion.Server
         /// <summary>Raw gRPC Context.</summary>
         public ServerCallContext CallContext { get; private set; }
 
-        // Unary
-        internal object UnaryMarshaller { get; set; }
-        internal byte[] UnaryResult { get; set; }
+        // internal, used from there methods.
+        internal object RequestMarshaller { get; set; }
+        internal object ResponseMarshaller { get; set; }
+        internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
+        internal byte[] Result { get; set; }
 
         public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context)
         {

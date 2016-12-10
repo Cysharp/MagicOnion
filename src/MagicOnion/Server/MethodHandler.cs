@@ -53,11 +53,19 @@ namespace MagicOnion.Server
             this.ServiceName = classType.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
             MethodType mt;
-            this.unwrapResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask);
+            this.unwrapResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.requestType);
             this.MethodType = mt;
 
             var parameters = methodInfo.GetParameters();
-            this.requestType = MagicOnionMarshallers.CreateRequestTypeAndMarshaller(options.ZeroFormatterTypeResolverType, classType.Name + "/" + methodInfo.Name, parameters, out requestMarshaller);
+            if (requestType == null)
+            {
+                this.requestType = MagicOnionMarshallers.CreateRequestTypeAndMarshaller(options.ZeroFormatterTypeResolverType, classType.Name + "/" + methodInfo.Name, parameters, out requestMarshaller);
+            }
+            else
+            {
+                this.requestMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, requestType);
+            }
+
             this.responseMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, unwrapResponseType);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
@@ -102,6 +110,11 @@ namespace MagicOnion.Server
                     }
                     break;
                 case MethodType.ClientStreaming:
+                    // (ServiceContext context) => new FooService() { Context = context }.Bar();
+                    {
+                        var body = Expression.Call(instance, methodInfo);
+                        this.methodBody = Expression.Lambda(body, contextArg).Compile();
+                    }
                     break;
                 case MethodType.ServerStreaming:
                     break;
@@ -112,7 +125,7 @@ namespace MagicOnion.Server
             }
         }
 
-        static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask)
+        static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
         {
             var t = methodInfo.ReturnType;
             if (!t.IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
@@ -133,14 +146,21 @@ namespace MagicOnion.Server
             if (returnType == typeof(UnaryResult<>))
             {
                 methodType = MethodType.Unary;
+                requestTypeIfExists = null;
+                return t.GetGenericArguments()[0];
+            }
+            else if (returnType == typeof(ClientStreamingResult<,>))
+            {
+                methodType = MethodType.ClientStreaming;
+                var genArgs = t.GetGenericArguments();
+                requestTypeIfExists = genArgs[0];
+                return genArgs[1];
             }
             else
             {
                 //methodType = MethodType.Unary; // TODO:others...
                 throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
             }
-
-            return t.GetGenericArguments()[0];
         }
 
         // TODO:filter
@@ -176,9 +196,15 @@ namespace MagicOnion.Server
                         builder.AddMethod(method, handler);
                     }
                     break;
-                //case MethodType.ClientStreaming:
-                //    builder.AddMethod(method, ClientStreamingServerMethod);
-                //    break;
+                case MethodType.ClientStreaming:
+                    {
+                        var genericMethod = this.GetType()
+                            .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
+                            .MakeGenericMethod(requestType, unwrapResponseType);
+                        var handler = (ClientStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        builder.AddMethod(method, handler);
+                    }
+                    break;
                 //case MethodType.ServerStreaming:
                 //    builder.AddMethod(method, ServerStreamingServerMethod);
                 //    break;
@@ -190,15 +216,15 @@ namespace MagicOnion.Server
             }
         }
 
-        // TODO:Operation with filter...?
-
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.Unary, context);
-
-            serviceContext.UnaryMarshaller = responseMarshaller;
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.Unary, context)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller
+            };
 
             var deserializer = (Marshaller<TRequest>)requestMarshaller;
             var args = deserializer.Deserializer(request);
@@ -214,15 +240,33 @@ namespace MagicOnion.Server
                 body(args, serviceContext);
             }
 
-            return serviceContext.UnaryResult;
+            return serviceContext.Result;
         }
 
-        Task<TResponse> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context)
+        async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context);
+            using (requestStream)
+            {
+                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                {
+                    RequestMarshaller = requestMarshaller,
+                    ResponseMarshaller = responseMarshaller,
+                    RequestStream = requestStream
+                };
 
-            var body = (Func<IAsyncStreamReader<TRequest>, ServiceContext, Task<TResponse>>)this.methodBody;
-            return body(requestStream, serviceContext);
+                if (responseIsTask)
+                {
+                    var body = (Func<ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>>)this.methodBody;
+                    await body(serviceContext).ConfigureAwait(false);
+                }
+                else
+                {
+                    var body = (Func<ServiceContext, ClientStreamingResult<TRequest, TResponse>>)this.methodBody;
+                    body(serviceContext);
+                }
+
+                return serviceContext.Result;
+            }
         }
 
         //Task ServerStreamingServerMethod<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)

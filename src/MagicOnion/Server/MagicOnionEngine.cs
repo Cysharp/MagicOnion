@@ -20,10 +20,7 @@ namespace MagicOnion.Server
         {
             var builder = ServerServiceDefinition.CreateBuilder();
 
-            // TODO?
-
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
             var types = assemblies
               .SelectMany(x =>
               {
