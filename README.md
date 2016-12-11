@@ -40,7 +40,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 
 and, launch the server.
 
-```csahrp
+```csharp
 class Program
 {
     static void Main(string[] args)
@@ -67,7 +67,7 @@ class Program
         Console.ReadLine();
     }
 
-    // TODO:...
+    // Blank, used by next section 
     static async void ClientImpl()
     {
     }
