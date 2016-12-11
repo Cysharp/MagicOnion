@@ -6,11 +6,11 @@ Work in progress, stay tuned.
 
 Quick Start
 ---
-alpha-version is available in NuGet.
+alpha-version is available in NuGet(Currently only work on .NET 4.5, .NET Core and Unity is not yet)
 
 * Install-Package MagicOnion -Pre
 
-Let's implements Server! Server has two parts, interface and implementation.
+Let's implements Server, Server has two parts, interface and implementation.
 
 ```csharp
 using Grpc.Core;
