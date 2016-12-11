@@ -72,6 +72,7 @@
     <Compile Include="MagicOnionMarshallers.cs" />
     <Compile Include="Nil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReturnStatusException.cs" />
     <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionOptions.cs" />

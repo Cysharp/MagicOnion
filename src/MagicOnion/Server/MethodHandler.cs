@@ -268,7 +268,12 @@ namespace MagicOnion.Server
                     body(serviceContext, args);
                 }
 
-                return serviceContext.Result;
+                return serviceContext.Result ?? emptyBytes;
+            }
+            catch (ReturnStatusException ex)
+            {
+                context.Status = ex.ToStatus();
+                return emptyBytes;
             }
             catch (Exception ex)
             {
@@ -308,8 +313,13 @@ namespace MagicOnion.Server
                         body(serviceContext);
                     }
 
-                    return serviceContext.Result;
+                    return serviceContext.Result ?? emptyBytes;
                 }
+            }
+            catch (ReturnStatusException ex)
+            {
+                context.Status = ex.ToStatus();
+                return emptyBytes;
             }
             catch (Exception ex)
             {
@@ -350,7 +360,12 @@ namespace MagicOnion.Server
                     body(serviceContext, args);
                 }
 
-                return serviceContext.Result;
+                return emptyBytes;
+            }
+            catch (ReturnStatusException ex)
+            {
+                context.Status = ex.ToStatus();
+                return emptyBytes;
             }
             catch (Exception ex)
             {
@@ -391,8 +406,13 @@ namespace MagicOnion.Server
                         body(serviceContext);
                     }
 
-                    return serviceContext.Result;
+                    return emptyBytes;
                 }
+            }
+            catch (ReturnStatusException ex)
+            {
+                context.Status = ex.ToStatus();
+                return emptyBytes;
             }
             catch (Exception ex)
             {

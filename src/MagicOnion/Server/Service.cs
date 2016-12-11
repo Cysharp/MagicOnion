@@ -39,6 +39,13 @@ namespace MagicOnion.Server
             return default(UnaryResult<TResponse>); // dummy
         }
 
+        protected UnaryResult<TResponse> ReturnStatus<TResponse>(StatusCode statusCode, string detail)
+        {
+            Context.CallContext.Status = new Status(statusCode, detail);
+
+            return default(UnaryResult<TResponse>); // dummy
+        }
+
         protected ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>()
         {
             return new ClientStreamingContext<TRequest, TResponse>(Context);

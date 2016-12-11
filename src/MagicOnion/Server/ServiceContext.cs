@@ -113,15 +113,24 @@ namespace MagicOnion.Server
 
             return default(ClientStreamingResult<TRequest, TResponse>); // dummy
         }
+
+        public ClientStreamingResult<TRequest, TResponse> ReturnStatus(StatusCode statusCode, string detail)
+        {
+            context.CallContext.Status = new Status(statusCode, detail);
+
+            return default(ClientStreamingResult<TRequest, TResponse>); // dummy
+        }
     }
 
     public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
     {
+        readonly ServiceContext context;
         readonly IAsyncStreamWriter<byte[]> inner;
         readonly Marshaller<TResponse> marshaller;
 
         public ServerStreamingContext(ServiceContext context)
         {
+            this.context = context;
             this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
             this.inner = context.ResponseStream;
         }
@@ -149,10 +158,18 @@ namespace MagicOnion.Server
         {
             return default(ServerStreamingResult<TResponse>); // dummy
         }
+
+        public ServerStreamingResult<TResponse> ReturnStatus(StatusCode statusCode, string detail)
+        {
+            context.CallContext.Status = new Status(statusCode, detail);
+
+            return default(ServerStreamingResult<TResponse>); // dummy
+        }
     }
 
     public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>
     {
+        readonly ServiceContext context;
         readonly IAsyncStreamReader<byte[]> innerReader;
         readonly IAsyncStreamWriter<byte[]> innerWriter;
         readonly Marshaller<TRequest> requestMarshaller;
@@ -160,6 +177,7 @@ namespace MagicOnion.Server
 
         public DuplexStreamingContext(ServiceContext context)
         {
+            this.context = context;
             this.innerReader = context.RequestStream;
             this.innerWriter = context.ResponseStream;
             this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
@@ -216,6 +234,13 @@ namespace MagicOnion.Server
 
         public DuplexStreamingResult<TRequest, TResponse> Result()
         {
+            return default(DuplexStreamingResult<TRequest, TResponse>); // dummy
+        }
+
+        public DuplexStreamingResult<TRequest, TResponse> ReturnStatus(StatusCode statusCode, string detail)
+        {
+            context.CallContext.Status = new Status(statusCode, detail);
+
             return default(DuplexStreamingResult<TRequest, TResponse>); // dummy
         }
     }
