@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Server;
 using System;
+using System.Threading.Tasks;
 
 namespace MagicOnion.Tests
 {

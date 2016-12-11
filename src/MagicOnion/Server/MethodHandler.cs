@@ -1,17 +1,9 @@
-﻿
+﻿using Grpc.Core;
 using System;
 using System.Linq;
-using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.IO;
-using System.Linq.Expressions;
-using Grpc.Core;
-using System.Threading;
-using System.Reflection.Emit;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Internal;
-using ZeroFormatter;
 
 namespace MagicOnion.Server
 {
@@ -112,16 +104,15 @@ namespace MagicOnion.Server
                     }
                     break;
                 case MethodType.ClientStreaming:
+                case MethodType.DuplexStreaming:
                     // (ServiceContext context) => new FooService() { Context = context }.Bar();
                     {
                         var body = Expression.Call(instance, methodInfo);
                         this.methodBody = Expression.Lambda(body, contextArg).Compile();
                     }
                     break;
-                case MethodType.DuplexStreaming:
-                    break;
                 default:
-                    break;
+                    throw new InvalidOperationException("Unknown MethodType:" + MethodType);
             }
         }
 
@@ -162,9 +153,15 @@ namespace MagicOnion.Server
                 requestTypeIfExists = null;
                 return t.GetGenericArguments()[0];
             }
+            else if (returnType == typeof(DuplexStreamingResult<,>))
+            {
+                methodType = MethodType.DuplexStreaming;
+                var genArgs = t.GetGenericArguments();
+                requestTypeIfExists = genArgs[0];
+                return genArgs[1];
+            }
             else
             {
-                //methodType = MethodType.Unary; // TODO:others...
                 throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
             }
         }
@@ -220,11 +217,17 @@ namespace MagicOnion.Server
                         builder.AddMethod(method, handler);
                     }
                     break;
-                //case MethodType.DuplexStreaming:
-                //    builder.AddMethod(method, DuplexStreamingServerMethod);
-                //    break;
+                case MethodType.DuplexStreaming:
+                    {
+                        var genericMethod = this.GetType()
+                            .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
+                            .MakeGenericMethod(requestType, unwrapResponseType);
+                        var handler = (DuplexStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        builder.AddMethod(method, handler);
+                    }
+                    break;
                 default:
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("Unknown RegisterType:" + this.MethodType);
             }
         }
 
@@ -307,12 +310,32 @@ namespace MagicOnion.Server
             return serviceContext.Result;
         }
 
-        //Task DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
-        //{
-        //    var serviceContext = new ServiceContext(MethodType.DuplexStreaming, context);
-        //    var body = (Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServiceContext, Task<TResponse>>)this.methodBody;
-        //    return body(requestStream, responseStream, serviceContext);
-        //}
+        async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
+        {
+            using (requestStream)
+            {
+                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                {
+                    RequestMarshaller = requestMarshaller,
+                    ResponseMarshaller = responseMarshaller,
+                    RequestStream = requestStream,
+                    ResponseStream = responseStream
+                };
+
+                if (responseIsTask)
+                {
+                    var body = (Func<ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>>)this.methodBody;
+                    await body(serviceContext).ConfigureAwait(false);
+                }
+                else
+                {
+                    var body = (Func<ServiceContext, DuplexStreamingResult<TRequest, TResponse>>)this.methodBody;
+                    body(serviceContext);
+                }
+
+                return serviceContext.Result;
+            }
+        }
 
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
     }

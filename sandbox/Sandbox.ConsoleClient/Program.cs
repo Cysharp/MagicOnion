@@ -22,6 +22,7 @@ namespace MagicOnion.ConsoleClient
             UnaryRun(c).GetAwaiter().GetResult();
             ClientStreamRun(c).GetAwaiter().GetResult();
             ServerStreamRun(c).GetAwaiter().GetResult();
+            DuplexStreamRun(c).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)
@@ -81,6 +82,31 @@ namespace MagicOnion.ConsoleClient
                 Console.WriteLine(ex);
             }
         }
+
+        static async Task DuplexStreamRun(IMyFirstService client)
+        {
+            try
+            {
+                var stream = await client.StreamingThree();
+
+                var count = 0;
+                await stream.ResponseStream.ForEachAsync(async x =>
+                {
+                    Console.WriteLine("DuplexStream Response:" + x);
+
+                    await stream.RequestStream.WriteAsync(count++);
+                    if (x == "finish")
+                    {
+                        await stream.RequestStream.CompleteAsync();
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
     }
 
     public class ClientSimu : MagicOnionClientBase<IMyFirstService>, IMyFirstService
@@ -94,6 +120,11 @@ namespace MagicOnion.ConsoleClient
             var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(null, host, option);
             var result = new ClientStreamingResult<int, string>(callResult, null, null);
             return Task.FromResult(result);
+        }
+
+        public Task<DuplexStreamingResult<int, string>> StreamingThree()
+        {
+            throw new NotImplementedException();
         }
 
         public Task<ServerStreamingResult<string>> StreamingTwo(int x, int y, int z)

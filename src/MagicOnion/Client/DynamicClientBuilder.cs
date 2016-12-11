@@ -362,7 +362,15 @@ namespace MagicOnion.Client
                         }
                         break;
                     case MethodType.ClientStreaming:
-                        il.DeclareLocal(typeof(AsyncClientStreamingCall<byte[], byte[]>)); // callResult
+                    case MethodType.DuplexStreaming:
+                        if (def.MethodType == MethodType.ClientStreaming)
+                        {
+                            il.DeclareLocal(typeof(AsyncClientStreamingCall<byte[], byte[]>)); // callResult
+                        }
+                        else
+                        {
+                            il.DeclareLocal(typeof(AsyncDuplexStreamingCall<byte[], byte[]>)); // callResult
+                        }
 
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, invokerField);
@@ -371,23 +379,35 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Ldfld, hostField);
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, optionField);
-                        il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncClientStreamingCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        if (def.MethodType == MethodType.ClientStreaming)
+                        {
+                            il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncClientStreamingCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncDuplexStreamingCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        }
                         il.Emit(OpCodes.Stloc_0);
 
                         il.Emit(OpCodes.Ldloc_0);
                         il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
                         il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
 
-                        il.Emit(OpCodes.Newobj, typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                        if (def.MethodType == MethodType.ClientStreaming)
+                        {
+                            il.Emit(OpCodes.Newobj, typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Newobj, typeof(DuplexStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                        }
                         if (def.ResponseIsTask)
                         {
                             il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType)));
                         }
                         break;
-                    case MethodType.DuplexStreaming:
-                        break;
                     default:
-                        break;
+                        throw new InvalidOperationException("Not supported method type:" + def.MethodType); 
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -432,6 +452,13 @@ namespace MagicOnion.Client
                 methodType = MethodType.ServerStreaming;
                 requestTypeIfExists = null;
                 return t.GetGenericArguments()[0];
+            }
+            else if (returnType == typeof(DuplexStreamingResult<,>))
+            {
+                methodType = MethodType.DuplexStreaming;
+                var genArgs = t.GetGenericArguments();
+                requestTypeIfExists = genArgs[0];
+                return genArgs[1];
             }
             else
             {

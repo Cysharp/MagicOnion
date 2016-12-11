@@ -53,6 +53,11 @@ namespace MagicOnion.Server
             return new ServerStreamingContext<TResponse>(Context);
         }
 
+        protected DuplexStreamingContext<TRequest, TResponse> GetDuplexStreamingContext<TRequest, TResponse>()
+        {
+            return new DuplexStreamingContext<TRequest, TResponse>(Context);
+        }
+
         // Interface methods for Client
 
         TServiceInterface IService<TServiceInterface>.WithOption(CallOptions option)
@@ -147,13 +152,11 @@ namespace MagicOnion.Server
 
     public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
     {
-        readonly ServiceContext context;
         readonly IAsyncStreamWriter<byte[]> inner;
         readonly Marshaller<TResponse> marshaller;
 
         public ServerStreamingContext(ServiceContext context)
         {
-            this.context = context;
             this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
             this.inner = context.ResponseStream;
         }
@@ -180,6 +183,75 @@ namespace MagicOnion.Server
         public ServerStreamingResult<TResponse> Result()
         {
             return default(ServerStreamingResult<TResponse>); // dummy
+        }
+    }
+
+    public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>
+    {
+        readonly IAsyncStreamReader<byte[]> innerReader;
+        readonly IAsyncStreamWriter<byte[]> innerWriter;
+        readonly Marshaller<TRequest> requestMarshaller;
+        readonly Marshaller<TResponse> responseMarshaller;
+
+        public DuplexStreamingContext(ServiceContext context)
+        {
+            this.innerReader = context.RequestStream;
+            this.innerWriter = context.ResponseStream;
+            this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
+            this.responseMarshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
+        }
+
+        /// <summary>IAsyncStreamReader Methods.</summary>
+        public TRequest Current { get; private set; }
+
+        /// <summary>IAsyncStreamReader Methods.</summary>
+        public async Task<bool> MoveNext(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (await innerReader.MoveNext(cancellationToken))
+            {
+                this.Current = requestMarshaller.Deserializer(innerReader.Current);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>IAsyncStreamReader Methods.</summary>
+        public void Dispose()
+        {
+            innerReader.Dispose();
+        }
+
+        /// <summary>
+        /// IServerStreamWriter Methods.
+        /// </summary>
+        public WriteOptions WriteOptions
+        {
+            get
+            {
+                return innerWriter.WriteOptions;
+            }
+
+            set
+            {
+                innerWriter.WriteOptions = value;
+            }
+        }
+
+        /// <summary>
+        /// IServerStreamWriter Methods.
+        /// </summary>
+        public Task WriteAsync(TResponse message)
+        {
+            var bytes = responseMarshaller.Serializer(message);
+            return innerWriter.WriteAsync(bytes);
+        }
+
+        public DuplexStreamingResult<TRequest, TResponse> Result()
+        {
+            return default(DuplexStreamingResult<TRequest, TResponse>); // dummy
         }
     }
 }

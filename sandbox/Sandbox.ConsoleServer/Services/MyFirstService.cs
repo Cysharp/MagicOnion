@@ -62,6 +62,29 @@ namespace Sandbox.ConsoleServer.Services
             var stream = GetServerStreamingContext<string>();
             return stream.Result();
         }
+
+        public async Task<DuplexStreamingResult<int, string>> StreamingThree()
+        {
+            Logger.Debug($"Called DuplexStreamingResult");
+
+            var stream = GetDuplexStreamingContext<int, string>();
+
+            var waitTask = Task.Run(async () =>
+            {
+                await stream.ForEachAsync(x =>
+                {
+                    Logger.Debug($"Duplex Streaming Received:" + x);
+                });
+            });
+
+            await stream.WriteAsync("test1");
+            await stream.WriteAsync("test2");
+            await stream.WriteAsync("finish");
+
+            await waitTask;
+
+            return stream.Result();
+        }
     }
 }
 

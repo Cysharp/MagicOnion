@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncStreamReaderExtensions.cs" />
+    <Compile Include="DuplexStreamingResult.cs" />
     <Compile Include="ClientStreamingResult.cs" />
     <Compile Include="Client\DynamicClientBuilder.cs" />
     <Compile Include="Client\MagicOnionClient.cs" />

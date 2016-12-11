@@ -20,6 +20,9 @@ namespace MagicOnion.Tests
 
         ServerStreamingResult<string> Serverstreaming1(int x, int y, int z);
         Task<ServerStreamingResult<string>> ServerStreaming1Task(int x, int y, int z);
+
+        DuplexStreamingResult<int, string> DuplexStreaming1();
+        Task<DuplexStreamingResult<int, string>> DuplexStreaming1Task();
     }
 
     public class UnaryTestImpl : ServiceBase<ISimpleTest>, ISimpleTest
@@ -44,6 +47,27 @@ namespace MagicOnion.Tests
             });
 
             return streaming.Result("finished:" + string.Join(", ", list));
+        }
+
+        public DuplexStreamingResult<int, string> DuplexStreaming1()
+        {
+            var stream = GetDuplexStreamingContext<int, string>();
+            return stream.Result();
+        }
+
+        public async Task<DuplexStreamingResult<int, string>> DuplexStreaming1Task()
+        {
+            var stream = GetDuplexStreamingContext<int, string>();
+
+            var l = new List<int>();
+
+            while (await stream.MoveNext())
+            {
+                l.Add(stream.Current);
+                await stream.WriteAsync(string.Join(", ", l));
+            }
+
+            return stream.Result();
         }
 
         public ServerStreamingResult<string> Serverstreaming1(int x, int y, int z)
@@ -147,6 +171,34 @@ namespace MagicOnion.Tests
             }
             {
                 var r = client.Serverstreaming1(100, 200, 3);
+                (await r.ResponseStream.MoveNext()).IsFalse();
+            }
+        }
+
+        [Fact]
+        public async Task DuplexStreaming()
+        {
+            var client = MagicOnionClient.Create<ISimpleTest>(channel);
+            {
+                var r = await client.DuplexStreaming1Task();
+
+                await r.RequestStream.WriteAsync(1000);
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("1000");
+
+                await r.RequestStream.WriteAsync(2000);
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("1000, 2000");
+
+                await r.RequestStream.WriteAsync(3000);
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("1000, 2000, 3000");
+
+                await r.RequestStream.CompleteAsync();
+                (await r.ResponseStream.MoveNext()).IsFalse();
+            }
+            {
+                var r = client.DuplexStreaming1();
                 (await r.ResponseStream.MoveNext()).IsFalse();
             }
         }

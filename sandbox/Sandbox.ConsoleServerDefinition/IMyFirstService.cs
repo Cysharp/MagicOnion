@@ -15,5 +15,7 @@ namespace Sandbox.ConsoleServer
         Task<ClientStreamingResult<int, string>> StreamingOne();
         Task<ServerStreamingResult<string>> StreamingTwo(int x, int y, int z);
         ServerStreamingResult<string> StreamingTwo2(int x, int y, int z);
+
+        Task<DuplexStreamingResult<int, string>> StreamingThree();
     }
 }
