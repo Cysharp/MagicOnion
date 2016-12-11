@@ -7,7 +7,7 @@ namespace MagicOnion.Tests
 {
     public class ServerFixture : IDisposable
     {
-        Grpc.Core.Server server;
+        public Grpc.Core.Server server; // public!
         public ServerPort ServerPort { get; private set; }
 
         public ServerFixture()

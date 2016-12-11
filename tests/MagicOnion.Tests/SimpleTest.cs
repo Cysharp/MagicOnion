@@ -107,10 +107,12 @@ namespace MagicOnion.Tests
     public class SimpleTest : IClassFixture<ServerFixture>, IDisposable
     {
         Channel channel;
+        Grpc.Core.Server server;
 
         public SimpleTest(ServerFixture server)
         {
-            channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
+            this.server = server.server;
+            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
         }
 
         public void Dispose()
@@ -146,11 +148,6 @@ namespace MagicOnion.Tests
             }
             {
                 var r = client.ClientStreaming1();
-                await r.RequestStream.WriteAsync(10);
-                await r.RequestStream.WriteAsync(20);
-                await r.RequestStream.WriteAsync(30);
-                await r.RequestStream.CompleteAsync();
-
                 var result = await r.ResponseAsync;
                 result.Is("finished:");
             }
