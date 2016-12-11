@@ -10,16 +10,19 @@ using Xunit;
 
 namespace MagicOnion.Tests
 {
-    public interface IUnaryTest : IService<IUnaryTest>
+    public interface ISimpleTest : IService<ISimpleTest>
     {
         UnaryResult<int> Unary1(int x, int y);
         Task<UnaryResult<int>> Unary1Task(int x, int y);
 
         ClientStreamingResult<int, string> ClientStreaming1();
         Task<ClientStreamingResult<int, string>> ClientStreaming1Task();
+
+        ServerStreamingResult<string> Serverstreaming1(int x, int y, int z);
+        Task<ServerStreamingResult<string>> ServerStreaming1Task(int x, int y, int z);
     }
 
-    public class UnaryTestImpl : ServiceBase<IUnaryTest>, IUnaryTest
+    public class UnaryTestImpl : ServiceBase<ISimpleTest>, ISimpleTest
     {
         public ClientStreamingResult<int, string> ClientStreaming1()
         {
@@ -41,6 +44,28 @@ namespace MagicOnion.Tests
             });
 
             return streaming.Result("finished:" + string.Join(", ", list));
+        }
+
+        public ServerStreamingResult<string> Serverstreaming1(int x, int y, int z)
+        {
+            var stream = GetServerStreamingContext<string>();
+
+            // no write?
+            return stream.Result();
+        }
+
+        public async Task<ServerStreamingResult<string>> ServerStreaming1Task(int x, int y, int z)
+        {
+            var stream = GetServerStreamingContext<string>();
+
+            var acc = 0;
+            for (int i = 0; i < z; i++)
+            {
+                acc = acc + x + y;
+                await stream.WriteAsync(acc.ToString());
+            }
+
+            return stream.Result();
         }
 
         public UnaryResult<int> Unary1(int x, int y)
@@ -72,7 +97,7 @@ namespace MagicOnion.Tests
         [Fact]
         public async Task Unary()
         {
-            var client = MagicOnionClient.Create<IUnaryTest>(channel);
+            var client = MagicOnionClient.Create<ISimpleTest>(channel);
 
             var r = await client.Unary1(10, 20);
             r.Is(30);
@@ -84,7 +109,7 @@ namespace MagicOnion.Tests
         [Fact]
         public async Task ClientStreaming()
         {
-            var client = MagicOnionClient.Create<IUnaryTest>(channel);
+            var client = MagicOnionClient.Create<ISimpleTest>(channel);
             {
                 var r = await client.ClientStreaming1Task();
                 await r.RequestStream.WriteAsync(10);
@@ -104,6 +129,25 @@ namespace MagicOnion.Tests
 
                 var result = await r.ResponseAsync;
                 result.Is("finished:");
+            }
+        }
+
+        [Fact]
+        public async Task ServerStreaming()
+        {
+            var client = MagicOnionClient.Create<ISimpleTest>(channel);
+            {
+                var r = await client.ServerStreaming1Task(10, 20, 3);
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("30");
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("60");
+                await r.ResponseStream.MoveNext();
+                r.ResponseStream.Current.Is("90");
+            }
+            {
+                var r = client.Serverstreaming1(100, 200, 3);
+                (await r.ResponseStream.MoveNext()).IsFalse();
             }
         }
     }

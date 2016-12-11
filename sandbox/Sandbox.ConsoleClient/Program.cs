@@ -21,6 +21,7 @@ namespace MagicOnion.ConsoleClient
 
             UnaryRun(c).GetAwaiter().GetResult();
             ClientStreamRun(c).GetAwaiter().GetResult();
+            ServerStreamRun(c).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)
@@ -60,6 +61,26 @@ namespace MagicOnion.ConsoleClient
                 Console.WriteLine(ex);
             }
         }
+
+        static async Task ServerStreamRun(IMyFirstService client)
+        {
+            try
+            {
+                var stream = await client.StreamingTwo(10, 20, 3);
+
+                await stream.ResponseStream.ForEachAsync(x =>
+                {
+                    Console.WriteLine("ServerStream Response:" + x);
+                });
+
+                var stream2 = client.StreamingTwo2(10, 20, 3);
+                await stream2.ResponseStream.ForEachAsync(x => { });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
     }
 
     public class ClientSimu : MagicOnionClientBase<IMyFirstService>, IMyFirstService
@@ -73,6 +94,21 @@ namespace MagicOnion.ConsoleClient
             var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(null, host, option);
             var result = new ClientStreamingResult<int, string>(callResult, null, null);
             return Task.FromResult(result);
+        }
+
+        public Task<ServerStreamingResult<string>> StreamingTwo(int x, int y, int z)
+        {
+            // throw new NotImplementedException();
+            byte[] request = null; // marshalling
+
+            var callResult = callInvoker.AsyncServerStreamingCall<byte[], byte[]>(null, host, option, request);
+            var result = new ServerStreamingResult<string>(callResult, null); // response marshaller
+            return Task.FromResult(result);
+        }
+
+        public ServerStreamingResult<string> StreamingTwo2(int x, int y, int z)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<UnaryResult<string>> SumAsync(int x, int y)

@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncStreamReaderExtensions.cs" />
     <Compile Include="ClientStreamingResult.cs" />
     <Compile Include="Client\DynamicClientBuilder.cs" />
     <Compile Include="Client\MagicOnionClient.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="MagicOnionMarshallers.cs" />
     <Compile Include="Nil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionOptions.cs" />
     <Compile Include="Server\MethodHandler.cs" />

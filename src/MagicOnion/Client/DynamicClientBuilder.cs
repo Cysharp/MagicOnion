@@ -124,7 +124,7 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Newobj, bytesMethod.GetConstructors()[0]);
                 il.Emit(OpCodes.Stsfld, def.FieldMethod);
 
-                if (def.MethodType == MethodType.Unary)
+                if (def.MethodType == MethodType.Unary || def.MethodType == MethodType.ServerStreaming)
                 {
                     il.Emit(OpCodes.Ldtoken, resolverType);
                     il.Emit(OpCodes.Call, getTypeFromHandle);
@@ -296,8 +296,16 @@ namespace MagicOnion.Client
                 switch (def.MethodType)
                 {
                     case MethodType.Unary:
+                    case MethodType.ServerStreaming:
                         il.DeclareLocal(typeof(byte[])); // request
-                        il.DeclareLocal(typeof(AsyncUnaryCall<byte[]>)); // callResult
+                        if (def.MethodType == MethodType.Unary)
+                        {
+                            il.DeclareLocal(typeof(AsyncUnaryCall<byte[]>)); // callResult
+                        }
+                        else
+                        {
+                            il.DeclareLocal(typeof(AsyncServerStreamingCall<byte[]>));
+                        }
 
                         il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
                         il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").GetGetMethod());
@@ -328,12 +336,26 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, optionField);
                         il.Emit(OpCodes.Ldloc_0);
-                        il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncUnaryCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        if (def.MethodType == MethodType.Unary)
+                        {
+                            il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncUnaryCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Callvirt, typeof(CallInvoker).GetMethod("AsyncServerStreamingCall").MakeGenericMethod(typeof(byte[]), typeof(byte[])));
+                        }
                         il.Emit(OpCodes.Stloc_1);
 
                         il.Emit(OpCodes.Ldloc_1);
                         il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
-                        il.Emit(OpCodes.Newobj, typeof(UnaryResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                        if (def.MethodType == MethodType.Unary)
+                        {
+                            il.Emit(OpCodes.Newobj, typeof(UnaryResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                        }
+                        else
+                        {
+                            il.Emit(OpCodes.Newobj, typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                        }
                         if (def.ResponseIsTask)
                         {
                             il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(UnaryResult<>).MakeGenericType(def.ResponseType)));
@@ -361,8 +383,6 @@ namespace MagicOnion.Client
                         {
                             il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType)));
                         }
-                        break;
-                    case MethodType.ServerStreaming:
                         break;
                     case MethodType.DuplexStreaming:
                         break;
@@ -406,6 +426,12 @@ namespace MagicOnion.Client
                 var genArgs = t.GetGenericArguments();
                 requestTypeIfExists = genArgs[0];
                 return genArgs[1];
+            }
+            else if (returnType == typeof(ServerStreamingResult<>))
+            {
+                methodType = MethodType.ServerStreaming;
+                requestTypeIfExists = null;
+                return t.GetGenericArguments()[0];
             }
             else
             {

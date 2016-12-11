@@ -27,7 +27,7 @@ namespace MagicOnion.Server
             this.Context = context;
         }
 
-        // Unary
+        // Helpers
 
         protected UnaryResult<TResponse> UnaryResult<TResponse>(TResponse result)
         {
@@ -43,18 +43,17 @@ namespace MagicOnion.Server
             return default(UnaryResult<TResponse>); // dummy
         }
 
-        // ClientStreaming
-
         protected ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>()
         {
             return new ClientStreamingContext<TRequest, TResponse>(Context);
         }
 
-        protected IAsyncStreamWriter<T> GetStreamWriter<T>()
+        protected ServerStreamingContext<TResponse> GetServerStreamingContext<TResponse>()
         {
-            return null;
+            return new ServerStreamingContext<TResponse>(Context);
         }
 
+        // Interface methods for Client
 
         TServiceInterface IService<TServiceInterface>.WithOption(CallOptions option)
         {
@@ -143,6 +142,44 @@ namespace MagicOnion.Server
             context.Result = bytes;
 
             return default(ClientStreamingResult<TRequest, TResponse>); // dummy
+        }
+    }
+
+    public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
+    {
+        readonly ServiceContext context;
+        readonly IAsyncStreamWriter<byte[]> inner;
+        readonly Marshaller<TResponse> marshaller;
+
+        public ServerStreamingContext(ServiceContext context)
+        {
+            this.context = context;
+            this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
+            this.inner = context.ResponseStream;
+        }
+
+        public WriteOptions WriteOptions
+        {
+            get
+            {
+                return inner.WriteOptions;
+            }
+
+            set
+            {
+                inner.WriteOptions = value;
+            }
+        }
+
+        public Task WriteAsync(TResponse message)
+        {
+            var bytes = marshaller.Serializer(message);
+            return inner.WriteAsync(bytes);
+        }
+
+        public ServerStreamingResult<TResponse> Result()
+        {
+            return default(ServerStreamingResult<TResponse>); // dummy
         }
     }
 }

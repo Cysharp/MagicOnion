@@ -27,15 +27,40 @@ namespace Sandbox.ConsoleServer.Services
 
         public async Task<ClientStreamingResult<int, string>> StreamingOne()
         {
+            Logger.Debug($"Called StreamingOne");
+
             var stream = GetClientStreamingContext<int, string>();
 
             await stream.ForEachAsync(x =>
             {
-                Console.WriteLine("Client Stream Received:" + x);
-
+                Logger.Debug("Client Stream Received:" + x);
             });
 
             return stream.Result("finished");
+        }
+
+        public async Task<ServerStreamingResult<string>> StreamingTwo(int x, int y, int z)
+        {
+            Logger.Debug($"Called StreamingTwo - x:{x} y:{y} z:{z}");
+
+            var stream = GetServerStreamingContext<string>();
+
+            var acc = 0;
+            for (int i = 0; i < z; i++)
+            {
+                acc = acc + x + y;
+                await stream.WriteAsync(acc.ToString());
+            }
+
+            return stream.Result();
+        }
+
+        public ServerStreamingResult<string> StreamingTwo2(int x, int y, int z)
+        {
+            Logger.Debug($"Called StreamingTwo2 - x:{x} y:{y} z:{z}");
+
+            var stream = GetServerStreamingContext<string>();
+            return stream.Result();
         }
     }
 }

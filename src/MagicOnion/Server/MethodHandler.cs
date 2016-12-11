@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
@@ -88,7 +89,8 @@ namespace MagicOnion.Server
             switch (MethodType)
             {
                 case MethodType.Unary:
-                    // (TRequest request, ServiceContext context) => new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                case MethodType.ServerStreaming:
+                    // (ServiceContext context, TRequest request) => new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     {
                         var requestArg = Expression.Parameter(requestType, "request");
 
@@ -106,7 +108,7 @@ namespace MagicOnion.Server
                         }
 
                         var body = Expression.Call(instance, methodInfo, arguments);
-                        this.methodBody = Expression.Lambda(body, requestArg, contextArg).Compile();
+                        this.methodBody = Expression.Lambda(body, contextArg, requestArg).Compile();
                     }
                     break;
                 case MethodType.ClientStreaming:
@@ -115,8 +117,6 @@ namespace MagicOnion.Server
                         var body = Expression.Call(instance, methodInfo);
                         this.methodBody = Expression.Lambda(body, contextArg).Compile();
                     }
-                    break;
-                case MethodType.ServerStreaming:
                     break;
                 case MethodType.DuplexStreaming:
                     break;
@@ -155,6 +155,12 @@ namespace MagicOnion.Server
                 var genArgs = t.GetGenericArguments();
                 requestTypeIfExists = genArgs[0];
                 return genArgs[1];
+            }
+            else if (returnType == typeof(ServerStreamingResult<>))
+            {
+                methodType = MethodType.ServerStreaming;
+                requestTypeIfExists = null;
+                return t.GetGenericArguments()[0];
             }
             else
             {
@@ -205,9 +211,15 @@ namespace MagicOnion.Server
                         builder.AddMethod(method, handler);
                     }
                     break;
-                //case MethodType.ServerStreaming:
-                //    builder.AddMethod(method, ServerStreamingServerMethod);
-                //    break;
+                case MethodType.ServerStreaming:
+                    {
+                        var genericMethod = this.GetType()
+                            .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
+                            .MakeGenericMethod(requestType, unwrapResponseType);
+                        var handler = (ServerStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        builder.AddMethod(method, handler);
+                    }
+                    break;
                 //case MethodType.DuplexStreaming:
                 //    builder.AddMethod(method, DuplexStreamingServerMethod);
                 //    break;
@@ -231,13 +243,13 @@ namespace MagicOnion.Server
 
             if (responseIsTask)
             {
-                var body = (Func<TRequest, ServiceContext, Task<UnaryResult<TResponse>>>)this.methodBody;
-                await body(args, serviceContext).ConfigureAwait(false);
+                var body = (Func<ServiceContext, TRequest, Task<UnaryResult<TResponse>>>)this.methodBody;
+                await body(serviceContext, args).ConfigureAwait(false);
             }
             else
             {
-                var body = (Func<TRequest, ServiceContext, UnaryResult<TResponse>>)this.methodBody;
-                body(args, serviceContext);
+                var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
+                body(serviceContext, args);
             }
 
             return serviceContext.Result;
@@ -269,12 +281,31 @@ namespace MagicOnion.Server
             }
         }
 
-        //Task ServerStreamingServerMethod<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
-        //{
-        //    var serviceContext = new ServiceContext(MethodType.ServerStreaming, context);
-        //    var body = (Func<TRequest, IServerStreamWriter<TResponse>, ServiceContext, Task<TResponse>>)this.methodBody;
-        //    return body(request, responseStream, serviceContext);
-        //}
+        async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
+        {
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller,
+                ResponseStream = responseStream
+            };
+
+            var deserializer = (Marshaller<TRequest>)requestMarshaller;
+            var args = deserializer.Deserializer(request);
+
+            if (responseIsTask)
+            {
+                var body = (Func<ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
+                await body(serviceContext, args).ConfigureAwait(false);
+            }
+            else
+            {
+                var body = (Func<ServiceContext, TRequest, ServerStreamingResult<TResponse>>)this.methodBody;
+                body(serviceContext, args);
+            }
+
+            return serviceContext.Result;
+        }
 
         //Task DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
         //{

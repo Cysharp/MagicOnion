@@ -36,6 +36,7 @@ namespace MagicOnion.Server
         internal object RequestMarshaller { get; set; }
         internal object ResponseMarshaller { get; set; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
+        internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }
 
         public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context)

@@ -11,7 +11,7 @@ using ZeroFormatter.Internal;
 
 namespace MagicOnion
 {
-    internal class MarshallingAsyncStreamReader<TRequest, TResponse> : IAsyncStreamReader<TRequest>
+    internal class MarshallingAsyncStreamReader<TRequest> : IAsyncStreamReader<TRequest>
     {
         readonly IAsyncStreamReader<byte[]> inner;
         readonly Marshaller<TRequest> marshaller;
@@ -40,6 +40,37 @@ namespace MagicOnion
         public void Dispose()
         {
             inner.Dispose();
+        }
+    }
+
+    internal class MarshallingAsyncStreamWriter<T> : IAsyncStreamWriter<T>
+    {
+        readonly IAsyncStreamWriter<byte[]> inner;
+        readonly Marshaller<T> marshaller;
+
+        public MarshallingAsyncStreamWriter(IAsyncStreamWriter<byte[]> inner, Marshaller<T> marshaller)
+        {
+            this.inner = inner;
+            this.marshaller = marshaller;
+        }
+
+        public WriteOptions WriteOptions
+        {
+            get
+            {
+                return inner.WriteOptions;
+            }
+
+            set
+            {
+                inner.WriteOptions = value;
+            }
+        }
+
+        public Task WriteAsync(T message)
+        {
+            var bytes = marshaller.Serializer(message);
+            return inner.WriteAsync(bytes);
         }
     }
 
@@ -73,7 +104,6 @@ namespace MagicOnion
             return inner.WriteAsync(bytes);
         }
     }
-
 
     internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
