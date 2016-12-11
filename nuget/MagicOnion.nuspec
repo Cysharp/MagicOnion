@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>MagicOnion</id>
+        <version>0.1.0-alpha</version>
+        <title>MagicOnion</title>
+        <authors>neuecc</authors>
+        <owners>y.neuecc</owners>
+        <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>gRPC based HTTP2 RPC Streaming Framework for .NET, .NET Core and Unity.</description>
+        <releaseNotes>Initial alpha release.</releaseNotes>
+        <tags>gRPC, HTTP2</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.5" />
+        </frameworkAssemblies>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="Grpc" version="1.0.1" />
+                <dependency id="ZeroFormatter" version="1.5.5" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\src\MagicOnion\bin\Release\MagicOnion.dll" target="lib\net45" />
+        <file src="..\src\MagicOnion\bin\Release\MagicOnion.xml" target="lib\net45" />
+    </files>
+</package>

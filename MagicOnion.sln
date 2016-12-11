@@ -21,6 +21,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "sandbox\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleServerDefinition", "sandbox\Sandbox.ConsoleServerDefinition\Sandbox.ConsoleServerDefinition.csproj", "{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{7F61607D-5772-4E41-9D37-04E6AE7E47BA}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\MagicOnion.nuspec = nuget\MagicOnion.nuspec
+		nuget\pack.bat = nuget\pack.bat
+		nuget\push.bat = nuget\push.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
