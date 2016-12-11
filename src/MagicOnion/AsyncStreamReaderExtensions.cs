@@ -30,5 +30,25 @@ namespace MagicOnion
                 }
             }
         }
+
+        public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IAsyncStreamReader<T> stream)
+        {
+            return new EnumerableAsyncStreamReader<T>(stream);
+        }
+
+        class EnumerableAsyncStreamReader<T> : IAsyncEnumerable<T>
+        {
+            readonly IAsyncStreamReader<T> stream;
+
+            public EnumerableAsyncStreamReader(IAsyncStreamReader<T> stream)
+            {
+                this.stream = stream;
+            }
+
+            public IAsyncEnumerator<T> GetEnumerator()
+            {
+                return this.stream;
+            }
+        }
     }
 }

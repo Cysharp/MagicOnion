@@ -159,6 +159,7 @@ namespace MagicOnion
             .ToArray();
 
         public static readonly Marshaller<byte[]> ByteArrayMarshaller = Marshallers.Create<byte[]>(x => x, x => x);
+        public static readonly byte[] EmptyBytes = new byte[0];
 
         public static Marshaller<T> CreateZeroFormatterMarshaller<TTypeResolver, T>(Formatter<TTypeResolver, T> formatter)
             where TTypeResolver : ITypeResolver, new()

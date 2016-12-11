@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server
@@ -13,15 +12,12 @@ namespace MagicOnion.Server
     {
         public static ServerServiceDefinition BuildServerServiceDefinition()
         {
-            return BuildServerServiceDefinition(new MagicOnionOptions());
+            return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), new MagicOnionOptions());
         }
 
-        public static ServerServiceDefinition BuildServerServiceDefinition(MagicOnionOptions option)
+        public static ServerServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
         {
-            var builder = ServerServiceDefinition.CreateBuilder();
-
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var types = assemblies
+            var types = searchAssemblies
               .SelectMany(x =>
               {
                   try
@@ -32,11 +28,20 @@ namespace MagicOnion.Server
                   {
                       return ex.Types.Where(t => t != null);
                   }
-              })
-              .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
-              .Where(x => !x.IsAbstract);
+              });
+            return BuildServerServiceDefinition(types, option);
+        }
 
-            // TODO:Parallel is 1 on Debug...
+        public static ServerServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
+        {
+            var builder = ServerServiceDefinition.CreateBuilder();
+
+            var types = targetTypes
+              .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
+              .Where(x => !x.IsAbstract)
+              .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
+              .ToArray();
+
             Parallel.ForEach(types, new ParallelOptions { MaxDegreeOfParallelism = 1 }, classType =>
             {
                 var className = classType.Name;
@@ -45,15 +50,10 @@ namespace MagicOnion.Server
                     throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
                 }
 
-                // TODO:Ignore
-                // if (classType.GetCustomAttribute<IgnoreOperationAttribute>(true) != null) return; // ignore
-
                 foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
                 {
-                    if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue; // as property
-
-                    // TODO:Ignore
-                    // if (methodInfo.GetCustomAttribute<IgnoreOperationAttribute>(true) != null) continue; // ignore
+                    if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
+                    if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
 
                     var methodName = methodInfo.Name;
 

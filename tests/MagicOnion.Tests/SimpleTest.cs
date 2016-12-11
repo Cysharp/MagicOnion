@@ -107,11 +107,9 @@ namespace MagicOnion.Tests
     public class SimpleTest : IClassFixture<ServerFixture>, IDisposable
     {
         Channel channel;
-        Grpc.Core.Server server;
 
         public SimpleTest(ServerFixture server)
         {
-            this.server = server.server;
             this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
         }
 

@@ -31,6 +31,7 @@ namespace MagicOnion.Client
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
         static readonly FieldInfo byteArrayMarshaller = typeof(MagicOnionMarshallers).GetField("ByteArrayMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
         static readonly MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly FieldInfo emptyBytes = typeof(MagicOnionMarshallers).GetField("EmptyBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static DynamicClientBuilder()
         {
@@ -315,11 +316,12 @@ namespace MagicOnion.Client
                         }
                         if (parameters.Length == 0)
                         {
-                            // TODO:...
+                            // use empty byte[0]
+                            il.Emit(OpCodes.Ldsfld, emptyBytes);
                         }
                         else if (parameters.Length == 1)
                         {
-                            // TODO:...
+                            // already loaded parameter.
                         }
                         else
                         {
@@ -407,7 +409,7 @@ namespace MagicOnion.Client
                         }
                         break;
                     default:
-                        throw new InvalidOperationException("Not supported method type:" + def.MethodType); 
+                        throw new InvalidOperationException("Not supported method type:" + def.MethodType);
                 }
 
                 il.Emit(OpCodes.Ret);
