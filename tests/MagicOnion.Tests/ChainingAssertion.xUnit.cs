@@ -322,14 +322,14 @@ namespace Xunit
             }
         }
 
-        private class ReflectAccessor<T>
+        private class ReflectAccessor
         {
             public Func<object> GetValue { get; private set; }
             public Action<object> SetValue { get; private set; }
 
-            public ReflectAccessor(T target, string name)
+            public ReflectAccessor(Type t, object target, string name)
             {
-                var field = typeof(T).GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var field = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (field != null)
                 {
                     GetValue = () => field.GetValue(target);
@@ -337,7 +337,7 @@ namespace Xunit
                     return;
                 }
 
-                var prop = typeof(T).GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var prop = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (prop != null)
                 {
                     GetValue = () => prop.GetValue(target, null);
@@ -345,7 +345,7 @@ namespace Xunit
                     return;
                 }
 
-                throw new ArgumentException(string.Format("\"{0}\" not found : Type <{1}>", name, typeof(T).Name));
+                throw new ArgumentException(string.Format("\"{0}\" not found : Type <{1}>", name, t.Name));
             }
         }
 
@@ -500,51 +500,54 @@ namespace Xunit
         #region DynamicAccessor
 
         /// <summary>to DynamicAccessor that can call private method/field/property/indexer.</summary>
-        public static dynamic AsDynamic<T>(this T target)
+        public static dynamic AsDynamic(this object target)
         {
-            return new DynamicAccessor<T>(target);
+            if (target == null) return null;
+            return new DynamicAccessor(target);
         }
 
-        private class DynamicAccessor<T> : DynamicObject
+        private class DynamicAccessor : DynamicObject
         {
-            private readonly T target;
+            private readonly object target;
+            private readonly Type targetType;
             private static readonly BindingFlags TransparentFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-            public DynamicAccessor(T target)
+            public DynamicAccessor(object target)
             {
                 this.target = target;
+                this.targetType = target.GetType();
             }
 
             public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object value)
             {
                 try
                 {
-                    typeof(T).InvokeMember("Item", TransparentFlags | BindingFlags.SetProperty, null, target, indexes.Concat(new[] { value }).ToArray());
+                    targetType.InvokeMember("Item", TransparentFlags | BindingFlags.SetProperty, null, target, indexes.Concat(new[] { value }).ToArray());
                     return true;
                 }
-                catch (MissingMethodException) { throw new ArgumentException(string.Format("indexer not found : Type <{0}>", typeof(T).Name)); };
+                catch (MissingMethodException) { throw new ArgumentException(string.Format("indexer not found : Type <{0}>", targetType.Name)); };
             }
 
             public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
             {
                 try
                 {
-                    result = typeof(T).InvokeMember("Item", TransparentFlags | BindingFlags.GetProperty, null, target, indexes);
+                    result = targetType.InvokeMember("Item", TransparentFlags | BindingFlags.GetProperty, null, target, indexes);
                     return true;
                 }
-                catch (MissingMethodException) { throw new ArgumentException(string.Format("indexer not found : Type <{0}>", typeof(T).Name)); };
+                catch (MissingMethodException) { throw new ArgumentException(string.Format("indexer not found : Type <{0}>", targetType.Name)); };
             }
 
             public override bool TrySetMember(SetMemberBinder binder, object value)
             {
-                var accessor = new ReflectAccessor<T>(target, binder.Name);
+                var accessor = new ReflectAccessor(targetType, target, binder.Name);
                 accessor.SetValue(value);
                 return true;
             }
 
             public override bool TryGetMember(GetMemberBinder binder, out object result)
             {
-                var accessor = new ReflectAccessor<T>(target, binder.Name);
+                var accessor = new ReflectAccessor(targetType, target, binder.Name);
                 result = accessor.GetValue();
                 return true;
             }
@@ -580,10 +583,10 @@ namespace Xunit
             private MethodInfo MatchMethod(string methodName, object[] args, Type[] typeArgs, Type[] parameterTypes)
             {
                 // name match
-                var nameMatched = typeof(T).GetMethods(TransparentFlags)
+                var nameMatched = targetType.GetMethods(TransparentFlags)
                     .Where(mi => mi.Name == methodName)
                     .ToArray();
-                if (!nameMatched.Any()) throw new ArgumentException(string.Format("\"{0}\" not found : Type <{1}>", methodName, typeof(T).Name));
+                if (!nameMatched.Any()) throw new ArgumentException(string.Format("\"{0}\" not found : Type <{1}>", methodName, targetType.Name));
 
                 // type inference
                 var typedMethods = nameMatched
@@ -646,7 +649,7 @@ namespace Xunit
                     )
                     .ToArray();
 
-                if (!typedMethods.Any()) throw new ArgumentException(string.Format("\"{0}\" not match arguments : Type <{1}>", methodName, typeof(T).Name));
+                if (!typedMethods.Any()) throw new ArgumentException(string.Format("\"{0}\" not match arguments : Type <{1}>", methodName, targetType.Name));
 
                 // nongeneric
                 var nongeneric = typedMethods.Where(a => a.TypeParameters == null).ToArray();
@@ -665,7 +668,7 @@ namespace Xunit
                 if (generic != null) return generic.MethodInfo.MakeGenericMethod(generic.TypeParameters.Select(kvp => kvp.Value).ToArray());
 
                 // ambiguous
-                throw new ArgumentException(string.Format("\"{0}\" ambiguous arguments : Type <{1}>", methodName, typeof(T).Name));
+                throw new ArgumentException(string.Format("\"{0}\" ambiguous arguments : Type <{1}>", methodName, targetType.Name));
             }
 
             private class EqualsComparer<TX> : IEqualityComparer<TX>
@@ -711,7 +714,7 @@ namespace Xunit
             {
                 if (node.Expression == param && !Members.ContainsKey(node.Member.Name))
                 {
-                    var accessor = new ReflectAccessor<T>(target, node.Member.Name);
+                    var accessor = new ReflectAccessor(target.GetType(), target, node.Member.Name);
                     Members.Add(node.Member.Name, accessor.GetValue());
                 }
 

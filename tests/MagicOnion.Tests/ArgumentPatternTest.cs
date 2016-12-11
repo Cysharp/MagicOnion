@@ -363,7 +363,7 @@ namespace MagicOnion.Tests
                 throw new NotImplementedException();
             }
 
-            public IArgumentPattern WithOption(CallOptions option)
+            public IArgumentPattern WithOptions(CallOptions option)
             {
                 throw new NotImplementedException();
             }

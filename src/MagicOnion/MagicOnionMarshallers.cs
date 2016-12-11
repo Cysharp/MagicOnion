@@ -43,68 +43,6 @@ namespace MagicOnion
         }
     }
 
-    internal class MarshallingAsyncStreamWriter<T> : IAsyncStreamWriter<T>
-    {
-        readonly IAsyncStreamWriter<byte[]> inner;
-        readonly Marshaller<T> marshaller;
-
-        public MarshallingAsyncStreamWriter(IAsyncStreamWriter<byte[]> inner, Marshaller<T> marshaller)
-        {
-            this.inner = inner;
-            this.marshaller = marshaller;
-        }
-
-        public WriteOptions WriteOptions
-        {
-            get
-            {
-                return inner.WriteOptions;
-            }
-
-            set
-            {
-                inner.WriteOptions = value;
-            }
-        }
-
-        public Task WriteAsync(T message)
-        {
-            var bytes = marshaller.Serializer(message);
-            return inner.WriteAsync(bytes);
-        }
-    }
-
-    internal class MarshallingServerStreamWriter<TResponse> : IServerStreamWriter<TResponse>
-    {
-        readonly IServerStreamWriter<byte[]> inner;
-        readonly Marshaller<TResponse> marshaller;
-
-        public MarshallingServerStreamWriter(IServerStreamWriter<byte[]> inner, Marshaller<TResponse> marshaller)
-        {
-            this.inner = inner;
-            this.marshaller = marshaller;
-        }
-
-        public WriteOptions WriteOptions
-        {
-            get
-            {
-                return inner.WriteOptions;
-            }
-
-            set
-            {
-                inner.WriteOptions = value;
-            }
-        }
-
-        public Task WriteAsync(TResponse message)
-        {
-            var bytes = marshaller.Serializer(message);
-            return inner.WriteAsync(bytes);
-        }
-    }
-
     internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<byte[]> inner;

@@ -25,17 +25,17 @@ namespace MagicOnion.Client
 
         public T WithCancellationToken(CancellationToken cancellationToken)
         {
-            return WithOption(this.option.WithCancellationToken(cancellationToken));
+            return WithOptions(this.option.WithCancellationToken(cancellationToken));
         }
 
         public T WithDeadline(DateTime deadline)
         {
-            return WithOption(this.option.WithDeadline(deadline));
+            return WithOptions(this.option.WithDeadline(deadline));
         }
 
         public T WithHeaders(Metadata headers)
         {
-            return WithOption(this.option.WithHeaders(headers));
+            return WithOptions(this.option.WithHeaders(headers));
         }
 
         public T WithHost(string host)
@@ -45,7 +45,7 @@ namespace MagicOnion.Client
             return (T)(object)newInstance;
         }
 
-        public T WithOption(CallOptions option)
+        public T WithOptions(CallOptions option)
         {
             var newInstance = Clone();
             newInstance.option = option;

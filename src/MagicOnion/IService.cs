@@ -12,7 +12,7 @@ namespace MagicOnion
 
     public interface IService<TSelf> : __IServiceMarker
     {
-        TSelf WithOption(CallOptions option);
+        TSelf WithOptions(CallOptions option);
         TSelf WithHeaders(Metadata headers);
         TSelf WithDeadline(DateTime deadline);
         TSelf WithCancellationToken(CancellationToken cancellationToken);

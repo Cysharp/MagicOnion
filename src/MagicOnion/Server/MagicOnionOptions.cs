@@ -9,17 +9,24 @@ namespace MagicOnion.Server
 {
     public class MagicOnionOptions
     {
-        public Type ZeroFormatterTypeResolverType { get; private set; }
+        /// <summary>
+        /// ZeroFormatter resolver. Default is DefaultResolver.
+        /// </summary>
+        public Type ZeroFormatterTypeResolverType { get; set; }
 
-        public MagicOnionOptions()
-            : this(typeof(ZeroFormatter.Formatters.DefaultResolver))
+        /// <summary>
+        /// If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false.
+        /// </summary>
+        public bool IsReturnExceptionStackTraceInErrorDetail { get; set; }
+
+        /// <summary>
+        /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
+        /// </summary>
+        /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
+        public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
-
-        }
-
-        public MagicOnionOptions(Type zeroFormatterTypeResolverType)
-        {
-            this.ZeroFormatterTypeResolverType = zeroFormatterTypeResolverType;
+            this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
+            this.ZeroFormatterTypeResolverType = typeof(ZeroFormatter.Formatters.DefaultResolver);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MagicOnion.Tests
 
         public ServerFixture()
         {
-            var service = MagicOnionEngine.BuildServerServiceDefinition();
+            var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
 
             var port = new Random().Next(10000, 60000);
             var serverPort = new ServerPort("localhost", port, ServerCredentials.Insecure);

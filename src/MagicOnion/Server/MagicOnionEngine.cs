@@ -10,9 +10,14 @@ namespace MagicOnion.Server
 {
     public static class MagicOnionEngine
     {
-        public static ServerServiceDefinition BuildServerServiceDefinition()
+        /// <summary>
+        /// Search MagicOnion service from all assemblies.
+        /// </summary>
+        /// <param name="isReturnExceptionStackTraceInErrorDetail">If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</param>
+        /// <returns></returns>
+        public static ServerServiceDefinition BuildServerServiceDefinition(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
-            return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), new MagicOnionOptions());
+            return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
         }
 
         public static ServerServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
@@ -62,7 +67,7 @@ namespace MagicOnion.Server
                      || methodName == "GetHashCode"
                      || methodName == "GetType"
                      || methodName == "ToString"
-                     || methodName == "WithOption"
+                     || methodName == "WithOptions"
                      || methodName == "WithHeaders"
                      || methodName == "WithDeadline"
                      || methodName == "WithCancellationToken"

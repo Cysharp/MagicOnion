@@ -21,6 +21,8 @@ namespace MagicOnion.Server
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 
+        static readonly byte[] emptyBytes = new byte[0];
+
         public string ServiceName { get; private set; }
         public Type ServiceType { get; private set; }
         public MethodInfo MethodInfo { get; private set; }
@@ -30,6 +32,12 @@ namespace MagicOnion.Server
 
         // TODO:filter
         // readonly LightNodeFilterAttribute[] filters;
+
+        // options
+
+        readonly bool isReturnExceptionStackTraceInErrorDetail;
+
+        // use for request handling.
 
         readonly Type requestType;
         readonly Type unwrapResponseType;
@@ -65,6 +73,9 @@ namespace MagicOnion.Server
                 .Concat(methodInfo.GetCustomAttributes(true))
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
+
+            // options
+            this.isReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
 
             // TODO:filters
             //this.filters = options.Filters
@@ -235,105 +246,165 @@ namespace MagicOnion.Server
 
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.Unary, context)
+            try
             {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller
-            };
+                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.Unary, context)
+                {
+                    RequestMarshaller = requestMarshaller,
+                    ResponseMarshaller = responseMarshaller
+                };
 
-            var deserializer = (Marshaller<TRequest>)requestMarshaller;
-            var args = deserializer.Deserializer(request);
+                var deserializer = (Marshaller<TRequest>)requestMarshaller;
+                var args = deserializer.Deserializer(request);
 
-            if (responseIsTask)
-            {
-                var body = (Func<ServiceContext, TRequest, Task<UnaryResult<TResponse>>>)this.methodBody;
-                await body(serviceContext, args).ConfigureAwait(false);
+                if (responseIsTask)
+                {
+                    var body = (Func<ServiceContext, TRequest, Task<UnaryResult<TResponse>>>)this.methodBody;
+                    await body(serviceContext, args).ConfigureAwait(false);
+                }
+                else
+                {
+                    var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
+                    body(serviceContext, args);
+                }
+
+                return serviceContext.Result;
             }
-            else
+            catch (Exception ex)
             {
-                var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
-                body(serviceContext, args);
+                if (isReturnExceptionStackTraceInErrorDetail)
+                {
+                    context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    return emptyBytes;
+                }
+                else
+                {
+                    throw;
+                }
             }
-
-            return serviceContext.Result;
         }
 
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
-            using (requestStream)
+            try
             {
-                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                using (requestStream)
                 {
-                    RequestMarshaller = requestMarshaller,
-                    ResponseMarshaller = responseMarshaller,
-                    RequestStream = requestStream
-                };
+                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                    {
+                        RequestMarshaller = requestMarshaller,
+                        ResponseMarshaller = responseMarshaller,
+                        RequestStream = requestStream
+                    };
 
-                if (responseIsTask)
+                    if (responseIsTask)
+                    {
+                        var body = (Func<ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>>)this.methodBody;
+                        await body(serviceContext).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        var body = (Func<ServiceContext, ClientStreamingResult<TRequest, TResponse>>)this.methodBody;
+                        body(serviceContext);
+                    }
+
+                    return serviceContext.Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (isReturnExceptionStackTraceInErrorDetail)
                 {
-                    var body = (Func<ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>>)this.methodBody;
-                    await body(serviceContext).ConfigureAwait(false);
+                    context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    return emptyBytes;
                 }
                 else
                 {
-                    var body = (Func<ServiceContext, ClientStreamingResult<TRequest, TResponse>>)this.methodBody;
-                    body(serviceContext);
+                    throw;
                 }
-
-                return serviceContext.Result;
             }
         }
 
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
-            {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller,
-                ResponseStream = responseStream
-            };
-
-            var deserializer = (Marshaller<TRequest>)requestMarshaller;
-            var args = deserializer.Deserializer(request);
-
-            if (responseIsTask)
-            {
-                var body = (Func<ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
-                await body(serviceContext, args).ConfigureAwait(false);
-            }
-            else
-            {
-                var body = (Func<ServiceContext, TRequest, ServerStreamingResult<TResponse>>)this.methodBody;
-                body(serviceContext, args);
-            }
-
-            return serviceContext.Result;
-        }
-
-        async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
-        {
-            using (requestStream)
+            try
             {
                 var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
                 {
                     RequestMarshaller = requestMarshaller,
                     ResponseMarshaller = responseMarshaller,
-                    RequestStream = requestStream,
                     ResponseStream = responseStream
                 };
 
+                var deserializer = (Marshaller<TRequest>)requestMarshaller;
+                var args = deserializer.Deserializer(request);
+
                 if (responseIsTask)
                 {
-                    var body = (Func<ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>>)this.methodBody;
-                    await body(serviceContext).ConfigureAwait(false);
+                    var body = (Func<ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
+                    await body(serviceContext, args).ConfigureAwait(false);
                 }
                 else
                 {
-                    var body = (Func<ServiceContext, DuplexStreamingResult<TRequest, TResponse>>)this.methodBody;
-                    body(serviceContext);
+                    var body = (Func<ServiceContext, TRequest, ServerStreamingResult<TResponse>>)this.methodBody;
+                    body(serviceContext, args);
                 }
 
                 return serviceContext.Result;
+            }
+            catch (Exception ex)
+            {
+                if (isReturnExceptionStackTraceInErrorDetail)
+                {
+                    context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    return emptyBytes;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
+        {
+            try
+            {
+                using (requestStream)
+                {
+                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                    {
+                        RequestMarshaller = requestMarshaller,
+                        ResponseMarshaller = responseMarshaller,
+                        RequestStream = requestStream,
+                        ResponseStream = responseStream
+                    };
+
+                    if (responseIsTask)
+                    {
+                        var body = (Func<ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>>)this.methodBody;
+                        await body(serviceContext).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        var body = (Func<ServiceContext, DuplexStreamingResult<TRequest, TResponse>>)this.methodBody;
+                        body(serviceContext);
+                    }
+
+                    return serviceContext.Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (isReturnExceptionStackTraceInErrorDetail)
+                {
+                    context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    return emptyBytes;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 

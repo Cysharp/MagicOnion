@@ -66,7 +66,7 @@ namespace MagicOnion.Client
                      || methodName == "GetHashCode"
                      || methodName == "GetType"
                      || methodName == "ToString"
-                     || methodName == "WithOption"
+                     || methodName == "WithOptions"
                      || methodName == "WithHeaders"
                      || methodName == "WithDeadline"
                      || methodName == "WithCancellationToken"
@@ -203,9 +203,10 @@ namespace MagicOnion.Client
 
         static void DefineMethods(TypeBuilder typeBuilder, Type resolverType, Type interfaceType, MethodDefinition[] definitions, ConstructorInfo emptyCtor)
         {
-            var hostField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("host", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var optionField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("option", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var invokerField = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType).GetField("callInvoker", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var baseType = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType);
+            var hostField = baseType.GetField("host", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var optionField = baseType.GetField("option", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var invokerField = baseType.GetField("callInvoker", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             // Clone
             {
@@ -235,16 +236,17 @@ namespace MagicOnion.Client
             }
             // Overrides
             {
-                // TODO:Implement details.
-
                 // TSelf WithOption(CallOptions option)
                 {
-                    var method = typeBuilder.DefineMethod("WithOption", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    var method = typeBuilder.DefineMethod("WithOptions", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
                         interfaceType,
                         new[] { typeof(CallOptions) });
                     var il = method.GetILGenerator();
 
-                    il.EmitThrowNotimplemented();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, baseType.GetMethod("WithOptions", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+                    il.Emit(OpCodes.Ret);
                 }
                 // TSelf WithHeaders(Metadata headers);
                 {
@@ -253,7 +255,10 @@ namespace MagicOnion.Client
                         new[] { typeof(Metadata) });
                     var il = method.GetILGenerator();
 
-                    il.EmitThrowNotimplemented();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, baseType.GetMethod("WithHeaders", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+                    il.Emit(OpCodes.Ret);
                 }
                 // TSelf WithDeadline(DateTime deadline);
                 {
@@ -262,7 +267,10 @@ namespace MagicOnion.Client
                         new[] { typeof(DateTime) });
                     var il = method.GetILGenerator();
 
-                    il.EmitThrowNotimplemented();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, baseType.GetMethod("WithDeadline", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+                    il.Emit(OpCodes.Ret);
                 }
                 // TSelf WithCancellationToken(CancellationToken cancellationToken);
                 {
@@ -271,7 +279,10 @@ namespace MagicOnion.Client
                         new[] { typeof(CancellationToken) });
                     var il = method.GetILGenerator();
 
-                    il.EmitThrowNotimplemented();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, baseType.GetMethod("WithCancellationToken", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+                    il.Emit(OpCodes.Ret);
                 }
                 // TSelf WithHost(string host);
                 {
@@ -280,7 +291,10 @@ namespace MagicOnion.Client
                         new[] { typeof(string) });
                     var il = method.GetILGenerator();
 
-                    il.EmitThrowNotimplemented();
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, baseType.GetMethod("WithHost", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+                    il.Emit(OpCodes.Ret);
                 }
             }
             // Proxy Methods
