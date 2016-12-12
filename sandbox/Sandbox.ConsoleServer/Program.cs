@@ -11,9 +11,7 @@ namespace MagicOnion.ConsoleServer
         {
             Console.WriteLine("Server:::");
 
-            var ttt = typeof(Sandbox.ConsoleServer.Services.MyFirstService);
-            var interfaces = ttt.GetInterfaces();
-
+            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)

@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Grpc.Core.Logging;
 using MagicOnion.Client;
 using Sandbox.ConsoleServer;
 using System;
@@ -15,6 +16,9 @@ namespace MagicOnion.ConsoleClient
         {
             Console.WriteLine("Client:::");
 
+            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+            GrpcEnvironment.SetLogger(new ConsoleLogger());
+
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             channel.ConnectAsync().Wait();
             var c = MagicOnionClient.Create<IMyFirstService>(channel);
@@ -25,7 +29,7 @@ namespace MagicOnion.ConsoleClient
             DuplexStreamRun(c).GetAwaiter().GetResult();
 
             // many run
-            UnaryDoDoDoRun(c).GetAwaiter().GetResult();
+            // UnaryDoDoDoRun(c).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)
