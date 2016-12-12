@@ -23,6 +23,9 @@ namespace MagicOnion.ConsoleClient
             ClientStreamRun(c).GetAwaiter().GetResult();
             ServerStreamRun(c).GetAwaiter().GetResult();
             DuplexStreamRun(c).GetAwaiter().GetResult();
+
+            // many run
+            UnaryDoDoDoRun(c).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)
@@ -39,6 +42,19 @@ namespace MagicOnion.ConsoleClient
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        static async Task UnaryDoDoDoRun(IMyFirstService client)
+        {
+            List<Task> t = new List<Task>();
+            Parallel.For(0, 100, x =>
+            {
+                lock (t)
+                {
+                    t.Add(client.SumAsync(x, x).ContinueWith(y => y.Result.ResponseAsync).Unwrap());
+                }
+            });
+            await Task.WhenAll(t);
         }
 
         static async Task ClientStreamRun(IMyFirstService client)

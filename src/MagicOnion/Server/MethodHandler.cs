@@ -36,6 +36,7 @@ namespace MagicOnion.Server
         // options
 
         readonly bool isReturnExceptionStackTraceInErrorDetail;
+        readonly IMagicOnionLogger logger;
 
         // use for request handling.
 
@@ -76,6 +77,7 @@ namespace MagicOnion.Server
 
             // options
             this.isReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
+            this.logger = options.MagicOnionLogger;
 
             // TODO:filters
             //this.filters = options.Filters
@@ -246,9 +248,13 @@ namespace MagicOnion.Server
 
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var isErrorOrInterrupted = false;
             try
             {
-                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.Unary, context)
+                logger.BeginInvokeMethod(this.MethodType, context.Method);
+
+                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
                 {
                     RequestMarshaller = requestMarshaller,
                     ResponseMarshaller = responseMarshaller
@@ -272,14 +278,17 @@ namespace MagicOnion.Server
             }
             catch (ReturnStatusException ex)
             {
+                isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
                 return emptyBytes;
             }
             catch (Exception ex)
             {
+                isErrorOrInterrupted = true;
                 if (isReturnExceptionStackTraceInErrorDetail)
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    LogError(ex, context);
                     return emptyBytes;
                 }
                 else
@@ -287,15 +296,23 @@ namespace MagicOnion.Server
                     throw;
                 }
             }
+            finally
+            {
+                sw.Stop();
+                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+            }
         }
 
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var isErrorOrInterrupted = false;
             try
             {
+                logger.BeginInvokeMethod(this.MethodType, context.Method);
                 using (requestStream)
                 {
-                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
                     {
                         RequestMarshaller = requestMarshaller,
                         ResponseMarshaller = responseMarshaller,
@@ -318,14 +335,17 @@ namespace MagicOnion.Server
             }
             catch (ReturnStatusException ex)
             {
+                isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
                 return emptyBytes;
             }
             catch (Exception ex)
             {
+                isErrorOrInterrupted = true;
                 if (isReturnExceptionStackTraceInErrorDetail)
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    LogError(ex, context);
                     return emptyBytes;
                 }
                 else
@@ -333,13 +353,21 @@ namespace MagicOnion.Server
                     throw;
                 }
             }
+            finally
+            {
+                sw.Stop();
+                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+            }
         }
 
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var isErrorOrInterrupted = false;
             try
             {
-                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                logger.BeginInvokeMethod(this.MethodType, context.Method);
+                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
                 {
                     RequestMarshaller = requestMarshaller,
                     ResponseMarshaller = responseMarshaller,
@@ -364,14 +392,17 @@ namespace MagicOnion.Server
             }
             catch (ReturnStatusException ex)
             {
+                isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
                 return emptyBytes;
             }
             catch (Exception ex)
             {
+                isErrorOrInterrupted = true;
                 if (isReturnExceptionStackTraceInErrorDetail)
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    LogError(ex, context);
                     return emptyBytes;
                 }
                 else
@@ -379,15 +410,23 @@ namespace MagicOnion.Server
                     throw;
                 }
             }
+            finally
+            {
+                sw.Stop();
+                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+            }
         }
 
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var isErrorOrInterrupted = false;
             try
             {
+                logger.BeginInvokeMethod(this.MethodType, context.Method);
                 using (requestStream)
                 {
-                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, MethodType.ClientStreaming, context)
+                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
                     {
                         RequestMarshaller = requestMarshaller,
                         ResponseMarshaller = responseMarshaller,
@@ -411,14 +450,17 @@ namespace MagicOnion.Server
             }
             catch (ReturnStatusException ex)
             {
+                isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
                 return emptyBytes;
             }
             catch (Exception ex)
             {
+                isErrorOrInterrupted = true;
                 if (isReturnExceptionStackTraceInErrorDetail)
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    LogError(ex, context);
                     return emptyBytes;
                 }
                 else
@@ -426,6 +468,16 @@ namespace MagicOnion.Server
                     throw;
                 }
             }
+            finally
+            {
+                sw.Stop();
+                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+            }
+        }
+
+        static void LogError(Exception ex, ServerCallContext context)
+        {
+            GrpcEnvironment.Logger.Error(ex, "MagicOnionHandler throws exception occured in " + context.Method);
         }
 
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

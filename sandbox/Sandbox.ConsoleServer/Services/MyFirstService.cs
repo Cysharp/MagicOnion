@@ -13,7 +13,6 @@ namespace Sandbox.ConsoleServer.Services
         public async Task<UnaryResult<string>> SumAsync(int x, int y)
         {
             Logger.Debug($"Called SumAsync - x:{x} y:{y}");
-
             return UnaryResult((x + y).ToString());
 
         }

@@ -17,7 +17,15 @@ namespace MagicOnion.Server
         /// <returns></returns>
         public static ServerServiceDefinition BuildServerServiceDefinition(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
-            return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
+            return BuildServerServiceDefinition(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
+        }
+
+        /// <summary>
+        /// Search MagicOnion service from all assemblies.
+        /// </summary>
+        public static ServerServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+        {
+            return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), options);
         }
 
         public static ServerServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
@@ -47,7 +55,10 @@ namespace MagicOnion.Server
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .ToArray();
 
-            Parallel.ForEach(types, new ParallelOptions { MaxDegreeOfParallelism = 1 }, classType =>
+            option.MagicOnionLogger.BeginBuildServiceDefinition();
+            var sw = Stopwatch.StartNew();
+
+            Parallel.ForEach(types, classType =>
             {
                 var className = classType.Name;
                 if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
@@ -77,18 +88,17 @@ namespace MagicOnion.Server
                         continue;
                     }
 
-                    var sw = Stopwatch.StartNew();
-
                     // create handler
                     var handler = new MethodHandler(option, classType, methodInfo);
                     lock (builder)
                     {
                         handler.RegisterHandler(builder);
                     }
-
-                    sw.Stop();
                 }
             });
+
+            sw.Stop();
+            option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
             return builder.Build();
         }

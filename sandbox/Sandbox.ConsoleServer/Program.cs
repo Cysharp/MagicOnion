@@ -16,7 +16,10 @@ namespace MagicOnion.ConsoleServer
 
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
-            var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
+            var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
+            {
+                MagicOnionLogger = new MagicOnionLogToGrpcLogger()
+            });
 
             var server = new global::Grpc.Core.Server
             {
