@@ -22,14 +22,14 @@ using System;
 // implements T : IService<T>.
 public interface IMyFirstService : IService<IMyFirstService>
 {
-    UnaryResult<int> Sum(int x, int y);
+    UnaryResult<int> SumAsync(int x, int y);
 }
 
 // implement RPC service.
 // inehrit ServiceBase<interface>, interface
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
-    public UnaryResult<int> Sum(int x, int y)
+    public UnaryResult<int> SumAsync(int x, int y)
     {
         Logger.Debug($"Received:{x}, {y}");
 
