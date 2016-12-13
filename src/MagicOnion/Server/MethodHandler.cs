@@ -46,7 +46,7 @@ namespace MagicOnion.Server
         readonly object responseMarshaller;
         readonly bool responseIsTask;
 
-        readonly Delegate methodBody;
+        readonly Func<ServiceContext, Task> methodBody;
 
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
@@ -124,8 +124,15 @@ namespace MagicOnion.Server
                         }
 
                         var callBody = Expression.Call(instance, methodInfo, arguments);
+                        if (!responseIsTask)
+                        {
+                            callBody = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), callBody);
+                        }
+
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
-                        this.methodBody = Expression.Lambda(body, contextArg).Compile();
+                        var compiledBody = Expression.Lambda(body, contextArg).Compile();
+
+                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
                     }
                     break;
                 case MethodType.ClientStreaming:
@@ -133,7 +140,14 @@ namespace MagicOnion.Server
                     // (ServiceContext context) => new FooService() { Context = context }.Bar();
                     {
                         var body = Expression.Call(instance, methodInfo);
-                        this.methodBody = Expression.Lambda(body, contextArg).Compile();
+                        if (!responseIsTask)
+                        {
+                            body = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), body);
+                        }
+
+                        var compiledBody = Expression.Lambda(body, contextArg).Compile();
+
+                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
                     }
                     break;
                 default:
@@ -191,11 +205,10 @@ namespace MagicOnion.Server
             }
         }
 
-        // TODO:filter
-        Func<ServiceContext, Task> BuildMethodBodyWithFilter()
+        Func<ServiceContext, Task> BuildMethodBodyWithFilter(Func<ServiceContext, Task> methodBody)
         {
             var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-            Func<ServiceContext, Task> next = null; // last
+            Func<ServiceContext, Task> next = methodBody;
 
             foreach (var filter in this.filters.Reverse())
             {
@@ -278,17 +291,7 @@ namespace MagicOnion.Server
                     Request = request
                 };
 
-
-                if (responseIsTask)
-                {
-                    var body = (Func<ServiceContext, Task<UnaryResult<TResponse>>>)this.methodBody;
-                    await body(serviceContext).ConfigureAwait(false);
-                }
-                else
-                {
-                    var body = (Func<ServiceContext, UnaryResult<TResponse>>)this.methodBody;
-                    body(serviceContext);
-                }
+                await this.methodBody(serviceContext).ConfigureAwait(false);
 
                 return serviceContext.Result ?? emptyBytes;
             }
@@ -335,16 +338,7 @@ namespace MagicOnion.Server
                         RequestStream = requestStream
                     };
 
-                    if (responseIsTask)
-                    {
-                        var body = (Func<ServiceContext, Task<ClientStreamingResult<TRequest, TResponse>>>)this.methodBody;
-                        await body(serviceContext).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        var body = (Func<ServiceContext, ClientStreamingResult<TRequest, TResponse>>)this.methodBody;
-                        body(serviceContext);
-                    }
+                    await this.methodBody(serviceContext).ConfigureAwait(false);
 
                     return serviceContext.Result ?? emptyBytes;
                 }
@@ -391,16 +385,7 @@ namespace MagicOnion.Server
                     Request = request
                 };
 
-                if (responseIsTask)
-                {
-                    var body = (Func<ServiceContext, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
-                    await body(serviceContext).ConfigureAwait(false);
-                }
-                else
-                {
-                    var body = (Func<ServiceContext, ServerStreamingResult<TResponse>>)this.methodBody;
-                    body(serviceContext);
-                }
+                await this.methodBody(serviceContext).ConfigureAwait(false);
 
                 return emptyBytes;
             }
@@ -448,16 +433,7 @@ namespace MagicOnion.Server
                         ResponseStream = responseStream
                     };
 
-                    if (responseIsTask)
-                    {
-                        var body = (Func<ServiceContext, Task<DuplexStreamingResult<TRequest, TResponse>>>)this.methodBody;
-                        await body(serviceContext).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        var body = (Func<ServiceContext, DuplexStreamingResult<TRequest, TResponse>>)this.methodBody;
-                        body(serviceContext);
-                    }
+                    await this.methodBody(serviceContext).ConfigureAwait(false);
 
                     return emptyBytes;
                 }

@@ -78,6 +78,7 @@
     <Compile Include="ArgumentPatternTest.cs" />
     <Compile Include="ChainingAssertion.xUnit.cs" />
     <Compile Include="ClientConfigTest.cs" />
+    <Compile Include="FilterTest.cs" />
     <Compile Include="ReturnStatusTest.cs" />
     <Compile Include="SimpleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

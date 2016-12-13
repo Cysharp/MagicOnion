@@ -24,5 +24,10 @@ namespace MagicOnion.Server
         }
 
         public abstract Task Invoke(ServiceContext context);
+
+        public void SetStatusCode(ServiceContext context, Grpc.Core.StatusCode statusCode, string detail)
+        {
+            context.CallContext.Status = new Grpc.Core.Status(statusCode, detail);
+        }
     }
 }
