@@ -37,6 +37,7 @@ namespace MagicOnion.Server
         // internal, used from there methods.
         internal object RequestMarshaller { get; set; }
         internal object ResponseMarshaller { get; set; }
+        internal byte[] Request { get; set; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }

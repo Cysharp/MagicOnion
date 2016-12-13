@@ -93,9 +93,22 @@ namespace MagicOnion.Server
             {
                 case MethodType.Unary:
                 case MethodType.ServerStreaming:
-                    // (ServiceContext context, TRequest request) => new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                    // (ServiceContext context) =>
+                    // {
+                    //      var request = ((Marshaller<TRequest>)context.RequestMarshaller).Deserializer.Invoke(context.Request);
+                    //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                    // };
                     {
+                        var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+                        var marshallerType = typeof(Marshaller<>).MakeGenericType(requestType);
+
                         var requestArg = Expression.Parameter(requestType, "request");
+
+                        var requestMarshalleExpr = Expression.Convert(Expression.Property(contextArg, typeof(ServiceContext).GetProperty("RequestMarshaller", flags)), marshallerType);
+                        var deserializer = Expression.Property(requestMarshalleExpr, "Deserializer");
+                        var callDeserialize = Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), requestType).GetMethod("Invoke"), Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)));
+
+                        var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                         Expression[] arguments = new Expression[parameters.Length];
                         if (parameters.Length == 1)
@@ -110,8 +123,9 @@ namespace MagicOnion.Server
                             }
                         }
 
-                        var body = Expression.Call(instance, methodInfo, arguments);
-                        this.methodBody = Expression.Lambda(body, contextArg, requestArg).Compile();
+                        var callBody = Expression.Call(instance, methodInfo, arguments);
+                        var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
+                        this.methodBody = Expression.Lambda(body, contextArg).Compile();
                     }
                     break;
                 case MethodType.ClientStreaming:
@@ -178,77 +192,27 @@ namespace MagicOnion.Server
         }
 
         // TODO:filter
-        //async Task InvokeRecursive(int index, ServiceContext context)
-        //{
-        //    //index += 1;
-        //    //if (filters.Count != index)
-        //    //{
-        //    //    // chain next filter
-        //    //    return filters[index].Invoke(context, () => InvokeRecursive(index, filters, options, context, coordinator));
-        //    //}
-        //    //else
-        //    //{
-        //    //    // execute operation
-        //    //    return coordinator.ExecuteOperation(options, context, ExecuteOperation);
-        //    //}
+        Func<ServiceContext, Task> BuildMethodBodyWithFilter()
+        {
+            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            Func<ServiceContext, Task> next = null; // last
 
-        //    //filters[0].Invoke(context, () => InvokeRecursive(1, context));
-        //    //
+            foreach (var filter in this.filters.Reverse())
+            {
+                var fields = filter.GetType().GetFields(flags);
 
+                var newFilter = (MagicOnionFilterAttribute)Activator.CreateInstance(filter.GetType(), new object[] { next });
+                // copy all data.
+                foreach (var item in fields)
+                {
+                    item.SetValue(newFilter, item.GetValue(filter));
+                }
 
-        //    //Activator.c
+                next = newFilter.Invoke;
+            }
 
-        //    //var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
-        //    //Func<Task> last = () =>
-
-        //    Func<Task> methodBody = null;
-
-        //    var reverseFilters = this.filters.Reverse().ToArray();
-
-
-        //    Func<Task> nextFunc = methodBody;
-        //    foreach (var filter in this.filters.Reverse())
-        //    {
-        //        // var filter = Activator.CreateInstance(, nextFunc);
-
-
-
-        //    }
-
-        //    for (int i = 0; i < filters.Length; i++)
-        //    {
-
-        //    }
-
-
-        //    // copy, all fields dynamically.
-
-        //    //Func<Task<ServiceContext>> last = null;
-
-        //    Func<ServiceContext, Task> methodBoooody = null; // last
-        //    foreach (var item in this.filters.Reverse())
-        //    {
-        //        var filter = (MagicOnionFilterAttribute)Activator.CreateInstance(item.GetType(), new object[] { methodBoooody });
-        //        // copy fields...
-
-
-        //        // root.
-        //        methodBoooody = filter.Invoke;
-        //    }
-
-            
-
-        //    foreach (var item in filters)
-        //    {
-        //        //item.Invoke2(context, filters[1]);
-
-
-
-        //    }
-
-
-
-        //}
+            return next;
+        }
 
         internal void RegisterHandler(ServerServiceDefinition.Builder builder)
         {
@@ -310,21 +274,20 @@ namespace MagicOnion.Server
                 var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
                 {
                     RequestMarshaller = requestMarshaller,
-                    ResponseMarshaller = responseMarshaller
+                    ResponseMarshaller = responseMarshaller,
+                    Request = request
                 };
 
-                var deserializer = (Marshaller<TRequest>)requestMarshaller;
-                var args = deserializer.Deserializer(request);
 
                 if (responseIsTask)
                 {
-                    var body = (Func<ServiceContext, TRequest, Task<UnaryResult<TResponse>>>)this.methodBody;
-                    await body(serviceContext, args).ConfigureAwait(false);
+                    var body = (Func<ServiceContext, Task<UnaryResult<TResponse>>>)this.methodBody;
+                    await body(serviceContext).ConfigureAwait(false);
                 }
                 else
                 {
-                    var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
-                    body(serviceContext, args);
+                    var body = (Func<ServiceContext, UnaryResult<TResponse>>)this.methodBody;
+                    body(serviceContext);
                 }
 
                 return serviceContext.Result ?? emptyBytes;
@@ -424,21 +387,19 @@ namespace MagicOnion.Server
                 {
                     RequestMarshaller = requestMarshaller,
                     ResponseMarshaller = responseMarshaller,
-                    ResponseStream = responseStream
+                    ResponseStream = responseStream,
+                    Request = request
                 };
-
-                var deserializer = (Marshaller<TRequest>)requestMarshaller;
-                var args = deserializer.Deserializer(request);
 
                 if (responseIsTask)
                 {
-                    var body = (Func<ServiceContext, TRequest, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
-                    await body(serviceContext, args).ConfigureAwait(false);
+                    var body = (Func<ServiceContext, Task<ServerStreamingResult<TResponse>>>)this.methodBody;
+                    await body(serviceContext).ConfigureAwait(false);
                 }
                 else
                 {
-                    var body = (Func<ServiceContext, TRequest, ServerStreamingResult<TResponse>>)this.methodBody;
-                    body(serviceContext, args);
+                    var body = (Func<ServiceContext, ServerStreamingResult<TResponse>>)this.methodBody;
+                    body(serviceContext);
                 }
 
                 return emptyBytes;
