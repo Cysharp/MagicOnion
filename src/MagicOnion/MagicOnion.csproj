@@ -76,6 +76,7 @@
     <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\IMagicOnionLogger.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
+    <Compile Include="Server\MagicOnionFilterAttribute.cs" />
     <Compile Include="Server\MagicOnionOptions.cs" />
     <Compile Include="Server\MethodHandler.cs" />
     <Compile Include="Server\Service.cs" />

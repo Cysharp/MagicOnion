@@ -30,8 +30,7 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        // TODO:filter
-        // readonly LightNodeFilterAttribute[] filters;
+        readonly MagicOnionFilterAttribute[] filters;
 
         // options
 
@@ -75,16 +74,15 @@ namespace MagicOnion.Server
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
+            this.filters = options.GlobalFilters
+                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true))
+                .OrderBy(x => x.Order)
+                .ToArray();
+
             // options
             this.isReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
             this.logger = options.MagicOnionLogger;
-
-            // TODO:filters
-            //this.filters = options.Filters
-            //    .Concat(classType.GetCustomAttributes<LightNodeFilterAttribute>(true))
-            //    .Concat(methodInfo.GetCustomAttributes<LightNodeFilterAttribute>(true))
-            //    .OrderBy(x => x.Order)
-            //    .ToArray();
 
             // prepare lambda parameters
             var contextArg = Expression.Parameter(typeof(ServiceContext), "context");
@@ -180,21 +178,76 @@ namespace MagicOnion.Server
         }
 
         // TODO:filter
-        // return InvokeRecursive(-1, targetFilters, options, context, coordinator);
-
-        //Task InvokeRecursive(int index, IReadOnlyList<LightNodeFilterAttribute> filters, ILightNodeOptions options, OperationContext context, IOperationCoordinator coordinator)
+        //async Task InvokeRecursive(int index, ServiceContext context)
         //{
-        //    index += 1;
-        //    if (filters.Count != index)
+        //    //index += 1;
+        //    //if (filters.Count != index)
+        //    //{
+        //    //    // chain next filter
+        //    //    return filters[index].Invoke(context, () => InvokeRecursive(index, filters, options, context, coordinator));
+        //    //}
+        //    //else
+        //    //{
+        //    //    // execute operation
+        //    //    return coordinator.ExecuteOperation(options, context, ExecuteOperation);
+        //    //}
+
+        //    //filters[0].Invoke(context, () => InvokeRecursive(1, context));
+        //    //
+
+
+        //    //Activator.c
+
+        //    //var body = (Func<ServiceContext, TRequest, UnaryResult<TResponse>>)this.methodBody;
+        //    //Func<Task> last = () =>
+
+        //    Func<Task> methodBody = null;
+
+        //    var reverseFilters = this.filters.Reverse().ToArray();
+
+
+        //    Func<Task> nextFunc = methodBody;
+        //    foreach (var filter in this.filters.Reverse())
         //    {
-        //        // chain next filter
-        //        return filters[index].Invoke(context, () => InvokeRecursive(index, filters, options, context, coordinator));
+        //        // var filter = Activator.CreateInstance(, nextFunc);
+
+
+
         //    }
-        //    else
+
+        //    for (int i = 0; i < filters.Length; i++)
         //    {
-        //        // execute operation
-        //        return coordinator.ExecuteOperation(options, context, ExecuteOperation);
+
         //    }
+
+
+        //    // copy, all fields dynamically.
+
+        //    //Func<Task<ServiceContext>> last = null;
+
+        //    Func<ServiceContext, Task> methodBoooody = null; // last
+        //    foreach (var item in this.filters.Reverse())
+        //    {
+        //        var filter = (MagicOnionFilterAttribute)Activator.CreateInstance(item.GetType(), new object[] { methodBoooody });
+        //        // copy fields...
+
+
+        //        // root.
+        //        methodBoooody = filter.Invoke;
+        //    }
+
+            
+
+        //    foreach (var item in filters)
+        //    {
+        //        //item.Invoke2(context, filters[1]);
+
+
+
+        //    }
+
+
+
         //}
 
         internal void RegisterHandler(ServerServiceDefinition.Builder builder)

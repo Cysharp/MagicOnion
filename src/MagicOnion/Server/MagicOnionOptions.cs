@@ -25,6 +25,11 @@ namespace MagicOnion.Server
         public IMagicOnionLogger MagicOnionLogger { get; set; }
 
         /// <summary>
+        /// Global MagicOnion filters.
+        /// </summary>
+        public MagicOnionFilterAttribute[] GlobalFilters { get; set; }
+
+        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
@@ -33,6 +38,7 @@ namespace MagicOnion.Server
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
             this.ZeroFormatterTypeResolverType = typeof(ZeroFormatter.Formatters.DefaultResolver);
             this.MagicOnionLogger = new NullMagicOnionLogger();
+            this.GlobalFilters = new MagicOnionFilterAttribute[0];
         }
     }
 }
