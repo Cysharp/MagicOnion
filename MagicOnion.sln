@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{7F61607D
 		nuget\push.bat = nuget\push.bat
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.CodeGenerator", "src\MagicOnion.CodeGenerator\MagicOnion.CodeGenerator.csproj", "{9633B452-A984-46A6-9A92-B6291561BA09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9633B452-A984-46A6-9A92-B6291561BA09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9633B452-A984-46A6-9A92-B6291561BA09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9633B452-A984-46A6-9A92-B6291561BA09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9633B452-A984-46A6-9A92-B6291561BA09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +75,6 @@ Global
 		{A6F79DDC-B0FF-4337-9B24-8D5E768A8340} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{6BDE33A5-2744-40E5-8999-BF0465745587} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{9633B452-A984-46A6-9A92-B6291561BA09} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 EndGlobal
