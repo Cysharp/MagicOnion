@@ -109,3 +109,8 @@ UpgradeLog*.XML
 .vs/restore.dg
 
 # Unity
+
+src/MagicOnion.Client.Unity/bin/*
+src/MagicOnion.Client.Unity/Library/*
+src/MagicOnion.Client.Unity/obj/*
+src/MagicOnion.Client.Unity/Temp/*
