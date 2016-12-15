@@ -1,12 +1,12 @@
 MagicOnion
 ===
-gRPC based HTTP2 RPC Streaming Framework for .NET, .NET Core and Unity.
+gRPC based HTTP/2 RPC Streaming Framework for .NET, .NET Core and Unity.
 
 Work in progress, stay tuned.
 
 Quick Start
 ---
-alpha-version is available in NuGet(Currently only work on .NET 4.5, .NET Core and Unity is not yet)
+alpha-version is available in NuGet(Currently only work on .NET 4.5, .NET Core is not yet, Unity supports see [Unity Supports](https://github.com/neuecc/MagicOnion#unity-supports) section)
 
 * Install-Package MagicOnion -Pre
 
@@ -254,3 +254,22 @@ static async Task DuplexStreamRun(IMyFirstService client)
     });
 }
 ```
+
+Unity Supports
+---
+Code is located in `src/MagicOnion.Client.Unity/Assets/Scripts/gRPC` (port of Grpc.Core) and `src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion` (MagicOnion Runtime). There are require [ZeroFormatter](https://github.com/neuecc/ZeroFormatter) and [UniRx](https://github.com/neuecc/UniRx).
+
+MagicOnion's Unity client works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic client generation due to IL2CPP issue. But pre code generate helps it. `moc.exe`is using Roslyn so analyze source code, pass the target csproj.
+
+```
+moc arguments help:
+  -i, --input=VALUE          [required]Input path of analyze csproj
+  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
+  -s, --separate             [optional, default=false]Output files are separated
+  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
+  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
+  -r, --resolvername=VALUE   [optional, default=DefaultResolver]Register CustomSerializer target
+  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
+```
+
+moc.exe is located in `packages\MagicOnion.*.*.*\tools\moc.exe`.

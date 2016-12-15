@@ -1,0 +1,1 @@
+libz inject-dll --assembly src\MagicOnion.CodeGenerator\bin\Release\moc.exe --include src\MagicOnion.CodeGenerator\bin\Release\*.dll --move

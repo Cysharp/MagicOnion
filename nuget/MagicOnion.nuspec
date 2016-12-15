@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>MagicOnion</id>
-        <version>0.1.0-alpha</version>
+        <version>0.2.0-alpha</version>
         <title>MagicOnion</title>
         <authors>neuecc</authors>
         <owners>y.neuecc</owners>
@@ -25,5 +25,7 @@
     <files>
         <file src="..\src\MagicOnion\bin\Release\MagicOnion.dll" target="lib\net45" />
         <file src="..\src\MagicOnion\bin\Release\MagicOnion.xml" target="lib\net45" />
+        <file src="moc.exe" target="tools\" />
+        <file src="moc.exe.config" target="tools\" />
     </files>
 </package>
