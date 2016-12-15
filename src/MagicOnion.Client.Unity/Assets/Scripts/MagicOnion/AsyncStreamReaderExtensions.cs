@@ -52,11 +52,13 @@ namespace MagicOnion
         }
 
         // TODO:needs strict implementation
-        public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream)
-        {
-            var subject = new Subject<T>();
-            stream.ForEachAsync(x => subject.OnNext(x)); // cancellation!
-            return subject;
-        }
+        //public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream)
+        //{
+        //    var subject = new Subject<T>();
+        //    return subject.DoOnSubscribe(() =>
+        //    {
+        //        stream.ForEachAsync(x => subject.OnNext(x)).Subscribe(_ => { }, subject.OnError, subject.OnCompleted);
+        //    });
+        //}
     }
 }

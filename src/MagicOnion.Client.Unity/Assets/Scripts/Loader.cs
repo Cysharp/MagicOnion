@@ -9,7 +9,9 @@ namespace MagicOnion.Tests
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()
         {
-            UnitTest.RegisterAllMethods<ManualTest>();
+            UnitTest.RegisterAllMethods<SimpleTest>();
+            UnitTest.RegisterAllMethods<StandardTest>();
+            UnitTest.RegisterAllMethods<ArgumentPatternTest>();
         }
     }
 }

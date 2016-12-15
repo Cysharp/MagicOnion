@@ -395,8 +395,21 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write("Method, host, option);\r\n            return new ClientStreamingResult<int, string>" +
-                    "(callResult, ");
+            this.Write("Method, host, option);\r\n            return new ClientStreamingResult<");
+            
+            #line 85 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 85 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
+            
+            #line default
+            #line hidden
+            this.Write(">(callResult, ");
             
             #line 85 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
@@ -425,8 +438,21 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write("Method, host, option);\r\n            return new DuplexStreamingResult<int, string>" +
-                    "(callResult, ");
+            this.Write("Method, host, option);\r\n            return new DuplexStreamingResult<");
+            
+            #line 88 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 88 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
+            
+            #line default
+            #line hidden
+            this.Write(">(callResult, ");
             
             #line 88 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));

@@ -23,6 +23,7 @@ namespace MagicOnion.Client
             where TTypeResolver : ITypeResolver, new()
             where T : IService<T>
         {
+            if (channel == null) throw new ArgumentNullException(nameof(channel));
             var t = DynamicClientBuilder<TTypeResolver, T>.ClientType;
             return (T)Activator.CreateInstance(t, channel);
         }
@@ -31,6 +32,7 @@ namespace MagicOnion.Client
             where TTypeResolver : ITypeResolver, new()
             where T : IService<T>
         {
+            if (invoker == null) throw new ArgumentNullException(nameof(invoker));
             var t = DynamicClientBuilder<TTypeResolver, T>.ClientType;
             return (T)Activator.CreateInstance(t, invoker);
         }

@@ -82,10 +82,10 @@
             return new ServerStreamingResult<<#= item.ResponseType #>>(callResult, <#= item.Name #>ResponseMarshaller);
 <# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
             var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, host, option);
-            return new ClientStreamingResult<int, string>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+            return new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
 <# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, host, option);
-            return new DuplexStreamingResult<int, string>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+            return new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
 <# } #>
         }
 

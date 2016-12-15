@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IArgumentPattern.cs" />
+    <Compile Include="IStandard.cs" />
     <Compile Include="IMyFirstService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -104,13 +104,13 @@ namespace MagicOnion.CodeAnalysis
             if (constructedFrom == typeReferences.UnaryResult)
             {
                 methodType = MethodType.Unary;
-                requestType = null;
+                requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             }
             else if (constructedFrom == typeReferences.ServerStreamingResult)
             {
                 methodType = MethodType.ServerStreaming;
-                requestType = null;
+                requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             }
             else if (constructedFrom == typeReferences.ClientStreamingResult)
