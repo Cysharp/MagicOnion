@@ -52,7 +52,6 @@ namespace Grpc.Core.Internal
     /// </summary>
     internal abstract class AsyncCallBase<TWrite, TRead>
     {
-        static readonly ILogger Logger = GrpcEnvironment.Logger.ForType<AsyncCallBase<TWrite, TRead>>();
         protected static readonly Status DeserializeResponseFailureStatus = new Status(StatusCode.Internal, "Failed to deserialize response message.");
 
         readonly Func<TWrite, byte[]> serializer;
@@ -68,7 +67,7 @@ namespace Grpc.Core.Internal
 
         protected AsyncSubject<TRead> streamingReadTcs;  // Completion of a pending streaming read if not null.
         protected AsyncSubject<Unit> streamingWriteTcs;  // Completion of a pending streaming write or send close from client if not null.
-        protected AsyncSubject<Unit> sendStatusFromServerTcs;
+        
         protected bool isStreamingWriteCompletionDelayed;  // Only used for the client side.
 
         protected bool readingDone;  // True if last read (i.e. read with null payload) was already received.
@@ -301,27 +300,6 @@ namespace Grpc.Core.Internal
             {
                 origTcs.OnNext(Unit.Default);
                 origTcs.OnCompleted();
-            }
-        }
-
-        /// <summary>
-        /// Handles send status from server completion.
-        /// </summary>
-        protected void HandleSendStatusFromServerFinished(bool success)
-        {
-            lock (myLock)
-            {
-                ReleaseResourcesIfPossible();
-            }
-
-            if (!success)
-            {
-                sendStatusFromServerTcs.OnError(new IOException("Error sending status from server."));
-            }
-            else
-            {
-                sendStatusFromServerTcs.OnNext(Unit.Default);
-                sendStatusFromServerTcs.OnCompleted();
             }
         }
 

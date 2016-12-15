@@ -12,12 +12,14 @@
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.4p1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -58,12 +60,6 @@
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
@@ -72,6 +68,12 @@
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroFormatter">
+      <HintPath>Assets\Plugins\ZeroFormatter\ZeroFormatter.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroFormatter.Interfaces">
+      <HintPath>Assets\Plugins\ZeroFormatter\ZeroFormatter.Interfaces.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,10 +84,96 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Loader.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\AsyncStreamReaderExtensions.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClient.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClientBase.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\ClientStreamingResult.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\DuplexStreamingResult.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\DynamicArgumentTuple.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\IService.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\MagicOnionMarshallers.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\ServerStreamingResult.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\UnaryResult.cs" />
+    <Compile Include="Assets\Scripts\MagicOnionGenerated.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\Assert.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
-    <Compile Include="Assets\Scripts\Tests\ManualTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\SimpleTest.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AsyncAuthInterceptor.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AsyncClientStreamingCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AsyncDuplexStreamingCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AsyncServerStreamingCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AsyncUnaryCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\CallCredentials.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\CallInvocationDetails.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\CallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\CallOptions.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Calls.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Channel.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\ChannelCredentials.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\ChannelOptions.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\ChannelState.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\ClientBase.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\ContextPropagationToken.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\DefaultCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\GrpcEnvironment.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\IAsyncStreamReader.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\IAsyncStreamWriter.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\IClientStreamWriter.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\AsyncCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\AsyncCallBase.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\AtomicCounter.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\BatchContextSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CStringSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallCredentialsSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallError.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ChannelArgsSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ChannelCredentialsSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ChannelSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ClientRequestStream.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ClientResponseStream.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ClientSideStatus.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\ClockType.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CompletionQueueEvent.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CompletionQueueSafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CompletionRegistry.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\DebugStats.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\DefaultSslRootsOverride.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\GrpcThreadPool.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\INativeCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\InterceptingCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\MetadataArraySafeHandle.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeExtension.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeLogRedirector.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeMetadataCredentialsPlugin.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeMethods.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\SafeHandleZeroIsInvalid.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\Timespec.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\UnimplementedCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\KeyCertificatePair.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\ConsoleLogger.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\ILogger.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\LogLevel.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\LogLevelFilterLogger.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\NullLogger.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Logging\TextWriterLogger.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Marshaller.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Metadata.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Method.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\IProfiler.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerEntry.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerScope.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\Profilers.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\RpcException.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Shim\GrpcCancellationToken.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Status.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\StatusCode.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Utils\GrpcPreconditions.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Utils\IAsyncEnumerator.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Version.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\VersionInfo.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\WriteOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

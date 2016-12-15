@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace MagicOinon.Tests
+namespace MagicOnion.Tests
 {
     public static class UnitTestLoader
     {

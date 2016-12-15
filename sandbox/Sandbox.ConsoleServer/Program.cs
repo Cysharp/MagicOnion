@@ -11,8 +11,8 @@ namespace MagicOnion.ConsoleServer
         {
             Console.WriteLine("Server:::");
 
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+            //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+            //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)

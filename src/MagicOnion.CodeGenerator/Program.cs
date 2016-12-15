@@ -1,8 +1,10 @@
 ﻿using MagicOnion.CodeAnalysis;
+using MagicOnion.Generator;
 using Mono.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace MagicOnion.CodeGenerator
         public List<string> ConditionalSymbols { get; private set; }
         public bool IsSeparate { get; private set; }
         public string NamespaceRoot { get; private set; }
+        public string ResolverName { get; private set; }
 
         public bool IsParsed { get; set; }
 
@@ -26,6 +29,7 @@ namespace MagicOnion.CodeGenerator
         {
             ConditionalSymbols = new List<string>();
             NamespaceRoot = "MagicOnion";
+            ResolverName = "ZeroFormatter.Formatters.DefaultResolver";
 
             var option = new OptionSet()
             {
@@ -34,6 +38,10 @@ namespace MagicOnion.CodeGenerator
                 { "s|separate", "[optional, default=false]Output files are separated", _ => { IsSeparate = true; } },
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on ZeroFormatterInitializer", _ => { UnuseUnityAttr = true; } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
+
+                { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target", x => { ResolverName = x; } },
+
+
                 { "n|namespace=", "[optional, default=ZeroFormatter]Set namespace root name", x => { NamespaceRoot = x; } },
             };
             if (args.Length == 0)
@@ -90,7 +98,48 @@ namespace MagicOnion.CodeGenerator
 
             Console.WriteLine("Method Collect Complete:" + sw.Elapsed.ToString());
 
-            // TODO:Generate!
+            Console.WriteLine("Output Generation Start");
+            sw.Restart();
+
+            var texts = definitions.GroupBy(x => x.Namespace)
+                .Select(x => new CodeTemplate() { Namespace = x.Key, ZeroFormatterResolver = cmdArgs.ResolverName, Interfaces = x.ToArray() })
+                .Select(x => x.TransformText())
+                .ToArray();
+
+            var registerTemplate = new RegisterTemplate { Namespace = "globalname", Interfaces = definitions, UnuseUnityAttribute = false };
+
+            if (cmdArgs.IsSeparate)
+            {
+            }
+            else
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine(registerTemplate.TransformText());
+                foreach (var item in texts)
+                {
+                    sb.AppendLine(item);
+                }
+                Output(cmdArgs.OutputPath, sb.ToString());
+            }
+
+            Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
+            Console.WriteLine();
+        }
+
+        static void Output(string path, string text)
+        {
+            path = path.Replace("global::", "");
+
+            const string prefix = "[Out]";
+            Console.WriteLine(prefix + path);
+
+            var fi = new FileInfo(path);
+            if (!fi.Directory.Exists)
+            {
+                fi.Directory.Create();
+            }
+
+            System.IO.File.WriteAllText(path, text);
         }
     }
 }

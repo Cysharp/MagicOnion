@@ -3,30 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion
 {
     public static class AsyncStreamReaderExtensions
     {
-        public static async Task ForEachAsync<T>(this IAsyncStreamReader<T> stream, Action<T> action)
+        public static async Task ForEachAsync<T>(this IAsyncStreamReader<T> stream, Action<T> action, CancellationToken cancellation = default(CancellationToken))
         {
             using (stream)
             {
-                while (await stream.MoveNext())
+                while (!cancellation.IsCancellationRequested && await stream.MoveNext())
                 {
                     action(stream.Current);
                 }
             }
         }
 
-        public static async Task ForEachAsync<T>(this IAsyncStreamReader<T> stream, Func<T, Task> actionAction)
+        public static async Task ForEachAsync<T>(this IAsyncStreamReader<T> stream, Func<T, Task> asyncAction, CancellationToken cancellation = default(CancellationToken))
         {
             using (stream)
             {
-                while (await stream.MoveNext())
+                while (!cancellation.IsCancellationRequested && await stream.MoveNext())
                 {
-                    await actionAction(stream.Current);
+                    await asyncAction(stream.Current);
                 }
             }
         }

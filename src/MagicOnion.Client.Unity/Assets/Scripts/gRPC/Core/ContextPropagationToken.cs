@@ -32,6 +32,7 @@
 #endregion
 
 using System;
+using System.Threading;
 
 using Grpc.Core.Internal;
 using Grpc.Core.Utils;
@@ -63,10 +64,10 @@ namespace Grpc.Core
 
         readonly CallSafeHandle parentCall;
         readonly DateTime deadline;
-        readonly CancellationTokenWithCallback cancellationToken;
+        readonly GrpcCancellationToken cancellationToken;
         readonly ContextPropagationOptions options;
 
-        internal ContextPropagationToken(CallSafeHandle parentCall, DateTime deadline, CancellationTokenWithCallback cancellationToken, ContextPropagationOptions options)
+        internal ContextPropagationToken(CallSafeHandle parentCall, DateTime deadline, GrpcCancellationToken cancellationToken, ContextPropagationOptions options)
         {
             this.parentCall = GrpcPreconditions.CheckNotNull(parentCall);
             this.deadline = deadline;
@@ -99,7 +100,7 @@ namespace Grpc.Core
         /// <summary>
         /// Gets the parent call's cancellation token.
         /// </summary>
-        internal CancellationTokenWithCallback ParentCancellationToken
+        internal GrpcCancellationToken ParentCancellationToken
         {
             get
             {

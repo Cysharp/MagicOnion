@@ -1,0 +1,100 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.CodeAnalysis" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+
+<#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
+    using MagicOnion;
+    using MagicOnion.Client;
+    using UniRx;
+    using Grpc.Core;
+    using ZeroFormatter.Formatters;
+
+<# foreach(var interfaceDef in Interfaces) { #>
+
+    public interface <#= interfaceDef.Name #> : IService<<#= interfaceDef.Name #>>
+    {
+<# foreach(var method in interfaceDef.Methods) { #>   
+        <#= method.ToString() #>;
+<# } #>
+    }
+    
+<# var clientName = interfaceDef.Name + "Client"; #>
+    public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.Name #>>, <#= interfaceDef.Name #>
+    {
+<# foreach(var item in interfaceDef.Methods) { #>
+        static readonly Method<byte[], byte[]> <#= item.Name #>Method;
+        static readonly Marshaller<<#= item.RequestMarshallerType #>> <#= item.Name #>RequestMarshaller;
+        static readonly Marshaller<<#= item.ResponseType #>> <#= item.Name #>ResponseMarshaller;
+
+<# } #>
+
+        static <#= clientName #>()
+        {
+<# foreach(var item in interfaceDef.Methods) { #>
+            <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            <#= item.Name #>RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(<#= item.RequestFormatter(ZeroFormatterResolver) #>);
+            <#= item.Name #>ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<<#= ZeroFormatterResolver #>, <#= item.ResponseType #>>.Default);
+
+<# } #>
+        }
+
+        <#= clientName #>()
+        {
+        }
+
+        public <#= clientName #>(Channel channel)
+            : this(new DefaultCallInvoker(channel))
+        {
+
+        }
+
+        public <#= clientName #>(CallInvoker callInvoker)
+            : base(callInvoker)
+        {
+        }
+
+        protected override MagicOnionClientBase<<#= interfaceDef.Name #>> Clone()
+        {
+            var clone = new <#= clientName #>(this.callInvoker);
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            return clone;
+        }
+   
+<# foreach(var item in interfaceDef.Methods) { #>
+        public <#= item.ToString() #>
+        {
+<# if(item.MethodType == MethodType.Unary) { #>
+            var request = <#= item.Name #>RequestMarshaller.Serializer(<#= item.RequestObject() #>);
+            var callResult = callInvoker.AsyncUnaryCall(<#= item.Name #>Method, host, option, request);
+            return new UnaryResult<<#= item.ResponseType #>>(callResult, <#= item.Name #>ResponseMarshaller);
+<# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
+            var request = <#= item.Name #>RequestMarshaller.Serializer(<#= item.RequestObject() #>);
+            var callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, host, option, request);
+            return new ServerStreamingResult<<#= item.ResponseType #>>(callResult, <#= item.Name #>ResponseMarshaller);
+<# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
+            var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, host, option);
+            return new ClientStreamingResult<int, string>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+<# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
+            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, host, option);
+            return new DuplexStreamingResult<int, string>(callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+<# } #>
+        }
+
+<# } #>
+    }
+<# } #>
+<#= Namespace != null ? "}" : "" #>
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

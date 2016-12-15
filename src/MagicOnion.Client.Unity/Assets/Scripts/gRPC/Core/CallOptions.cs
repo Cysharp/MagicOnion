@@ -47,7 +47,7 @@ namespace Grpc.Core
     {
         Metadata headers;
         DateTime? deadline;
-        CancellationTokenWithCallback cancellationToken;
+        GrpcCancellationToken cancellationToken;
         WriteOptions writeOptions;
         ContextPropagationToken propagationToken;
         CallCredentials credentials;
@@ -61,12 +61,12 @@ namespace Grpc.Core
         /// <param name="writeOptions">Write options that will be used for this call.</param>
         /// <param name="propagationToken">Context propagation token obtained from <see cref="ServerCallContext"/>.</param>
         /// <param name="credentials">Credentials to use for this call.</param>
-        public CallOptions(Metadata headers = null, DateTime? deadline = null, CancellationTokenWithCallback cancellationToken = default(CancellationTokenWithCallback),
+        public CallOptions(Metadata headers = null, DateTime? deadline = null, GrpcCancellationToken cancellationToken = default(GrpcCancellationToken),
                            WriteOptions writeOptions = null, ContextPropagationToken propagationToken = null, CallCredentials credentials = null)
         {
             this.headers = headers;
             this.deadline = deadline;
-            this.cancellationToken = (cancellationToken == null ? new CancellationTokenWithCallback() : cancellationToken);
+            this.cancellationToken = cancellationToken;
             this.writeOptions = writeOptions;
             this.propagationToken = propagationToken;
             this.credentials = credentials;
@@ -97,9 +97,9 @@ namespace Grpc.Core
         /// happen (there is an inherent race),
         /// the call will finish with <c>StatusCode.Cancelled</c> status.
         /// </summary>
-        public CancellationTokenWithCallback CancellationToken
+        public GrpcCancellationToken CancellationToken
         {
-            get { return (cancellationToken == null ? (cancellationToken = new CancellationTokenWithCallback()) : cancellationToken); }
+            get { return cancellationToken; }
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Grpc.Core
         /// <c>CancellationToken</c> set to the value provided. Values of all other fields are preserved.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public CallOptions WithCancellationToken(CancellationTokenWithCallback cancellationToken)
+        public CallOptions WithCancellationToken(GrpcCancellationToken cancellationToken)
         {
             var newOptions = this;
             newOptions.cancellationToken = cancellationToken;
@@ -218,11 +218,10 @@ namespace Grpc.Core
                 {
                     GrpcPreconditions.CheckArgument(!newOptions.CancellationToken.CanBeCanceled,
                         "Cannot propagate cancellation token from parent call. The cancellation token has already been set to a non-default value.");
-                    
                     newOptions.cancellationToken = propagationToken.ParentCancellationToken;
                 }
             }
-                
+
             newOptions.headers = newOptions.headers ?? Metadata.Empty;
             newOptions.deadline = newOptions.deadline ?? DateTime.MaxValue;
             return newOptions;

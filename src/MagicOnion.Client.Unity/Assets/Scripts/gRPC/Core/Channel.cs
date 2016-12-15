@@ -31,13 +31,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using Grpc.Core.Internal;
 using Grpc.Core.Logging;
 using Grpc.Core.Utils;
-
 using UniRx;
-using CancellationTokenSource = UniRx.BooleanDisposable;
 
 namespace Grpc.Core
 {
@@ -52,7 +51,7 @@ namespace Grpc.Core
 
         readonly object myLock = new object();
         readonly AtomicCounter activeCallCounter = new AtomicCounter();
-        readonly CancellationTokenSource shutdownTokenSource = new CancellationTokenSource();
+        readonly GrpcCancellationTokenSource shutdownTokenSource = new GrpcCancellationTokenSource();
 
         readonly string target;
         readonly GrpcEnvironment environment;
@@ -147,7 +146,7 @@ namespace Grpc.Core
         {
             GrpcPreconditions.CheckArgument(lastObservedState != ChannelState.Shutdown,
                 "Shutdown is a terminal state. No further state changes can occur.");
-            var subject = new AsyncSubject<bool>(); // TaskCompletionSource<object>
+            var subject = new AsyncSubject<bool>();
             var deadlineTimespec = deadline.HasValue ? Timespec.FromDateTime(deadline.Value) : Timespec.InfFuture;
             var handler = new BatchCompletionDelegate((success, ctx) =>
             {
@@ -179,11 +178,11 @@ namespace Grpc.Core
         /// <summary>
         /// Returns a token that gets cancelled once <c>ShutdownAsync</c> is invoked.
         /// </summary>
-        public CancellationToken ShutdownToken
+        public GrpcCancellationToken ShutdownToken
         {
             get
             {
-                return new CancellationToken(this.shutdownTokenSource);
+                return this.shutdownTokenSource.Token;
             }
         }
 
@@ -198,26 +197,51 @@ namespace Grpc.Core
         public IObservable<Unit> ConnectAsync(DateTime? deadline = null)
         {
             var currentState = GetConnectivityState(true);
-            return WaitUntilReady(currentState, deadline);
-        }
-
-        IObservable<Unit> WaitUntilReady(ChannelState currentState, DateTime? deadline = null)
-        {
-            if (currentState != ChannelState.Ready)
+            if (currentState == ChannelState.Ready)
             {
-                if (currentState == ChannelState.Shutdown)
-                {
-                    return Observable.Throw<Unit>(new OperationCanceledException("Channel has reached Shutdown state."));
-                }
-
-                return WaitForStateChangedAsync(currentState, deadline).ContinueWith(_ =>
-                {
-                    var newState = GetConnectivityState(false);
-                    return WaitUntilReady(newState, deadline); // recursive...
-                });
+                return Observable.ReturnUnit();
             }
 
-            return Observable.ReturnUnit();
+            if (currentState == ChannelState.Shutdown)
+            {
+                return Observable.Throw<Unit>(new OperationCanceledException("Channel has reached Shutdown state."));
+            }
+
+            var subject = new AsyncSubject<Unit>();
+            TryWaitForStateChangedAsync(subject, currentState, deadline);
+            return subject;
+        }
+
+        private void TryWaitForStateChangedAsync(AsyncSubject<Unit> subject, ChannelState currentState, DateTime? deadline = null)
+        {
+            if (currentState == ChannelState.Shutdown)
+            {
+                throw new OperationCanceledException("Channel has reached Shutdown state.");
+            }
+
+            WaitForStateChangedAsync(currentState, deadline)
+                .ContinueWith(_ =>
+                {
+                    currentState = GetConnectivityState(false);
+
+                    if (currentState != ChannelState.Ready)
+                    {
+                        if (currentState == ChannelState.Shutdown)
+                        {
+                            return Observable.Throw<Unit>(new OperationCanceledException("Channel has reached Shutdown state."));
+                        }
+
+                        TryWaitForStateChangedAsync(subject, currentState, deadline);
+                    }
+                    else
+                    {
+                        subject.OnNext(Unit.Default);
+                        subject.OnCompleted();
+                    }
+
+                    return Observable.ReturnUnit();
+                })
+                .Subscribe();
         }
 
         /// <summary>
@@ -240,7 +264,7 @@ namespace Grpc.Core
             }
             GrpcEnvironment.UnregisterChannel(this);
 
-            shutdownTokenSource.Dispose();
+            shutdownTokenSource.Cancel();
 
             var activeCallCount = activeCallCounter.Count;
             if (activeCallCount > 0)

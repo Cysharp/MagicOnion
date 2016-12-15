@@ -1,0 +1,31 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.CodeAnalysis" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+namespace <#= Namespace #>
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+
+    public static partial class MagicOnionInitializer
+    {
+<# if( !UnuseUnityAttribute) { #>
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+<# } #>
+        public static void Register()
+        {
+<# foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register(x => new <#= clientName #>(x), x => new <#= clientName #>(x));
+<# } #>
+        }
+    }
+}

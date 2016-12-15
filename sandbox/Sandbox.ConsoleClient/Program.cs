@@ -3,9 +3,12 @@ using Grpc.Core.Logging;
 using MagicOnion.Client;
 using Sandbox.ConsoleServer;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.ConsoleClient
@@ -16,7 +19,7 @@ namespace MagicOnion.ConsoleClient
         {
             Console.WriteLine("Client:::");
 
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+            //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
@@ -29,7 +32,7 @@ namespace MagicOnion.ConsoleClient
             DuplexStreamRun(c).GetAwaiter().GetResult();
 
             // many run
-            // UnaryDoDoDoRun(c).GetAwaiter().GetResult();
+            // UnaryLoadTest(c).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)
@@ -48,17 +51,21 @@ namespace MagicOnion.ConsoleClient
             }
         }
 
-        static async Task UnaryDoDoDoRun(IMyFirstService client)
+        static async Task UnaryLoadTest(IMyFirstService client)
         {
-            List<Task> t = new List<Task>();
-            Parallel.For(0, 100, x =>
-            {
-                lock (t)
-                {
-                    t.Add(client.SumAsync(x, x).ContinueWith(y => y.Result.ResponseAsync).Unwrap());
-                }
-            });
+            ThreadPool.SetMinThreads(1000, 1000);
+            var sw = Stopwatch.StartNew();
+            ConcurrentQueue<Task> t = new ConcurrentQueue<Task>();
+            Parallel.For(0, 10000, new ParallelOptions { MaxDegreeOfParallelism = 300 }, x =>
+             {
+                 t.Enqueue(client.SumAsync(x, x).ContinueWith(y => y.Result.ResponseAsync).Unwrap());
+             });
             await Task.WhenAll(t);
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed.TotalMilliseconds + "ms"); // 10000request, x-ms
+            var one = sw.Elapsed.TotalMilliseconds / 10000; // 1request, ms
+            Console.WriteLine(one);
+            Console.WriteLine((1000.0 / one) + "req per/sec");
         }
 
         static async Task ClientStreamRun(IMyFirstService client)
