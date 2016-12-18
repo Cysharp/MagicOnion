@@ -3,9 +3,9 @@
     <metadata>
         <id>MagicOnion.HttpGateway</id>
         <version>0.3.0-alpha</version>
-        <title>MagicOnion</title>
+        <title>MagicOnion.HttpGateway</title>
         <authors>neuecc</authors>
-        <owners>y.neuecc</owners>
+        <owners>neuecc</owners>
         <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</description>
