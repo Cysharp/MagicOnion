@@ -7,20 +7,8 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
-    internal class MethodHandler
+    public class MethodHandler
     {
-        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
-
-        static readonly Type[] dynamicArgumentTupleFormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
-
         static readonly byte[] emptyBytes = new byte[0];
 
         public string ServiceName { get; private set; }
@@ -39,8 +27,8 @@ namespace MagicOnion.Server
 
         // use for request handling.
 
-        readonly Type requestType;
-        readonly Type unwrapResponseType;
+        public readonly Type RequestType;
+        public readonly Type UnwrappedResponseType;
 
         readonly object requestMarshaller;
         readonly object responseMarshaller;
@@ -48,26 +36,32 @@ namespace MagicOnion.Server
 
         readonly Func<ServiceContext, Task> methodBody;
 
+        public Func<object, byte> serialize;
+
+        // helper
+        readonly Func<object, object, byte[]> boxedRequestSerialize;
+        readonly Func<object, byte[], object> boxedResponseDeserialize;
+
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
             this.ServiceType = classType;
             this.ServiceName = classType.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
             MethodType mt;
-            this.unwrapResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.requestType);
+            this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
             this.MethodType = mt;
 
             var parameters = methodInfo.GetParameters();
-            if (requestType == null)
+            if (RequestType == null)
             {
-                this.requestType = MagicOnionMarshallers.CreateRequestTypeAndMarshaller(options.ZeroFormatterTypeResolverType, classType.Name + "/" + methodInfo.Name, parameters, out requestMarshaller);
+                this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndMarshaller(options.ZeroFormatterTypeResolverType, classType.Name + "/" + methodInfo.Name, parameters, out requestMarshaller);
             }
             else
             {
-                this.requestMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, requestType);
+                this.requestMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, RequestType);
             }
 
-            this.responseMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, unwrapResponseType);
+            this.responseMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, UnwrappedResponseType);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
@@ -100,13 +94,13 @@ namespace MagicOnion.Server
                     // };
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                        var marshallerType = typeof(Marshaller<>).MakeGenericType(requestType);
+                        var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
 
-                        var requestArg = Expression.Parameter(requestType, "request");
+                        var requestArg = Expression.Parameter(RequestType, "request");
 
                         var requestMarshalleExpr = Expression.Convert(Expression.Property(contextArg, typeof(ServiceContext).GetProperty("RequestMarshaller", flags)), marshallerType);
                         var deserializer = Expression.Property(requestMarshalleExpr, "Deserializer");
-                        var callDeserialize = Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), requestType).GetMethod("Invoke"), Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)));
+                        var callDeserialize = Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), RequestType).GetMethod("Invoke"), Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)));
 
                         var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
@@ -153,6 +147,38 @@ namespace MagicOnion.Server
                 default:
                     throw new InvalidOperationException("Unknown MethodType:" + MethodType);
             }
+
+            // Utility
+            {
+                // (object requestMarshaller, object value) => ((Marshaller<TRequest>)requestMarshaller).Serializer.Invoke((TRequest)value);
+                var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
+                var requestMarshallerArg = Expression.Parameter(typeof(object), "requestMarshaller");
+                var valueArg = Expression.Parameter(typeof(object), "value");
+                var serializer = Expression.Property(Expression.Convert(requestMarshallerArg, marshallerType), "Serializer");
+                var callSerialize = Expression.Call(serializer, typeof(Func<,>).MakeGenericType(RequestType, typeof(byte[])).GetMethod("Invoke"),
+                    Expression.Convert(valueArg, RequestType));
+
+                boxedRequestSerialize = Expression.Lambda<Func<object, object, byte[]>>(callSerialize, requestMarshallerArg, valueArg).Compile();
+            }
+            {
+                // (object responseMarshaller, byte[] value) => ((Marshaller<TResponse>)requestMarshaller).Deserializer.Invoke(value);
+                var marshallerType = typeof(Marshaller<>).MakeGenericType(UnwrappedResponseType);
+                var responseMarshallerArg = Expression.Parameter(typeof(object), "responseMarshaller");
+                var valueArg = Expression.Parameter(typeof(byte[]), "value");
+                var deserializer = Expression.Property(Expression.Convert(responseMarshallerArg, marshallerType), "Deserializer");
+                var callDeserialize = Expression.Convert(Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), UnwrappedResponseType).GetMethod("Invoke"), valueArg), typeof(object));
+                boxedResponseDeserialize = Expression.Lambda<Func<object, byte[], object>>(callDeserialize, responseMarshallerArg, valueArg).Compile();
+            }
+        }
+
+        public byte[] BoxedSerialize(object requestValue)
+        {
+            return boxedRequestSerialize(this.requestMarshaller, requestValue);
+        }
+
+        public object BoxedDeserialize(byte[] responseValue)
+        {
+            return boxedResponseDeserialize(this.responseMarshaller, responseValue);
         }
 
         static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
@@ -237,7 +263,7 @@ namespace MagicOnion.Server
                     {
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(UnaryServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
-                            .MakeGenericMethod(requestType, unwrapResponseType);
+                            .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (UnaryServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this, genericMethod);
                         builder.AddMethod(method, handler);
                     }
@@ -246,7 +272,7 @@ namespace MagicOnion.Server
                     {
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
-                            .MakeGenericMethod(requestType, unwrapResponseType);
+                            .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ClientStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this, genericMethod);
                         builder.AddMethod(method, handler);
                     }
@@ -255,7 +281,7 @@ namespace MagicOnion.Server
                     {
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
-                            .MakeGenericMethod(requestType, unwrapResponseType);
+                            .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ServerStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this, genericMethod);
                         builder.AddMethod(method, handler);
                     }
@@ -264,7 +290,7 @@ namespace MagicOnion.Server
                     {
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
-                            .MakeGenericMethod(requestType, unwrapResponseType);
+                            .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (DuplexStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this, genericMethod);
                         builder.AddMethod(method, handler);
                     }
@@ -466,6 +492,11 @@ namespace MagicOnion.Server
         static void LogError(Exception ex, ServerCallContext context)
         {
             GrpcEnvironment.Logger.Error(ex, "MagicOnionHandler throws exception occured in " + context.Method);
+        }
+
+        public override string ToString()
+        {
+            return ServiceName + "/" + MethodInfo.Name;
         }
     }
 }

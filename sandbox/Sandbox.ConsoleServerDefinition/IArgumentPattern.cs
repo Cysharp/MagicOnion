@@ -19,5 +19,10 @@ namespace Sandbox.ConsoleServer
         Task<ServerStreamingResult<MyResponse>> ServerStreamingResult3();
         Task<ServerStreamingResult<Nil>> ServerStreamingResult4();
         Task<ServerStreamingResult<MyStructResponse>> ServerStreamingResult5(MyStructRequest req);
+
+        // Check for Swagge
+        UnaryResult<bool> UnaryS1(DateTime dt, DateTimeOffset dt2);
+        UnaryResult<bool> UnaryS2(int[] arrayPattern);
+        UnaryResult<bool> UnaryS3(int[] arrayPattern1, string[] arrayPattern2, MyEnum[] arrayPattern3);
     }
 }

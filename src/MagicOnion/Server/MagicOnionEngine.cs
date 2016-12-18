@@ -15,7 +15,7 @@ namespace MagicOnion.Server
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</param>
         /// <returns></returns>
-        public static ServerServiceDefinition BuildServerServiceDefinition(bool isReturnExceptionStackTraceInErrorDetail = false)
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
             return BuildServerServiceDefinition(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
         }
@@ -23,12 +23,12 @@ namespace MagicOnion.Server
         /// <summary>
         /// Search MagicOnion service from all assemblies.
         /// </summary>
-        public static ServerServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
         {
             return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), options);
         }
 
-        public static ServerServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
         {
             var types = searchAssemblies
               .SelectMany(x =>
@@ -45,9 +45,10 @@ namespace MagicOnion.Server
             return BuildServerServiceDefinition(types, option);
         }
 
-        public static ServerServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
         {
             var builder = ServerServiceDefinition.CreateBuilder();
+            var handlers = new List<MethodHandler>();
 
             var types = targetTypes
               .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
@@ -92,15 +93,18 @@ namespace MagicOnion.Server
                     var handler = new MethodHandler(option, classType, methodInfo);
                     lock (builder)
                     {
+                        handlers.Add(handler);
                         handler.RegisterHandler(builder);
                     }
                 }
             });
 
+            var result = new MagicOnionServiceDefinition(builder.Build(), handlers);
+
             sw.Stop();
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
-            return builder.Build();
+            return result;
         }
     }
 }

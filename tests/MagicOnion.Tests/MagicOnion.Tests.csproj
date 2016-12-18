@@ -65,12 +65,12 @@
       <HintPath>..\..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZeroFormatter.1.5.5\lib\net45\ZeroFormatter.dll</HintPath>
+    <Reference Include="ZeroFormatter, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ZeroFormatter.1.5.6\lib\net45\ZeroFormatter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.5\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.6\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -85,6 +85,7 @@
     <Compile Include="_ServerFixture.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

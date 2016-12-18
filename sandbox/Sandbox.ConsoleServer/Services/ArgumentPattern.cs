@@ -86,5 +86,20 @@ namespace Sandbox.ConsoleServer.Services
                 Y = req.Y
             });
         }
+
+        public UnaryResult<bool> UnaryS1(DateTime dt, DateTimeOffset dt2)
+        {
+            return UnaryResult(true);
+        }
+
+        public UnaryResult<bool> UnaryS2(int[] arrayPattern)
+        {
+            return UnaryResult(true);
+        }
+
+        public UnaryResult<bool> UnaryS3(int[] arrayPattern1, string[] arrayPattern2, MyEnum[] arrayPattern3)
+        {
+            return UnaryResult(true);
+        }
     }
 }

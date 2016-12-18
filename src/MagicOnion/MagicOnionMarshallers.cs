@@ -224,5 +224,12 @@ namespace MagicOnion
                 return t;
             }
         }
+
+        public static object InsantiateDynamicArgumentTuple(Type[] typeParameters, object[] arguments)
+        {
+            // start from T2
+            var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
+            return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments);
+        }
     }
 }

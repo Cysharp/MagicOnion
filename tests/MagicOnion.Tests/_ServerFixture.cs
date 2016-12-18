@@ -14,12 +14,12 @@ namespace MagicOnion.Tests
         {
             var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
 
-            var port = new Random().Next(10000, 60000);
+            var port = new Random().Next(10000, 30000);
             var serverPort = new ServerPort("localhost", port, ServerCredentials.Insecure);
 
             server = new global::Grpc.Core.Server
             {
-                Services = { service },
+                Services = { service.ServerServiceDefinition },
                 Ports = { serverPort }
             };
 

@@ -6,7 +6,7 @@ Work in progress, stay tuned.
 
 Quick Start
 ---
-alpha-version is available in NuGet(Currently only work on .NET 4.5, .NET Core is not yet, Unity supports see [Unity Supports](https://github.com/neuecc/MagicOnion#unity-supports) section)
+alpha-version is available in NuGet(Currently only work on .NET 4.5, .NET Core is not yet, Unity supports see [Unity Supports](https://github.com/neuecc/MagicOnion#unity-supports) section, HttpGateway + Swagger Intergarion supports see [Swagger](https://github.com/neuecc/MagicOnion#swagger) section)
 
 * Install-Package MagicOnion -Pre
 
@@ -254,6 +254,72 @@ static async Task DuplexStreamRun(IMyFirstService client)
     });
 }
 ```
+
+Swagger
+---
+MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation.
+
+* Install-Package MagicOnion.HttpGateway -Pre
+
+HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
+
+```csharp
+static void Main(string[] args)
+{
+    // gRPC definition.
+    GrpcEnvironment.SetLogger(new ConsoleLogger());
+    var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
+    {
+        MagicOnionLogger = new MagicOnionLogToGrpcLogger()
+    });
+    var server = new global::Grpc.Core.Server
+    {
+        Services = { service },
+        Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
+    };
+    server.Start();
+
+    // ASP.NET Core definition.
+    var webHost = new WebHostBuilder()
+        .ConfigureServices(collection =>
+        {
+            // Add MagicOnionServiceDefinition for reference from Startup.
+            collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
+        })
+        .UseWebListener()
+        .UseStartup<Startup>()
+        .UseUrls("http://localhost:5432")
+        .Build();
+
+    webHost.Run();
+}
+```
+
+```csharp
+public class Startup
+{
+    public void Configure(IApplicationBuilder app)
+    {
+        // Take from builder.
+        var magicOnion = app.ApplicationServices.GetService<MagicOnionServiceDefinition>();
+
+        // Optional:Summary to Swagger
+        var xmlName = "Sandbox.ConsoleServerDefinition.xml";
+        var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+
+        // HttpGateway has two middlewares.
+        // One is SwaggerView(MagicOnionSwaggerMiddleware)
+        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
+        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
+        {
+            XmlDocumentPath = xmlPath
+        });
+        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
+    }
+}
+```
+
+![image](https://cloud.githubusercontent.com/assets/46207/21295543/aa1171a8-c59a-11e6-93f8-e3f805fe246b.png)
 
 Unity Supports
 ---

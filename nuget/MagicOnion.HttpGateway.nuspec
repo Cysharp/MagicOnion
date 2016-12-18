@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>MagicOnion.HttpGateway</id>
+        <version>0.3.0-alpha</version>
+        <title>MagicOnion</title>
+        <authors>neuecc</authors>
+        <owners>y.neuecc</owners>
+        <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</description>
+        <releaseNotes>alpha release.</releaseNotes>
+        <tags>gRPC, HTTP2</tags>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework4.5" />
+        </frameworkAssemblies>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="MagicOnion" version="0.3.0-alpha" />
+                <dependency id="Microsoft.AspNetCore.Http.Abstractions" version="1.1.0" />
+                <dependency id="Newtonsoft.Json" version="9.0.1" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\src\MagicOnion.HttpGateway\bin\Release\MagicOnion.HttpGateway.dll" target="lib\net45" />
+        <file src="..\src\MagicOnion.HttpGateway\bin\Release\MagicOnion.HttpGateway.xml" target="lib\net45" />
+    </files>
+</package>
