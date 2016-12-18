@@ -304,22 +304,25 @@ public class Startup
         var magicOnion = app.ApplicationServices.GetService<MagicOnionServiceDefinition>();
 
         // Optional:Summary to Swagger
-        var xmlName = "Sandbox.ConsoleServerDefinition.xml";
-        var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+        // var xmlName = "Sandbox.ConsoleServerDefinition.xml";
+        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
 
         // HttpGateway has two middlewares.
         // One is SwaggerView(MagicOnionSwaggerMiddleware)
         // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
         app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
         {
-            XmlDocumentPath = xmlPath
+            // XmlDocumentPath = xmlPath
         });
         app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
     }
 }
 ```
 
-![image](https://cloud.githubusercontent.com/assets/46207/21295543/aa1171a8-c59a-11e6-93f8-e3f805fe246b.png)
+Open `http://localhost:5432`, you can see swagger view.
+
+![image](https://cloud.githubusercontent.com/assets/46207/21295648/064b2638-c59d-11e6-8a76-e6dd39d256bc.png)
+
 
 Unity Supports
 ---
