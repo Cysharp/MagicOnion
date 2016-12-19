@@ -49,7 +49,7 @@ namespace MagicOnion.HttpGateway.Swagger
                 doc.schemes = new[] { httpContext.Request.Scheme };
                 doc.paths = new Dictionary<string, PathItem>();
                 doc.definitions = new Dictionary<string, Schema>();
-                
+
 
                 // tags.
                 var xmlServiceName = (options.XmlDocumentPath != null)
@@ -57,7 +57,7 @@ namespace MagicOnion.HttpGateway.Swagger
                     : null;
 
                 doc.tags = handlers
-                    .Select(x=>x.ServiceName)
+                    .Select(x => x.ServiceName)
                     .Distinct()
                     .Select(x =>
                     {
@@ -220,6 +220,35 @@ namespace MagicOnion.HttpGateway.Swagger
                     }
                     else
                     {
+                        Schema items = null;
+                        if (swaggerDataType == "array")
+                        {
+                            var collectionType = GetCollectionType(memberType);
+                            var dataType = ToSwaggerDataType(collectionType);
+                            if (dataType == "object")
+                            {
+                                items = new Schema
+                                {
+                                    @ref = BuildSchema(definitions, collectionType)
+                                };
+                            }
+                            else
+                            {
+                                if (collectionType.IsEnum)
+                                {
+                                    items = new Schema
+                                    {
+                                        type = "string",
+                                        @enum = Enum.GetNames(collectionType)
+                                    };
+                                }
+                                else
+                                {
+                                    items = new Schema { type = ToSwaggerDataType(collectionType) };
+                                }
+                            }
+                        }
+
                         return new
                         {
                             Name = x.Name,
@@ -227,6 +256,7 @@ namespace MagicOnion.HttpGateway.Swagger
                             {
                                 type = swaggerDataType,
                                 description = memberType.Name,
+                                items = items
                             }
                         };
                     }
