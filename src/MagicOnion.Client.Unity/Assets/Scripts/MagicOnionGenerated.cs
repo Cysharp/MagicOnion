@@ -2,7 +2,7 @@
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
-namespace globalname
+namespace MagicOnion
 {
     using global::System;
     using global::System.Collections.Generic;
@@ -54,6 +54,12 @@ namespace Sandbox.ConsoleServer {
         ServerStreamingResult<global::SharedLibrary.Nil> ServerStreamingResult4();
    
         ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req);
+   
+        UnaryResult<bool> UnaryS1(global::System.DateTime dt, global::System.DateTimeOffset dt2);
+   
+        UnaryResult<bool> UnaryS2(int[] arrayPattern);
+   
+        UnaryResult<bool> UnaryS3(int[] arrayPattern1, string[] arrayPattern2, global::SharedLibrary.MyEnum[] arrayPattern3);
     }
     
     public class IArgumentPatternClient : MagicOnionClientBase<IArgumentPattern>, IArgumentPattern
@@ -94,6 +100,18 @@ namespace Sandbox.ConsoleServer {
         static readonly Marshaller<global::SharedLibrary.MyStructRequest> ServerStreamingResult5RequestMarshaller;
         static readonly Marshaller<global::SharedLibrary.MyStructResponse> ServerStreamingResult5ResponseMarshaller;
 
+        static readonly Method<byte[], byte[]> UnaryS1Method;
+        static readonly Marshaller<DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>> UnaryS1RequestMarshaller;
+        static readonly Marshaller<bool> UnaryS1ResponseMarshaller;
+
+        static readonly Method<byte[], byte[]> UnaryS2Method;
+        static readonly Marshaller<int[]> UnaryS2RequestMarshaller;
+        static readonly Marshaller<bool> UnaryS2ResponseMarshaller;
+
+        static readonly Method<byte[], byte[]> UnaryS3Method;
+        static readonly Marshaller<DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>> UnaryS3RequestMarshaller;
+        static readonly Marshaller<bool> UnaryS3ResponseMarshaller;
+
 
         static IArgumentPatternClient()
         {
@@ -133,6 +151,18 @@ namespace Sandbox.ConsoleServer {
             ServerStreamingResult5RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructRequest>.Default);
             ServerStreamingResult5ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructResponse>.Default);
 
+            UnaryS1Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset)));
+            UnaryS1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+
+            UnaryS2Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, int[]>.Default);
+            UnaryS2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+
+            UnaryS3Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[])));
+            UnaryS3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+
         }
 
         IArgumentPatternClient()
@@ -161,65 +191,86 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<global::SharedLibrary.MyHugeResponse> Unary1(int x, int y, string z = "unknown", global::SharedLibrary.MyEnum e = SharedLibrary.MyEnum.Orange, global::SharedLibrary.MyStructResponse soho = default(global::SharedLibrary.MyStructResponse), ulong zzz = 9, global::SharedLibrary.MyRequest req = null)
         {
-            var request = Unary1RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(x, y, z, e, soho, zzz, req));
-            var callResult = callInvoker.AsyncUnaryCall(Unary1Method, host, option, request);
-            return new UnaryResult<global::SharedLibrary.MyHugeResponse>(callResult, Unary1ResponseMarshaller);
+            var __request = Unary1RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(x, y, z, e, soho, zzz, req));
+            var __callResult = callInvoker.AsyncUnaryCall(Unary1Method, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyHugeResponse>(__callResult, Unary1ResponseMarshaller);
         }
 
         public UnaryResult<global::SharedLibrary.MyResponse> Unary2(global::SharedLibrary.MyRequest req)
         {
-            var request = Unary2RequestMarshaller.Serializer(req);
-            var callResult = callInvoker.AsyncUnaryCall(Unary2Method, host, option, request);
-            return new UnaryResult<global::SharedLibrary.MyResponse>(callResult, Unary2ResponseMarshaller);
+            var __request = Unary2RequestMarshaller.Serializer(req);
+            var __callResult = callInvoker.AsyncUnaryCall(Unary2Method, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyResponse>(__callResult, Unary2ResponseMarshaller);
         }
 
         public UnaryResult<global::SharedLibrary.MyResponse> Unary3()
         {
-            var request = Unary3RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
-            var callResult = callInvoker.AsyncUnaryCall(Unary3Method, host, option, request);
-            return new UnaryResult<global::SharedLibrary.MyResponse>(callResult, Unary3ResponseMarshaller);
+            var __request = Unary3RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
+            var __callResult = callInvoker.AsyncUnaryCall(Unary3Method, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyResponse>(__callResult, Unary3ResponseMarshaller);
         }
 
         public UnaryResult<global::SharedLibrary.MyStructResponse> Unary5(global::SharedLibrary.MyStructRequest req)
         {
-            var request = Unary5RequestMarshaller.Serializer(req);
-            var callResult = callInvoker.AsyncUnaryCall(Unary5Method, host, option, request);
-            return new UnaryResult<global::SharedLibrary.MyStructResponse>(callResult, Unary5ResponseMarshaller);
+            var __request = Unary5RequestMarshaller.Serializer(req);
+            var __callResult = callInvoker.AsyncUnaryCall(Unary5Method, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyStructResponse>(__callResult, Unary5ResponseMarshaller);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult1(int x, int y, string z = "unknown")
         {
-            var request = ServerStreamingResult1RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, string>(x, y, z));
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult1Method, host, option, request);
-            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(callResult, ServerStreamingResult1ResponseMarshaller);
+            var __request = ServerStreamingResult1RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, string>(x, y, z));
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult1Method, base.host, base.option, __request);
+            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, ServerStreamingResult1ResponseMarshaller);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult2(global::SharedLibrary.MyRequest req)
         {
-            var request = ServerStreamingResult2RequestMarshaller.Serializer(req);
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult2Method, host, option, request);
-            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(callResult, ServerStreamingResult2ResponseMarshaller);
+            var __request = ServerStreamingResult2RequestMarshaller.Serializer(req);
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult2Method, base.host, base.option, __request);
+            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, ServerStreamingResult2ResponseMarshaller);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult3()
         {
-            var request = ServerStreamingResult3RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult3Method, host, option, request);
-            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(callResult, ServerStreamingResult3ResponseMarshaller);
+            var __request = ServerStreamingResult3RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult3Method, base.host, base.option, __request);
+            return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, ServerStreamingResult3ResponseMarshaller);
         }
 
         public ServerStreamingResult<global::SharedLibrary.Nil> ServerStreamingResult4()
         {
-            var request = ServerStreamingResult4RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult4Method, host, option, request);
-            return new ServerStreamingResult<global::SharedLibrary.Nil>(callResult, ServerStreamingResult4ResponseMarshaller);
+            var __request = ServerStreamingResult4RequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult4Method, base.host, base.option, __request);
+            return new ServerStreamingResult<global::SharedLibrary.Nil>(__callResult, ServerStreamingResult4ResponseMarshaller);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req)
         {
-            var request = ServerStreamingResult5RequestMarshaller.Serializer(req);
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult5Method, host, option, request);
-            return new ServerStreamingResult<global::SharedLibrary.MyStructResponse>(callResult, ServerStreamingResult5ResponseMarshaller);
+            var __request = ServerStreamingResult5RequestMarshaller.Serializer(req);
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult5Method, base.host, base.option, __request);
+            return new ServerStreamingResult<global::SharedLibrary.MyStructResponse>(__callResult, ServerStreamingResult5ResponseMarshaller);
+        }
+
+        public UnaryResult<bool> UnaryS1(global::System.DateTime dt, global::System.DateTimeOffset dt2)
+        {
+            var __request = UnaryS1RequestMarshaller.Serializer(new DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>(dt, dt2));
+            var __callResult = callInvoker.AsyncUnaryCall(UnaryS1Method, base.host, base.option, __request);
+            return new UnaryResult<bool>(__callResult, UnaryS1ResponseMarshaller);
+        }
+
+        public UnaryResult<bool> UnaryS2(int[] arrayPattern)
+        {
+            var __request = UnaryS2RequestMarshaller.Serializer(arrayPattern);
+            var __callResult = callInvoker.AsyncUnaryCall(UnaryS2Method, base.host, base.option, __request);
+            return new UnaryResult<bool>(__callResult, UnaryS2ResponseMarshaller);
+        }
+
+        public UnaryResult<bool> UnaryS3(int[] arrayPattern1, string[] arrayPattern2, global::SharedLibrary.MyEnum[] arrayPattern3)
+        {
+            var __request = UnaryS3RequestMarshaller.Serializer(new DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>(arrayPattern1, arrayPattern2, arrayPattern3));
+            var __callResult = callInvoker.AsyncUnaryCall(UnaryS3Method, base.host, base.option, __request);
+            return new UnaryResult<bool>(__callResult, UnaryS3ResponseMarshaller);
         }
 
     }
@@ -301,28 +352,28 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<int> Unary1Async(int x, int y)
         {
-            var request = Unary1AsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
-            var callResult = callInvoker.AsyncUnaryCall(Unary1AsyncMethod, host, option, request);
-            return new UnaryResult<int>(callResult, Unary1AsyncResponseMarshaller);
+            var __request = Unary1AsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
+            var __callResult = callInvoker.AsyncUnaryCall(Unary1AsyncMethod, base.host, base.option, __request);
+            return new UnaryResult<int>(__callResult, Unary1AsyncResponseMarshaller);
         }
 
         public ClientStreamingResult<int, string> ClientStreaming1Async()
         {
-            var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreaming1AsyncMethod, host, option);
-            return new ClientStreamingResult<int, string>(callResult, ClientStreaming1AsyncRequestMarshaller, ClientStreaming1AsyncResponseMarshaller);
+            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreaming1AsyncMethod, base.host, base.option);
+            return new ClientStreamingResult<int, string>(__callResult, ClientStreaming1AsyncRequestMarshaller, ClientStreaming1AsyncResponseMarshaller);
         }
 
         public ServerStreamingResult<int> ServerStreamingAsync(int x, int y, int z)
         {
-            var request = ServerStreamingAsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
-            var callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingAsyncMethod, host, option, request);
-            return new ServerStreamingResult<int>(callResult, ServerStreamingAsyncResponseMarshaller);
+            var __request = ServerStreamingAsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
+            var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingAsyncMethod, base.host, base.option, __request);
+            return new ServerStreamingResult<int>(__callResult, ServerStreamingAsyncResponseMarshaller);
         }
 
         public DuplexStreamingResult<int, int> DuplexStreamingAsync()
         {
-            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
-            return new DuplexStreamingResult<int, int>(callResult, DuplexStreamingAsyncRequestMarshaller, DuplexStreamingAsyncResponseMarshaller);
+            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
+            return new DuplexStreamingResult<int, int>(__callResult, DuplexStreamingAsyncRequestMarshaller, DuplexStreamingAsyncResponseMarshaller);
         }
 
     }
@@ -424,42 +475,42 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<string> SumAsync(int x, int y)
         {
-            var request = SumAsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
-            var callResult = callInvoker.AsyncUnaryCall(SumAsyncMethod, host, option, request);
-            return new UnaryResult<string>(callResult, SumAsyncResponseMarshaller);
+            var __request = SumAsyncRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
+            var __callResult = callInvoker.AsyncUnaryCall(SumAsyncMethod, base.host, base.option, __request);
+            return new UnaryResult<string>(__callResult, SumAsyncResponseMarshaller);
         }
 
         public UnaryResult<string> SumAsync2(int x, int y)
         {
-            var request = SumAsync2RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
-            var callResult = callInvoker.AsyncUnaryCall(SumAsync2Method, host, option, request);
-            return new UnaryResult<string>(callResult, SumAsync2ResponseMarshaller);
+            var __request = SumAsync2RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int>(x, y));
+            var __callResult = callInvoker.AsyncUnaryCall(SumAsync2Method, base.host, base.option, __request);
+            return new UnaryResult<string>(__callResult, SumAsync2ResponseMarshaller);
         }
 
         public ClientStreamingResult<int, string> StreamingOne()
         {
-            var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(StreamingOneMethod, host, option);
-            return new ClientStreamingResult<int, string>(callResult, StreamingOneRequestMarshaller, StreamingOneResponseMarshaller);
+            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(StreamingOneMethod, base.host, base.option);
+            return new ClientStreamingResult<int, string>(__callResult, StreamingOneRequestMarshaller, StreamingOneResponseMarshaller);
         }
 
         public ServerStreamingResult<string> StreamingTwo(int x, int y, int z)
         {
-            var request = StreamingTwoRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
-            var callResult = callInvoker.AsyncServerStreamingCall(StreamingTwoMethod, host, option, request);
-            return new ServerStreamingResult<string>(callResult, StreamingTwoResponseMarshaller);
+            var __request = StreamingTwoRequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
+            var __callResult = callInvoker.AsyncServerStreamingCall(StreamingTwoMethod, base.host, base.option, __request);
+            return new ServerStreamingResult<string>(__callResult, StreamingTwoResponseMarshaller);
         }
 
         public ServerStreamingResult<string> StreamingTwo2(int x, int y, int z = 9999)
         {
-            var request = StreamingTwo2RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
-            var callResult = callInvoker.AsyncServerStreamingCall(StreamingTwo2Method, host, option, request);
-            return new ServerStreamingResult<string>(callResult, StreamingTwo2ResponseMarshaller);
+            var __request = StreamingTwo2RequestMarshaller.Serializer(new DynamicArgumentTuple<int, int, int>(x, y, z));
+            var __callResult = callInvoker.AsyncServerStreamingCall(StreamingTwo2Method, base.host, base.option, __request);
+            return new ServerStreamingResult<string>(__callResult, StreamingTwo2ResponseMarshaller);
         }
 
         public DuplexStreamingResult<int, string> StreamingThree()
         {
-            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(StreamingThreeMethod, host, option);
-            return new DuplexStreamingResult<int, string>(callResult, StreamingThreeRequestMarshaller, StreamingThreeResponseMarshaller);
+            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(StreamingThreeMethod, base.host, base.option);
+            return new DuplexStreamingResult<int, string>(__callResult, StreamingThreeRequestMarshaller, StreamingThreeResponseMarshaller);
         }
 
     }
