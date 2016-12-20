@@ -249,6 +249,12 @@ namespace MagicOnion.HttpGateway.Swagger
                             }
                         }
 
+                        IList<object> schemaEnum = null;
+                        if (memberType.IsEnum)
+                        {
+                            schemaEnum = Enum.GetNames(memberType);
+                        }
+
                         return new
                         {
                             Name = x.Name,
@@ -256,6 +262,7 @@ namespace MagicOnion.HttpGateway.Swagger
                             {
                                 type = swaggerDataType,
                                 description = memberType.Name,
+                                @enum = schemaEnum,
                                 items = items
                             }
                         };

@@ -19,7 +19,7 @@ namespace MagicOnion.HttpGateway.Swagger
         public SwaggerOptions(string title, string description, string apiBasePath)
         {
             ApiBasePath = apiBasePath;
-            JsonName = "api-default.json";
+            JsonName = "swagger.json";
             Info = new Info { description = description, title = title };
         }
     }
