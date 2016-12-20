@@ -71,6 +71,7 @@
     <Compile Include="IgnoreAttribute.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="MagicOnionMarshallers.cs" />
+    <Compile Include="MetadataExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReturnStatusException.cs" />
     <Compile Include="ServerStreamingResult.cs" />
