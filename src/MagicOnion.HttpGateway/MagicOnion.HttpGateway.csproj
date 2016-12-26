@@ -147,12 +147,12 @@
       <HintPath>$(SolutionDir)packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.5.6\lib\net45\ZeroFormatter.dll</HintPath>
+    <Reference Include="ZeroFormatter, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.5.7\lib\net45\ZeroFormatter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.6\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.7\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -234,7 +234,7 @@
     <EmbeddedResource Include="Swagger\SwaggerUI\lib\sanitize-html.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
+  <Import Project="$(SolutionDir)packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

@@ -32,8 +32,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.5\lib\net35\ZeroFormatter.Interfaces.dll</HintPath>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.7\lib\net35\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -49,7 +49,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.5\tools\zfc.exe -i $(ProjectPath) -o $(SolutionDir)src\MagicOnion.Client.Unity\Assets\Scripts\ZeroFormatterGenerated.cs -u</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.7\tools\zfc.exe -i $(ProjectPath) -o $(SolutionDir)src\MagicOnion.Client.Unity\Assets\Scripts\ZeroFormatterGenerated.cs -u</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

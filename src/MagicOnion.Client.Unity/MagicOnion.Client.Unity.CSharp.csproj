@@ -64,14 +64,14 @@
     <Reference Include="SharedLibrary">
       <HintPath>Assets\Plugins\SharedLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces">
-      <HintPath>Assets\Plugins\ZeroFormatter.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="ZeroFormatter">
       <HintPath>Assets\Plugins\ZeroFormatter\ZeroFormatter.dll</HintPath>
     </Reference>
     <Reference Include="ZeroFormatter.Interfaces">
       <HintPath>Assets\Plugins\ZeroFormatter\ZeroFormatter.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroFormatter.Interfaces">
+      <HintPath>Assets\Plugins\ZeroFormatter.Interfaces.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -47,12 +47,12 @@
       <HintPath>$(SolutionDir)packages\System.Interactive.Async.3.0.0\lib\net45\System.Interactive.Async.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.5.6\lib\net45\ZeroFormatter.dll</HintPath>
+    <Reference Include="ZeroFormatter, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.5.7\lib\net45\ZeroFormatter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.6\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.7\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -101,12 +101,12 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
+  <Import Project="$(SolutionDir)packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

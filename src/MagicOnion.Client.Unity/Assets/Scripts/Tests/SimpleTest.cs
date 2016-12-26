@@ -15,15 +15,9 @@ namespace MagicOnion.Tests
     {
         IMyFirstService GetClient()
         {
-
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             var client = MagicOnionClient.Create<IMyFirstService>(channel);
 
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             return client;
         }
 
