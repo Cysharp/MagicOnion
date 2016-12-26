@@ -49,7 +49,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.5\tools\zfc.exe -i $(ProjectPath) -o $(SolutionDir)src\MagicOnion.Client.Unity\Assets\Scripts\ZeroFormatterGenerated.cs</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.5\tools\zfc.exe -i $(ProjectPath) -o $(SolutionDir)src\MagicOnion.Client.Unity\Assets\Scripts\ZeroFormatterGenerated.cs -u</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

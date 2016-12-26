@@ -14,7 +14,6 @@ namespace ZeroFormatter
 
     public static partial class ZeroFormatterInitializer
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Register()
         {
             // Enums

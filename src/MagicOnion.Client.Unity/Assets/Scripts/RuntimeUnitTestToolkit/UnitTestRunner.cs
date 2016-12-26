@@ -263,10 +263,22 @@ namespace RuntimeUnitTestToolkit
                 else
                 {
                     var coroutineFactory = (Func<IEnumerator>)v;
-                    yield return StartCoroutine(UnwrapEnumerator(coroutineFactory(), ex =>
+                    IEnumerator coroutine = null;
+                    try
+                    {
+                        coroutine = coroutineFactory();
+                    }
+                    catch(Exception ex)
                     {
                         exception = ex;
-                    }));
+                    }
+                    if (exception == null)
+                    {
+                        yield return StartCoroutine(UnwrapEnumerator(coroutine, ex =>
+                        {
+                            exception = ex;
+                        }));
+                    }
                 }
 
                 methodStopwatch.Stop();
