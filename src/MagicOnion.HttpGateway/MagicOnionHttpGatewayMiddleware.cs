@@ -128,8 +128,15 @@ namespace MagicOnion.HttpGateway
 
                 var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodInfo.Name, MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
 
+                // create header
+                var metadata = new Metadata();
+                foreach (var header in httpContext.Request.Headers)
+                {
+                    metadata.Add(header.Key, header.Value);
+                }
+
                 var invoker = new DefaultCallInvoker(channel);
-                var rawResponse = await invoker.AsyncUnaryCall(method, null, default(CallOptions), requestObject);
+                var rawResponse = await invoker.AsyncUnaryCall(method, null, default(CallOptions).WithHeaders(metadata), requestObject);
 
                 // ZeroFormatter -> Object -> Json
                 var obj = handler.BoxedDeserialize(rawResponse);
