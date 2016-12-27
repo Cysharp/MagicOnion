@@ -13,6 +13,17 @@ using MagicOnion.HttpGateway.Swagger;
 
 namespace MagicOnion.ConsoleServer
 {
+    public static class Configuration
+    {
+        public static readonly string GrpcHost = "localhost";
+        public static readonly string GatewayHost = "http://localhost:5432";
+
+        //public static readonly string GrpcHost = "0.0.0.0";
+        //public static readonly string GatewayHost = "http://*:80";
+
+        public static readonly string GrpcHostLocal = "localhost:12345";
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -31,11 +42,10 @@ namespace MagicOnion.ConsoleServer
             var server = new global::Grpc.Core.Server
             {
                 Services = { service },
-                Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
+                Ports = { new ServerPort(Configuration.GrpcHost, 12345, ServerCredentials.Insecure) }
             };
 
             server.Start();
-
 
             var webHost = new WebHostBuilder()
                 .ConfigureServices(collection =>
@@ -44,7 +54,7 @@ namespace MagicOnion.ConsoleServer
                 })
                 .UseWebListener()
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:5432")
+                .UseUrls(Configuration.GatewayHost)
                 .Build();
 
             webHost.Run();
@@ -65,7 +75,7 @@ namespace MagicOnion.ConsoleServer
             {
                 XmlDocumentPath = xmlPath
             });
-            app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
+            app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel(Configuration.GrpcHostLocal, ChannelCredentials.Insecure));
         }
     }
 }
