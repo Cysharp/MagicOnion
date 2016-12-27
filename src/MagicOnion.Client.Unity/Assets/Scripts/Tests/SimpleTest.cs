@@ -15,10 +15,7 @@ namespace MagicOnion.Tests
     {
         IMyFirstService GetClient()
         {
-            var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
-            var client = MagicOnionClient.Create<IMyFirstService>(channel);
-
-            return client;
+            return UnitTestClient.Create<IMyFirstService>();
         }
 
         public IEnumerator Unary()

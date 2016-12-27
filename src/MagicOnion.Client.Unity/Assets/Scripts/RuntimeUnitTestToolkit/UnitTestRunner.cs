@@ -58,11 +58,11 @@ namespace RuntimeUnitTestToolkit
             }
         }
 
-        public static void AddCustomButton(Button button)
+        public static void AddCustomAction(string name, UnityAction action)
         {
             try
             {
-                UnitTestRunner.AddCustomButton(button);
+                UnitTestRunner.AddCutomAction(name, action);
             }
             catch (Exception ex)
             {
@@ -106,8 +106,7 @@ namespace RuntimeUnitTestToolkit
         // object is IEnumerator or Func<IEnumerator>
         static Dictionary<string, List<KeyValuePair<string, object>>> tests = new Dictionary<string, List<KeyValuePair<string, object>>>();
 
-        static List<Button> additionalButtonsOnFirst = new List<Button>();
-
+        static List<Pair> additionalActionsOnFirst = new List<Pair>();
 
         public Button clearButton;
         public RectTransform list;
@@ -122,7 +121,7 @@ namespace RuntimeUnitTestToolkit
 
         void Start()
         {
-            UnityEngine.Application.logMessageReceived += (a,b,c) =>
+            UnityEngine.Application.logMessageReceived += (a, b, c) =>
             {
                 logText.text += "[" + c + "]" + a + "\n";
             };
@@ -142,11 +141,16 @@ namespace RuntimeUnitTestToolkit
             executeAllButton.gameObject.GetComponent<Image>().color = new Color(250 / 255f, 150 / 255f, 150 / 255f, 1);
             executeAllButton.transform.SetSiblingIndex(1);
 
-            additionalButtonsOnFirst.Reverse();
-            foreach (var item in additionalButtonsOnFirst)
+            additionalActionsOnFirst.Reverse();
+            foreach (var item in additionalActionsOnFirst)
             {
-                item.transform.SetParent(list);
-                item.transform.SetSiblingIndex(1);
+                var newButton = GameObject.Instantiate(clearButton);
+                newButton.name = item.Name;
+                newButton.onClick.RemoveAllListeners();
+                newButton.GetComponentInChildren<Text>().text = item.Name;
+                newButton.onClick.AddListener(item.Action);
+                newButton.transform.SetParent(list);
+                newButton.transform.SetSiblingIndex(1);
             }
 
 #if !(UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
@@ -204,9 +208,9 @@ namespace RuntimeUnitTestToolkit
             list.Add(new KeyValuePair<string, object>(title, asyncTestCoroutine));
         }
 
-        public static void AddCustomButton(Button button)
+        public static void AddCutomAction(string name, UnityAction action)
         {
-            additionalButtonsOnFirst.Add(button);
+            additionalActionsOnFirst.Add(new Pair { Name = name, Action = action });
         }
 
         System.Collections.IEnumerator ScrollLogToEndNextFrame()
@@ -268,12 +272,13 @@ namespace RuntimeUnitTestToolkit
                     {
                         coroutine = coroutineFactory();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         exception = ex;
                     }
                     if (exception == null)
                     {
+
                         yield return StartCoroutine(UnwrapEnumerator(coroutine, ex =>
                         {
                             exception = ex;
@@ -331,9 +336,29 @@ namespace RuntimeUnitTestToolkit
 
                 if (hasNext)
                 {
-                    yield return enumerator.Current;
+                    // unwrap self for bug of Unity
+                    // https://issuetracker.unity3d.com/issues/does-not-stop-coroutine-when-it-throws-exception-in-movenext-at-first-frame
+                    var moreCoroutine = enumerator.Current as IEnumerator;
+                    if (moreCoroutine != null)
+                    {
+                        yield return StartCoroutine(UnwrapEnumerator(moreCoroutine, ex =>
+                        {
+                            exceptionCallback(ex);
+                            hasNext = false;
+                        }));
+                    }
+                    else
+                    {
+                        yield return enumerator.Current;
+                    }
                 }
             }
+        }
+
+        struct Pair
+        {
+            public string Name;
+            public UnityAction Action;
         }
     }
 }

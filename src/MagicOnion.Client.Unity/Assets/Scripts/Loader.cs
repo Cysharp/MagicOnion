@@ -8,6 +8,8 @@ using System;
 using Grpc.Core.Logging;
 using System.IO;
 using System.Text;
+using Grpc.Core;
+using MagicOnion.Client;
 
 namespace MagicOnion.Tests
 {
@@ -21,14 +23,38 @@ namespace MagicOnion.Tests
             MagicOnionInitializer.Register();
             ZeroFormatter.Formatters.Formatter.RegisterArray<DefaultResolver, MyEnum>();
 
+            // Button ON
+            RuntimeUnitTestToolkit.UnitTest.AddCustomAction("Use Local", () =>
+            {
+                UnitTestClient.endPoint = "local";
+            });
+            RuntimeUnitTestToolkit.UnitTest.AddCustomAction("Use Remote", () =>
+            {
+                UnitTestClient.endPoint = "104.199.192.165";
+            });
+
             // gRPC Config
-            Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
-            Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+            // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
+            // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
             Grpc.Core.GrpcEnvironment.SetLogger(new MagicOnion.UnityDebugLogger());
 
+            // Register Tests
             UnitTest.RegisterAllMethods<SimpleTest>();
             UnitTest.RegisterAllMethods<StandardTest>();
             UnitTest.RegisterAllMethods<ArgumentPatternTest>();
+        }
+    }
+
+    public static class UnitTestClient
+    {
+        internal static string endPoint = "localhost";
+
+        public static T Create<T>() where T : IService<T>
+        {
+            var channel = new Channel(endPoint, 12345, ChannelCredentials.Insecure);
+            var client = MagicOnionClient.Create<T>(channel).WithDeadline(DateTime.UtcNow.AddSeconds(10));
+
+            return client;
         }
     }
 }

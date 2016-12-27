@@ -16,9 +16,7 @@ namespace MagicOnion.Tests
     {
         IArgumentPattern GetClient()
         {
-            var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
-            var client = MagicOnionClient.Create<IArgumentPattern>(channel);
-            return client.WithDeadline(DateTime.UtcNow.AddSeconds(10));
+            return UnitTestClient.Create<IArgumentPattern>();
         }
 
         public IEnumerator Unary1()
