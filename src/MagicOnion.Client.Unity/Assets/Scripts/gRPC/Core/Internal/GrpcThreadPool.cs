@@ -106,7 +106,8 @@ namespace Grpc.Core.Internal
             {
                 foreach (var thread in threads)
                 {
-                    thread.Join();
+                    // NOTE:does not wait.
+                    // thread.Join();
                 }
 
                 foreach (var cq in completionQueues)
@@ -176,7 +177,7 @@ namespace Grpc.Core.Internal
                     }
                 }
             }
-            while (ev.type != CompletionQueueEvent.CompletionType.Shutdown);
+            while (ev.type != CompletionQueueEvent.CompletionType.Shutdown && !cq.IsClosed);
         }
 
         private static ReadOnlyCollection<CompletionQueueSafeHandle> CreateCompletionQueueList(GrpcEnvironment environment, int completionQueueCount)

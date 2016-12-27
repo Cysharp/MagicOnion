@@ -289,7 +289,8 @@ namespace Grpc.Core
             {
                 GrpcNativeShutdown();
                 isClosed = true;
-                debugStats.CheckOK();
+                // NOTE:does not check status.
+                // debugStats.CheckOK();
             });
         }
 
