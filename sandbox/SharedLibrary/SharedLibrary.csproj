@@ -34,7 +34,7 @@
     <Reference Include="System.Core" />
     <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.7\lib\net35\ZeroFormatter.Interfaces.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
