@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
-    public class MethodHandler
+    public class MethodHandler : IEquatable<MethodHandler>
     {
         static readonly byte[] emptyBytes = new byte[0];
 
@@ -131,6 +131,11 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.ClientStreaming:
                 case MethodType.DuplexStreaming:
+                    if (parameters.Length != 0)
+                    {
+                        throw new InvalidOperationException($"{MethodType} does not support method parameters. If you need to send initial parameter, use header instead.");
+                    }
+
                     // (ServiceContext context) => new FooService() { Context = context }.Bar();
                     {
                         var body = Expression.Call(instance, methodInfo);
@@ -497,6 +502,16 @@ namespace MagicOnion.Server
         public override string ToString()
         {
             return ServiceName + "/" + MethodInfo.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return ServiceName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
+        }
+
+        public bool Equals(MethodHandler other)
+        {
+            return ServiceName.Equals(other.ServiceName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
         }
     }
 }

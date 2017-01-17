@@ -65,6 +65,8 @@ namespace MagicOnion.Server
             this.inner = context.RequestStream;
         }
 
+        public ServiceContext ServiceContext { get { return context; } }
+
         public TRequest Current { get; private set; }
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken = default(CancellationToken))
@@ -136,6 +138,8 @@ namespace MagicOnion.Server
             this.inner = context.ResponseStream;
         }
 
+        public ServiceContext ServiceContext { get { return context; } }
+
         public WriteOptions WriteOptions
         {
             get
@@ -184,6 +188,8 @@ namespace MagicOnion.Server
             this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
             this.responseMarshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
         }
+
+        public ServiceContext ServiceContext { get { return context; } }
 
         /// <summary>IAsyncStreamReader Methods.</summary>
         public TRequest Current { get; private set; }

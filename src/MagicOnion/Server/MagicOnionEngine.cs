@@ -48,7 +48,7 @@ namespace MagicOnion.Server
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
         {
             var builder = ServerServiceDefinition.CreateBuilder();
-            var handlers = new List<MethodHandler>();
+            var handlers = new HashSet<MethodHandler>();
 
             var types = targetTypes
               .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
@@ -59,7 +59,7 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
-            Parallel.ForEach(types, classType =>
+            Parallel.ForEach(types, new ParallelOptions { MaxDegreeOfParallelism = 1 }, classType =>
             {
                 var className = classType.Name;
                 if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
@@ -93,13 +93,16 @@ namespace MagicOnion.Server
                     var handler = new MethodHandler(option, classType, methodInfo);
                     lock (builder)
                     {
-                        handlers.Add(handler);
+                        if (!handlers.Add(handler))
+                        {
+                            throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
+                        }
                         handler.RegisterHandler(builder);
                     }
                 }
             });
 
-            var result = new MagicOnionServiceDefinition(builder.Build(), handlers);
+            var result = new MagicOnionServiceDefinition(builder.Build(), handlers.ToArray());
 
             sw.Stop();
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);

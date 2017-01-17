@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>MagicOnion</id>
-        <version>0.3.1-alpha</version>
+        <version>0.3.2-alpha</version>
         <title>MagicOnion</title>
         <authors>neuecc</authors>
         <owners>neuecc</owners>
         <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>gRPC based HTTP2 RPC Streaming Framework for .NET, .NET Core and Unity.</description>
-        <releaseNotes>add MetadataExtensions.</releaseNotes>
+        <releaseNotes>throw kindness error message when define invalid method. Add StreamingContext.ServiceContext property.</releaseNotes>
         <tags>gRPC, HTTP2</tags>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
