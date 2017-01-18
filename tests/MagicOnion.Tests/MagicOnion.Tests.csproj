@@ -79,6 +79,7 @@
     <Compile Include="ChainingAssertion.xUnit.cs" />
     <Compile Include="ClientConfigTest.cs" />
     <Compile Include="FilterTest.cs" />
+    <Compile Include="PartialDefinitionTest.cs" />
     <Compile Include="ReturnStatusTest.cs" />
     <Compile Include="ServerErrorTest.cs" />
     <Compile Include="SimpleTest.cs" />

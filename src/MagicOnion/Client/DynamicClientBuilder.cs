@@ -58,7 +58,9 @@ namespace MagicOnion.Client
         static MethodDefinition[] SearchDefinitions(Type interfaceType)
         {
             return interfaceType
-                .GetMethods()
+                .GetInterfaces()
+                .Concat(new []{ interfaceType })
+                .SelectMany(x => x.GetMethods())
                 .Where(x =>
                 {
                     var methodName = x.Name;
@@ -130,7 +132,7 @@ namespace MagicOnion.Client
                     il.Emit(OpCodes.Ldtoken, resolverType);
                     il.Emit(OpCodes.Call, getTypeFromHandle);
                     il.Emit(OpCodes.Ldstr, def.Path);
-                    il.Emit(OpCodes.Ldtoken, interfaceType);
+                    il.Emit(OpCodes.Ldtoken, def.MethodInfo.DeclaringType);
                     il.Emit(OpCodes.Call, getTypeFromHandle);
                     il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
                     il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetMethod", new[] { typeof(string) }));
