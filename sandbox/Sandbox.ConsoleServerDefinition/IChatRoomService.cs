@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Sandbox.ConsoleServer
 {
-    public interface IChatRoomStreaming : IStreamingService
+    public interface IChatRoomStreaming// : IStreamingService
     {
         Task<ServerStreamingResult<RoomMember>> OnJoin();
         Task<ServerStreamingResult<RoomMember>> OnLeave();

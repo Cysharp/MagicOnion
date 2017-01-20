@@ -4,14 +4,7 @@ using System.Threading;
 
 namespace MagicOnion.Server
 {
-    public interface IStreamingService
-    {
-        ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>();
-        ServerStreamingContext<TResponse> GetServerStreamingContext<TResponse>();
-        DuplexStreamingContext<TRequest, TResponse> GetDuplexStreamingContext<TRequest, TResponse>();
-    }
-
-    public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>, IStreamingService
+    public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>
     {
         public ServiceContext Context { get; set; }
 

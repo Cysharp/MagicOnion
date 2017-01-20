@@ -16,9 +16,10 @@ namespace Sandbox.ConsoleClient
 
         public static async Task Run(Channel channel)
         {
-            var heartbeat = MagicOnionClient.Create<IHeartbeat>(channel).Connect();
+            var heartbeat = await ClientConnectionLifetimeManager.Connect(channel);
 
-            var client = MagicOnionClient.Create<IChatRoomService>(channel);
+            var client = MagicOnionClient.Create<IChatRoomService>(channel)
+                .WithHeaders(heartbeat.ToMetadata());
 
 
             var room = await await client.CreateNewRoom("room", "hogehoge");

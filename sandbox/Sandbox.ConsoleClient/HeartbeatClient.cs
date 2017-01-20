@@ -76,6 +76,13 @@ namespace Sandbox.ConsoleClient
             return new ClientConnectionLifetimeManager(task, source, connectionId, method);
         }
 
+        public Metadata ToMetadata()
+        {
+            var meta = new Metadata();
+            meta.Add(HeaderKey, connectionId);
+            return meta;
+        }
+
         public CancellationTokenRegistration RegisterDisconnectAction(Action action)
         {
             return source.Token.Register(action);

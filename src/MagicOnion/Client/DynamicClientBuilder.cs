@@ -59,11 +59,15 @@ namespace MagicOnion.Client
         {
             return interfaceType
                 .GetInterfaces()
-                .Concat(new []{ interfaceType })
+                .Concat(new[] { interfaceType })
                 .SelectMany(x => x.GetMethods())
                 .Where(x =>
                 {
-                    var methodName = x.Name;
+                    var methodInfo = x;
+                    if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) return false;
+                    if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) return false; // ignore
+
+                    var methodName = methodInfo.Name;
                     if (methodName == "Equals"
                      || methodName == "GetHashCode"
                      || methodName == "GetType"
