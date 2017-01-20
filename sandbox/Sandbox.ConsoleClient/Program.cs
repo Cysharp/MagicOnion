@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Logging;
 using MagicOnion.Client;
+using Sandbox.ConsoleClient;
 using Sandbox.ConsoleServer;
 using System;
 using System.Collections.Concurrent;
@@ -35,7 +36,13 @@ namespace MagicOnion.ConsoleClient
             //DuplexStreamRun(c).GetAwaiter().GetResult();
 
             // many run
-            UnaryLoadTest(c).GetAwaiter().GetResult();
+            //UnaryLoadTest(c).GetAwaiter().GetResult();
+
+
+            //HearbeatClient.Test(channel).GetAwaiter().GetResult();
+            //Console.ReadLine();
+
+            ChatClient.Run(channel).GetAwaiter().GetResult();
         }
 
         static async Task UnaryRun(IMyFirstService client)

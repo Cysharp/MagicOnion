@@ -61,8 +61,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HeartbeatClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ChatClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -76,6 +78,10 @@
     <ProjectReference Include="..\Sandbox.ConsoleServerDefinition\Sandbox.ConsoleServerDefinition.csproj">
       <Project>{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}</Project>
       <Name>Sandbox.ConsoleServerDefinition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
+      <Project>{6bde33a5-2744-40e5-8999-bf0465745587}</Project>
+      <Name>SharedLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

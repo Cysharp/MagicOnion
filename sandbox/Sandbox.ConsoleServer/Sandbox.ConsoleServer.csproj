@@ -256,6 +256,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ArgumentPattern.cs" />
+    <Compile Include="Services\ChatRoomService.cs" />
+    <Compile Include="Services\Heartbeat.cs" />
     <Compile Include="Services\MyFirstService.cs" />
     <Compile Include="Services\Standard.cs" />
   </ItemGroup>

@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IArgumentPattern.cs" />
+    <Compile Include="IChatRoomService.cs" />
+    <Compile Include="IHeartbeat.cs" />
     <Compile Include="IStandard.cs" />
     <Compile Include="IMyFirstService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
