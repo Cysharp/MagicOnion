@@ -37,12 +37,12 @@ namespace MagicOnion.Server
         // Factory and Cache.
 
         public const string HeaderKey = "connection_id";
-        public static ConcurrentDictionary<string, ConnectionContext> manager = new ConcurrentDictionary<string, ConnectionContext>();
+        static ConcurrentDictionary<string, ConnectionContext> manager = new ConcurrentDictionary<string, ConnectionContext>();
 
         public static string GetConnectionId(ServiceContext context)
         {
             var connectionId = context.CallContext.RequestHeaders.Get(HeaderKey);
-            if (connectionId == null || connectionId.IsBinary) throw new Exception("ConnectionLifetimeManager must needs `connection_id` header and Guid string.");
+            if (connectionId == null || connectionId.IsBinary) throw new Exception("ConnectionContext must needs `connection_id` header and Guid string.");
 
             return connectionId.Value;
         }

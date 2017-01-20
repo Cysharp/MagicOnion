@@ -42,10 +42,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Interactive.Async, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\System.Interactive.Async.3.0.0\lib\net45\System.Interactive.Async.dll</HintPath>
@@ -80,6 +76,7 @@
     <Compile Include="ReturnStatusException.cs" />
     <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\ConnectionContext.cs" />
+    <Compile Include="Server\EmbeddedService\Heartbeat.cs" />
     <Compile Include="Server\IMagicOnionLogger.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionFilterAttribute.cs" />

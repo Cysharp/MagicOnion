@@ -4,7 +4,6 @@ using MagicOnion.Server;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -22,7 +21,8 @@ namespace MagicOnion.Server
 
     public class StreamingContextGroup<TKey, TValue, TStreamingService>
     {
-        ImmutableDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>> repositories;
+        readonly ConcurrentDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>> repositories;
+        readonly IEqualityComparer<TKey> comparer;
 
         public int Count
         {
@@ -31,36 +31,45 @@ namespace MagicOnion.Server
                 return repositories.Count;
             }
         }
-
-        public IEnumerable<TKey> Keys()
+        public IEnumerable<TKey> Keys
         {
-            return repositories.Keys;
+            get
+            {
+                return repositories.Keys;
+            }
         }
 
-        public IEnumerable<KeyValuePair<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>> KeyValues()
+        public IEnumerable<KeyValuePair<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>> KeyValues
         {
-            return repositories.AsEnumerable();
+            get
+            {
+                return repositories.AsEnumerable();
+            }
         }
 
         public StreamingContextGroup()
+            : this(EqualityComparer<TKey>.Default)
         {
-            repositories = ImmutableDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>.Empty;
         }
 
         public StreamingContextGroup(IEqualityComparer<TKey> comparer)
         {
-            repositories = ImmutableDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>.Empty.WithComparers(comparer);
+            this.repositories = new ConcurrentDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>(comparer);
+            this.comparer = comparer;
         }
 
         public void Add(TKey key, TValue value, StreamingContextRepository<TStreamingService> repository)
         {
             if (repository.IsDisposed) return;
-            ImmutableInterlocked.Update(ref repositories, (x, y) => x.Add(y.Item1, Tuple.Create(y.Item2, y.Item3)), Tuple.Create(key, value, repository));
+            repositories[key] = Tuple.Create(value, repository);
         }
 
-        public void Remove(TKey key)
+        public Tuple<TValue, StreamingContextRepository<TStreamingService>> Remove(TKey key)
         {
-            ImmutableInterlocked.Update(ref repositories, (x, y) => x.Remove(y), key);
+            Tuple<TValue, StreamingContextRepository<TStreamingService>> value;
+            return repositories.TryRemove(key, out value)
+                ? value
+                : null;
         }
 
         public Tuple<TValue, StreamingContextRepository<TStreamingService>> Get(TKey key)
@@ -82,13 +91,11 @@ namespace MagicOnion.Server
 
         public IEnumerable<Tuple<TValue, StreamingContextRepository<TStreamingService>>> AllExcept(TKey exceptKey)
         {
-            var comparer = repositories.KeyComparer;
             return repositories.Where(x => !comparer.Equals(x.Key, exceptKey)).Select(x => x.Value);
         }
 
         public IEnumerable<Tuple<TValue, StreamingContextRepository<TStreamingService>>> AllExcept(params TKey[] exceptKeys)
         {
-            var comparer = repositories.KeyComparer;
             var set = new HashSet<TKey>(exceptKeys, comparer);
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
