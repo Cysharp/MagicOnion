@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server.EmbeddedService
 {
-    internal interface IHeartbeat
+    internal interface IMagicOnionEmbeddedHeartbeat
     {
         Task<DuplexStreamingResult<bool, bool>> Connect();
     }
 
     [Ignore]
-    internal class Heartbeat : ServiceBase<IHeartbeat>, IHeartbeat
+    internal class MagicOnionEmbeddedHeartbeat : ServiceBase<IMagicOnionEmbeddedHeartbeat>, IMagicOnionEmbeddedHeartbeat
     {
         public async Task<DuplexStreamingResult<bool, bool>> Connect()
         {

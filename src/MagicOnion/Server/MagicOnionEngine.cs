@@ -54,6 +54,7 @@ namespace MagicOnion.Server
               .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
               .Where(x => !x.IsAbstract)
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
+              .Concat(SupplyEmbeddedService(option))
               .ToArray();
 
             option.MagicOnionLogger.BeginBuildServiceDefinition();
@@ -108,6 +109,13 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
             return result;
+        }
+
+        static IEnumerable<Type> SupplyEmbeddedService(MagicOnionOptions options)
+        {
+            if (options.DisableEmbeddedService) yield break;
+
+            yield return typeof(MagicOnion.Server.EmbeddedService.MagicOnionEmbeddedHeartbeat);
         }
     }
 }

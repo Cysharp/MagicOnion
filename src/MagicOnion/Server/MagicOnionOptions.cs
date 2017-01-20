@@ -25,6 +25,11 @@ namespace MagicOnion.Server
         public IMagicOnionLogger MagicOnionLogger { get; set; }
 
         /// <summary>
+        /// Disable embedded service(ex:heartbeat), default is false.
+        /// </summary>
+        public bool DisableEmbeddedService { get; set; }
+
+        /// <summary>
         /// Global MagicOnion filters.
         /// </summary>
         public MagicOnionFilterAttribute[] GlobalFilters { get; set; }
@@ -39,6 +44,7 @@ namespace MagicOnion.Server
             this.ZeroFormatterTypeResolverType = typeof(ZeroFormatter.Formatters.DefaultResolver);
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new MagicOnionFilterAttribute[0];
+            this.DisableEmbeddedService = false;
         }
     }
 }
