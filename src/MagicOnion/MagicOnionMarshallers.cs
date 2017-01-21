@@ -47,11 +47,13 @@ namespace MagicOnion
     {
         readonly IClientStreamWriter<byte[]> inner;
         readonly Marshaller<T> marshaller;
+        readonly SemaphoreSlim semaphore;
 
         public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, Marshaller<T> marshaller)
         {
             this.inner = inner;
             this.marshaller = marshaller;
+            this.semaphore = new SemaphoreSlim(1, 1);
         }
 
         public WriteOptions WriteOptions
@@ -72,10 +74,18 @@ namespace MagicOnion
             return inner.CompleteAsync();
         }
 
-        public Task WriteAsync(T message)
+        public async Task WriteAsync(T message)
         {
             var bytes = marshaller.Serializer(message);
-            return inner.WriteAsync(bytes);
+            await this.semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await inner.WriteAsync(bytes).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.semaphore.Release();
+            }
         }
     }
 

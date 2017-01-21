@@ -130,12 +130,14 @@ namespace MagicOnion.Server
         readonly ServiceContext context;
         readonly IAsyncStreamWriter<byte[]> inner;
         readonly Marshaller<TResponse> marshaller;
+        readonly SemaphoreSlim semaphore;
 
         public ServerStreamingContext(ServiceContext context)
         {
             this.context = context;
             this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
             this.inner = context.ResponseStream;
+            this.semaphore = new SemaphoreSlim(1, 1);
         }
 
         public ServiceContext ServiceContext { get { return context; } }
@@ -153,10 +155,18 @@ namespace MagicOnion.Server
             }
         }
 
-        public Task WriteAsync(TResponse message)
+        public async Task WriteAsync(TResponse message)
         {
             var bytes = marshaller.Serializer(message);
-            return inner.WriteAsync(bytes);
+            await this.semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await inner.WriteAsync(bytes).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.semaphore.Release();
+            }
         }
 
         public ServerStreamingResult<TResponse> Result()
@@ -179,6 +189,7 @@ namespace MagicOnion.Server
         readonly IAsyncStreamWriter<byte[]> innerWriter;
         readonly Marshaller<TRequest> requestMarshaller;
         readonly Marshaller<TResponse> responseMarshaller;
+        readonly SemaphoreSlim semaphore;
 
         public DuplexStreamingContext(ServiceContext context)
         {
@@ -187,6 +198,7 @@ namespace MagicOnion.Server
             this.innerWriter = context.ResponseStream;
             this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
             this.responseMarshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
+            this.semaphore = new SemaphoreSlim(1, 1);
         }
 
         public ServiceContext ServiceContext { get { return context; } }
@@ -233,10 +245,18 @@ namespace MagicOnion.Server
         /// <summary>
         /// IServerStreamWriter Methods.
         /// </summary>
-        public Task WriteAsync(TResponse message)
+        public async Task WriteAsync(TResponse message)
         {
             var bytes = responseMarshaller.Serializer(message);
-            return innerWriter.WriteAsync(bytes);
+            await this.semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await innerWriter.WriteAsync(bytes).ConfigureAwait(false);
+            }
+            finally
+            {
+                this.semaphore.Release();
+            }
         }
 
         public DuplexStreamingResult<TRequest, TResponse> Result()
