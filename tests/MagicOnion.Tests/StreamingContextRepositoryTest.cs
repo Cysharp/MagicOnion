@@ -21,7 +21,7 @@ namespace MagicOnion.Tests
         Task<ServerStreamingResult<string>> ReceiveMessages();
     }
 
-    public class Service : ServiceBase<IStreamingRepositoryTestService>, IStreamingRepositoryTestService
+    public class StreamingRepositoryTestService : ServiceBase<IStreamingRepositoryTestService>, IStreamingRepositoryTestService
     {
         static StreamingContextRepository<IStreamingRepositoryTestService> cache;
 
