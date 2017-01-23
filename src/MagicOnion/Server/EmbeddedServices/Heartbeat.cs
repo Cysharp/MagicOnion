@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Server.EmbeddedService
+namespace MagicOnion.Server.EmbeddedServices
 {
-    internal interface IMagicOnionEmbeddedHeartbeat
+    public interface IMagicOnionEmbeddedHeartbeat : IService<IMagicOnionEmbeddedHeartbeat>
     {
         Task<DuplexStreamingResult<bool, bool>> Connect();
     }

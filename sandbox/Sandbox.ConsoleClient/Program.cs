@@ -28,7 +28,7 @@ namespace MagicOnion.ConsoleClient
 
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             channel.ConnectAsync().Wait();
-            var c = MagicOnionClient.Create<IMyFirstService>(channel);
+            //var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
             //UnaryRun(c).GetAwaiter().GetResult();
             //ClientStreamRun(c).GetAwaiter().GetResult();
@@ -42,7 +42,20 @@ namespace MagicOnion.ConsoleClient
             //HearbeatClient.Test(channel).GetAwaiter().GetResult();
             //Console.ReadLine();
 
-            ChatClient.Run(channel).GetAwaiter().GetResult();
+            //ChatClient.Run(channel).GetAwaiter().GetResult();
+            TestHeartbeat(channel).GetAwaiter().GetResult();
+        }
+
+        static async Task TestHeartbeat(Channel channel)
+        {
+            var cc = new ChannelContext(channel);
+            await cc.WaitConnectComplete();
+
+            Console.ReadLine();
+            cc.Dispose();
+
+            Console.ReadLine();
+
         }
 
         static async Task UnaryRun(IMyFirstService client)

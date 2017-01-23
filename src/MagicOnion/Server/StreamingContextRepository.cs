@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server
@@ -50,7 +51,7 @@ namespace MagicOnion.Server
         bool isDisposed;
         TService dummyInstance;
 
-        readonly ConcurrentDictionary<MethodInfo, IStreamingContextInfo> streamingContext = new ConcurrentDictionary<MethodInfo, IStreamingContextInfo>();
+        readonly ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>> streamingContext = new ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>>();
 
         public bool IsDisposed => isDisposed;
 
@@ -74,16 +75,18 @@ namespace MagicOnion.Server
             }, tcs);
 
             var info = new StreamingContextInfo<TResponse>(tcs, context);
-            streamingContext[methodSelector.Method] = info;
+            streamingContext[methodSelector.Method] = Tuple.Create(new SemaphoreSlim(1, 1), (IStreamingContextInfo)info);
             return info;
         }
 
         public async Task WriteAsync<TResponse>(Func<TService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value)
         {
-            IStreamingContextInfo streamingContextObject;
+            Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
             if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
             {
-                var context = streamingContextObject.ServerStreamingContext as ServerStreamingContext<TResponse>;
+                await streamingContextObject.Item1.WaitAsync().ConfigureAwait(false); // wait lock
+                if (isDisposed) return;
+                var context = streamingContextObject.Item2.ServerStreamingContext as ServerStreamingContext<TResponse>;
                 await context.WriteAsync(value).ConfigureAwait(false);
             }
             else
@@ -100,7 +103,12 @@ namespace MagicOnion.Server
             // complete all.
             foreach (var item in streamingContext)
             {
-                item.Value.Complete();
+                var semaphore = item.Value.Item1;
+                while (semaphore.CurrentCount == 0)
+                {
+                    semaphore.Release();
+                }
+                item.Value.Item2.Complete();
             }
         }
     }

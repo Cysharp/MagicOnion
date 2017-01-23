@@ -58,6 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncStreamReaderExtensions.cs" />
+    <Compile Include="Client\ChannelContext.cs" />
+    <Compile Include="Client\EmbeddedServices\HeartbeatClient.cs" />
     <Compile Include="DuplexStreamingResult.cs" />
     <Compile Include="ClientStreamingResult.cs" />
     <Compile Include="Client\DynamicClientBuilder.cs" />
@@ -76,7 +78,7 @@
     <Compile Include="ReturnStatusException.cs" />
     <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\ConnectionContext.cs" />
-    <Compile Include="Server\EmbeddedService\Heartbeat.cs" />
+    <Compile Include="Server\EmbeddedServices\Heartbeat.cs" />
     <Compile Include="Server\IMagicOnionLogger.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionFilterAttribute.cs" />
