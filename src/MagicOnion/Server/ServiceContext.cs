@@ -22,6 +22,8 @@ namespace MagicOnion.Server
             }
         }
 
+        public DateTime Timestamp { get; private set; }
+
         public Type ServiceType { get; private set; }
 
         public MethodInfo MethodInfo { get; private set; }
@@ -49,6 +51,7 @@ namespace MagicOnion.Server
             this.AttributeLookup = attributeLookup;
             this.MethodType = methodType;
             this.CallContext = context;
+            this.Timestamp = DateTime.UtcNow;
         }
     }
 

@@ -43,7 +43,6 @@ namespace MagicOnion.Client
             var module = AssemblyHolder.Module;
             var methodDefinitions = SearchDefinitions(t);
 
-            // IRouteGuideCliet: MagicOnionClientBase<IRouteGuide>, IRouteGuide
             var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
             var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{resolverType.Name}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
@@ -59,7 +58,7 @@ namespace MagicOnion.Client
         {
             return interfaceType
                 .GetInterfaces()
-                .Concat(new[] { interfaceType })
+                .Concat(new []{ interfaceType })
                 .SelectMany(x => x.GetMethods())
                 .Where(x =>
                 {

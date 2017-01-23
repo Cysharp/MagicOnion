@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Logging;
 using MagicOnion.Client;
+using MagicOnion.Client.EmbeddedServices;
 using Sandbox.ConsoleClient;
 using Sandbox.ConsoleServer;
 using System;
@@ -28,9 +29,9 @@ namespace MagicOnion.ConsoleClient
 
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             channel.ConnectAsync().Wait();
-            //var c = MagicOnionClient.Create<IMyFirstService>(channel);
+            var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
-            //UnaryRun(c).GetAwaiter().GetResult();
+            UnaryRun(c).GetAwaiter().GetResult();
             //ClientStreamRun(c).GetAwaiter().GetResult();
             //ServerStreamRun(c).GetAwaiter().GetResult();
             //DuplexStreamRun(c).GetAwaiter().GetResult();
@@ -43,16 +44,28 @@ namespace MagicOnion.ConsoleClient
             //Console.ReadLine();
 
             //ChatClient.Run(channel).GetAwaiter().GetResult();
-            TestHeartbeat(channel).GetAwaiter().GetResult();
+            //TestHeartbeat(channel).GetAwaiter().GetResult();
         }
 
         static async Task TestHeartbeat(Channel channel)
         {
+            await channel.ConnectAsync();
+            Console.WriteLine("Client -> Server, " + await new PingClient(channel).Ping() + "ms");
+            Console.WriteLine("Client -> Server, " + await new PingClient(channel).Ping() + "ms");
+
             var cc = new ChannelContext(channel);
+            cc.RegisterDisconnectedAction(() =>
+            {
+                Console.WriteLine("disconnected detected!");
+            });
             await cc.WaitConnectComplete();
 
+
+
+
             Console.ReadLine();
-            cc.Dispose();
+            //cc.Dispose();
+            await new PingClient(channel).Ping();
 
             Console.ReadLine();
 

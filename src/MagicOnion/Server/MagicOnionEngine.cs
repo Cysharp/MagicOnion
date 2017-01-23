@@ -54,7 +54,7 @@ namespace MagicOnion.Server
               .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
               .Where(x => !x.IsAbstract)
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
-              .Concat(SupplyEmbeddedService(option))
+              .Concat(SupplyEmbeddedServices(option))
               .ToArray();
 
             option.MagicOnionLogger.BeginBuildServiceDefinition();
@@ -111,11 +111,12 @@ namespace MagicOnion.Server
             return result;
         }
 
-        static IEnumerable<Type> SupplyEmbeddedService(MagicOnionOptions options)
+        static IEnumerable<Type> SupplyEmbeddedServices(MagicOnionOptions options)
         {
             if (options.DisableEmbeddedService) yield break;
 
             yield return typeof(MagicOnion.Server.EmbeddedServices.MagicOnionEmbeddedHeartbeat);
+            yield return typeof(MagicOnion.Server.EmbeddedServices.MagicOnionEmbeddedPing);
         }
     }
 }

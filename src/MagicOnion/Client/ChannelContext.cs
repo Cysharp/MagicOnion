@@ -79,7 +79,7 @@ namespace MagicOnion.Client
                     try
                     {
                         // now channelstate is ready and wait changed.
-                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext(CancellationToken.None));
+                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext(CancellationToken.None)).ConfigureAwait(false);
                     }
                     finally
                     {
@@ -107,6 +107,7 @@ namespace MagicOnion.Client
 
         public void Dispose()
         {
+            if (isDisposed) return;
             isDisposed = true;
 
             waitConnectComplete.TrySetCanceled();
