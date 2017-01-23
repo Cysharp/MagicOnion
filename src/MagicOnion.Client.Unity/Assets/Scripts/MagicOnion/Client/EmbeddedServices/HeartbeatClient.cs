@@ -1,13 +1,10 @@
 ﻿using Grpc.Core;
-using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
-using System;
-using System.Threading.Tasks;
+using UniRx;
 using ZeroFormatter.Formatters;
 
 namespace MagicOnion.Client.EmbeddedServices
 {
-    [Ignore]
     public class HeartbeatClient : MagicOnionClientBase<IMagicOnionEmbeddedHeartbeat>, IMagicOnionEmbeddedHeartbeat
     {
         static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
@@ -48,10 +45,10 @@ namespace MagicOnion.Client.EmbeddedServices
             return clone;
         }
 
-        public Task<DuplexStreamingResult<bool, bool>> Connect()
+        public IObservable<DuplexStreamingResult<bool, bool>> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
-            return Task.FromResult(new DuplexStreamingResult<bool, bool>(__callResult, DuplexStreamingAsyncRequestMarshaller, DuplexStreamingAsyncResponseMarshaller));
+            return Observable.Return(new DuplexStreamingResult<bool, bool>(__callResult, DuplexStreamingAsyncRequestMarshaller, DuplexStreamingAsyncResponseMarshaller));
         }
     }
 }

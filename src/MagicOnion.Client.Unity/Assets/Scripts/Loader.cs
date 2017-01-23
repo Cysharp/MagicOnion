@@ -42,6 +42,7 @@ namespace MagicOnion.Tests
             UnitTest.RegisterAllMethods<SimpleTest>();
             UnitTest.RegisterAllMethods<StandardTest>();
             UnitTest.RegisterAllMethods<ArgumentPatternTest>();
+            UnitTest.RegisterAllMethods<HeartbeatTest>();
         }
     }
 
@@ -55,6 +56,12 @@ namespace MagicOnion.Tests
             var client = MagicOnionClient.Create<T>(channel).WithDeadline(DateTime.UtcNow.AddSeconds(10));
 
             return client;
+        }
+
+        public static Channel GetChannel()
+        {
+            var channel = new Channel(endPoint, 12345, ChannelCredentials.Insecure);
+            return channel;
         }
     }
 }

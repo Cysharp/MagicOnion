@@ -70,7 +70,10 @@ namespace MagicOnion
         /// </remarks>
         public void Dispose()
         {
-            this.inner.Dispose();
+            if (this.inner != null)
+            {
+                this.inner.Dispose();
+            }
         }
     }
 }

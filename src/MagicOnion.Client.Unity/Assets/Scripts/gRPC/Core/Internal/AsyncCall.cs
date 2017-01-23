@@ -288,7 +288,7 @@ namespace Grpc.Core.Internal
 
         protected override Exception GetRpcExceptionClientOnly()
         {
-            return new RpcException(finishedStatus.Value.Status);
+            return new RpcException(finishedStatus.Value.Status, () => (finishedStatus.HasValue) ? GetTrailers() : null);
         }
 
         protected override IObservable<Unit> CheckSendAllowedOrEarlyResult()
@@ -307,7 +307,7 @@ namespace Grpc.Core.Internal
                 // Writing after the call has finished is not a programming error because server can close
                 // the call anytime, so don't throw directly, but let the write task finish with an error.
                 var tcs = new AsyncSubject<Unit>();
-                tcs.OnError(new RpcException(finishedStatus.Value.Status));
+                tcs.OnError(new RpcException(finishedStatus.Value.Status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
                 return tcs;
             }
 
@@ -435,7 +435,7 @@ namespace Grpc.Core.Internal
                 var status = receivedStatus.Status;
                 if (status.StatusCode != StatusCode.OK)
                 {
-                    unaryResponseTcs.OnError(new RpcException(status));
+                    unaryResponseTcs.OnError(new RpcException(status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
                     return;
                 }
 
@@ -475,7 +475,7 @@ namespace Grpc.Core.Internal
             var status = receivedStatus.Status;
             if (status.StatusCode != StatusCode.OK)
             {
-                streamingCallFinishedTcs.OnError(new RpcException(status));
+                streamingCallFinishedTcs.OnError(new RpcException(status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
                 return;
             }
 

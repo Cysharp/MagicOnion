@@ -104,11 +104,11 @@ namespace Grpc.Core.Internal
             // Task.Run(() => { });
             return Observable.Start(() =>
             {
-                foreach (var thread in threads)
-                {
+                //foreach (var thread in threads)
+                //{
                     // NOTE:does not wait.
                     // thread.Join();
-                }
+                //}
 
                 foreach (var cq in completionQueues)
                 {

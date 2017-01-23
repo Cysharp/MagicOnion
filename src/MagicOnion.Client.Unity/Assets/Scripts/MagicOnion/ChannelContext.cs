@@ -2,9 +2,10 @@
 using MagicOnion.Client.EmbeddedServices;
 using MagicOnion.Server;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using UniRx;
 
 namespace MagicOnion.Client
 {
@@ -18,9 +19,9 @@ namespace MagicOnion.Client
 
         bool isDisposed;
         int currentRetryCount = 0;
-        Task connectingTask;
         DuplexStreamingResult<bool, bool> latestStreamingResult;
-        TaskCompletionSource<object> waitConnectComplete;
+        AsyncSubject<Unit> waitConnectComplete;
+        IDisposable connectingTask;
         LinkedList<Action> disconnectedActions = new LinkedList<Action>();
 
         string connectionId;
@@ -42,13 +43,19 @@ namespace MagicOnion.Client
             {
                 this.connectionId = this.connectionIdFactory();
             }
-            this.waitConnectComplete = new TaskCompletionSource<object>();
-            connectingTask = ConnectAlways();
+            this.waitConnectComplete = new AsyncSubject<Unit>();
+            connectingTask = Observable.FromCoroutine(() => ConnectAlways()).Subscribe();
+
+            // destructor
+            MainThreadDispatcher.OnApplicationQuitAsObservable().Subscribe(_ =>
+            {
+                this.Dispose();
+            });
         }
 
-        public Task WaitConnectComplete()
+        public IObservable<Unit> WaitConnectComplete()
         {
-            return waitConnectComplete.Task;
+            return waitConnectComplete;
         }
 
         public IDisposable RegisterDisconnectedAction(Action action)
@@ -57,44 +64,63 @@ namespace MagicOnion.Client
             return new UnregisterToken(node);
         }
 
-        async Task ConnectAlways()
+        IEnumerator ConnectAlways()
         {
             while (true)
             {
+                if (isDisposed) yield break;
+                if (channel.State == ChannelState.Shutdown) yield break;
+
+                var conn = channel.ConnectAsync().ToYieldInstruction();
+                yield return conn;
+
+                if (isDisposed) yield break;
+                if (conn.HasError)
+                {
+                    GrpcEnvironment.Logger.Error(conn.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    continue;
+                }
+
+                var connectionId = (useSameId) ? this.connectionId : connectionIdFactory();
+                var client = new HeartbeatClient(channel, connectionId);
+                latestStreamingResult.Dispose();
+                var heartBeatConnect = client.Connect().ToYieldInstruction();
+                yield return heartBeatConnect;
+                if (heartBeatConnect.HasError)
+                {
+                    GrpcEnvironment.Logger.Error(heartBeatConnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    continue;
+                }
+                else
+                {
+                    latestStreamingResult = heartBeatConnect.Result;
+                }
+
+                this.connectionId = connectionId;
+                currentRetryCount = 0;
+
+                waitConnectComplete.OnNext(Unit.Default);
+                waitConnectComplete.OnCompleted();
+
+                var waitForDisconnect = Observable.Amb(channel.WaitForStateChangedAsync(ChannelState.Ready), heartBeatConnect.Result.ResponseStream.MoveNext()).ToYieldInstruction();
+                yield return waitForDisconnect;
+
                 try
                 {
-                    if (isDisposed) return;
-                    if (channel.State == ChannelState.Shutdown) return;
-
-                    await channel.ConnectAsync();
-
-                    if (isDisposed) return;
-
-                    var connectionId = (useSameId) ? this.connectionId : connectionIdFactory();
-                    var client = new HeartbeatClient(channel, connectionId);
-                    latestStreamingResult.Dispose();
-                    latestStreamingResult = await client.Connect();
-                    this.connectionId = connectionId;
-                    currentRetryCount = 0;
-                    waitConnectComplete.TrySetResult(new object());
-
-                    try
+                    waitConnectComplete = new AsyncSubject<Unit>();
+                    foreach (var action in disconnectedActions)
                     {
-                        // now channelstate is ready and wait changed.
-                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext(CancellationToken.None)).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        waitConnectComplete = new TaskCompletionSource<object>();
-                        foreach (var action in disconnectedActions)
-                        {
-                            action();
-                        }
+                        action();
                     }
                 }
                 catch (Exception ex)
                 {
                     GrpcEnvironment.Logger.Error(ex, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                }
+
+                if (waitForDisconnect.HasError)
+                {
+                    GrpcEnvironment.Logger.Error(waitForDisconnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
                 }
             }
         }
@@ -112,7 +138,8 @@ namespace MagicOnion.Client
             if (isDisposed) return;
             isDisposed = true;
 
-            waitConnectComplete.TrySetCanceled();
+            connectingTask.Dispose();
+            waitConnectComplete.Dispose();
             latestStreamingResult.Dispose();
         }
 
