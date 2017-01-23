@@ -66,10 +66,6 @@ namespace MagicOnion.Client
 
                     await channel.ConnectAsync();
 
-                    if (waitConnectComplete.Task.IsCompleted)
-                    {
-                        waitConnectComplete = new TaskCompletionSource<object>();
-                    }
                     if (isDisposed) return;
 
                     var connectionId = (useSameId) ? this.connectionId : connectionIdFactory();
@@ -87,6 +83,7 @@ namespace MagicOnion.Client
                     }
                     finally
                     {
+                        waitConnectComplete = new TaskCompletionSource<object>();
                         foreach (var action in disconnectedActions)
                         {
                             action();
