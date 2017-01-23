@@ -23,5 +23,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("c79ce0bf-ed4c-47be-822e-e82cf83fc68a")]
 
 // major-minor-patch
-[assembly: AssemblyVersion("0.3.2")]
-[assembly: AssemblyFileVersion("0.3.2")]
+[assembly: AssemblyVersion("0.3.3")]
+[assembly: AssemblyFileVersion("0.3.3")]
