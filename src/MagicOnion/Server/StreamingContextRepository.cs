@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -48,6 +49,9 @@ namespace MagicOnion.Server
 
     public class StreamingContextRepository<TService> : IDisposable
     {
+        // (ConcreteServiceType, TResponse) => Func<TService, ServerStreamingContext<TResponse>>;
+        static ConcurrentDictionary<Tuple<Type, Type>, Delegate> delegateCache = new ConcurrentDictionary<Tuple<Type, Type>, Delegate>();
+
         bool isDisposed;
         TService dummyInstance;
 
@@ -62,10 +66,18 @@ namespace MagicOnion.Server
                 dummyInstance = (TService)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(self.GetType());
             }
 
-            // TODO:no reflection
-            var context = (ServerStreamingContext<TResponse>)self.GetType().GetMethod("GetServerStreamingContext")
-                .MakeGenericMethod(typeof(TResponse))
-                .Invoke(self, null);
+            var getServerStreamingContext = delegateCache.GetOrAdd(Tuple.Create(self.GetType(), typeof(TResponse)), x =>
+            {
+                var methodInfo = x.Item1.GetMethod("GetServerStreamingContext").MakeGenericMethod(typeof(TResponse));
+
+                var arg1 = Expression.Parameter(typeof(TService), "instance");
+                var convert = Expression.Convert(arg1, x.Item1);
+                var call = Expression.Call(convert, methodInfo);
+                var lambda = Expression.Lambda<Func<TService, ServerStreamingContext<TResponse>>>(call, arg1);
+                return lambda.Compile();
+            });
+
+            var context = (getServerStreamingContext as Func<TService, ServerStreamingContext<TResponse>>).Invoke(self);
 
             var tcs = new TaskCompletionSource<object>();
 
@@ -84,10 +96,20 @@ namespace MagicOnion.Server
             Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
             if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
             {
-                await streamingContextObject.Item1.WaitAsync().ConfigureAwait(false); // wait lock
-                if (isDisposed) return;
-                var context = streamingContextObject.Item2.ServerStreamingContext as ServerStreamingContext<TResponse>;
-                await context.WriteAsync(value).ConfigureAwait(false);
+                try
+                {
+                    await streamingContextObject.Item1.WaitAsync().ConfigureAwait(false); // wait lock
+                    if (isDisposed) return;
+                    var context = streamingContextObject.Item2.ServerStreamingContext as ServerStreamingContext<TResponse>;
+                    await context.WriteAsync(value).ConfigureAwait(false);
+                }
+                finally
+                {
+                    if (!isDisposed)
+                    {
+                        streamingContextObject.Item1.Release();
+                    }
+                }
             }
             else
             {

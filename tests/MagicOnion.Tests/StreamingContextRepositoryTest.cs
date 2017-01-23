@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
+using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using System;
@@ -64,31 +66,37 @@ namespace MagicOnion.Tests
         [Fact]
         public async Task ParallelWrite()
         {
-            var channelContext = new ChannelContext(channel);
-            await channelContext.WaitConnectComplete();
-
-            var client = channelContext.CreateClient<IStreamingRepositoryTestService>();
-
-                                       
-
-            var list = new List<string>();
-            await client.Register();
-            var streaming = await client.ReceiveMessages();
-
-            var tasks = Enumerable.Range(0, 100)
-                .Select(x => "Write:" + x.ToString())
-                .Select(async x => (await client.SendMessage(x)).ResponseAsync)
-                .Select(x => x.Unwrap())
-                .ToArray();
-
-            var t2 = streaming.ResponseStream.ForEachAsync(x =>
+            using (var channelContext = new ChannelContext(channel))
             {
-                list.Add(x);
-            });
+                await channelContext.WaitConnectComplete();
 
-            await Task.WhenAll(tasks);
-            await client.Unregister();
-            await t2;
+                var client = channelContext.CreateClient<IStreamingRepositoryTestService>();
+
+
+                var list = new List<string>();
+                await await client.Register();
+                var streaming = await client.ReceiveMessages();
+
+                var t2 = streaming.ResponseStream.ForEachAsync(x =>
+                {
+                    list.Add(x);
+                });
+
+                await Task.Delay(TimeSpan.FromMilliseconds(100)); // wait subscribe done...
+
+                var tasks = Enumerable.Range(0, 100)
+                    .Select(x => "Write:" + x.ToString())
+                    .Select(async x => (await client.SendMessage(x)).ResponseAsync)
+                    .Select(x => x.Unwrap())
+                    .ToArray();
+
+
+                await Task.WhenAll(tasks);
+                await client.Unregister();
+                await t2;
+            }
         }
     }
 }
+
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
