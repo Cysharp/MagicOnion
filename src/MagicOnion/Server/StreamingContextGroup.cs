@@ -78,11 +78,16 @@ namespace MagicOnion.Server
 
         public IEnumerable<StreamingContextRepository<TStreamingService>> AllExcept(params TKey[] exceptKeys)
         {
+            return AllExcept(exceptKeys.AsEnumerable());
+        }
+
+        public IEnumerable<StreamingContextRepository<TStreamingService>> AllExcept(IEnumerable<TKey> exceptKeys)
+        {
             var set = new HashSet<TKey>(exceptKeys, comparer);
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastTo<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] includeKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastTo<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -136,7 +141,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] exceptKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> exceptKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
