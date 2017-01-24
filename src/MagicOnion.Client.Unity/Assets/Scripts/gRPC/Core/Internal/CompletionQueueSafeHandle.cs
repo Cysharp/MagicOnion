@@ -39,6 +39,7 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_completion_queue from <c>grpc/grpc.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class CompletionQueueSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
@@ -46,7 +47,7 @@ namespace Grpc.Core.Internal
         AtomicCounter shutdownRefcount = new AtomicCounter(1);
         CompletionRegistry completionRegistry;
 
-        private CompletionQueueSafeHandle()
+        public CompletionQueueSafeHandle()
         {
         }
 

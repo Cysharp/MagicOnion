@@ -40,11 +40,12 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpcsharp_batch_context
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class BatchContextSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private BatchContextSafeHandle()
+        public BatchContextSafeHandle()
         {
         }
 

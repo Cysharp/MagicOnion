@@ -37,14 +37,15 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_metadata_array from <c>grpc/grpc.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class MetadataArraySafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private MetadataArraySafeHandle()
+        public MetadataArraySafeHandle()
         {
         }
-            
+
         public static MetadataArraySafeHandle Create(Metadata metadata)
         {
             using (Profilers.ForCurrentThread().NewScope("MetadataArraySafeHandle.Create"))

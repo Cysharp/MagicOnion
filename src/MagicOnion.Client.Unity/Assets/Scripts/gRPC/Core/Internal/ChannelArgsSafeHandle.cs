@@ -36,11 +36,12 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_channel_args from <c>grpc/grpc.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class ChannelArgsSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private ChannelArgsSafeHandle()
+        public ChannelArgsSafeHandle()
         {
         }
 

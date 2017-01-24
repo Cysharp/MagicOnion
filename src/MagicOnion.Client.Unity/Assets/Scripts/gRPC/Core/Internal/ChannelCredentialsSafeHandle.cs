@@ -37,11 +37,12 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_channel_credentials from <c>grpc/grpc_security.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class ChannelCredentialsSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private ChannelCredentialsSafeHandle()
+        public ChannelCredentialsSafeHandle()
         {
         }
 
