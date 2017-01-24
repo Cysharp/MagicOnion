@@ -133,6 +133,19 @@ namespace MagicOnion.Client
                 .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } });
         }
 
+        public T CreateClient<T>(Metadata metadata)
+            where T : IService<T>
+        {
+            var newMetadata = new Metadata();
+            for (int i = 0; i < metadata.Count; i++)
+            {
+                newMetadata.Add(metadata[i]);
+            }
+            newMetadata.Add(ChannelContext.HeaderKey, ConnectionId);
+
+            return MagicOnionClient.Create<T>(channel).WithHeaders(newMetadata);
+        }
+
         public void Dispose()
         {
             if (isDisposed) return;
