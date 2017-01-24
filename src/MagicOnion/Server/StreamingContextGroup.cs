@@ -87,7 +87,7 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastTo<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastToAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
