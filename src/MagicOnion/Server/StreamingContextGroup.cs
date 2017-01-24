@@ -82,6 +82,24 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
+        public async Task BroadcastTo<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] includeKeys, bool parallel = true, bool ignoreError = true)
+        {
+            if (parallel)
+            {
+                await Task.WhenAll(includeKeys.Select(x => this.Get(x)).Where(x => x != null).Select(x =>
+                {
+                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
+                })).ConfigureAwait(false);
+            }
+            else
+            {
+                foreach (var item in includeKeys.Select(x => this.Get(x)).Where(x => x != null))
+                {
+                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
+                }
+            }
+        }
+
         public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
