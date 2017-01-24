@@ -36,11 +36,12 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// Owned char* object.
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class CStringSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private CStringSafeHandle()
+        public CStringSafeHandle()
         {
         }
 

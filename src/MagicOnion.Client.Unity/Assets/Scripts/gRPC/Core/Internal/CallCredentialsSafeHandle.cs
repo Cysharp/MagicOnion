@@ -37,11 +37,12 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_call_credentials from <c>grpc/grpc_security.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class CallCredentialsSafeHandle : SafeHandleZeroIsInvalid
     {
         static readonly NativeMethods Native = NativeMethods.Get();
 
-        private CallCredentialsSafeHandle()
+        public CallCredentialsSafeHandle()
         {
         }
 

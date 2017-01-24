@@ -41,6 +41,7 @@ namespace Grpc.Core.Internal
     /// <summary>
     /// grpc_call from <c>grpc/grpc.h</c>
     /// </summary>
+    [UnityEngine.Scripting.Preserve]
     internal class CallSafeHandle : SafeHandleZeroIsInvalid, INativeCall
     {
         public static readonly CallSafeHandle NullInstance = new CallSafeHandle();
@@ -49,7 +50,7 @@ namespace Grpc.Core.Internal
         const uint GRPC_WRITE_BUFFER_HINT = 1;
         CompletionQueueSafeHandle completionQueue;
 
-        private CallSafeHandle()
+        public CallSafeHandle()
         {
         }
 

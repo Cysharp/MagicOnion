@@ -43,7 +43,7 @@ namespace Grpc.Core
         private readonly Status status;
 
         // TODO:Modified, for read header details.
-        const string ExceptionDetailKey = "exceptiond_detail";
+        const string ExceptionDetailKey = "exception_detail";
 
         static string CombineStatus(Status status, Func<Metadata> getMetadata)
         {
