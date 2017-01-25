@@ -58,6 +58,15 @@ namespace MagicOnion.Server
         readonly ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>> streamingContext = new ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>>();
 
         public bool IsDisposed => isDisposed;
+        public ConnectionContext ConnectionContext { get; }
+
+        public StreamingContextRepository(ConnectionContext connectionContext)
+        {
+            connectionContext.ConnectionStatus.Register(() =>
+            {
+                Dispose();
+            });
+        }
 
         public StreamingContextInfo<TResponse> RegisterStreamingMethod<TResponse>(TService self, Func<Task<ServerStreamingResult<TResponse>>> methodSelector)
         {

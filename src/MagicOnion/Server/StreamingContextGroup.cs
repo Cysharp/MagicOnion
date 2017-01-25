@@ -50,14 +50,19 @@ namespace MagicOnion.Server
         {
             if (repository.IsDisposed) return;
             repositories[key] = repository;
+
+            // when detect disconnected, automatically remove.
+            repository.ConnectionContext.ConnectionStatus.Register(() =>
+            {
+                Remove(key);
+            });
         }
 
-        public StreamingContextRepository<TStreamingService> Remove(TKey key)
+        // can't return value because if automatically remove raises at first, user can't take it.
+        public void Remove(TKey key)
         {
             StreamingContextRepository<TStreamingService> value;
-            return repositories.TryRemove(key, out value)
-                ? value
-                : null;
+            repositories.TryRemove(key, out value);
         }
 
         public StreamingContextRepository<TStreamingService> Get(TKey key)
