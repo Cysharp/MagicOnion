@@ -62,6 +62,7 @@ namespace MagicOnion.Server
 
         public StreamingContextRepository(ConnectionContext connectionContext)
         {
+            this.ConnectionContext = connectionContext;
             connectionContext.ConnectionStatus.Register(() =>
             {
                 Dispose();
@@ -70,6 +71,8 @@ namespace MagicOnion.Server
 
         public StreamingContextInfo<TResponse> RegisterStreamingMethod<TResponse>(TService self, Func<Task<ServerStreamingResult<TResponse>>> methodSelector)
         {
+            if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
+
             if (dummyInstance == null)
             {
                 dummyInstance = (TService)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(self.GetType());
@@ -90,7 +93,12 @@ namespace MagicOnion.Server
 
             var tcs = new TaskCompletionSource<object>();
 
-            context.ServiceContext.GetConnectionContext().ConnectionStatus.Register(state =>
+            if (context.ServiceContext.GetConnectionContext() != ConnectionContext)
+            {
+                throw new Exception("TSerivce connection and initialized connection are different.");
+            }
+
+            ConnectionContext.ConnectionStatus.Register(state =>
             {
                 ((TaskCompletionSource<object>)state).TrySetResult(null);
             }, tcs);
@@ -102,6 +110,8 @@ namespace MagicOnion.Server
 
         public async Task WriteAsync<TResponse>(Func<TService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value)
         {
+            if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
+
             Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
             if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
             {
@@ -128,7 +138,7 @@ namespace MagicOnion.Server
 
         public void Dispose()
         {
-            if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository");
+            if (isDisposed) return;
             isDisposed = true;
 
             // complete all.

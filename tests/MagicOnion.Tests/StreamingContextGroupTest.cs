@@ -24,8 +24,9 @@ namespace MagicOnion.Tests
 
         public async Task<UnaryResult<bool>> Register()
         {
-            var id = this.GetConnectionContext().ConnectionId;
-            group.Add(id, new StreamingContextRepository<IStreamingContextGroupTestService>());
+            var connection = this.GetConnectionContext();
+            var id = connection.ConnectionId;
+            group.Add(id, new StreamingContextRepository<IStreamingContextGroupTestService>(connection));
             return UnaryResult(true);
         }
 

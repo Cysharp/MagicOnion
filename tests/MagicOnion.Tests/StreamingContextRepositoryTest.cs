@@ -27,7 +27,7 @@ namespace MagicOnion.Tests
 
         public async Task<UnaryResult<bool>> Register()
         {
-            cache = new StreamingContextRepository<IStreamingRepositoryTestService>();
+            cache = new StreamingContextRepository<IStreamingRepositoryTestService>(this.GetConnectionContext());
             return UnaryResult(true);
         }
 

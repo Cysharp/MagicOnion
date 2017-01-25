@@ -197,7 +197,7 @@ namespace Sandbox.ConsoleServer.Services
             var connection = this.GetConnectionContext();
             var item = connection.Items.GetOrAdd("RoomStreamingStreamingContextRepository", _ => new Lazy<StreamingContextRepository<IChatRoomStreaming>>(() =>
             {
-                return new StreamingContextRepository<IChatRoomStreaming>();
+                return new StreamingContextRepository<IChatRoomStreaming>(connection);
             }));
             return (item as Lazy<StreamingContextRepository<IChatRoomStreaming>>).Value;
         }
