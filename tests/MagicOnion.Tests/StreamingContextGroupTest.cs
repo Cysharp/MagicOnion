@@ -81,6 +81,10 @@ namespace MagicOnion.Tests
             using (var c2 = new ChannelContext(channel1, () => "id2"))
             using (var c3 = new ChannelContext(channel1, () => "id3"))
             {
+                await c1.WaitConnectComplete();
+                await c2.WaitConnectComplete();
+                await c3.WaitConnectComplete();
+
                 var hoge = c1.CreateClient<IStreamingContextGroupTestService>();
                 var huga = c2.CreateClient<IStreamingContextGroupTestService>();
                 var tako = c3.CreateClient<IStreamingContextGroupTestService>();
@@ -96,8 +100,6 @@ namespace MagicOnion.Tests
                 var t1 = (await hoge.ReceiveMessages()).ResponseStream.ForEachAsync(x => l1.Add(x));
                 var t2 = (await huga.ReceiveMessages()).ResponseStream.ForEachAsync(x => l2.Add(x));
                 var t3 = (await tako.ReceiveMessages()).ResponseStream.ForEachAsync(x => l3.Add(x));
-
-                await Task.Delay(TimeSpan.FromMilliseconds(300));
 
                 await await hoge.SendMessage("from message 1");
                 await await huga.SendMessage("from message 2");

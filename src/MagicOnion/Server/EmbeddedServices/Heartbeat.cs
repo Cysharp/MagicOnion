@@ -24,6 +24,9 @@ namespace MagicOnion.Server.EmbeddedServices
 
             try
             {
+                // send to connect complete.
+                await streaming.WriteAsync(true).ConfigureAwait(false);
+
                 // wait client disconnect.
                 // if client send complete event, safe unsubscribe of heartbeat.
                 await streaming.MoveNext();

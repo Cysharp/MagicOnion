@@ -6,20 +6,19 @@ namespace MagicOnion
 {
     public static class AsyncStreamReaderExtensions
     {
-        //TODO:implement Observbale.While
         public static IObservable<Unit> ForEachAsync<T>(this IAsyncStreamReader<T> stream, Action<T> action)
         {
-            return RecursiveAction(stream, action);
+            return RecursiveActionAsync(stream, action);
         }
 
-        static IObservable<Unit> RecursiveAction<T>(IAsyncStreamReader<T> stream, Action<T> action)
+        static IObservable<Unit> RecursiveActionAsync<T>(IAsyncStreamReader<T> stream, Action<T> action)
         {
             return stream.MoveNext().ContinueWith(x =>
             {
                 if (x)
                 {
                     action(stream.Current);
-                    return RecursiveAction(stream, action);
+                    return RecursiveActionAsync(stream, action);
                 }
                 else
                 {
@@ -51,14 +50,14 @@ namespace MagicOnion
             });
         }
 
-        // TODO:needs strict implementation
-        //public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream)
-        //{
-        //    var subject = new Subject<T>();
-        //    return subject.DoOnSubscribe(() =>
-        //    {
-        //        stream.ForEachAsync(x => subject.OnNext(x)).Subscribe(_ => { }, subject.OnError, subject.OnCompleted);
-        //    });
-        //}
+        public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream, bool observeOnMainThread = true)
+        {
+            var seq = Observable.Create<T>(observer =>
+            {
+                return stream.ForEachAsync(x => observer.OnNext(x)).Subscribe(_ => { }, observer.OnError, observer.OnCompleted);
+            });
+
+            return (observeOnMainThread) ? seq.ObserveOnMainThread() : seq;
+        }
     }
 }

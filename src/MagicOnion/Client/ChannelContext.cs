@@ -74,6 +74,10 @@ namespace MagicOnion.Client
                     var client = new HeartbeatClient(channel, connectionId);
                     latestStreamingResult.Dispose();
                     latestStreamingResult = await client.Connect();
+                    
+                    // wait connect complete.
+                    await latestStreamingResult.ResponseStream.MoveNext();
+
                     this.connectionId = connectionId;
                     currentRetryCount = 0;
                     waitConnectComplete.TrySetResult(new object());
@@ -81,7 +85,7 @@ namespace MagicOnion.Client
                     try
                     {
                         // now channelstate is ready and wait changed.
-                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext(CancellationToken.None)).ConfigureAwait(false);
+                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext()).ConfigureAwait(false);
                     }
                     finally
                     {
