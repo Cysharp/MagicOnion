@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 using ZeroFormatter;
 
 namespace MagicOnion.Tests
@@ -53,20 +54,16 @@ namespace MagicOnion.Tests
         }
     }
 
-    public class ClientConfigTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class ClientConfigTest
     {
-        Channel channel;
+        ITestOutputHelper logger;
         IConfigurationChange client;
 
-        public ClientConfigTest(ServerFixture server)
+        public ClientConfigTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-            this.client = MagicOnionClient.Create<IConfigurationChange>(channel);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.client = server.CreateClient<IConfigurationChange>();
         }
 
         /*

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -104,18 +105,16 @@ namespace MagicOnion.Tests
         }
     }
 
-    public class SimpleTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class SimpleTest
     {
+        ITestOutputHelper logger;
         Channel channel;
 
-        public SimpleTest(ServerFixture server)
+        public SimpleTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.channel = server.DefaultChannel;
         }
 
         [Fact]

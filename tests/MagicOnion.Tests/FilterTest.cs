@@ -8,6 +8,7 @@ using MagicOnion.Server;
 using Xunit;
 using Grpc.Core;
 using MagicOnion.Client;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -186,21 +187,16 @@ namespace MagicOnion.Tests
     }
 
 
-    public class FilterTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class FilterTest
     {
-        Channel channel;
         IFilterTester client;
 
-        public FilterTest(ServerFixture server)
+        public FilterTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-            this.client = MagicOnionClient.Create<IFilterTester>(channel);
+            this.client = server.CreateClient<IFilterTester>();
         }
 
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
-        }
 
         [Fact]
         public void Filter()

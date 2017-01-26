@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -48,19 +49,17 @@ namespace MagicOnion.Tests
             return await cache.RegisterStreamingMethod(this, ReceiveMessages);
         }
     }
-
-    public class StreamingContextRepositoryTest : IClassFixture<ServerFixture>, IDisposable
+    
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class StreamingContextRepositoryTest
     {
+        ITestOutputHelper logger;
         Channel channel;
 
-        public StreamingContextRepositoryTest(ServerFixture server)
+        public StreamingContextRepositoryTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.channel = server.DefaultChannel;
         }
 
         [Fact]

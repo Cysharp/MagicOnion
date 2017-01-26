@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -76,20 +77,16 @@ namespace MagicOnion.Tests
         }
     }
 
-    public class ReturnStatusTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class ReturnStatusTest
     {
-        Channel channel;
+        ITestOutputHelper logger;
         IReturnStatus client;
 
-        public ReturnStatusTest(ServerFixture server)
+        public ReturnStatusTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-            this.client = MagicOnionClient.Create<IReturnStatus>(channel);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.client = server.CreateClient<IReturnStatus>();
         }
 
         [Fact]

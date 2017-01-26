@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 using ZeroFormatter;
 using ZeroFormatter.Formatters;
 
@@ -178,18 +179,16 @@ namespace MagicOnion.Tests
         }
     }
 
-    public class ArgumentPatternTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class ArgumentPatternTest
     {
+        ITestOutputHelper logger;
         Channel channel;
 
-        public ArgumentPatternTest(ServerFixture server)
+        public ArgumentPatternTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.channel = server.DefaultChannel;
         }
 
         [Fact]

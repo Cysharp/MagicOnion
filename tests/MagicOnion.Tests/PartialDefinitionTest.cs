@@ -4,8 +4,7 @@ using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using Xunit;
-
-
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -31,24 +30,21 @@ namespace MagicOnion.Tests
     }
 
 
-    public class PartialDefinitionTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class PartialDefinitionTest
     {
-        Channel channel;
+        ITestOutputHelper logger;
+        IPartialDefinition client;
 
-        public PartialDefinitionTest(ServerFixture server)
+        public PartialDefinitionTest(ITestOutputHelper logger, ServerFixture server)
         {
-            this.channel = new Channel(server.ServerPort.Host, server.ServerPort.Port, ChannelCredentials.Insecure);
-        }
-
-        public void Dispose()
-        {
-            channel.ShutdownAsync().Wait();
+            this.logger = logger;
+            this.client = server.CreateClient<IPartialDefinition>();
         }
 
         [Fact]
         public async Task Unary1()
         {
-            var client = MagicOnionClient.Create<IPartialDefinition>(channel);
             var r = await client.Unary1(10, 20);
             r.Is(30);
         }
@@ -56,7 +52,6 @@ namespace MagicOnion.Tests
         [Fact]
         public async Task Unary2()
         {
-            var client = MagicOnionClient.Create<IPartialDefinition>(channel);
             var r = await client.Unary2();
             r.Is(100);
         }

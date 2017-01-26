@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Tests
 {
@@ -52,13 +53,16 @@ namespace MagicOnion.Tests
 
 
 
-    public class StreamingContextGroupTest : IClassFixture<ServerFixture>, IDisposable
+    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    public class StreamingContextGroupTest : IDisposable
     {
+        ITestOutputHelper logger;
         ServerPort serverPort;
         List<Channel> channels = new List<Channel>();
 
-        public StreamingContextGroupTest(ServerFixture server)
+        public StreamingContextGroupTest(ITestOutputHelper logger, ServerFixture server)
         {
+            this.logger = logger;
             this.serverPort = server.ServerPort;
         }
 
