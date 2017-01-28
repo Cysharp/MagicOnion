@@ -259,6 +259,7 @@
     <Compile Include="Services\ChatRoomService.cs" />
     <Compile Include="Services\Heartbeat.cs" />
     <Compile Include="Services\MyFirstService.cs" />
+    <Compile Include="Services\SendMetadata.cs" />
     <Compile Include="Services\Standard.cs" />
   </ItemGroup>
   <ItemGroup>

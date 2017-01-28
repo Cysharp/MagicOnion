@@ -29,9 +29,10 @@ namespace MagicOnion.ConsoleClient
 
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             channel.ConnectAsync().Wait();
-            var c = MagicOnionClient.Create<IMyFirstService>(channel);
+            //var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
-            UnaryRun(c).GetAwaiter().GetResult();
+            TestHeartbeat(channel).GetAwaiter().GetResult();
+            //UnaryRun(c).GetAwaiter().GetResult();
             //ClientStreamRun(c).GetAwaiter().GetResult();
             //ServerStreamRun(c).GetAwaiter().GetResult();
             //DuplexStreamRun(c).GetAwaiter().GetResult();

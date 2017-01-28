@@ -32,11 +32,18 @@ namespace MagicOnion.ConsoleServer
 
             //Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
             //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+
+            Environment.SetEnvironmentVariable("SETTINGS_MAX_HEADER_LIST_SIZE", "1000000");
+
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
             {
-                MagicOnionLogger = new MagicOnionLogToGrpcLogger()
+                MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
+                GlobalFilters = new MagicOnionFilterAttribute[]
+                {
+                    new MagicOnion.Server.EmbeddedFilters.ErrorDetailToTrailersFilterAttribute()
+                }
             });
 
             var server = new global::Grpc.Core.Server

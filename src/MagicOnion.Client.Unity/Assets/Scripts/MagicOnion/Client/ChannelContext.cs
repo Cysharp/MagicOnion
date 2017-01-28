@@ -96,6 +96,14 @@ namespace MagicOnion.Client
                     latestStreamingResult = heartBeatConnect.Result;
                 }
 
+                var connectCheck = heartBeatConnect.Result.ResponseStream.MoveNext().ToYieldInstruction();
+                yield return connectCheck;
+                if (connectCheck.HasError)
+                {
+                    GrpcEnvironment.Logger.Error(heartBeatConnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    continue;
+                }
+
                 this.connectionId = connectionId;
                 currentRetryCount = 0;
 

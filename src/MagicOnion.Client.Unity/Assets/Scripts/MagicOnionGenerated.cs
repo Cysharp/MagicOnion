@@ -15,6 +15,9 @@ namespace MagicOnion
         public static void Register()
         {
             MagicOnionClientRegistry<Sandbox.ConsoleServer.IArgumentPattern>.Register(x => new Sandbox.ConsoleServer.IArgumentPatternClient(x), x => new Sandbox.ConsoleServer.IArgumentPatternClient(x));
+            MagicOnionClientRegistry<Sandbox.ConsoleServer.IChatRoomService>.Register(x => new Sandbox.ConsoleServer.IChatRoomServiceClient(x), x => new Sandbox.ConsoleServer.IChatRoomServiceClient(x));
+            MagicOnionClientRegistry<Sandbox.ConsoleServer.IHeartbeat>.Register(x => new Sandbox.ConsoleServer.IHeartbeatClient(x), x => new Sandbox.ConsoleServer.IHeartbeatClient(x));
+            MagicOnionClientRegistry<Sandbox.ConsoleServer.ISendMetadata>.Register(x => new Sandbox.ConsoleServer.ISendMetadataClient(x), x => new Sandbox.ConsoleServer.ISendMetadataClient(x));
             MagicOnionClientRegistry<Sandbox.ConsoleServer.IStandard>.Register(x => new Sandbox.ConsoleServer.IStandardClient(x), x => new Sandbox.ConsoleServer.IStandardClient(x));
             MagicOnionClientRegistry<Sandbox.ConsoleServer.IMyFirstService>.Register(x => new Sandbox.ConsoleServer.IMyFirstServiceClient(x), x => new Sandbox.ConsoleServer.IMyFirstServiceClient(x));
         }
@@ -114,60 +117,54 @@ namespace Sandbox.ConsoleServer {
 
         static IArgumentPatternClient()
         {
-            try
-            {
-                Unary1Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                Unary1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(default(int), default(int), "unknown", SharedLibrary.MyEnum.Orange, default(global::SharedLibrary.MyStructResponse), 9, null));
-                Unary1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyHugeResponse>.Default);
+            Unary1Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            Unary1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(default(int), default(int), "unknown", SharedLibrary.MyEnum.Orange, default(global::SharedLibrary.MyStructResponse), 9, null));
+            Unary1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyHugeResponse>.Default);
 
-                Unary2Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                Unary2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyRequest>.Default);
-                Unary2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
+            Unary2Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            Unary2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyRequest>.Default);
+            Unary2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
 
-                Unary3Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                Unary3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
-                Unary3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
+            Unary3Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            Unary3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
+            Unary3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
 
-                Unary5Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary5", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                Unary5RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructRequest>.Default);
-                Unary5ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructResponse>.Default);
+            Unary5Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary5", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            Unary5RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructRequest>.Default);
+            Unary5ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructResponse>.Default);
 
-                ServerStreamingResult1Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                ServerStreamingResult1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int, int, string>(default(int), default(int), "unknown"));
-                ServerStreamingResult1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
+            ServerStreamingResult1Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ServerStreamingResult1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int, int, string>(default(int), default(int), "unknown"));
+            ServerStreamingResult1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
 
-                ServerStreamingResult2Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                ServerStreamingResult2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyRequest>.Default);
-                ServerStreamingResult2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
+            ServerStreamingResult2Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ServerStreamingResult2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyRequest>.Default);
+            ServerStreamingResult2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
 
-                ServerStreamingResult3Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                ServerStreamingResult3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
-                ServerStreamingResult3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
+            ServerStreamingResult3Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ServerStreamingResult3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
+            ServerStreamingResult3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyResponse>.Default);
 
-                ServerStreamingResult4Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult4", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                ServerStreamingResult4RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
-                ServerStreamingResult4ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.Nil>.Default);
+            ServerStreamingResult4Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult4", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ServerStreamingResult4RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
+            ServerStreamingResult4ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.Nil>.Default);
 
-                ServerStreamingResult5Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult5", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                ServerStreamingResult5RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructRequest>.Default);
-                ServerStreamingResult5ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructResponse>.Default);
+            ServerStreamingResult5Method = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IArgumentPattern", "ServerStreamingResult5", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ServerStreamingResult5RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructRequest>.Default);
+            ServerStreamingResult5ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.MyStructResponse>.Default);
 
-                UnaryS1Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                UnaryS1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset)));
-                UnaryS1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+            UnaryS1Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS1RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset)));
+            UnaryS1ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
 
-                UnaryS2Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                UnaryS2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, int[]>.Default);
-                UnaryS2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+            UnaryS2Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS2", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS2RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, int[]>.Default);
+            UnaryS2ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
 
-                UnaryS3Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-                UnaryS3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[])));
-                UnaryS3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
-            }
-            catch(System.Exception ex)
-            {
-                UnityEngine.Debug.LogException(ex);
-            }
+            UnaryS3Method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "UnaryS3", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            UnaryS3RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(new DynamicArgumentTupleFormatter<ZeroFormatter.Formatters.DefaultResolver, int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[])));
+            UnaryS3ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+
         }
 
         IArgumentPatternClient()
@@ -276,6 +273,167 @@ namespace Sandbox.ConsoleServer {
             var __request = UnaryS3RequestMarshaller.Serializer(new DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>(arrayPattern1, arrayPattern2, arrayPattern3));
             var __callResult = callInvoker.AsyncUnaryCall(UnaryS3Method, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, UnaryS3ResponseMarshaller);
+        }
+
+    }
+
+    public interface IChatRoomService : IService<IChatRoomService>
+    {
+    }
+    
+    public class IChatRoomServiceClient : MagicOnionClientBase<IChatRoomService>, IChatRoomService
+    {
+
+        static IChatRoomServiceClient()
+        {
+        }
+
+        IChatRoomServiceClient()
+        {
+        }
+
+        public IChatRoomServiceClient(Channel channel)
+            : this(new DefaultCallInvoker(channel))
+        {
+
+        }
+
+        public IChatRoomServiceClient(CallInvoker callInvoker)
+            : base(callInvoker)
+        {
+        }
+
+        protected override MagicOnionClientBase<IChatRoomService> Clone()
+        {
+            var clone = new IChatRoomServiceClient(this.callInvoker);
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            return clone;
+        }
+   
+    }
+
+    public interface IHeartbeat : IService<IHeartbeat>
+    {
+   
+        DuplexStreamingResult<global::SharedLibrary.Nil, global::SharedLibrary.Nil> Connect();
+   
+        UnaryResult<global::SharedLibrary.Nil> TestSend(string connectionId);
+    }
+    
+    public class IHeartbeatClient : MagicOnionClientBase<IHeartbeat>, IHeartbeat
+    {
+        static readonly Method<byte[], byte[]> ConnectMethod;
+        static readonly Marshaller<global::SharedLibrary.Nil> ConnectRequestMarshaller;
+        static readonly Marshaller<global::SharedLibrary.Nil> ConnectResponseMarshaller;
+
+        static readonly Method<byte[], byte[]> TestSendMethod;
+        static readonly Marshaller<string> TestSendRequestMarshaller;
+        static readonly Marshaller<global::SharedLibrary.Nil> TestSendResponseMarshaller;
+
+
+        static IHeartbeatClient()
+        {
+            ConnectMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IHeartbeat", "Connect", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            ConnectRequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.Nil>.Default);
+            ConnectResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.Nil>.Default);
+
+            TestSendMethod = new Method<byte[], byte[]>(MethodType.Unary, "IHeartbeat", "TestSend", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            TestSendRequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, string>.Default);
+            TestSendResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, global::SharedLibrary.Nil>.Default);
+
+        }
+
+        IHeartbeatClient()
+        {
+        }
+
+        public IHeartbeatClient(Channel channel)
+            : this(new DefaultCallInvoker(channel))
+        {
+
+        }
+
+        public IHeartbeatClient(CallInvoker callInvoker)
+            : base(callInvoker)
+        {
+        }
+
+        protected override MagicOnionClientBase<IHeartbeat> Clone()
+        {
+            var clone = new IHeartbeatClient(this.callInvoker);
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            return clone;
+        }
+   
+        public DuplexStreamingResult<global::SharedLibrary.Nil, global::SharedLibrary.Nil> Connect()
+        {
+            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(ConnectMethod, base.host, base.option);
+            return new DuplexStreamingResult<global::SharedLibrary.Nil, global::SharedLibrary.Nil>(__callResult, ConnectRequestMarshaller, ConnectResponseMarshaller);
+        }
+
+        public UnaryResult<global::SharedLibrary.Nil> TestSend(string connectionId)
+        {
+            var __request = TestSendRequestMarshaller.Serializer(connectionId);
+            var __callResult = callInvoker.AsyncUnaryCall(TestSendMethod, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.Nil>(__callResult, TestSendResponseMarshaller);
+        }
+
+    }
+
+    public interface ISendMetadata : IService<ISendMetadata>
+    {
+   
+        UnaryResult<int> PangPong();
+    }
+    
+    public class ISendMetadataClient : MagicOnionClientBase<ISendMetadata>, ISendMetadata
+    {
+        static readonly Method<byte[], byte[]> PangPongMethod;
+        static readonly Marshaller<byte[]> PangPongRequestMarshaller;
+        static readonly Marshaller<int> PangPongResponseMarshaller;
+
+
+        static ISendMetadataClient()
+        {
+            PangPongMethod = new Method<byte[], byte[]>(MethodType.Unary, "ISendMetadata", "PangPong", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            PangPongRequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, byte[]>.Default);
+            PangPongResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, int>.Default);
+
+        }
+
+        ISendMetadataClient()
+        {
+        }
+
+        public ISendMetadataClient(Channel channel)
+            : this(new DefaultCallInvoker(channel))
+        {
+
+        }
+
+        public ISendMetadataClient(CallInvoker callInvoker)
+            : base(callInvoker)
+        {
+        }
+
+        protected override MagicOnionClientBase<ISendMetadata> Clone()
+        {
+            var clone = new ISendMetadataClient(this.callInvoker);
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            return clone;
+        }
+   
+        public UnaryResult<int> PangPong()
+        {
+            var __request = PangPongRequestMarshaller.Serializer(MagicOnionMarshallers.EmptyBytes);
+            var __callResult = callInvoker.AsyncUnaryCall(PangPongMethod, base.host, base.option, __request);
+            return new UnaryResult<int>(__callResult, PangPongResponseMarshaller);
         }
 
     }

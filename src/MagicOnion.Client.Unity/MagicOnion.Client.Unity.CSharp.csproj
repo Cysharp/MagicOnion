@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.7p2</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -86,7 +88,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Loader.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\AsyncStreamReaderExtensions.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\ChannelContext.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Client\ChannelContext.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\HeartbeatClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\PingClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClient.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
     <Compile Include="Assets\Scripts\Tests\ArgumentPatternTest.cs" />
+    <Compile Include="Assets\Scripts\Tests\MetadataTest.cs" />
     <Compile Include="Assets\Scripts\Tests\HeartbeatTest.cs" />
     <Compile Include="Assets\Scripts\Tests\SimpleTest.cs" />
     <Compile Include="Assets\Scripts\Tests\StandardTest.cs" />

@@ -5,6 +5,8 @@ namespace MagicOnion
 {
     public static class MetadataExtensions
     {
+        public const string BinarySuffix = "-bin";
+
         /// <summary>
         /// Get metdata entry. If does not exists, return null.
         /// </summary>
