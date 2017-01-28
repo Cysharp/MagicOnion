@@ -80,6 +80,7 @@
     <Compile Include="ServerStreamingResult.cs" />
     <Compile Include="Server\ConnectionContext.cs" />
     <Compile Include="Server\EmbeddedFilters\ErrorDetailToTrailersFilterAttribute.cs" />
+    <Compile Include="Server\EmbeddedFilters\NewRelicCustomInstrumentationFilterAttribute.cs" />
     <Compile Include="Server\EmbeddedServices\Ping.cs" />
     <Compile Include="Server\EmbeddedServices\Heartbeat.cs" />
     <Compile Include="Server\IMagicOnionLogger.cs" />
