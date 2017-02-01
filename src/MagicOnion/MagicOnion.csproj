@@ -47,12 +47,12 @@
       <HintPath>$(SolutionDir)packages\System.Interactive.Async.3.0.0\lib\net45\System.Interactive.Async.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.5.7\lib\net45\ZeroFormatter.dll</HintPath>
+    <Reference Include="ZeroFormatter, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.6.2\lib\net45\ZeroFormatter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.5.7\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.6.2\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
