@@ -194,6 +194,8 @@ namespace MagicOnion.HttpGateway.Swagger
         string BuildSchema(IDictionary<string, Schema> definitions, Type type)
         {
             var fullName = type.FullName;
+            if (fullName == null) return ""; // safety(TODO:IDictionary<> is not supported)
+
             Schema schema;
             if (definitions.TryGetValue(fullName, out schema)) return "#/definitions/" + fullName;
 
