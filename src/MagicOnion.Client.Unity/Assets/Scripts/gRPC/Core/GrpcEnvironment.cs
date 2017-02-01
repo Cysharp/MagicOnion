@@ -328,11 +328,12 @@ namespace Grpc.Core
                     if (!hooksRegistered)
                     {
                         // In Unity, use OnApplicationQuit instead of AppDomain.Unload, ProcessExit.
-                        // Note: How to use in UnityEditor?
+#if UNITY_EDITOR
                         MainThreadDispatcher.OnApplicationQuitAsObservable().Subscribe(_ =>
                         {
                             HandleShutdown();
                         });
+#endif
                     }
                     hooksRegistered = true;
                 }

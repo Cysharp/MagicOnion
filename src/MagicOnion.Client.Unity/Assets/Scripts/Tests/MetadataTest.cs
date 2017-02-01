@@ -32,6 +32,18 @@ namespace MagicOnion.Tests
             {
                 Debug.Log("No Error");
             }
+
+            channel.ShutdownAsync().Subscribe();
         }
+
+        //static Channel _staticChannel;
+        //static ChannelContext _ctx;
+
+        //public IEnumerator Humo()
+        //{
+        //    _staticChannel = UnitTestClient.GetChannel();
+        //    _ctx = new ChannelContext(_staticChannel);
+        //    yield return _ctx.WaitConnectComplete().ToYieldInstruction();
+        //}
     }
 }

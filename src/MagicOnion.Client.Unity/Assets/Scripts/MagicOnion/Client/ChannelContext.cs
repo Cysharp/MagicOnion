@@ -22,6 +22,7 @@ namespace MagicOnion.Client
         DuplexStreamingResult<bool, bool> latestStreamingResult;
         AsyncSubject<Unit> waitConnectComplete;
         IDisposable connectingTask;
+        GrpcCancellationTokenSource cancellationTokenSource = new GrpcCancellationTokenSource();
         LinkedList<Action> disconnectedActions = new LinkedList<Action>();
 
         string connectionId;
@@ -31,6 +32,14 @@ namespace MagicOnion.Client
             {
                 if (isDisposed) throw new ObjectDisposedException("ChannelContext");
                 return connectionId;
+            }
+        }
+
+        public Channel Channel
+        {
+            get
+            {
+                return channel;
             }
         }
 
@@ -44,10 +53,13 @@ namespace MagicOnion.Client
                 this.connectionId = this.connectionIdFactory();
             }
             this.waitConnectComplete = new AsyncSubject<Unit>();
-            connectingTask = Observable.FromCoroutine(() => ConnectAlways()).Subscribe();
+            connectingTask = Observable.FromCoroutine(() => ConnectAlways()).Subscribe(_ => { }, ex =>
+            {
+                UnityEngine.Debug.Log("Error Detected:" + ex.ToString());
+            }, () => { });
 
             // destructor
-            MainThreadDispatcher.OnApplicationQuitAsObservable().Subscribe(_ =>
+            this.channel.ShutdownToken.Register(() =>
             {
                 this.Dispose();
             });
@@ -71,7 +83,7 @@ namespace MagicOnion.Client
                 if (isDisposed) yield break;
                 if (channel.State == ChannelState.Shutdown) yield break;
 
-                var conn = channel.ConnectAsync().ToYieldInstruction();
+                var conn = channel.ConnectAsync().ToYieldInstruction(false);
                 yield return conn;
 
                 if (isDisposed) yield break;
@@ -84,7 +96,7 @@ namespace MagicOnion.Client
                 var connectionId = (useSameId) ? this.connectionId : connectionIdFactory();
                 var client = new HeartbeatClient(channel, connectionId);
                 latestStreamingResult.Dispose();
-                var heartBeatConnect = client.Connect().ToYieldInstruction();
+                var heartBeatConnect = client.Connect().ToYieldInstruction(false);
                 yield return heartBeatConnect;
                 if (heartBeatConnect.HasError)
                 {
@@ -96,7 +108,7 @@ namespace MagicOnion.Client
                     latestStreamingResult = heartBeatConnect.Result;
                 }
 
-                var connectCheck = heartBeatConnect.Result.ResponseStream.MoveNext().ToYieldInstruction();
+                var connectCheck = heartBeatConnect.Result.ResponseStream.MoveNext().ToYieldInstruction(false);
                 yield return connectCheck;
                 if (connectCheck.HasError)
                 {
@@ -110,9 +122,8 @@ namespace MagicOnion.Client
                 waitConnectComplete.OnNext(Unit.Default);
                 waitConnectComplete.OnCompleted();
 
-                var waitForDisconnect = Observable.Amb(channel.WaitForStateChangedAsync(ChannelState.Ready), heartBeatConnect.Result.ResponseStream.MoveNext()).ToYieldInstruction();
+                var waitForDisconnect = Observable.Amb(channel.WaitForStateChangedAsync(ChannelState.Ready), heartBeatConnect.Result.ResponseStream.MoveNext()).ToYieldInstruction(false);
                 yield return waitForDisconnect;
-
                 try
                 {
                     waitConnectComplete = new AsyncSubject<Unit>();
@@ -151,8 +162,9 @@ namespace MagicOnion.Client
             }
             newMetadata.Add(ChannelContext.HeaderKey, ConnectionId);
 
-            return MagicOnionClient.Create<T>(channel).WithHeaders(newMetadata);
+            return MagicOnionClient.Create<T>(channel).WithHeaders(newMetadata).WithCancellationToken(cancellationTokenSource.Token);
         }
+
 
         public void Dispose()
         {
@@ -160,6 +172,7 @@ namespace MagicOnion.Client
             isDisposed = true;
 
             connectingTask.Dispose();
+            cancellationTokenSource.Cancel();
             waitConnectComplete.Dispose();
             latestStreamingResult.Dispose();
         }
