@@ -18,6 +18,8 @@ namespace MagicOnion.CodeAnalysis
     {
         public string Name { get; set; }
         public string Namespace { get; set; }
+        public bool IsServiceDifinition { get; set; }
+        public string[] InterfaceNames { get; set; }
         public MethodDefinition[] Methods { get; set; }
 
         public override string ToString()

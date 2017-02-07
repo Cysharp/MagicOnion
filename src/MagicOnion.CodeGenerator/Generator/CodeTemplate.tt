@@ -18,13 +18,19 @@
 
 <# foreach(var interfaceDef in Interfaces) { #>
 
-    public interface <#= interfaceDef.Name #> : IService<<#= interfaceDef.Name #>>
+<# if(!interfaceDef.IsServiceDifinition) { #>
+
+    public interface <#= interfaceDef.Name #><# if(interfaceDef.InterfaceNames.Any()) { #> : <#=String.Join(", ", interfaceDef.InterfaceNames) #><# } #>
+
     {
 <# foreach(var method in interfaceDef.Methods) { #>   
         <#= method.ToString() #>;
 <# } #>
     }
-    
+
+<# } #>
+
+<# if(interfaceDef.IsServiceDifinition) { #>
 <# var clientName = interfaceDef.Name + "Client"; #>
     public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.Name #>>, <#= interfaceDef.Name #>
     {
@@ -91,6 +97,7 @@
 
 <# } #>
     }
+<# } #>
 <# } #>
 <#= Namespace != null ? "}" : "" #>
 
