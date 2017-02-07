@@ -98,12 +98,22 @@ namespace MagicOnion.CodeGenerator
             Console.WriteLine("Output Generation Start");
             sw.Restart();
 
-            var texts = definitions.GroupBy(x => x.Namespace)
-                .Select(x => new CodeTemplate() { Namespace = x.Key, ZeroFormatterResolver = cmdArgs.ResolverName, Interfaces = x.ToArray() })
-                // .Select(x => x.TransformText())
+            var texts = definitions
+                .GroupBy(x => x.Namespace)
+                .Select(x => new CodeTemplate()
+                {
+                    Namespace = x.Key,
+                    ZeroFormatterResolver = cmdArgs.ResolverName,
+                    Interfaces = x.ToArray()
+                })
                 .ToArray();
 
-            var registerTemplate = new RegisterTemplate { Namespace = cmdArgs.NamespaceRoot, Interfaces = definitions, UnuseUnityAttribute = cmdArgs.UnuseUnityAttr };
+            var registerTemplate = new RegisterTemplate
+            {
+                Namespace = cmdArgs.NamespaceRoot,
+                Interfaces = definitions.Where(x => x.IsServiceDifinition).ToArray(),
+                UnuseUnityAttribute = cmdArgs.UnuseUnityAttr
+            };
 
             if (cmdArgs.IsSeparate)
             {

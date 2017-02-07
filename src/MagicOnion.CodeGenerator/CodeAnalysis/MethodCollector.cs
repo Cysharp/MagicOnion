@@ -36,8 +36,10 @@ namespace MagicOnion.CodeAnalysis
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes);
 
         readonly string csProjPath;
-        readonly INamedTypeSymbol[] targetTypes;
+        readonly INamedTypeSymbol[] serviceTypes;
+        readonly INamedTypeSymbol[] interfaces;
         readonly ReferenceSymbols typeReferences;
+        readonly INamedTypeSymbol baseInterface;
 
         public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols)
         {
@@ -47,47 +49,90 @@ namespace MagicOnion.CodeAnalysis
 
             var marker = compilation.GetTypeByMetadataName("MagicOnion.__IServiceMarker");
 
-            targetTypes = compilation.GetNamedTypeSymbols()
+            baseInterface = compilation.GetTypeByMetadataName("MagicOnion.IService`1");
+
+            serviceTypes = compilation.GetNamedTypeSymbols()
                 .Where(t => t.AllInterfaces.Any(x => x == marker))
+                .ToArray();
+
+            interfaces = serviceTypes
+                .Concat(serviceTypes.SelectMany(x => x.AllInterfaces))
+                .Distinct()
+                .Where(x => x != marker)
+                .Where(t => t != baseInterface)
+                .Where(x => !x.IsGenericType || x.ConstructedFrom != baseInterface)
                 .ToArray();
         }
 
         // not visitor pattern:)
         public InterfaceDefintion[] Visit()
         {
-            return targetTypes.Select(x => new InterfaceDefintion
-            {
-                Name = x.ToDisplayString(shortTypeNameFormat),
-                Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                Methods = x.GetAllMembers()
-                    .OfType<IMethodSymbol>()
-                    .Select(y =>
+            return interfaces
+                .Select(x => new InterfaceDefintion()
+                {
+                    Name = x.ToDisplayString(shortTypeNameFormat),
+                    Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
+                    IsServiceDifinition = false,
+                    InterfaceNames = x.Interfaces.Select(y => y.ToDisplayString()).ToArray(),
+                    Methods = x.GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Select(CreateMethodDefinition)
+                        .ToArray()
+                })
+                .Concat(serviceTypes
+                    .Select(x => new InterfaceDefintion
                     {
-                        MethodType t;
-                        string requestType;
-                        string responseType;
-                        ExtractRequestResponseType(y, out t, out requestType, out responseType);
-                        return new MethodDefinition
-                        {
-                            Name = y.Name,
-                            MethodType = t,
-                            RequestType = requestType,
-                            ResponseType = responseType,
-                            Parameters = y.Parameters.Select(p =>
-                            {
-                                return new ParameterDefinition
-                                {
-                                    ParameterName = p.Name,
-                                    TypeName = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                                    HasDefaultValue = p.HasExplicitDefaultValue,
-                                    DefaultValue = GetDefaultValue(p)
-                                };
-                            }).ToArray()
-                        };
-                    })
-                    .ToArray()
-            })
-            .ToArray();
+                        Name = x.ToDisplayString(shortTypeNameFormat),
+                        Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
+                        IsServiceDifinition = true,
+                        InterfaceNames = new string[0],
+                        Methods = x.GetAllInterfaceMembers() //with base interface method
+                            .OfType<IMethodSymbol>()
+                            .Distinct(MethodNameComparer.Instance)
+                            .Where(y => y.ContainingType.ConstructedFrom != baseInterface)
+                            .Select(CreateMethodDefinition)
+                            .ToArray()
+                    }))
+                .ToArray();
+        }
+
+        private class MethodNameComparer : IEqualityComparer<IMethodSymbol>
+        {
+            public static IEqualityComparer<IMethodSymbol> Instance { get; } = new MethodNameComparer();
+            public bool Equals(IMethodSymbol x, IMethodSymbol y)
+            {
+                return x.Name == y.Name;
+            }
+
+            public int GetHashCode(IMethodSymbol obj)
+            {
+                return obj.Name.GetHashCode();
+            }
+        }
+
+        private MethodDefinition CreateMethodDefinition(IMethodSymbol y)
+        {
+            MethodType t;
+            string requestType;
+            string responseType;
+            ExtractRequestResponseType(y, out t, out requestType, out responseType);
+            return new MethodDefinition
+            {
+                Name = y.Name,
+                MethodType = t,
+                RequestType = requestType,
+                ResponseType = responseType,
+                Parameters = y.Parameters.Select(p =>
+                {
+                    return new ParameterDefinition
+                    {
+                        ParameterName = p.Name,
+                        TypeName = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        HasDefaultValue = p.HasExplicitDefaultValue,
+                        DefaultValue = GetDefaultValue(p)
+                    };
+                }).ToArray()
+            };
         }
 
         void ExtractRequestResponseType(IMethodSymbol method, out MethodType methodType, out string requestType, out string responseType)

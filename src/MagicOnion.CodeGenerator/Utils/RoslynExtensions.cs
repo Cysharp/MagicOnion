@@ -170,5 +170,11 @@ namespace MagicOnion
                 t = t.BaseType;
             }
         }
+
+        public static IEnumerable<ISymbol> GetAllInterfaceMembers(this ITypeSymbol symbol)
+        {
+            return symbol.GetMembers()
+                .Concat(symbol.AllInterfaces.SelectMany(x => x.GetMembers()));
+        }
     }
 }
