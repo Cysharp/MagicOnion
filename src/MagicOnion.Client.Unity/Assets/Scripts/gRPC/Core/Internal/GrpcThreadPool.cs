@@ -51,7 +51,11 @@ namespace Grpc.Core.Internal
 
         readonly GrpcEnvironment environment;
         readonly object myLock = new object();
-        readonly List<Thread> threads = new List<Thread>();
+#if UNITY_METRO
+        readonly List<ReadOnlyReactiveProperty<bool>> threads = new List<ReadOnlyReactiveProperty<bool>>();
+#else
+        readonly List<System.Threading.Thread> threads = new List<System.Threading.Thread>();
+#endif
         readonly int poolSize;
         readonly int completionQueueCount;
 
@@ -127,7 +131,11 @@ namespace Grpc.Core.Internal
         {
             get
             {
+#if UNITY_METRO
+                return threads.Any(t => t.Value);
+#else
                 return threads.Any(t => t.ThreadState != ThreadState.Stopped);
+#endif
             }
         }
 
@@ -139,18 +147,29 @@ namespace Grpc.Core.Internal
             }
         }
 
-        private Thread CreateAndStartThread(int threadIndex)
+#if UNITY_METRO
+        private ReadOnlyReactiveProperty<bool> CreateAndStartThread(int threadIndex)
+        {
+            var cqIndex = threadIndex % completionQueues.Count;
+            var cq = completionQueues.ElementAt(cqIndex);
+            return Observable.Start(() => RunHandlerLoop(cq), Scheduler.ThreadPool)
+                .Select(_ => false)
+                .ToReadOnlyReactiveProperty(true);
+        }
+#else
+        private System.Threading.Thread CreateAndStartThread(int threadIndex)
         {
             var cqIndex = threadIndex % completionQueues.Count;
             var cq = completionQueues.ElementAt(cqIndex);
 
-            var thread = new Thread(new ThreadStart(() => RunHandlerLoop(cq)));
+            var thread = new System.Threading.Thread(new ThreadStart(() => RunHandlerLoop(cq)));
             thread.IsBackground = true;
             thread.Name = string.Format("grpc {0} (cq {1})", threadIndex, cqIndex);
             thread.Start();
 
             return thread;
         }
+#endif
 
         /// <summary>
         /// Body of the polling thread.

@@ -97,7 +97,11 @@ namespace Grpc.Core.Internal
             }
             catch (Exception e)
             {
+#if UNITY_METRO
+                UnityEngine.Debug.Log("Caught exception in native callback " + e);
+#else
                 Console.WriteLine("Caught exception in native callback " + e);
+#endif
             }
         }
     }
