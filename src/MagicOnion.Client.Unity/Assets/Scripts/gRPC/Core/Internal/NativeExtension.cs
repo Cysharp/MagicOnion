@@ -88,7 +88,7 @@ namespace Grpc.Core.Internal
         {
             get { return this.nativeMethods; }
         }
-
+#if !UNITY_METRO
         private static string GetAssemblyPath()
         {
             var assembly = typeof(NativeExtension).Assembly;
@@ -116,6 +116,7 @@ namespace Grpc.Core.Internal
         {
             return uri.ToLowerInvariant().StartsWith(Uri.UriSchemeFile);
         }
+#endif
 #endif
     }
 }

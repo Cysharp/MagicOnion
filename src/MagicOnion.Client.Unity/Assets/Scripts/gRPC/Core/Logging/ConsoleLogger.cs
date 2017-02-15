@@ -37,6 +37,7 @@ using System.Globalization;
 
 namespace Grpc.Core.Logging
 {
+#if !UNITY_METRO
     /// <summary>Logger that logs to System.Console.</summary>
     public class ConsoleLogger : TextWriterLogger
     {
@@ -62,4 +63,5 @@ namespace Grpc.Core.Logging
             return new ConsoleLogger(typeof(T));
         }
     }
+#endif
 }
