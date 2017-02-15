@@ -7,11 +7,17 @@ namespace MagicOnion
     {
         readonly Type forType;
         readonly string forTypeString;
+        readonly bool errorToWarn = true; // default is true(gRPC internal log show to warn)
 
         public UnityDebugLogger()
             : this(null)
         {
+        }
 
+        public UnityDebugLogger(bool errorToWarn)
+            : this(null)
+        {
+            this.errorToWarn = errorToWarn;
         }
 
         protected UnityDebugLogger(Type forType)
@@ -89,13 +95,27 @@ namespace MagicOnion
         /// <summary>Logs a message with severity Error.</summary>
         public void Error(string message)
         {
-            UnityEngine.Debug.LogError(BuildMessage(message));
+            if (errorToWarn)
+            {
+                UnityEngine.Debug.LogWarning(BuildMessage(message));
+            }
+            else
+            {
+                UnityEngine.Debug.LogError(BuildMessage(message));
+            }
         }
 
         /// <summary>Logs a formatted message with severity Error.</summary>
         public void Error(string format, params object[] formatArgs)
         {
-            UnityEngine.Debug.LogError(BuildMessage(format, formatArgs));
+            if (errorToWarn)
+            {
+                UnityEngine.Debug.LogWarning(BuildMessage(format, formatArgs));
+            }
+            else
+            {
+                UnityEngine.Debug.LogError(BuildMessage(format, formatArgs));
+            }
         }
 
         /// <summary>Logs a message and an associated exception with severity Error.</summary>

@@ -1,10 +1,8 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client.EmbeddedServices;
-using MagicOnion.Server;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UniRx;
 
 namespace MagicOnion.Client
