@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MagicOnion.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,8 +44,9 @@ namespace MagicOnion.Server
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }
+        internal IMagicOnionLogger MagicOnionLogger { get; private set; }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context)
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IMagicOnionLogger logger)
         {
             this.ServiceType = serviceType;
             this.MethodInfo = methodInfo;
@@ -52,6 +54,7 @@ namespace MagicOnion.Server
             this.MethodType = methodType;
             this.CallContext = context;
             this.Timestamp = DateTime.UtcNow;
+            this.MagicOnionLogger = logger;
         }
     }
 
@@ -65,7 +68,7 @@ namespace MagicOnion.Server
         {
             this.context = context;
             this.marshaller = (Marshaller<TRequest>)context.RequestMarshaller;
-            this.inner = context.RequestStream;
+            this.inner = new LoggableStreamReader<byte[]>(context.MagicOnionLogger, context, context.RequestStream);
         }
 
         public ServiceContext ServiceContext { get { return context; } }
@@ -138,7 +141,7 @@ namespace MagicOnion.Server
         {
             this.context = context;
             this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
-            this.inner = context.ResponseStream;
+            this.inner = new LoggableStreamWriter<byte[]>(context.MagicOnionLogger, context, context.ResponseStream);
         }
 
         public ServiceContext ServiceContext { get { return context; } }
@@ -186,8 +189,8 @@ namespace MagicOnion.Server
         public DuplexStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.innerReader = context.RequestStream;
-            this.innerWriter = context.ResponseStream;
+            this.innerReader = new LoggableStreamReader<byte[]>(context.MagicOnionLogger, context, context.RequestStream);
+            this.innerWriter = new LoggableStreamWriter<byte[]>(context.MagicOnionLogger, context, context.ResponseStream);
             this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
             this.responseMarshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
         }

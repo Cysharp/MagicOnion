@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using System;
+using Grpc.Core;
 
 namespace MagicOnion.Server
 {
@@ -7,8 +8,11 @@ namespace MagicOnion.Server
         void BeginBuildServiceDefinition();
         void EndBuildServiceDefinition(double elapsed);
 
-        void BeginInvokeMethod(MethodType type, string method);
-        void EndInvokeMethod(MethodType type, string method, double elapsed, bool isErrorOrInterrupted);
+        void BeginInvokeMethod(ServiceContext context);
+        void EndInvokeMethod(ServiceContext context, double elapsed, bool isErrorOrInterrupted);
+
+        void WriteToStream(ServiceContext context);
+        void ReadFromStream(ServiceContext context, bool complete);
     }
 
     public class NullMagicOnionLogger : IMagicOnionLogger
@@ -17,7 +21,15 @@ namespace MagicOnion.Server
         {
         }
 
-        public void BeginInvokeMethod(MethodType type, string method)
+        public void BeginInvokeMethod( ServiceContext context)
+        {
+        }
+
+        public void ReadFromStream( ServiceContext context, bool complete)
+        {
+        }
+
+        public void WriteToStream( ServiceContext context)
         {
         }
 
@@ -25,7 +37,7 @@ namespace MagicOnion.Server
         {
         }
 
-        public void EndInvokeMethod(MethodType type, string method, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeMethod(ServiceContext context, double elapsed, bool isErrorOrInterrupted)
         {
         }
     }
@@ -47,14 +59,24 @@ namespace MagicOnion.Server
             GrpcEnvironment.Logger.Debug($"{nameof(EndBuildServiceDefinition)} elapsed:{elapsed}");
         }
 
-        public void BeginInvokeMethod(MethodType type, string method)
+        public void BeginInvokeMethod(ServiceContext context)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(type)} method:{method}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method}");
         }
 
-        public void EndInvokeMethod(MethodType type, string method, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeMethod(ServiceContext context, double elapsed, bool isErrorOrInterrupted)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(type)}  method:{method} elapsed:{elapsed} isErrorOrInterrupted:{isErrorOrInterrupted}");
+            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} elapsed:{elapsed} isErrorOrInterrupted:{isErrorOrInterrupted}");
+        }
+
+        public void WriteToStream( ServiceContext context)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method}");
+        }
+
+        public void ReadFromStream( ServiceContext context, bool complete)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} complete:{complete}");
         }
 
         // enum.ToString is slow.

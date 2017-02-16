@@ -29,13 +29,13 @@ namespace MagicOnion.ConsoleClient
 
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             channel.ConnectAsync().Wait();
-            //var c = MagicOnionClient.Create<IMyFirstService>(channel);
+            var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
-            TestHeartbeat(channel).GetAwaiter().GetResult();
+            // TestHeartbeat(channel).GetAwaiter().GetResult();
             //UnaryRun(c).GetAwaiter().GetResult();
-            //ClientStreamRun(c).GetAwaiter().GetResult();
-            //ServerStreamRun(c).GetAwaiter().GetResult();
-            //DuplexStreamRun(c).GetAwaiter().GetResult();
+            ClientStreamRun(c).GetAwaiter().GetResult();
+            ServerStreamRun(c).GetAwaiter().GetResult();
+            DuplexStreamRun(c).GetAwaiter().GetResult();
 
             // many run
             //UnaryLoadTest(c).GetAwaiter().GetResult();

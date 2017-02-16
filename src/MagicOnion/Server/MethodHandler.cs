@@ -309,17 +309,15 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller,
+                Request = request
+            };
             try
             {
-                logger.BeginInvokeMethod(this.MethodType, context.Method);
-
-                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
-                {
-                    RequestMarshaller = requestMarshaller,
-                    ResponseMarshaller = responseMarshaller,
-                    Request = request
-                };
-
+                logger.BeginInvokeMethod(serviceContext);
                 await this.methodBody(serviceContext).ConfigureAwait(false);
 
                 return serviceContext.Result ?? emptyBytes;
@@ -347,7 +345,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -355,18 +353,17 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller,
+                RequestStream = requestStream
+            };
             try
             {
-                logger.BeginInvokeMethod(this.MethodType, context.Method);
                 using (requestStream)
                 {
-                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
-                    {
-                        RequestMarshaller = requestMarshaller,
-                        ResponseMarshaller = responseMarshaller,
-                        RequestStream = requestStream
-                    };
-
+                    logger.BeginInvokeMethod(serviceContext);
                     await this.methodBody(serviceContext).ConfigureAwait(false);
 
                     return serviceContext.Result ?? emptyBytes;
@@ -395,7 +392,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -403,17 +400,16 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller,
+                ResponseStream = responseStream,
+                Request = request
+            };
             try
             {
-                logger.BeginInvokeMethod(this.MethodType, context.Method);
-                var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
-                {
-                    RequestMarshaller = requestMarshaller,
-                    ResponseMarshaller = responseMarshaller,
-                    ResponseStream = responseStream,
-                    Request = request
-                };
-
+                logger.BeginInvokeMethod(serviceContext);
                 await this.methodBody(serviceContext).ConfigureAwait(false);
 
                 return emptyBytes;
@@ -441,7 +437,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -449,18 +445,18 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            {
+                RequestMarshaller = requestMarshaller,
+                ResponseMarshaller = responseMarshaller,
+                RequestStream = requestStream,
+                ResponseStream = responseStream
+            };
             try
             {
-                logger.BeginInvokeMethod(this.MethodType, context.Method);
+                logger.BeginInvokeMethod(serviceContext);
                 using (requestStream)
                 {
-                    var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context)
-                    {
-                        RequestMarshaller = requestMarshaller,
-                        ResponseMarshaller = responseMarshaller,
-                        RequestStream = requestStream,
-                        ResponseStream = responseStream
-                    };
 
                     await this.methodBody(serviceContext).ConfigureAwait(false);
 
@@ -490,7 +486,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(this.MethodType, context.Method, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
