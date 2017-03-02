@@ -6,26 +6,12 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 
-using ZeroFormatter;
-using ZeroFormatter.Formatters;
+using System;
+using MessagePack;
+using MessagePack.Formatters;
 
 namespace MagicOnion
 {
-    internal static class FormatterLengthHelper
-    {
-        internal static int? GetLength(params IFormatter[] formatters)
-        {
-            int? sum = 0;
-            foreach (var item in formatters)
-            {
-                var len = item.GetLength();
-                if (len == null) return null;
-                sum += len;
-            }
-            return sum;
-        }
-    }
-
     // T2 ~ T20
 
 <# for(var i = 2; i <= 20; i++) {
@@ -67,14 +53,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, <#= typeArgs #>> : Formatter<TTypeResolver, DynamicArgumentTuple<<#= typeArgs #>>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<<#= typeArgs #>> : IMessagePackFormatter<DynamicArgumentTuple<<#= typeArgs #>>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-<# for(var j = 1; j <= i; j++) { #>
-        readonly Formatter<TTypeResolver, T<#= j #>> formatter<#= j #>;
-<# } #>
 <# for(var j = 1; j <= i; j++) { #>
         readonly T<#= j #> default<#= j #>;
 <# } #>
@@ -82,42 +62,20 @@ namespace MagicOnion
         public DynamicArgumentTupleFormatter(<#= defaultArgs #>)
         {
 <# for(var j = 1; j <= i; j++) { #>
-            this.formatter<#= j #> = Formatter<TTypeResolver, T<#= j #>>.Default;
-<# } #>
-<# for(var j = 1; j <= i; j++) { #>
             this.default<#= j #> = default<#= j #>;
 <# } #>
-            this.length = FormatterLengthHelper.GetLength(<#= formatterArgs #>);
-            this.noUseDirtyTracker = <#= nouseArgs #>;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
 <# for(var j = 1; j <= i; j++) { #>
-            offset += this.formatter<#= j #>.Serialize(ref bytes, offset, value.Item<#= j #>);
+            offset += formatterResolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref bytes, offset, value.Item<#= j #>, formatterResolver);
 <# } #>
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<<#= typeArgs #>> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int byteSize)
         {
             byteSize = 0;
             int size;
@@ -127,7 +85,7 @@ namespace MagicOnion
             if (bytes.Length == byteSize) return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(0) #>);
 
 <# } #>
-            var item<#= j #> = this.formatter<#= j #>.Deserialize(ref bytes, offset, tracker, out size);
+            var item<#= j #> = formatterResolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(bytes, offset, formatterResolver, out size);
             offset += size;
             byteSize += size;
 <# if(j != i) { #>

@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Internal;
 
 namespace MagicOnion.Client
 {
@@ -24,8 +22,7 @@ namespace MagicOnion.Client
         }
     }
 
-    internal static class DynamicClientBuilder<TTypeResolver, T>
-        where TTypeResolver : ITypeResolver, new()
+    internal static class DynamicClientBuilder<T>
     {
         public static readonly Type ClientType;
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });

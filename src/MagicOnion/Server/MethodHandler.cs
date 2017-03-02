@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -30,8 +31,7 @@ namespace MagicOnion.Server
         public readonly Type RequestType;
         public readonly Type UnwrappedResponseType;
 
-        readonly object requestMarshaller;
-        readonly object responseMarshaller;
+        readonly IFormatterResolver resolver;
         readonly bool responseIsTask;
 
         readonly Func<ServiceContext, Task> methodBody;
@@ -50,18 +50,13 @@ namespace MagicOnion.Server
             MethodType mt;
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
             this.MethodType = mt;
+            this.resolver = options.FormatterResolver;
 
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
             {
-                this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndMarshaller(options.ZeroFormatterTypeResolverType, classType.Name + "/" + methodInfo.Name, parameters, out requestMarshaller);
+                this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
             }
-            else
-            {
-                this.requestMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, RequestType);
-            }
-
-            this.responseMarshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(options.ZeroFormatterTypeResolverType, UnwrappedResponseType);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
@@ -89,10 +84,12 @@ namespace MagicOnion.Server
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
-                    //      var request = ((Marshaller<TRequest>)context.RequestMarshaller).Deserializer.Invoke(context.Request);
+                    //      var request = context.Resolver.GetFormatterWithVerify<TRequest>().Deserialize(context.Request);
                     //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     // };
                     {
+                        // TODO:change expression
+
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
                         var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
 
@@ -155,6 +152,8 @@ namespace MagicOnion.Server
 
             // Utility
             {
+                // TODO:Unknown Utilities
+
                 // (object requestMarshaller, object value) => ((Marshaller<TRequest>)requestMarshaller).Serializer.Invoke((TRequest)value);
                 var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
                 var requestMarshallerArg = Expression.Parameter(typeof(object), "requestMarshaller");
@@ -260,7 +259,7 @@ namespace MagicOnion.Server
 
         internal void RegisterHandler(ServerServiceDefinition.Builder builder)
         {
-            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodInfo.Name, MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodInfo.Name, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
             switch (this.MethodType)
             {
@@ -309,10 +308,8 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller,
                 Request = request
             };
             try
@@ -353,10 +350,8 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller,
                 RequestStream = requestStream
             };
             try
@@ -400,10 +395,8 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller,
                 ResponseStream = responseStream,
                 Request = request
             };
@@ -445,10 +438,8 @@ namespace MagicOnion.Server
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
-                RequestMarshaller = requestMarshaller,
-                ResponseMarshaller = responseMarshaller,
                 RequestStream = requestStream,
                 ResponseStream = responseStream
             };

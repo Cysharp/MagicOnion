@@ -41,6 +41,10 @@
       <HintPath>$(SolutionDir)packages\Grpc.Core.1.0.1\lib\net45\Grpc.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MessagePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MessagePack.0.6.0\lib\net45\MessagePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\Microsoft.AspNetCore.Http.Abstractions.1.1.0\lib\net451\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
       <Private>True</Private>
@@ -138,6 +142,14 @@
       <HintPath>$(SolutionDir)packages\System.Text.Encodings.Web.4.3.0\lib\netstandard1.0\System.Text.Encodings.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -145,14 +157,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ZeroFormatter, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.1.6.2\lib\net45\ZeroFormatter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)packages\ZeroFormatter.Interfaces.1.6.2\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

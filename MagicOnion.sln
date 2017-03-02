@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleClient", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleServer", "sandbox\Sandbox.ConsoleServer\Sandbox.ConsoleServer.csproj", "{A6F79DDC-B0FF-4337-9B24-8D5E768A8340}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "sandbox\SharedLibrary\SharedLibrary.csproj", "{6BDE33A5-2744-40E5-8999-BF0465745587}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleServerDefinition", "sandbox\Sandbox.ConsoleServerDefinition\Sandbox.ConsoleServerDefinition.csproj", "{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{7F61607D-5772-4E41-9D37-04E6AE7E47BA}"
@@ -33,7 +31,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.CodeGenerator", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.HttpGateway", "src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj", "{FCE03661-803E-4629-944F-45DB6B444320}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedProjectLibrary", "sandbox\SharedProjectLibrary\SharedProjectLibrary.shproj", "{5526FA31-4F38-4FF7-96EE-A73BF495E1EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStandardShare", "sandbox\NetStandardShare\NetStandardShare.csproj", "{A9E28AFD-4FEC-416A-9F85-C64F05605B22}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{5526fa31-4f38-4ff7-96ee-a73bf495e1ee}*SharedItemsImports = 13
+		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{a6f79ddc-b0ff-4337-9b24-8d5e768a8340}*SharedItemsImports = 4
+		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{a9e28afd-4fec-416a-9f85-c64f05605b22}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -55,10 +62,6 @@ Global
 		{A6F79DDC-B0FF-4337-9B24-8D5E768A8340}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F79DDC-B0FF-4337-9B24-8D5E768A8340}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6F79DDC-B0FF-4337-9B24-8D5E768A8340}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BDE33A5-2744-40E5-8999-BF0465745587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BDE33A5-2744-40E5-8999-BF0465745587}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BDE33A5-2744-40E5-8999-BF0465745587}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BDE33A5-2744-40E5-8999-BF0465745587}.Release|Any CPU.Build.0 = Release|Any CPU
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,6 +74,10 @@ Global
 		{FCE03661-803E-4629-944F-45DB6B444320}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCE03661-803E-4629-944F-45DB6B444320}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCE03661-803E-4629-944F-45DB6B444320}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9E28AFD-4FEC-416A-9F85-C64F05605B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9E28AFD-4FEC-416A-9F85-C64F05605B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9E28AFD-4FEC-416A-9F85-C64F05605B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9E28AFD-4FEC-416A-9F85-C64F05605B22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,9 +87,10 @@ Global
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{59C4CF2E-964B-460A-BCCA-33F434DD11EF} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A6F79DDC-B0FF-4337-9B24-8D5E768A8340} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
-		{6BDE33A5-2744-40E5-8999-BF0465745587} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{26D5411C-460A-489A-A1E8-B7CC0B4D05BB} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{9633B452-A984-46A6-9A92-B6291561BA09} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{FCE03661-803E-4629-944F-45DB6B444320} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{5526FA31-4F38-4FF7-96EE-A73BF495E1EE} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{A9E28AFD-4FEC-416A-9F85-C64F05605B22} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 	EndGlobalSection
 EndGlobal

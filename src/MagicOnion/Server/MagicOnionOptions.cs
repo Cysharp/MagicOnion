@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZeroFormatter.Formatters;
+﻿using MessagePack;
 
 namespace MagicOnion.Server
 {
     public class MagicOnionOptions
     {
         /// <summary>
-        /// ZeroFormatter resolver. Default is DefaultResolver.
+        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default).
         /// </summary>
-        public Type ZeroFormatterTypeResolverType { get; set; }
+        public IFormatterResolver FormatterResolver { get; set; }
 
         /// <summary>
         /// If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false.
@@ -41,7 +36,7 @@ namespace MagicOnion.Server
         public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
-            this.ZeroFormatterTypeResolverType = typeof(ZeroFormatter.Formatters.DefaultResolver);
+            this.FormatterResolver = MessagePackSerializer.DefaultResolver;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new MagicOnionFilterAttribute[0];
             this.DisableEmbeddedService = false;

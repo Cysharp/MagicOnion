@@ -1,9 +1,6 @@
 ﻿using Grpc.Core;
-using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
-using System;
 using System.Threading.Tasks;
-using ZeroFormatter.Formatters;
 
 namespace MagicOnion.Client.EmbeddedServices
 {
@@ -11,15 +8,11 @@ namespace MagicOnion.Client.EmbeddedServices
     public class HeartbeatClient : MagicOnionClientBase<IMagicOnionEmbeddedHeartbeat>, IMagicOnionEmbeddedHeartbeat
     {
         static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
-        static readonly Marshaller<bool> DuplexStreamingAsyncRequestMarshaller;
-        static readonly Marshaller<bool> DuplexStreamingAsyncResponseMarshaller;
         readonly string connectionId;
 
         static HeartbeatClient()
         {
-            DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IMagicOnionEmbeddedHeartbeat", "Connect", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-            DuplexStreamingAsyncRequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
-            DuplexStreamingAsyncResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<ZeroFormatter.Formatters.DefaultResolver, bool>.Default);
+            DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IMagicOnionEmbeddedHeartbeat", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
         }
 
         HeartbeatClient()
@@ -48,10 +41,15 @@ namespace MagicOnion.Client.EmbeddedServices
             return clone;
         }
 
-        public Task<DuplexStreamingResult<bool, bool>> Connect()
+        Task<DuplexStreamingResult<bool, bool>> IMagicOnionEmbeddedHeartbeat.Connect()
+        {
+            return Task.FromResult(Connect());
+        }
+
+        public DuplexStreamingResult<bool, bool> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
-            return Task.FromResult(new DuplexStreamingResult<bool, bool>(__callResult, DuplexStreamingAsyncRequestMarshaller, DuplexStreamingAsyncResponseMarshaller));
+            return new DuplexStreamingResult<bool, bool>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance); // <bool> is builtin only.
         }
     }
 }

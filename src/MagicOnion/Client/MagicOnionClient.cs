@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client;
+using MessagePack;
 using System;
-using ZeroFormatter.Formatters;
 
 namespace MagicOnion.Client
 {
@@ -10,30 +10,29 @@ namespace MagicOnion.Client
         public static T Create<T>(Channel channel)
             where T : IService<T>
         {
-            return Create<DefaultResolver, T>(channel);
+            return Create<T>(channel, MessagePackSerializer.DefaultResolver);
         }
 
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
-            return Create<DefaultResolver, T>(invoker);
+            return Create<T>(invoker, MessagePackSerializer.DefaultResolver);
         }
 
-        public static T Create<TTypeResolver, T>(Channel channel)
-            where TTypeResolver : ITypeResolver, new()
+        // TODO:resolver!!!
+        public static T Create<T>(Channel channel, IFormatterResolver resolver)
             where T : IService<T>
         {
             if (channel == null) throw new ArgumentNullException(nameof(channel));
-            var t = DynamicClientBuilder<TTypeResolver, T>.ClientType;
+            var t = DynamicClientBuilder<T>.ClientType;
             return (T)Activator.CreateInstance(t, channel);
         }
 
-        public static T Create<TTypeResolver, T>(CallInvoker invoker)
-            where TTypeResolver : ITypeResolver, new()
+        public static T Create<T>(CallInvoker invoker, IFormatterResolver resolver)
             where T : IService<T>
         {
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
-            var t = DynamicClientBuilder<TTypeResolver, T>.ClientType;
+            var t = DynamicClientBuilder<T>.ClientType;
             return (T)Activator.CreateInstance(t, invoker);
         }
     }

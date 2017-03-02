@@ -41,6 +41,10 @@
       <HintPath>..\..\packages\Grpc.Core.1.0.1\lib\net45\Grpc.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MessagePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MessagePack.0.6.0\lib\net45\MessagePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Hosting, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNetCore.Hosting.1.1.0\lib\net451\Microsoft.AspNetCore.Hosting.dll</HintPath>
       <Private>True</Private>
@@ -234,6 +238,14 @@
       <HintPath>..\..\packages\System.Text.Encodings.Web.4.3.0\lib\netstandard1.0\System.Text.Encodings.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -241,14 +253,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ZeroFormatter, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZeroFormatter.1.5.7\lib\net45\ZeroFormatter.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ZeroFormatter.Interfaces, Version=1.5.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\ZeroFormatter.Interfaces.1.5.7\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -275,15 +279,16 @@
       <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
       <Name>MagicOnion</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NetStandardShare\NetStandardShare.csproj">
+      <Project>{a9e28afd-4fec-416a-9f85-c64f05605b22}</Project>
+      <Name>NetStandardShare</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sandbox.ConsoleServerDefinition\Sandbox.ConsoleServerDefinition.csproj">
       <Project>{26D5411C-460A-489A-A1E8-B7CC0B4D05BB}</Project>
       <Name>Sandbox.ConsoleServerDefinition</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
-      <Project>{6bde33a5-2744-40e5-8999-bf0465745587}</Project>
-      <Name>SharedLibrary</Name>
-    </ProjectReference>
   </ItemGroup>
+  <Import Project="..\SharedProjectLibrary\SharedProjectLibrary.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('..\..\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

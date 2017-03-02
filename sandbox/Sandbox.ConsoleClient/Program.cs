@@ -34,8 +34,8 @@ namespace MagicOnion.ConsoleClient
             // TestHeartbeat(channel).GetAwaiter().GetResult();
             //UnaryRun(c).GetAwaiter().GetResult();
             ClientStreamRun(c).GetAwaiter().GetResult();
-            ServerStreamRun(c).GetAwaiter().GetResult();
             DuplexStreamRun(c).GetAwaiter().GetResult();
+            ServerStreamRun(c).GetAwaiter().GetResult();
 
             // many run
             //UnaryLoadTest(c).GetAwaiter().GetResult();

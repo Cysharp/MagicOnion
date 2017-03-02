@@ -1,23 +1,23 @@
 ﻿using System;
-using ZeroFormatter;
+using MessagePack;
 
 namespace SharedLibrary
 {
-    [ZeroFormattable]
+    [MessagePackObject]
     public class MyRequest
     {
-        [Index(0)]
-        public virtual int Id { get; set; }
-        [Index(1)]
-        public virtual string Data { get; set; }
+        [Key(0)]
+        public int Id { get; set; }
+        [Key(1)]
+        public string Data { get; set; }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public struct MyStructRequest
     {
-        [Index(0)]
+        [Key(0)]
         public int X;
-        [Index(1)]
+        [Key(1)]
         public int Y;
 
         public MyStructRequest(int x, int y)
@@ -27,12 +27,12 @@ namespace SharedLibrary
         }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public struct MyStructResponse
     {
-        [Index(0)]
+        [Key(0)]
         public int X;
-        [Index(1)]
+        [Key(1)]
         public int Y;
 
         public MyStructResponse(int x, int y)
@@ -45,7 +45,7 @@ namespace SharedLibrary
     /// <summary>
     /// Represents Void/Unit.
     /// </summary>
-    [ZeroFormattable]
+    [MessagePackObject]
     public struct Nil : IEquatable<Nil>
     {
         public static readonly Nil Default = default(Nil);
@@ -61,32 +61,32 @@ namespace SharedLibrary
         }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public class MyResponse
     {
-        [Index(0)]
-        public virtual int Id { get; set; }
-        [Index(1)]
-        public virtual string Data { get; set; }
+        [Key(0)]
+        public int Id { get; set; }
+        [Key(1)]
+        public string Data { get; set; }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public class MyHugeResponse
     {
-        [Index(0)]
-        public virtual int x { get; set; }
-        [Index(1)]
-        public virtual int y { get; set; }
-        [Index(2)]
-        public virtual string z { get; set; }
-        [Index(3)]
-        public virtual MyEnum e { get; set; }
-        [Index(4)]
-        public virtual MyStructResponse soho { get; set; }
-        [Index(5)]
-        public virtual ulong zzz { get; set; }
-        [Index(6)]
-        public virtual MyRequest req { get; set; }
+        [Key(0)]
+        public int x { get; set; }
+        [Key(1)]
+        public int y { get; set; }
+        [Key(2)]
+        public string z { get; set; }
+        [Key(3)]
+        public MyEnum e { get; set; }
+        [Key(4)]
+        public MyStructResponse soho { get; set; }
+        [Key(5)]
+        public ulong zzz { get; set; }
+        [Key(6)]
+        public MyRequest req { get; set; }
     }
 
     public enum MyEnum

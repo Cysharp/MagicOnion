@@ -55,10 +55,6 @@
       <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
       <Name>MagicOnion</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
-      <Project>{6bde33a5-2744-40e5-8999-bf0465745587}</Project>
-      <Name>SharedLibrary</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Threading.Tasks;
 
@@ -12,10 +13,10 @@ namespace MagicOnion
         readonly AsyncServerStreamingCall<byte[]> inner;
         readonly MarshallingAsyncStreamReader<TResponse> responseStream;
 
-        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, Marshaller<TResponse> responseMarshaller)
+        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, responseMarshaller);
+            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
         }
 
         /// <summary>

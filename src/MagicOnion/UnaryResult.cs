@@ -1,4 +1,6 @@
 ﻿using Grpc.Core;
+using MessagePack;
+using MessagePack.Formatters;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -10,18 +12,18 @@ namespace MagicOnion
     public struct UnaryResult<TResponse>
     {
         readonly AsyncUnaryCall<byte[]> inner;
-        readonly Marshaller<TResponse> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public UnaryResult(AsyncUnaryCall<byte[]> inner, Marshaller<TResponse> marshaller)
+        public UnaryResult(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
         async Task<TResponse> Deserialize()
         {
             var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-            return marshaller.Deserializer(bytes);
+            return MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
         }
 
         /// <summary>

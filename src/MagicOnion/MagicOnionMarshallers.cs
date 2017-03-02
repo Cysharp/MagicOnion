@@ -1,34 +1,32 @@
 ﻿using Grpc.Core;
-using MagicOnion.Server;
+using MessagePack;
+using MessagePack.Formatters;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using ZeroFormatter;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Internal;
 
 namespace MagicOnion
 {
-    internal class MarshallingAsyncStreamReader<TRequest> : IAsyncStreamReader<TRequest>
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>
     {
         readonly IAsyncStreamReader<byte[]> inner;
-        readonly Marshaller<TRequest> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, Marshaller<TRequest> marshaller)
+        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
-        public TRequest Current { get; private set; }
+        public T Current { get; private set; }
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken)
         {
             if (await inner.MoveNext(cancellationToken))
             {
-                this.Current = marshaller.Deserializer(inner.Current);
+                this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
                 return true;
             }
             else
@@ -46,12 +44,12 @@ namespace MagicOnion
     internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<byte[]> inner;
-        readonly Marshaller<T> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, Marshaller<T> marshaller)
+        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
         public WriteOptions WriteOptions
@@ -74,7 +72,7 @@ namespace MagicOnion
 
         public Task WriteAsync(T message)
         {
-            var bytes = marshaller.Serializer(message);
+            var bytes = MessagePackSerializer.Serialize(message, resolver);
             return inner.WriteAsync(bytes);
         }
     }
@@ -82,8 +80,6 @@ namespace MagicOnion
     // invoke from dynamic methods so must be public
     public static class MagicOnionMarshallers
     {
-        static readonly DirtyTracker NullTracker = new DirtyTracker();
-
         static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).Assembly
             .GetTypes()
             .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
@@ -96,58 +92,9 @@ namespace MagicOnion
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 
-        public static readonly Marshaller<byte[]> ByteArrayMarshaller = Marshallers.Create<byte[]>(x => x, x => x);
-        public static readonly byte[] EmptyBytes = new byte[0];
+        public static readonly byte[] UnsafeNilBytes = new byte[] { MessagePackCode.Nil };
 
-        public static Marshaller<T> CreateZeroFormatterMarshaller<TTypeResolver, T>(Formatter<TTypeResolver, T> formatter)
-            where TTypeResolver : ITypeResolver, new()
-        {
-            if (typeof(T) == typeof(byte[]))
-            {
-                return (Marshaller<T>)(object)ByteArrayMarshaller;
-            }
-
-            var noUseDirtyTracker = formatter.NoUseDirtyTracker;
-
-            return new Marshaller<T>(x =>
-            {
-                byte[] bytes = null;
-                var size = formatter.Serialize(ref bytes, 0, x);
-                if (bytes.Length != size)
-                {
-                    BinaryUtil.FastResize(ref bytes, size);
-                }
-                return bytes;
-            }, bytes =>
-            {
-                var tracker = noUseDirtyTracker ? NullTracker : new DirtyTracker();
-                int _;
-                return formatter.Deserialize(ref bytes, 0, tracker, out _);
-            });
-        }
-
-        internal static object CreateZeroFormattertMarshallerReflection(Type resolverType, Type elementType)
-        {
-            if (elementType == typeof(byte[])) return ByteArrayMarshaller;
-
-            var formatter = typeof(Formatter<,>).MakeGenericType(resolverType, elementType)
-                .GetProperty("Default")
-                .GetGetMethod()
-                .Invoke(null, Type.EmptyTypes);
-
-            return CreateZeroFormattertMarshallerReflection(resolverType, elementType, formatter);
-        }
-
-        internal static object CreateZeroFormattertMarshallerReflection(Type resolverType, Type elementType, object formatter)
-        {
-            if (elementType == typeof(byte[])) return ByteArrayMarshaller;
-
-            var marshaller = typeof(MagicOnionMarshallers).GetMethod("CreateZeroFormatterMarshaller", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                .MakeGenericMethod(resolverType, elementType)
-                .Invoke(null, new object[] { formatter });
-
-            return marshaller;
-        }
+        public static readonly Marshaller<byte[]> ThroughMarshaller = new Marshaller<byte[]>(x => x, x => x);
 
         internal static Type CreateRequestType(ParameterInfo[] parameters)
         {
@@ -175,18 +122,15 @@ namespace MagicOnion
             }
         }
 
-        public static Type CreateRequestTypeAndMarshaller(Type resolverType, string path, ParameterInfo[] parameters, out object marshaller)
+        public static Type CreateRequestTypeAndSetResolver(string path, ParameterInfo[] parameters, ref IFormatterResolver resolver)
         {
             if (parameters.Length == 0)
             {
-                marshaller = MagicOnionMarshallers.ByteArrayMarshaller;
                 return typeof(byte[]);
             }
             else if (parameters.Length == 1)
             {
-                var t = parameters[0].ParameterType;
-                marshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(resolverType, t);
-                return t;
+                return parameters[0].ParameterType;
             }
             else if (parameters.Length > 20)
             {
@@ -199,7 +143,7 @@ namespace MagicOnion
                 var formatterTypeBase = dynamicArgumentTupleFormatterTypes[parameters.Length - 2];
 
                 var t = tupleTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
-                var formatterType = formatterTypeBase.MakeGenericType(new[] { resolverType }.Concat(parameters.Select(x => x.ParameterType)).ToArray());
+                var formatterType = formatterTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
 
                 var defaultValues = parameters
                     .Select(x =>
@@ -220,7 +164,7 @@ namespace MagicOnion
 
                 var formatter = Activator.CreateInstance(formatterType, defaultValues);
 
-                marshaller = MagicOnionMarshallers.CreateZeroFormattertMarshallerReflection(resolverType, t, formatter);
+                resolver = new PriorityResolver(t, formatter, resolver);
                 return t;
             }
         }
@@ -230,6 +174,36 @@ namespace MagicOnion
             // start from T2
             var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
             return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments);
+        }
+    }
+
+    internal class PriorityResolver : IFormatterResolver
+    {
+        readonly Type formatterType;
+        readonly object formatter;
+        readonly IFormatterResolver innerResolver;
+
+        public PriorityResolver(Type formatterType, object formatter, IFormatterResolver innerResolver)
+        {
+            this.formatterType = formatterType;
+            this.formatter = formatter;
+            this.innerResolver = innerResolver;
+        }
+
+        public IMessagePackFormatter<T> GetFormatter<T>()
+        {
+            if (typeof(T) == formatterType)
+            {
+                return (IMessagePackFormatter<T>)formatter;
+            }
+            else if (innerResolver == null)
+            {
+                return MessagePackSerializer.DefaultResolver.GetFormatterWithVerify<T>();
+            }
+            else
+            {
+                return innerResolver.GetFormatterWithVerify<T>();
+            }
         }
     }
 }

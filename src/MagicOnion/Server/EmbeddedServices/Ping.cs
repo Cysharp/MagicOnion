@@ -1,19 +1,18 @@
-﻿using System;
+﻿using MessagePack;
 
 namespace MagicOnion.Server.EmbeddedServices
 {
     public interface IMagicOnionEmbeddedPing : IService<IMagicOnionEmbeddedPing>
     {
-        UnaryResult<double> Ping(DateTime utcSendBegin);
+        UnaryResult<Nil> Ping();
     }
 
     [Ignore]
     internal class MagicOnionEmbeddedPing : ServiceBase<IMagicOnionEmbeddedPing>, IMagicOnionEmbeddedPing
     {
-        public UnaryResult<double> Ping(DateTime utcSendBegin)
+        public UnaryResult<Nil> Ping()
         {
-            var elapsed = this.Context.Timestamp - utcSendBegin;
-            return UnaryResult(elapsed.TotalMilliseconds);
+            return UnaryResult(Nil.Default);
         }
     }
 }

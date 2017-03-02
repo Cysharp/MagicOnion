@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,15 +38,14 @@ namespace MagicOnion.Server
         public ServerCallContext CallContext { get; private set; }
 
         // internal, used from there methods.
-        internal object RequestMarshaller { get; set; }
-        internal object ResponseMarshaller { get; set; }
+        internal IFormatterResolver FormatterResolver { get; private set; }
         internal byte[] Request { get; set; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }
         internal IMagicOnionLogger MagicOnionLogger { get; private set; }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IMagicOnionLogger logger)
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger)
         {
             this.ServiceType = serviceType;
             this.MethodInfo = methodInfo;
@@ -54,7 +53,16 @@ namespace MagicOnion.Server
             this.MethodType = methodType;
             this.CallContext = context;
             this.Timestamp = DateTime.UtcNow;
+            this.FormatterResolver = resolver;
             this.MagicOnionLogger = logger;
+        }
+
+        /// <summary>
+        /// modify request/response resolver in this context.
+        /// </summary>
+        public void ChangeFormatterResolver(IFormatterResolver resolver)
+        {
+            this.FormatterResolver = resolver;
         }
     }
 
@@ -62,12 +70,10 @@ namespace MagicOnion.Server
     {
         readonly ServiceContext context;
         readonly IAsyncStreamReader<byte[]> inner;
-        readonly Marshaller<TRequest> marshaller;
 
         public ClientStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.marshaller = (Marshaller<TRequest>)context.RequestMarshaller;
             this.inner = new LoggableStreamReader<byte[]>(context.MagicOnionLogger, context, context.RequestStream);
         }
 
@@ -79,7 +85,7 @@ namespace MagicOnion.Server
         {
             if (await inner.MoveNext(cancellationToken))
             {
-                this.Current = marshaller.Deserializer(inner.Current);
+                this.Current = MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.FormatterResolver);
                 return true;
             }
             else
@@ -111,13 +117,7 @@ namespace MagicOnion.Server
 
         public ClientStreamingResult<TRequest, TResponse> Result(TResponse result)
         {
-            var marshaller = context.ResponseMarshaller;
-            if (marshaller == null) throw new Exception();
-
-            var serializer = marshaller as Marshaller<TResponse>;
-            if (serializer == null) throw new Exception();
-
-            var bytes = serializer.Serializer(result);
+            var bytes = MessagePackSerializer.Serialize<TResponse>(result, context.FormatterResolver);
             context.Result = bytes;
 
             return default(ClientStreamingResult<TRequest, TResponse>); // dummy
@@ -135,12 +135,10 @@ namespace MagicOnion.Server
     {
         readonly ServiceContext context;
         readonly IAsyncStreamWriter<byte[]> inner;
-        readonly Marshaller<TResponse> marshaller;
 
         public ServerStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.marshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
             this.inner = new LoggableStreamWriter<byte[]>(context.MagicOnionLogger, context, context.ResponseStream);
         }
 
@@ -161,7 +159,7 @@ namespace MagicOnion.Server
 
         public Task WriteAsync(TResponse message)
         {
-            var bytes = marshaller.Serializer(message);
+            var bytes = MessagePackSerializer.Serialize(message, context.FormatterResolver);
             return inner.WriteAsync(bytes);
         }
 
@@ -183,16 +181,12 @@ namespace MagicOnion.Server
         readonly ServiceContext context;
         readonly IAsyncStreamReader<byte[]> innerReader;
         readonly IAsyncStreamWriter<byte[]> innerWriter;
-        readonly Marshaller<TRequest> requestMarshaller;
-        readonly Marshaller<TResponse> responseMarshaller;
 
         public DuplexStreamingContext(ServiceContext context)
         {
             this.context = context;
             this.innerReader = new LoggableStreamReader<byte[]>(context.MagicOnionLogger, context, context.RequestStream);
             this.innerWriter = new LoggableStreamWriter<byte[]>(context.MagicOnionLogger, context, context.ResponseStream);
-            this.requestMarshaller = (Marshaller<TRequest>)context.RequestMarshaller;
-            this.responseMarshaller = (Marshaller<TResponse>)context.ResponseMarshaller;
         }
 
         public ServiceContext ServiceContext { get { return context; } }
@@ -205,7 +199,7 @@ namespace MagicOnion.Server
         {
             if (await innerReader.MoveNext(cancellationToken))
             {
-                this.Current = requestMarshaller.Deserializer(innerReader.Current);
+                this.Current = MessagePackSerializer.Deserialize<TRequest>(innerReader.Current, context.FormatterResolver);
                 return true;
             }
             else
@@ -241,7 +235,7 @@ namespace MagicOnion.Server
         /// </summary>
         public Task WriteAsync(TResponse message)
         {
-            var bytes = responseMarshaller.Serializer(message);
+            var bytes = MessagePackSerializer.Serialize(message, context.FormatterResolver);
             return innerWriter.WriteAsync(bytes);
         }
 
