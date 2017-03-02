@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MessagePack;
+using MessagePack.Formatters;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -35,12 +36,7 @@ namespace MagicOnion.Server
         readonly bool responseIsTask;
 
         readonly Func<ServiceContext, Task> methodBody;
-
         public Func<object, byte> serialize;
-
-        // helper
-        readonly Func<object, object, byte[]> boxedRequestSerialize;
-        readonly Func<object, byte[], object> boxedResponseDeserialize;
 
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
@@ -88,17 +84,14 @@ namespace MagicOnion.Server
                     //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     // };
                     {
-                        // TODO:change expression
-
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                        var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
 
                         var requestArg = Expression.Parameter(RequestType, "request");
+                        var getResolver = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Resolver", flags));
+                        var getFormatter = Expression.Call(typeof(FormatterResolverExtensions).GetMethod("GetFormatterWithVerify").MakeGenericMethod(RequestType), getResolver);
+                        var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags));
 
-                        var requestMarshalleExpr = Expression.Convert(Expression.Property(contextArg, typeof(ServiceContext).GetProperty("RequestMarshaller", flags)), marshallerType);
-                        var deserializer = Expression.Property(requestMarshalleExpr, "Deserializer");
-                        var callDeserialize = Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), RequestType).GetMethod("Invoke"), Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)));
-
+                        var callDeserialize = Expression.Call(getFormatter, typeof(IMessagePackFormatter<>).MakeGenericType(RequestType).GetMethod("Deserialize"), contextRequest);
                         var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                         Expression[] arguments = new Expression[parameters.Length];
@@ -149,40 +142,17 @@ namespace MagicOnion.Server
                 default:
                     throw new InvalidOperationException("Unknown MethodType:" + MethodType);
             }
-
-            // Utility
-            {
-                // TODO:Unknown Utilities
-
-                // (object requestMarshaller, object value) => ((Marshaller<TRequest>)requestMarshaller).Serializer.Invoke((TRequest)value);
-                var marshallerType = typeof(Marshaller<>).MakeGenericType(RequestType);
-                var requestMarshallerArg = Expression.Parameter(typeof(object), "requestMarshaller");
-                var valueArg = Expression.Parameter(typeof(object), "value");
-                var serializer = Expression.Property(Expression.Convert(requestMarshallerArg, marshallerType), "Serializer");
-                var callSerialize = Expression.Call(serializer, typeof(Func<,>).MakeGenericType(RequestType, typeof(byte[])).GetMethod("Invoke"),
-                    Expression.Convert(valueArg, RequestType));
-
-                boxedRequestSerialize = Expression.Lambda<Func<object, object, byte[]>>(callSerialize, requestMarshallerArg, valueArg).Compile();
-            }
-            {
-                // (object responseMarshaller, byte[] value) => ((Marshaller<TResponse>)requestMarshaller).Deserializer.Invoke(value);
-                var marshallerType = typeof(Marshaller<>).MakeGenericType(UnwrappedResponseType);
-                var responseMarshallerArg = Expression.Parameter(typeof(object), "responseMarshaller");
-                var valueArg = Expression.Parameter(typeof(byte[]), "value");
-                var deserializer = Expression.Property(Expression.Convert(responseMarshallerArg, marshallerType), "Deserializer");
-                var callDeserialize = Expression.Convert(Expression.Call(deserializer, typeof(Func<,>).MakeGenericType(typeof(byte[]), UnwrappedResponseType).GetMethod("Invoke"), valueArg), typeof(object));
-                boxedResponseDeserialize = Expression.Lambda<Func<object, byte[], object>>(callDeserialize, responseMarshallerArg, valueArg).Compile();
-            }
         }
 
+        // non-filtered.
         public byte[] BoxedSerialize(object requestValue)
         {
-            return boxedRequestSerialize(this.requestMarshaller, requestValue);
+            return MessagePackSerializer.NonGeneric.Serialize(RequestType, requestValue, resolver);
         }
 
         public object BoxedDeserialize(byte[] responseValue)
         {
-            return boxedResponseDeserialize(this.responseMarshaller, responseValue);
+            return MessagePackSerializer.NonGeneric.Deserialize(UnwrappedResponseType, responseValue, resolver);
         }
 
         static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)

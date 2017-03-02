@@ -123,10 +123,10 @@ namespace MagicOnion.HttpGateway
                     deserializedObject = Newtonsoft.Json.JsonConvert.DeserializeObject(body, handler.RequestType);
                 }
 
-                // JSON to C# Object to ZeroFormatter
+                // JSON to C# Object to MessagePack
                 var requestObject = handler.BoxedSerialize(deserializedObject);
 
-                var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodInfo.Name, MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+                var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodInfo.Name, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
                 // create header
                 var metadata = new Metadata();
@@ -138,7 +138,7 @@ namespace MagicOnion.HttpGateway
                 var invoker = new DefaultCallInvoker(channel);
                 var rawResponse = await invoker.AsyncUnaryCall(method, null, default(CallOptions).WithHeaders(metadata), requestObject);
 
-                // ZeroFormatter -> Object -> Json
+                // MessagePack -> Object -> Json
                 var obj = handler.BoxedDeserialize(rawResponse);
                 var v = JsonConvert.SerializeObject(obj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
                 httpContext.Response.ContentType = "application/json";
