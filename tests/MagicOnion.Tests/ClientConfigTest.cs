@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,24 +10,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using ZeroFormatter;
 
 namespace MagicOnion.Tests
 {
-    [ZeroFormattable]
+    [MessagePackObject]
     public class SerializableCallContext
     {
-        [Index(0)]
+        [Key(0)]
         public virtual DateTime Deadline { get; set; }
-        [Index(1)]
+        [Key(1)]
         public virtual string Host { get; set; }
-        [Index(2)]
+        [Key(2)]
         public virtual string Method { get; set; }
-        [Index(3)]
+        [Key(3)]
         public virtual string Peer { get; set; }
-        [Index(4)]
+        [Key(4)]
         public virtual Dictionary<string, string> RequestHeaders { get; set; }
-        [Index(5)]
+        [Key(5)]
         public virtual Dictionary<string, string> ResponseTrailers { get; set; }
     }
 

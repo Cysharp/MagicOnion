@@ -1,32 +1,31 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using ZeroFormatter;
-using ZeroFormatter.Formatters;
 
 namespace MagicOnion.Tests
 {
-    [ZeroFormattable]
+    [MessagePackObject]
     public class MyRequest
     {
-        [Index(0)]
+        [Key(0)]
         public virtual int Id { get; set; }
-        [Index(1)]
+        [Key(1)]
         public virtual string Data { get; set; }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public struct MyStructRequest
     {
-        [Index(0)]
+        [Key(0)]
         public int X;
-        [Index(1)]
+        [Key(1)]
         public int Y;
 
         public MyStructRequest(int x, int y)
@@ -36,12 +35,12 @@ namespace MagicOnion.Tests
         }
     }
 
-    [ZeroFormattable]
+    [MessagePackObject]
     public struct MyStructResponse
     {
-        [Index(0)]
+        [Key(0)]
         public int X;
-        [Index(1)]
+        [Key(1)]
         public int Y;
 
         public MyStructResponse(int x, int y)
@@ -51,33 +50,13 @@ namespace MagicOnion.Tests
         }
     }
 
-    /// <summary>
-    /// Represents Void/Unit.
-    /// </summary>
-    [ZeroFormattable]
-    public struct Nil : IEquatable<Nil>
-    {
-        public static readonly Nil Default = default(Nil);
 
-        public bool Equals(Nil other)
-        {
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
-        }
-    }
-
-
-
-    [ZeroFormattable]
+    [MessagePackObject]
     public class MyResponse
     {
-        [Index(0)]
+        [Key(0)]
         public virtual int Id { get; set; }
-        [Index(1)]
+        [Key(1)]
         public virtual string Data { get; set; }
     }
 
@@ -331,16 +310,13 @@ namespace MagicOnion.Tests
             public UnaryResult<MyResponse> Unary1(int x, int y, string z = "unknown")
             {
                 var tuple = new DynamicArgumentTuple<int, int>(x, y);
-                var formatter = new DynamicArgumentTupleFormatter<DefaultResolver, int, int>(0, 0);
-                var requestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(formatter);
 
-                var method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
+                var method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+                var request = MessagePackSerializer.Serialize(tuple);
 
-                var request = requestMarshaller.Serializer(tuple);
                 var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 
-                var responseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(ZeroFormatter.Formatters.Formatter<DefaultResolver, MyResponse>.Default);
-                return new UnaryResult<MyResponse>(callResult, responseMarshaller);
+                return new UnaryResult<MyResponse>(callResult, MessagePackSerializer.DefaultResolver);
             }
 
             public UnaryResult<MyResponse> Unary2(MyRequest req)
