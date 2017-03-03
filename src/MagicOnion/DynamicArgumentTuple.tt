@@ -54,7 +54,11 @@ namespace MagicOnion
         public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value, IFormatterResolver formatterResolver)
         {
             var startOffset = offset;
-            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 3);
+<# if( i<= 15) { #>
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, <#= i #>);
+<# } else { #>
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, <#= i #>);
+<# } #>
 <# for(var j = 1; j <= i; j++) { #>
             offset += formatterResolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref bytes, offset, value.Item<#= j #>, formatterResolver);
 <# } #>

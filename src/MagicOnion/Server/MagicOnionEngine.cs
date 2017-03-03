@@ -51,7 +51,7 @@ namespace MagicOnion.Server
             var handlers = new HashSet<MethodHandler>();
 
             var types = targetTypes
-              .Where(x => typeof(__IServiceMarker).IsAssignableFrom(x))
+              .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
               .Where(x => !x.IsAbstract)
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .Concat(SupplyEmbeddedServices(option))

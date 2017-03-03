@@ -42,10 +42,6 @@ namespace MagicOnion.Server
         static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
 
-
-
-
-
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
             this.ServiceType = classType;
