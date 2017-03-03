@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,19 +16,19 @@ namespace MagicOnion
     {
         readonly AsyncClientStreamingCall<byte[], byte[]> inner;
         readonly MarshallingClientStreamWriter<TRequest> requestStream;
-        readonly Marshaller<TResponse> responseMarshaller;
+        readonly IFormatterResolver resolver;
 
-        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, Marshaller<TRequest> requestMarshaller, Marshaller<TResponse> responseMarshaller)
+        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, requestMarshaller);
-            this.responseMarshaller = responseMarshaller;
+            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
+            this.resolver = resolver;
         }
 
         async Task<TResponse> Deserialize()
         {
             var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-            return responseMarshaller.Deserializer(bytes);
+            return MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
         }
 
         /// <summary>

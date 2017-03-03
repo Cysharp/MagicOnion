@@ -2,6 +2,7 @@
 using Grpc.Core.Logging;
 using MagicOnion.Client;
 using MagicOnion.Client.EmbeddedServices;
+using MessagePack;
 using Sandbox.ConsoleClient;
 using Sandbox.ConsoleServer;
 using System;
@@ -224,4 +225,50 @@ namespace MagicOnion.ConsoleClient
             throw new NotImplementedException();
         }
     }
+
+
+    public class HandwriteClient : MagicOnionClientBase<IStandard>, IStandard
+    {
+        // static
+        static readonly Method<byte[], byte[]> Unary1AsyncMethod;
+        static readonly Method<byte[], byte[]> ClientStreaming1AsyncMethod;
+        static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
+        static readonly Method<byte[], byte[]> ServerStreamingAsyncMethod;
+
+        // field
+        readonly IFormatterResolver resolver;
+
+        public HandwriteClient(IFormatterResolver resolver)
+        {
+            this.resolver = resolver;
+        }
+
+        protected override MagicOnionClientBase<IStandard> Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ClientStreamingResult<int, string>> ClientStreaming1Async()
+        {
+            return Task.FromResult(new ClientStreamingResult<int, string>(base.callInvoker.AsyncClientStreamingCall(ClientStreaming1AsyncMethod, this.host, this.option), resolver));
+        }
+
+        public Task<DuplexStreamingResult<int, int>> DuplexStreamingAsync()
+        {
+            return Task.FromResult(new DuplexStreamingResult<int, int>(base.callInvoker.AsyncDuplexStreamingCall(ServerStreamingAsyncMethod, this.host, this.option), resolver));
+        }
+
+        public Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z)
+        {
+            var request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), resolver);
+            return Task.FromResult(new ServerStreamingResult<int>(base.callInvoker.AsyncServerStreamingCall(ServerStreamingAsyncMethod, this.host, this.option, request), resolver));
+        }
+
+        public Task<UnaryResult<int>> Unary1Async(int x, int y)
+        {
+            var request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), resolver);
+            return Task.FromResult(new UnaryResult<int>(base.callInvoker.AsyncUnaryCall(Unary1AsyncMethod, this.host, this.option, request), resolver));
+        }
+    }
+
 }

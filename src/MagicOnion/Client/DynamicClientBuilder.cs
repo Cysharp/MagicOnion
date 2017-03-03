@@ -36,12 +36,11 @@ namespace MagicOnion.Client
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
 
-            var resolverType = typeof(TTypeResolver);
             var module = AssemblyHolder.Module;
             var methodDefinitions = SearchDefinitions(t);
 
             var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
-            var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{resolverType.Name}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
+            var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
             DefineStaticFields(typeBuilder, methodDefinitions);
             DefineStaticConstructor(typeBuilder, resolverType, t, methodDefinitions);
@@ -93,15 +92,7 @@ namespace MagicOnion.Client
             foreach (var item in definitions)
             {
                 item.FieldMethod = typeBuilder.DefineField(item.MethodInfo.Name + "Method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
-
                 item.ResponseType = UnwrapResponseType(item, out item.MethodType, out item.ResponseIsTask, out item.RequestType);
-                item.FieldResponseMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "ResponseMarshaller", typeof(Marshaller<>).MakeGenericType(item.ResponseType), FieldAttributes.Private | FieldAttributes.Static);
-
-                if (item.RequestType == null)
-                {
-                    item.RequestType = MagicOnionMarshallers.CreateRequestType(item.MethodInfo.GetParameters());
-                }
-                item.FieldRequestMarshaller = typeBuilder.DefineField(item.MethodInfo.Name + "RequestMarshaller", typeof(Marshaller<>).MakeGenericType(item.RequestType), FieldAttributes.Private | FieldAttributes.Static);
             }
         }
 
@@ -498,9 +489,9 @@ namespace MagicOnion.Client
             public bool ResponseIsTask;
             public FieldInfo FieldMethod;
             public Type RequestType;
-            public FieldInfo FieldRequestMarshaller;
+            //public FieldInfo FieldRequestMarshaller;
             public Type ResponseType;
-            public FieldInfo FieldResponseMarshaller;
+            //public FieldInfo FieldResponseMarshaller;
         }
     }
 }
