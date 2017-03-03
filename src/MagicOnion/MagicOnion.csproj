@@ -108,6 +108,7 @@
   <ItemGroup>
     <Content Include="DynamicArgumentTuple.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
+using MessagePack;
 using SharedLibrary;
 using System;
 using System.Collections.Concurrent;

@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Threading;
 
@@ -27,13 +28,7 @@ namespace MagicOnion.Server
 
         protected UnaryResult<TResponse> UnaryResult<TResponse>(TResponse result)
         {
-            var marshaller = Context.ResponseMarshaller;
-            if (marshaller == null) throw new Exception();
-
-            var serializer = marshaller as Marshaller<TResponse>;
-            if (serializer == null) throw new Exception();
-
-            var bytes = serializer.Serializer(result);
+            var bytes = MessagePackSerializer.Serialize(result, Context.FormatterResolver);
             Context.Result = bytes;
 
             return default(UnaryResult<TResponse>); // dummy

@@ -26,7 +26,7 @@ namespace MagicOnion.Client.EmbeddedServices
         }
 
         public HeartbeatClient(CallInvoker callInvoker, string connectionId)
-            : base(callInvoker)
+            : base(callInvoker, null)
         {
             this.connectionId = connectionId;
             this.option = this.option.WithHeaders(new Metadata { { ChannelContext.HeaderKey, connectionId } });

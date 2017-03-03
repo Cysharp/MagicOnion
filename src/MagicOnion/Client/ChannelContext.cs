@@ -73,8 +73,8 @@ namespace MagicOnion.Client
                     var connectionId = (useSameId) ? this.connectionId : connectionIdFactory();
                     var client = new HeartbeatClient(channel, connectionId);
                     latestStreamingResult.Dispose();
-                    latestStreamingResult = await client.Connect();
-                    
+                    latestStreamingResult = client.Connect();
+
                     // wait connect complete.
                     await latestStreamingResult.ResponseStream.MoveNext();
 

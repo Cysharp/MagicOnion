@@ -1,4 +1,5 @@
 ﻿using MagicOnion;
+using MessagePack;
 using SharedLibrary;
 using System;
 using System.Collections.Generic;

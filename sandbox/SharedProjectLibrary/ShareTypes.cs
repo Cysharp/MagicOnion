@@ -42,25 +42,6 @@ namespace SharedLibrary
         }
     }
 
-    /// <summary>
-    /// Represents Void/Unit.
-    /// </summary>
-    [MessagePackObject]
-    public struct Nil : IEquatable<Nil>
-    {
-        public static readonly Nil Default = default(Nil);
-
-        public bool Equals(Nil other)
-        {
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return 0;
-        }
-    }
-
     [MessagePackObject]
     public class MyResponse
     {

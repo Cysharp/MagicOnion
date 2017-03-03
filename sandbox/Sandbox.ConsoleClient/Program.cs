@@ -3,13 +3,13 @@ using Grpc.Core.Logging;
 using MagicOnion.Client;
 using MagicOnion.Client.EmbeddedServices;
 using MessagePack;
-using Sandbox.ConsoleClient;
 using Sandbox.ConsoleServer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,33 +20,64 @@ namespace MagicOnion.ConsoleClient
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Client:::");
+            try
+            {
 
-            //GrpcEnvironment.SetThreadPoolSize(1000);
-            //GrpcEnvironment.SetCompletionQueueCount(1000);
+                Console.WriteLine("Client:::");
 
-            //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
-            GrpcEnvironment.SetLogger(new ConsoleLogger());
+                //GrpcEnvironment.SetThreadPoolSize(1000);
+                //GrpcEnvironment.SetCompletionQueueCount(1000);
 
-            var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
-            channel.ConnectAsync().Wait();
-            var c = MagicOnionClient.Create<IMyFirstService>(channel);
+                //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
+                GrpcEnvironment.SetLogger(new ConsoleLogger());
 
-            // TestHeartbeat(channel).GetAwaiter().GetResult();
-            //UnaryRun(c).GetAwaiter().GetResult();
-            ClientStreamRun(c).GetAwaiter().GetResult();
-            DuplexStreamRun(c).GetAwaiter().GetResult();
-            ServerStreamRun(c).GetAwaiter().GetResult();
+                var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+                //channel.ConnectAsync().Wait();
+                var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
-            // many run
-            //UnaryLoadTest(c).GetAwaiter().GetResult();
+                // TestHeartbeat(channel).GetAwaiter().GetResult();
+                //UnaryRun(c).GetAwaiter().GetResult();
+                //ClientStreamRun(c).GetAwaiter().GetResult();
+                //DuplexStreamRun(c).GetAwaiter().GetResult();
+                ServerStreamRun(c).GetAwaiter().GetResult();
+
+                // many run
+                //UnaryLoadTest(c).GetAwaiter().GetResult();
 
 
-            //HearbeatClient.Test(channel).GetAwaiter().GetResult();
-            //Console.ReadLine();
+                //HearbeatClient.Test(channel).GetAwaiter().GetResult();
+                //Console.ReadLine();
 
-            //ChatClient.Run(channel).GetAwaiter().GetResult();
-            //TestHeartbeat(channel).GetAwaiter().GetResult();
+                //ChatClient.Run(channel).GetAwaiter().GetResult();
+                //TestHeartbeat(channel).GetAwaiter().GetResult();
+            }
+            finally
+            {
+                var asm = AssemblyHolder.Save();
+                Verify(asm);
+                Console.WriteLine("end");
+            }
+        }
+
+        static void Verify(params AssemblyBuilder[] builders)
+        {
+            var path = @"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6.1 Tools\x64\PEVerify.exe";
+
+            foreach (var targetDll in builders)
+            {
+                var psi = new ProcessStartInfo(path, targetDll.GetName().Name + ".dll")
+                {
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                };
+
+                var p = Process.Start(psi);
+                var data = p.StandardOutput.ReadToEnd();
+                Console.WriteLine(data);
+            }
         }
 
         static async Task TestHeartbeat(Channel channel)
@@ -177,98 +208,5 @@ namespace MagicOnion.ConsoleClient
 
     }
 
-    public class ClientSimu : MagicOnionClientBase<IMyFirstService>, IMyFirstService
-    {
-        protected ClientSimu(CallInvoker callInvoker) : base(callInvoker)
-        {
-        }
-
-        public Task<ClientStreamingResult<int, string>> StreamingOne()
-        {
-            var callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(null, host, option);
-            var result = new ClientStreamingResult<int, string>(callResult, null, null);
-            return Task.FromResult(result);
-        }
-
-        public Task<DuplexStreamingResult<int, string>> StreamingThree()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ServerStreamingResult<string>> StreamingTwo(int x, int y, int z)
-        {
-            // throw new NotImplementedException();
-            byte[] request = null; // marshalling
-
-            var callResult = callInvoker.AsyncServerStreamingCall<byte[], byte[]>(null, host, option, request);
-            var result = new ServerStreamingResult<string>(callResult, null); // response marshaller
-            return Task.FromResult(result);
-        }
-
-        public ServerStreamingResult<string> StreamingTwo2(int x, int y, int z)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UnaryResult<string>> SumAsync(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public UnaryResult<string> SumAsync2(int x, int y)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override MagicOnionClientBase<IMyFirstService> Clone()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
-    public class HandwriteClient : MagicOnionClientBase<IStandard>, IStandard
-    {
-        // static
-        static readonly Method<byte[], byte[]> Unary1AsyncMethod;
-        static readonly Method<byte[], byte[]> ClientStreaming1AsyncMethod;
-        static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
-        static readonly Method<byte[], byte[]> ServerStreamingAsyncMethod;
-
-        // field
-        readonly IFormatterResolver resolver;
-
-        public HandwriteClient(IFormatterResolver resolver)
-        {
-            this.resolver = resolver;
-        }
-
-        protected override MagicOnionClientBase<IStandard> Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ClientStreamingResult<int, string>> ClientStreaming1Async()
-        {
-            return Task.FromResult(new ClientStreamingResult<int, string>(base.callInvoker.AsyncClientStreamingCall(ClientStreaming1AsyncMethod, this.host, this.option), resolver));
-        }
-
-        public Task<DuplexStreamingResult<int, int>> DuplexStreamingAsync()
-        {
-            return Task.FromResult(new DuplexStreamingResult<int, int>(base.callInvoker.AsyncDuplexStreamingCall(ServerStreamingAsyncMethod, this.host, this.option), resolver));
-        }
-
-        public Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z)
-        {
-            var request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), resolver);
-            return Task.FromResult(new ServerStreamingResult<int>(base.callInvoker.AsyncServerStreamingCall(ServerStreamingAsyncMethod, this.host, this.option, request), resolver));
-        }
-
-        public Task<UnaryResult<int>> Unary1Async(int x, int y)
-        {
-            var request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), resolver);
-            return Task.FromResult(new UnaryResult<int>(base.callInvoker.AsyncUnaryCall(Unary1AsyncMethod, this.host, this.option, request), resolver));
-        }
-    }
 
 }

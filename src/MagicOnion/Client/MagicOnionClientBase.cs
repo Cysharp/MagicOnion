@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Threading;
 
@@ -10,15 +11,17 @@ namespace MagicOnion.Client
         protected string host;
         protected CallOptions option;
         protected CallInvoker callInvoker;
+        protected IFormatterResolver resolver;
 
         protected MagicOnionClientBase()
         {
 
         }
 
-        protected MagicOnionClientBase(CallInvoker callInvoker)
+        protected MagicOnionClientBase(CallInvoker callInvoker, IFormatterResolver resolver)
         {
             this.callInvoker = callInvoker;
+            this.resolver = resolver;
         }
 
         protected abstract MagicOnionClientBase<T> Clone();

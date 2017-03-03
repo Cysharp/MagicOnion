@@ -25,7 +25,7 @@ namespace MagicOnion.Client.EmbeddedServices
         }
 
         public PingClient(CallInvoker callInvoker)
-            : base(callInvoker)
+            : base(callInvoker, null)
         {
         }
 

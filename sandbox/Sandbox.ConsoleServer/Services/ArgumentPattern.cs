@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion;
 using SharedLibrary;
+using MessagePack;
 
 namespace Sandbox.ConsoleServer.Services
 {

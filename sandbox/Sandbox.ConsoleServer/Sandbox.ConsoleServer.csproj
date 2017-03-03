@@ -288,7 +288,6 @@
       <Name>Sandbox.ConsoleServerDefinition</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\SharedProjectLibrary\SharedProjectLibrary.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets" Condition="Exists('..\..\packages\Grpc.Core.1.0.1\build\net45\Grpc.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

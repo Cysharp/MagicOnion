@@ -18,33 +18,18 @@ namespace MagicOnion
     var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0}", x)));
     var methodArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} item{0}", x)));
     var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} default{0}", x)));
-    var formatterArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("formatter{0}", x)));
-    var nouseArgs = string.Join(" && ", Enumerable.Range(1, i).Select(x => string.Format("formatter{0}.NoUseDirtyTracker", x)));
-    Func<int, string> makeDefault = itemCount => 
-    {
-        var itemArg = string.Join(", ", Enumerable.Range(1, itemCount).Select(x => string.Format("item{0}", x)));
-        var defaultArg= string.Join(", ", Enumerable.Range(itemCount + 1, i - itemCount).Select(x => string.Format("default{0}", x)));
-        if(itemArg == "")
-        {
-            return defaultArg;
-        }
-        else if(defaultArg != "")
-        {
-            return itemArg + ", " + defaultArg;
-        }
-        else
-        {
-            return itemArg;
-        }
-    };
+    var itemArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("item{0}", x)));
  #>
     
+    [MessagePackObject]
     public struct DynamicArgumentTuple<<#= typeArgs #>>
     {
 <# for(var j = 1; j <= i; j++) { #>
+        [Key(<#= j - 1  #>)]
         public readonly T<#= j#> Item<#= j #>;
 <# } #>
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(<#= methodArgs #>)
         {
 <# for(var j = 1; j <= i; j++) { #>
@@ -69,30 +54,43 @@ namespace MagicOnion
         public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value, IFormatterResolver formatterResolver)
         {
             var startOffset = offset;
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 3);
 <# for(var j = 1; j <= i; j++) { #>
             offset += formatterResolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref bytes, offset, value.Item<#= j #>, formatterResolver);
 <# } #>
             return offset - startOffset;
         }
 
-        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int byteSize)
+        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
+            
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
+
 <# for(var j = 1; j <= i; j++) { #>
-
-<# if(j == 1) { #>
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(0) #>);
-
+            var item<#= j #> = default<#= j #>;
 <# } #>
-            var item<#= j #> = formatterResolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(bytes, offset, formatterResolver, out size);
-            offset += size;
-            byteSize += size;
-<# if(j != i) { #>
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(j) #>);
-<# } } #>
 
-            return new DynamicArgumentTuple<<#= typeArgs #>>(<#= makeDefault(i) #>);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+<# for(var j = 1; j <= i; j++) { #>
+                    case <#= j - 1 #>:
+                        item<#= j #> = formatterResolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+<# } #>
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
+
+                offset += readSize;
+            }
+
+            readSize =  offset - startOffset;
+            return new DynamicArgumentTuple<<#= typeArgs #>>(<#= itemArgs #>);
         }
     }
 <# } #>

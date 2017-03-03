@@ -38,7 +38,6 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{5526fa31-4f38-4ff7-96ee-a73bf495e1ee}*SharedItemsImports = 13
-		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{a6f79ddc-b0ff-4337-9b24-8d5e768a8340}*SharedItemsImports = 4
 		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{a9e28afd-4fec-416a-9f85-c64f05605b22}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

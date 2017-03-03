@@ -38,6 +38,14 @@ namespace MagicOnion.Server
         readonly Func<ServiceContext, Task> methodBody;
         public Func<object, byte> serialize;
 
+        // reflection cache
+        static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
+
+
+
+
+
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
             this.ServiceType = classType;
@@ -80,18 +88,18 @@ namespace MagicOnion.Server
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
-                    //      var request = context.Resolver.GetFormatterWithVerify<TRequest>().Deserialize(context.Request);
+                    //      var request = MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
                     //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     // };
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
                         var requestArg = Expression.Parameter(RequestType, "request");
-                        var getResolver = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Resolver", flags));
-                        var getFormatter = Expression.Call(typeof(FormatterResolverExtensions).GetMethod("GetFormatterWithVerify").MakeGenericMethod(RequestType), getResolver);
+                        var getResolver = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("FormatterResolver", flags));
+
                         var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags));
 
-                        var callDeserialize = Expression.Call(getFormatter, typeof(IMessagePackFormatter<>).MakeGenericType(RequestType).GetMethod("Deserialize"), contextRequest);
+                        var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getResolver);
                         var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                         Expression[] arguments = new Expression[parameters.Length];

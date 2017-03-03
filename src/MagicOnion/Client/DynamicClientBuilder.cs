@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion.Utils;
+using MessagePack;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
-    internal static class AssemblyHolder
+    public static class AssemblyHolder
     {
         public const string ModuleName = "MagicOnion.Client.DynamicClient";
 
@@ -20,15 +21,21 @@ namespace MagicOnion.Client
         {
             assembly = new DynamicAssembly(ModuleName);
         }
+
+        public static AssemblyBuilder Save()
+        {
+            return assembly.Save();
+        }
     }
 
     internal static class DynamicClientBuilder<T>
     {
         public static readonly Type ClientType;
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
-        static readonly FieldInfo byteArrayMarshaller = typeof(MagicOnionMarshallers).GetField("ByteArrayMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        static readonly MethodInfo getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        static readonly FieldInfo emptyBytes = typeof(MagicOnionMarshallers).GetField("EmptyBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly FieldInfo nilBytes = typeof(MagicOnionMarshallers).GetField("UnsafeNilBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly MethodInfo callMessagePackSerialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            .First(x => x.Name == "Serialize" && x.GetParameters().Length == 2 && x.ReturnType == typeof(byte[]));
 
         static DynamicClientBuilder()
         {
@@ -43,9 +50,9 @@ namespace MagicOnion.Client
             var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
             DefineStaticFields(typeBuilder, methodDefinitions);
-            DefineStaticConstructor(typeBuilder, resolverType, t, methodDefinitions);
+            DefineStaticConstructor(typeBuilder, t, methodDefinitions);
             var emptyCtor = DefineConstructors(typeBuilder, methodDefinitions);
-            DefineMethods(typeBuilder, resolverType, t, methodDefinitions, emptyCtor);
+            DefineMethods(typeBuilder, t, methodDefinitions, emptyCtor);
 
             ClientType = typeBuilder.CreateTypeInfo().AsType();
         }
@@ -54,7 +61,7 @@ namespace MagicOnion.Client
         {
             return interfaceType
                 .GetInterfaces()
-                .Concat(new []{ interfaceType })
+                .Concat(new[] { interfaceType })
                 .SelectMany(x => x.GetMethods())
                 .Where(x =>
                 {
@@ -93,18 +100,18 @@ namespace MagicOnion.Client
             {
                 item.FieldMethod = typeBuilder.DefineField(item.MethodInfo.Name + "Method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
                 item.ResponseType = UnwrapResponseType(item, out item.MethodType, out item.ResponseIsTask, out item.RequestType);
+
+                if (item.RequestType == null)
+                {
+                    item.RequestType = MagicOnionMarshallers.CreateRequestType(item.MethodInfo.GetParameters());
+                }
             }
         }
 
-        static void DefineStaticConstructor(TypeBuilder typeBuilder, Type resolverType, Type interfaceType, MethodDefinition[] definitions)
+        static void DefineStaticConstructor(TypeBuilder typeBuilder, Type interfaceType, MethodDefinition[] definitions)
         {
             var cctor = typeBuilder.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, Type.EmptyTypes);
             var il = cctor.GetILGenerator();
-
-            for (int i = 0; i < definitions.Length; i++)
-            {
-                il.DeclareLocal(typeof(object)); // object _marshaller
-            }
 
             for (int i = 0; i < definitions.Length; i++)
             {
@@ -113,39 +120,10 @@ namespace MagicOnion.Client
                 il.EmitLdc_I4((int)def.MethodType);
                 il.Emit(OpCodes.Ldstr, def.ServiceType.Name);
                 il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
-                il.Emit(OpCodes.Ldsfld, byteArrayMarshaller);
-                il.Emit(OpCodes.Ldsfld, byteArrayMarshaller);
+                il.Emit(OpCodes.Ldsfld, throughMarshaller);
+                il.Emit(OpCodes.Ldsfld, throughMarshaller);
                 il.Emit(OpCodes.Newobj, bytesMethod.GetConstructors()[0]);
                 il.Emit(OpCodes.Stsfld, def.FieldMethod);
-
-                if (def.MethodType == MethodType.Unary || def.MethodType == MethodType.ServerStreaming)
-                {
-                    il.Emit(OpCodes.Ldtoken, resolverType);
-                    il.Emit(OpCodes.Call, getTypeFromHandle);
-                    il.Emit(OpCodes.Ldstr, def.Path);
-                    il.Emit(OpCodes.Ldtoken, def.MethodInfo.DeclaringType);
-                    il.Emit(OpCodes.Call, getTypeFromHandle);
-                    il.Emit(OpCodes.Ldstr, def.MethodInfo.Name);
-                    il.Emit(OpCodes.Call, typeof(Type).GetMethod("GetMethod", new[] { typeof(string) }));
-                    il.Emit(OpCodes.Callvirt, typeof(MethodBase).GetMethod("GetParameters"));
-                    il.EmitLdloca(i);
-                    il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateRequestTypeAndMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
-                    il.Emit(OpCodes.Pop);
-                    il.EmitLdloc(i);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, def.RequestType).GetProperty("Default").GetGetMethod());
-                    il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateZeroFormatterMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                        .MakeGenericMethod(resolverType, def.RequestType));
-                }
-                il.Emit(OpCodes.Castclass, def.FieldRequestMarshaller.FieldType);
-                il.Emit(OpCodes.Stsfld, def.FieldRequestMarshaller);
-
-                il.Emit(OpCodes.Call, typeof(Formatter<,>).MakeGenericType(resolverType, def.ResponseType).GetProperty("Default").GetGetMethod());
-                il.Emit(OpCodes.Call, typeof(MagicOnionMarshallers).GetMethod("CreateZeroFormatterMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                    .MakeGenericMethod(resolverType, def.ResponseType));
-                il.Emit(OpCodes.Stsfld, def.FieldResponseMarshaller);
             }
 
             il.Emit(OpCodes.Ret);
@@ -167,39 +145,30 @@ namespace MagicOnion.Client
             }
 
             ConstructorInfo invokerCtor;
-            // .ctor(CallInvoker):base(callInvoker)
+            // .ctor(CallInvoker, IFormatterResolver):base(callInvoker, resolver)
             {
-                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker) });
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker), typeof(IFormatterResolver) });
                 var il = ctor.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker) }, null));
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker), typeof(IFormatterResolver) }, null));
                 il.Emit(OpCodes.Ret);
 
                 invokerCtor = ctor;
-            }
-            // .ctor(Channel):this(new DefaultCallInvoker(channel))
-            {
-                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(Channel) });
-                var il = ctor.GetILGenerator();
-
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Newobj, typeof(DefaultCallInvoker).GetConstructor(new[] { typeof(Channel) }));
-                il.Emit(OpCodes.Call, invokerCtor);
-                il.Emit(OpCodes.Ret);
             }
 
             return emptyCtor;
         }
 
-        static void DefineMethods(TypeBuilder typeBuilder, Type resolverType, Type interfaceType, MethodDefinition[] definitions, ConstructorInfo emptyCtor)
+        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, MethodDefinition[] definitions, ConstructorInfo emptyCtor)
         {
             var baseType = typeof(MagicOnionClientBase<>).MakeGenericType(interfaceType);
             var hostField = baseType.GetField("host", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var optionField = baseType.GetField("option", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var invokerField = baseType.GetField("callInvoker", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var resolverField = baseType.GetField("resolver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             // Clone
             {
@@ -224,6 +193,11 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldfld, invokerField);
                 il.Emit(OpCodes.Stfld, invokerField);
+
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, resolverField);
+                il.Emit(OpCodes.Stfld, resolverField);
 
                 il.Emit(OpCodes.Ret);
             }
@@ -315,8 +289,7 @@ namespace MagicOnion.Client
                             il.DeclareLocal(typeof(AsyncServerStreamingCall<byte[]>));
                         }
 
-                        il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
-                        il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").GetGetMethod());
+                        // create request
                         for (int j = 0; j < parameters.Length; j++)
                         {
                             il.Emit(OpCodes.Ldarg, j + 1);
@@ -324,19 +297,26 @@ namespace MagicOnion.Client
                         if (parameters.Length == 0)
                         {
                             // use empty byte[0]
-                            il.Emit(OpCodes.Ldsfld, emptyBytes);
+                            il.Emit(OpCodes.Ldsfld, nilBytes);
                         }
                         else if (parameters.Length == 1)
                         {
                             // already loaded parameter.
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                         }
                         else
                         {
+                            // call new DynamicArgumentTuple<T>
                             il.Emit(OpCodes.Newobj, def.RequestType.GetConstructors()[0]);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                         }
-                        il.Emit(OpCodes.Callvirt, def.FieldRequestMarshaller.FieldType.GetProperty("Serializer").PropertyType.GetMethod("Invoke"));
                         il.Emit(OpCodes.Stloc_0);
 
+                        // create ***Result
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, invokerField);
                         il.Emit(OpCodes.Ldsfld, def.FieldMethod);
@@ -355,19 +335,24 @@ namespace MagicOnion.Client
                         }
                         il.Emit(OpCodes.Stloc_1);
 
+                        // create return result
                         il.Emit(OpCodes.Ldloc_1);
-                        il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, resolverField);
+                        Type resultType;
                         if (def.MethodType == MethodType.Unary)
                         {
-                            il.Emit(OpCodes.Newobj, typeof(UnaryResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                            resultType = typeof(UnaryResult<>).MakeGenericType(def.ResponseType);
+                            il.Emit(OpCodes.Newobj, resultType.GetConstructors()[0]);
                         }
                         else
                         {
-                            il.Emit(OpCodes.Newobj, typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType).GetConstructors()[0]);
+                            resultType = typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType);
+                            il.Emit(OpCodes.Newobj, resultType.GetConstructors()[0]);
                         }
                         if (def.ResponseIsTask)
                         {
-                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(UnaryResult<>).MakeGenericType(def.ResponseType)));
+                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(resultType));
                         }
                         break;
                     case MethodType.ClientStreaming:
@@ -398,21 +383,25 @@ namespace MagicOnion.Client
                         }
                         il.Emit(OpCodes.Stloc_0);
 
+                        // create return result
                         il.Emit(OpCodes.Ldloc_0);
-                        il.Emit(OpCodes.Ldsfld, def.FieldRequestMarshaller);
-                        il.Emit(OpCodes.Ldsfld, def.FieldResponseMarshaller);
-
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, resolverField);
+                        Type resultType2;
                         if (def.MethodType == MethodType.ClientStreaming)
                         {
-                            il.Emit(OpCodes.Newobj, typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                            resultType2 = typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
+                            il.Emit(OpCodes.Newobj, resultType2.GetConstructors()[0]);
                         }
                         else
                         {
-                            il.Emit(OpCodes.Newobj, typeof(DuplexStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType).GetConstructors()[0]);
+                            resultType2 = typeof(DuplexStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
+                            il.Emit(OpCodes.Newobj, resultType2.GetConstructors()[0]);
                         }
+
                         if (def.ResponseIsTask)
                         {
-                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType)));
+                            il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult").MakeGenericMethod(resultType2));
                         }
                         break;
                     default:
@@ -471,7 +460,6 @@ namespace MagicOnion.Client
             }
             else
             {
-                //methodType = MethodType.Unary; // TODO:others...
                 throw new Exception($"Invalid return type, path:{def.Path} type:{t.Name}");
             }
         }
@@ -489,9 +477,7 @@ namespace MagicOnion.Client
             public bool ResponseIsTask;
             public FieldInfo FieldMethod;
             public Type RequestType;
-            //public FieldInfo FieldRequestMarshaller;
             public Type ResponseType;
-            //public FieldInfo FieldResponseMarshaller;
         }
     }
 }
