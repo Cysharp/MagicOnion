@@ -35,20 +35,24 @@ namespace MagicOnion.ConsoleClient
                 //channel.ConnectAsync().Wait();
                 var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
+                var c2 = MagicOnionClient.Create<IArgumentPattern>(channel);
+                var c3 = MagicOnionClient.Create<Sandbox.ConsoleServer.IChatRoomService>(channel);
+                var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard > (channel);
+
                 // TestHeartbeat(channel).GetAwaiter().GetResult();
-                //UnaryRun(c).GetAwaiter().GetResult();
-                //ClientStreamRun(c).GetAwaiter().GetResult();
-                //DuplexStreamRun(c).GetAwaiter().GetResult();
+                UnaryRun(c).GetAwaiter().GetResult();
+                ClientStreamRun(c).GetAwaiter().GetResult();
+                DuplexStreamRun(c).GetAwaiter().GetResult();
                 ServerStreamRun(c).GetAwaiter().GetResult();
 
                 // many run
                 //UnaryLoadTest(c).GetAwaiter().GetResult();
 
 
-                //HearbeatClient.Test(channel).GetAwaiter().GetResult();
-                //Console.ReadLine();
+//                HearbeatClient.Test(channel).GetAwaiter().GetResult();
+                Console.ReadLine();
 
-                //ChatClient.Run(channel).GetAwaiter().GetResult();
+  //              ChatClient.Run(channel).GetAwaiter().GetResult();
                 //TestHeartbeat(channel).GetAwaiter().GetResult();
             }
             finally

@@ -88,7 +88,6 @@
     <Compile Include="Server\EmbeddedServices\Ping.cs" />
     <Compile Include="Server\EmbeddedServices\Heartbeat.cs" />
     <Compile Include="Server\IMagicOnionLogger.cs" />
-    <Compile Include="Server\LoggableStream.cs" />
     <Compile Include="Server\MagicOnionEngine.cs" />
     <Compile Include="Server\MagicOnionFilterAttribute.cs" />
     <Compile Include="Server\MagicOnionOptions.cs" />

@@ -290,18 +290,19 @@ namespace MagicOnion.Server
             {
                 Request = request
             };
+
+            byte[] response = emptyBytes;
             try
             {
-                logger.BeginInvokeMethod(serviceContext);
+                logger.BeginInvokeMethod(serviceContext, request);
                 await this.methodBody(serviceContext).ConfigureAwait(false);
-
-                return serviceContext.Result ?? emptyBytes;
+                response = serviceContext.Result ?? emptyBytes;
             }
             catch (ReturnStatusException ex)
             {
                 isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
-                return emptyBytes;
+                response = emptyBytes;
             }
             catch (Exception ex)
             {
@@ -310,7 +311,7 @@ namespace MagicOnion.Server
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
                     LogError(ex, context);
-                    return emptyBytes;
+                    response = emptyBytes;
                 }
                 else
                 {
@@ -320,8 +321,10 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, response, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
+
+            return response;
         }
 
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
@@ -332,21 +335,22 @@ namespace MagicOnion.Server
             {
                 RequestStream = requestStream
             };
+            byte[] response = emptyBytes;
             try
             {
                 using (requestStream)
                 {
-                    logger.BeginInvokeMethod(serviceContext);
+                    logger.BeginInvokeMethod(serviceContext, emptyBytes);
                     await this.methodBody(serviceContext).ConfigureAwait(false);
 
-                    return serviceContext.Result ?? emptyBytes;
+                    response = serviceContext.Result ?? emptyBytes;
                 }
             }
             catch (ReturnStatusException ex)
             {
                 isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
-                return emptyBytes;
+                response = emptyBytes;
             }
             catch (Exception ex)
             {
@@ -355,7 +359,7 @@ namespace MagicOnion.Server
                 {
                     context.Status = new Status(StatusCode.Unknown, ex.ToString());
                     LogError(ex, context);
-                    return emptyBytes;
+                    response = emptyBytes;
                 }
                 else
                 {
@@ -365,8 +369,9 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, response, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
+            return response;
         }
 
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
@@ -380,7 +385,7 @@ namespace MagicOnion.Server
             };
             try
             {
-                logger.BeginInvokeMethod(serviceContext);
+                logger.BeginInvokeMethod(serviceContext, request);
                 await this.methodBody(serviceContext).ConfigureAwait(false);
 
                 return emptyBytes;
@@ -408,7 +413,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, emptyBytes, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -423,7 +428,7 @@ namespace MagicOnion.Server
             };
             try
             {
-                logger.BeginInvokeMethod(serviceContext);
+                logger.BeginInvokeMethod(serviceContext, emptyBytes);
                 using (requestStream)
                 {
 
@@ -455,7 +460,7 @@ namespace MagicOnion.Server
             finally
             {
                 sw.Stop();
-                logger.EndInvokeMethod(serviceContext, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, emptyBytes, sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
