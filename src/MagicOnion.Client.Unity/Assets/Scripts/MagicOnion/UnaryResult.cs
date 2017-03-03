@@ -1,6 +1,7 @@
 ﻿using System;
 using Grpc.Core;
 using UniRx;
+using MessagePack;
 
 namespace MagicOnion
 {
@@ -10,12 +11,12 @@ namespace MagicOnion
     public struct UnaryResult<TResponse>
     {
         readonly AsyncUnaryCall<byte[]> inner;
-        readonly Marshaller<TResponse> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public UnaryResult(AsyncUnaryCall<byte[]> inner, Marshaller<TResponse> marshaller)
+        public UnaryResult(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
         /// <summary>
@@ -25,8 +26,8 @@ namespace MagicOnion
         {
             get
             {
-                var m = marshaller; // struct can not use field value in lambda(if avoid, we needs to implement SelectWithState)
-                return inner.ResponseAsync.Select(x => m.Deserializer(x));
+                var m = resolver; // struct can not use field value in lambda(if avoid, we needs to implement SelectWithState)
+                return inner.ResponseAsync.Select(x => MessagePackSerializer.Deserialize<TResponse>(x, m));
             }
         }
 

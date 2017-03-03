@@ -1,32 +1,21 @@
 ﻿
-using ZeroFormatter;
-using ZeroFormatter.Formatters;
+using MessagePack;
+using MessagePack.Formatters;
 
 namespace MagicOnion
 {
-    internal static class FormatterLengthHelper
-    {
-        internal static int? GetLength(params IFormatter[] formatters)
-        {
-            int? sum = 0;
-            foreach (var item in formatters)
-            {
-                var len = item.GetLength();
-                if (len == null) return null;
-                sum += len;
-            }
-            return sum;
-        }
-    }
-
     // T2 ~ T20
 
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2)
         {
             Item1 = item1;
@@ -34,77 +23,70 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
         readonly T1 default1;
         readonly T2 default2;
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
             this.default1 = default1;
             this.default2 = default2;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 2);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2>(default1, default2);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2>(item1, default2);
+            var item1 = default1;
+            var item2 = default2;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
+                offset += readSize;
+            }
+
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2>(item1, item2);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3)
         {
             Item1 = item1;
@@ -113,88 +95,79 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 3);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3>(default1, default2, default3);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3>(item1, default2, default3);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3>(item1, item2, default3);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
+                offset += readSize;
+            }
 
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3>(item1, item2, item3);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4)
         {
             Item1 = item1;
@@ -204,15 +177,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -220,83 +186,79 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
             this.default4 = default4;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 4);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4>(default1, default2, default3, default4);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4>(item1, default2, default3, default4);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4>(item1, item2, default3, default4);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4>(item1, item2, item3, default4);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4>(item1, item2, item3, item4);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5)
         {
             Item1 = item1;
@@ -307,16 +269,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -325,92 +279,87 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
             this.default4 = default4;
             this.default5 = default5;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 5);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(default1, default2, default3, default4, default5);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, default2, default3, default4, default5);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, item2, default3, default4, default5);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, item2, item3, default4, default5);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, item2, item3, item4, default5);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, item2, item3, item4, item5);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6)
         {
             Item1 = item1;
@@ -422,17 +371,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -442,101 +382,95 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
             this.default4 = default4;
             this.default5 = default5;
             this.default6 = default6;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 6);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(default1, default2, default3, default4, default5, default6);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, default2, default3, default4, default5, default6);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, default3, default4, default5, default6);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, default4, default5, default6);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, default5, default6);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, item5, default6);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, item5, item6);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7)
         {
             Item1 = item1;
@@ -549,18 +483,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -571,13 +495,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -585,96 +502,96 @@ namespace MagicOnion
             this.default5 = default5;
             this.default6 = default6;
             this.default7 = default7;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 7);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(default1, default2, default3, default4, default5, default6, default7);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, default2, default3, default4, default5, default6, default7);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, default3, default4, default5, default6, default7);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, default4, default5, default6, default7);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, default5, default6, default7);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, default6, default7);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, item6, default7);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, item6, item7);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8)
         {
             Item1 = item1;
@@ -688,19 +605,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -712,14 +618,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -728,103 +626,103 @@ namespace MagicOnion
             this.default6 = default6;
             this.default7 = default7;
             this.default8 = default8;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 8);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(default1, default2, default3, default4, default5, default6, default7, default8);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, default2, default3, default4, default5, default6, default7, default8);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, default3, default4, default5, default6, default7, default8);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, default4, default5, default6, default7, default8);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, default5, default6, default7, default8);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, item5, default6, default7, default8);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, item5, item6, default7, default8);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, item5, item6, item7, default8);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, item5, item6, item7, item8);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9)
         {
             Item1 = item1;
@@ -839,20 +737,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -865,15 +751,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -883,110 +760,110 @@ namespace MagicOnion
             this.default7 = default7;
             this.default8 = default8;
             this.default9 = default9;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 9);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(default1, default2, default3, default4, default5, default6, default7, default8, default9);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, default2, default3, default4, default5, default6, default7, default8, default9);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, default3, default4, default5, default6, default7, default8, default9);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, default4, default5, default6, default7, default8, default9);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, default5, default6, default7, default8, default9);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, default6, default7, default8, default9);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, item6, default7, default8, default9);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, item6, item7, default8, default9);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, item6, item7, item8, default9);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, item6, item7, item8, item9);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10)
         {
             Item1 = item1;
@@ -1002,21 +879,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -1030,16 +894,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -1050,117 +904,117 @@ namespace MagicOnion
             this.default8 = default8;
             this.default9 = default9;
             this.default10 = default10;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 10);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11)
         {
             Item1 = item1;
@@ -1177,22 +1031,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -1207,17 +1047,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -1229,124 +1058,124 @@ namespace MagicOnion
             this.default9 = default9;
             this.default10 = default10;
             this.default11 = default11;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 11);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12)
         {
             Item1 = item1;
@@ -1364,23 +1193,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -1396,18 +1210,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -1420,131 +1222,131 @@ namespace MagicOnion
             this.default10 = default10;
             this.default11 = default11;
             this.default12 = default12;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 12);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13)
         {
             Item1 = item1;
@@ -1563,24 +1365,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -1597,19 +1383,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -1623,138 +1396,138 @@ namespace MagicOnion
             this.default11 = default11;
             this.default12 = default12;
             this.default13 = default13;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 13);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14)
         {
             Item1 = item1;
@@ -1774,25 +1547,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -1810,20 +1566,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -1838,145 +1580,145 @@ namespace MagicOnion
             this.default12 = default12;
             this.default13 = default13;
             this.default14 = default14;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 14);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15)
         {
             Item1 = item1;
@@ -1997,26 +1739,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -2035,21 +1759,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -2065,152 +1774,152 @@ namespace MagicOnion
             this.default13 = default13;
             this.default14 = default14;
             this.default15 = default15;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
+            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 15);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
+        [Key(15)]
         public readonly T16 Item16;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15, T16 item16)
         {
             Item1 = item1;
@@ -2232,27 +1941,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
-        readonly Formatter<TTypeResolver, T16> formatter16;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -2272,22 +1962,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15, T16 default16)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
-            this.formatter16 = Formatter<TTypeResolver, T16>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -2304,159 +1978,159 @@ namespace MagicOnion
             this.default14 = default14;
             this.default15 = default15;
             this.default16 = default16;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15, formatter16);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker && formatter16.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
-            offset += this.formatter16.Serialize(ref bytes, offset, value.Item16);
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 16);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T16>().Serialize(ref bytes, offset, value.Item16, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
+            var item16 = default16;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 15:
+                        item16 = formatterResolver.GetFormatterWithVerify<T16>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15, default16);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15, default16);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15, default16);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15, default16);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15, default16);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15, default16);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, default16);
-
-            var item16 = this.formatter16.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
+        [Key(15)]
         public readonly T16 Item16;
+        [Key(16)]
         public readonly T17 Item17;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15, T16 item16, T17 item17)
         {
             Item1 = item1;
@@ -2479,28 +2153,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
-        readonly Formatter<TTypeResolver, T16> formatter16;
-        readonly Formatter<TTypeResolver, T17> formatter17;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -2521,23 +2175,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15, T16 default16, T17 default17)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
-            this.formatter16 = Formatter<TTypeResolver, T16>.Default;
-            this.formatter17 = Formatter<TTypeResolver, T17>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -2555,166 +2192,166 @@ namespace MagicOnion
             this.default15 = default15;
             this.default16 = default16;
             this.default17 = default17;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15, formatter16, formatter17);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker && formatter16.NoUseDirtyTracker && formatter17.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
-            offset += this.formatter16.Serialize(ref bytes, offset, value.Item16);
-            offset += this.formatter17.Serialize(ref bytes, offset, value.Item17);
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 17);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T16>().Serialize(ref bytes, offset, value.Item16, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T17>().Serialize(ref bytes, offset, value.Item17, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
+            var item16 = default16;
+            var item17 = default17;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 15:
+                        item16 = formatterResolver.GetFormatterWithVerify<T16>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 16:
+                        item17 = formatterResolver.GetFormatterWithVerify<T17>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15, default16, default17);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15, default16, default17);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15, default16, default17);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15, default16, default17);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15, default16, default17);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, default16, default17);
-
-            var item16 = this.formatter16.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, default17);
-
-            var item17 = this.formatter17.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
+        [Key(15)]
         public readonly T16 Item16;
+        [Key(16)]
         public readonly T17 Item17;
+        [Key(17)]
         public readonly T18 Item18;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15, T16 item16, T17 item17, T18 item18)
         {
             Item1 = item1;
@@ -2738,29 +2375,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
-        readonly Formatter<TTypeResolver, T16> formatter16;
-        readonly Formatter<TTypeResolver, T17> formatter17;
-        readonly Formatter<TTypeResolver, T18> formatter18;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -2782,24 +2398,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15, T16 default16, T17 default17, T18 default18)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
-            this.formatter16 = Formatter<TTypeResolver, T16>.Default;
-            this.formatter17 = Formatter<TTypeResolver, T17>.Default;
-            this.formatter18 = Formatter<TTypeResolver, T18>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -2818,173 +2416,173 @@ namespace MagicOnion
             this.default16 = default16;
             this.default17 = default17;
             this.default18 = default18;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15, formatter16, formatter17, formatter18);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker && formatter16.NoUseDirtyTracker && formatter17.NoUseDirtyTracker && formatter18.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
-            offset += this.formatter16.Serialize(ref bytes, offset, value.Item16);
-            offset += this.formatter17.Serialize(ref bytes, offset, value.Item17);
-            offset += this.formatter18.Serialize(ref bytes, offset, value.Item18);
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 18);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T16>().Serialize(ref bytes, offset, value.Item16, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T17>().Serialize(ref bytes, offset, value.Item17, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T18>().Serialize(ref bytes, offset, value.Item18, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
+            var item16 = default16;
+            var item17 = default17;
+            var item18 = default18;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 15:
+                        item16 = formatterResolver.GetFormatterWithVerify<T16>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 16:
+                        item17 = formatterResolver.GetFormatterWithVerify<T17>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 17:
+                        item18 = formatterResolver.GetFormatterWithVerify<T18>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15, default16, default17, default18);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15, default16, default17, default18);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15, default16, default17, default18);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15, default16, default17, default18);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, default16, default17, default18);
-
-            var item16 = this.formatter16.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, default17, default18);
-
-            var item17 = this.formatter17.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, default18);
-
-            var item18 = this.formatter18.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
+        [Key(15)]
         public readonly T16 Item16;
+        [Key(16)]
         public readonly T17 Item17;
+        [Key(17)]
         public readonly T18 Item18;
+        [Key(18)]
         public readonly T19 Item19;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15, T16 item16, T17 item17, T18 item18, T19 item19)
         {
             Item1 = item1;
@@ -3009,30 +2607,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
-        readonly Formatter<TTypeResolver, T16> formatter16;
-        readonly Formatter<TTypeResolver, T17> formatter17;
-        readonly Formatter<TTypeResolver, T18> formatter18;
-        readonly Formatter<TTypeResolver, T19> formatter19;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -3055,25 +2631,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15, T16 default16, T17 default17, T18 default18, T19 default19)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
-            this.formatter16 = Formatter<TTypeResolver, T16>.Default;
-            this.formatter17 = Formatter<TTypeResolver, T17>.Default;
-            this.formatter18 = Formatter<TTypeResolver, T18>.Default;
-            this.formatter19 = Formatter<TTypeResolver, T19>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -3093,180 +2650,180 @@ namespace MagicOnion
             this.default17 = default17;
             this.default18 = default18;
             this.default19 = default19;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15, formatter16, formatter17, formatter18, formatter19);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker && formatter16.NoUseDirtyTracker && formatter17.NoUseDirtyTracker && formatter18.NoUseDirtyTracker && formatter19.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
-            offset += this.formatter16.Serialize(ref bytes, offset, value.Item16);
-            offset += this.formatter17.Serialize(ref bytes, offset, value.Item17);
-            offset += this.formatter18.Serialize(ref bytes, offset, value.Item18);
-            offset += this.formatter19.Serialize(ref bytes, offset, value.Item19);
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 19);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T16>().Serialize(ref bytes, offset, value.Item16, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T17>().Serialize(ref bytes, offset, value.Item17, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T18>().Serialize(ref bytes, offset, value.Item18, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T19>().Serialize(ref bytes, offset, value.Item19, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
+            var item16 = default16;
+            var item17 = default17;
+            var item18 = default18;
+            var item19 = default19;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 15:
+                        item16 = formatterResolver.GetFormatterWithVerify<T16>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 16:
+                        item17 = formatterResolver.GetFormatterWithVerify<T17>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 17:
+                        item18 = formatterResolver.GetFormatterWithVerify<T18>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 18:
+                        item19 = formatterResolver.GetFormatterWithVerify<T19>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15, default16, default17, default18, default19);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15, default16, default17, default18, default19);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15, default16, default17, default18, default19);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, default16, default17, default18, default19);
-
-            var item16 = this.formatter16.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, default17, default18, default19);
-
-            var item17 = this.formatter17.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, default18, default19);
-
-            var item18 = this.formatter18.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, default19);
-
-            var item19 = this.formatter19.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, item19);
         }
     }
-    
+
+    [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>
     {
+        [Key(0)]
         public readonly T1 Item1;
+        [Key(1)]
         public readonly T2 Item2;
+        [Key(2)]
         public readonly T3 Item3;
+        [Key(3)]
         public readonly T4 Item4;
+        [Key(4)]
         public readonly T5 Item5;
+        [Key(5)]
         public readonly T6 Item6;
+        [Key(6)]
         public readonly T7 Item7;
+        [Key(7)]
         public readonly T8 Item8;
+        [Key(8)]
         public readonly T9 Item9;
+        [Key(9)]
         public readonly T10 Item10;
+        [Key(10)]
         public readonly T11 Item11;
+        [Key(11)]
         public readonly T12 Item12;
+        [Key(12)]
         public readonly T13 Item13;
+        [Key(13)]
         public readonly T14 Item14;
+        [Key(14)]
         public readonly T15 Item15;
+        [Key(15)]
         public readonly T16 Item16;
+        [Key(16)]
         public readonly T17 Item17;
+        [Key(17)]
         public readonly T18 Item18;
+        [Key(18)]
         public readonly T19 Item19;
+        [Key(19)]
         public readonly T20 Item20;
 
+        [SerializationConstructor]
         public DynamicArgumentTuple(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5, T6 item6, T7 item7, T8 item8, T9 item9, T10 item10, T11 item11, T12 item12, T13 item13, T14 item14, T15 item15, T16 item16, T17 item17, T18 item18, T19 item19, T20 item20)
         {
             Item1 = item1;
@@ -3292,31 +2849,8 @@ namespace MagicOnion
         }
     }
 
-    public class DynamicArgumentTupleFormatter<TTypeResolver, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> : Formatter<TTypeResolver, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>>
-        where TTypeResolver : ITypeResolver, new()
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> : IMessagePackFormatter<DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>>
     {
-        readonly int? length;
-        readonly bool noUseDirtyTracker;
-        readonly Formatter<TTypeResolver, T1> formatter1;
-        readonly Formatter<TTypeResolver, T2> formatter2;
-        readonly Formatter<TTypeResolver, T3> formatter3;
-        readonly Formatter<TTypeResolver, T4> formatter4;
-        readonly Formatter<TTypeResolver, T5> formatter5;
-        readonly Formatter<TTypeResolver, T6> formatter6;
-        readonly Formatter<TTypeResolver, T7> formatter7;
-        readonly Formatter<TTypeResolver, T8> formatter8;
-        readonly Formatter<TTypeResolver, T9> formatter9;
-        readonly Formatter<TTypeResolver, T10> formatter10;
-        readonly Formatter<TTypeResolver, T11> formatter11;
-        readonly Formatter<TTypeResolver, T12> formatter12;
-        readonly Formatter<TTypeResolver, T13> formatter13;
-        readonly Formatter<TTypeResolver, T14> formatter14;
-        readonly Formatter<TTypeResolver, T15> formatter15;
-        readonly Formatter<TTypeResolver, T16> formatter16;
-        readonly Formatter<TTypeResolver, T17> formatter17;
-        readonly Formatter<TTypeResolver, T18> formatter18;
-        readonly Formatter<TTypeResolver, T19> formatter19;
-        readonly Formatter<TTypeResolver, T20> formatter20;
         readonly T1 default1;
         readonly T2 default2;
         readonly T3 default3;
@@ -3340,26 +2874,6 @@ namespace MagicOnion
 
         public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5, T6 default6, T7 default7, T8 default8, T9 default9, T10 default10, T11 default11, T12 default12, T13 default13, T14 default14, T15 default15, T16 default16, T17 default17, T18 default18, T19 default19, T20 default20)
         {
-            this.formatter1 = Formatter<TTypeResolver, T1>.Default;
-            this.formatter2 = Formatter<TTypeResolver, T2>.Default;
-            this.formatter3 = Formatter<TTypeResolver, T3>.Default;
-            this.formatter4 = Formatter<TTypeResolver, T4>.Default;
-            this.formatter5 = Formatter<TTypeResolver, T5>.Default;
-            this.formatter6 = Formatter<TTypeResolver, T6>.Default;
-            this.formatter7 = Formatter<TTypeResolver, T7>.Default;
-            this.formatter8 = Formatter<TTypeResolver, T8>.Default;
-            this.formatter9 = Formatter<TTypeResolver, T9>.Default;
-            this.formatter10 = Formatter<TTypeResolver, T10>.Default;
-            this.formatter11 = Formatter<TTypeResolver, T11>.Default;
-            this.formatter12 = Formatter<TTypeResolver, T12>.Default;
-            this.formatter13 = Formatter<TTypeResolver, T13>.Default;
-            this.formatter14 = Formatter<TTypeResolver, T14>.Default;
-            this.formatter15 = Formatter<TTypeResolver, T15>.Default;
-            this.formatter16 = Formatter<TTypeResolver, T16>.Default;
-            this.formatter17 = Formatter<TTypeResolver, T17>.Default;
-            this.formatter18 = Formatter<TTypeResolver, T18>.Default;
-            this.formatter19 = Formatter<TTypeResolver, T19>.Default;
-            this.formatter20 = Formatter<TTypeResolver, T20>.Default;
             this.default1 = default1;
             this.default2 = default2;
             this.default3 = default3;
@@ -3380,159 +2894,136 @@ namespace MagicOnion
             this.default18 = default18;
             this.default19 = default19;
             this.default20 = default20;
-            this.length = FormatterLengthHelper.GetLength(formatter1, formatter2, formatter3, formatter4, formatter5, formatter6, formatter7, formatter8, formatter9, formatter10, formatter11, formatter12, formatter13, formatter14, formatter15, formatter16, formatter17, formatter18, formatter19, formatter20);
-            this.noUseDirtyTracker = formatter1.NoUseDirtyTracker && formatter2.NoUseDirtyTracker && formatter3.NoUseDirtyTracker && formatter4.NoUseDirtyTracker && formatter5.NoUseDirtyTracker && formatter6.NoUseDirtyTracker && formatter7.NoUseDirtyTracker && formatter8.NoUseDirtyTracker && formatter9.NoUseDirtyTracker && formatter10.NoUseDirtyTracker && formatter11.NoUseDirtyTracker && formatter12.NoUseDirtyTracker && formatter13.NoUseDirtyTracker && formatter14.NoUseDirtyTracker && formatter15.NoUseDirtyTracker && formatter16.NoUseDirtyTracker && formatter17.NoUseDirtyTracker && formatter18.NoUseDirtyTracker && formatter19.NoUseDirtyTracker && formatter20.NoUseDirtyTracker;
         }
 
-        public override bool NoUseDirtyTracker
+        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> value, IFormatterResolver formatterResolver)
         {
-            get
-            {
-                return noUseDirtyTracker;
-            }
-        }
-
-        public override int? GetLength()
-        {
-            return length;
-        }
-
-        public override int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> value)
-        {
-            if (length != null && bytes == null)
-            {
-                bytes = new byte[length.Value];
-            }
             var startOffset = offset;
-            offset += this.formatter1.Serialize(ref bytes, offset, value.Item1);
-            offset += this.formatter2.Serialize(ref bytes, offset, value.Item2);
-            offset += this.formatter3.Serialize(ref bytes, offset, value.Item3);
-            offset += this.formatter4.Serialize(ref bytes, offset, value.Item4);
-            offset += this.formatter5.Serialize(ref bytes, offset, value.Item5);
-            offset += this.formatter6.Serialize(ref bytes, offset, value.Item6);
-            offset += this.formatter7.Serialize(ref bytes, offset, value.Item7);
-            offset += this.formatter8.Serialize(ref bytes, offset, value.Item8);
-            offset += this.formatter9.Serialize(ref bytes, offset, value.Item9);
-            offset += this.formatter10.Serialize(ref bytes, offset, value.Item10);
-            offset += this.formatter11.Serialize(ref bytes, offset, value.Item11);
-            offset += this.formatter12.Serialize(ref bytes, offset, value.Item12);
-            offset += this.formatter13.Serialize(ref bytes, offset, value.Item13);
-            offset += this.formatter14.Serialize(ref bytes, offset, value.Item14);
-            offset += this.formatter15.Serialize(ref bytes, offset, value.Item15);
-            offset += this.formatter16.Serialize(ref bytes, offset, value.Item16);
-            offset += this.formatter17.Serialize(ref bytes, offset, value.Item17);
-            offset += this.formatter18.Serialize(ref bytes, offset, value.Item18);
-            offset += this.formatter19.Serialize(ref bytes, offset, value.Item19);
-            offset += this.formatter20.Serialize(ref bytes, offset, value.Item20);
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 20);
+            offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T8>().Serialize(ref bytes, offset, value.Item8, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T9>().Serialize(ref bytes, offset, value.Item9, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T10>().Serialize(ref bytes, offset, value.Item10, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T11>().Serialize(ref bytes, offset, value.Item11, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T12>().Serialize(ref bytes, offset, value.Item12, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T13>().Serialize(ref bytes, offset, value.Item13, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T14>().Serialize(ref bytes, offset, value.Item14, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T15>().Serialize(ref bytes, offset, value.Item15, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T16>().Serialize(ref bytes, offset, value.Item16, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T17>().Serialize(ref bytes, offset, value.Item17, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T18>().Serialize(ref bytes, offset, value.Item18, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T19>().Serialize(ref bytes, offset, value.Item19, formatterResolver);
+            offset += formatterResolver.GetFormatterWithVerify<T20>().Serialize(ref bytes, offset, value.Item20, formatterResolver);
             return offset - startOffset;
         }
 
-        public override DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> Deserialize(ref byte[] bytes, int offset, DirtyTracker tracker, out int byteSize)
+        public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            byteSize = 0;
-            int size;
+            var startOffset = offset;
 
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(default1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
+            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
 
-            var item1 = this.formatter1.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, default2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
+            var item1 = default1;
+            var item2 = default2;
+            var item3 = default3;
+            var item4 = default4;
+            var item5 = default5;
+            var item6 = default6;
+            var item7 = default7;
+            var item8 = default8;
+            var item9 = default9;
+            var item10 = default10;
+            var item11 = default11;
+            var item12 = default12;
+            var item13 = default13;
+            var item14 = default14;
+            var item15 = default15;
+            var item16 = default16;
+            var item17 = default17;
+            var item18 = default18;
+            var item19 = default19;
+            var item20 = default20;
 
-            var item2 = this.formatter2.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, default3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
+            for (var i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 1:
+                        item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 2:
+                        item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 3:
+                        item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 4:
+                        item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 5:
+                        item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 6:
+                        item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 7:
+                        item8 = formatterResolver.GetFormatterWithVerify<T8>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 8:
+                        item9 = formatterResolver.GetFormatterWithVerify<T9>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 9:
+                        item10 = formatterResolver.GetFormatterWithVerify<T10>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 10:
+                        item11 = formatterResolver.GetFormatterWithVerify<T11>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 11:
+                        item12 = formatterResolver.GetFormatterWithVerify<T12>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 12:
+                        item13 = formatterResolver.GetFormatterWithVerify<T13>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 13:
+                        item14 = formatterResolver.GetFormatterWithVerify<T14>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 14:
+                        item15 = formatterResolver.GetFormatterWithVerify<T15>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 15:
+                        item16 = formatterResolver.GetFormatterWithVerify<T16>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 16:
+                        item17 = formatterResolver.GetFormatterWithVerify<T17>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 17:
+                        item18 = formatterResolver.GetFormatterWithVerify<T18>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 18:
+                        item19 = formatterResolver.GetFormatterWithVerify<T19>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    case 19:
+                        item20 = formatterResolver.GetFormatterWithVerify<T20>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        break;
+                    default:
+                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        break;
+                }
 
-            var item3 = this.formatter3.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, default4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
+                offset += readSize;
+            }
 
-            var item4 = this.formatter4.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, default5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item5 = this.formatter5.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, default6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item6 = this.formatter6.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, default7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item7 = this.formatter7.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, default8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item8 = this.formatter8.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, default9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item9 = this.formatter9.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, default10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item10 = this.formatter10.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, default11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item11 = this.formatter11.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, default12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item12 = this.formatter12.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, default13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item13 = this.formatter13.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, default14, default15, default16, default17, default18, default19, default20);
-
-            var item14 = this.formatter14.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, default15, default16, default17, default18, default19, default20);
-
-            var item15 = this.formatter15.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, default16, default17, default18, default19, default20);
-
-            var item16 = this.formatter16.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, default17, default18, default19, default20);
-
-            var item17 = this.formatter17.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, default18, default19, default20);
-
-            var item18 = this.formatter18.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, default19, default20);
-
-            var item19 = this.formatter19.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-            if (bytes.Length == byteSize) return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, item19, default20);
-
-            var item20 = this.formatter20.Deserialize(ref bytes, offset, tracker, out size);
-            offset += size;
-            byteSize += size;
-
+            readSize = offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, item19, item20);
         }
     }

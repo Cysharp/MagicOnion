@@ -35,6 +35,7 @@ namespace MagicOnion.Client.EmbeddedServices
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
+            clone.resolver = this.resolver;
             return clone;
         }
 

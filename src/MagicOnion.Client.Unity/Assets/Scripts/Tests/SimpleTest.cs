@@ -5,7 +5,6 @@ using System.Collections;
 using Grpc.Core;
 using MagicOnion.Client;
 using Sandbox.ConsoleServer;
-using ZeroFormatter.Formatters;
 using System.Collections.Generic;
 using System;
 

@@ -14,7 +14,7 @@
     using MagicOnion.Client;
     using UniRx;
     using Grpc.Core;
-    using ZeroFormatter.Formatters;
+    using MessagePack;
 
 <# foreach(var interfaceDef in Interfaces) { #>
 
@@ -36,18 +36,12 @@
     {
 <# foreach(var item in interfaceDef.Methods) { #>
         static readonly Method<byte[], byte[]> <#= item.Name #>Method;
-        static readonly Marshaller<<#= item.RequestMarshallerType #>> <#= item.Name #>RequestMarshaller;
-        static readonly Marshaller<<#= item.ResponseType #>> <#= item.Name #>ResponseMarshaller;
-
 <# } #>
 
         static <#= clientName #>()
         {
 <# foreach(var item in interfaceDef.Methods) { #>
-            <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ByteArrayMarshaller, MagicOnionMarshallers.ByteArrayMarshaller);
-            <#= item.Name #>RequestMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(<#= item.RequestFormatter(ZeroFormatterResolver) #>);
-            <#= item.Name #>ResponseMarshaller = MagicOnionMarshallers.CreateZeroFormatterMarshaller(Formatter<<#= ZeroFormatterResolver #>, <#= item.ResponseType #>>.Default);
-
+            <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 <# } #>
         }
 
@@ -55,23 +49,18 @@
         {
         }
 
-        public <#= clientName #>(Channel channel)
-            : this(new DefaultCallInvoker(channel))
-        {
-
-        }
-
-        public <#= clientName #>(CallInvoker callInvoker)
-            : base(callInvoker)
+        public <#= clientName #>(CallInvoker callInvoker, IFormatterResolver resolver)
+            : base(callInvoker, resolver)
         {
         }
 
         protected override MagicOnionClientBase<<#= interfaceDef.Name #>> Clone()
         {
-            var clone = new <#= clientName #>(this.callInvoker);
+            var clone = new <#= clientName #>();
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
+            clone.resolver = this.resolver;
             return clone;
         }
    
@@ -79,19 +68,19 @@
         public <#= item.ToString() #>
         {
 <# if(item.MethodType == MethodType.Unary) { #>
-            var __request = <#= item.Name #>RequestMarshaller.Serializer(<#= item.RequestObject() #>);
+            var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncUnaryCall(<#= item.Name #>Method, base.host, base.option, __request);
-            return new UnaryResult<<#= item.ResponseType #>>(__callResult, <#= item.Name #>ResponseMarshaller);
+            return new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver);
 <# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
-            var __request = <#= item.Name #>RequestMarshaller.Serializer(<#= item.RequestObject() #>);
+            var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, base.host, base.option, __request);
-            return new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, <#= item.Name #>ResponseMarshaller);
+            return new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, base.resolver);
 <# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+            return new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver);
 <# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, <#= item.Name #>RequestMarshaller, <#= item.Name #>ResponseMarshaller);
+            return new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver);
 <# } #>
         }
 

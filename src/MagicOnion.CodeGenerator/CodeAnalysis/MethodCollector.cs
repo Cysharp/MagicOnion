@@ -47,7 +47,7 @@ namespace MagicOnion.CodeAnalysis
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.ToArray()).GetAwaiter().GetResult();
             this.typeReferences = new ReferenceSymbols(compilation);
 
-            var marker = compilation.GetTypeByMetadataName("MagicOnion.__IServiceMarker");
+            var marker = compilation.GetTypeByMetadataName("MagicOnion.IServiceMarker");
 
             baseInterface = compilation.GetTypeByMetadataName("MagicOnion.IService`1");
 

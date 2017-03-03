@@ -190,7 +190,9 @@ namespace MagicOnion.ConsoleClient
         {
             try
             {
-                var stream = await client.StreamingThree();
+
+                
+                   var stream = await client.StreamingThree();
 
                 var count = 0;
                 await stream.ResponseStream.ForEachAsync(async x =>

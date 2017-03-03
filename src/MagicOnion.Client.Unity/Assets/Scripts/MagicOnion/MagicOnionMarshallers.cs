@@ -1,24 +1,21 @@
-﻿using System;
-using Grpc.Core;
+﻿using Grpc.Core;
+using MessagePack;
 using UniRx;
-using ZeroFormatter;
-using ZeroFormatter.Formatters;
-using ZeroFormatter.Internal;
 
 namespace MagicOnion
 {
-    internal class MarshallingAsyncStreamReader<TRequest> : IAsyncStreamReader<TRequest>
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>
     {
         readonly IAsyncStreamReader<byte[]> inner;
-        readonly Marshaller<TRequest> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, Marshaller<TRequest> marshaller)
+        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
-        public TRequest Current { get; private set; }
+        public T Current { get; private set; }
 
         public IObservable<bool> MoveNext()
         {
@@ -26,7 +23,7 @@ namespace MagicOnion
             {
                 if (x)
                 {
-                    this.Current = marshaller.Deserializer(inner.Current);
+                    this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
                 }
             });
         }
@@ -40,12 +37,12 @@ namespace MagicOnion
     internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<byte[]> inner;
-        readonly Marshaller<T> marshaller;
+        readonly IFormatterResolver resolver;
 
-        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, Marshaller<T> marshaller)
+        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.marshaller = marshaller;
+            this.resolver = resolver;
         }
 
         public WriteOptions WriteOptions
@@ -68,42 +65,14 @@ namespace MagicOnion
 
         public IObservable<Unit> WriteAsync(T message)
         {
-            var bytes = marshaller.Serializer(message);
+            var bytes = MessagePackSerializer.Serialize(message, resolver);
             return inner.WriteAsync(bytes);
         }
     }
 
     public static class MagicOnionMarshallers
     {
-        static readonly DirtyTracker NullTracker = new DirtyTracker();
-        public static readonly Marshaller<byte[]> ByteArrayMarshaller = Marshallers.Create<byte[]>(x => x, x => x);
-        public static readonly byte[] EmptyBytes = new byte[0];
-
-        public static Marshaller<T> CreateZeroFormatterMarshaller<TTypeResolver, T>(Formatter<TTypeResolver, T> formatter)
-            where TTypeResolver : ITypeResolver, new()
-        {
-            if (typeof(T) == typeof(byte[]))
-            {
-                return (Marshaller<T>)(object)ByteArrayMarshaller;
-            }
-
-            var noUseDirtyTracker = formatter.NoUseDirtyTracker;
-
-            return new Marshaller<T>(x =>
-            {
-                byte[] bytes = null;
-                var size = formatter.Serialize(ref bytes, 0, x);
-                if (bytes.Length != size)
-                {
-                    BinaryUtil.FastResize(ref bytes, size);
-                }
-                return bytes;
-            }, bytes =>
-            {
-                var tracker = noUseDirtyTracker ? NullTracker : new DirtyTracker();
-                int _;
-                return formatter.Deserialize(ref bytes, 0, tracker, out _);
-            });
-        }
+        public static readonly Marshaller<byte[]> ThroughMarshaller = Marshallers.Create<byte[]>(x => x, x => x);
+        public static readonly byte[] UnsafeNilBytes = new byte[] { MessagePackCode.Nil };
     }
 }

@@ -18,13 +18,18 @@ namespace <#= Namespace #>
 
     public static partial class MagicOnionInitializer
     {
+        static bool isRegistered = false;
+
 <# if( !UnuseUnityAttribute) { #>
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
 <# } #>
         public static void Register()
         {
+            if(isRegistered) return;
+            isRegistered = true;
+
 <# foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
-            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register(x => new <#= clientName #>(x), x => new <#= clientName #>(x));
+            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y) => new <#= clientName #>(x, y));
 <# } #>
         }
     }

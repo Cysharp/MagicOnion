@@ -19,9 +19,7 @@ namespace MagicOnion.CodeGenerator
         public string OutputPath { get; private set; }
         public bool UnuseUnityAttr { get; private set; }
         public List<string> ConditionalSymbols { get; private set; }
-        public bool IsSeparate { get; private set; }
         public string NamespaceRoot { get; private set; }
-        public string ResolverName { get; private set; }
 
         public bool IsParsed { get; set; }
 
@@ -29,16 +27,13 @@ namespace MagicOnion.CodeGenerator
         {
             ConditionalSymbols = new List<string>();
             NamespaceRoot = "MagicOnion";
-            ResolverName = "ZeroFormatter.Formatters.DefaultResolver";
 
             var option = new OptionSet()
             {
                 { "i|input=", "[required]Input path of analyze csproj", x => { InputPath = x; } },
                 { "o|output=", "[required]Output path(file) or directory base(in separated mode)", x => { OutputPath = x; } },
-                { "s|separate", "[optional, default=false]Output files are separated", _ => { IsSeparate = true; } },
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer", _ => { UnuseUnityAttr = true; } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
-                { "r|resolvername=", "[optional, default=DefaultResolver]Register CustomSerializer target", x => { ResolverName = x; } },
                 { "n|namespace=", "[optional, default=MagicOnion]Set namespace root name", x => { NamespaceRoot = x; } },
             };
             if (args.Length == 0)
@@ -100,10 +95,10 @@ namespace MagicOnion.CodeGenerator
 
             var texts = definitions
                 .GroupBy(x => x.Namespace)
+                .OrderBy(x => x.Key)
                 .Select(x => new CodeTemplate()
                 {
                     Namespace = x.Key,
-                    ZeroFormatterResolver = cmdArgs.ResolverName,
                     Interfaces = x.ToArray()
                 })
                 .ToArray();
@@ -115,31 +110,13 @@ namespace MagicOnion.CodeGenerator
                 UnuseUnityAttribute = cmdArgs.UnuseUnityAttr
             };
 
-            if (cmdArgs.IsSeparate)
+            var sb = new StringBuilder();
+            sb.AppendLine(registerTemplate.TransformText());
+            foreach (var item in texts)
             {
-                var initializerPath = Path.Combine(cmdArgs.OutputPath, "MagicOnionInitializer.cs");
-                Output(initializerPath, registerTemplate.TransformText());
-
-                foreach (var item in texts)
-                {
-                    foreach (var interfaceDef in item.Interfaces)
-                    {
-                        var path = Path.Combine(cmdArgs.OutputPath, interfaceDef.ToString().Replace(".", "\\") + ".cs");
-                        var template2 = new CodeTemplate() { Namespace = interfaceDef.Namespace, ZeroFormatterResolver = cmdArgs.ResolverName, Interfaces = new[] { interfaceDef } };
-                        Output(path, template2.TransformText());
-                    }
-                }
+                sb.AppendLine(item.TransformText());
             }
-            else
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine(registerTemplate.TransformText());
-                foreach (var item in texts)
-                {
-                    sb.AppendLine(item.TransformText());
-                }
-                Output(cmdArgs.OutputPath, sb.ToString());
-            }
+            Output(cmdArgs.OutputPath, sb.ToString());
 
             Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();

@@ -1,44 +1,49 @@
 ﻿using Grpc.Core;
 using System;
-using ZeroFormatter.Formatters;
+using MessagePack;
 
 namespace MagicOnion.Client
 {
     public static class MagicOnionClient
     {
         public static T Create<T>(Channel channel)
-            where T : IService<T>
+           where T : IService<T>
         {
-            return MagicOnionClientRegistry<T>.Create(channel);
+            return Create<T>(new DefaultCallInvoker(channel), MessagePackSerializer.DefaultResolver);
         }
 
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
-            return MagicOnionClientRegistry<T>.Create(invoker);
+            return Create<T>(invoker, MessagePackSerializer.DefaultResolver);
+        }
+
+        public static T Create<T>(Channel channel, IFormatterResolver resolver)
+            where T : IService<T>
+        {
+            return Create<T>(new DefaultCallInvoker(channel), resolver);
+        }
+
+        public static T Create<T>(CallInvoker invoker, IFormatterResolver resolver)
+            where T : IService<T>
+        {
+            return MagicOnionClientRegistry<T>.Create(invoker, resolver);
         }
     }
 
     public static class MagicOnionClientRegistry<T>
         where T : IService<T>
     {
-        static Func<Channel, T> consturtor1;
-        static Func<CallInvoker, T> consturtor2;
+        static Func<CallInvoker, IFormatterResolver, T> consturtor;
 
-        public static void Register(Func<Channel, T> ctor1, Func<CallInvoker, T> ctor2)
+        public static void Register(Func<CallInvoker, IFormatterResolver, T> ctor)
         {
-            consturtor1 = ctor1;
-            consturtor2 = ctor2;
+            consturtor = ctor;
         }
 
-        public static T Create(Channel channel)
+        public static T Create(CallInvoker invoker, IFormatterResolver resolver)
         {
-            return consturtor1(channel);
-        }
-
-        public static T Create(CallInvoker invoker)
-        {
-            return consturtor2(invoker);
+            return consturtor(invoker, resolver);
         }
     }
 }

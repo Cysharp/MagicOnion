@@ -17,11 +17,7 @@ namespace MagicOnion
                 var entry = metadata[i];
                 if (ignoreCase)
                 {
-#if UNITY_METRO
                     if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-#else
-                    if (entry.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
-#endif
                     {
                         return entry;
                     }
@@ -47,11 +43,7 @@ namespace MagicOnion
                 var entry = metadata[i];
                 if (ignoreCase)
                 {
-#if UNITY_METRO
                     if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
-#else
-                    if (entry.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
-#endif
                     {
                         return entry.Value;
                     }

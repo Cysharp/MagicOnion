@@ -68,7 +68,7 @@ namespace MagicOnion.CodeAnalysis
                     case MethodType.ServerStreaming:
                         if (Parameters.Length == 0)
                         {
-                            return "byte[]";
+                            return "Nil";
                         }
                         else if (Parameters.Length == 1)
                         {
@@ -87,39 +87,21 @@ namespace MagicOnion.CodeAnalysis
             }
         }
 
-        public string RequestFormatter(string resolverName)
-        {
-            if (Parameters.Length == 1 || MethodType == MethodType.ClientStreaming || MethodType == MethodType.DuplexStreaming)
-            {
-                return $"ZeroFormatter.Formatters.Formatter<{resolverName}, {RequestType}>.Default";
-            }
-            else if (Parameters.Length == 0)
-            {
-                return $"ZeroFormatter.Formatters.Formatter<{resolverName}, byte[]>.Default";
-            }
-            else
-            {
-                var typeArgs = string.Join(", ", Parameters.Select(x => x.TypeName));
-                var parameterValues = string.Join(", ", Parameters.Select(x => x.DefaultValue));
-                return $"new DynamicArgumentTupleFormatter<{resolverName}, {typeArgs}>({parameterValues})";
-            }
-        }
-
         public string RequestObject()
         {
             if (Parameters.Length == 0)
             {
-                return $"MagicOnionMarshallers.EmptyBytes";
+                return $"MagicOnionMarshallers.UnsafeNilBytes";
             }
             else if (Parameters.Length == 1)
             {
-                return Parameters[0].ParameterName;
+                return $"MessagePackSerializer.Serialize({Parameters[0].ParameterName}, base.resolver)";
             }
             else
             {
                 var typeArgs = string.Join(", ", Parameters.Select(x => x.TypeName));
                 var parameterNames = string.Join(", ", Parameters.Select(x => x.ParameterName));
-                return $"new DynamicArgumentTuple<{typeArgs}>({parameterNames})";
+                return $"MessagePackSerializer.Serialize(new DynamicArgumentTuple<{typeArgs}>({parameterNames}), base.resolver)";
             }
         }
 

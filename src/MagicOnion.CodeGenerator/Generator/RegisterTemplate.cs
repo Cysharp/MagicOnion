@@ -37,12 +37,21 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n    using global::System;\r\n    using global::System.Collections.Generic;\r\n  " +
-                    "  using global::System.Linq;\r\n    using global::MagicOnion;\r\n    using global::M" +
-                    "agicOnion.Client;\r\n\r\n    public static partial class MagicOnionInitializer\r\n    " +
-                    "{\r\n");
+            this.Write(@"
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+
+    public static partial class MagicOnionInitializer
+    {
+        static bool isRegistered = false;
+
+");
             
-            #line 21 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 23 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
  if( !UnuseUnityAttribute) { 
             
             #line default
@@ -50,42 +59,36 @@ namespace MagicOnion.Generator
             this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
                     "oadType.BeforeSceneLoad)]\r\n");
             
-            #line 23 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 25 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("        public static void Register()\r\n        {\r\n");
+            this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
+                    "turn;\r\n            isRegistered = true;\r\n\r\n");
             
-            #line 26 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 31 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
  foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; 
             
             #line default
             #line hidden
             this.Write("            MagicOnionClientRegistry<");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
             
             #line default
             #line hidden
-            this.Write(">.Register(x => new ");
+            this.Write(">.Register((x, y) => new ");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 32 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
-            this.Write("(x), x => new ");
+            this.Write("(x, y));\r\n");
             
-            #line 27 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            
-            #line default
-            #line hidden
-            this.Write("(x));\r\n");
-            
-            #line 28 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
+            #line 33 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default

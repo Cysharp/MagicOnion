@@ -4,12 +4,12 @@ using System;
 namespace MagicOnion
 {
     // used for MagicOnionEngine assembly scan for boostup analyze speed.
-    public interface __IServiceMarker
+    public interface IServiceMarker
     {
 
     }
 
-    public interface IService<TSelf> : __IServiceMarker
+    public interface IService<TSelf> : IServiceMarker
     {
         TSelf WithOptions(CallOptions option);
         TSelf WithHeaders(Metadata headers);

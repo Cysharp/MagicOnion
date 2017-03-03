@@ -1,9 +1,8 @@
 ﻿using RuntimeUnitTestToolkit;
 using UnityEngine;
 using System.Collections;
-using ZeroFormatter;
 using SharedLibrary;
-using ZeroFormatter.Formatters;
+using MessagePack;
 using System;
 using Grpc.Core.Logging;
 using System.IO;
@@ -19,9 +18,9 @@ namespace MagicOnion.Tests
         public static void Register()
         {
             // Register First
-            ZeroFormatterInitializer.Register();
+            //ZeroFormatterInitializer.Register();
             MagicOnionInitializer.Register();
-            ZeroFormatter.Formatters.Formatter.RegisterArray<DefaultResolver, MyEnum>();
+            //ZeroFormatter.Formatters.Formatter.RegisterArray<DefaultResolver, MyEnum>();
 
             // Button ON
             RuntimeUnitTestToolkit.UnitTest.AddCustomAction("Use Local", () =>
@@ -54,7 +53,7 @@ namespace MagicOnion.Tests
         public static T Create<T>() where T : IService<T>
         {
             var channel = new Channel(endPoint, 12345, ChannelCredentials.Insecure);
-            
+
             var client = MagicOnionClient.Create<T>(channel).WithDeadline(DateTime.UtcNow.AddSeconds(10));
 
             return client;

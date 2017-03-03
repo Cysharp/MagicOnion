@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client.EmbeddedServices;
+using MessagePack;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -142,15 +143,26 @@ namespace MagicOnion.Client
             }
         }
 
-        // TODO:more createClient overload.
         public T CreateClient<T>()
             where T : IService<T>
         {
-            return MagicOnionClient.Create<T>(channel)
+            return CreateClient<T>(MessagePackSerializer.DefaultResolver);
+        }
+
+        public T CreateClient<T>(IFormatterResolver resolver)
+            where T : IService<T>
+        {
+            return MagicOnionClient.Create<T>(channel, resolver)
                 .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } });
         }
 
         public T CreateClient<T>(Metadata metadata)
+            where T : IService<T>
+        {
+            return CreateClient<T>(metadata, MessagePackSerializer.DefaultResolver);
+        }
+
+        public T CreateClient<T>(Metadata metadata, IFormatterResolver resolver)
             where T : IService<T>
         {
             var newMetadata = new Metadata();
@@ -160,7 +172,7 @@ namespace MagicOnion.Client
             }
             newMetadata.Add(ChannelContext.HeaderKey, ConnectionId);
 
-            return MagicOnionClient.Create<T>(channel).WithHeaders(newMetadata).WithCancellationToken(cancellationTokenSource.Token);
+            return MagicOnionClient.Create<T>(channel, resolver).WithHeaders(newMetadata).WithCancellationToken(cancellationTokenSource.Token);
         }
 
 
