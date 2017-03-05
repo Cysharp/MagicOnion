@@ -88,7 +88,11 @@ namespace MagicOnion.CodeGenerator
 
             var definitions = collector.Visit();
 
+            Test(definitions);
+
             Console.WriteLine("Method Collect Complete:" + sw.Elapsed.ToString());
+
+            
 
             Console.WriteLine("Output Generation Start");
             sw.Restart();
@@ -136,6 +140,24 @@ namespace MagicOnion.CodeGenerator
             }
 
             System.IO.File.WriteAllText(path, text);
+        }
+
+        static void Test(InterfaceDefintion[] definitions)
+        {
+            //foreach (var method in definitions.SelectMany(x => x.Methods))
+            //{
+            //    // method.ReturnType;
+
+            //    method.UnwrappedOriginalResposneTypeSymbol.
+
+            //    foreach (var p in method.Parameters)
+            //    {
+            //        // p.TypeName
+            //    }
+
+
+            //}
+
         }
     }
 }

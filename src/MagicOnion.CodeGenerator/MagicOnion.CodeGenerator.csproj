@@ -160,12 +160,21 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CodeTemplate.tt</DependentUpon>
     </Compile>
-    <Compile Include="Generator\RegisterTemplate.Partial.cs" />
-    <Compile Include="Generator\CodeTemplate.Partial.cs" />
+    <Compile Include="Generator\EnumTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Generator\TemplatePartials.cs" />
     <Compile Include="Generator\RegisterTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>RegisterTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Generator\ResolverTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResolverTemplate.tt</DependentUpon>
     </Compile>
     <Compile Include="Mono.Options\Options.cs" />
     <Compile Include="Program.cs" />
@@ -186,9 +195,17 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CodeTemplate.cs</LastGenOutput>
     </Content>
+    <Content Include="Generator\EnumTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+    </Content>
     <Content Include="Generator\RegisterTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="Generator\ResolverTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ResolverTemplate.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

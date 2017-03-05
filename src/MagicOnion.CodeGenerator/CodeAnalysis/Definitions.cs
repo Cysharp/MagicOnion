@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,8 @@ namespace MagicOnion.CodeAnalysis
         public string RequestType { get; set; }
         public string ResponseType { get; set; }
         public ParameterDefinition[] Parameters { get; set; }
+
+        public ITypeSymbol UnwrappedOriginalResposneTypeSymbol { get; set; }
 
         public string ReturnType
         {
@@ -117,6 +120,7 @@ namespace MagicOnion.CodeAnalysis
         public string ParameterName { get; set; }
         public bool HasDefaultValue { get; set; }
         public string DefaultValue { get; set; }
+        public IParameterSymbol OriginalSymbol { get; set; }
 
         public override string ToString()
         {
@@ -130,4 +134,43 @@ namespace MagicOnion.CodeAnalysis
             }
         }
     }
+
+    // MessagePack Definitions
+
+    public interface IResolverRegisterInfo
+    {
+        string FullName { get; }
+        string FormatterName { get; }
+    }
+
+
+    public class GenericSerializationInfo : IResolverRegisterInfo, IEquatable<GenericSerializationInfo>
+    {
+        public string FullName { get; set; }
+
+        public string FormatterName { get; set; }
+
+        public bool Equals(GenericSerializationInfo other)
+        {
+            return FullName.Equals(other.FullName);
+        }
+
+        public override int GetHashCode()
+        {
+            return FullName.GetHashCode();
+        }
+    }
+
+    public class EnumSerializationInfo : IResolverRegisterInfo
+    {
+        public string Namespace { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public string UnderlyingType { get; set; }
+
+        public string FormatterName => Namespace + "." + Name + "Formatter";
+    }
+
+
+
 }

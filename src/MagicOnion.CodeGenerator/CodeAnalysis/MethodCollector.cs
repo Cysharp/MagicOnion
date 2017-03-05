@@ -115,13 +115,15 @@ namespace MagicOnion.CodeAnalysis
             MethodType t;
             string requestType;
             string responseType;
-            ExtractRequestResponseType(y, out t, out requestType, out responseType);
+            ITypeSymbol unwrappedOriginalResponseType;
+            ExtractRequestResponseType(y, out t, out requestType, out responseType, out unwrappedOriginalResponseType);
             return new MethodDefinition
             {
                 Name = y.Name,
                 MethodType = t,
                 RequestType = requestType,
                 ResponseType = responseType,
+                UnwrappedOriginalResposneTypeSymbol = unwrappedOriginalResponseType,
                 Parameters = y.Parameters.Select(p =>
                 {
                     return new ParameterDefinition
@@ -129,13 +131,14 @@ namespace MagicOnion.CodeAnalysis
                         ParameterName = p.Name,
                         TypeName = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         HasDefaultValue = p.HasExplicitDefaultValue,
-                        DefaultValue = GetDefaultValue(p)
+                        DefaultValue = GetDefaultValue(p),
+                        OriginalSymbol = p
                     };
                 }).ToArray()
             };
         }
 
-        void ExtractRequestResponseType(IMethodSymbol method, out MethodType methodType, out string requestType, out string responseType)
+        void ExtractRequestResponseType(IMethodSymbol method, out MethodType methodType, out string requestType, out string responseType, out ITypeSymbol unwrappedOriginalResponseType)
         {
             var retType = method.ReturnType as INamedTypeSymbol;
 
@@ -151,24 +154,28 @@ namespace MagicOnion.CodeAnalysis
                 methodType = MethodType.Unary;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                unwrappedOriginalResponseType = retType.TypeArguments[0];
             }
             else if (constructedFrom == typeReferences.ServerStreamingResult)
             {
                 methodType = MethodType.ServerStreaming;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                unwrappedOriginalResponseType = retType.TypeArguments[0];
             }
             else if (constructedFrom == typeReferences.ClientStreamingResult)
             {
                 methodType = MethodType.ClientStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                unwrappedOriginalResponseType = retType.TypeArguments[1];
             }
             else if (constructedFrom == typeReferences.DuplexStreamingResult)
             {
                 methodType = MethodType.DuplexStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                unwrappedOriginalResponseType = retType.TypeArguments[1];
             }
             else
             {
