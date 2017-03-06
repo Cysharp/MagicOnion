@@ -1,5 +1,6 @@
 ﻿using MagicOnion.CodeAnalysis;
 using MagicOnion.Generator;
+using Microsoft.CodeAnalysis;
 using Mono.Options;
 using System;
 using System.Collections.Generic;
@@ -88,14 +89,31 @@ namespace MagicOnion.CodeGenerator
 
             var definitions = collector.Visit();
 
-            Test(definitions);
+            GenericSerializationInfo[] genericInfos;
+            EnumSerializationInfo[] enumInfos;
+            ExtractResolverInfo(definitions, out genericInfos, out enumInfos);
 
             Console.WriteLine("Method Collect Complete:" + sw.Elapsed.ToString());
 
-            
-
             Console.WriteLine("Output Generation Start");
             sw.Restart();
+
+            var enumTemplates = enumInfos.GroupBy(x => x.Namespace)
+                .OrderBy(x => x.Key)
+                .Select(x => new EnumTemplate()
+                {
+                    Namespace = x.Key,
+                    enumSerializationInfos = x.ToArray()
+                })
+                .ToArray();
+
+            var resolverTemplate = new ResolverTemplate()
+            {
+                Namespace = cmdArgs.NamespaceRoot + ".Resolvers",
+                FormatterNamespace = cmdArgs.NamespaceRoot + ".Formatters",
+                ResolverName = "MagicOnionResolver",
+                registerInfos = genericInfos.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enumInfos.OrderBy(x => x.FullName)).ToArray()
+            };
 
             var texts = definitions
                 .GroupBy(x => x.Namespace)
@@ -116,6 +134,12 @@ namespace MagicOnion.CodeGenerator
 
             var sb = new StringBuilder();
             sb.AppendLine(registerTemplate.TransformText());
+            sb.AppendLine(resolverTemplate.TransformText());
+            foreach (var item in enumTemplates)
+            {
+                sb.AppendLine(item.TransformText());
+            }
+
             foreach (var item in texts)
             {
                 sb.AppendLine(item.TransformText());
@@ -142,22 +166,166 @@ namespace MagicOnion.CodeGenerator
             System.IO.File.WriteAllText(path, text);
         }
 
-        static void Test(InterfaceDefintion[] definitions)
+        static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable,
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly);
+
+        static readonly HashSet<string> embeddedTypes = new HashSet<string>(new string[]
         {
-            //foreach (var method in definitions.SelectMany(x => x.Methods))
-            //{
-            //    // method.ReturnType;
+            "short",
+            "int",
+            "long",
+            "ushort",
+            "uint",
+            "ulong",
+            "float",
+            "double",
+            "bool",
+            "byte",
+            "sbyte",
+            "decimal",
+            "char",
+            "string",
+            "System.Guid",
+            "System.TimeSpan",
+            "System.DateTime",
+            "System.DateTimeOffset",
 
-            //    method.UnwrappedOriginalResposneTypeSymbol.
+            "MessagePack.Nil",
 
-            //    foreach (var p in method.Parameters)
-            //    {
-            //        // p.TypeName
-            //    }
+            // and arrays
+            
+            "short[]",
+            "int[]",
+            "long[]",
+            "ushort[]",
+            "uint[]",
+            "ulong[]",
+            "float[]",
+            "double[]",
+            "bool[]",
+            "byte[]",
+            "sbyte[]",
+            "decimal[]",
+            "char[]",
+            "string[]",
+            "System.DateTime[]",
+            "System.ArraySegment<byte>",
+            "System.ArraySegment<byte>?",
+
+            // extensions
+
+            "UnityEngine.Vector2",
+            "UnityEngine.Vector3",
+            "UnityEngine.Vector4",
+            "UnityEngine.Quaternion",
+            "UnityEngine.Color",
+            "UnityEngine.Bounds",
+            "UnityEngine.Rect",
+
+            "System.Reactive.Unit",
+        });
 
 
-            //}
+        static void ExtractResolverInfo(InterfaceDefintion[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults)
+        {
+            var genericInfos = new List<GenericSerializationInfo>();
+            var enumInfos = new List<EnumSerializationInfo>();
 
+            foreach (var method in definitions.SelectMany(x => x.Methods))
+            {
+                IArrayTypeSymbol array = null;
+                INamedTypeSymbol enumType = null;
+                bool isCheckedParamType = false;
+
+                // return type
+                if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
+                {
+                    array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
+                    if (embeddedTypes.Contains(array.ToString())) continue;
+                    goto MAKE_ARRAY;
+                }
+                else if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
+                {
+                    enumType = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
+                    goto MAKE_ENUM;
+                }
+
+                PARAM_TYPE:
+                isCheckedParamType = true;
+
+                // paramter type
+                if (method.Parameters.Length == 1)
+                {
+                    var p = method.Parameters[0];
+                    if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
+                    {
+                        array = p.OriginalSymbol.Type as IArrayTypeSymbol;
+                        if (embeddedTypes.Contains(array.ToString())) continue;
+                        goto MAKE_ARRAY;
+                    }
+                    else if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
+                    {
+                        enumType = p.OriginalSymbol.Type as INamedTypeSymbol;
+                        goto MAKE_ENUM;
+                    }
+
+                }
+                else if (method.Parameters.Length != 0)
+                {
+                    // create dynamicargumenttuple
+                    var parameterArguments = method.Parameters.Select(x => x.OriginalSymbol)
+                       .Select(x => $"default({x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})")
+                       .ToArray();
+
+                    var typeArguments = method.Parameters.Select(x => x.OriginalSymbol).Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+                    var tupleInfo = new GenericSerializationInfo
+                    {
+                        FormatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{string.Join(", ", typeArguments)}>({string.Join(", ", parameterArguments)})",
+                        FullName = $"global::MagicOnion.DynamicArgumentTuple<{string.Join(", ", typeArguments)}>",
+                    };
+                    genericInfos.Add(tupleInfo);
+                }
+
+                continue;
+
+                MAKE_ARRAY:
+                var arrayInfo = new GenericSerializationInfo
+                {
+                    FormatterName = $"global::MessagePack.Formatters.ArrayFormatter<{array.ElementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
+                    FullName = array.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                };
+                genericInfos.Add(arrayInfo);
+
+                if (!isCheckedParamType)
+                {
+                    goto PARAM_TYPE;
+                }
+
+                continue;
+
+                MAKE_ENUM:
+                var enumInfo = new EnumSerializationInfo
+                {
+                    Name = enumType.Name,
+                    Namespace = enumType.ContainingNamespace.IsGlobalNamespace ? null : enumType.ContainingNamespace.ToDisplayString(),
+                    FullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                    UnderlyingType = enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat)
+                };
+                enumInfos.Add(enumInfo);
+
+                if (!isCheckedParamType)
+                {
+                    goto PARAM_TYPE;
+                }
+
+                continue;
+            }
+
+            genericInfoResults = genericInfos.Distinct().ToArray();
+            enumInfoResults = enumInfos.Distinct().ToArray();
         }
     }
 }

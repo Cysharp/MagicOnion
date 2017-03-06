@@ -159,16 +159,36 @@ namespace MagicOnion.CodeAnalysis
         {
             return FullName.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 
-    public class EnumSerializationInfo : IResolverRegisterInfo
+    public class EnumSerializationInfo : IResolverRegisterInfo, IEquatable<EnumSerializationInfo>
     {
         public string Namespace { get; set; }
         public string Name { get; set; }
         public string FullName { get; set; }
         public string UnderlyingType { get; set; }
 
-        public string FormatterName => Namespace + "." + Name + "Formatter";
+        public string FormatterName => Namespace + "." + Name + "Formatter()";
+
+        public bool Equals(EnumSerializationInfo other)
+        {
+            return FullName.Equals(other.FullName);
+        }
+
+        public override int GetHashCode()
+        {
+            return FullName.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 
 

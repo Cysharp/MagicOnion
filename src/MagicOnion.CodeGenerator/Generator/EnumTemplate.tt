@@ -8,7 +8,7 @@
 #pragma warning disable 414
 #pragma warning disable 168
 
-namespace <#= Namespace #>
+namespace MagicOnion.Formatters.<#= Namespace #>
 {
     using System;
     using MessagePack;

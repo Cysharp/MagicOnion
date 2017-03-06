@@ -164,7 +164,7 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write("();\r\n");
+            this.Write(";\r\n");
             
             #line 68 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
  } 

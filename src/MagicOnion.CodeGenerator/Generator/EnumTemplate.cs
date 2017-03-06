@@ -29,7 +29,7 @@ namespace MagicOnion.Generator
         public virtual string TransformText()
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 168\r\n\r\nnamespace ");
+                    " 414\r\n#pragma warning disable 168\r\n\r\nnamespace MagicOnion.Formatters.");
             
             #line 11 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
