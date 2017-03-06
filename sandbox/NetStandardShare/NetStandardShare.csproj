@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MessagePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MessagePack.0.6.1\lib\net45\MessagePack.dll</HintPath>
+      <HintPath>..\..\packages\MessagePack.0.7.2\lib\net45\MessagePack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -58,7 +58,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\..\packages\MessagePackAnalyzer.1.2.0\analyzers\dotnet\cs\MessagePackAnalyzer.dll" />
+    <Analyzer Include="..\..\packages\MessagePackAnalyzer.1.3.0\analyzers\dotnet\cs\MessagePackAnalyzer.dll" />
   </ItemGroup>
   <Import Project="..\SharedProjectLibrary\SharedProjectLibrary.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
