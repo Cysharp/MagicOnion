@@ -235,44 +235,43 @@ namespace MagicOnion.CodeGenerator
 
             foreach (var method in definitions.SelectMany(x => x.Methods))
             {
-                IArrayTypeSymbol array = null;
-                INamedTypeSymbol enumType = null;
-                bool isCheckedParamType = false;
-
-                // return type
                 if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
                 {
-                    array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
+                    var array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
                     if (embeddedTypes.Contains(array.ToString())) continue;
-                    goto MAKE_ARRAY;
+                    MakeArray(array, genericInfos);
+                    if (array.ElementType.TypeKind == TypeKind.Enum)
+                    {
+                        MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                    }
                 }
                 else if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
                 {
-                    enumType = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
-                    goto MAKE_ENUM;
+                    var enumType = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
+                    MakeEnum(enumType, enumInfos);
                 }
 
-                PARAM_TYPE:
-                isCheckedParamType = true;
-
                 // paramter type
-                if (method.Parameters.Length == 1)
+                foreach (var p in method.Parameters)
                 {
-                    var p = method.Parameters[0];
                     if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
                     {
-                        array = p.OriginalSymbol.Type as IArrayTypeSymbol;
+                        var array = p.OriginalSymbol.Type as IArrayTypeSymbol;
                         if (embeddedTypes.Contains(array.ToString())) continue;
-                        goto MAKE_ARRAY;
+                        MakeArray(array, genericInfos);
+                        if (array.ElementType.TypeKind == TypeKind.Enum)
+                        {
+                            MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                        }
                     }
                     else if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
                     {
-                        enumType = p.OriginalSymbol.Type as INamedTypeSymbol;
-                        goto MAKE_ENUM;
+                        var enumType = p.OriginalSymbol.Type as INamedTypeSymbol;
+                        MakeEnum(enumType, enumInfos);
                     }
-
                 }
-                else if (method.Parameters.Length != 0)
+
+                if (method.Parameters.Length != 0)
                 {
                     // create dynamicargumenttuple
                     var parameterArguments = method.Parameters.Select(x => x.OriginalSymbol)
@@ -288,44 +287,32 @@ namespace MagicOnion.CodeGenerator
                     };
                     genericInfos.Add(tupleInfo);
                 }
-
-                continue;
-
-                MAKE_ARRAY:
-                var arrayInfo = new GenericSerializationInfo
-                {
-                    FormatterName = $"global::MessagePack.Formatters.ArrayFormatter<{array.ElementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
-                    FullName = array.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                };
-                genericInfos.Add(arrayInfo);
-
-                if (!isCheckedParamType)
-                {
-                    goto PARAM_TYPE;
-                }
-
-                continue;
-
-                MAKE_ENUM:
-                var enumInfo = new EnumSerializationInfo
-                {
-                    Name = enumType.Name,
-                    Namespace = enumType.ContainingNamespace.IsGlobalNamespace ? null : enumType.ContainingNamespace.ToDisplayString(),
-                    FullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                    UnderlyingType = enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat)
-                };
-                enumInfos.Add(enumInfo);
-
-                if (!isCheckedParamType)
-                {
-                    goto PARAM_TYPE;
-                }
-
-                continue;
             }
 
             genericInfoResults = genericInfos.Distinct().ToArray();
             enumInfoResults = enumInfos.Distinct().ToArray();
+        }
+
+        static void MakeArray(IArrayTypeSymbol array, List<GenericSerializationInfo> list)
+        {
+            var arrayInfo = new GenericSerializationInfo
+            {
+                FormatterName = $"global::MessagePack.Formatters.ArrayFormatter<{array.ElementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
+                FullName = array.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            };
+            list.Add(arrayInfo);
+        }
+
+        static void MakeEnum(INamedTypeSymbol enumType, List<EnumSerializationInfo> list)
+        {
+            var enumInfo = new EnumSerializationInfo
+            {
+                Name = enumType.Name,
+                Namespace = enumType.ContainingNamespace.IsGlobalNamespace ? null : enumType.ContainingNamespace.ToDisplayString(),
+                FullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                UnderlyingType = enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat)
+            };
+            list.Add(enumInfo);
         }
     }
 }
