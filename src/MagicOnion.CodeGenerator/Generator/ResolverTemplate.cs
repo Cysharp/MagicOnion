@@ -43,8 +43,8 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write(" : global::MessagePack.IFormatterResolver\r\n    {\r\n        public static global::M" +
-                    "essagePack.IFormatterResolver Instance = new ");
+            this.Write(" : global::MessagePack.IFormatterResolver\r\n    {\r\n        public static readonly " +
+                    "global::MessagePack.IFormatterResolver Instance = new ");
             
             #line 18 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
