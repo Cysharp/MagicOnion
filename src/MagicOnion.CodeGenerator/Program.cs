@@ -271,7 +271,7 @@ namespace MagicOnion.CodeGenerator
                     }
                 }
 
-                if (method.Parameters.Length != 0)
+                if (method.Parameters.Length > 1)
                 {
                     // create dynamicargumenttuple
                     var parameterArguments = method.Parameters.Select(x => x.OriginalSymbol)
