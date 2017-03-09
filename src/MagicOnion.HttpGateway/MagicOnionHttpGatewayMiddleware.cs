@@ -66,7 +66,7 @@ namespace MagicOnion.HttpGateway
                                 if (stringValues.Count == 1 || collectionType == null)
                                 {
                                     var values = (string)stringValues;
-                                    if (p.ParameterType == typeof(DateTime) || p.ParameterType == typeof(DateTimeOffset))
+                                    if (p.ParameterType == typeof(DateTime) || p.ParameterType == typeof(DateTimeOffset) || p.ParameterType == typeof(DateTime?) || p.ParameterType == typeof(DateTimeOffset?))
                                     {
                                         values = "\"" + values + "\"";
                                     }
@@ -80,7 +80,7 @@ namespace MagicOnion.HttpGateway
                                     {
                                         serializeTarget = "[" + string.Join(", ", stringValues.Select(x => JsonConvert.SerializeObject(x))) + "]"; // escape serialzie
                                     }
-                                    else if (collectionType.IsEnum || collectionType == typeof(DateTime) || collectionType == typeof(DateTimeOffset))
+                                    else if (collectionType.IsEnum || collectionType == typeof(DateTime) || collectionType == typeof(DateTimeOffset) || collectionType == typeof(DateTime?) || collectionType == typeof(DateTimeOffset?))
                                     {
                                         serializeTarget = "[" + string.Join(", ", stringValues.Select(x => "\"" + x + "\"")) + "]";
                                     }

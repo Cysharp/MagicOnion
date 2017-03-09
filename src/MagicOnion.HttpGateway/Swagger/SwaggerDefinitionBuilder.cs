@@ -121,11 +121,11 @@ namespace MagicOnion.HttpGateway.Swagger
             var parameters = parameterInfos
                 .Select(x =>
                 {
-                    var parameterXmlComment = x.ParameterType.Name;
+                    var parameterXmlComment = UnwrapTypeName(x.ParameterType);
                     if (xmlComment != null)
                     {
                         xmlComment.Parameters.TryGetValue(x.Name, out parameterXmlComment);
-                        parameterXmlComment = x.ParameterType.Name + " " + parameterXmlComment;
+                        parameterXmlComment = UnwrapTypeName(x.ParameterType) + " " + parameterXmlComment;
                     }
 
                     var defaultValue = x.DefaultValue;
@@ -263,7 +263,7 @@ namespace MagicOnion.HttpGateway.Swagger
                             Schema = new Schema
                             {
                                 type = swaggerDataType,
-                                description = memberType.Name,
+                                description = UnwrapTypeName(memberType),
                                 @enum = schemaEnum,
                                 items = items
                             }
@@ -403,6 +403,15 @@ namespace MagicOnion.HttpGateway.Swagger
                 default:
                     return "object";
             }
+        }
+
+        static string UnwrapTypeName(Type t)
+        {
+            if (t == typeof(void)) return "void";
+            if (!t.IsGenericType) return t.Name;
+
+            var innerFormat = string.Join(", ", t.GetGenericArguments().Select(x => UnwrapTypeName(x)));
+            return Regex.Replace(t.GetGenericTypeDefinition().Name, @"`.+$", "") + "&lt;" + innerFormat + "&gt;";
         }
 
         class Item1EqualityCompaerer<T1, T2> : EqualityComparer<Tuple<T1, T2>>
