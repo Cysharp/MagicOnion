@@ -26,7 +26,7 @@ namespace MagicOnion
         {
             if (await inner.MoveNext(cancellationToken))
             {
-                this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
+                this.Current = LZ4MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
                 return true;
             }
             else
@@ -72,7 +72,7 @@ namespace MagicOnion
 
         public Task WriteAsync(T message)
         {
-            var bytes = MessagePackSerializer.Serialize(message, resolver);
+            var bytes = LZ4MessagePackSerializer.Serialize(message, resolver);
             return inner.WriteAsync(bytes);
         }
     }

@@ -33,6 +33,123 @@ namespace MagicOnion
 #pragma warning disable 414
 #pragma warning disable 168
 
+namespace MagicOnion.Resolvers
+{
+    using System;
+    using MessagePack;
+
+    public class MagicOnionResolver : global::MessagePack.IFormatterResolver
+    {
+        public static readonly global::MessagePack.IFormatterResolver Instance = new MagicOnionResolver();
+
+        MagicOnionResolver()
+        {
+
+        }
+
+        public global::MessagePack.Formatters.IMessagePackFormatter<T> GetFormatter<T>()
+        {
+            return FormatterCache<T>.formatter;
+        }
+
+        static class FormatterCache<T>
+        {
+            public static readonly global::MessagePack.Formatters.IMessagePackFormatter<T> formatter;
+
+            static FormatterCache()
+            {
+                var f = MagicOnionResolverGetFormatterHelper.GetFormatter(typeof(T));
+                if (f != null)
+                {
+                    formatter = (global::MessagePack.Formatters.IMessagePackFormatter<T>)f;
+                }
+            }
+        }
+    }
+
+    internal static class MagicOnionResolverGetFormatterHelper
+    {
+        static readonly global::System.Collections.Generic.Dictionary<Type, int> lookup;
+
+        static MagicOnionResolverGetFormatterHelper()
+        {
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(10)
+            {
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>), 0 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 1 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>), 2 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string>), 3 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 4 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>), 5 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 6 },
+                {typeof(global::Sandbox.ChatRoomResponse[]), 7 },
+                {typeof(global::SharedLibrary.MyEnum[]), 8 },
+                {typeof(global::SharedLibrary.MyEnum), 9 },
+            };
+        }
+
+        internal static object GetFormatter(Type t)
+        {
+            int key;
+            if (!lookup.TryGetValue(t, out key)) return null;
+
+            switch (key)
+            {
+                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset));
+                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
+                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(default(int), default(int), default(string), default(global::SharedLibrary.MyEnum), default(global::SharedLibrary.MyStructResponse), default(ulong), default(global::SharedLibrary.MyRequest));
+                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string>(default(int), default(int), default(string));
+                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
+                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[]));
+                case 6: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
+                case 7: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.ChatRoomResponse>();
+                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::SharedLibrary.MyEnum>();
+                case 9: return new MagicOnion.Formatters.SharedLibrary.MyEnumFormatter();
+                default: return null;
+            }
+        }
+    }
+}
+
+#pragma warning disable 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+
+namespace MagicOnion.Formatters.SharedLibrary
+{
+    using System;
+    using MessagePack;
+
+    public sealed class MyEnumFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedLibrary.MyEnum>
+    {
+        public int Serialize(ref byte[] bytes, int offset, global::SharedLibrary.MyEnum value, global::MessagePack.IFormatterResolver formatterResolver)
+        {
+            return MessagePackBinary.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+        
+        public global::SharedLibrary.MyEnum Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
+        {
+            return (global::SharedLibrary.MyEnum)MessagePackBinary.ReadInt32(bytes, offset, out readSize);
+        }
+    }
+
+
+}
+
+#pragma warning disable 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+
 namespace Sandbox.ConsoleServer {
     using MagicOnion;
     using MagicOnion.Client;
@@ -216,14 +333,14 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<global::SharedLibrary.MyHugeResponse> Unary1(int x, int y, string z = "unknown", global::SharedLibrary.MyEnum e = SharedLibrary.MyEnum.Orange, global::SharedLibrary.MyStructResponse soho = default(global::SharedLibrary.MyStructResponse), ulong zzz = 9, global::SharedLibrary.MyRequest req = null)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(x, y, z, e, soho, zzz, req), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(x, y, z, e, soho, zzz, req), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(Unary1Method, base.host, base.option, __request);
             return new UnaryResult<global::SharedLibrary.MyHugeResponse>(__callResult, base.resolver);
         }
 
         public UnaryResult<global::SharedLibrary.MyResponse> Unary2(global::SharedLibrary.MyRequest req)
         {
-            var __request = MessagePackSerializer.Serialize(req, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(req, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(Unary2Method, base.host, base.option, __request);
             return new UnaryResult<global::SharedLibrary.MyResponse>(__callResult, base.resolver);
         }
@@ -237,21 +354,21 @@ namespace Sandbox.ConsoleServer {
 
         public UnaryResult<global::SharedLibrary.MyStructResponse> Unary5(global::SharedLibrary.MyStructRequest req)
         {
-            var __request = MessagePackSerializer.Serialize(req, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(req, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(Unary5Method, base.host, base.option, __request);
             return new UnaryResult<global::SharedLibrary.MyStructResponse>(__callResult, base.resolver);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult1(int x, int y, string z = "unknown")
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, string>(x, y, z), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, string>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult1Method, base.host, base.option, __request);
             return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, base.resolver);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult2(global::SharedLibrary.MyRequest req)
         {
-            var __request = MessagePackSerializer.Serialize(req, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(req, base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult2Method, base.host, base.option, __request);
             return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, base.resolver);
         }
@@ -272,28 +389,29 @@ namespace Sandbox.ConsoleServer {
 
         public ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req)
         {
-            var __request = MessagePackSerializer.Serialize(req, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(req, base.resolver);
+
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult5Method, base.host, base.option, __request);
             return new ServerStreamingResult<global::SharedLibrary.MyStructResponse>(__callResult, base.resolver);
         }
 
         public UnaryResult<bool> UnaryS1(global::System.DateTime dt, global::System.DateTimeOffset dt2)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>(dt, dt2), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>(dt, dt2), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(UnaryS1Method, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, base.resolver);
         }
 
         public UnaryResult<bool> UnaryS2(int[] arrayPattern)
         {
-            var __request = MessagePackSerializer.Serialize(arrayPattern, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(arrayPattern, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(UnaryS2Method, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, base.resolver);
         }
 
         public UnaryResult<bool> UnaryS3(int[] arrayPattern1, string[] arrayPattern2, global::SharedLibrary.MyEnum[] arrayPattern3)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>(arrayPattern1, arrayPattern2, arrayPattern3), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>(arrayPattern1, arrayPattern2, arrayPattern3), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(UnaryS3Method, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, base.resolver);
         }
@@ -345,14 +463,14 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<global::Sandbox.ChatRoomResponse> CreateNewRoom(string roomName, string nickName)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomName, nickName), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomName, nickName), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(CreateNewRoomMethod, base.host, base.option, __request);
             return new UnaryResult<global::Sandbox.ChatRoomResponse>(__callResult, base.resolver);
         }
 
         public UnaryResult<global::Sandbox.ChatRoomResponse> Join(string roomId, string nickName)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomId, nickName), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomId, nickName), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(JoinMethod, base.host, base.option, __request);
             return new UnaryResult<global::Sandbox.ChatRoomResponse>(__callResult, base.resolver);
         }
@@ -366,14 +484,14 @@ namespace Sandbox.ConsoleServer {
 
         public UnaryResult<bool> Leave(string roomId)
         {
-            var __request = MessagePackSerializer.Serialize(roomId, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(roomId, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(LeaveMethod, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, base.resolver);
         }
 
         public UnaryResult<bool> SendMessage(string roomId, string message)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomId, message), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, string>(roomId, message), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(SendMessageMethod, base.host, base.option, __request);
             return new UnaryResult<bool>(__callResult, base.resolver);
         }
@@ -440,7 +558,7 @@ namespace Sandbox.ConsoleServer {
 
         public UnaryResult<global::MessagePack.Nil> TestSend(string connectionId)
         {
-            var __request = MessagePackSerializer.Serialize(connectionId, base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(connectionId, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(TestSendMethod, base.host, base.option, __request);
             return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
         }
@@ -522,7 +640,7 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<int> Unary1Async(int x, int y)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(Unary1AsyncMethod, base.host, base.option, __request);
             return new UnaryResult<int>(__callResult, base.resolver);
         }
@@ -535,7 +653,7 @@ namespace Sandbox.ConsoleServer {
 
         public ServerStreamingResult<int> ServerStreamingAsync(int x, int y, int z)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingAsyncMethod, base.host, base.option, __request);
             return new ServerStreamingResult<int>(__callResult, base.resolver);
         }
@@ -589,14 +707,14 @@ namespace Sandbox.ConsoleServer {
    
         public UnaryResult<string> SumAsync(int x, int y)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(SumAsyncMethod, base.host, base.option, __request);
             return new UnaryResult<string>(__callResult, base.resolver);
         }
 
         public UnaryResult<string> SumAsync2(int x, int y)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(SumAsync2Method, base.host, base.option, __request);
             return new UnaryResult<string>(__callResult, base.resolver);
         }
@@ -609,14 +727,14 @@ namespace Sandbox.ConsoleServer {
 
         public ServerStreamingResult<string> StreamingTwo(int x, int y, int z)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(StreamingTwoMethod, base.host, base.option, __request);
             return new ServerStreamingResult<string>(__callResult, base.resolver);
         }
 
         public ServerStreamingResult<string> StreamingTwo2(int x, int y, int z = 9999)
         {
-            var __request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(StreamingTwo2Method, base.host, base.option, __request);
             return new ServerStreamingResult<string>(__callResult, base.resolver);
         }

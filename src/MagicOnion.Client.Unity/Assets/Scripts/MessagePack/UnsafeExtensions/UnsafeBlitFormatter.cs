@@ -1,4 +1,4 @@
-﻿#if UNSAFE
+﻿#if ENABLE_UNSAFE_MSGPACK
 
 using MessagePack.Formatters;
 using System;

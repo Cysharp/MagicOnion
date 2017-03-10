@@ -90,7 +90,7 @@ namespace MagicOnion.Server
             {
                 var data = inner.Current;
                 logger.ReadFromStream(context, data, false);
-                this.Current = MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.FormatterResolver);
+                this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.FormatterResolver);
                 return true;
             }
             else
@@ -123,7 +123,7 @@ namespace MagicOnion.Server
 
         public ClientStreamingResult<TRequest, TResponse> Result(TResponse result)
         {
-            var bytes = MessagePackSerializer.Serialize<TResponse>(result, context.FormatterResolver);
+            var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result, context.FormatterResolver);
             context.Result = bytes;
 
             return default(ClientStreamingResult<TRequest, TResponse>); // dummy
@@ -167,7 +167,7 @@ namespace MagicOnion.Server
 
         public Task WriteAsync(TResponse message)
         {
-            var bytes = MessagePackSerializer.Serialize(message, context.FormatterResolver);
+            var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
             logger.WriteToStream(context, bytes);
             return inner.WriteAsync(bytes);
         }
@@ -213,7 +213,7 @@ namespace MagicOnion.Server
             {
                 var data = innerReader.Current;
                 logger.ReadFromStream(context, data, false);
-                this.Current = MessagePackSerializer.Deserialize<TRequest>(data, context.FormatterResolver);
+                this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(data, context.FormatterResolver);
                 return true;
             }
             else
@@ -250,7 +250,7 @@ namespace MagicOnion.Server
         /// </summary>
         public Task WriteAsync(TResponse message)
         {
-            var bytes = MessagePackSerializer.Serialize(message, context.FormatterResolver);
+            var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
             logger.WriteToStream(context, bytes);
             return innerWriter.WriteAsync(bytes);
         }

@@ -2,20 +2,35 @@
 
 namespace MessagePack.Resolvers
 {
-    public class DefaultResolver : IFormatterResolver
+    /// <summary>
+    /// Default composited resolver, builtin -> dynamic enum -> dynamic generic -> dynamic union -> dynamic object.
+    /// </summary>
+    public class StandardResolver : IFormatterResolver
     {
-        public static IFormatterResolver Instance = new DefaultResolver();
+        public static IFormatterResolver Instance = new StandardResolver();
 
         static readonly IFormatterResolver[] resolvers = new[]
         {
             BuiltinResolver.Instance, // Try Builtin
+
+#if !NETSTANDARD1_4
+            MessagePack.Unity.UnityResolver.Instance,
+#if ENABLE_UNSAFE_MSGPACK
+            MessagePack.Unity.Extension.UnityBlitResolver.Instance,
+#endif
+#endif
+
+#if !ENABLE_IL2CPP
+
             DynamicEnumResolver.Instance, // Try Enum
             DynamicGenericResolver.Instance, // Try Array, Tuple, Collection
             DynamicUnionResolver.Instance, // Try Union(Interface)
             DynamicObjectResolver.Instance // Try Object
+
+#endif
         };
 
-        DefaultResolver()
+        StandardResolver()
         {
         }
 
@@ -43,17 +58,17 @@ namespace MessagePack.Resolvers
         }
     }
 
-    public class DefaultWithContractlessResolver : IFormatterResolver
+    public class ContractlessStandardResolver : IFormatterResolver
     {
-        public static IFormatterResolver Instance = new DefaultWithContractlessResolver();
+        public static IFormatterResolver Instance = new ContractlessStandardResolver();
 
         static readonly IFormatterResolver[] resolvers = new[]
         {
-            DefaultResolver.Instance,
+            StandardResolver.Instance,
             DynamicContractlessObjectResolver.Instance,
         };
 
-        DefaultWithContractlessResolver()
+        ContractlessStandardResolver()
         {
         }
 

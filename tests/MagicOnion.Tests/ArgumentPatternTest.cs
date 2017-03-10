@@ -312,7 +312,7 @@ namespace MagicOnion.Tests
                 var tuple = new DynamicArgumentTuple<int, int>(x, y);
 
                 var method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-                var request = MessagePackSerializer.Serialize(tuple);
+                var request = LZ4MessagePackSerializer.Serialize(tuple);
 
                 var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 

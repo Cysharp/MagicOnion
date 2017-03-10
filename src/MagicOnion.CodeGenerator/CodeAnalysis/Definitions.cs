@@ -98,13 +98,13 @@ namespace MagicOnion.CodeAnalysis
             }
             else if (Parameters.Length == 1)
             {
-                return $"MessagePackSerializer.Serialize({Parameters[0].ParameterName}, base.resolver)";
+                return $"LZ4MessagePackSerializer.Serialize({Parameters[0].ParameterName}, base.resolver)";
             }
             else
             {
                 var typeArgs = string.Join(", ", Parameters.Select(x => x.TypeName));
                 var parameterNames = string.Join(", ", Parameters.Select(x => x.ParameterName));
-                return $"MessagePackSerializer.Serialize(new DynamicArgumentTuple<{typeArgs}>({parameterNames}), base.resolver)";
+                return $"LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<{typeArgs}>({parameterNames}), base.resolver)";
             }
         }
 

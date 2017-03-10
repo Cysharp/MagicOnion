@@ -15,12 +15,13 @@ namespace MagicOnion.Utils
         public DynamicAssembly(string moduleName)
         {
             this.moduleName = moduleName;
-#if DEBUG
+#if ENABLE_SAVE_ASSEMBLY
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
+            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
 #else
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
+            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
 #endif
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
         }
 
         public AssemblyBuilder Save()

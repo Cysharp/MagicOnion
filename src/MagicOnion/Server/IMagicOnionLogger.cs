@@ -143,7 +143,7 @@ namespace MagicOnion.Server
         string ToJson(byte[] bytes)
         {
             if (bytes == null || bytes.Length == 0) return "";
-            return "dump:" + MessagePackSerializer.ToJson(bytes);
+            return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
         }
 
         // enum.ToString is slow.

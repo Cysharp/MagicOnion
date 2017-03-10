@@ -39,7 +39,7 @@ namespace MagicOnion.Server
         public Func<object, byte> serialize;
 
         // reflection cache
-        static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
+        static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
 
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
@@ -84,7 +84,7 @@ namespace MagicOnion.Server
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
-                    //      var request = MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
+                    //      var request = LZ4MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
                     //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     // };
                     {
@@ -151,12 +151,12 @@ namespace MagicOnion.Server
         // non-filtered.
         public byte[] BoxedSerialize(object requestValue)
         {
-            return MessagePackSerializer.NonGeneric.Serialize(RequestType, requestValue, resolver);
+            return LZ4MessagePackSerializer.NonGeneric.Serialize(RequestType, requestValue, resolver);
         }
 
         public object BoxedDeserialize(byte[] responseValue)
         {
-            return MessagePackSerializer.NonGeneric.Deserialize(UnwrappedResponseType, responseValue, resolver);
+            return LZ4MessagePackSerializer.NonGeneric.Deserialize(UnwrappedResponseType, responseValue, resolver);
         }
 
         static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
