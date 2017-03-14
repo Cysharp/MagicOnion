@@ -227,6 +227,11 @@ namespace MagicOnion.CodeGenerator
             "System.Reactive.Unit",
         });
 
+        static readonly Dictionary<string, string> additionalSupportGenericFormatter = new Dictionary<string, string>
+        {
+            {"System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatter<TREPLACE>()" },
+            {"System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter<TREPLACE>()"},
+        };
 
         static void ExtractResolverInfo(InterfaceDefintion[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults)
         {
@@ -235,6 +240,8 @@ namespace MagicOnion.CodeGenerator
 
             foreach (var method in definitions.SelectMany(x => x.Methods))
             {
+                var namedResponse = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
+
                 if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
                 {
                     var array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
@@ -250,10 +257,35 @@ namespace MagicOnion.CodeGenerator
                     var enumType = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
                     MakeEnum(enumType, enumInfos);
                 }
+                else if(namedResponse != null && namedResponse.IsGenericType)
+                {
+                    // generic type handling
+                    var genericType = namedResponse.ConstructUnboundGenericType();
+                    var genericTypeString = genericType.ToDisplayString();
+                    var fullName = namedResponse.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                    string formatterString;
+
+                    if (genericTypeString == "T?")
+                    {
+                        var more = namedResponse.TypeArguments[0];
+                        if (more.TypeKind == TypeKind.Enum)
+                        {
+                            MakeEnum(more as INamedTypeSymbol, enumInfos);
+                        }
+
+                        MakeNullable(namedResponse, genericInfos);
+                    }
+                    else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out formatterString))
+                    {
+                        MakeGeneric(namedResponse, formatterString, genericInfos);
+                    }
+                }
 
                 // paramter type
                 foreach (var p in method.Parameters)
                 {
+                    namedResponse = p.OriginalSymbol.Type as INamedTypeSymbol;
+
                     if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
                     {
                         var array = p.OriginalSymbol.Type as IArrayTypeSymbol;
@@ -268,6 +300,29 @@ namespace MagicOnion.CodeGenerator
                     {
                         var enumType = p.OriginalSymbol.Type as INamedTypeSymbol;
                         MakeEnum(enumType, enumInfos);
+                    }
+                    else if (namedResponse != null && namedResponse.IsGenericType)
+                    {
+                        // generic type handling
+                        var genericType = namedResponse.ConstructUnboundGenericType();
+                        var genericTypeString = genericType.ToDisplayString();
+                        var fullName = namedResponse.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                        string formatterString;
+
+                        if (genericTypeString == "T?")
+                        {
+                            var more = namedResponse.TypeArguments[0];
+                            if (more.TypeKind == TypeKind.Enum)
+                            {
+                                MakeEnum(more as INamedTypeSymbol, enumInfos);
+                            }
+
+                            MakeNullable(namedResponse, genericInfos);
+                        }
+                        else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out formatterString))
+                        {
+                            MakeGeneric(namedResponse, formatterString, genericInfos);
+                        }
                     }
                 }
 
@@ -313,6 +368,29 @@ namespace MagicOnion.CodeGenerator
                 UnderlyingType = enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat)
             };
             list.Add(enumInfo);
+        }
+
+        static void MakeNullable(INamedTypeSymbol type, List<GenericSerializationInfo> list)
+        {
+            var info = new GenericSerializationInfo
+            {
+                FormatterName = $"global::MessagePack.Formatters.NullableFormatter<{type.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
+                FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            };
+            list.Add(info);
+        }
+
+        static void MakeGeneric(INamedTypeSymbol type, string formatterTemplate, List<GenericSerializationInfo> list)
+        {
+            var typeArgs = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+            var f = formatterTemplate.Replace("TREPLACE", typeArgs);
+
+            var info = new GenericSerializationInfo
+            {
+                FormatterName = f,
+                FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            };
+            list.Add(info);
         }
     }
 }

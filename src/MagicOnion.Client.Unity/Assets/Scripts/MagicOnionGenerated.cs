@@ -25,6 +25,7 @@ namespace MagicOnion
             MagicOnionClientRegistry<Sandbox.ConsoleServer.ISendMetadata>.Register((x, y) => new Sandbox.ConsoleServer.ISendMetadataClient(x, y));
             MagicOnionClientRegistry<Sandbox.ConsoleServer.IStandard>.Register((x, y) => new Sandbox.ConsoleServer.IStandardClient(x, y));
             MagicOnionClientRegistry<Sandbox.ConsoleServer.IMyFirstService>.Register((x, y) => new Sandbox.ConsoleServer.IMyFirstServiceClient(x, y));
+            MagicOnionClientRegistry<Sandbox.ConsoleServer.ITetDefinition>.Register((x, y) => new Sandbox.ConsoleServer.ITetDefinitionClient(x, y));
         }
     }
 }
@@ -73,18 +74,22 @@ namespace MagicOnion.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(10)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(14)
             {
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>), 0 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 1 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>), 2 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string>), 3 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 4 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>), 5 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 6 },
-                {typeof(global::Sandbox.ChatRoomResponse[]), 7 },
-                {typeof(global::SharedLibrary.MyEnum[]), 8 },
-                {typeof(global::SharedLibrary.MyEnum), 9 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, int>>), 0 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>), 1 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 2 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>), 3 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string>), 4 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 5 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>), 6 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 7 },
+                {typeof(global::Sandbox.ChatRoomResponse[]), 8 },
+                {typeof(global::SharedLibrary.MyEnum?), 9 },
+                {typeof(global::SharedLibrary.MyEnum[]), 10 },
+                {typeof(global::System.Collections.Generic.Dictionary<int, int>), 11 },
+                {typeof(global::System.Collections.Generic.List<int>), 12 },
+                {typeof(global::SharedLibrary.MyEnum), 13 },
             };
         }
 
@@ -95,16 +100,20 @@ namespace MagicOnion.Resolvers
 
             switch (key)
             {
-                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset));
-                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
-                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(default(int), default(int), default(string), default(global::SharedLibrary.MyEnum), default(global::SharedLibrary.MyStructResponse), default(ulong), default(global::SharedLibrary.MyRequest));
-                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string>(default(int), default(int), default(string));
-                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
-                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[]));
-                case 6: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
-                case 7: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.ChatRoomResponse>();
-                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::SharedLibrary.MyEnum>();
-                case 9: return new MagicOnion.Formatters.SharedLibrary.MyEnumFormatter();
+                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, int>>(default(global::System.Collections.Generic.List<int>), default(global::System.Collections.Generic.Dictionary<int, int>));
+                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.DateTime, global::System.DateTimeOffset>(default(global::System.DateTime), default(global::System.DateTimeOffset));
+                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
+                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string, global::SharedLibrary.MyEnum, global::SharedLibrary.MyStructResponse, ulong, global::SharedLibrary.MyRequest>(default(int), default(int), default(string), default(global::SharedLibrary.MyEnum), default(global::SharedLibrary.MyStructResponse), default(ulong), default(global::SharedLibrary.MyRequest));
+                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string>(default(int), default(int), default(string));
+                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
+                case 6: return new global::MagicOnion.DynamicArgumentTupleFormatter<int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[]));
+                case 7: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
+                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.ChatRoomResponse>();
+                case 9: return new global::MessagePack.Formatters.NullableFormatter<global::SharedLibrary.MyEnum>();
+                case 10: return new global::MessagePack.Formatters.ArrayFormatter<global::SharedLibrary.MyEnum>();
+                case 11: return new global::MessagePack.Formatters.DictionaryFormatter<int, int>();
+                case 12: return new global::MessagePack.Formatters.ListFormatter<int>();
+                case 13: return new MagicOnion.Formatters.SharedLibrary.MyEnumFormatter();
                 default: return null;
             }
         }
@@ -251,6 +260,15 @@ namespace Sandbox.ConsoleServer {
 
 
 
+    public interface ITetDefinition : MagicOnion.IService<Sandbox.ConsoleServer.ITetDefinition>
+    {
+   
+        UnaryResult<global::SharedLibrary.MyEnum?> Test(global::System.Collections.Generic.List<int> l, global::System.Collections.Generic.Dictionary<int, int> d);
+    }
+
+
+
+
     public interface IChatRoomCommand
     {
    
@@ -390,7 +408,6 @@ namespace Sandbox.ConsoleServer {
         public ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req)
         {
             var __request = LZ4MessagePackSerializer.Serialize(req, base.resolver);
-
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult5Method, base.host, base.option, __request);
             return new ServerStreamingResult<global::SharedLibrary.MyStructResponse>(__callResult, base.resolver);
         }
@@ -743,6 +760,44 @@ namespace Sandbox.ConsoleServer {
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(StreamingThreeMethod, base.host, base.option);
             return new DuplexStreamingResult<int, string>(__callResult, base.resolver);
+        }
+
+    }
+
+
+    public class ITetDefinitionClient : MagicOnionClientBase<ITetDefinition>, ITetDefinition
+    {
+        static readonly Method<byte[], byte[]> TestMethod;
+
+        static ITetDefinitionClient()
+        {
+            TestMethod = new Method<byte[], byte[]>(MethodType.Unary, "ITetDefinition", "Test", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+        }
+
+        ITetDefinitionClient()
+        {
+        }
+
+        public ITetDefinitionClient(CallInvoker callInvoker, IFormatterResolver resolver)
+            : base(callInvoker, resolver)
+        {
+        }
+
+        protected override MagicOnionClientBase<ITetDefinition> Clone()
+        {
+            var clone = new ITetDefinitionClient();
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            clone.resolver = this.resolver;
+            return clone;
+        }
+   
+        public UnaryResult<global::SharedLibrary.MyEnum?> Test(global::System.Collections.Generic.List<int> l, global::System.Collections.Generic.Dictionary<int, int> d)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, int>>(l, d), base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(TestMethod, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyEnum?>(__callResult, base.resolver);
         }
 
     }
