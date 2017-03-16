@@ -43,7 +43,7 @@ namespace MagicOnion.Server.EmbeddedFilters
                     {
                         sb.AppendLine(lineSplit[i]);
                     }
-                    if (sb.Length >= 10000)
+                    if (sb.Length >= 6000)
                     {
                         sb.AppendLine("----Omit Message(message size is too long)----");
                         break;
