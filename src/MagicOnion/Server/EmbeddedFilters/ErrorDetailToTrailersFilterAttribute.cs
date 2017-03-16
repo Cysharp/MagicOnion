@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,14 +44,16 @@ namespace MagicOnion.Server.EmbeddedFilters
                     {
                         sb.AppendLine(lineSplit[i]);
                     }
-                    if (sb.Length >= 6000)
+                    if (sb.Length >= 10000)
                     {
                         sb.AppendLine("----Omit Message(message size is too long)----");
                         break;
                     }
                 }
                 var str = sb.ToString();
-                context.CallContext.ResponseTrailers.Add(ExceptionDetailKey, Encoding.UTF8.GetBytes(str));
+
+                var bytes = LZ4MessagePackSerializer.Serialize(str);
+                context.CallContext.ResponseTrailers.Add(ExceptionDetailKey, bytes);
 
                 throw;
             }
