@@ -87,6 +87,7 @@ namespace MagicOnion.Server
                     //      var request = LZ4MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
                     //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     // };
+                    try
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -122,15 +123,20 @@ namespace MagicOnion.Server
 
                         this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
                     }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
+                    }
                     break;
                 case MethodType.ClientStreaming:
                 case MethodType.DuplexStreaming:
                     if (parameters.Length != 0)
                     {
-                        throw new InvalidOperationException($"{MethodType} does not support method parameters. If you need to send initial parameter, use header instead.");
+                        throw new InvalidOperationException($"{MethodType} does not support method parameters. If you need to send initial parameter, use header instead. Path:{ToString()}");
                     }
 
                     // (ServiceContext context) => new FooService() { Context = context }.Bar();
+                    try
                     {
                         var body = Expression.Call(instance, methodInfo);
                         if (!responseIsTask)
@@ -142,9 +148,13 @@ namespace MagicOnion.Server
 
                         this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
                     }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
+                    }
                     break;
                 default:
-                    throw new InvalidOperationException("Unknown MethodType:" + MethodType);
+                    throw new InvalidOperationException("Unknown MethodType:" + MethodType + $"Path:{ToString()}");
             }
         }
 
