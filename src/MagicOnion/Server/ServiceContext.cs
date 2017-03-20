@@ -37,8 +37,9 @@ namespace MagicOnion.Server
         /// <summary>Raw gRPC Context.</summary>
         public ServerCallContext CallContext { get; private set; }
 
+        public IFormatterResolver FormatterResolver { get; private set; }
+
         // internal, used from there methods.
-        internal IFormatterResolver FormatterResolver { get; private set; }
         internal byte[] Request { get; set; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
@@ -89,13 +90,13 @@ namespace MagicOnion.Server
             if (await inner.MoveNext(cancellationToken))
             {
                 var data = inner.Current;
-                logger.ReadFromStream(context, data, false);
+                logger.ReadFromStream(context, data, typeof(TRequest), false);
                 this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.FormatterResolver);
                 return true;
             }
             else
             {
-                logger.ReadFromStream(context, emptyBytes, true);
+                logger.ReadFromStream(context, emptyBytes, typeof(Nil), true);
                 return false;
             }
         }
@@ -168,7 +169,7 @@ namespace MagicOnion.Server
         public Task WriteAsync(TResponse message)
         {
             var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
-            logger.WriteToStream(context, bytes);
+            logger.WriteToStream(context, bytes, typeof(TResponse));
             return inner.WriteAsync(bytes);
         }
 
@@ -212,13 +213,13 @@ namespace MagicOnion.Server
             if (await innerReader.MoveNext(cancellationToken))
             {
                 var data = innerReader.Current;
-                logger.ReadFromStream(context, data, false);
+                logger.ReadFromStream(context, data, typeof(TRequest), false);
                 this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(data, context.FormatterResolver);
                 return true;
             }
             else
             {
-                logger.ReadFromStream(context, emptyBytes, true);
+                logger.ReadFromStream(context, emptyBytes, typeof(Nil), true);
                 return false;
             }
         }
@@ -251,7 +252,7 @@ namespace MagicOnion.Server
         public Task WriteAsync(TResponse message)
         {
             var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
-            logger.WriteToStream(context, bytes);
+            logger.WriteToStream(context, bytes, typeof(TResponse));
             return innerWriter.WriteAsync(bytes);
         }
 

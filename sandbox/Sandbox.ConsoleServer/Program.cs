@@ -40,7 +40,7 @@ namespace MagicOnion.ConsoleServer
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
             {
                 // MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
-                MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithDataDump(),
+                MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 GlobalFilters = new MagicOnionFilterAttribute[]
                 {
                     new MagicOnion.Server.EmbeddedFilters.ErrorDetailToTrailersFilterAttribute()
