@@ -91,7 +91,7 @@ static async void ClientImpl()
 }
 ```
 
-MagicOnion allows primitive, multiple request value. Complex type is serialized by [ZeroFormatter](https://github.com/neuecc/ZeroFormatter) so type should follow ZeroFormatter rules. 
+MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules. 
 
 Project Structure
 ---
@@ -326,7 +326,7 @@ Open `http://localhost:5432`, you can see swagger view.
 
 Unity Supports
 ---
-Code is located in `src/MagicOnion.Client.Unity/Assets/Scripts/gRPC` (port of Grpc.Core) and `src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion` (MagicOnion Runtime). There are require [ZeroFormatter](https://github.com/neuecc/ZeroFormatter) and [UniRx](https://github.com/neuecc/UniRx).
+Code is located in `src/MagicOnion.Client.Unity/Assets/Scripts/gRPC` (port of Grpc.Core) and `src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion` (MagicOnion Runtime). There are require [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) and [UniRx](https://github.com/neuecc/UniRx).
 
 MagicOnion's Unity client works on all platforms(PC, Android, iOS, etc...). But it can 'not' use dynamic client generation due to IL2CPP issue. But pre code generate helps it. `moc.exe`is using Roslyn so analyze source code, pass the target csproj.
 
