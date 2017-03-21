@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
+using MagicOnion.CompilerServices;
 using MessagePack;
-using MessagePack.Formatters;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -9,6 +9,7 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncUnaryCall.
     /// </summary>
+    [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder<>))]
     public struct UnaryResult<TResponse>
     {
         internal readonly bool  hasRawValue; // internal

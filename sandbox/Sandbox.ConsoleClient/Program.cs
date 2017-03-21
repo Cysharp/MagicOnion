@@ -25,6 +25,9 @@ namespace MagicOnion.ConsoleClient
 
                 Console.WriteLine("Client:::");
 
+                UnaryCSharpSevenTest().GetAwaiter().GetResult();
+                return;
+
                 //GrpcEnvironment.SetThreadPoolSize(1000);
                 //GrpcEnvironment.SetCompletionQueueCount(1000);
 
@@ -37,7 +40,7 @@ namespace MagicOnion.ConsoleClient
 
                 var c2 = MagicOnionClient.Create<IArgumentPattern>(channel);
                 var c3 = MagicOnionClient.Create<Sandbox.ConsoleServer.IChatRoomService>(channel);
-                var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard > (channel);
+                var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard>(channel);
 
                 // TestHeartbeat(channel).GetAwaiter().GetResult();
                 UnaryRun(c).GetAwaiter().GetResult();
@@ -52,7 +55,7 @@ namespace MagicOnion.ConsoleClient
                 //                HearbeatClient.Test(channel).GetAwaiter().GetResult();
                 Console.ReadLine();
 
-  //              ChatClient.Run(channel).GetAwaiter().GetResult();
+                //              ChatClient.Run(channel).GetAwaiter().GetResult();
                 //TestHeartbeat(channel).GetAwaiter().GetResult();
             }
             finally
@@ -62,6 +65,45 @@ namespace MagicOnion.ConsoleClient
                 Console.WriteLine("end");
             }
         }
+
+
+
+
+
+        // client, perfect!
+
+        static async Task UnaryCSharpSevenTest()
+        {
+            var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+            var client = MagicOnionClient.Create<IStandard>(channel);
+
+            var r1 = await client.Unary1(1, 10);
+            var r2 = await client.Unary2(100, 20);
+
+            Console.WriteLine((r1, r2));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         static void Verify(params AssemblyBuilder[] builders)
         {
@@ -191,8 +233,8 @@ namespace MagicOnion.ConsoleClient
             try
             {
 
-                
-                   var stream = await client.StreamingThree();
+
+                var stream = await client.StreamingThree();
 
                 var count = 0;
                 await stream.ResponseStream.ForEachAsync(async x =>

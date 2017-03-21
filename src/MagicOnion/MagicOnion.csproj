@@ -65,6 +65,7 @@
     <Compile Include="Client\ChannelContext.cs" />
     <Compile Include="Client\EmbeddedServices\PingClient.cs" />
     <Compile Include="Client\EmbeddedServices\HeartbeatClient.cs" />
+    <Compile Include="CompilerServices\AsyncUnaryResultMethodBuilder.cs" />
     <Compile Include="DuplexStreamingResult.cs" />
     <Compile Include="ClientStreamingResult.cs" />
     <Compile Include="Client\DynamicClientBuilder.cs" />
