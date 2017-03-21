@@ -141,39 +141,90 @@ namespace MagicOnion.Generator
             
             #line default
             #line hidden
-            this.Write("            };\r\n        }\r\n\r\n        internal static object GetFormatter(Type t)\r" +
-                    "\n        {\r\n            int key;\r\n            if (!lookup.TryGetValue(t, out key" +
-                    ")) return null;\r\n\r\n            switch (key)\r\n            {\r\n");
+            this.Write(@"            };
+        }
+
+        internal static object GetFormatter(Type t)
+        {
+            int key;
+            if (!lookup.TryGetValue(t, out key))
+            {
+                if (t == typeof(UniRx.Unit))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.UnitFormatter.Instance;
+                }
+                else if (t == typeof(Nullable<UniRx.Unit>))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.NullableUnitFormatter.Instance;
+                }
+                return null;
+            }
+
+            switch (key)
+            {
+");
             
-            #line 66 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
+            #line 77 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
  for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
             
             #line default
             #line hidden
             this.Write("                case ");
             
-            #line 67 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
+            #line 78 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(": return new ");
             
-            #line 67 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
+            #line 78 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName:  FormatterNamespace + "." + x.FormatterName));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 68 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
+            #line 79 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n#pra" +
-                    "gma warning disable 168\r\n#pragma warning restore 414\r\n#pragma warning restore 61" +
-                    "8\r\n#pragma warning restore 612");
+            this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nname" +
+                    "space ");
+            
+            #line 86 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\ResolverTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
+            
+            #line default
+            #line hidden
+            this.Write(".UniRxIntegrate\r\n{\r\n    using System;\r\n    using UniRx;\r\n    using MessagePack;\r\n" +
+                    "    using MessagePack.Formatters;\r\n\r\n    public class UnitFormatter : IMessagePa" +
+                    "ckFormatter<Unit>\r\n    {\r\n        public static readonly IMessagePackFormatter<U" +
+                    "nit> Instance = new UnitFormatter();\r\n\r\n        UnitFormatter()\r\n        {\r\n\r\n  " +
+                    "      }\r\n\r\n        public int Serialize(ref byte[] bytes, int offset, Unit value" +
+                    ", IFormatterResolver typeResolver)\r\n        {\r\n            return MessagePackBin" +
+                    "ary.WriteNil(ref bytes, offset);\r\n        }\r\n\r\n        public Unit Deserialize(b" +
+                    "yte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)\r\n   " +
+                    "     {\r\n            if (bytes[offset] == MessagePackCode.Nil)\r\n            {\r\n  " +
+                    "              readSize = 1;\r\n                return Unit.Default;\r\n            }" +
+                    "\r\n            else\r\n            {\r\n                throw new InvalidOperationExc" +
+                    "eption(string.Format(\"code is invalid. code:{0} format:{1}\", bytes[offset], Mess" +
+                    "agePackCode.ToFormatName(bytes[offset])));\r\n            }\r\n        }\r\n    }\r\n\r\n " +
+                    "   public class NullableUnitFormatter : IMessagePackFormatter<Unit?>\r\n    {\r\n   " +
+                    "     public static readonly IMessagePackFormatter<Unit?> Instance = new Nullable" +
+                    "UnitFormatter();\r\n\r\n        NullableUnitFormatter()\r\n        {\r\n\r\n        }\r\n\r\n " +
+                    "       public int Serialize(ref byte[] bytes, int offset, Unit? value, IFormatte" +
+                    "rResolver typeResolver)\r\n        {\r\n            return MessagePackBinary.WriteNi" +
+                    "l(ref bytes, offset);\r\n        }\r\n\r\n        public Unit? Deserialize(byte[] byte" +
+                    "s, int offset, IFormatterResolver typeResolver, out int readSize)\r\n        {\r\n  " +
+                    "          if (bytes[offset] == MessagePackCode.Nil)\r\n            {\r\n            " +
+                    "    readSize = 1;\r\n                return Unit.Default;\r\n            }\r\n        " +
+                    "    else\r\n            {\r\n                throw new InvalidOperationException(str" +
+                    "ing.Format(\"code is invalid. code:{0} format:{1}\", bytes[offset], MessagePackCod" +
+                    "e.ToFormatName(bytes[offset])));\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n\r\n#pragm" +
+                    "a warning disable 168\r\n#pragma warning restore 414\r\n#pragma warning restore 618\r" +
+                    "\n#pragma warning restore 612");
             return this.GenerationEnvironment.ToString();
         }
     }

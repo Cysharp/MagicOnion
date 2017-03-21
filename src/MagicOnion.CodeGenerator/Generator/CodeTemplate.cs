@@ -88,7 +88,7 @@ namespace MagicOnion.Generator
             this.Write("   \r\n        ");
             
             #line 27 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(isAsyncSuffix ? method.AsyncToString() : method.ToString()));
             
             #line default
             #line hidden
@@ -253,7 +253,7 @@ namespace MagicOnion.Generator
             this.Write("        public ");
             
             #line 68 "C:\Users\y.kawai\Documents\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(isAsyncSuffix ? item.AsyncToString() : item.ToString()));
             
             #line default
             #line hidden

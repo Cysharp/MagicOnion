@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Sandbox.ConsoleServer
 {
+#if DEBUG
     public interface IStandard : IService<IStandard>
     {
         Task<UnaryResult<int>> Unary1Async(int x, int y);
@@ -10,4 +11,5 @@ namespace Sandbox.ConsoleServer
         Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z);
         Task<DuplexStreamingResult<int, int>> DuplexStreamingAsync();
     }
+#endif
 }

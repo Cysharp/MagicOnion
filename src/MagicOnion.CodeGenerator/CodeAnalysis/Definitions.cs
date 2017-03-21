@@ -36,7 +36,21 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
-        public string ResponseType { get; set; }
+
+        string responseType;
+        public string ResponseType
+        {
+            get
+            {
+                return responseType;
+            }
+            set
+            {
+                responseType = (value == "global::MessagePack.Nil")
+                    ? "global::UniRx.Unit"
+                    : value;
+            }
+        }
         public ParameterDefinition[] Parameters { get; set; }
 
         public ITypeSymbol UnwrappedOriginalResposneTypeSymbol { get; set; }
@@ -111,6 +125,18 @@ namespace MagicOnion.CodeAnalysis
         public override string ToString()
         {
             return $"{ReturnType} {Name}({string.Join(", ", Parameters.Select(x => x.ToString()))})";
+        }
+
+        public string AsyncToString()
+        {
+            if (Name.EndsWith("Async"))
+            {
+                return ToString();
+            }
+            else
+            {
+                return $"{ReturnType} {Name}Async({string.Join(", ", Parameters.Select(x => x.ToString()))})";
+            }
         }
     }
 

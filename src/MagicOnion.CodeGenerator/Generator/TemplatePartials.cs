@@ -10,6 +10,7 @@ namespace MagicOnion.Generator
     public partial class CodeTemplate
     {
         public string Namespace { get; set; }
+        public bool isAsyncSuffix { get; set; }
         public MagicOnion.CodeAnalysis.InterfaceDefintion[] Interfaces { get; set; }
     }
 

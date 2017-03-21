@@ -19,6 +19,7 @@ namespace MagicOnion.CodeGenerator
         public string InputPath { get; private set; }
         public string OutputPath { get; private set; }
         public bool UnuseUnityAttr { get; private set; }
+        public bool IsAsyncSuffix { get; private set; }
         public List<string> ConditionalSymbols { get; private set; }
         public string NamespaceRoot { get; private set; }
 
@@ -28,6 +29,7 @@ namespace MagicOnion.CodeGenerator
         {
             ConditionalSymbols = new List<string>();
             NamespaceRoot = "MagicOnion";
+            IsAsyncSuffix = false;
 
             var option = new OptionSet()
             {
@@ -36,6 +38,7 @@ namespace MagicOnion.CodeGenerator
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer", _ => { UnuseUnityAttr = true; } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
                 { "n|namespace=", "[optional, default=MagicOnion]Set namespace root name", x => { NamespaceRoot = x; } },
+                { "a|asyncSuffix", "[optional, default=false]Use methodName to async suffix", _ => { IsAsyncSuffix = true; } },
             };
             if (args.Length == 0)
             {
@@ -121,6 +124,7 @@ namespace MagicOnion.CodeGenerator
                 .Select(x => new CodeTemplate()
                 {
                     Namespace = x.Key,
+                    isAsyncSuffix = cmdArgs.IsAsyncSuffix,
                     Interfaces = x.ToArray()
                 })
                 .ToArray();
@@ -163,7 +167,7 @@ namespace MagicOnion.CodeGenerator
                 fi.Directory.Create();
             }
 
-            System.IO.File.WriteAllText(path, text);
+            System.IO.File.WriteAllText(path, text, Encoding.UTF8);
         }
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(

@@ -59,7 +59,18 @@ namespace <#= Namespace #>
         internal static object GetFormatter(Type t)
         {
             int key;
-            if (!lookup.TryGetValue(t, out key)) return null;
+            if (!lookup.TryGetValue(t, out key))
+            {
+                if (t == typeof(UniRx.Unit))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.UnitFormatter.Instance;
+                }
+                else if (t == typeof(Nullable<UniRx.Unit>))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.NullableUnitFormatter.Instance;
+                }
+                return null;
+            }
 
             switch (key)
             {
@@ -71,6 +82,71 @@ namespace <#= Namespace #>
         }
     }
 }
+
+namespace <#= Namespace #>.UniRxIntegrate
+{
+    using System;
+    using UniRx;
+    using MessagePack;
+    using MessagePack.Formatters;
+
+    public class UnitFormatter : IMessagePackFormatter<Unit>
+    {
+        public static readonly IMessagePackFormatter<Unit> Instance = new UnitFormatter();
+
+        UnitFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, Unit value, IFormatterResolver typeResolver)
+        {
+            return MessagePackBinary.WriteNil(ref bytes, offset);
+        }
+
+        public Unit Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        {
+            if (bytes[offset] == MessagePackCode.Nil)
+            {
+                readSize = 1;
+                return Unit.Default;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", bytes[offset], MessagePackCode.ToFormatName(bytes[offset])));
+            }
+        }
+    }
+
+    public class NullableUnitFormatter : IMessagePackFormatter<Unit?>
+    {
+        public static readonly IMessagePackFormatter<Unit?> Instance = new NullableUnitFormatter();
+
+        NullableUnitFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, Unit? value, IFormatterResolver typeResolver)
+        {
+            return MessagePackBinary.WriteNil(ref bytes, offset);
+        }
+
+        public Unit? Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        {
+            if (bytes[offset] == MessagePackCode.Nil)
+            {
+                readSize = 1;
+                return Unit.Default;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", bytes[offset], MessagePackCode.ToFormatName(bytes[offset])));
+            }
+        }
+    }
+}
+
 
 #pragma warning disable 168
 #pragma warning restore 414
