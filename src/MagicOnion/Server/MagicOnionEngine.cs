@@ -60,7 +60,7 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
-            Parallel.ForEach(types, /*new ParallelOptions { MaxDegreeOfParallelism = 1 },*/ classType =>
+            Parallel.ForEach(types, new ParallelOptions { MaxDegreeOfParallelism = 1 }, classType =>
             {
                 var className = classType.Name;
                 if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))

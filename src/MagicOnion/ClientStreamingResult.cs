@@ -14,12 +14,25 @@ namespace MagicOnion
     /// </summary>
     public struct ClientStreamingResult<TRequest, TResponse> : IDisposable
     {
+        internal readonly TResponse rawValue;
+        internal readonly bool hasRawValue;
         readonly AsyncClientStreamingCall<byte[], byte[]> inner;
         readonly MarshallingClientStreamWriter<TRequest> requestStream;
         readonly IFormatterResolver resolver;
 
+        public ClientStreamingResult(TResponse rawValue)
+        {
+            this.hasRawValue = true;
+            this.rawValue = rawValue;
+            this.inner = null;
+            this.requestStream = null;
+            this.resolver = null;
+        }
+
         public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
         {
+            this.hasRawValue = false;
+            this.rawValue = default(TResponse);
             this.inner = inner;
             this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
             this.resolver = resolver;
@@ -38,7 +51,14 @@ namespace MagicOnion
         {
             get
             {
-                return Deserialize();
+                if (hasRawValue)
+                {
+                    return Task.FromResult(rawValue);
+                }
+                else
+                {
+                    return Deserialize();
+                }
             }
         }
 

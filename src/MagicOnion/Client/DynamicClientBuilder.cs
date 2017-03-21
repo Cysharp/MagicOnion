@@ -343,7 +343,7 @@ namespace MagicOnion.Client
                         if (def.MethodType == MethodType.Unary)
                         {
                             resultType = typeof(UnaryResult<>).MakeGenericType(def.ResponseType);
-                            il.Emit(OpCodes.Newobj, resultType.GetConstructors()[0]);
+                            il.Emit(OpCodes.Newobj, resultType.GetConstructors().OrderBy(x => x.GetParameters().Length).Last());
                         }
                         else
                         {
@@ -391,7 +391,7 @@ namespace MagicOnion.Client
                         if (def.MethodType == MethodType.ClientStreaming)
                         {
                             resultType2 = typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
-                            il.Emit(OpCodes.Newobj, resultType2.GetConstructors()[0]);
+                            il.Emit(OpCodes.Newobj, resultType2.GetConstructors().OrderBy(x => x.GetParameters().Length).Last());
                         }
                         else
                         {

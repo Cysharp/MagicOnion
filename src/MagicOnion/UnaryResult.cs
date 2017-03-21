@@ -11,11 +11,24 @@ namespace MagicOnion
     /// </summary>
     public struct UnaryResult<TResponse>
     {
+        internal readonly bool  hasRawValue; // internal
+        internal readonly TResponse rawValue; // internal
+
         readonly AsyncUnaryCall<byte[]> inner;
         readonly IFormatterResolver resolver;
 
+        public UnaryResult(TResponse rawValue)
+        {
+            this.hasRawValue = true;
+            this.rawValue = rawValue;
+            this.inner = null;
+            this.resolver = null;
+        }
+
         public UnaryResult(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
         {
+            this.hasRawValue = false;
+            this.rawValue = default(TResponse);
             this.inner = inner;
             this.resolver = resolver;
         }
@@ -33,7 +46,14 @@ namespace MagicOnion
         {
             get
             {
-                return Deserialize();
+                if (!hasRawValue)
+                {
+                    return Deserialize();
+                }
+                else
+                {
+                    return Task.FromResult(rawValue);
+                }
             }
         }
 

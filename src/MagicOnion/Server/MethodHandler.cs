@@ -85,11 +85,13 @@ namespace MagicOnion.Server
                     // (ServiceContext context) =>
                     // {
                     //      var request = LZ4MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
-                    //      return new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                    //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                    //      return MethodHandlerResultHelper.SerializeUnaryResult(result, context);
                     // };
                     try
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+                        var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
                         var requestArg = Expression.Parameter(RequestType, "request");
                         var getResolver = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("FormatterResolver", flags));
@@ -113,9 +115,20 @@ namespace MagicOnion.Server
                         }
 
                         var callBody = Expression.Call(instance, methodInfo, arguments);
-                        if (!responseIsTask)
+
+                        if (MethodType == MethodType.Unary)
                         {
-                            callBody = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), callBody);
+                            var finalMethod = (responseIsTask)
+                                ? typeof(MethodHandlerResultHelper).GetMethod("SerializeTaskUnaryResult", staticFlags).MakeGenericMethod(UnwrappedResponseType)
+                                : typeof(MethodHandlerResultHelper).GetMethod("SerializeUnaryResult", staticFlags).MakeGenericMethod(UnwrappedResponseType);
+                            callBody = Expression.Call(finalMethod, callBody, contextArg);
+                        }
+                        else
+                        {
+                            if (!responseIsTask)
+                            {
+                                callBody = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), callBody);
+                            }
                         }
 
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
@@ -139,9 +152,21 @@ namespace MagicOnion.Server
                     try
                     {
                         var body = Expression.Call(instance, methodInfo);
-                        if (!responseIsTask)
+
+                        if (MethodType == MethodType.ClientStreaming)
                         {
-                            body = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), body);
+                            var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+                            var finalMethod = (responseIsTask)
+                                ? typeof(MethodHandlerResultHelper).GetMethod("SerializeTaskClientStreamingResult", staticFlags).MakeGenericMethod(RequestType, UnwrappedResponseType)
+                                : typeof(MethodHandlerResultHelper).GetMethod("SerializeClientStreamingResult", staticFlags).MakeGenericMethod(RequestType, UnwrappedResponseType);
+                            body = Expression.Call(finalMethod, body, contextArg);
+                        }
+                        else
+                        {
+                            if (!responseIsTask)
+                            {
+                                body = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), body);
+                            }
                         }
 
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
@@ -480,6 +505,49 @@ namespace MagicOnion.Server
         public bool Equals(MethodHandler other)
         {
             return ServiceName.Equals(other.ServiceName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
+        }
+    }
+
+    internal class MethodHandlerResultHelper
+    {
+        public static Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
+        {
+            if (result.hasRawValue)
+            {
+                var bytes = LZ4MessagePackSerializer.Serialize<T>(result.rawValue, context.FormatterResolver);
+                context.Result = bytes;
+            }
+            return Task.CompletedTask;
+        }
+
+        public static async Task SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
+        {
+            var result = await taskResult.ConfigureAwait(false);
+            if (result.hasRawValue)
+            {
+                var bytes = LZ4MessagePackSerializer.Serialize<T>(result.rawValue, context.FormatterResolver);
+                context.Result = bytes;
+            }
+        }
+
+        public static Task SerializeClientStreamingResult<TRequest, TResponse>(ClientStreamingResult<TRequest, TResponse> result, ServiceContext context)
+        {
+            if (result.hasRawValue)
+            {
+                var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
+                context.Result = bytes;
+            }
+            return Task.CompletedTask;
+        }
+
+        public static async Task SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+        {
+            var result = await taskResult.ConfigureAwait(false);
+            if (result.hasRawValue)
+            {
+                var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
+                context.Result = bytes;
+            }
         }
     }
 }

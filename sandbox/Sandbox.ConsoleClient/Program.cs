@@ -49,7 +49,7 @@ namespace MagicOnion.ConsoleClient
                 //UnaryLoadTest(c).GetAwaiter().GetResult();
 
 
-//                HearbeatClient.Test(channel).GetAwaiter().GetResult();
+                //                HearbeatClient.Test(channel).GetAwaiter().GetResult();
                 Console.ReadLine();
 
   //              ChatClient.Run(channel).GetAwaiter().GetResult();

@@ -124,10 +124,7 @@ namespace MagicOnion.Server
 
         public ClientStreamingResult<TRequest, TResponse> Result(TResponse result)
         {
-            var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result, context.FormatterResolver);
-            context.Result = bytes;
-
-            return default(ClientStreamingResult<TRequest, TResponse>); // dummy
+            return new ClientStreamingResult<TRequest, TResponse>(result);
         }
 
         public ClientStreamingResult<TRequest, TResponse> ReturnStatus(StatusCode statusCode, string detail)

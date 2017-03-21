@@ -28,10 +28,7 @@ namespace MagicOnion.Server
 
         protected UnaryResult<TResponse> UnaryResult<TResponse>(TResponse result)
         {
-            var bytes = LZ4MessagePackSerializer.Serialize(result, Context.FormatterResolver);
-            Context.Result = bytes;
-
-            return default(UnaryResult<TResponse>); // dummy
+            return new MagicOnion.UnaryResult<TResponse>(result);
         }
 
         protected UnaryResult<TResponse> ReturnStatus<TResponse>(StatusCode statusCode, string detail)
