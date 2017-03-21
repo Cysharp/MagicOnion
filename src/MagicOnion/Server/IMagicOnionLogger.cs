@@ -146,6 +146,8 @@ namespace MagicOnion.Server
         string ToJson(byte[] bytes)
         {
             if (bytes == null || bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
+
             return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
         }
 
@@ -220,6 +222,7 @@ namespace MagicOnion.Server
         string ToJson(byte[] bytes, Type type, ServiceContext context)
         {
             if (bytes == null || bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
 
             var reData = LZ4MessagePackSerializer.NonGeneric.Deserialize(type, bytes, context.FormatterResolver);
             var reSerialized = MessagePackSerializer.NonGeneric.Serialize(type, reData, dumpResolver);
