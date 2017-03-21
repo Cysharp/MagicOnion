@@ -290,7 +290,6 @@ namespace MagicOnion.Server
 
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
@@ -326,8 +325,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                sw.Stop();
-                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
 
             return response;
@@ -335,7 +333,6 @@ namespace MagicOnion.Server
 
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
@@ -374,15 +371,13 @@ namespace MagicOnion.Server
             }
             finally
             {
-                sw.Stop();
-                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
             return response;
         }
 
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
@@ -418,14 +413,12 @@ namespace MagicOnion.Server
             }
             finally
             {
-                sw.Stop();
-                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             var isErrorOrInterrupted = false;
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
             {
@@ -465,8 +458,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                sw.Stop();
-                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), sw.Elapsed.TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
