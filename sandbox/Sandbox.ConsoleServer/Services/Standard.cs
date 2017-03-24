@@ -43,14 +43,53 @@ namespace Sandbox.ConsoleServer.Services
             {
                 await stream.WriteAsync((x + y));
             }
-            
+
             return stream.Result();
         }
 
-        public async Task<UnaryResult<int>> Unary1Async(int x, int y)
+
+
+
+
+
+
+
+
+
+
+
+
+        // server:
+        // return int but return type is UnaryResult<int>
+        // no more Task<UnaryResult<int>>, everything naturally
+
+        public async UnaryResult<int> Unary1(int x, int y)
         {
-            return UnaryResult(x + y);
+            return x + y;
         }
+
+        public async UnaryResult<int> Unary2(int x, int y)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            return x + y;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 
