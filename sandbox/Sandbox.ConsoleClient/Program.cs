@@ -80,7 +80,7 @@ namespace MagicOnion.ConsoleClient
             var r1 = await client.Unary1(1, 10);
             var r2 = await client.Unary2(100, 20);
 
-            Console.WriteLine((r1, r2));
+            // Console.WriteLine((r1, r2));
         }
 
 
