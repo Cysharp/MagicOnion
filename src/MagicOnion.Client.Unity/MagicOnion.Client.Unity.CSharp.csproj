@@ -17,7 +17,8 @@
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.7p2</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -93,6 +94,9 @@
     <Compile Include="Assets\Scripts\MagicOnion\ServerStreamingResult.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\UnaryResult.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncStreamReaderExtensions.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Unity\ChannelExtensions.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Unity\EditorWindowSupportsCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Unity\MagicOnionWindow.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\UnityDebugLogger.cs" />
     <Compile Include="Assets\Scripts\MagicOnionGenerated.cs" />
     <Compile Include="Assets\Scripts\MessagePack\Attributes.cs" />

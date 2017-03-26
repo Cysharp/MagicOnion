@@ -52,7 +52,7 @@ namespace MagicOnion.Client
                 this.connectionId = this.connectionIdFactory();
             }
             this.waitConnectComplete = new AsyncSubject<Unit>();
-            connectingTask = Observable.FromCoroutine(() => ConnectAlways()).Subscribe(_ => { }, ex =>
+            connectingTask = Observable.FromCoroutine(token => ConnectAlways(token), false).Subscribe(_ => { }, ex =>
             {
                 UnityEngine.Debug.Log("Error Detected:" + ex.ToString());
             }, () => { });
@@ -75,17 +75,19 @@ namespace MagicOnion.Client
             return new UnregisterToken(node);
         }
 
-        IEnumerator ConnectAlways()
+        IEnumerator ConnectAlways(CancellationToken token)
         {
             while (true)
             {
                 if (isDisposed) yield break;
                 if (channel.State == ChannelState.Shutdown) yield break;
+                if (token.IsCancellationRequested) yield break;
 
                 var conn = channel.ConnectAsync().ToYieldInstruction(false);
                 yield return conn;
 
                 if (isDisposed) yield break;
+                if (token.IsCancellationRequested) yield break;
                 if (conn.HasError)
                 {
                     GrpcEnvironment.Logger.Error(conn.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
@@ -106,6 +108,7 @@ namespace MagicOnion.Client
                 {
                     latestStreamingResult = heartBeatConnect.Result;
                 }
+                if (token.IsCancellationRequested) yield break;
 
                 var connectCheck = heartBeatConnect.Result.ResponseStream.MoveNext().ToYieldInstruction(false);
                 yield return connectCheck;
@@ -114,6 +117,7 @@ namespace MagicOnion.Client
                     GrpcEnvironment.Logger.Error(heartBeatConnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
                     continue;
                 }
+                if (token.IsCancellationRequested) yield break;
 
                 this.connectionId = connectionId;
                 currentRetryCount = 0;
@@ -130,6 +134,7 @@ namespace MagicOnion.Client
                     {
                         action();
                     }
+                    disconnectedActions.Clear();
                 }
                 catch (Exception ex)
                 {
@@ -140,6 +145,8 @@ namespace MagicOnion.Client
                 {
                     GrpcEnvironment.Logger.Error(waitForDisconnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
                 }
+
+                if (token.IsCancellationRequested) yield break;
             }
         }
 
@@ -149,17 +156,38 @@ namespace MagicOnion.Client
             return CreateClient<T>(MessagePackSerializer.DefaultResolver);
         }
 
+        public T CreateClient<T>(Func<Channel, CallInvoker> callInvokerFactory)
+            where T : IService<T>
+        {
+            return CreateClient<T>(callInvokerFactory, MessagePackSerializer.DefaultResolver);
+        }
+
         public T CreateClient<T>(IFormatterResolver resolver)
             where T : IService<T>
         {
             return MagicOnionClient.Create<T>(channel, resolver)
-                .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } });
+                .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } })
+                .WithCancellationToken(cancellationTokenSource.Token);
+        }
+
+        public T CreateClient<T>(Func<Channel, CallInvoker> callInvokerFactory, IFormatterResolver resolver)
+            where T : IService<T>
+        {
+            return MagicOnionClient.Create<T>(callInvokerFactory(channel), resolver)
+                .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } })
+                .WithCancellationToken(cancellationTokenSource.Token);
         }
 
         public T CreateClient<T>(Metadata metadata)
             where T : IService<T>
         {
             return CreateClient<T>(metadata, MessagePackSerializer.DefaultResolver);
+        }
+
+        public T CreateClient<T>(Func<Channel, CallInvoker> callInvokerFactory, Metadata metadata)
+            where T : IService<T>
+        {
+            return CreateClient<T>(callInvokerFactory, metadata, MessagePackSerializer.DefaultResolver);
         }
 
         public T CreateClient<T>(Metadata metadata, IFormatterResolver resolver)
@@ -175,6 +203,19 @@ namespace MagicOnion.Client
             return MagicOnionClient.Create<T>(channel, resolver).WithHeaders(newMetadata).WithCancellationToken(cancellationTokenSource.Token);
         }
 
+        public T CreateClient<T>(Func<Channel, CallInvoker> callInvokerFactory, Metadata metadata, IFormatterResolver resolver)
+            where T : IService<T>
+        {
+            var newMetadata = new Metadata();
+            for (int i = 0; i < metadata.Count; i++)
+            {
+                newMetadata.Add(metadata[i]);
+            }
+            newMetadata.Add(ChannelContext.HeaderKey, ConnectionId);
+
+            return MagicOnionClient.Create<T>(callInvokerFactory(channel), resolver).WithHeaders(newMetadata).WithCancellationToken(cancellationTokenSource.Token);
+        }
+
 
         public void Dispose()
         {
@@ -185,6 +226,12 @@ namespace MagicOnion.Client
             cancellationTokenSource.Cancel();
             waitConnectComplete.Dispose();
             latestStreamingResult.Dispose();
+
+            foreach (var item in disconnectedActions)
+            {
+                item();
+            }
+            disconnectedActions.Clear();
         }
 
         class UnregisterToken : IDisposable
@@ -200,7 +247,10 @@ namespace MagicOnion.Client
             {
                 if (node != null)
                 {
-                    node.List.Remove(node);
+                    if (node.List != null)
+                    {
+                        node.List.Remove(node);
+                    }
                     node = null;
                 }
             }

@@ -9,7 +9,7 @@ namespace MagicOnion.Client
         public static T Create<T>(Channel channel)
            where T : IService<T>
         {
-            return Create<T>(new DefaultCallInvoker(channel), MessagePackSerializer.DefaultResolver);
+            return Create<T>(channel, MessagePackSerializer.DefaultResolver);
         }
 
         public static T Create<T>(CallInvoker invoker)
@@ -21,7 +21,13 @@ namespace MagicOnion.Client
         public static T Create<T>(Channel channel, IFormatterResolver resolver)
             where T : IService<T>
         {
-            return Create<T>(new DefaultCallInvoker(channel), resolver);
+#if UNITY_EDITOR
+            var invoker = new EditorWindowSupportsCallInvoker(channel);
+#else
+            var invoker = new DefaultCallInvoker(channel);
+#endif
+
+            return Create<T>(invoker, resolver);
         }
 
         public static T Create<T>(CallInvoker invoker, IFormatterResolver resolver)
