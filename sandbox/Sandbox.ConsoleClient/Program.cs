@@ -25,8 +25,8 @@ namespace MagicOnion.ConsoleClient
 
                 Console.WriteLine("Client:::");
 
-                UnaryCSharpSevenTest().GetAwaiter().GetResult();
-                return;
+                //UnaryCSharpSevenTest().GetAwaiter().GetResult();
+                //return;
 
                 //GrpcEnvironment.SetThreadPoolSize(1000);
                 //GrpcEnvironment.SetCompletionQueueCount(1000);

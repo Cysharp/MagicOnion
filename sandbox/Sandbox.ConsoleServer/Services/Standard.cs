@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MagicOnion;
+using SharedLibrary;
 
 namespace Sandbox.ConsoleServer.Services
 {
@@ -34,6 +35,11 @@ namespace Sandbox.ConsoleServer.Services
             });
 
             return stream.Result();
+        }
+
+        public UnaryResult<MyClass2> Echo(string name, int x, int y, MyEnum2 e)
+        {
+            return UnaryResult(new MyClass2 { Name = name, Sum = (x + y) * (int)e });
         }
 
         public async Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z)
@@ -65,15 +71,16 @@ namespace Sandbox.ConsoleServer.Services
 
         public UnaryResult<int> Unary1(int x, int y)
         {
-            //return x + y;
-            throw new Exception();
+            return UnaryResult(x + y);
+            //throw new Exception();
         }
 
         public UnaryResult<int> Unary2(int x, int y)
         {
+            return UnaryResult(x + y);
             //await Task.Delay(TimeSpan.FromSeconds(1));
 
-            throw new Exception();
+            //throw new Exception();
             //return x + y;
         }
 
