@@ -166,12 +166,11 @@ namespace Grpc.Core.Logging
 
         private void Log(string severityString, string message)
         {
-            var log = string.Format("{0}{1} {2}{3}",
+            textWriterProvider().WriteLine("{0}{1} {2}{3}",
                 severityString,
                 DateTime.Now.ToString(DateTimeFormatString, CultureInfo.InvariantCulture),
                 forTypeString,
                 message);
-            textWriterProvider().WriteLine(log);
         }
     }
 }

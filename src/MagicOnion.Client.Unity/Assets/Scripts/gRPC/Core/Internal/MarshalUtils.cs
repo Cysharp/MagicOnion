@@ -32,55 +32,59 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using UniRx;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Grpc.Core.Internal
 {
-    internal class ClientResponseStream<TRequest, TResponse> : IAsyncStreamReader<TResponse>
-        where TRequest : class
-        where TResponse : class
+    /// <summary>
+    /// Useful methods for native/managed marshalling.
+    /// </summary>
+    internal static class MarshalUtils
     {
-        readonly AsyncCall<TRequest, TResponse> call;
-        TResponse current;
+        static readonly Encoding EncodingUTF8 = System.Text.Encoding.UTF8;
+        static readonly Encoding EncodingASCII = System.Text.Encoding.ASCII;
 
-        public ClientResponseStream(AsyncCall<TRequest, TResponse> call)
+        /// <summary>
+        /// Converts <c>IntPtr</c> pointing to a UTF-8 encoded byte array to <c>string</c>.
+        /// </summary>
+        public static string PtrToStringUTF8(IntPtr ptr, int len)
         {
-            this.call = call;
+            var bytes = new byte[len];
+            Marshal.Copy(ptr, bytes, 0, len);
+            return EncodingUTF8.GetString(bytes);
         }
 
-        public TResponse Current
+        /// <summary>
+        /// Returns byte array containing UTF-8 encoding of given string.
+        /// </summary>
+        public static byte[] GetBytesUTF8(string str)
         {
-            get
-            {
-                if (current == null)
-                {
-                    throw new InvalidOperationException("No current element is available.");
-                }
-                return current;
-            }
+            return EncodingUTF8.GetBytes(str);
         }
 
-        public IObservable<bool> MoveNext()
+        /// <summary>
+        /// Get string from a UTF8 encoded byte array.
+        /// </summary>
+        public static string GetStringUTF8(byte[] bytes)
         {
-            return call.ReadMessageAsync().ContinueWith(result =>
-            {
-                this.current = result;
-
-                if (result == null)
-                {
-                    return call.StreamingResponseCallFinishedTask.Select(_ => false);
-                }
-
-                return Observable.Return(true);
-            });
-
+            return EncodingUTF8.GetString(bytes);
         }
 
-        public void Dispose()
+        /// <summary>
+        /// Returns byte array containing ASCII encoding of given string.
+        /// </summary>
+        public static byte[] GetBytesASCII(string str)
         {
-            // TODO(jtattermusch): implement the semantics of stream disposal.
+            return EncodingASCII.GetBytes(str);
+        }
+
+        /// <summary>
+        /// Get string from an ASCII encoded byte array.
+        /// </summary>
+        public static string GetStringASCII(byte[] bytes)
+        {
+            return EncodingASCII.GetString(bytes);
         }
     }
 }

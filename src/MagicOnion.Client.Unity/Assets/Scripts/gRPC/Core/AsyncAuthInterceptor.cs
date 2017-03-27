@@ -33,10 +33,10 @@
 
 using System;
 using System.Collections.Generic;
+using UniRx;
 
 using Grpc.Core.Internal;
 using Grpc.Core.Utils;
-using UniRx;
 
 namespace Grpc.Core
 {

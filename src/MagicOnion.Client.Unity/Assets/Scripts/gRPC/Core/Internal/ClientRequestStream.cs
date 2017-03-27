@@ -29,8 +29,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 using System;
-using Grpc.Core.Internal;
 using UniRx;
+using Grpc.Core.Internal;
 
 namespace Grpc.Core.Internal
 {

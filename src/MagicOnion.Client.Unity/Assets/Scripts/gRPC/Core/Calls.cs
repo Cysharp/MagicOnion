@@ -44,6 +44,22 @@ namespace Grpc.Core
     public static class Calls
     {
         /// <summary>
+        /// Invokes a simple remote call in a blocking fashion.
+        /// </summary>
+        /// <returns>The response.</returns>
+        /// <param name="call">The call defintion.</param>
+        /// <param name="req">Request message.</param>
+        /// <typeparam name="TRequest">Type of request message.</typeparam>
+        /// <typeparam name="TResponse">The of response message.</typeparam>
+        public static TResponse BlockingUnaryCall<TRequest, TResponse>(CallInvocationDetails<TRequest, TResponse> call, TRequest req)
+            where TRequest : class
+            where TResponse : class
+        {
+            var asyncCall = new AsyncCall<TRequest, TResponse>(call);
+            return asyncCall.UnaryCall(req);
+        }
+
+        /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>
         /// <returns>An awaitable call object providing access to the response.</returns>

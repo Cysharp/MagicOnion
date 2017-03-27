@@ -32,55 +32,32 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using UniRx;
 
-namespace Grpc.Core.Internal
+namespace Grpc.Core
 {
-    internal class ClientResponseStream<TRequest, TResponse> : IAsyncStreamReader<TResponse>
-        where TRequest : class
-        where TResponse : class
+    /// <summary>
+    /// Compression level based on grpc_compression_level from grpc/compression.h
+    /// </summary>
+    public enum CompressionLevel
     {
-        readonly AsyncCall<TRequest, TResponse> call;
-        TResponse current;
+        /// <summary>
+        /// No compression.
+        /// </summary>
+        None = 0,
 
-        public ClientResponseStream(AsyncCall<TRequest, TResponse> call)
-        {
-            this.call = call;
-        }
+        /// <summary>
+        /// Low compression.
+        /// </summary>
+        Low,
 
-        public TResponse Current
-        {
-            get
-            {
-                if (current == null)
-                {
-                    throw new InvalidOperationException("No current element is available.");
-                }
-                return current;
-            }
-        }
+        /// <summary>
+        /// Medium compression.
+        /// </summary>
+        Medium,
 
-        public IObservable<bool> MoveNext()
-        {
-            return call.ReadMessageAsync().ContinueWith(result =>
-            {
-                this.current = result;
-
-                if (result == null)
-                {
-                    return call.StreamingResponseCallFinishedTask.Select(_ => false);
-                }
-
-                return Observable.Return(true);
-            });
-
-        }
-
-        public void Dispose()
-        {
-            // TODO(jtattermusch): implement the semantics of stream disposal.
-        }
+        /// <summary>
+        /// High compression.
+        /// </summary>
+        High,
     }
 }

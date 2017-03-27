@@ -51,6 +51,7 @@ namespace Grpc.Core
         WriteOptions writeOptions;
         ContextPropagationToken propagationToken;
         CallCredentials credentials;
+        CallFlags flags;
 
         /// <summary>
         /// Creates a new instance of <c>CallOptions</c> struct.
@@ -70,6 +71,7 @@ namespace Grpc.Core
             this.writeOptions = writeOptions;
             this.propagationToken = propagationToken;
             this.credentials = credentials;
+            this.flags = default(CallFlags);
         }
 
         /// <summary>
@@ -124,6 +126,24 @@ namespace Grpc.Core
         public CallCredentials Credentials
         {
             get { return this.credentials; }
+        }
+
+        /// <summary>
+        /// If <c>true</c> and and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
+        /// instead of failing immediately (which is the default "FailFast" semantics).
+        /// Note: experimental API that can change or be removed without any prior notice.
+        /// </summary>
+        public bool IsWaitForReady
+        {
+            get { return (this.flags & CallFlags.WaitForReady) == CallFlags.WaitForReady; }
+        }
+
+        /// <summary>
+        /// Flags to use for this call.
+        /// </summary>
+        internal CallFlags Flags
+        {
+            get { return this.flags; }
         }
 
         /// <summary>
@@ -199,6 +219,32 @@ namespace Grpc.Core
         }
 
         /// <summary>
+        /// Returns new instance of <see cref="CallOptions"/> with "WaitForReady" semantics enabled/disabled.
+        /// <see cref="IsWaitForReady"/>.
+        /// Note: experimental API that can change or be removed without any prior notice.
+        /// </summary>
+        public CallOptions WithWaitForReady(bool waitForReady = true)
+        {
+            if (waitForReady)
+            {
+                return WithFlags(this.flags | CallFlags.WaitForReady);
+            }
+            return WithFlags(this.flags & ~CallFlags.WaitForReady);
+        }
+
+        /// <summary>
+        /// Returns new instance of <see cref="CallOptions"/> with
+        /// <c>Flags</c> set to the value provided. Values of all other fields are preserved.
+        /// </summary>
+        /// <param name="flags">The call flags.</param>
+        internal CallOptions WithFlags(CallFlags flags)
+        {
+            var newOptions = this;
+            newOptions.flags = flags;
+            return newOptions;
+        }
+
+        /// <summary>
         /// Returns a new instance of <see cref="CallOptions"/> with 
         /// all previously unset values set to their defaults and deadline and cancellation
         /// token propagated when appropriate.
@@ -216,12 +262,12 @@ namespace Grpc.Core
                 }
                 if (propagationToken.Options.IsPropagateCancellation)
                 {
-                    GrpcPreconditions.CheckArgument(!newOptions.CancellationToken.CanBeCanceled,
+                    GrpcPreconditions.CheckArgument(!newOptions.cancellationToken.CanBeCanceled,
                         "Cannot propagate cancellation token from parent call. The cancellation token has already been set to a non-default value.");
                     newOptions.cancellationToken = propagationToken.ParentCancellationToken;
                 }
             }
-
+                
             newOptions.headers = newOptions.headers ?? Metadata.Empty;
             newOptions.deadline = newOptions.deadline ?? DateTime.MaxValue;
             return newOptions;

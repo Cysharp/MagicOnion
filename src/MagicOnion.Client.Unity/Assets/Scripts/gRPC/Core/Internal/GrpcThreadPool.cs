@@ -35,10 +35,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Grpc.Core.Logging;
-using Grpc.Core.Utils;
 using System.Collections.ObjectModel;
 using UniRx;
+using Grpc.Core.Logging;
+using Grpc.Core.Profiling;
+using Grpc.Core.Utils;
 
 namespace Grpc.Core.Internal
 {
@@ -58,6 +59,8 @@ namespace Grpc.Core.Internal
 #endif
         readonly int poolSize;
         readonly int completionQueueCount;
+
+        readonly List<BasicProfiler> threadProfilers = new List<BasicProfiler>();  // profilers assigned to threadpool threads
 
         bool stopRequested;
 
@@ -87,7 +90,8 @@ namespace Grpc.Core.Internal
 
                 for (int i = 0; i < poolSize; i++)
                 {
-                    threads.Add(CreateAndStartThread(i));
+                    var optionalProfiler = i < threadProfilers.Count ? threadProfilers[i] : null;
+                    threads.Add(CreateAndStartThread(i, optionalProfiler));
                 }
             }
         }
@@ -105,17 +109,22 @@ namespace Grpc.Core.Internal
                 }
             }
 
-            // Task.Run(() => { });
             return Observable.Start(() =>
             {
-                // foreach (var thread in threads)
-                // {
-                //     thread.Join();
-                // }
+                // Join causes 
+                //foreach (var thread in threads)
+                //{
+                //    thread.Join();
+                //}
 
                 foreach (var cq in completionQueues)
                 {
                     cq.Dispose();
+                }
+
+                for (int i = 0; i < threadProfilers.Count; i++)
+                {
+                    threadProfilers[i].Dump(string.Format("grpc_trace_thread_{0}.txt", i));
                 }
             }, Scheduler.ThreadPool);
         }
@@ -146,9 +155,8 @@ namespace Grpc.Core.Internal
                 return completionQueues;
             }
         }
-
 #if UNITY_METRO
-        private ReadOnlyReactiveProperty<bool> CreateAndStartThread(int threadIndex)
+        private ReadOnlyReactiveProperty<bool> CreateAndStartThread(int threadIndex, IProfiler optionalProfiler)
         {
             var cqIndex = threadIndex % completionQueues.Count;
             var cq = completionQueues.ElementAt(cqIndex);
@@ -157,12 +165,12 @@ namespace Grpc.Core.Internal
                 .ToReadOnlyReactiveProperty(true);
         }
 #else
-        private System.Threading.Thread CreateAndStartThread(int threadIndex)
+        private System.Threading.Thread CreateAndStartThread(int threadIndex, IProfiler optionalProfiler)
         {
             var cqIndex = threadIndex % completionQueues.Count;
             var cq = completionQueues.ElementAt(cqIndex);
 
-            var thread = new System.Threading.Thread(new ThreadStart(() => RunHandlerLoop(cq)));
+            var thread = new System.Threading.Thread(new ThreadStart(() => RunHandlerLoop(cq, optionalProfiler)));
             thread.IsBackground = true;
             thread.Name = string.Format("grpc {0} (cq {1})", threadIndex, cqIndex);
             thread.Start();
@@ -174,8 +182,13 @@ namespace Grpc.Core.Internal
         /// <summary>
         /// Body of the polling thread.
         /// </summary>
-        private void RunHandlerLoop(CompletionQueueSafeHandle cq)
+        private void RunHandlerLoop(CompletionQueueSafeHandle cq, IProfiler optionalProfiler)
         {
+            if (optionalProfiler != null)
+            {
+                Profilers.SetForCurrentThread(optionalProfiler);
+            }
+
             CompletionQueueEvent ev;
             do
             {
@@ -195,7 +208,7 @@ namespace Grpc.Core.Internal
                     }
                 }
             }
-            while (ev.type != CompletionQueueEvent.CompletionType.Shutdown && !cq.IsClosed);
+            while (ev.type != CompletionQueueEvent.CompletionType.Shutdown && !cq.IsClosed); // modified !cq.IsClosed so avoid UnityEditor freeze.
         }
 
         private static ReadOnlyCollection<CompletionQueueSafeHandle> CreateCompletionQueueList(GrpcEnvironment environment, int completionQueueCount)

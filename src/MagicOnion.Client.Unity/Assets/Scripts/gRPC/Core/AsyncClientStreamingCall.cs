@@ -94,7 +94,7 @@ namespace Grpc.Core
             }
         }
 
-        /// <summary>
+          /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>

@@ -32,55 +32,29 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using UniRx;
 
 namespace Grpc.Core.Internal
 {
-    internal class ClientResponseStream<TRequest, TResponse> : IAsyncStreamReader<TResponse>
-        where TRequest : class
-        where TResponse : class
+    /// <summary>
+    /// Flags to enable special call behaviors (client-side only).
+    /// </summary>
+    [Flags]
+    internal enum CallFlags
     {
-        readonly AsyncCall<TRequest, TResponse> call;
-        TResponse current;
+        /// <summary>
+        /// The call is idempotent (retrying the call doesn't change the outcome of the operation).
+        /// </summary>
+        IdempotentRequest = 0x10,
 
-        public ClientResponseStream(AsyncCall<TRequest, TResponse> call)
-        {
-            this.call = call;
-        }
+        /// <summary>
+        /// If channel is in <c>ChannelState.TransientFailure</c>, attempt waiting for the channel to recover
+        /// instead of failing the call immediately.
+        /// </summary>
+        WaitForReady = 0x20,
 
-        public TResponse Current
-        {
-            get
-            {
-                if (current == null)
-                {
-                    throw new InvalidOperationException("No current element is available.");
-                }
-                return current;
-            }
-        }
-
-        public IObservable<bool> MoveNext()
-        {
-            return call.ReadMessageAsync().ContinueWith(result =>
-            {
-                this.current = result;
-
-                if (result == null)
-                {
-                    return call.StreamingResponseCallFinishedTask.Select(_ => false);
-                }
-
-                return Observable.Return(true);
-            });
-
-        }
-
-        public void Dispose()
-        {
-            // TODO(jtattermusch): implement the semantics of stream disposal.
-        }
+        /// <summary>
+        /// The call is cacheable. gRPC is free to use GET verb */
+        /// </summary>
+        CacheableRequest = 0x40
     }
 }

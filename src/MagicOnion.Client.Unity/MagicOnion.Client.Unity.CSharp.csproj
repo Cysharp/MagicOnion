@@ -77,6 +77,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\ChatShare.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\IProfiler.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerEntry.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\Profilers.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerScope.cs" />
     <Compile Include="Assets\Scripts\Loader.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\ChannelContext.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\HeartbeatClient.cs" />
@@ -156,6 +160,8 @@
     <Compile Include="Assets\Scripts\gRPC\Core\AsyncDuplexStreamingCall.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\AsyncServerStreamingCall.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\AsyncUnaryCall.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AuthContext.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\AuthProperty.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\CallCredentials.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\CallInvocationDetails.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\CallInvoker.cs" />
@@ -166,6 +172,7 @@
     <Compile Include="Assets\Scripts\gRPC\Core\ChannelOptions.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\ChannelState.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\ClientBase.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\CompressionLevel.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\ContextPropagationToken.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\DefaultCallInvoker.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\GrpcEnvironment.cs" />
@@ -175,10 +182,12 @@
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\AsyncCall.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\AsyncCallBase.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\AtomicCounter.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\AuthContextSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\BatchContextSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\CStringSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallCredentialsSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallError.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallFlags.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\CallSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\ChannelArgsSafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\ChannelCredentialsSafeHandle.cs" />
@@ -195,14 +204,17 @@
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\GrpcThreadPool.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\INativeCall.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\InterceptingCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\MarshalUtils.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\MetadataArraySafeHandle.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeExtension.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeLogRedirector.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeMetadataCredentialsPlugin.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\NativeMethods.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\PlatformApis.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\SafeHandleZeroIsInvalid.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\Timespec.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Internal\UnimplementedCallInvoker.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Internal\UnmanagedLibrary.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\KeyCertificatePair.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Logging\ConsoleLogger.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Logging\ILogger.cs" />
@@ -213,19 +225,17 @@
     <Compile Include="Assets\Scripts\gRPC\Core\Marshaller.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Metadata.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Method.cs" />
-    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\IProfiler.cs" />
-    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerEntry.cs" />
-    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\ProfilerScope.cs" />
-    <Compile Include="Assets\Scripts\gRPC\Core\Profiling\Profilers.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\RpcException.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Shim\GrpcCancellationToken.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Shim\IAsyncEnumerator.cs" />
+    <Compile Include="Assets\Scripts\gRPC\Core\Shim\IntPtrEqualityComparer.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Status.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\StatusCode.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Utils\GrpcPreconditions.cs" />
-    <Compile Include="Assets\Scripts\gRPC\Core\Utils\IAsyncEnumerator.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\Version.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\VersionInfo.cs" />
     <Compile Include="Assets\Scripts\gRPC\Core\WriteOptions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
