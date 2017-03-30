@@ -74,4 +74,20 @@ namespace SharedLibrary
     {
         Apple, Orange, Grape
     }
+
+    [MessagePackObject]
+    public class MyClass2
+    {
+        [Key(0)]
+        public string Name { get; set; }
+        [Key(1)]
+        public int Sum { get; set; }
+    }
+
+    public enum MyEnum2
+    {
+        A = 2,
+        B = 3,
+        C = 4
+    }
 }
