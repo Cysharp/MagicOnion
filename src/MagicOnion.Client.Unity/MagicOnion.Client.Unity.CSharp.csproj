@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\MagicOnion\DuplexStreamingResult.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\DynamicArgumentTuple.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Heartbeat.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\HookInvoker.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\IService.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\MagicOnionMarshallers.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\MetadataExtensions.cs" />

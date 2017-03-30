@@ -33,7 +33,7 @@ namespace MagicOnion
             get
             {
                 var r = resolver;
-                return inner.ResponseAsync.Select(x => MessagePackSerializer.Deserialize<TResponse>(x, r));
+                return inner.ResponseAsync.Select(x => LZ4MessagePackSerializer.Deserialize<TResponse>(x, r));
             }
         }
 
