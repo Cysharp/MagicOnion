@@ -32,6 +32,14 @@ namespace MagicOnion.Tests
                 UnitTestClient.endPoint = "104.199.192.165";
             });
 
+#if UNITY_EDITOR_WIN
+            // Debugger Attached, avoid UnityEditor crash
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                Grpc.Core.GrpcEnvironment.IsDebugging = true;
+            }
+#endif
+
             // gRPC Config
             // Environment.SetEnvironmentVariable("GRPC_VERBOSITY", "DEBUG");
             // Environment.SetEnvironmentVariable("GRPC_TRACE", "all");

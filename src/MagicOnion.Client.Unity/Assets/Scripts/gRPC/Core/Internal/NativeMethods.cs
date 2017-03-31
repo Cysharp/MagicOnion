@@ -119,6 +119,9 @@ namespace Grpc.Core.Internal
         public readonly Delegates.grpcsharp_completion_queue_create_delegate grpcsharp_completion_queue_create;
         public readonly Delegates.grpcsharp_completion_queue_shutdown_delegate grpcsharp_completion_queue_shutdown;
         public readonly Delegates.grpcsharp_completion_queue_next_delegate grpcsharp_completion_queue_next;
+#if UNITY_EDITOR
+        public readonly Delegates.grpcsharp_completion_queue_next_debuggable_delegate grpcsharp_completion_queue_next_debuggable;
+#endif
         public readonly Delegates.grpcsharp_completion_queue_pluck_delegate grpcsharp_completion_queue_pluck;
         public readonly Delegates.grpcsharp_completion_queue_destroy_delegate grpcsharp_completion_queue_destroy;
 
@@ -218,6 +221,9 @@ namespace Grpc.Core.Internal
             this.grpcsharp_completion_queue_create = NativeCalls.grpcsharp_completion_queue_create;
             this.grpcsharp_completion_queue_shutdown = NativeCalls.grpcsharp_completion_queue_shutdown;
             this.grpcsharp_completion_queue_next = NativeCalls.grpcsharp_completion_queue_next;
+#if UNITY_EDITOR
+            this.grpcsharp_completion_queue_next_debuggable = NativeCalls.grpcsharp_completion_queue_next_debuggable;
+#endif
             this.grpcsharp_completion_queue_pluck = NativeCalls.grpcsharp_completion_queue_pluck;
             this.grpcsharp_completion_queue_destroy = NativeCalls.grpcsharp_completion_queue_destroy;
 
@@ -341,6 +347,9 @@ namespace Grpc.Core.Internal
             public delegate CompletionQueueSafeHandle grpcsharp_completion_queue_create_delegate();
             public delegate void grpcsharp_completion_queue_shutdown_delegate(CompletionQueueSafeHandle cq);
             public delegate CompletionQueueEvent grpcsharp_completion_queue_next_delegate(CompletionQueueSafeHandle cq);
+#if UNITY_EDITOR
+            public delegate CompletionQueueEvent grpcsharp_completion_queue_next_debuggable_delegate(CompletionQueueSafeHandle cq, MagicForDebugDelegate callback);
+#endif
             public delegate CompletionQueueEvent grpcsharp_completion_queue_pluck_delegate(CompletionQueueSafeHandle cq, IntPtr tag);
             public delegate void grpcsharp_completion_queue_destroy_delegate(IntPtr cq);
 
@@ -535,6 +544,11 @@ namespace Grpc.Core.Internal
 
             [DllImport(pluginName)]
             internal static extern CompletionQueueEvent grpcsharp_completion_queue_next(CompletionQueueSafeHandle cq);
+
+#if UNITY_EDITOR
+            [DllImport(pluginName)]
+            internal static extern CompletionQueueEvent grpcsharp_completion_queue_next_debuggable(CompletionQueueSafeHandle cq, [MarshalAs(UnmanagedType.FunctionPtr)] MagicForDebugDelegate callback);
+#endif
 
             [DllImport(pluginName)]
             internal static extern CompletionQueueEvent grpcsharp_completion_queue_pluck(CompletionQueueSafeHandle cq, IntPtr tag);
