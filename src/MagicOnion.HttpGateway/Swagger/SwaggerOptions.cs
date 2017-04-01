@@ -15,12 +15,14 @@ namespace MagicOnion.HttpGateway.Swagger
         public Func<HttpContext, string> CustomHost { get; set; }
         public string XmlDocumentPath { get; set; }
         public string JsonName { get; set; }
+        public string[] ForceSchemas { get; set; }
 
         public SwaggerOptions(string title, string description, string apiBasePath)
         {
             ApiBasePath = apiBasePath;
             JsonName = "swagger.json";
             Info = new Info { description = description, title = title };
+            ForceSchemas = new string[0];
         }
     }
 }

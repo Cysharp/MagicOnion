@@ -46,7 +46,7 @@ namespace MagicOnion.HttpGateway.Swagger
                 doc.info = options.Info;
                 doc.host = (options.CustomHost != null) ? options.CustomHost(httpContext) : httpContext.Request.Headers["Host"][0];
                 doc.basePath = options.ApiBasePath;
-                doc.schemes = new[] { httpContext.Request.Scheme };
+                doc.schemes = (options.ForceSchemas.Length == 0) ? new[] { httpContext.Request.IsHttps ? "https" : httpContext.Request.Scheme } : options.ForceSchemas;
                 doc.paths = new Dictionary<string, PathItem>();
                 doc.definitions = new Dictionary<string, Schema>();
 
