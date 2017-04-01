@@ -30,8 +30,9 @@
 #endregion
 using System;
 using System.Runtime.InteropServices;
-
+using System.Threading;
 using UniRx;
+
 using Grpc.Core.Logging;
 using Grpc.Core.Utils;
 
@@ -77,7 +78,8 @@ namespace Grpc.Core.Internal
             {
                 var context = new AuthInterceptorContext(Marshal.PtrToStringAnsi(serviceUrlPtr),
                                                          Marshal.PtrToStringAnsi(methodNamePtr));
-                StartGetMetadata(context, callbackPtr, userDataPtr).Subscribe(); // fire and forget.
+                // Don't await, we are in a native callback and need to return.
+                GetMetadataAsync(context, callbackPtr, userDataPtr).Subscribe();
             }
             catch (Exception e)
             {
@@ -86,7 +88,7 @@ namespace Grpc.Core.Internal
             }
         }
 
-        private IObservable<Unit> StartGetMetadata(AuthInterceptorContext context, IntPtr callbackPtr, IntPtr userDataPtr)
+        private IObservable<Unit> GetMetadataAsync(AuthInterceptorContext context, IntPtr callbackPtr, IntPtr userDataPtr)
         {
             try
             {
@@ -103,7 +105,7 @@ namespace Grpc.Core.Internal
                     {
                         Native.grpcsharp_metadata_credentials_notify_from_plugin(callbackPtr, userDataPtr, MetadataArraySafeHandle.Create(Metadata.Empty), StatusCode.Unknown, GetMetadataExceptionMsg);
                         Logger.Error(e, GetMetadataExceptionMsg);
-                        return Observable.ReturnUnit(); // no throw.
+                        return Observable.ReturnUnit();
                     });
             }
             catch (Exception e)

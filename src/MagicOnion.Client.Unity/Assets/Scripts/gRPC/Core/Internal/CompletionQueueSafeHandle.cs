@@ -36,6 +36,8 @@ using Grpc.Core.Utils;
 
 namespace Grpc.Core.Internal
 {
+    internal delegate void MagicForDebugDelegate();
+
     /// <summary>
     /// grpc_completion_queue from <c>grpc/grpc.h</c>
     /// </summary>
@@ -65,15 +67,31 @@ namespace Grpc.Core.Internal
 
         public CompletionQueueEvent Next()
         {
+#if UNITY_EDITOR
+            if (GrpcEnvironment.IsDebugging)
+            {
+                var callback = new MagicForDebugDelegate(MagicForDebug);
+                return Native.grpcsharp_completion_queue_next_debuggable(this, callback);
+            }
+
+#endif
             return Native.grpcsharp_completion_queue_next(this);
         }
 
+#if UNITY_EDITOR
+        [AOT.MonoPInvokeCallback(typeof(GprLogDelegate))]
+        private static void MagicForDebug()
+        {
+            if (GrpcEnvironment.IsDebugging)
+            {
+                System.Threading.Thread.Sleep(10);
+            }
+        }
+#endif
+
         public CompletionQueueEvent Pluck(IntPtr tag)
         {
-            using (Profilers.ForCurrentThread().NewScope("CompletionQueueSafeHandle.Pluck"))
-            {
-                return Native.grpcsharp_completion_queue_pluck(this, tag);
-            }
+            return Native.grpcsharp_completion_queue_pluck(this, tag);
         }
 
         /// <summary>

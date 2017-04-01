@@ -45,6 +45,7 @@ namespace Grpc.Core.Internal
     /// </summary>
     internal static class DefaultSslRootsOverride
     {
+        // const string RootsPemResourceName = "Grpc.Core.roots.pem";
         static object staticLock = new object();
 
         /// <summary>
@@ -54,8 +55,16 @@ namespace Grpc.Core.Internal
         {
             lock (staticLock)
             {
-                //var pemRootCerts = Grpc.Unity.Resources.ResourceLoader.GetRootsPem();
-                //native.grpcsharp_override_default_ssl_roots(pemRootCerts);
+                //var stream = typeof(DefaultSslRootsOverride).GetTypeInfo().Assembly.GetManifestResourceStream(RootsPemResourceName);
+                //if (stream == null)
+                //{
+                //    throw new IOException(string.Format("Error loading the embedded resource \"{0}\"", RootsPemResourceName));   
+                //}
+                //using (var streamReader = new StreamReader(stream))
+                //{
+                //    var pemRootCerts = streamReader.ReadToEnd();
+                //    native.grpcsharp_override_default_ssl_roots(pemRootCerts);
+                //}
             }
         }
     }

@@ -8,7 +8,7 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncUnaryCall.
     /// </summary>
-    public struct UnaryResult<TResponse>
+    public struct UnaryResult<TResponse> : IObservable<TResponse>
     {
         readonly AsyncUnaryCall<byte[]> inner;
         readonly IFormatterResolver resolver;
@@ -27,7 +27,7 @@ namespace MagicOnion
             get
             {
                 var m = resolver; // struct can not use field value in lambda(if avoid, we needs to implement SelectWithState)
-                return inner.ResponseAsync.Select(x => MessagePackSerializer.Deserialize<TResponse>(x, m));
+                return inner.ResponseAsync.Select(x => LZ4MessagePackSerializer.Deserialize<TResponse>(x, m));
             }
         }
 
@@ -81,6 +81,11 @@ namespace MagicOnion
         public void Dispose()
         {
             inner.Dispose();
+        }
+
+        public IDisposable Subscribe(IObserver<TResponse> observer)
+        {
+            return ResponseAsyncOnMainThread.Subscribe(observer);
         }
     }
 }

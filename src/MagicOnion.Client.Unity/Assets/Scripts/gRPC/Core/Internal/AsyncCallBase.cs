@@ -37,12 +37,12 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using UniRx;
 
 using Grpc.Core.Internal;
 using Grpc.Core.Logging;
 using Grpc.Core.Profiling;
 using Grpc.Core.Utils;
-using UniRx;
 
 namespace Grpc.Core.Internal
 {
@@ -52,6 +52,7 @@ namespace Grpc.Core.Internal
     /// </summary>
     internal abstract class AsyncCallBase<TWrite, TRead>
     {
+        // static readonly ILogger Logger = GrpcEnvironment.Logger.ForType<AsyncCallBase<TWrite, TRead>>();
         protected static readonly Status DeserializeResponseFailureStatus = new Status(StatusCode.Internal, "Failed to deserialize response message.");
 
         readonly Func<TWrite, byte[]> serializer;
@@ -67,7 +68,7 @@ namespace Grpc.Core.Internal
 
         protected AsyncSubject<TRead> streamingReadTcs;  // Completion of a pending streaming read if not null.
         protected AsyncSubject<Unit> streamingWriteTcs;  // Completion of a pending streaming write or send close from client if not null.
-        
+        // protected AsyncSubject<object> sendStatusFromServerTcs;
         protected bool isStreamingWriteCompletionDelayed;  // Only used for the client side.
 
         protected bool readingDone;  // True if last read (i.e. read with null payload) was already received.
@@ -180,19 +181,16 @@ namespace Grpc.Core.Internal
         /// </summary>
         protected bool ReleaseResourcesIfPossible()
         {
-            using (Profilers.ForCurrentThread().NewScope("AsyncCallBase.ReleaseResourcesIfPossible"))
+            if (!disposed && call != null)
             {
-                if (!disposed && call != null)
+                bool noMoreSendCompletions = streamingWriteTcs == null && (halfcloseRequested || cancelRequested || finished);
+                if (noMoreSendCompletions && readingDone && finished)
                 {
-                    bool noMoreSendCompletions = streamingWriteTcs == null && (halfcloseRequested || cancelRequested || finished);
-                    if (noMoreSendCompletions && readingDone && finished)
-                    {
-                        ReleaseResources();
-                        return true;
-                    }
+                    ReleaseResources();
+                    return true;
                 }
-                return false;
             }
+            return false;
         }
 
         protected abstract bool IsClient
@@ -228,28 +226,20 @@ namespace Grpc.Core.Internal
 
         protected byte[] UnsafeSerialize(TWrite msg)
         {
-            using (Profilers.ForCurrentThread().NewScope("AsyncCallBase.UnsafeSerialize"))
-            {
-                return serializer(msg);
-            }
+            return serializer(msg);
         }
 
         protected Exception TryDeserialize(byte[] payload, out TRead msg)
         {
-            using (Profilers.ForCurrentThread().NewScope("AsyncCallBase.TryDeserialize"))
+            try
             {
-                try
-                {
-                
-                    msg = deserializer(payload);
-                    return null;
-             
-                }
-                catch (Exception e)
-                {
-                    msg = default(TRead);
-                    return e;
-                }
+                msg = deserializer(payload);
+                return null;
+            }
+            catch (Exception e)
+            {
+                msg = default(TRead);
+                return e;
             }
         }
 
@@ -262,7 +252,8 @@ namespace Grpc.Core.Internal
             AsyncSubject<Unit> origTcs = null;
             lock (myLock)
             {
-                if (!success && !finished && IsClient) {
+                if (!success && !finished && IsClient)
+                {
                     // We should be setting this only once per call, following writes will be short circuited
                     // because they cannot start until the entire call finishes.
                     GrpcPreconditions.CheckState(!isStreamingWriteCompletionDelayed);
@@ -274,7 +265,7 @@ namespace Grpc.Core.Internal
                 else
                 {
                     origTcs = streamingWriteTcs;
-                    streamingWriteTcs = null;    
+                    streamingWriteTcs = null;
                 }
 
                 ReleaseResourcesIfPossible();

@@ -65,17 +65,17 @@ namespace Grpc.Core.Internal
         public IObservable<bool> MoveNext()
         {
             return call.ReadMessageAsync().ContinueWith(result =>
-           {
-               this.current = result;
+            {
+                this.current = result;
 
-               if (result == null)
-               {
-                   return call.StreamingCallFinishedTask.Select(_ => false);
-               }
+                if (result == null)
+                {
+                    return call.StreamingResponseCallFinishedTask.Select(_ => false);
+                }
 
-               return Observable.Return(true);
-           });
-            
+                return Observable.Return(true);
+            });
+
         }
 
         public void Dispose()

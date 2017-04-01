@@ -43,7 +43,6 @@ namespace MagicOnion.ConsoleServer
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 GlobalFilters = new MagicOnionFilterAttribute[]
                 {
-                    new MagicOnion.Server.EmbeddedFilters.ErrorDetailToTrailersFilterAttribute()
                 }
             });
 

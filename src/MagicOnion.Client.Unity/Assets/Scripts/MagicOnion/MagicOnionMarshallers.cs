@@ -23,7 +23,7 @@ namespace MagicOnion
             {
                 if (x)
                 {
-                    this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
+                    this.Current = LZ4MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
                 }
             });
         }
@@ -65,7 +65,7 @@ namespace MagicOnion
 
         public IObservable<Unit> WriteAsync(T message)
         {
-            var bytes = MessagePackSerializer.Serialize(message, resolver);
+            var bytes = LZ4MessagePackSerializer.Serialize(message, resolver);
             return inner.WriteAsync(bytes);
         }
     }

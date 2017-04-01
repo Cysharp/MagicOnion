@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MagicOnion;
+using SharedLibrary;
 
 namespace Sandbox.ConsoleServer.Services
 {
@@ -36,6 +37,11 @@ namespace Sandbox.ConsoleServer.Services
             return stream.Result();
         }
 
+        public UnaryResult<MyClass2> Echo(string name, int x, int y, MyEnum2 e)
+        {
+            return UnaryResult(new MyClass2 { Name = name, Sum = (x + y) * (int)e });
+        }
+
         public async Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z)
         {
             var stream = GetServerStreamingContext<int>();
@@ -63,16 +69,19 @@ namespace Sandbox.ConsoleServer.Services
         // return int but return type is UnaryResult<int>
         // no more Task<UnaryResult<int>>, everything naturally
 
-        public async UnaryResult<int> Unary1(int x, int y)
+        public UnaryResult<int> Unary1(int x, int y)
         {
-            return x + y;
+            return UnaryResult(x + y);
+            //throw new Exception();
         }
 
-        public async UnaryResult<int> Unary2(int x, int y)
+        public UnaryResult<int> Unary2(int x, int y)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            return UnaryResult(x + y);
+            //await Task.Delay(TimeSpan.FromSeconds(1));
 
-            return x + y;
+            //throw new Exception();
+            //return x + y;
         }
 
 

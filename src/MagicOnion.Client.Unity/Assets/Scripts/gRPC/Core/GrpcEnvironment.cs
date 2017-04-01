@@ -65,6 +65,34 @@ namespace Grpc.Core
 
         bool isClosed;
 
+#if UNITY_EDITOR
+        // for UnityEditor debugging
+        public static bool IsDebugging { get; set; }
+
+        // for Editor Window
+        public static int GetCurrentChannels(List<Channel> channelPool)
+        {
+            lock (staticLock)
+            {
+                int count = 0;
+                foreach (var item in registeredChannels)
+                {
+                    if (channelPool.Count == count)
+                    {
+                        channelPool.Add(item);
+                    }
+                    else
+                    {
+                        channelPool[count] = item;
+                    }
+                    count++;
+                }
+                return count;
+            }
+        }
+
+#endif
+
         /// <summary>
         /// Returns a reference-counted instance of initialized gRPC environment.
         /// Subsequent invocations return the same instance unless reference count has dropped to zero previously.
@@ -78,6 +106,14 @@ namespace Grpc.Core
                 refCount++;
                 if (instance == null)
                 {
+#if UNITY_EDITOR
+                    if (IsDebugging)
+                    {
+                        // Debugger Attached, avoid UnityEditor crash
+                        SetThreadPoolSize(1);
+                    }
+#endif
+
                     instance = new GrpcEnvironment();
                 }
                 return instance;
@@ -216,6 +252,14 @@ namespace Grpc.Core
             threadPool.Start();
         }
 
+
+#if UNITY_EDITOR
+        static GrpcEnvironment()
+        {
+            IsDebugging = false;
+        }
+#endif
+
         /// <summary>
         /// Gets the completion queues used by this gRPC environment.
         /// </summary>
@@ -327,12 +371,18 @@ namespace Grpc.Core
                 {
                     if (!hooksRegistered)
                     {
-                        // In Unity, use OnApplicationQuit instead of AppDomain.Unload, ProcessExit.
-#if UNITY_EDITOR
+#if NETSTANDARD1_5
+                        System.Runtime.Loader.AssemblyLoadContext.Default.Unloading += (assemblyLoadContext) => { HandleShutdown(); };
+#elif UNITY_EDITOR
+
                         MainThreadDispatcher.OnApplicationQuitAsObservable().Subscribe(_ =>
                         {
                             HandleShutdown();
                         });
+
+#else
+                        AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => { HandleShutdown(); };
+                        AppDomain.CurrentDomain.DomainUnload += (sender, eventArgs) => { HandleShutdown(); };
 #endif
                     }
                     hooksRegistered = true;

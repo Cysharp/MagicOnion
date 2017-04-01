@@ -1,9 +1,9 @@
 ﻿using MagicOnion;
+using SharedLibrary;
 using System.Threading.Tasks;
 
 namespace Sandbox.ConsoleServer
 {
-#if DEBUG
     public interface IStandard : IService<IStandard>
     {
         UnaryResult<int> Unary1(int x, int y);
@@ -12,6 +12,7 @@ namespace Sandbox.ConsoleServer
         Task<ClientStreamingResult<int, string>> ClientStreaming1Async();
         Task<ServerStreamingResult<int>> ServerStreamingAsync(int x, int y, int z);
         Task<DuplexStreamingResult<int, int>> DuplexStreamingAsync();
+
+        UnaryResult<MyClass2> Echo(string name, int x, int y, MyEnum2 e);
     }
-#endif
 }

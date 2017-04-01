@@ -18,7 +18,7 @@ namespace MagicOnion.Tests
 
         public IEnumerator Unary()
         {
-            var r = GetClient().Unary1Async(999, 3000).ResponseAsync.ToYieldInstruction();
+            var r = GetClient().Unary1(999, 3000).ResponseAsync.ToYieldInstruction();
             yield return r;
 
             r.Result.Is(3999);

@@ -41,11 +41,18 @@ namespace Grpc.Core.Profiling
     internal static class Profilers
     {
         static readonly NopProfiler DefaultProfiler = new NopProfiler();
+
+        [ThreadStatic]
         static IProfiler profilers;
 
         public static IProfiler ForCurrentThread()
         {
-            return profilers ?? DefaultProfiler;
+            if (profilers == null)
+            {
+                return DefaultProfiler;
+            }
+
+            return profilers;
         }
 
         public static void SetForCurrentThread(IProfiler profiler)
@@ -80,7 +87,7 @@ namespace Grpc.Core.Profiling
         ProfilerEntry[] entries;
         int count;
 
-        public BasicProfiler() : this(1024*1024)
+        public BasicProfiler() : this(20 * 1024 * 1024)
         {
         }
 
@@ -127,7 +134,8 @@ namespace Grpc.Core.Profiling
         }
 
         // NOT THREADSAFE!
-        void AddEntry(ProfilerEntry entry) {
+        void AddEntry(ProfilerEntry entry)
+        {
             entries[count++] = entry;
         }
     }

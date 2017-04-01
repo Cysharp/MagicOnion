@@ -46,9 +46,6 @@ namespace Grpc.Core.Internal
         readonly Func<string, string> hostInterceptor;
         readonly Func<CallOptions, CallOptions> callOptionsInterceptor;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Grpc.Core.InterceptingCallInvoker"/> class.
-        /// </summary>
         public InterceptingCallInvoker(CallInvoker callInvoker,
             Func<string, string> hostInterceptor = null,
             Func<CallOptions, CallOptions> callOptionsInterceptor = null)
@@ -57,7 +54,7 @@ namespace Grpc.Core.Internal
             this.hostInterceptor = hostInterceptor;
             this.callOptionsInterceptor = callOptionsInterceptor;
         }
-
+        
         /// <summary>
         /// Invokes a simple remote call asynchronously.
         /// </summary>

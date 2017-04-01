@@ -32,7 +32,6 @@
 #endregion
 
 using System;
-using System.Text;
 
 namespace Grpc.Core
 {
@@ -43,35 +42,15 @@ namespace Grpc.Core
     {
         private readonly Status status;
 
-        // TODO:Modified, for read header details.
-        const string ExceptionDetailKey = "exception_detail-bin";
-
-        static string CombineStatus(Status status, Func<Metadata> getMetadata)
-        {
-            var metadata = getMetadata();
-            if (metadata == null) return status.ToString();
-
-            var value = MagicOnion.MetadataExtensions.Get(metadata, ExceptionDetailKey);
-            if (value == null)
-            {
-                return status.ToString();
-            }
-            else
-            {
-                return string.Format("Status(StatusCode={0}, Detail=\"{1}\")", status.StatusCode, Encoding.UTF8.GetString(value.ValueBytes));
-            }
-        }
-
         /// <summary>
         /// Creates a new <c>RpcException</c> associated with given status.
         /// </summary>
         /// <param name="status">Resulting status of a call.</param>
-        public RpcException(Status status, Func<Metadata> getMetadata) : base(CombineStatus(status, getMetadata))
+        public RpcException(Status status) : base(status.ToString())
         {
             this.status = status;
         }
 
-        /*
         /// <summary>
         /// Creates a new <c>RpcException</c> associated with given status and message.
         /// </summary>
@@ -81,7 +60,6 @@ namespace Grpc.Core
         {
             this.status = status;
         }
-        */
 
         /// <summary>
         /// Resulting status of the call.

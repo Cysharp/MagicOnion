@@ -48,7 +48,7 @@ namespace Grpc.Core.Internal
         static readonly ILogger Logger = GrpcEnvironment.Logger.ForType<CompletionRegistry>();
 
         readonly GrpcEnvironment environment;
-        readonly Dictionary<IntPtr, OpCompletionDelegate> dict = new Dictionary<IntPtr, OpCompletionDelegate>();
+        readonly Dictionary<IntPtr, OpCompletionDelegate> dict = new Dictionary<IntPtr, OpCompletionDelegate>(IntPtrEqualityComparer.Instance);
 
         public CompletionRegistry(GrpcEnvironment environment)
         {
@@ -91,7 +91,7 @@ namespace Grpc.Core.Internal
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Exception occured while invoking completion delegate.");
+                Logger.Error(e, "Exception occured while invoking batch completion delegate.");
             }
             finally
             {

@@ -33,9 +33,9 @@
 
 using System;
 using Grpc.Core.Logging;
-using Grpc.Core.Profiling;
 using Grpc.Core.Utils;
 using UniRx;
+using Grpc.Core.Profiling;
 
 namespace Grpc.Core.Internal
 {
@@ -44,15 +44,16 @@ namespace Grpc.Core.Internal
     /// </summary>
     internal class AsyncCall<TRequest, TResponse> : AsyncCallBase<TRequest, TResponse>
     {
+        static readonly ILogger Logger = GrpcEnvironment.Logger.ForType<AsyncCall<TRequest, TResponse>>();
+
         readonly CallInvocationDetails<TRequest, TResponse> details;
         readonly INativeCall injectedNativeCall;  // for testing
 
         // Completion of a pending unary response if not null.
         AsyncSubject<TResponse> unaryResponseTcs;
 
-        // TODO(jtattermusch): this field doesn't need to be initialized for unary response calls.
-        // Indicates that response streaming call has finished.
-        AsyncSubject<object> streamingCallFinishedTcs = new AsyncSubject<object>();
+        // Completion of a streaming response call if not null.
+        AsyncSubject<object> streamingResponseCallFinishedTcs;
 
         // TODO(jtattermusch): this field could be lazy-initialized (only if someone requests the response headers).
         // Response headers set here once received.
@@ -76,6 +77,59 @@ namespace Grpc.Core.Internal
             this.injectedNativeCall = injectedNativeCall;
         }
 
+        // TODO: this method is not Async, so it shouldn't be in AsyncCall class, but 
+        // it is reusing fair amount of code in this class, so we are leaving it here.
+        /// <summary>
+        /// Blocking unary request - unary response call.
+        /// </summary>
+        public TResponse UnaryCall(TRequest msg)
+        {
+            var profiler = Profilers.ForCurrentThread();
+
+            using (profiler.NewScope("AsyncCall.UnaryCall"))
+            using (CompletionQueueSafeHandle cq = CompletionQueueSafeHandle.Create())
+            {
+                byte[] payload = UnsafeSerialize(msg);
+
+                unaryResponseTcs = new AsyncSubject<TResponse>();
+
+                lock (myLock)
+                {
+                    GrpcPreconditions.CheckState(!started);
+                    started = true;
+                    Initialize(cq);
+
+                    halfcloseRequested = true;
+                    readingDone = true;
+                }
+
+                using (var metadataArray = MetadataArraySafeHandle.Create(details.Options.Headers))
+                using (var ctx = BatchContextSafeHandle.Create())
+                {
+                    call.StartUnary(ctx, payload, GetWriteFlagsForCall(), metadataArray, details.Options.Flags);
+
+                    var ev = cq.Pluck(ctx.Handle);
+
+                    bool success = (ev.success != 0);
+                    try
+                    {
+                        using (profiler.NewScope("AsyncCall.UnaryCall.HandleBatch"))
+                        {
+                            HandleUnaryResponse(success, ctx.GetReceivedStatusOnClient(), ctx.GetReceivedMessage(), ctx.GetReceivedInitialMetadata());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, "Exception occured while invoking completion delegate.");
+                    }
+                }
+
+                // Once the blocking call returns, the result should be available synchronously.
+                // Note that GetAwaiter().GetResult() doesn't wrap exceptions in AggregateException.
+                return unaryResponseTcs.Wait();
+            }
+        }
+
         /// <summary>
         /// Starts a unary request - unary response call.
         /// </summary>
@@ -96,7 +150,7 @@ namespace Grpc.Core.Internal
                 unaryResponseTcs = new AsyncSubject<TResponse>();
                 using (var metadataArray = MetadataArraySafeHandle.Create(details.Options.Headers))
                 {
-                    call.StartUnary(HandleUnaryResponse, payload, metadataArray, GetWriteFlagsForCall());
+                    call.StartUnary(HandleUnaryResponse, payload, GetWriteFlagsForCall(), metadataArray, details.Options.Flags);
                 }
                 return unaryResponseTcs;
             }
@@ -120,7 +174,7 @@ namespace Grpc.Core.Internal
                 unaryResponseTcs = new AsyncSubject<TResponse>();
                 using (var metadataArray = MetadataArraySafeHandle.Create(details.Options.Headers))
                 {
-                    call.StartClientStreaming(HandleUnaryResponse, metadataArray);
+                    call.StartClientStreaming(HandleUnaryResponse, metadataArray, details.Options.Flags);
                 }
 
                 return unaryResponseTcs;
@@ -143,9 +197,10 @@ namespace Grpc.Core.Internal
 
                 byte[] payload = UnsafeSerialize(msg);
 
+                streamingResponseCallFinishedTcs = new AsyncSubject<object>();
                 using (var metadataArray = MetadataArraySafeHandle.Create(details.Options.Headers))
                 {
-                    call.StartServerStreaming(HandleFinished, payload, metadataArray, GetWriteFlagsForCall());
+                    call.StartServerStreaming(HandleFinished, payload, GetWriteFlagsForCall(), metadataArray, details.Options.Flags);
                 }
                 call.StartReceiveInitialMetadata(HandleReceivedResponseHeaders);
             }
@@ -164,9 +219,10 @@ namespace Grpc.Core.Internal
 
                 Initialize(details.Channel.CompletionQueue);
 
+                streamingResponseCallFinishedTcs = new AsyncSubject<object>();
                 using (var metadataArray = MetadataArraySafeHandle.Create(details.Options.Headers))
                 {
-                    call.StartDuplexStreaming(HandleFinished, metadataArray);
+                    call.StartDuplexStreaming(HandleFinished, metadataArray, details.Options.Flags);
                 }
                 call.StartReceiveInitialMetadata(HandleReceivedResponseHeaders);
             }
@@ -221,13 +277,13 @@ namespace Grpc.Core.Internal
         }
 
         /// <summary>
-        /// Get the task that completes once if streaming call finishes with ok status and throws RpcException with given status otherwise.
+        /// Get the task that completes once if streaming response call finishes with ok status and throws RpcException with given status otherwise.
         /// </summary>
-        public IObservable<object> StreamingCallFinishedTask
+        public IObservable<object> StreamingResponseCallFinishedTask
         {
             get
             {
-                return streamingCallFinishedTcs;
+                return streamingResponseCallFinishedTcs;
             }
         }
 
@@ -288,7 +344,7 @@ namespace Grpc.Core.Internal
 
         protected override Exception GetRpcExceptionClientOnly()
         {
-            return new RpcException(finishedStatus.Value.Status, () => (finishedStatus.HasValue) ? GetTrailers() : null);
+            return new RpcException(finishedStatus.Value.Status);
         }
 
         protected override IObservable<Unit> CheckSendAllowedOrEarlyResult()
@@ -307,7 +363,7 @@ namespace Grpc.Core.Internal
                 // Writing after the call has finished is not a programming error because server can close
                 // the call anytime, so don't throw directly, but let the write task finish with an error.
                 var tcs = new AsyncSubject<Unit>();
-                tcs.OnError(new RpcException(finishedStatus.Value.Status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
+                tcs.OnError(new RpcException(finishedStatus.Value.Status));
                 return tcs;
             }
 
@@ -330,35 +386,29 @@ namespace Grpc.Core.Internal
 
         private void Initialize(CompletionQueueSafeHandle cq)
         {
-            using (Profilers.ForCurrentThread().NewScope("AsyncCall.Initialize"))
-            { 
-                var call = CreateNativeCall(cq);
+            var call = CreateNativeCall(cq);
 
-                details.Channel.AddCallReference(this);
-                InitializeInternal(call);
-                RegisterCancellationCallback();
-            }
+            details.Channel.AddCallReference(this);
+            InitializeInternal(call);
+            RegisterCancellationCallback();
         }
 
         private INativeCall CreateNativeCall(CompletionQueueSafeHandle cq)
         {
-            using (Profilers.ForCurrentThread().NewScope("AsyncCall.CreateNativeCall"))
-            { 
-                if (injectedNativeCall != null)
-                {
-                    return injectedNativeCall;  // allows injecting a mock INativeCall in tests.
-                }
+            if (injectedNativeCall != null)
+            {
+                return injectedNativeCall;  // allows injecting a mock INativeCall in tests.
+            }
 
-                var parentCall = details.Options.PropagationToken != null ? details.Options.PropagationToken.ParentCall : CallSafeHandle.NullInstance;
+            var parentCall = details.Options.PropagationToken != null ? details.Options.PropagationToken.ParentCall : CallSafeHandle.NullInstance;
 
-                var credentials = details.Options.Credentials;
-                using (var nativeCredentials = credentials != null ? credentials.ToNativeCredentials() : null)
-                {
-                    var result = details.Channel.Handle.CreateCall(
-                                 parentCall, ContextPropagationToken.DefaultMask, cq,
-                                 details.Method, details.Host, Timespec.FromDateTime(details.Options.Deadline.Value), nativeCredentials);
-                    return result;
-                }
+            var credentials = details.Options.Credentials;
+            using (var nativeCredentials = credentials != null ? credentials.ToNativeCredentials() : null)
+            {
+                var result = details.Channel.Handle.CreateCall(
+                             parentCall, ContextPropagationToken.DefaultMask, cq,
+                             details.Method, details.Host, Timespec.FromDateTime(details.Options.Deadline.Value), nativeCredentials);
+                return result;
             }
         }
 
@@ -399,49 +449,46 @@ namespace Grpc.Core.Internal
             // NOTE: because this event is a result of batch containing GRPC_OP_RECV_STATUS_ON_CLIENT,
             // success will be always set to true.
 
-            using (Profilers.ForCurrentThread().NewScope("AsyncCall.HandleUnaryResponse"))
+            AsyncSubject<Unit> delayedStreamingWriteTcs = null;
+            TResponse msg = default(TResponse);
+            var deserializeException = TryDeserialize(receivedMessage, out msg);
+
+            lock (myLock)
             {
-                AsyncSubject<Unit> delayedStreamingWriteTcs = null;
-                TResponse msg = default(TResponse);
-                var deserializeException = TryDeserialize(receivedMessage, out msg);
+                finished = true;
 
-                lock (myLock)
+                if (deserializeException != null && receivedStatus.Status.StatusCode == StatusCode.OK)
                 {
-                    finished = true;
+                    receivedStatus = new ClientSideStatus(DeserializeResponseFailureStatus, receivedStatus.Trailers);
+                }
+                finishedStatus = receivedStatus;
 
-                    if (deserializeException != null && receivedStatus.Status.StatusCode == StatusCode.OK)
-                    {
-                        receivedStatus = new ClientSideStatus(DeserializeResponseFailureStatus, receivedStatus.Trailers);
-                    }
-                    finishedStatus = receivedStatus;
-
-                    if (isStreamingWriteCompletionDelayed)
-                    {
-                        delayedStreamingWriteTcs = streamingWriteTcs;
-                        streamingWriteTcs = null;
-                    }
-
-                    ReleaseResourcesIfPossible();
+                if (isStreamingWriteCompletionDelayed)
+                {
+                    delayedStreamingWriteTcs = streamingWriteTcs;
+                    streamingWriteTcs = null;
                 }
 
-                responseHeadersTcs.OnNext(responseHeaders);
-                responseHeadersTcs.OnCompleted();
-
-                if (delayedStreamingWriteTcs != null)
-                {
-                    delayedStreamingWriteTcs.OnError(GetRpcExceptionClientOnly());
-                }
-
-                var status = receivedStatus.Status;
-                if (status.StatusCode != StatusCode.OK)
-                {
-                    unaryResponseTcs.OnError(new RpcException(status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
-                    return;
-                }
-
-                unaryResponseTcs.OnNext(msg);
-                unaryResponseTcs.OnCompleted();
+                ReleaseResourcesIfPossible();
             }
+
+            responseHeadersTcs.OnNext(responseHeaders);
+            responseHeadersTcs.OnCompleted();
+
+            if (delayedStreamingWriteTcs != null)
+            {
+                delayedStreamingWriteTcs.OnError(GetRpcExceptionClientOnly());
+            }
+
+            var status = receivedStatus.Status;
+            if (status.StatusCode != StatusCode.OK)
+            {
+                unaryResponseTcs.OnError(new RpcException(status));
+                return;
+            }
+
+            unaryResponseTcs.OnNext(msg);
+            unaryResponseTcs.OnCompleted();
         }
 
         /// <summary>
@@ -475,12 +522,12 @@ namespace Grpc.Core.Internal
             var status = receivedStatus.Status;
             if (status.StatusCode != StatusCode.OK)
             {
-                streamingCallFinishedTcs.OnError(new RpcException(status, () => (finishedStatus.HasValue) ? GetTrailers() : null));
+                streamingResponseCallFinishedTcs.OnError(new RpcException(status));
                 return;
             }
 
-            streamingCallFinishedTcs.OnNext(null);
-            streamingCallFinishedTcs.OnCompleted();
+            streamingResponseCallFinishedTcs.OnNext(null);
+            streamingResponseCallFinishedTcs.OnCompleted();
         }
     }
 }

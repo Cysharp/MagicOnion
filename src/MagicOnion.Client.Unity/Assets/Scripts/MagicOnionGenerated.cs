@@ -1,4 +1,4 @@
-#pragma warning disable 618
+﻿#pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
@@ -74,7 +74,7 @@ namespace MagicOnion.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(14)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(16)
             {
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, int>>), 0 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.DateTime, global::System.DateTimeOffset>), 1 },
@@ -83,20 +83,33 @@ namespace MagicOnion.Resolvers
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, string>), 4 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 5 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int[], string[], global::SharedLibrary.MyEnum[]>), 6 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 7 },
-                {typeof(global::Sandbox.ChatRoomResponse[]), 8 },
-                {typeof(global::SharedLibrary.MyEnum?), 9 },
-                {typeof(global::SharedLibrary.MyEnum[]), 10 },
-                {typeof(global::System.Collections.Generic.Dictionary<int, int>), 11 },
-                {typeof(global::System.Collections.Generic.List<int>), 12 },
-                {typeof(global::SharedLibrary.MyEnum), 13 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, int, int, global::SharedLibrary.MyEnum2>), 7 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 8 },
+                {typeof(global::Sandbox.ChatRoomResponse[]), 9 },
+                {typeof(global::SharedLibrary.MyEnum?), 10 },
+                {typeof(global::SharedLibrary.MyEnum[]), 11 },
+                {typeof(global::System.Collections.Generic.Dictionary<int, int>), 12 },
+                {typeof(global::System.Collections.Generic.List<int>), 13 },
+                {typeof(global::SharedLibrary.MyEnum), 14 },
+                {typeof(global::SharedLibrary.MyEnum2), 15 },
             };
         }
 
         internal static object GetFormatter(Type t)
         {
             int key;
-            if (!lookup.TryGetValue(t, out key)) return null;
+            if (!lookup.TryGetValue(t, out key))
+            {
+                if (t == typeof(UniRx.Unit))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.UnitFormatter.Instance;
+                }
+                else if (t == typeof(Nullable<UniRx.Unit>))
+                {
+                    return MagicOnion.Resolvers.UniRxIntegrate.NullableUnitFormatter.Instance;
+                }
+                return null;
+            }
 
             switch (key)
             {
@@ -107,18 +120,85 @@ namespace MagicOnion.Resolvers
                 case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, string>(default(int), default(int), default(string));
                 case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
                 case 6: return new global::MagicOnion.DynamicArgumentTupleFormatter<int[], string[], global::SharedLibrary.MyEnum[]>(default(int[]), default(string[]), default(global::SharedLibrary.MyEnum[]));
-                case 7: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
-                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.ChatRoomResponse>();
-                case 9: return new global::MessagePack.Formatters.NullableFormatter<global::SharedLibrary.MyEnum>();
-                case 10: return new global::MessagePack.Formatters.ArrayFormatter<global::SharedLibrary.MyEnum>();
-                case 11: return new global::MessagePack.Formatters.DictionaryFormatter<int, int>();
-                case 12: return new global::MessagePack.Formatters.ListFormatter<int>();
-                case 13: return new MagicOnion.Formatters.SharedLibrary.MyEnumFormatter();
+                case 7: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, int, int, global::SharedLibrary.MyEnum2>(default(string), default(int), default(int), default(global::SharedLibrary.MyEnum2));
+                case 8: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
+                case 9: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.ChatRoomResponse>();
+                case 10: return new global::MessagePack.Formatters.NullableFormatter<global::SharedLibrary.MyEnum>();
+                case 11: return new global::MessagePack.Formatters.ArrayFormatter<global::SharedLibrary.MyEnum>();
+                case 12: return new global::MessagePack.Formatters.DictionaryFormatter<int, int>();
+                case 13: return new global::MessagePack.Formatters.ListFormatter<int>();
+                case 14: return new MagicOnion.Formatters.SharedLibrary.MyEnumFormatter();
+                case 15: return new MagicOnion.Formatters.SharedLibrary.MyEnum2Formatter();
                 default: return null;
             }
         }
     }
 }
+
+namespace MagicOnion.Resolvers.UniRxIntegrate
+{
+    using System;
+    using UniRx;
+    using MessagePack;
+    using MessagePack.Formatters;
+
+    public class UnitFormatter : IMessagePackFormatter<Unit>
+    {
+        public static readonly IMessagePackFormatter<Unit> Instance = new UnitFormatter();
+
+        UnitFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, Unit value, IFormatterResolver typeResolver)
+        {
+            return MessagePackBinary.WriteNil(ref bytes, offset);
+        }
+
+        public Unit Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        {
+            if (bytes[offset] == MessagePackCode.Nil)
+            {
+                readSize = 1;
+                return Unit.Default;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", bytes[offset], MessagePackCode.ToFormatName(bytes[offset])));
+            }
+        }
+    }
+
+    public class NullableUnitFormatter : IMessagePackFormatter<Unit?>
+    {
+        public static readonly IMessagePackFormatter<Unit?> Instance = new NullableUnitFormatter();
+
+        NullableUnitFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, Unit? value, IFormatterResolver typeResolver)
+        {
+            return MessagePackBinary.WriteNil(ref bytes, offset);
+        }
+
+        public Unit? Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        {
+            if (bytes[offset] == MessagePackCode.Nil)
+            {
+                readSize = 1;
+                return Unit.Default;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", bytes[offset], MessagePackCode.ToFormatName(bytes[offset])));
+            }
+        }
+    }
+}
+
 
 #pragma warning disable 168
 #pragma warning restore 414
@@ -144,6 +224,19 @@ namespace MagicOnion.Formatters.SharedLibrary
         public global::SharedLibrary.MyEnum Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
         {
             return (global::SharedLibrary.MyEnum)MessagePackBinary.ReadInt32(bytes, offset, out readSize);
+        }
+    }
+
+    public sealed class MyEnum2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedLibrary.MyEnum2>
+    {
+        public int Serialize(ref byte[] bytes, int offset, global::SharedLibrary.MyEnum2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        {
+            return MessagePackBinary.WriteInt32(ref bytes, offset, (Int32)value);
+        }
+        
+        public global::SharedLibrary.MyEnum2 Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
+        {
+            return (global::SharedLibrary.MyEnum2)MessagePackBinary.ReadInt32(bytes, offset, out readSize);
         }
     }
 
@@ -185,7 +278,7 @@ namespace Sandbox.ConsoleServer {
    
         ServerStreamingResult<global::SharedLibrary.MyResponse> ServerStreamingResult3();
    
-        ServerStreamingResult<global::MessagePack.Nil> ServerStreamingResult4();
+        ServerStreamingResult<global::UniRx.Unit> ServerStreamingResult4();
    
         ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req);
    
@@ -209,9 +302,9 @@ namespace Sandbox.ConsoleServer {
     public interface IHeartbeat : MagicOnion.IService<Sandbox.ConsoleServer.IHeartbeat>
     {
    
-        DuplexStreamingResult<global::MessagePack.Nil, global::MessagePack.Nil> Connect();
+        DuplexStreamingResult<global::MessagePack.Nil, global::UniRx.Unit> Connect();
    
-        UnaryResult<global::MessagePack.Nil> TestSend(string connectionId);
+        UnaryResult<global::UniRx.Unit> TestSend(string connectionId);
     }
 
 
@@ -229,13 +322,17 @@ namespace Sandbox.ConsoleServer {
     public interface IStandard : MagicOnion.IService<Sandbox.ConsoleServer.IStandard>
     {
    
-        UnaryResult<int> Unary1Async(int x, int y);
+        UnaryResult<int> Unary1(int x, int y);
+   
+        UnaryResult<int> Unary2(int x, int y);
    
         ClientStreamingResult<int, string> ClientStreaming1Async();
    
         ServerStreamingResult<int> ServerStreamingAsync(int x, int y, int z);
    
         DuplexStreamingResult<int, int> DuplexStreamingAsync();
+   
+        UnaryResult<global::SharedLibrary.MyClass2> Echo(string name, int x, int y, global::SharedLibrary.MyEnum2 e);
     }
 
 
@@ -398,11 +495,11 @@ namespace Sandbox.ConsoleServer {
             return new ServerStreamingResult<global::SharedLibrary.MyResponse>(__callResult, base.resolver);
         }
 
-        public ServerStreamingResult<global::MessagePack.Nil> ServerStreamingResult4()
+        public ServerStreamingResult<global::UniRx.Unit> ServerStreamingResult4()
         {
             var __request = MagicOnionMarshallers.UnsafeNilBytes;
             var __callResult = callInvoker.AsyncServerStreamingCall(ServerStreamingResult4Method, base.host, base.option, __request);
-            return new ServerStreamingResult<global::MessagePack.Nil>(__callResult, base.resolver);
+            return new ServerStreamingResult<global::UniRx.Unit>(__callResult, base.resolver);
         }
 
         public ServerStreamingResult<global::SharedLibrary.MyStructResponse> ServerStreamingResult5(global::SharedLibrary.MyStructRequest req)
@@ -567,17 +664,17 @@ namespace Sandbox.ConsoleServer {
             return clone;
         }
    
-        public DuplexStreamingResult<global::MessagePack.Nil, global::MessagePack.Nil> Connect()
+        public DuplexStreamingResult<global::MessagePack.Nil, global::UniRx.Unit> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(ConnectMethod, base.host, base.option);
-            return new DuplexStreamingResult<global::MessagePack.Nil, global::MessagePack.Nil>(__callResult, base.resolver);
+            return new DuplexStreamingResult<global::MessagePack.Nil, global::UniRx.Unit>(__callResult, base.resolver);
         }
 
-        public UnaryResult<global::MessagePack.Nil> TestSend(string connectionId)
+        public UnaryResult<global::UniRx.Unit> TestSend(string connectionId)
         {
             var __request = LZ4MessagePackSerializer.Serialize(connectionId, base.resolver);
             var __callResult = callInvoker.AsyncUnaryCall(TestSendMethod, base.host, base.option, __request);
-            return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
+            return new UnaryResult<global::UniRx.Unit>(__callResult, base.resolver);
         }
 
     }
@@ -623,17 +720,21 @@ namespace Sandbox.ConsoleServer {
 
     public class IStandardClient : MagicOnionClientBase<IStandard>, IStandard
     {
-        static readonly Method<byte[], byte[]> Unary1AsyncMethod;
+        static readonly Method<byte[], byte[]> Unary1Method;
+        static readonly Method<byte[], byte[]> Unary2Method;
         static readonly Method<byte[], byte[]> ClientStreaming1AsyncMethod;
         static readonly Method<byte[], byte[]> ServerStreamingAsyncMethod;
         static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
+        static readonly Method<byte[], byte[]> EchoMethod;
 
         static IStandardClient()
         {
-            Unary1AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IStandard", "Unary1Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            Unary1Method = new Method<byte[], byte[]>(MethodType.Unary, "IStandard", "Unary1", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            Unary2Method = new Method<byte[], byte[]>(MethodType.Unary, "IStandard", "Unary2", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             ClientStreaming1AsyncMethod = new Method<byte[], byte[]>(MethodType.ClientStreaming, "IStandard", "ClientStreaming1Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             ServerStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IStandard", "ServerStreamingAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IStandard", "DuplexStreamingAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            EchoMethod = new Method<byte[], byte[]>(MethodType.Unary, "IStandard", "Echo", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
         }
 
         IStandardClient()
@@ -655,10 +756,17 @@ namespace Sandbox.ConsoleServer {
             return clone;
         }
    
-        public UnaryResult<int> Unary1Async(int x, int y)
+        public UnaryResult<int> Unary1(int x, int y)
         {
             var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(Unary1AsyncMethod, base.host, base.option, __request);
+            var __callResult = callInvoker.AsyncUnaryCall(Unary1Method, base.host, base.option, __request);
+            return new UnaryResult<int>(__callResult, base.resolver);
+        }
+
+        public UnaryResult<int> Unary2(int x, int y)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(Unary2Method, base.host, base.option, __request);
             return new UnaryResult<int>(__callResult, base.resolver);
         }
 
@@ -679,6 +787,13 @@ namespace Sandbox.ConsoleServer {
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
             return new DuplexStreamingResult<int, int>(__callResult, base.resolver);
+        }
+
+        public UnaryResult<global::SharedLibrary.MyClass2> Echo(string name, int x, int y, global::SharedLibrary.MyEnum2 e)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, int, int, global::SharedLibrary.MyEnum2>(name, x, y, e), base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(EchoMethod, base.host, base.option, __request);
+            return new UnaryResult<global::SharedLibrary.MyClass2>(__callResult, base.resolver);
         }
 
     }

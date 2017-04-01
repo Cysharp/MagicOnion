@@ -53,7 +53,7 @@ namespace Grpc.Core.Internal
         private NativeExtension()
         {
             this.nativeMethods = new NativeMethods();
-
+            
             // Redirect the the native logs as the very first thing after loading the native extension
             // to make sure we don't lose any logs.
             NativeLogRedirector.Redirect(this.nativeMethods);
@@ -88,7 +88,34 @@ namespace Grpc.Core.Internal
         {
             get { return this.nativeMethods; }
         }
-#if !UNITY_METRO
+
+        /// <summary>
+        /// Detects which configuration of native extension to load and load it.
+        /// </summary>
+        private static UnmanagedLibrary Load()
+        {
+            // TODO: allow customizing path to native extension (possibly through exposing a GrpcEnvironment property).
+            // See https://github.com/grpc/grpc/pull/7303 for one option.
+            var assemblyDirectory = Path.GetDirectoryName(GetAssemblyPath());
+
+            // With old-style VS projects, the native libraries get copied using a .targets rule to the build output folder
+            // alongside the compiled assembly.
+            // With dotnet cli projects targeting net45 framework, the native libraries (just the required ones)
+            // are similarly copied to the built output folder, through the magic of Microsoft.NETCore.Platforms.
+            var classicPath = Path.Combine(assemblyDirectory, GetNativeLibraryFilename());
+
+            // With dotnet cli project targeting netcoreapp1.0, projects will use Grpc.Core assembly directly in the location where it got restored
+            // by nuget. We locate the native libraries based on known structure of Grpc.Core nuget package.
+            // When "dotnet publish" is used, the runtimes directory is copied next to the published assemblies.
+            string runtimesDirectory = string.Format("runtimes/{0}/native", GetPlatformString());
+            var netCorePublishedAppStylePath = Path.Combine(Path.Combine(assemblyDirectory, runtimesDirectory), GetNativeLibraryFilename());
+            var netCoreAppStylePath = Path.Combine(Path.Combine(Path.Combine(assemblyDirectory, "../.."), runtimesDirectory), GetNativeLibraryFilename());
+
+            // Look for all native library in all possible locations in given order.
+            string[] paths = new[] { classicPath, netCorePublishedAppStylePath, netCoreAppStylePath};
+            return new UnmanagedLibrary(paths);
+        }
+
         private static string GetAssemblyPath()
         {
             var assembly = typeof(NativeExtension).Assembly;
@@ -117,6 +144,58 @@ namespace Grpc.Core.Internal
             return uri.ToLowerInvariant().StartsWith(Uri.UriSchemeFile);
         }
 #endif
+
+        private static string GetPlatformString()
+        {
+            if (PlatformApis.IsWindows)
+            {
+                return "win";
+            }
+            if (PlatformApis.IsLinux)
+            {
+                return "linux";
+            }
+            if (PlatformApis.IsMacOSX)
+            {
+                return "osx";
+            }
+            throw new InvalidOperationException("Unsupported platform.");
+        }
+
+        // Currently, only Intel platform is supported.
+        private static string GetArchitectureString()
+        {
+            if (PlatformApis.Is64Bit)
+            {
+                return "x64";
+            }
+            else
+            {
+                return "x86";
+            }
+        }
+
+        // platform specific file name of the extension library
+        private static string GetNativeLibraryFilename()
+        {
+#if UNITY_IOS || UNITY_TVOS || UNITY_WEBGL
+		return "__Internal";
 #endif
+
+            string architecture = GetArchitectureString();
+            if (PlatformApis.IsWindows)
+            {
+                return string.Format("grpc_csharp_ext.{0}.dll", architecture);
+            }
+            if (PlatformApis.IsLinux)
+            {
+                return string.Format("libgrpc_csharp_ext.{0}.so", architecture);
+            }
+            if (PlatformApis.IsMacOSX)
+            {
+                return string.Format("libgrpc_csharp_ext.{0}.dylib", architecture);
+            }
+            throw new InvalidOperationException("Unsupported platform.");
+        }
     }
 }
