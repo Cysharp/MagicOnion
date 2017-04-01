@@ -41,12 +41,12 @@ namespace MagicOnion.HttpGateway.Swagger
                 xDocLookup = (options.XmlDocumentPath != null)
                     ? BuildXmlMemberCommentStructure(options.XmlDocumentPath)
                     : null;
-                
+
                 var doc = new SwaggerDocument();
                 doc.info = options.Info;
                 doc.host = (options.CustomHost != null) ? options.CustomHost(httpContext) : httpContext.Request.Headers["Host"][0];
                 doc.basePath = options.ApiBasePath;
-                doc.schemes = new[] { httpContext.Request.IsHttps ? "https" : httpContext.Request.Scheme };
+                doc.schemes = (options.ForceSchemas.Length == 0) ? new[] { httpContext.Request.IsHttps ? "https" : httpContext.Request.Scheme } : options.ForceSchemas;
                 doc.paths = new Dictionary<string, PathItem>();
                 doc.definitions = new Dictionary<string, Schema>();
 
