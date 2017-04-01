@@ -32,6 +32,7 @@
 #endregion
 
 using System;
+using System.Text;
 
 namespace Grpc.Core
 {
@@ -42,23 +43,21 @@ namespace Grpc.Core
     {
         private readonly Status status;
 
+        readonly Func<Metadata> getMetadata;
+
         /// <summary>
         /// Creates a new <c>RpcException</c> associated with given status.
         /// </summary>
         /// <param name="status">Resulting status of a call.</param>
-        public RpcException(Status status) : base(status.ToString())
+        public RpcException(Status status, Func<Metadata> getMetadata)
         {
             this.status = status;
+            this.getMetadata = getMetadata;
         }
 
-        /// <summary>
-        /// Creates a new <c>RpcException</c> associated with given status and message.
-        /// </summary>
-        /// <param name="status">Resulting status of a call.</param>
-        /// <param name="message">The exception message.</param> 
-        public RpcException(Status status, string message) : base(message)
+        public Metadata GetTrailers()
         {
-            this.status = status;
+            return this.getMetadata();
         }
 
         /// <summary>
