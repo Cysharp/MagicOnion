@@ -50,6 +50,7 @@ namespace Grpc.Core
         /// </summary>
         /// <param name="status">Resulting status of a call.</param>
         public RpcException(Status status, Func<Metadata> getMetadata)
+            : base(string.Format("Status(StatusCode={0}, Detail=\"{1}\")", status.StatusCode, status.Detail))
         {
             this.status = status;
             this.getMetadata = getMetadata;
