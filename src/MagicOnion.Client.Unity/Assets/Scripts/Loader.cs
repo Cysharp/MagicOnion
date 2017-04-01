@@ -9,6 +9,8 @@ using System.IO;
 using System.Text;
 using Grpc.Core;
 using MagicOnion.Client;
+using MagicOnion.Resolvers;
+using MessagePack.Resolvers;
 
 namespace MagicOnion.Tests
 {
@@ -18,9 +20,13 @@ namespace MagicOnion.Tests
         public static void Register()
         {
             // Register First
-            //ZeroFormatterInitializer.Register();
             MagicOnionInitializer.Register();
-            //ZeroFormatter.Formatters.Formatter.RegisterArray<DefaultResolver, MyEnum>();
+
+            MessagePack.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
+                MagicOnionResolver.Instance,
+                BuiltinResolver.Instance,
+                // Note:needs MessagePack generated resolver
+                StandardResolver.Instance);
 
             // Button ON
             RuntimeUnitTestToolkit.UnitTest.AddCustomAction("Use Local", () =>
@@ -29,7 +35,7 @@ namespace MagicOnion.Tests
             });
             RuntimeUnitTestToolkit.UnitTest.AddCustomAction("Use Remote", () =>
             {
-                UnitTestClient.endPoint = "104.199.192.165";
+                UnitTestClient.endPoint = "104.199.192.165"; // where is?
             });
 
 #if UNITY_EDITOR_WIN
