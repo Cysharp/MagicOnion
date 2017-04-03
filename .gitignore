@@ -114,3 +114,7 @@ src/MagicOnion.Client.Unity/bin/*
 src/MagicOnion.Client.Unity/Library/*
 src/MagicOnion.Client.Unity/obj/*
 src/MagicOnion.Client.Unity/Temp/*
+
+nuget/tools/*
+nuget/*.nupkg
+nuget/*.unitypackage

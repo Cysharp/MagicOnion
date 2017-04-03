@@ -124,7 +124,8 @@ Streaming
 // Definitions
 public interface IMyFirstService : IService<IMyFirstService>
 {
-    Task<UnaryResult<string>> SumAsync(int x, int y);
+    UnaryResult<string> SumAsync(int x, int y);
+    Task<UnaryResult<string>> SumLegacyTaskAsync(int x, int y);
     Task<ClientStreamingResult<int, string>> ClientStreamingSampleAsync();
     Task<ServerStreamingResult<string>> ServertSreamingSampleAsync(int x, int y, int z);
     Task<DuplexStreamingResult<int, string>> DuplexStreamingSampleAync();
@@ -133,11 +134,20 @@ public interface IMyFirstService : IService<IMyFirstService>
 // Server
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
-    public async Task<UnaryResult<string>> SumAsync(int x, int y)
+    // VisualStudio 2017(C# 7.0) supports return `async UnaryResult` directly
+    public async UnaryResult<string> SumAsync(int x, int y)
     {
         Logger.Debug($"Called SumAsync - x:{x} y:{y}");
 
-        // If Unary, return UnaryResult value.
+        return (x + y).ToString();
+    }
+
+    // VS2015(C# 6.0), use Task
+    public async Task<UnaryResult<string>> SumLegacyTaskAsync(int x, int y)
+    {
+        Logger.Debug($"Called SumAsync - x:{x} y:{y}");
+
+        // use UnaryResult method.
         return UnaryResult((x + y).ToString());
     }
 
@@ -323,6 +333,39 @@ Open `http://localhost:5432`, you can see swagger view.
 
 ![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
 
+Filter
+---
+Filter example.
+
+```
+public class SampleFilterAttribute : MagicOnionFilterAttribute
+{
+    // constructor convention rule. requires Func<ServiceContext, Task> next.
+    public SampleFilterAttribute(Func<ServiceContext, Task> next) : base(next) { }
+
+    // other constructor, use base(null)
+    public SampleFilterAttribute() : base(null) { }
+
+    public override async Task Invoke(ServiceContext context)
+    {
+        try
+        {
+            /* on before */
+            await Next(context); // next
+            /* on after */
+        }
+        catch
+        {
+            /* on exception */
+            throw;
+        }
+        finally
+        {
+            /* on finally */
+        }
+    }
+}
+```
 
 Unity Supports
 ---
@@ -334,11 +377,10 @@ MagicOnion's Unity client works on all platforms(PC, Android, iOS, etc...). But 
 moc arguments help:
   -i, --input=VALUE          [required]Input path of analyze csproj
   -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -s, --separate             [optional, default=false]Output files are separated
   -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
   -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
-  -r, --resolvername=VALUE   [optional, default=DefaultResolver]Register CustomSerializer target
   -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
+  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
 ```
 
 moc.exe is located in `packages\MagicOnion.*.*.*\tools\moc.exe`.

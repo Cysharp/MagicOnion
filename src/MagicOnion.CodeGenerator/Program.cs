@@ -38,7 +38,7 @@ namespace MagicOnion.CodeGenerator
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer", _ => { UnuseUnityAttr = true; } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
                 { "n|namespace=", "[optional, default=MagicOnion]Set namespace root name", x => { NamespaceRoot = x; } },
-                { "a|asyncSuffix", "[optional, default=false]Use methodName to async suffix", _ => { IsAsyncSuffix = true; } },
+                { "a|asyncsuffix", "[optional, default=false]Use methodName to async suffix", _ => { IsAsyncSuffix = true; } },
             };
             if (args.Length == 0)
             {
