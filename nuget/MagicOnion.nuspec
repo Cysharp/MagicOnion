@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>MagicOnion</id>
-        <version>0.3.3-alpha</version>
+        <version>0.4.0-alpha</version>
         <title>MagicOnion</title>
         <authors>neuecc</authors>
         <owners>neuecc</owners>
@@ -17,15 +17,14 @@
         </frameworkAssemblies>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="Grpc" version="1.0.1" />
-                <dependency id="ZeroFormatter" version="1.5.6" />
+                <dependency id="Grpc" version="1.2.0" />
+                <dependency id="MessagePack" version="1.1.2" />
             </group>
         </dependencies>
     </metadata>
     <files>
         <file src="..\src\MagicOnion\bin\Release\MagicOnion.dll" target="lib\net45" />
         <file src="..\src\MagicOnion\bin\Release\MagicOnion.xml" target="lib\net45" />
-        <file src="moc.exe" target="tools\" />
-        <file src="moc.exe.config" target="tools\" />
+        <file src="tools\*" target="tools" />
     </files>
 </package>
