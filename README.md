@@ -1,5 +1,7 @@
 MagicOnion
 ===
+[![Releases](https://img.shields.io/github/release/neuecc/MagicOnion.svg)](https://github.com/neuecc/MagicOnion/releases)
+
 gRPC based HTTP/2 RPC Streaming Framework for .NET, .NET Core and Unity.
 
 Work in progress, stay tuned.
