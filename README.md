@@ -217,9 +217,12 @@ Client sample.
 ```csharp
 static async Task UnaryRun(IMyFirstService client)
 {
-    // await await
-    var vvvvv = await await client.SumAsync(10, 20);
+    // await
+    var vvvvv = await client.SumAsync(10, 20);
     Console.WriteLine("SumAsync:" + vvvvv);
+    
+    // if use Task<UnaryResult>, use await await
+    var vvvv2 = await await client.SumLegacyTaskAsync(10, 20);
 }
 
 static async Task ClientStreamRun(IMyFirstService client)
