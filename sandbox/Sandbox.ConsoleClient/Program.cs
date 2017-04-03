@@ -38,6 +38,8 @@ namespace MagicOnion.ConsoleClient
                 //channel.ConnectAsync().Wait();
                 var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
+                c.SumAsync(10, 20).GetAwaiter().GetResult().ResponseAsync.GetAwaiter().GetResult();
+
                 var c2 = MagicOnionClient.Create<IArgumentPattern>(channel);
                 var c3 = MagicOnionClient.Create<Sandbox.ConsoleServer.IChatRoomService>(channel);
                 var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard>(channel);

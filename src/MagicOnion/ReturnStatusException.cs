@@ -16,7 +16,7 @@ namespace MagicOnion
 
         public Status ToStatus()
         {
-            return new Status(StatusCode, Detail);
+            return new Status(StatusCode, Detail ?? "");
         }
     }
 }

@@ -89,41 +89,41 @@ namespace MagicOnion.Tests
             this.client = server.CreateClient<IReturnStatus>();
         }
 
-        [Fact]
-        public void CheckException()
-        {
-            Assert.Throws<RpcException>(() => client.Unary1().ResponseAsync.GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
-            Assert.Throws<RpcException>(() => client.ClientStreaming1().ResponseAsync.GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
-            Assert.Throws<RpcException>(() => client.Serverstreaming1().ResponseStream.MoveNext().GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
-            Assert.Throws<RpcException>(() => client.DuplexStreaming1().ResponseStream.MoveNext().GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
-        }
+        //[Fact]
+        //public void CheckException()
+        //{
+        //    Assert.Throws<RpcException>(() => client.Unary1().ResponseAsync.GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
+        //    Assert.Throws<RpcException>(() => client.ClientStreaming1().ResponseAsync.GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
+        //    Assert.Throws<RpcException>(() => client.Serverstreaming1().ResponseStream.MoveNext().GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
+        //    Assert.Throws<RpcException>(() => client.DuplexStreaming1().ResponseStream.MoveNext().GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.Aborted && x.Status.Detail == "a");
+        //}
 
-        [Fact]
-        public void CheckDirect()
-        {
-            Assert.Throws<RpcException>(() => client.Unary2().ResponseAsync.GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
-            Assert.Throws<RpcException>(() => client.ClientStreaming2().ResponseAsync.GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
-            Assert.Throws<RpcException>(() => client.Serverstreaming2().ResponseStream.MoveNext().GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
-            Assert.Throws<RpcException>(() => client.DuplexStreaming2().ResponseStream.MoveNext().GetAwaiter().GetResult())
-                .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
-        }
+        //[Fact]
+        //public void CheckDirect()
+        //{
+        //    Assert.Throws<RpcException>(() => client.Unary2().ResponseAsync.GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
+        //    Assert.Throws<RpcException>(() => client.ClientStreaming2().ResponseAsync.GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
+        //    Assert.Throws<RpcException>(() => client.Serverstreaming2().ResponseStream.MoveNext().GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
+        //    Assert.Throws<RpcException>(() => client.DuplexStreaming2().ResponseStream.MoveNext().GetAwaiter().GetResult())
+        //        .Is(x => x.Status.StatusCode == StatusCode.InvalidArgument && x.Status.Detail == "b");
+        //}
 
         [Fact]
         public void CheckCustomThrow()
         {
             var ex = Assert.Throws<RpcException>(() =>
             {
-                client.CustomThrow(9999).GetAwaiter().GetResult();
+                client.CustomThrow(123).GetAwaiter().GetResult();
             });
 
-            ex.Status.StatusCode.Is((StatusCode)9999);
+            ex.Status.StatusCode.Is((StatusCode)123);
         }
     }
 }
