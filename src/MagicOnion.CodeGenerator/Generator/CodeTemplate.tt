@@ -24,7 +24,7 @@
 
     {
 <# foreach(var method in interfaceDef.Methods) { #>   
-        <#= isAsyncSuffix ? method.AsyncToString() : method.ToString() #>;
+        <#= (isAsyncSuffix && method.MethodType == MethodType.Unary) ? method.AsyncToString() : method.ToString() #>;
 <# } #>
     }
 
@@ -65,7 +65,7 @@
         }
    
 <# foreach(var item in interfaceDef.Methods) { #>
-        public <#= isAsyncSuffix ? item.AsyncToString() : item.ToString() #>
+        public <#= (isAsyncSuffix && item.MethodType == MethodType.Unary) ? item.AsyncToString() : item.ToString() #>
         {
 <# if(item.MethodType == MethodType.Unary) { #>
             var __request = <#= item.RequestObject() #>;
