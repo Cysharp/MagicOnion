@@ -160,7 +160,7 @@ namespace Grpc.Core.Internal
         {
             var cqIndex = threadIndex % completionQueues.Count;
             var cq = completionQueues.ElementAt(cqIndex);
-            return Observable.Start(() => RunHandlerLoop(cq), Scheduler.ThreadPool)
+            return Observable.Start(() => RunHandlerLoop(cq, optionalProfiler), Scheduler.ThreadPool)
                 .Select(_ => false)
                 .ToReadOnlyReactiveProperty(true);
         }

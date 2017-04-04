@@ -88,7 +88,7 @@ namespace Grpc.Core.Internal
         {
             get { return this.nativeMethods; }
         }
-
+#if !UNITY_METRO
         /// <summary>
         /// Detects which configuration of native extension to load and load it.
         /// </summary>
@@ -144,7 +144,7 @@ namespace Grpc.Core.Internal
             return uri.ToLowerInvariant().StartsWith(Uri.UriSchemeFile);
         }
 #endif
-
+#endif
         private static string GetPlatformString()
         {
             if (PlatformApis.IsWindows)

@@ -380,7 +380,7 @@ namespace Grpc.Core
                             HandleShutdown();
                         });
 
-#else
+#elif !UNITY_METRO
                         AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => { HandleShutdown(); };
                         AppDomain.CurrentDomain.DomainUnload += (sender, eventArgs) => { HandleShutdown(); };
 #endif

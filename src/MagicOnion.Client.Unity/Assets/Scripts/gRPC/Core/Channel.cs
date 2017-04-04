@@ -269,11 +269,13 @@ namespace Grpc.Core
             var activeCallCount = activeCallCounter.Count;
             if (activeCallCount > 0)
             {
+#if !UNITY_METRO
                 // wait for shutdown complete...!
                 Logger.Debug("Wait shutdown start 0.5 sec...");
                 System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500));
 
                 if (activeCallCounter.Count > 0)
+#endif
                 {
                     Logger.Warning("Channel shutdown was called but there are still {0} active calls for that channel.", activeCallCount);
                 }

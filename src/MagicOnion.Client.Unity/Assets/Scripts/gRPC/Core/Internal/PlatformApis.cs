@@ -58,6 +58,11 @@ namespace Grpc.Core.Internal
             isMacOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             isNetCore = RuntimeInformation.FrameworkDescription.StartsWith(".NET Core");
+#elif UNITY_METRO
+            isLinux = false;
+            isMacOSX = false;
+            isWindows = true;
+            isNetCore = false;
 #else
             var platform = Environment.OSVersion.Platform;
 
