@@ -11,9 +11,7 @@ namespace Sandbox.ConsoleServer.Services
     {
         public async Task<UnaryResult<string>> SumAsync(int x, int y)
         {
-            return ReturnStatus<string>((Grpc.Core.StatusCode)101, null);
-            //return UnaryResult((x + y).ToString());
-
+            return UnaryResult((x + y).ToString());
         }
 
         public UnaryResult<string> SumAsync2(int x, int y)
