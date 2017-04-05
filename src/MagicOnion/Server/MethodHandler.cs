@@ -360,7 +360,7 @@ namespace MagicOnion.Server
                     }
                     var str = sb.ToString();
 
-                    context.Status = new Status(StatusCode.Unknown, msg);
+                    context.Status = new Status(StatusCode.Unknown, str);
                     LogError(ex, context);
                     response = emptyBytes;
                 }
