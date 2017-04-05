@@ -339,7 +339,28 @@ namespace MagicOnion.Server
                 isErrorOrInterrupted = true;
                 if (isReturnExceptionStackTraceInErrorDetail)
                 {
-                    context.Status = new Status(StatusCode.Unknown, ex.ToString());
+                    // Trim data.
+                    var msg = ex.ToString();
+                    var lineSplit = msg.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                    var sb = new System.Text.StringBuilder();
+                    for (int i = 0; i < lineSplit.Length; i++)
+                    {
+                        if (!(lineSplit[i].Contains("System.Runtime.CompilerServices")
+                           || lineSplit[i].Contains("直前に例外がスローされた場所からのスタック トレースの終わり")
+                           || lineSplit[i].Contains("End of stack trace from the previous location where the exception was thrown")
+                           ))
+                        {
+                            sb.AppendLine(lineSplit[i]);
+                        }
+                        if (sb.Length >= 5000)
+                        {
+                            sb.AppendLine("----Omit Message(message size is too long)----");
+                            break;
+                        }
+                    }
+                    var str = sb.ToString();
+
+                    context.Status = new Status(StatusCode.Unknown, msg);
                     LogError(ex, context);
                     response = emptyBytes;
                 }
