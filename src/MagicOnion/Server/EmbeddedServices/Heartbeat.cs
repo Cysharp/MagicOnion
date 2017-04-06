@@ -1,19 +1,20 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server.EmbeddedServices
 {
     public interface IMagicOnionEmbeddedHeartbeat : IService<IMagicOnionEmbeddedHeartbeat>
     {
-        Task<DuplexStreamingResult<bool, bool>> Connect();
+        Task<DuplexStreamingResult<Nil, Nil>> Connect();
     }
 
     [Ignore]
     internal class MagicOnionEmbeddedHeartbeat : ServiceBase<IMagicOnionEmbeddedHeartbeat>, IMagicOnionEmbeddedHeartbeat
     {
-        public async Task<DuplexStreamingResult<bool, bool>> Connect()
+        public async Task<DuplexStreamingResult<Nil, Nil>> Connect()
         {
-            var streaming = GetDuplexStreamingContext<bool, bool>();
+            var streaming = GetDuplexStreamingContext<Nil, Nil>();
 
             var id = ConnectionContext.GetConnectionId(Context);
             var cancellationTokenSource = ConnectionContext.Register(id);
@@ -21,11 +22,12 @@ namespace MagicOnion.Server.EmbeddedServices
             try
             {
                 // send to connect complete.
-                await streaming.WriteAsync(true).ConfigureAwait(false);
+                await streaming.WriteAsync(Nil.Default).ConfigureAwait(false);
 
-                // wait client disconnect.
-                // if client send complete event, safe unsubscribe of heartbeat.
-                await streaming.MoveNext();
+                // receive client hearbeat ping.
+                while (await streaming.MoveNext().ConfigureAwait(false))
+                {
+                }
             }
             catch (RpcException)
             {

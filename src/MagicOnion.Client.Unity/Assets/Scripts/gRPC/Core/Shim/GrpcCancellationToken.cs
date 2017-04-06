@@ -11,6 +11,7 @@ namespace Grpc.Core
         int state = 1; // 1 = normal, 2 = alreadyCanceled
         object gate = new object();
         List<Action> callbackActions;
+        List<Action> callbackActionsLast;
 
         public bool CanBeCanceled
         {
@@ -43,6 +44,13 @@ namespace Grpc.Core
                             callbackActions[i].Invoke();
                         }
                     }
+                    if (callbackActionsLast != null)
+                    {
+                        for (int i = 0; i < callbackActionsLast.Count; i++)
+                        {
+                            callbackActionsLast[i].Invoke();
+                        }
+                    }
                 }
             }
         }
@@ -58,6 +66,26 @@ namespace Grpc.Core
                         callbackActions = new List<Action>();
                     }
                     callbackActions.Add(callback);
+                }
+            }
+            else
+            {
+                callback();
+            }
+        }
+
+        // second priority
+        internal void InternalRegisterLast(Action callback)
+        {
+            if (!IsCancellationRequested)
+            {
+                lock (gate)
+                {
+                    if (callbackActionsLast == null)
+                    {
+                        callbackActionsLast = new List<Action>();
+                    }
+                    callbackActionsLast.Add(callback);
                 }
             }
             else
@@ -102,6 +130,14 @@ namespace Grpc.Core
             if (!CanBeCanceled) return;
 
             source.InternalRegister(callback);
+        }
+
+        public void RegisterLast(Action callback)
+        {
+            if (callback == null) throw new ArgumentNullException("callback");
+            if (!CanBeCanceled) return;
+
+            source.InternalRegisterLast(callback);
         }
     }
 }

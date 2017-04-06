@@ -41,10 +41,20 @@ namespace MagicOnion.Server
 
         public static string GetConnectionId(ServiceContext context)
         {
-            var connectionId = context.CallContext.RequestHeaders.Get(HeaderKey);
-            if (connectionId == null || connectionId.IsBinary) throw new Exception("ConnectionContext must needs `connection_id` header and Guid string.");
+            return TryGetConnectionId(context, out var id) ? id : null;
+        }
 
-            return connectionId.Value;
+        public static bool TryGetConnectionId(ServiceContext context, out string id)
+        {
+            var connectionId = context.CallContext.RequestHeaders.Get(HeaderKey);
+            if (connectionId == null || connectionId.IsBinary)
+            {
+                id = null;
+                return false;
+            }
+
+            id = connectionId.Value;
+            return true;
         }
 
         public static CancellationTokenSource Register(string connectionId)
@@ -73,6 +83,20 @@ namespace MagicOnion.Server
             }
         }
 
+        public static bool TryGetContext(string connectionId, out ConnectionContext context)
+        {
+            ConnectionContext source;
+            if (manager.TryGetValue(connectionId, out source))
+            {
+                context = source;
+                return true;
+            }
+            else
+            {
+                context = null;
+                return false;
+            }
+        }
 
         #endregion
     }
@@ -86,8 +110,11 @@ namespace MagicOnion.Server
 
         public static ConnectionContext GetConnectionContext(this ServiceContext context)
         {
-            var id = ConnectionContext.GetConnectionId(context);
-            return ConnectionContext.GetContext(id);
+            if (!ConnectionContext.TryGetConnectionId(context, out var id))
+            {
+                return null;
+            }
+            return ConnectionContext.TryGetContext(id, out var ctx) ? ctx : null;
         }
     }
 }

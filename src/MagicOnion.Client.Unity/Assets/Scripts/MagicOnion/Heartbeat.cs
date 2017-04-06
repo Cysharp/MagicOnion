@@ -1,9 +1,10 @@
-﻿using UniRx;
+﻿using MessagePack;
+using UniRx;
 
 namespace MagicOnion.Server.EmbeddedServices
 {
     public interface IMagicOnionEmbeddedHeartbeat : IService<IMagicOnionEmbeddedHeartbeat>
     {
-        IObservable<DuplexStreamingResult<bool, bool>> Connect();
+        IObservable<DuplexStreamingResult<Nil, Nil>> Connect();
     }
 }

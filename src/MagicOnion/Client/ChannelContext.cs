@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client.EmbeddedServices;
 using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,9 +20,10 @@ namespace MagicOnion.Client
         bool isDisposed;
         int currentRetryCount = 0;
         Task connectingTask;
-        DuplexStreamingResult<bool, bool> latestStreamingResult;
+        DuplexStreamingResult<Nil, Nil> latestStreamingResult;
         TaskCompletionSource<object> waitConnectComplete;
         LinkedList<Action> disconnectedActions = new LinkedList<Action>();
+        int pingSecond;
 
         string connectionId;
         public string ConnectionId
@@ -33,7 +35,7 @@ namespace MagicOnion.Client
             }
         }
 
-        public ChannelContext(Channel channel, Func<string> connectionIdFactory = null, bool useSameId = true)
+        public ChannelContext(Channel channel, Func<string> connectionIdFactory = null, bool useSameId = true, int pingSecond = 15)
         {
             this.channel = channel;
             this.useSameId = useSameId;
@@ -43,6 +45,7 @@ namespace MagicOnion.Client
                 this.connectionId = this.connectionIdFactory();
             }
             this.waitConnectComplete = new TaskCompletionSource<object>();
+            this.pingSecond = pingSecond;
             connectingTask = ConnectAlways();
         }
 
@@ -82,13 +85,30 @@ namespace MagicOnion.Client
                     currentRetryCount = 0;
                     waitConnectComplete.TrySetResult(new object());
 
+                    bool isFinished = false;
                     try
                     {
-                        // now channelstate is ready and wait changed.
-                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext()).ConfigureAwait(false);
+                        var heartbeat = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                while (true)
+                                {
+                                    if (isFinished) return;
+                                    await Task.Delay(TimeSpan.FromSeconds(pingSecond)).ConfigureAwait(false);
+                                    if (isFinished) return;
+                                    await latestStreamingResult.RequestStream.WriteAsync(Nil.Default).ConfigureAwait(false);
+                                }
+                            }
+                            catch { }
+                        });
+
+                        await Task.WhenAny(channel.WaitForStateChangedAsync(ChannelState.Ready), latestStreamingResult.ResponseStream.MoveNext(), heartbeat).ConfigureAwait(false);
                     }
                     finally
                     {
+                        isFinished = true;
+
                         waitConnectComplete = new TaskCompletionSource<object>();
                         foreach (var action in disconnectedActions)
                         {

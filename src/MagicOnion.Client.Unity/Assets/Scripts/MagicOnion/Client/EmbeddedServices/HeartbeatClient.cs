@@ -2,6 +2,7 @@
 using Grpc.Core;
 using MagicOnion.Server.EmbeddedServices;
 using UniRx;
+using MessagePack;
 
 namespace MagicOnion.Client.EmbeddedServices
 {
@@ -42,10 +43,10 @@ namespace MagicOnion.Client.EmbeddedServices
             return clone;
         }
 
-        public IObservable<DuplexStreamingResult<bool, bool>> Connect()
+        public IObservable<DuplexStreamingResult<Nil, Nil>> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
-            return Observable.Return(new DuplexStreamingResult<bool, bool>(__callResult, resolver));
+            return Observable.Return(new DuplexStreamingResult<Nil, Nil>(__callResult, resolver));
         }
     }
 }

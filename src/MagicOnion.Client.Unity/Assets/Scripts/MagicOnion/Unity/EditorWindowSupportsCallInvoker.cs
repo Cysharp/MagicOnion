@@ -11,11 +11,19 @@ namespace MagicOnion
 {
     public class EditorWindowSupportsCallInvoker : CallInvoker
     {
+        readonly CallInvoker unaryInvoker;
         readonly Channel channel;
 
         public EditorWindowSupportsCallInvoker(Channel channel)
         {
             this.channel = channel;
+            this.unaryInvoker = null;
+        }
+
+        public EditorWindowSupportsCallInvoker(CallInvoker unaryInvoker, Channel channel)
+        {
+            this.channel = channel;
+            this.unaryInvoker = unaryInvoker;
         }
 
         /// <summary>
@@ -23,8 +31,15 @@ namespace MagicOnion
         /// </summary>
         public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options, TRequest request)
         {
-            var call = CreateCall(method, host, options);
-            return Calls.AsyncUnaryCall(call, request);
+            if (unaryInvoker == null)
+            {
+                var call = CreateCall(method, host, options);
+                return Calls.AsyncUnaryCall(call, request);
+            }
+            else
+            {
+                return unaryInvoker.AsyncUnaryCall(method, host, options, request);
+            }
         }
 
         /// <summary>

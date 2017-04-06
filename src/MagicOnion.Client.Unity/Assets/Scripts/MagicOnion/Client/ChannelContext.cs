@@ -18,11 +18,14 @@ namespace MagicOnion.Client
 
         bool isDisposed;
         int currentRetryCount = 0;
-        DuplexStreamingResult<bool, bool> latestStreamingResult;
+        int pingSecond;
+        DuplexStreamingResult<Nil, Nil> latestStreamingResult;
         AsyncSubject<Unit> waitConnectComplete;
         IDisposable connectingTask;
         GrpcCancellationTokenSource cancellationTokenSource = new GrpcCancellationTokenSource();
         LinkedList<Action> disconnectedActions = new LinkedList<Action>();
+
+        public bool IsDisposed { get { return isDisposed; } }
 
         string connectionId;
         public string ConnectionId
@@ -42,10 +45,11 @@ namespace MagicOnion.Client
             }
         }
 
-        public ChannelContext(Channel channel, Func<string> connectionIdFactory = null, bool useSameId = true)
+        public ChannelContext(Channel channel, Func<string> connectionIdFactory = null, bool useSameId = true, int pingSecond = 15)
         {
             this.channel = channel;
             this.useSameId = useSameId;
+            this.pingSecond = pingSecond;
             this.connectionIdFactory = connectionIdFactory ?? (() => Guid.NewGuid().ToString());
             if (useSameId)
             {
@@ -58,7 +62,7 @@ namespace MagicOnion.Client
             }, () => { });
 
             // destructor
-            this.channel.ShutdownToken.Register(() =>
+            this.channel.ShutdownToken.RegisterLast(() =>
             {
                 this.Dispose();
             });
@@ -125,7 +129,8 @@ namespace MagicOnion.Client
                 waitConnectComplete.OnNext(Unit.Default);
                 waitConnectComplete.OnCompleted();
 
-                var waitForDisconnect = Observable.Amb(channel.WaitForStateChangedAsync(ChannelState.Ready), heartBeatConnect.Result.ResponseStream.MoveNext()).ToYieldInstruction(false);
+                var heartbeat = Observable.FromCoroutine((ct) => PingLoop(latestStreamingResult, ct)).Select(_ => true);
+                var waitForDisconnect = Observable.Amb(channel.WaitForStateChangedAsync(ChannelState.Ready), heartBeatConnect.Result.ResponseStream.MoveNext(), heartbeat).ToYieldInstruction(false);
                 yield return waitForDisconnect;
                 try
                 {
@@ -147,6 +152,22 @@ namespace MagicOnion.Client
                 }
 
                 if (token.IsCancellationRequested) yield break;
+            }
+        }
+
+        IEnumerator PingLoop(DuplexStreamingResult<Nil, Nil> streaming, CancellationToken token)
+        {
+            var waiter = new UnityEngine.WaitForSeconds(pingSecond);
+            while (true)
+            {
+                if (token.IsCancellationRequested) yield break;
+                yield return waiter;
+
+                if (token.IsCancellationRequested) yield break;
+
+                var r = streaming.RequestStream.WriteAsync(Nil.Default).ToYieldInstruction(false);
+                yield return r;
+                if (r.HasError) yield break;
             }
         }
 
@@ -227,9 +248,9 @@ namespace MagicOnion.Client
             waitConnectComplete.Dispose();
             latestStreamingResult.Dispose();
 
-            foreach (var item in disconnectedActions)
+            foreach (var action in disconnectedActions)
             {
-                item();
+                action();
             }
             disconnectedActions.Clear();
         }

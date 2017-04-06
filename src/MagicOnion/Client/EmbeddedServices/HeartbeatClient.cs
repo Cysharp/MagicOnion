@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion.Server.EmbeddedServices;
+using MessagePack;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Client.EmbeddedServices
@@ -42,15 +43,15 @@ namespace MagicOnion.Client.EmbeddedServices
             return clone;
         }
 
-        Task<DuplexStreamingResult<bool, bool>> IMagicOnionEmbeddedHeartbeat.Connect()
+        Task<DuplexStreamingResult<Nil, Nil>> IMagicOnionEmbeddedHeartbeat.Connect()
         {
             return Task.FromResult(Connect());
         }
 
-        public DuplexStreamingResult<bool, bool> Connect()
+        public DuplexStreamingResult<Nil, Nil> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
-            return new DuplexStreamingResult<bool, bool>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance); // <bool> is builtin only.
+            return new DuplexStreamingResult<Nil, Nil>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance);
         }
     }
 }
