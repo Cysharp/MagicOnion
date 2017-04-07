@@ -15,7 +15,7 @@ namespace MagicOnion.Server
         internal static AsyncLocal<ServiceContext> currentServiceContext = new AsyncLocal<ServiceContext>();
 
         /// <summary>
-        /// Get Current ServiceContext. This property requires to MagicOnionOptions.EnableCurrentContext = true;
+        /// Get Current ServiceContext. This property requires to MagicOnionOptions.Enable
         /// </summary>
         public static ServiceContext Current
         {
@@ -32,7 +32,10 @@ namespace MagicOnion.Server
         {
             get
             {
-                if (items == null) items = new ConcurrentDictionary<string, object>();
+                lock (CallContext) // lock per CallContext, is this dangerous?
+                {
+                    if (items == null) items = new ConcurrentDictionary<string, object>();
+                }
                 return items;
             }
         }
