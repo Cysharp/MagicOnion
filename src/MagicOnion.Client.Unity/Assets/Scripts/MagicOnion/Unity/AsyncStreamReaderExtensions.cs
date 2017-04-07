@@ -6,16 +6,26 @@ namespace MagicOnion
 {
     public static class AsyncStreamReaderExtensions
     {
-        public static IDisposable Subscribe<T>(this IAsyncStreamReader<T> stream, Action<T> onNext, bool observeOnMainThread = true)
+        public static IDisposable Subscribe<T>(this IAsyncStreamReader<T> stream, Action<T> onNext, bool observeOnMainThread = true, IDisposable streamingResult = null)
         {
             if (observeOnMainThread)
             {
-                return AsObservable(stream, observeOnMainThread).Subscribe(onNext);
+                return AsObservable(stream, observeOnMainThread, streamingResult).Subscribe(onNext);
             }
-            else
-            {
-                return ForEachAsync<T>(stream, onNext).Subscribe();
-            }
+
+            var subscription = ForEachAsync<T>(stream, onNext).Subscribe();
+
+            if (streamingResult == null) return subscription;
+
+            return StableCompositeDisposable.Create(subscription, streamingResult);
+        }
+
+        public static IDisposable Subscribe<T>(this IAsyncStreamReader<T> stream, IObserver<T> observer, bool observeOnMainThread = true, IDisposable streamingResult = null)
+        {
+            var subscription = AsObservable(stream, observeOnMainThread).Subscribe(observer);
+
+            if (streamingResult == null) return subscription;
+            return StableCompositeDisposable.Create(subscription, streamingResult);
         }
 
         public static IObservable<Unit> ForEachAsync<T>(this IAsyncStreamReader<T> stream, Action<T> action)
@@ -25,19 +35,23 @@ namespace MagicOnion
 
         static IObservable<Unit> RecursiveActionAsync<T>(IAsyncStreamReader<T> stream, Action<T> action)
         {
-            return stream.MoveNext().ContinueWith(x =>
-            {
-                if (x)
+            return stream.MoveNext()
+                .ContinueWith(x =>
                 {
-                    action(stream.Current);
-                    return RecursiveActionAsync(stream, action);
-                }
-                else
+                    if (x)
+                    {
+                        action(stream.Current);
+                        return RecursiveActionAsync(stream, action);
+                    }
+                    else
+                    {
+                        return Observable.ReturnUnit();
+                    }
+                })
+                .Finally(() =>
                 {
                     stream.Dispose();
-                    return Observable.ReturnUnit();
-                }
-            });
+                });
         }
 
         public static IObservable<Unit> ForEachAsync<T>(this IAsyncStreamReader<T> stream, Func<T, IObservable<Unit>> asyncAction)
@@ -62,11 +76,14 @@ namespace MagicOnion
             });
         }
 
-        public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream, bool observeOnMainThread = true)
+        public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream, bool observeOnMainThread = true, IDisposable streamingResult = null)
         {
             var seq = Observable.Create<T>(observer =>
             {
-                return stream.ForEachAsync(x => observer.OnNext(x)).Subscribe(_ => { }, observer.OnError, observer.OnCompleted);
+                var subscription = stream.ForEachAsync(x => observer.OnNext(x)).Subscribe(_ => { }, observer.OnError, observer.OnCompleted);
+                if (streamingResult == null) return subscription;
+
+                return StableCompositeDisposable.Create(subscription, streamingResult);
             });
 
             return (observeOnMainThread) ? seq.ObserveOnMainThread() : seq;
