@@ -24,6 +24,12 @@ namespace MagicOnion.Server
         /// </summary>
         public bool DisableEmbeddedService { get; set; }
 
+
+        /// <summary>
+        /// Enable ServiceContext.Current option by AsyncLocal.
+        /// </summary>
+        public bool EnableCurrentContext { get; set; }
+
         /// <summary>
         /// Global MagicOnion filters.
         /// </summary>
@@ -40,6 +46,7 @@ namespace MagicOnion.Server
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new MagicOnionFilterAttribute[0];
             this.DisableEmbeddedService = false;
+            this.EnableCurrentContext = false;
         }
     }
 }

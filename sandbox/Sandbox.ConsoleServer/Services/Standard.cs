@@ -15,7 +15,13 @@ namespace Sandbox.ConsoleServer.Services
     {
         public async UnaryResult<int?> NullableCheck(bool isNull)
         {
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            var huga = ServiceContext.Current;
+
+
+            await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+            var hugahuga = ServiceContext.Current;
+
 
             if (isNull) return null;
             else return 100;

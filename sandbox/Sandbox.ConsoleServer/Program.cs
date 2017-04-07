@@ -43,7 +43,8 @@ namespace MagicOnion.ConsoleServer
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 GlobalFilters = new MagicOnionFilterAttribute[]
                 {
-                }
+                },
+                EnableCurrentContext = true
             });
 
             var server = new global::Grpc.Core.Server

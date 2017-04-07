@@ -12,6 +12,19 @@ namespace MagicOnion.Server
 {
     public class ServiceContext
     {
+        internal static AsyncLocal<ServiceContext> currentServiceContext = new AsyncLocal<ServiceContext>();
+
+        /// <summary>
+        /// Get Current ServiceContext. This property requires to MagicOnionOptions.EnableCurrentContext = true;
+        /// </summary>
+        public static ServiceContext Current
+        {
+            get
+            {
+                return currentServiceContext.Value;
+            }
+        }
+
         ConcurrentDictionary<string, object> items;
 
         /// <summary>Object storage per invoke.</summary>

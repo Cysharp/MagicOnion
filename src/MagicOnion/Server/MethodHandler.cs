@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using MessagePack;
-using MessagePack.Formatters;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,6 +25,7 @@ namespace MagicOnion.Server
 
         readonly bool isReturnExceptionStackTraceInErrorDetail;
         readonly IMagicOnionLogger logger;
+        readonly bool enableCurrentContext;
 
         // use for request handling.
 
@@ -72,6 +72,7 @@ namespace MagicOnion.Server
             // options
             this.isReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
             this.logger = options.MagicOnionLogger;
+            this.enableCurrentContext = options.EnableCurrentContext;
 
             // prepare lambda parameters
             var contextArg = Expression.Parameter(typeof(ServiceContext), "context");
@@ -325,6 +326,10 @@ namespace MagicOnion.Server
             try
             {
                 logger.BeginInvokeMethod(serviceContext, request, typeof(TRequest));
+                if (enableCurrentContext)
+                {
+                    ServiceContext.currentServiceContext.Value = serviceContext;
+                }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
                 response = serviceContext.Result ?? emptyBytes;
             }
@@ -390,8 +395,11 @@ namespace MagicOnion.Server
                 using (requestStream)
                 {
                     logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
+                    if (enableCurrentContext)
+                    {
+                        ServiceContext.currentServiceContext.Value = serviceContext;
+                    }
                     await this.methodBody(serviceContext).ConfigureAwait(false);
-
                     response = serviceContext.Result ?? emptyBytes;
                 }
             }
@@ -433,8 +441,11 @@ namespace MagicOnion.Server
             try
             {
                 logger.BeginInvokeMethod(serviceContext, request, typeof(TRequest));
+                if (enableCurrentContext)
+                {
+                    ServiceContext.currentServiceContext.Value = serviceContext;
+                }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
-
                 return emptyBytes;
             }
             catch (ReturnStatusException ex)
@@ -476,7 +487,10 @@ namespace MagicOnion.Server
                 logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
                 using (requestStream)
                 {
-
+                    if (enableCurrentContext)
+                    {
+                        ServiceContext.currentServiceContext.Value = serviceContext;
+                    }
                     await this.methodBody(serviceContext).ConfigureAwait(false);
 
                     return emptyBytes;
