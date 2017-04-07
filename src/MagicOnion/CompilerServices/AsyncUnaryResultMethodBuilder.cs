@@ -55,7 +55,7 @@ namespace MagicOnion.CompilerServices
                 else
                 {
                     useBuilder = true;
-                    return new UnaryResult<T>(methodBuilder.Task.Result);
+                    return new UnaryResult<T>(methodBuilder.Task);
                 }
             }
         }

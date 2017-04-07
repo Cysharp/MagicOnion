@@ -36,26 +36,32 @@ namespace MagicOnion.ConsoleClient
 
                 var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
                 //channel.ConnectAsync().Wait();
-                var c = MagicOnionClient.Create<IMyFirstService>(channel);
 
-                c.SumAsync(10, 20).GetAwaiter().GetResult().ResponseAsync.GetAwaiter().GetResult();
+                var c = MagicOnionClient.Create<IStandard>(channel);
 
-                var c2 = MagicOnionClient.Create<IArgumentPattern>(channel);
-                var c3 = MagicOnionClient.Create<Sandbox.ConsoleServer.IChatRoomService>(channel);
-                var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard>(channel);
-
-                // TestHeartbeat(channel).GetAwaiter().GetResult();
-                UnaryRun(c).GetAwaiter().GetResult();
-                ClientStreamRun(c).GetAwaiter().GetResult();
-                DuplexStreamRun(c).GetAwaiter().GetResult();
-                ServerStreamRun(c).GetAwaiter().GetResult();
-
-                // many run
-                //UnaryLoadTest(c).GetAwaiter().GetResult();
+                RunTest(c).GetAwaiter().GetResult();
+                return;
 
 
-                //                HearbeatClient.Test(channel).GetAwaiter().GetResult();
-                Console.ReadLine();
+                //return;
+                ////c.SumAsync(10, 20).GetAwaiter().GetResult().ResponseAsync.GetAwaiter().GetResult();
+
+                //var c2 = MagicOnionClient.Create<IArgumentPattern>(channel);
+                //var c3 = MagicOnionClient.Create<Sandbox.ConsoleServer.IChatRoomService>(channel);
+                //var c4 = MagicOnionClient.Create<Sandbox.ConsoleServer.IStandard>(channel);
+
+                //// TestHeartbeat(channel).GetAwaiter().GetResult();
+                //UnaryRun(c).GetAwaiter().GetResult();
+                //ClientStreamRun(c).GetAwaiter().GetResult();
+                //DuplexStreamRun(c).GetAwaiter().GetResult();
+                //ServerStreamRun(c).GetAwaiter().GetResult();
+
+                //// many run
+                ////UnaryLoadTest(c).GetAwaiter().GetResult();
+
+
+                ////                HearbeatClient.Test(channel).GetAwaiter().GetResult();
+                //Console.ReadLine();
 
                 //              ChatClient.Run(channel).GetAwaiter().GetResult();
                 //TestHeartbeat(channel).GetAwaiter().GetResult();
@@ -69,7 +75,12 @@ namespace MagicOnion.ConsoleClient
         }
 
 
+        static async Task RunTest(IStandard c)
+        {
+            var huga1 = await c.NullableCheck(false);
+            var huga2 = await c.NullableCheck(true);
 
+        }
 
 
         // client, perfect!

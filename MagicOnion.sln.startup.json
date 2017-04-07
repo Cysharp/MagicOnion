@@ -36,6 +36,13 @@
 				"Sandbox.ConsoleServer": {},
 				"Sandbox.ConsoleClient": {}
 			}
+		},
+		"Server + Server2 + Client": {
+					"Projects": {
+						"Sandbox.ConsoleServer": {},
+						"Sandbox.ConsoleServer2": {},
+						"Sandbox.ConsoleClient": {}
+					}
 		}
 	}
 }

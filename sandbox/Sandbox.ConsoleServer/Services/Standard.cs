@@ -13,6 +13,15 @@ namespace Sandbox.ConsoleServer.Services
 {
     public class Standard : ServiceBase<IStandard>, IStandard
     {
+        public async UnaryResult<int?> NullableCheck(bool isNull)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            if (isNull) return null;
+            else return 100;
+        }
+
+
         public async Task<ClientStreamingResult<int, string>> ClientStreaming1Async()
         {
             var stream = GetClientStreamingContext<int, string>();

@@ -6,6 +6,8 @@ namespace Sandbox.ConsoleServer
 {
     public interface IStandard : IService<IStandard>
     {
+        UnaryResult<int?> NullableCheck(bool isNull);
+
         UnaryResult<int> Unary1(int x, int y);
         UnaryResult<int> Unary2(int x, int y);
 

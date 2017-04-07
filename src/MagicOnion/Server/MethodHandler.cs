@@ -531,14 +531,15 @@ namespace MagicOnion.Server
 
     internal class MethodHandlerResultHelper
     {
-        public static Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
+        public static async Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
         {
             if (result.hasRawValue)
             {
-                var bytes = LZ4MessagePackSerializer.Serialize<T>(result.rawValue, context.FormatterResolver);
+                var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
+
+                var bytes = LZ4MessagePackSerializer.Serialize<T>(value, context.FormatterResolver);
                 context.Result = bytes;
             }
-            return Task.CompletedTask;
         }
 
         public static async Task SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
@@ -546,7 +547,9 @@ namespace MagicOnion.Server
             var result = await taskResult.ConfigureAwait(false);
             if (result.hasRawValue)
             {
-                var bytes = LZ4MessagePackSerializer.Serialize<T>(result.rawValue, context.FormatterResolver);
+                var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
+
+                var bytes = LZ4MessagePackSerializer.Serialize<T>(value, context.FormatterResolver);
                 context.Result = bytes;
             }
         }
