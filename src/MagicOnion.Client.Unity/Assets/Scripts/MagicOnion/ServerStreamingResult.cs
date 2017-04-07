@@ -8,7 +8,7 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncServerStreamingCall.
     /// </summary>
-    public struct ServerStreamingResult<TResponse> : IDisposable
+    public struct ServerStreamingResult<TResponse> : IDisposable, IObservable<TResponse>
     {
         readonly AsyncServerStreamingCall<byte[]> inner;
         readonly MarshallingAsyncStreamReader<TResponse> responseStream;
@@ -75,6 +75,16 @@ namespace MagicOnion
             {
                 this.inner.Dispose();
             }
+        }
+
+        public IObservable<TResponse> AsObservable(bool observeOnMainThread = true)
+        {
+            return responseStream.AsObservable(observeOnMainThread, this);
+        }
+
+        public IDisposable Subscribe(IObserver<TResponse> observer)
+        {
+            return responseStream.Subscribe(observer, true, this);
         }
     }
 }

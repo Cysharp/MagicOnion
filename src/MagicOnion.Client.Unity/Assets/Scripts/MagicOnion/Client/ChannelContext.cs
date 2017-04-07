@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UniRx;
+using UnityEngine;
 
 namespace MagicOnion.Client
 {
@@ -81,6 +82,7 @@ namespace MagicOnion.Client
 
         IEnumerator ConnectAlways(CancellationToken token)
         {
+            var waitSeconds = new WaitForSeconds(5);
             while (true)
             {
                 if (isDisposed) yield break;
@@ -95,6 +97,7 @@ namespace MagicOnion.Client
                 if (conn.HasError)
                 {
                     GrpcEnvironment.Logger.Error(conn.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    yield return waitSeconds;
                     continue;
                 }
 
@@ -106,6 +109,7 @@ namespace MagicOnion.Client
                 if (heartBeatConnect.HasError)
                 {
                     GrpcEnvironment.Logger.Error(heartBeatConnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    yield return waitSeconds;
                     continue;
                 }
                 else
@@ -118,7 +122,8 @@ namespace MagicOnion.Client
                 yield return connectCheck;
                 if (connectCheck.HasError)
                 {
-                    GrpcEnvironment.Logger.Error(heartBeatConnect.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    GrpcEnvironment.Logger.Error(connectCheck.Error, "Reconnect Failed, Retrying:" + currentRetryCount++);
+                    yield return waitSeconds;
                     continue;
                 }
                 if (token.IsCancellationRequested) yield break;
