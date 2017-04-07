@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MessagePack;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,14 +12,14 @@ namespace MagicOnion.Server
 {
     public class ServiceContext
     {
-        Dictionary<string, object> items;
+        ConcurrentDictionary<string, object> items;
 
         /// <summary>Object storage per invoke.</summary>
-        public IDictionary<string, object> Items
+        public ConcurrentDictionary<string, object> Items
         {
             get
             {
-                if (items == null) items = new Dictionary<string, object>();
+                if (items == null) items = new ConcurrentDictionary<string, object>();
                 return items;
             }
         }
