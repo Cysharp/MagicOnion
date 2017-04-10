@@ -71,6 +71,16 @@ namespace MagicOnion.Server
             return repositories.TryGetValue(key, out v) ? v : null;
         }
 
+        public IEnumerable<StreamingContextRepository<TStreamingService>> Get(params TKey[] keys)
+        {
+            return keys.Select(x => this.Get(x)).Where(x => x != null);
+        }
+
+        public IEnumerable<StreamingContextRepository<TStreamingService>> Get(IEnumerable<TKey> keys)
+        {
+            return keys.Select(x => this.Get(x)).Where(x => x != null);
+        }
+
         public IEnumerable<StreamingContextRepository<TStreamingService>> All()
         {
             return repositories.Values;
@@ -94,7 +104,7 @@ namespace MagicOnion.Server
 
         public Task BroadcastToAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
         {
-            return includeKeys.Select(x => this.Get(x)).Where(x => x != null).BroadcastAsync(methodSelector, value, parallel, ignoreError);
+            return Get(includeKeys).BroadcastAsync(methodSelector, value, parallel, ignoreError);
         }
 
         public Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
@@ -170,6 +180,16 @@ namespace MagicOnion.Server
         {
             Tuple<TValue, StreamingContextRepository<TStreamingService>> v;
             return repositories.TryGetValue(key, out v) ? v : null;
+        }
+
+        public IEnumerable<Tuple<TValue, StreamingContextRepository<TStreamingService>>> Get(params TKey[] keys)
+        {
+            return keys.Select(x => this.Get(x)).Where(x => x != null);
+        }
+
+        public IEnumerable<Tuple<TValue, StreamingContextRepository<TStreamingService>>> Get(IEnumerable<TKey> keys)
+        {
+            return keys.Select(x => this.Get(x)).Where(x => x != null);
         }
 
         public TValue GetValue(TKey key)
