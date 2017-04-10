@@ -92,95 +92,24 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastToAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
+        public Task BroadcastToAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
         {
-            if (parallel)
-            {
-                await Task.WhenAll(includeKeys.Select(x => this.Get(x)).Where(x => x != null).Select(x =>
-                {
-                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in includeKeys.Select(x => this.Get(x)).Where(x => x != null))
-                {
-                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
+            return includeKeys.Select(x => this.Get(x)).Where(x => x != null).BroadcastAsync(methodSelector, value, parallel, ignoreError);
         }
 
-        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
+        public Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
         {
-            if (parallel)
-            {
-                await Task.WhenAll(repositories.Values.Select(x =>
-                {
-                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in repositories.Values)
-                {
-                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
+            return All().BroadcastAsync(methodSelector, value, parallel, ignoreError);
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
+        public Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
         {
-            if (parallel)
-            {
-                await Task.WhenAll(AllExcept(exceptKey).Select(x =>
-                {
-                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in AllExcept(exceptKey))
-                {
-                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
+            return AllExcept(exceptKey).BroadcastAsync(methodSelector, value, parallel, ignoreError);
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> exceptKeys, bool parallel = true, bool ignoreError = true)
+        public Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> exceptKeys, bool parallel = true, bool ignoreError = true)
         {
-            if (parallel)
-            {
-                await Task.WhenAll(AllExcept(exceptKeys).Select(x =>
-                {
-                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in AllExcept(exceptKeys))
-                {
-                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
-        }
-
-        async Task AwaitErrorHandling(Task task, bool ignoreError)
-        {
-            try
-            {
-                await task.ConfigureAwait(false);
-            }
-            catch (RpcException ex)
-            {
-                if (ignoreError)
-                {
-                    GrpcEnvironment.Logger.Error(ex, "logged but ignore error from StreamingContextGroup.BroadcastAll");
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return AllExcept(exceptKeys).BroadcastAsync(methodSelector, value, parallel, ignoreError);
         }
     }
 
@@ -265,61 +194,49 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
+        public Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
+        {
+            return All()
+                .Select(x => x.Item2)
+                .BroadcastAsync(methodSelector, value, parallel, ignoreError);
+        }
+
+        public Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
+        {
+            return AllExcept(exceptKey)
+                .Select(x => x.Item2)
+                .BroadcastAsync(methodSelector, value, parallel, ignoreError);
+        }
+
+        public Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] exceptKeys, bool parallel = true, bool ignoreError = true)
+        {
+            return AllExcept(exceptKeys)
+                .Select(x => x.Item2)
+                .BroadcastAsync(methodSelector, value, parallel, ignoreError);
+        }
+    }
+
+    public static class StreamingContextGroupExtensions
+    {
+        public static async Task BroadcastAsync<TStreamingService, TResponse>(this IEnumerable<StreamingContextRepository<TStreamingService>> repositories, Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
-                await Task.WhenAll(repositories.Values.Select(x =>
+                await Task.WhenAll(repositories.Select(x =>
                 {
-                    return AwaitErrorHandling(x.Item2.WriteAsync(methodSelector, value), ignoreError);
+                    return AwaitErrorHandling(x.WriteAsync(methodSelector, value), ignoreError);
                 })).ConfigureAwait(false);
             }
             else
             {
-                foreach (var item in repositories.Values)
+                foreach (var item in repositories)
                 {
-                    await AwaitErrorHandling(item.Item2.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
+                    await AwaitErrorHandling(item.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
                 }
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
-        {
-            if (parallel)
-            {
-                await Task.WhenAll(AllExcept(exceptKey).Select(x =>
-                {
-                    return AwaitErrorHandling(x.Item2.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in AllExcept(exceptKey))
-                {
-                    await AwaitErrorHandling(item.Item2.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
-        }
-
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] exceptKeys, bool parallel = true, bool ignoreError = true)
-        {
-            if (parallel)
-            {
-                await Task.WhenAll(AllExcept(exceptKeys).Select(x =>
-                {
-                    return AwaitErrorHandling(x.Item2.WriteAsync(methodSelector, value), ignoreError);
-                })).ConfigureAwait(false);
-            }
-            else
-            {
-                foreach (var item in AllExcept(exceptKeys))
-                {
-                    await AwaitErrorHandling(item.Item2.WriteAsync(methodSelector, value), ignoreError).ConfigureAwait(false);
-                }
-            }
-        }
-
-        async Task AwaitErrorHandling(Task task, bool ignoreError)
+        private async static Task AwaitErrorHandling(Task task, bool ignoreError)
         {
             try
             {
@@ -329,7 +246,7 @@ namespace MagicOnion.Server
             {
                 if (ignoreError)
                 {
-                    GrpcEnvironment.Logger.Error(ex, "logged but ignore error from StreamingContextGroup.BroadcastAll");
+                    GrpcEnvironment.Logger.Error(ex, "logged but ignore error from StreamingContextGroup.Broadcast");
                 }
                 else
                 {
