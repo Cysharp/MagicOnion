@@ -57,6 +57,7 @@ namespace MagicOnion.Server
         public IFormatterResolver FormatterResolver { get; private set; }
 
         // internal, used from there methods.
+        internal bool IsIgnoreSerialization { get; set; }
         internal byte[] Request { get; set; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
@@ -81,6 +82,15 @@ namespace MagicOnion.Server
         public void ChangeFormatterResolver(IFormatterResolver resolver)
         {
             this.FormatterResolver = resolver;
+        }
+
+        /// <summary>
+        /// Unsafe optimize option, ignore serialization process of LZ4MessagePackSerializer. This is useful for cache result.
+        /// </summary>
+        public void ForceSetRawUnaryResult(byte[] result)
+        {
+            this.IsIgnoreSerialization = true;
+            this.Result = result;
         }
     }
 
