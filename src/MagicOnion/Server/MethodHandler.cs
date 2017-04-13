@@ -547,7 +547,7 @@ namespace MagicOnion.Server
     {
         public static async Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
         {
-            if (result.hasRawValue)
+            if (result.hasRawValue && !context.IsIgnoreSerialization)
             {
                 var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
 
@@ -559,7 +559,7 @@ namespace MagicOnion.Server
         public static async Task SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
         {
             var result = await taskResult.ConfigureAwait(false);
-            if (result.hasRawValue)
+            if (result.hasRawValue && !context.IsIgnoreSerialization)
             {
                 var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
 

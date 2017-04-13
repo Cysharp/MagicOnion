@@ -80,6 +80,8 @@ namespace MagicOnion.Server
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
+            if (context.ServiceType == typeof(EmbeddedServices.MagicOnionEmbeddedHeartbeat)) return;
+
             GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete}");
         }
 
@@ -140,6 +142,8 @@ namespace MagicOnion.Server
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
+            if (context.ServiceType == typeof(EmbeddedServices.MagicOnionEmbeddedHeartbeat)) return;
+
             GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData)}");
         }
 
@@ -216,6 +220,8 @@ namespace MagicOnion.Server
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
+            if (context.ServiceType == typeof(EmbeddedServices.MagicOnionEmbeddedHeartbeat)) return;
+
             GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData, type, context)}");
         }
 
