@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using System;
+using System.Threading;
 using UniRx;
 
 namespace MagicOnion
@@ -30,63 +31,268 @@ namespace MagicOnion
 
         public static IObservable<Unit> ForEachAsync<T>(this IAsyncStreamReader<T> stream, Action<T> action)
         {
-            return RecursiveActionAsync(stream, action);
+            return Observable.CreateWithState<Unit, Tuple<IAsyncStreamReader<T>, Action<T>>>(Tuple.Create(stream, action), (state0, observer) =>
+            {
+                var disp = new MultipleAssignmentDisposable();
+
+                var worker = new AsyncStreamReaderForEachAsync_<T>(disp, state0.Item1, state0.Item2, observer);
+                worker.ConsumeNext();
+
+                return disp;
+            });
         }
 
-        static IObservable<Unit> RecursiveActionAsync<T>(IAsyncStreamReader<T> stream, Action<T> action)
+        class AsyncStreamReaderForEachAsync_<T> : IObserver<bool>
         {
-            return stream.MoveNext()
-                .ContinueWith(x =>
+            readonly MultipleAssignmentDisposable disp;
+            readonly IAsyncStreamReader<T> stream;
+            readonly Action<T> action;
+            readonly IObserver<Unit> rootObserver;
+
+            int isStopped = 0;
+
+            public AsyncStreamReaderForEachAsync_(MultipleAssignmentDisposable disp, IAsyncStreamReader<T> stream, Action<T> action, IObserver<Unit> rootObserver)
+            {
+                this.disp = disp;
+                this.stream = stream;
+                this.action = action;
+                this.rootObserver = rootObserver;
+            }
+
+            public void ConsumeNext()
+            {
+                try
                 {
-                    if (x)
+                    disp.Disposable = stream.MoveNext().Subscribe(this);
+                }
+                catch (Exception ex)
+                {
+                    stream.Dispose();
+                    rootObserver.OnError(ex);
+                }
+            }
+
+            public void OnNext(bool value)
+            {
+                if (isStopped == 0)
+                {
+                    if (value == true)
                     {
-                        action(stream.Current);
-                        return RecursiveActionAsync(stream, action);
+                        try
+                        {
+                            action(stream.Current);
+                        }
+                        catch (Exception ex)
+                        {
+                            stream.Dispose();
+                            rootObserver.OnError(ex);
+                            return;
+                        }
+
+                        ConsumeNext(); // recursive next
                     }
                     else
                     {
-                        return Observable.ReturnUnit();
+                        rootObserver.OnCompleted();
                     }
-                })
-                .Finally(() =>
+                }
+            }
+
+            public void OnError(Exception error)
+            {
+                if (Interlocked.Increment(ref isStopped) == 1)
                 {
                     stream.Dispose();
-                });
+                    rootObserver.OnError(error);
+                }
+            }
+
+            public void OnCompleted()
+            {
+                // re-use observer.
+            }
         }
 
         public static IObservable<Unit> ForEachAsync<T>(this IAsyncStreamReader<T> stream, Func<T, IObservable<Unit>> asyncAction)
         {
-            return RecursiveActionAsync(stream, asyncAction);
+            return Observable.CreateWithState<Unit, Tuple<IAsyncStreamReader<T>, Func<T, IObservable<Unit>>>>(Tuple.Create(stream, asyncAction), (state0, observer) =>
+            {
+                var disp = new MultipleAssignmentDisposable();
+
+                var worker = new AsyncStreamReaderForEachAsync__<T>(disp, state0.Item1, state0.Item2, observer);
+                worker.ConsumeNext();
+
+                return disp;
+            });
         }
 
-        static IObservable<Unit> RecursiveActionAsync<T>(IAsyncStreamReader<T> stream, Func<T, IObservable<Unit>> asyncAction)
+        class AsyncStreamReaderForEachAsync__<T> : IObserver<bool>
         {
-            return stream.MoveNext().ContinueWith(x =>
+            readonly MultipleAssignmentDisposable disp;
+            readonly IAsyncStreamReader<T> stream;
+            readonly Func<T, IObservable<Unit>> asyncAction;
+            readonly IObserver<Unit> rootObserver;
+
+            int isStopped = 0;
+
+            public AsyncStreamReaderForEachAsync__(MultipleAssignmentDisposable disp, IAsyncStreamReader<T> stream, Func<T, IObservable<Unit>> asyncAction, IObserver<Unit> rootObserver)
             {
-                if (x)
+                this.disp = disp;
+                this.stream = stream;
+                this.asyncAction = asyncAction;
+                this.rootObserver = rootObserver;
+            }
+
+            public void ConsumeNext()
+            {
+                try
                 {
-                    return asyncAction(stream.Current)
-                        .ContinueWith(_ => RecursiveActionAsync(stream, asyncAction));
+                    disp.Disposable = stream.MoveNext().Subscribe(this);
                 }
-                else
+                catch (Exception ex)
                 {
                     stream.Dispose();
-                    return Observable.ReturnUnit();
+                    rootObserver.OnError(ex);
                 }
-            });
+            }
+
+            public void OnNext(bool value)
+            {
+                if (isStopped == 0)
+                {
+                    if (value == true)
+                    {
+                        try
+                        {
+                            this.disp.Disposable = asyncAction(stream.Current)
+                                .Subscribe(_ =>
+                                {
+                                    ConsumeNext();
+                                }, ex => OnError(ex));
+                        }
+                        catch (Exception ex)
+                        {
+                            stream.Dispose();
+                            rootObserver.OnError(ex);
+                            return;
+                        }
+
+                        ConsumeNext(); // recursive next
+                    }
+                    else
+                    {
+                        rootObserver.OnCompleted();
+                    }
+                }
+            }
+
+            public void OnError(Exception error)
+            {
+                if (Interlocked.Increment(ref isStopped) == 1)
+                {
+                    stream.Dispose();
+                    rootObserver.OnError(error);
+                }
+            }
+
+            public void OnCompleted()
+            {
+            }
         }
 
         public static IObservable<T> AsObservable<T>(this IAsyncStreamReader<T> stream, bool observeOnMainThread = true, IDisposable streamingResult = null)
         {
-            var seq = Observable.Create<T>(observer =>
+            var seq = Observable.CreateWithState<T, Tuple<IAsyncStreamReader<T>, IDisposable>>(Tuple.Create(stream, streamingResult), (state, observer) =>
             {
-                var subscription = stream.ForEachAsync(x => observer.OnNext(x)).Subscribe(_ => { }, observer.OnError, observer.OnCompleted);
-                if (streamingResult == null) return subscription;
+                var disp = new MultipleAssignmentDisposable();
+                var b = new AsyncStreamReaderAsObservable_<T>(disp, state.Item1, observer, state.Item2);
+                b.ConsumeNext();
 
-                return StableCompositeDisposable.Create(subscription, streamingResult);
+                if (state.Item2 == null)
+                {
+                    return disp;
+                }
+                else
+                {
+                    return StableCompositeDisposable.Create(disp, streamingResult);
+                }
             });
 
             return (observeOnMainThread) ? seq.ObserveOnMainThread() : seq;
+        }
+
+        class AsyncStreamReaderAsObservable_<T> : IObserver<bool>
+        {
+            readonly MultipleAssignmentDisposable disp;
+            readonly IAsyncStreamReader<T> stream;
+            readonly IObserver<T> rootObserver;
+            IDisposable streamingResult;
+
+            int isStopped = 0;
+
+            public AsyncStreamReaderAsObservable_(MultipleAssignmentDisposable disp, IAsyncStreamReader<T> stream, IObserver<T> rootObserver, IDisposable streamingResult)
+            {
+                this.disp = disp;
+                this.stream = stream;
+                this.rootObserver = rootObserver;
+                this.streamingResult = streamingResult ?? Disposable.Empty;
+            }
+
+            public void ConsumeNext()
+            {
+                try
+                {
+                    disp.Disposable = stream.MoveNext().Subscribe(this);
+                }
+                catch (Exception ex)
+                {
+                    stream.Dispose();
+                    streamingResult.Dispose();
+                    rootObserver.OnError(ex);
+                }
+            }
+
+            public void OnNext(bool value)
+            {
+                if (isStopped == 0)
+                {
+                    if (value == true)
+                    {
+                        try
+                        {
+                            rootObserver.OnNext(stream.Current);
+                        }
+                        catch (Exception ex)
+                        {
+                            stream.Dispose();
+                            streamingResult.Dispose();
+                            rootObserver.OnError(ex);
+                            return;
+                        }
+
+                        ConsumeNext(); // recursive next
+                    }
+                    else
+                    {
+                        rootObserver.OnCompleted();
+                    }
+                }
+            }
+
+            public void OnError(Exception error)
+            {
+                if (Interlocked.Increment(ref isStopped) == 1)
+                {
+                    stream.Dispose();
+                    streamingResult.Dispose();
+                    rootObserver.OnError(error);
+                }
+            }
+
+            public void OnCompleted()
+            {
+                // re-use observer.
+            }
         }
     }
 }
