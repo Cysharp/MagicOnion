@@ -63,6 +63,31 @@
             clone.resolver = this.resolver;
             return clone;
         }
+
+        public new <#= interfaceDef.Name #> WithHeaders(Metadata headers)
+        {
+            return base.WithHeaders(headers);
+        }
+
+        public new <#= interfaceDef.Name #> WithCancellationToken(GrpcCancellationToken cancellationToken)
+        {
+            return base.WithCancellationToken(cancellationToken);
+        }
+
+        public new <#= interfaceDef.Name #> WithDeadline(System.DateTime deadline)
+        {
+            return base.WithDeadline(deadline);
+        }
+
+        public new <#= interfaceDef.Name #> WithHost(string host)
+        {
+            return base.WithHost(host);
+        }
+
+        public new <#= interfaceDef.Name #> WithOptions(CallOptions option)
+        {
+            return base.WithOptions(option);
+        }
    
 <# foreach(var item in interfaceDef.Methods) { #>
         public <#= (isAsyncSuffix && item.MethodType == MethodType.Unary) ? item.AsyncToString() : item.ToString() #>
