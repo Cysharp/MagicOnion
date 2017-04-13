@@ -39,6 +39,11 @@ namespace MagicOnion.Server
         public const string HeaderKey = "connection_id";
         static ConcurrentDictionary<string, ConnectionContext> manager = new ConcurrentDictionary<string, ConnectionContext>();
 
+        public static int GetCurrentManagingConnectionCount()
+        {
+            return manager.Count;
+        }
+
         public static string GetConnectionId(ServiceContext context)
         {
             return TryGetConnectionId(context, out var id) ? id : null;
