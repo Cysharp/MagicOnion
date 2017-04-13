@@ -1,138 +1,139 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MagicOnion</RootNamespace>
+    <AssemblyName>MagicOnion</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ENABLE_SAVE_ASSEMBLY</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\MagicOnion.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\MagicOnion.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Grpc.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\Grpc.Core.1.2.0\lib\net45\Grpc.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MessagePack">
+      <HintPath>$(SolutionDir)packages\MessagePack.1.1.2\lib\net45\MessagePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Interactive.Async, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\System.Interactive.Async.3.1.1\lib\net46\System.Interactive.Async.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\System.Runtime.Serialization.Primitives.4.3.0\lib\net46\System.Runtime.Serialization.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsyncStreamReaderExtensions.cs" />
+    <Compile Include="Client\ChannelContext.cs" />
+    <Compile Include="Client\EmbeddedServices\PingClient.cs" />
+    <Compile Include="Client\EmbeddedServices\HeartbeatClient.cs" />
+    <Compile Include="CompilerServices\AsyncUnaryResultMethodBuilder.cs" />
+    <Compile Include="DuplexStreamingResult.cs" />
+    <Compile Include="ClientStreamingResult.cs" />
+    <Compile Include="Client\DynamicClientBuilder.cs" />
+    <Compile Include="Client\MagicOnionClient.cs" />
+    <Compile Include="Client\MagicOnionClientBase.cs" />
+    <Compile Include="DynamicArgumentTuple.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
+    </Compile>
+    <Compile Include="IgnoreAttribute.cs" />
+    <Compile Include="IService.cs" />
+    <Compile Include="MagicOnionMarshallers.cs" />
+    <Compile Include="MetadataExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReturnStatusException.cs" />
+    <Compile Include="ServerStreamingResult.cs" />
+    <Compile Include="Server\CompositeLogger.cs" />
+    <Compile Include="Server\CompositeMagicOnionLogger.cs" />
+    <Compile Include="Server\ConnectionContext.cs" />
+    <Compile Include="Server\EmbeddedFilters\NewRelicCustomInstrumentationFilterAttribute.cs" />
+    <Compile Include="Server\EmbeddedServices\Ping.cs" />
+    <Compile Include="Server\EmbeddedServices\Heartbeat.cs" />
+    <Compile Include="Server\IMagicOnionLogger.cs" />
+    <Compile Include="Server\MagicOnionEngine.cs" />
+    <Compile Include="Server\MagicOnionFilterAttribute.cs" />
+    <Compile Include="Server\MagicOnionOptions.cs" />
+    <Compile Include="Server\MagicOnionServiceDefinition.cs" />
+    <Compile Include="Server\MethodHandler.cs" />
+    <Compile Include="Server\Service.cs" />
+    <Compile Include="Server\ServiceContext.cs" />
+    <Compile Include="Server\StreamingContextGroup.cs" />
+    <Compile Include="Server\StreamingContextRepository.cs" />
+    <Compile Include="UnaryResult.cs" />
+    <Compile Include="Utils\DynamicAssembly.cs" />
+    <Compile Include="Utils\ILGeneratorExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DynamicArgumentTuple.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)\packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>MagicOnion</RootNamespace>
-        <AssemblyName>MagicOnion</AssemblyName>
-        <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-        <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-        <FileAlignment>512</FileAlignment>
-        <NuGetPackageImportStamp>
-        </NuGetPackageImportStamp>
-        <TargetFrameworkProfile />
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>TRACE;DEBUG;ENABLE_SAVE_ASSEMBLY</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <DocumentationFile>bin\Debug\MagicOnion.xml</DocumentationFile>
-        <NoWarn>1591</NoWarn>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <DocumentationFile>bin\Release\MagicOnion.xml</DocumentationFile>
-        <NoWarn>1591</NoWarn>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="Grpc.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad, processorArchitecture=MSIL">
-            <HintPath>$(SolutionDir)packages\Grpc.Core.1.2.0\lib\net45\Grpc.Core.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="MessagePack">
-            <HintPath>$(SolutionDir)packages\MessagePack.1.1.2\lib\net45\MessagePack.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Interactive.Async, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-            <HintPath>$(SolutionDir)packages\System.Interactive.Async.3.1.1\lib\net46\System.Interactive.Async.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="System.Runtime.Serialization" />
-        <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-            <HintPath>$(SolutionDir)packages\System.Runtime.Serialization.Primitives.4.3.0\lib\net46\System.Runtime.Serialization.Primitives.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-            <HintPath>$(SolutionDir)packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-            <HintPath>$(SolutionDir)packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="AsyncStreamReaderExtensions.cs" />
-        <Compile Include="Client\ChannelContext.cs" />
-        <Compile Include="Client\EmbeddedServices\PingClient.cs" />
-        <Compile Include="Client\EmbeddedServices\HeartbeatClient.cs" />
-        <Compile Include="CompilerServices\AsyncUnaryResultMethodBuilder.cs" />
-        <Compile Include="DuplexStreamingResult.cs" />
-        <Compile Include="ClientStreamingResult.cs" />
-        <Compile Include="Client\DynamicClientBuilder.cs" />
-        <Compile Include="Client\MagicOnionClient.cs" />
-        <Compile Include="Client\MagicOnionClientBase.cs" />
-        <Compile Include="DynamicArgumentTuple.cs">
-            <AutoGen>True</AutoGen>
-            <DesignTime>True</DesignTime>
-            <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
-        </Compile>
-        <Compile Include="IgnoreAttribute.cs" />
-        <Compile Include="IService.cs" />
-        <Compile Include="MagicOnionMarshallers.cs" />
-        <Compile Include="MetadataExtensions.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="ReturnStatusException.cs" />
-        <Compile Include="ServerStreamingResult.cs" />
-        <Compile Include="Server\CompositeLogger.cs" />
-        <Compile Include="Server\ConnectionContext.cs" />
-        <Compile Include="Server\EmbeddedFilters\NewRelicCustomInstrumentationFilterAttribute.cs" />
-        <Compile Include="Server\EmbeddedServices\Ping.cs" />
-        <Compile Include="Server\EmbeddedServices\Heartbeat.cs" />
-        <Compile Include="Server\IMagicOnionLogger.cs" />
-        <Compile Include="Server\MagicOnionEngine.cs" />
-        <Compile Include="Server\MagicOnionFilterAttribute.cs" />
-        <Compile Include="Server\MagicOnionOptions.cs" />
-        <Compile Include="Server\MagicOnionServiceDefinition.cs" />
-        <Compile Include="Server\MethodHandler.cs" />
-        <Compile Include="Server\Service.cs" />
-        <Compile Include="Server\ServiceContext.cs" />
-        <Compile Include="Server\StreamingContextGroup.cs" />
-        <Compile Include="Server\StreamingContextRepository.cs" />
-        <Compile Include="UnaryResult.cs" />
-        <Compile Include="Utils\DynamicAssembly.cs" />
-        <Compile Include="Utils\ILGeneratorExtensions.cs" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="app.config">
-            <SubType>Designer</SubType>
-        </None>
-        <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="DynamicArgumentTuple.tt">
-            <Generator>TextTemplatingFileGenerator</Generator>
-            <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-        <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-    </ItemGroup>
-    <ItemGroup />
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <Import Project="$(SolutionDir)packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets" Condition="Exists('$(SolutionDir)\packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets')" />
-    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-        <PropertyGroup>
-            <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-        </PropertyGroup>
-        <Error Condition="!Exists('$(SolutionDir)packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets'))" />
-    </Target>
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    <Error Condition="!Exists('$(SolutionDir)packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Grpc.Core.1.2.0\build\net45\Grpc.Core.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
