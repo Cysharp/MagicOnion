@@ -40,7 +40,7 @@ namespace MagicOnion.Tests
 
         public async Task<UnaryResult<bool>> SendMessage(string message)
         {
-            await group.BroadcastAllAsync(x => x.ReceiveMessages, message, ignoreError: false);
+            await group.BroadcastAllAsync(x => nameof(x.ReceiveMessages), message, ignoreError: false);
             return UnaryResult(true);
         }
 

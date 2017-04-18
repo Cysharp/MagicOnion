@@ -92,7 +92,7 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastToAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastToAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, IEnumerable<TKey> includeKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -110,7 +110,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -128,7 +128,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -146,7 +146,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, IEnumerable<TKey> exceptKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, IEnumerable<TKey> exceptKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -265,7 +265,7 @@ namespace MagicOnion.Server
             return repositories.Where(x => !set.Equals(x.Key)).Select(x => x.Value);
         }
 
-        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -283,7 +283,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, TKey exceptKey, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {
@@ -301,7 +301,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value, TKey[] exceptKeys, bool parallel = true, bool ignoreError = true)
+        public async Task BroadcastAllExceptAsync<TResponse>(Func<TStreamingService, string> methodSelector, TResponse value, TKey[] exceptKeys, bool parallel = true, bool ignoreError = true)
         {
             if (parallel)
             {

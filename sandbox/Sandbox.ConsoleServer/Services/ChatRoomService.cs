@@ -43,17 +43,17 @@ namespace Sandbox.ConsoleServer.Services
 
         public Task BroadcastJoinAsync(RoomMember joinMember)
         {
-            return this.group.BroadcastAllAsync(x => x.OnJoin, joinMember);
+            return this.group.BroadcastAllAsync(x => nameof(x.OnJoin), joinMember);
         }
 
         public Task BroadcastLeaveAsync(RoomMember leaveMember)
         {
-            return this.group.BroadcastAllAsync(x => x.OnLeave, leaveMember);
+            return this.group.BroadcastAllAsync(x => nameof(x.OnLeave), leaveMember);
         }
 
         public Task BroadcastMessageAsync(RoomMember sendMember, string message)
         {
-            return this.group.BroadcastAllAsync(x => x.OnMessageReceived, new ChatMessage { Sender = sendMember, Message = message });
+            return this.group.BroadcastAllAsync(x => nameof(x.OnMessageReceived), new ChatMessage { Sender = sendMember, Message = message });
         }
 
         public ChatRoomResponse ToChatRoomResponse()

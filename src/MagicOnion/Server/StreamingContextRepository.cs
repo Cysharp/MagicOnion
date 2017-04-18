@@ -55,7 +55,7 @@ namespace MagicOnion.Server
         bool isDisposed;
         TService dummyInstance;
 
-        readonly ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>> streamingContext = new ConcurrentDictionary<MethodInfo, Tuple<SemaphoreSlim, IStreamingContextInfo>>();
+        readonly ConcurrentDictionary<string, Tuple<SemaphoreSlim, IStreamingContextInfo>> streamingContext = new ConcurrentDictionary<string, Tuple<SemaphoreSlim, IStreamingContextInfo>>();
 
         public bool IsDisposed => isDisposed;
         public ConnectionContext ConnectionContext { get; }
@@ -104,16 +104,17 @@ namespace MagicOnion.Server
             }, tcs);
 
             var info = new StreamingContextInfo<TResponse>(tcs, context);
-            streamingContext[methodSelector.Method] = Tuple.Create(new SemaphoreSlim(1, 1), (IStreamingContextInfo)info);
+            var method = $"{typeof(TService).FullName}.{methodSelector.Method.Name}";
+            streamingContext[method] = Tuple.Create(new SemaphoreSlim(1, 1), (IStreamingContextInfo)info);
             return info;
         }
 
-        public async Task WriteAsync<TResponse>(Func<TService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector, TResponse value)
+        public async Task WriteAsync<TResponse>(Func<TService, string> methodSelector, TResponse value)
         {
             if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
 
-            Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
-            if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
+            var method = $"{typeof(TService).FullName}.{methodSelector(dummyInstance)}";
+            if (streamingContext.TryGetValue(method, out var streamingContextObject))
             {
                 try
                 {
@@ -132,7 +133,7 @@ namespace MagicOnion.Server
             }
             else
             {
-                throw new Exception("Does not exists streaming context. :" + methodSelector.Method.Name);
+                throw new Exception("Does not exists streaming context. : " + method);
             }
         }
 

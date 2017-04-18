@@ -40,7 +40,7 @@ namespace MagicOnion.Tests
 
         public async Task<UnaryResult<bool>> SendMessage(string message)
         {
-            await cache.WriteAsync(x => x.ReceiveMessages, message);
+            await cache.WriteAsync(x => nameof(x.ReceiveMessages), message);
             return UnaryResult(true);
         }
 
