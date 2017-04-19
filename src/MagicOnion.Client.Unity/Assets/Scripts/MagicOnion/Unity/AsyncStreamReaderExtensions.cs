@@ -214,7 +214,7 @@ namespace MagicOnion
                 }
                 else
                 {
-                    return StableCompositeDisposable.Create(disp, streamingResult);
+                    return StableCompositeDisposable.Create(disp, state.Item2);
                 }
             });
 

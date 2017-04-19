@@ -36,6 +36,12 @@ namespace MagicOnion.Server
             return new MagicOnion.UnaryResult<Nil>(Nil.Default);
         }
 
+        protected TResponse ReturnStatusCode<TResponse>(int statusCode, string detail)
+        {
+            Context.CallContext.Status = new Status((StatusCode)statusCode, detail ?? "");
+            return default(TResponse);
+        }
+
         protected UnaryResult<TResponse> ReturnStatus<TResponse>(StatusCode statusCode, string detail)
         {
             Context.CallContext.Status = new Status(statusCode, detail ?? "");
