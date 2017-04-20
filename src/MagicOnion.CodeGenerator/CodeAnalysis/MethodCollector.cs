@@ -13,6 +13,7 @@ namespace MagicOnion.CodeAnalysis
         public readonly INamedTypeSymbol ClientStreamingResult;
         public readonly INamedTypeSymbol ServerStreamingResult;
         public readonly INamedTypeSymbol DuplexStreamingResult;
+        public readonly INamedTypeSymbol GenerateDefineIf;
 
         public ReferenceSymbols(Compilation compilation)
         {
@@ -22,6 +23,7 @@ namespace MagicOnion.CodeAnalysis
             ClientStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ClientStreamingResult`2");
             DuplexStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.DuplexStreamingResult`2");
             ServerStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ServerStreamingResult`1");
+            GenerateDefineIf = compilation.GetTypeByMetadataName("MagicOnion.GenerateDefineIfAttribute");
         }
     }
 
@@ -74,6 +76,7 @@ namespace MagicOnion.CodeAnalysis
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
                     IsServiceDifinition = false,
                     InterfaceNames = x.Interfaces.Select(y => y.ToDisplayString()).ToArray(),
+                    IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(CreateMethodDefinition)
@@ -86,6 +89,7 @@ namespace MagicOnion.CodeAnalysis
                         Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
                         IsServiceDifinition = true,
                         InterfaceNames = new string[0],
+                        IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                         Methods = x.GetAllInterfaceMembers() //with base interface method
                             .OfType<IMethodSymbol>()
                             .Distinct(MethodNameComparer.Instance)
@@ -124,6 +128,7 @@ namespace MagicOnion.CodeAnalysis
                 RequestType = requestType,
                 ResponseType = responseType,
                 UnwrappedOriginalResposneTypeSymbol = unwrappedOriginalResponseType,
+                IsIfDebug = y.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                 Parameters = y.Parameters.Select(p =>
                 {
                     return new ParameterDefinition

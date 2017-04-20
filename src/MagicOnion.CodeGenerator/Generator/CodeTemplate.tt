@@ -19,29 +19,54 @@
 <# foreach(var interfaceDef in Interfaces) { #>
 
 <# if(!interfaceDef.IsServiceDifinition) { #>
-
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
     public interface <#= interfaceDef.Name #><# if(interfaceDef.InterfaceNames.Any()) { #> : <#=String.Join(", ", interfaceDef.InterfaceNames) #><# } #>
 
     {
 <# foreach(var method in interfaceDef.Methods) { #>   
+<# if(method.IsIfDebug) { #>
+#if DEBUG
+<# } #>
         <#= (isAsyncSuffix && method.MethodType == MethodType.Unary) ? method.AsyncToString() : method.ToString() #>;
+<# if(method.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
     }
-
+<# if(interfaceDef.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
 
 <# if(interfaceDef.IsServiceDifinition) { #>
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
 <# var clientName = interfaceDef.Name + "Client"; #>
     public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.Name #>>, <#= interfaceDef.Name #>
     {
 <# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
         static readonly Method<byte[], byte[]> <#= item.Name #>Method;
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
 
         static <#= clientName #>()
         {
 <# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
             <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
         }
 
@@ -90,6 +115,9 @@
         }
    
 <# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
         public <#= (isAsyncSuffix && item.MethodType == MethodType.Unary) ? item.AsyncToString() : item.ToString() #>
         {
 <# if(item.MethodType == MethodType.Unary) { #>
@@ -108,9 +136,14 @@
             return new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver);
 <# } #>
         }
-
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
     }
+<# if(interfaceDef.IsIfDebug) { #>
+#endif 
+<# } #>
 <# } #>
 <# } #>
 <#= Namespace != null ? "}" : "" #>

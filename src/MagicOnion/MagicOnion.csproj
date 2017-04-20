@@ -82,6 +82,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
     </Compile>
+    <Compile Include="GenerateDefineDebugAttribute.cs" />
     <Compile Include="IgnoreAttribute.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="MagicOnionMarshallers.cs" />

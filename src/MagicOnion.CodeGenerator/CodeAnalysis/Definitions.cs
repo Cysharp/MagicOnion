@@ -21,6 +21,7 @@ namespace MagicOnion.CodeAnalysis
         public string Namespace { get; set; }
         public bool IsServiceDifinition { get; set; }
         public string[] InterfaceNames { get; set; }
+        public bool IsIfDebug { get; set; }
         public MethodDefinition[] Methods { get; set; }
 
         public override string ToString()
@@ -36,6 +37,7 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
+        public bool IsIfDebug { get; set; }
 
         string responseType;
         public string ResponseType

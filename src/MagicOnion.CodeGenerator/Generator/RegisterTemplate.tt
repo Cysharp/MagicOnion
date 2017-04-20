@@ -29,7 +29,13 @@ namespace <#= Namespace #>
             isRegistered = true;
 
 <# foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
             MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y) => new <#= clientName #>(x, y));
+<# if(interfaceDef.IsIfDebug) { #>
+#endif
+<# } #>
 <# } #>
         }
     }
