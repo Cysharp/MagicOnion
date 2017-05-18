@@ -136,6 +136,33 @@ namespace MagicOnion.Server
             }
         }
 
+        public async Task Complete<TResponse>(Func<TService, Func<Task<ServerStreamingResult<TResponse>>>> methodSelector)
+        {
+            if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
+
+            Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
+            if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
+            {
+                try
+                {
+                    await streamingContextObject.Item1.WaitAsync().ConfigureAwait(false); // wait lock
+                    if (isDisposed) return;
+                    streamingContextObject.Item2.Complete();
+                }
+                finally
+                {
+                    if (!isDisposed)
+                    {
+                        streamingContextObject.Item1.Release();
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Does not exists streaming context. :" + methodSelector.Method.Name);
+            }
+        }
+
         public void Dispose()
         {
             if (isDisposed) return;
