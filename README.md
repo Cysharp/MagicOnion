@@ -388,3 +388,23 @@ moc arguments help:
 ```
 
 moc.exe is located in `packages\MagicOnion.*.*.*\tools\moc.exe`.
+
+Who is using this?
+---
+MagicOnion is already in production use at [kuro-kishi](https://kuro-kishi.jp/)(Mobile RPG on iOS/Android at Japan Market), kuro-kishi receiving 30000 connections and many conncurrent requests.
+
+Author Info
+---
+Yoshifumi Kawai(a.k.a. neuecc) is a software developer in Japan.  
+He is the Director/CTO at Grani, Inc.  
+Grani is a mobile game developer company in Japan and well known for using C#.  
+He is awarding Microsoft MVP for Visual C# since 2011.  
+He is known as the creator of [UniRx](http://github.com/neuecc/UniRx/)(Reactive Extensions for Unity)  
+
+Blog: [https://medium.com/@neuecc](https://medium.com/@neuecc) (English)  
+Blog: [http://neue.cc/](http://neue.cc/) (Japanese)  
+Twitter: [https://twitter.com/neuecc](https://twitter.com/neuecc) (Japanese)   
+
+License
+---
+This library is under the MIT License.
