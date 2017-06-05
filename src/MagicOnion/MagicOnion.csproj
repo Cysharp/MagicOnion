@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net46;net47;</TargetFrameworks>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net46'">
@@ -14,6 +15,7 @@
       <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
       <NoWarn>1701;1702;1705;1591</NoWarn>
       <DefineConstants>RELEASE;NET_FRAMEWORK;net46;NON_UNITY;</DefineConstants>
+      <DocumentationFile>bin\Release\net46\MagicOnion.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
@@ -26,6 +28,7 @@
       <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
       <NoWarn>1701;1702;1705;1591</NoWarn>
       <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
+      <DocumentationFile>bin\Release\net47\MagicOnion.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard1.5'">
@@ -38,9 +41,8 @@
       <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
       <NoWarn>1701;1702;1705;1591</NoWarn>
       <DefineConstants>RELEASE;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
+      <DocumentationFile>bin\Release\netstandard1.5\MagicOnion.xml</DocumentationFile>
   </PropertyGroup>
-
-
 
 <!-- NuGet -->
 

@@ -15,7 +15,7 @@ namespace MagicOnion.CodeAnalysis
         DuplexStreaming = 3
     }
 
-    public class InterfaceDefintion
+    public class InterfaceDefinition
     {
         public string Name { get; set; }
         public string Namespace { get; set; }

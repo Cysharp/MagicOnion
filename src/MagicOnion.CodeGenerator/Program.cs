@@ -237,7 +237,7 @@ namespace MagicOnion.CodeGenerator
             {"System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter<TREPLACE>()"},
         };
 
-        static void ExtractResolverInfo(InterfaceDefintion[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults)
+        static void ExtractResolverInfo(InterfaceDefinition[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults)
         {
             var genericInfos = new List<GenericSerializationInfo>();
             var enumInfos = new List<EnumSerializationInfo>();

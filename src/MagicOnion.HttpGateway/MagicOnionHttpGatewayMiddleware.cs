@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using System.Reflection;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -56,7 +57,7 @@ namespace MagicOnion.HttpGateway
                             {
                                 args.Add((string)stringValues);
                             }
-                            else if (p.ParameterType.IsEnum)
+                            else if (p.ParameterType.GetTypeInfo().IsEnum)
                             {
                                 args.Add(Enum.Parse(p.ParameterType, (string)stringValues));
                             }
@@ -80,7 +81,7 @@ namespace MagicOnion.HttpGateway
                                     {
                                         serializeTarget = "[" + string.Join(", ", stringValues.Select(x => JsonConvert.SerializeObject(x))) + "]"; // escape serialzie
                                     }
-                                    else if (collectionType.IsEnum || collectionType == typeof(DateTime) || collectionType == typeof(DateTimeOffset) || collectionType == typeof(DateTime?) || collectionType == typeof(DateTimeOffset?))
+                                    else if (collectionType.GetTypeInfo().IsEnum || collectionType == typeof(DateTime) || collectionType == typeof(DateTimeOffset) || collectionType == typeof(DateTime?) || collectionType == typeof(DateTimeOffset?))
                                     {
                                         serializeTarget = "[" + string.Join(", ", stringValues.Select(x => "\"" + x + "\"")) + "]";
                                     }
@@ -155,7 +156,7 @@ namespace MagicOnion.HttpGateway
         {
             if (type.IsArray) return type.GetElementType();
 
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 var genTypeDef = type.GetGenericTypeDefinition();
                 if (genTypeDef == typeof(IEnumerable<>)

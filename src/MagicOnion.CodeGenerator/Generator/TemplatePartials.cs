@@ -11,14 +11,14 @@ namespace MagicOnion.Generator
     {
         public string Namespace { get; set; }
         public bool isAsyncSuffix { get; set; }
-        public MagicOnion.CodeAnalysis.InterfaceDefintion[] Interfaces { get; set; }
+        public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
     }
 
     public partial class RegisterTemplate
     {
         public string Namespace { get; set; }
         public bool UnuseUnityAttribute { get; set; }
-        public MagicOnion.CodeAnalysis.InterfaceDefintion[] Interfaces { get; set; }
+        public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
     }
 
     public partial class ResolverTemplate

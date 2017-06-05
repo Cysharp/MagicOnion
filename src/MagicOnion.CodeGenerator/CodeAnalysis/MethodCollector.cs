@@ -67,10 +67,10 @@ namespace MagicOnion.CodeAnalysis
         }
 
         // not visitor pattern:)
-        public InterfaceDefintion[] Visit()
+        public InterfaceDefinition[] Visit()
         {
             return interfaces
-                .Select(x => new InterfaceDefintion()
+                .Select(x => new InterfaceDefinition()
                 {
                     Name = x.ToDisplayString(shortTypeNameFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
@@ -83,7 +83,7 @@ namespace MagicOnion.CodeAnalysis
                         .ToArray()
                 })
                 .Concat(serviceTypes
-                    .Select(x => new InterfaceDefintion
+                    .Select(x => new InterfaceDefinition
                     {
                         Name = x.ToDisplayString(shortTypeNameFormat),
                         Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),

@@ -32,6 +32,9 @@ namespace MagicOnion.Server
 
 #else
 
+        /// <summary>
+        /// Search MagicOnion service from entry assembly.
+        /// </summary>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
         {
             return BuildServerServiceDefinition(new[] { Assembly.GetEntryAssembly() }, options);

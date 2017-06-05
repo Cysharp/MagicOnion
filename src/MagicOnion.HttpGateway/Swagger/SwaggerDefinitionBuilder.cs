@@ -141,9 +141,9 @@ namespace MagicOnion.HttpGateway.Swagger
 
                     string defaultObjectExample = null;
                     object[] enums = null;
-                    if (x.ParameterType.IsEnum || (collectionType != null && collectionType.IsEnum))
+                    if (x.ParameterType.GetTypeInfo().IsEnum || (collectionType != null && collectionType.GetTypeInfo().IsEnum))
                     {
-                        var enumType = (x.ParameterType.IsEnum) ? x.ParameterType : collectionType;
+                        var enumType = (x.ParameterType.GetTypeInfo().IsEnum) ? x.ParameterType : collectionType;
 
                         var enumValues = Enum.GetNames(enumType);
 
@@ -167,7 +167,12 @@ namespace MagicOnion.HttpGateway.Swagger
                         refSchema = new Schema { @ref = BuildSchema(definitions, x.ParameterType) };
                         if (parameterInfos.Length != 1)
                         {
+#if NET_FRAMEWORK
                             var unknownObj = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(x.ParameterType);
+#else
+                            var unknownObj = Activator.CreateInstance(x.ParameterType);
+#endif
+
                             defaultObjectExample = JsonConvert.SerializeObject(unknownObj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
                         }
                     }
@@ -236,7 +241,7 @@ namespace MagicOnion.HttpGateway.Swagger
                             }
                             else
                             {
-                                if (collectionType.IsEnum)
+                                if (collectionType.GetTypeInfo().IsEnum)
                                 {
                                     items = new Schema
                                     {
@@ -252,7 +257,7 @@ namespace MagicOnion.HttpGateway.Swagger
                         }
 
                         IList<object> schemaEnum = null;
-                        if (memberType.IsEnum)
+                        if (memberType.GetTypeInfo().IsEnum)
                         {
                             schemaEnum = Enum.GetNames(memberType);
                         }
@@ -295,7 +300,7 @@ namespace MagicOnion.HttpGateway.Swagger
         {
             if (type.IsArray) return type.GetElementType();
 
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 var genTypeDef = type.GetGenericTypeDefinition();
                 if (genTypeDef == typeof(IEnumerable<>)
@@ -375,7 +380,7 @@ namespace MagicOnion.HttpGateway.Swagger
                 type = Nullable.GetUnderlyingType(type);
             }
 
-            if (type.IsEnum || type == typeof(DateTime) || type == typeof(DateTimeOffset))
+            if (type.GetTypeInfo().IsEnum || type == typeof(DateTime) || type == typeof(DateTimeOffset))
             {
                 return "string";
             }
@@ -408,7 +413,7 @@ namespace MagicOnion.HttpGateway.Swagger
         static string UnwrapTypeName(Type t)
         {
             if (t == typeof(void)) return "void";
-            if (!t.IsGenericType) return t.Name;
+            if (!t.GetTypeInfo().IsGenericType) return t.Name;
 
             var innerFormat = string.Join(", ", t.GetGenericArguments().Select(x => UnwrapTypeName(x)));
             return Regex.Replace(t.GetGenericTypeDefinition().Name, @"`.+$", "") + "&lt;" + innerFormat + "&gt;";
