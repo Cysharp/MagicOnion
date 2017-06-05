@@ -20,6 +20,8 @@ namespace MagicOnion.Server
             return BuildServerServiceDefinition(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
         }
 
+#if NET_FRAMEWORK
+
         /// <summary>
         /// Search MagicOnion service from all assemblies.
         /// </summary>
@@ -28,6 +30,18 @@ namespace MagicOnion.Server
             return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), options);
         }
 
+#else
+
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+        {
+            return BuildServerServiceDefinition(new[] { Assembly.GetEntryAssembly() }, options);
+        }
+
+#endif
+
+        /// <summary>
+        /// Search MagicOnion service from target assemblies. ex: new[]{ typeof(Startup).GetTypeInfo().Assembly }
+        /// </summary>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(Assembly[] searchAssemblies, MagicOnionOptions option)
         {
             var types = searchAssemblies
@@ -52,7 +66,7 @@ namespace MagicOnion.Server
 
             var types = targetTypes
               .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
-              .Where(x => !x.IsAbstract)
+              .Where(x => !x.GetTypeInfo().IsAbstract)
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .Concat(SupplyEmbeddedServices(option))
               .ToArray();

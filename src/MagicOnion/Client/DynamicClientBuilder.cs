@@ -22,10 +22,14 @@ namespace MagicOnion.Client
             assembly = new DynamicAssembly(ModuleName);
         }
 
+#if ENABLE_SAVE_ASSEMBLY
+
         public static AssemblyBuilder Save()
         {
             return assembly.Save();
         }
+
+#endif
     }
 
     internal static class DynamicClientBuilder<T>
@@ -417,7 +421,7 @@ namespace MagicOnion.Client
             //if (!t.IsGenericType) throw new Exception($"Invalid ResponseType, Path:{def.Path} Type:{t.Name}");
 
             var t = def.MethodInfo.ReturnType;
-            if (!t.IsGenericType) throw new Exception($"Invalid return type, path:{def.Path} type:{t.Name}");
+            if (!t.GetTypeInfo().IsGenericType) throw new Exception($"Invalid return type, path:{def.Path} type:{t.Name}");
 
             // Task<Unary<T>>
             if (t.GetGenericTypeDefinition() == typeof(Task<>))

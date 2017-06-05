@@ -24,10 +24,14 @@ namespace MagicOnion.Utils
 #endif
         }
 
+#if ENABLE_SAVE_ASSEMBLY
+
         public AssemblyBuilder Save()
         {
             assemblyBuilder.Save(moduleName + ".dll");
             return assemblyBuilder;
         }
+
+#endif
     }
 }

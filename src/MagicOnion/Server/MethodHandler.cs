@@ -45,7 +45,7 @@ namespace MagicOnion.Server
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
             this.ServiceType = classType;
-            this.ServiceName = classType.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
+            this.ServiceName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
             MethodType mt;
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
@@ -198,7 +198,7 @@ namespace MagicOnion.Server
         static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
         {
             var t = methodInfo.ReturnType;
-            if (!t.IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+            if (!t.GetTypeInfo().IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
 
             // Task<Unary<T>>
             if (t.GetGenericTypeDefinition() == typeof(Task<>))
@@ -278,7 +278,8 @@ namespace MagicOnion.Server
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(UnaryServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        var handler = (UnaryServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this, genericMethod);
+
+                        var handler = (UnaryServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this);
                         builder.AddMethod(method, handler);
                     }
                     break;
@@ -287,7 +288,7 @@ namespace MagicOnion.Server
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        var handler = (ClientStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        var handler = (ClientStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this);
                         builder.AddMethod(method, handler);
                     }
                     break;
@@ -296,7 +297,7 @@ namespace MagicOnion.Server
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        var handler = (ServerStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        var handler = (ServerStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this);
                         builder.AddMethod(method, handler);
                     }
                     break;
@@ -305,7 +306,7 @@ namespace MagicOnion.Server
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        var handler = (DuplexStreamingServerMethod<byte[], byte[]>)Delegate.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this, genericMethod);
+                        var handler = (DuplexStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this);
                         builder.AddMethod(method, handler);
                     }
                     break;

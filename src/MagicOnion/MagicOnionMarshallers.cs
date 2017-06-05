@@ -80,13 +80,13 @@ namespace MagicOnion
     // invoke from dynamic methods so must be public
     public static class MagicOnionMarshallers
     {
-        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).Assembly
+        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
             .GetTypes()
             .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 
-        static readonly Type[] dynamicArgumentTupleFormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).Assembly
+        static readonly Type[] dynamicArgumentTupleFormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).GetTypeInfo().Assembly
             .GetTypes()
             .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
             .OrderBy(x => x.GetGenericArguments().Length)
@@ -152,7 +152,7 @@ namespace MagicOnion
                         {
                             return x.DefaultValue;
                         }
-                        else if (x.ParameterType.IsValueType)
+                        else if (x.ParameterType.GetTypeInfo().IsValueType)
                         {
                             return Activator.CreateInstance(x.ParameterType);
                         }

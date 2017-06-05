@@ -17,7 +17,7 @@ namespace MagicOnion
                 var entry = metadata[i];
                 if (ignoreCase)
                 {
-                    if (entry.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+                    if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                     {
                         return entry;
                     }
@@ -43,7 +43,7 @@ namespace MagicOnion
                 var entry = metadata[i];
                 if (ignoreCase)
                 {
-                    if (entry.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+                    if (entry.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                     {
                         return entry.Value;
                     }

@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStandardShare", "sandbox
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleServer2", "sandbox\Sandbox.ConsoleServer2\Sandbox.ConsoleServer2.csproj", "{7CF23E57-381B-428D-B44A-D5328A71414B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Tests.NetCore", "tests\MagicOnion.Tests.NetCore\MagicOnion.Tests.NetCore.csproj", "{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{5526fa31-4f38-4ff7-96ee-a73bf495e1ee}*SharedItemsImports = 13
@@ -83,6 +85,10 @@ Global
 		{7CF23E57-381B-428D-B44A-D5328A71414B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CF23E57-381B-428D-B44A-D5328A71414B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CF23E57-381B-428D-B44A-D5328A71414B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,5 +104,6 @@ Global
 		{5526FA31-4F38-4FF7-96EE-A73BF495E1EE} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A9E28AFD-4FEC-416A-9F85-C64F05605B22} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{7CF23E57-381B-428D-B44A-D5328A71414B} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 	EndGlobalSection
 EndGlobal

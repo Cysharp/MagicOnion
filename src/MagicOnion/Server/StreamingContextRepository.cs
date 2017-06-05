@@ -75,7 +75,9 @@ namespace MagicOnion.Server
 
             if (dummyInstance == null)
             {
-                dummyInstance = (TService)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(self.GetType());
+                // .NET Standard does not support GetUninitializedObject, TService may always has zero argument constructor.
+                // dummyInstance = (TService)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(self.GetType());
+                dummyInstance = (TService)Activator.CreateInstance(self.GetType());
             }
 
             var getServerStreamingContext = delegateCache.GetOrAdd(Tuple.Create(self.GetType(), typeof(TResponse)), x =>
@@ -104,7 +106,8 @@ namespace MagicOnion.Server
             }, tcs);
 
             var info = new StreamingContextInfo<TResponse>(tcs, context);
-            streamingContext[methodSelector.Method] = Tuple.Create(new SemaphoreSlim(1, 1), (IStreamingContextInfo)info);
+
+            streamingContext[methodSelector.GetMethodInfo()] = Tuple.Create(new SemaphoreSlim(1, 1), (IStreamingContextInfo)info);
             return info;
         }
 
@@ -113,7 +116,7 @@ namespace MagicOnion.Server
             if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
 
             Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
-            if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
+            if (streamingContext.TryGetValue(methodSelector(dummyInstance).GetMethodInfo(), out streamingContextObject))
             {
                 try
                 {
@@ -132,7 +135,7 @@ namespace MagicOnion.Server
             }
             else
             {
-                throw new Exception("Does not exists streaming context. :" + methodSelector.Method.Name);
+                throw new Exception("Does not exists streaming context. :" + methodSelector.GetMethodInfo().Name);
             }
         }
 
@@ -141,7 +144,7 @@ namespace MagicOnion.Server
             if (isDisposed) throw new ObjectDisposedException("StreamingContextRepository", "already disposed(disconnected).");
 
             Tuple<SemaphoreSlim, IStreamingContextInfo> streamingContextObject;
-            if (streamingContext.TryGetValue(methodSelector(dummyInstance).Method, out streamingContextObject))
+            if (streamingContext.TryGetValue(methodSelector(dummyInstance).GetMethodInfo(), out streamingContextObject))
             {
                 try
                 {
@@ -159,7 +162,7 @@ namespace MagicOnion.Server
             }
             else
             {
-                throw new Exception("Does not exists streaming context. :" + methodSelector.Method.Name);
+                throw new Exception("Does not exists streaming context. :" + methodSelector.GetMethodInfo().Name);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using System.Reflection;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using System;
@@ -41,7 +42,8 @@ namespace MagicOnion.Tests
 
         public ServerFixture()
         {
-            var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
+            var options = new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true };
+            var service = MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ServerFixture).GetTypeInfo().Assembly }, options);
 
             var port = RandomProvider.ThreadRandom.Next(10000, 30000);
             var serverPort = new ServerPort("localhost", port, ServerCredentials.Insecure);

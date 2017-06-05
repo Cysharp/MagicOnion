@@ -120,7 +120,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -132,7 +131,6 @@ namespace Xunit
     #region Extensions
 
     [System.Diagnostics.DebuggerStepThroughAttribute]
-    [ContractVerification(false)]
     public static partial class AssertEx
     {
         /// <summary>Assert.Equal, if T is IEnumerable then compare value equality</summary>
