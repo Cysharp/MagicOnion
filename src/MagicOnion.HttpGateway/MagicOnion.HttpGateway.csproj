@@ -1,76 +1,75 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
-   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;net46;net47;</TargetFrameworks>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net46'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>DEBUG;NET_FRAMEWORK;net46;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard1.5;net46;net47;</TargetFrameworks>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net46'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>RELEASE;NET_FRAMEWORK;net46;NON_UNITY;</DefineConstants>
-      <DocumentationFile>bin\Release\net46\MagicOnion.HttpGateway.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net46'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>DEBUG;NET_FRAMEWORK;net46;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>DEBUG;NET_FRAMEWORK;NET47;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net46'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>RELEASE;NET_FRAMEWORK;net46;NON_UNITY;</DefineConstants>
+        <DocumentationFile>bin\Release\net46\MagicOnion.HttpGateway.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net47'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
-      <DocumentationFile>bin\Release\net47\MagicOnion.HttpGateway.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>DEBUG;NET_FRAMEWORK;NET47;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard1.5'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>DEBUG;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
+        <DocumentationFile>bin\Release\net47\MagicOnion.HttpGateway.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'netstandard1.5'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>RELEASE;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
-      <DocumentationFile>bin\Release\netstandard1.5\MagicOnion.HttpGateway.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard1.5'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>DEBUG;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Swagger\SwaggerUI\index.html" />
-    <None Remove="Swagger\SwaggerUI\o2c.html" />
-    <None Remove="Swagger\SwaggerUI\swagger-ui.js" />
-    <None Remove="Swagger\SwaggerUI\swagger-ui.min.js" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'netstandard1.5'">
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>RELEASE;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
+        <DocumentationFile>bin\Release\netstandard1.5\MagicOnion.HttpGateway.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Swagger\SwaggerUI\**\*" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Swagger\SwaggerUI\index.html" />
+        <None Remove="Swagger\SwaggerUI\o2c.html" />
+        <None Remove="Swagger\SwaggerUI\swagger-ui.js" />
+        <None Remove="Swagger\SwaggerUI\swagger-ui.min.js" />
+    </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Swagger\SwaggerUI\**\*" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Grpc" Version="1.3.6" />
-    <PackageReference Include="MessagePack" Version="1.2.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\MagicOnion\MagicOnion.csproj">
-      <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
-      <Name>MagicOnion</Name>
-    </ProjectReference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  
+    <ItemGroup>
+        <PackageReference Include="Grpc" Version="1.3.6" />
+        <PackageReference Include="MessagePack" Version="1.2.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MagicOnion\MagicOnion.csproj">
+            <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
+            <Name>MagicOnion</Name>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Properties\" />
+    </ItemGroup>
+
 </Project>
