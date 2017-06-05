@@ -8,7 +8,9 @@ Quick Start
 ---
 for .NET 4.6, 4.7 and .NET Standard 1.5(.NET Core) available in NuGet. Unity supports see [Unity Supports](https://github.com/neuecc/MagicOnion#unity-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](https://github.com/neuecc/MagicOnion#swagger) section.
 
-* Install-Package MagicOnion
+```
+Install-Package MagicOnion
+```
 
 Let's implements Server, Server has two parts, interface and implementation.
 
