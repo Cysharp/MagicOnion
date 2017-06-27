@@ -2,28 +2,28 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>MagicOnion.HttpGateway</id>
-        <version>0.5.0</version>
+        <version>0.5.1</version>
         <title>MagicOnion.HttpGateway</title>
         <authors>neuecc</authors>
         <owners>neuecc</owners>
         <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</description>
-        <releaseNotes>Support .NET Core.</releaseNotes>
+        <releaseNotes>update dependency.</releaseNotes>
         <tags>gRPC, HTTP2</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.6">
-                <dependency id="MagicOnion" version="0.5.0" />
+                <dependency id="MagicOnion" version="0.5.1" />
                 <dependency id="Microsoft.AspNetCore.Http.Abstractions" version="1.1.0" />
                 <dependency id="Newtonsoft.Json" version="10.0.2" />
             </group>
             <group targetFramework=".NETFramework4.7">
-                <dependency id="MagicOnion" version="0.5.0" />
+                <dependency id="MagicOnion" version="0.5.1" />
                 <dependency id="Microsoft.AspNetCore.Http.Abstractions" version="1.1.0" />
                 <dependency id="Newtonsoft.Json" version="10.0.2" />
             </group>
             <group targetFramework=".NETStandard1.5">
-                <dependency id="MagicOnion" version="0.5.0" />
+                <dependency id="MagicOnion" version="0.5.1" />
                 <dependency id="Microsoft.AspNetCore.Http.Abstractions" version="1.1.0" />
                 <dependency id="Newtonsoft.Json" version="10.0.2" />
             </group>

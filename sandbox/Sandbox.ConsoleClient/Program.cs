@@ -152,9 +152,6 @@ namespace MagicOnion.ConsoleClient
             });
             await cc.WaitConnectComplete();
 
-
-
-
             Console.ReadLine();
             //cc.Dispose();
             await new PingClient(channel).Ping();
