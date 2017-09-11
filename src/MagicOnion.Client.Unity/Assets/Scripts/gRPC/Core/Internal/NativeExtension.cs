@@ -179,8 +179,8 @@ namespace Grpc.Core.Internal
         private static string GetNativeLibraryFilename()
         {
 #if UNITY_IOS || UNITY_TVOS || UNITY_WEBGL
-		return "__Internal";
-#endif
+            return "__Internal";
+#else
 
             string architecture = GetArchitectureString();
             if (PlatformApis.IsWindows)
@@ -196,6 +196,7 @@ namespace Grpc.Core.Internal
                 return string.Format("libgrpc_csharp_ext.{0}.dylib", architecture);
             }
             throw new InvalidOperationException("Unsupported platform.");
+#endif
         }
     }
 }
