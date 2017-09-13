@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
 using UnityEditor;
 
 namespace MagicOnion
@@ -23,7 +22,6 @@ namespace MagicOnion
                 EditorApplication.LockReloadAssemblies();
                 EditorApplication.playmodeStateChanged += PlayModeChanged;
                 isStopped = true;
-                Debug.Log("Stop Compiling the scripts");
             }
         }
 
@@ -35,7 +33,6 @@ namespace MagicOnion
             EditorApplication.UnlockReloadAssemblies();
             EditorApplication.playmodeStateChanged -= PlayModeChanged;
             isStopped = false;
-            Debug.Log("Start Compiling the scripts");
         }
     }
 }
