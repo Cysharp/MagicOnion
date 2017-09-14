@@ -37,9 +37,10 @@ namespace MagicOnion.ConsoleClient
                 var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
                 //channel.ConnectAsync().Wait();
 
-                var c = MagicOnionClient.Create<IStandard>(channel);
+                //var c = MagicOnionClient.Create<IStandard>(channel);
 
-                RunTest(c).GetAwaiter().GetResult();
+                //RunTest(c).GetAwaiter().GetResult();
+                RunChat(new ChannelContext(channel)).GetAwaiter().GetResult();
                 return;
 
 
@@ -68,10 +69,30 @@ namespace MagicOnion.ConsoleClient
             }
             finally
             {
-                var asm = AssemblyHolder.Save();
-                Verify(asm);
-                Console.WriteLine("end");
+                //var asm = AssemblyHolder.Save();
+                //Verify(asm);
+                //Console.WriteLine("end");
             }
+        }
+
+        static async Task RunChat(ChannelContext ctx)
+        {
+            // create room
+            var client = ctx.CreateClient<IChatRoomService>();
+
+            var room = await client.CreateNewRoom("test", "A");
+
+            var waiter = (await client.OnJoin()).ResponseStream.ForEachAsync(xs =>
+           {
+               Console.WriteLine(xs);
+           });
+
+            await client.Join(room.Id, "B");
+
+            //var result = await await client.SendMessage(room.Id, "foo bar baz");
+            // Console.WriteLine("Send success:" + result);
+
+            await waiter;
         }
 
 

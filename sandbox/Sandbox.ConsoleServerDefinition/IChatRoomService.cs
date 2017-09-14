@@ -18,15 +18,15 @@ namespace Sandbox.ConsoleServer
     public interface IChatRoomCommand
     {
         /// <summary>Create new room.</summary>
-        Task<UnaryResult<ChatRoomResponse>> CreateNewRoom(string roomName, string nickName);
+        UnaryResult<ChatRoomResponse> CreateNewRoom(string roomName, string nickName);
 
-        Task<UnaryResult<ChatRoomResponse>> Join(string roomId, string nickName);
+        UnaryResult<ChatRoomResponse> Join(string roomId, string nickName);
 
-        Task<UnaryResult<ChatRoomResponse[]>> GetRooms();
+        UnaryResult<ChatRoomResponse[]> GetRooms();
 
-        Task<UnaryResult<bool>> Leave(string roomId);
+        UnaryResult<bool> Leave(string roomId);
 
-        Task<UnaryResult<bool>> SendMessage(string roomId, string message);
+        UnaryResult<bool> SendMessage(string roomId, string message);
     }
 
     public interface IChatRoomService : IService<IChatRoomService>, IChatRoomCommand, IChatRoomStreaming

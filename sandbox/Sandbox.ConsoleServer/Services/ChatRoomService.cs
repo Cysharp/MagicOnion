@@ -1,4 +1,6 @@
-﻿using MagicOnion;
+﻿#pragma warning disable CS1998
+
+using MagicOnion;
 using MagicOnion.Server;
 using System;
 using System.Collections.Concurrent;
@@ -112,9 +114,11 @@ namespace Sandbox.ConsoleServer.Services
             context.Items[$"RoomService{room.Id}.MyId"] = id;
         }
 
+
         // RoomCommand
 
-        public Task<UnaryResult<ChatRoomResponse>> CreateNewRoom(string roomName, string nickName)
+
+        public async UnaryResult<ChatRoomResponse> CreateNewRoom(string roomName, string nickName)
         {
             var room = new ChatRoom(Guid.NewGuid().ToString(), roomName);
             var member = new RoomMember(Guid.NewGuid().ToString(), nickName);
@@ -131,15 +135,15 @@ namespace Sandbox.ConsoleServer.Services
                 LeaveCore(t.Item1, t.Item2).Wait();
             }, Tuple.Create(room.Id, member.Id));
 
-            return Task.FromResult(UnaryResult(room.ToChatRoomResponse()));
+            return room.ToChatRoomResponse();
         }
 
-        public Task<UnaryResult<ChatRoomResponse[]>> GetRooms()
+        public async UnaryResult<ChatRoomResponse[]> GetRooms()
         {
-            return Task.FromResult(UnaryResult(RoomRepository.Default.GetRooms().Select(x => x.ToChatRoomResponse()).ToArray()));
+            return RoomRepository.Default.GetRooms().Select(x => x.ToChatRoomResponse()).ToArray();
         }
 
-        public async Task<UnaryResult<ChatRoomResponse>> Join(string roomId, string nickName)
+        public async UnaryResult<ChatRoomResponse> Join(string roomId, string nickName)
         {
             var room = RoomRepository.Default.GetRoom(roomId);
             var newMember = new RoomMember(Guid.NewGuid().ToString(), nickName);
@@ -147,16 +151,16 @@ namespace Sandbox.ConsoleServer.Services
 
             await room.BroadcastJoinAsync(newMember);
 
-            return UnaryResult(room.ToChatRoomResponse());
+            return room.ToChatRoomResponse();
         }
 
-        public async Task<UnaryResult<bool>> Leave(string roomId)
+        public async UnaryResult<bool> Leave(string roomId)
         {
             var connectionContext = this.GetConnectionContext();
             var room = RoomRepository.Default.GetRoom(roomId);
-            if (room == null) return UnaryResult(false);
+            if (room == null) return false;
             await LeaveCore(roomId, GetMyId(connectionContext, room));
-            return UnaryResult(true);
+            return true;
         }
 
         // called from ConnectionStatus.Register so should be static.
@@ -179,15 +183,15 @@ namespace Sandbox.ConsoleServer.Services
             }
         }
 
-        public Task<UnaryResult<bool>> SendMessage(string roomId, string message)
+        public async UnaryResult<bool> SendMessage(string roomId, string message)
         {
             var room = RoomRepository.Default.GetRoom(roomId);
             var myId = GetMyId(this.GetConnectionContext(), room);
             var self = room.GetMember(myId);
-            if (self == null) return Task.FromResult(UnaryResult(false));
+            if (self == null) return false;
 
             RoomRepository.Default.GetRoom(roomId).BroadcastMessageAsync(self.Value, message);
-            return Task.FromResult(UnaryResult(true));
+            return true;
         }
 
         // RoomStreaming
@@ -197,7 +201,7 @@ namespace Sandbox.ConsoleServer.Services
             var connection = this.GetConnectionContext();
             var item = connection.Items.GetOrAdd("RoomStreamingStreamingContextRepository", _ => new Lazy<StreamingContextRepository<IChatRoomStreaming>>(() =>
             {
-                return new StreamingContextRepository<IChatRoomStreaming>(connection);
+                return new StreamingContextRepository<IChatRoomStreaming>(connection, this);
             }));
             return (item as Lazy<StreamingContextRepository<IChatRoomStreaming>>).Value;
         }
@@ -218,3 +222,5 @@ namespace Sandbox.ConsoleServer.Services
         }
     }
 }
+
+#pragma warning restore CS1998

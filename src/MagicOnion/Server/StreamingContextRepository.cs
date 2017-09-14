@@ -60,6 +60,7 @@ namespace MagicOnion.Server
         public bool IsDisposed => isDisposed;
         public ConnectionContext ConnectionContext { get; }
 
+        // TODO:Obsolete?
         public StreamingContextRepository(ConnectionContext connectionContext)
         {
             this.ConnectionContext = connectionContext;
@@ -67,6 +68,19 @@ namespace MagicOnion.Server
             {
                 Dispose();
             });
+        }
+
+        public StreamingContextRepository(ConnectionContext connectionContext, TService self)
+        {
+            this.ConnectionContext = connectionContext;
+            connectionContext.ConnectionStatus.Register(() =>
+            {
+                Dispose();
+            });
+
+            // .NET Standard does not support GetUninitializedObject, TService may always has zero argument constructor.
+            // dummyInstance = (TService)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(self.GetType());
+            dummyInstance = (TService)Activator.CreateInstance(self.GetType());
         }
 
         public StreamingContextInfo<TResponse> RegisterStreamingMethod<TResponse>(TService self, Func<Task<ServerStreamingResult<TResponse>>> methodSelector)
