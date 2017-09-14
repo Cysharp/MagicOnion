@@ -190,7 +190,7 @@ namespace Sandbox.ConsoleServer.Services
             var self = room.GetMember(myId);
             if (self == null) return false;
 
-            RoomRepository.Default.GetRoom(roomId).BroadcastMessageAsync(self.Value, message);
+            await RoomRepository.Default.GetRoom(roomId).BroadcastMessageAsync(self.Value, message);
             return true;
         }
 
