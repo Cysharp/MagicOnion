@@ -71,7 +71,7 @@ internal static class ReflectionExtensions
 
     public static IEnumerable<Attribute> GetCustomAttributes(this Type type, bool inherit)
     {
-        return type.GetTypeInfo().GetCustomAttributes(inherit);
+        return type.GetTypeInfo().GetCustomAttributes(inherit).Cast<Attribute>();
     }
 
     public static bool IsAssignableFrom(this Type type, Type c)

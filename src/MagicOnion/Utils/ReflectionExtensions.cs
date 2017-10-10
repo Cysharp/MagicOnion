@@ -17,7 +17,7 @@ internal static class ReflectionExtensions
         return type.IsPublic;
     }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD
 
     public static bool IsConstructedGenericType(this System.Reflection.TypeInfo type)
     {
