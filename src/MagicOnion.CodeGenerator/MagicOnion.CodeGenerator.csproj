@@ -196,7 +196,7 @@
     <Compile Include="Mono.Options\Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\EnvHelper.cs" />
+    <Compile Include="Utils\EnvironmentHelper.cs" />
     <Compile Include="Utils\RoslynExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
