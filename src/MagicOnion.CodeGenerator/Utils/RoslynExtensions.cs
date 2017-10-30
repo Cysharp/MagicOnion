@@ -9,13 +9,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using MagicOnion.Utils;
 
 namespace MagicOnion
 {
     // Utility and Extension methods for Roslyn
     internal static class RoslynExtensions
     {
-        public static async Task<Compilation> GetCompilationFromProject(string csprojPath, params string[] preprocessorSymbols)
+        public static async Task<Compilation> GetCompilationFromProject(string csprojPath,
+            params string[] preprocessorSymbols)
         {
             // fucking workaround of resolve reference...
             var externalReferences = new List<PortableExecutableReference>();
@@ -53,13 +55,22 @@ namespace MagicOnion
                 }
             }
 
+            EnvironmentHelper.Setup();
+            
             var workspace = MSBuildWorkspace.Create();
+            workspace.WorkspaceFailed += WorkSpaceFailed;
             var project = await workspace.OpenProjectAsync(csprojPath).ConfigureAwait(false);
             project = project.AddMetadataReferences(externalReferences); // workaround:)
-            project = project.WithParseOptions((project.ParseOptions as CSharpParseOptions).WithPreprocessorSymbols(preprocessorSymbols));
+            project = project.WithParseOptions(
+                (project.ParseOptions as CSharpParseOptions).WithPreprocessorSymbols(preprocessorSymbols));
 
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
             return compilation;
+        }
+
+        private static void WorkSpaceFailed(object sender, WorkspaceDiagnosticEventArgs e)
+        {
+            Console.WriteLine(e);
         }
 
         public static IEnumerable<INamedTypeSymbol> GetNamedTypeSymbols(this Compilation compilation)
@@ -99,14 +110,16 @@ namespace MagicOnion
                 .FirstOrDefault();
         }
 
-        public static AttributeData FindAttributeShortName(this IEnumerable<AttributeData> attributeDataList, string typeName)
+        public static AttributeData FindAttributeShortName(this IEnumerable<AttributeData> attributeDataList,
+            string typeName)
         {
             return attributeDataList
                 .Where(x => x.AttributeClass.Name == typeName)
                 .FirstOrDefault();
         }
 
-        public static AttributeData FindAttributeIncludeBasePropertyShortName(this IPropertySymbol property, string typeName)
+        public static AttributeData FindAttributeIncludeBasePropertyShortName(this IPropertySymbol property,
+            string typeName)
         {
             do
             {
@@ -118,7 +131,8 @@ namespace MagicOnion
             return null;
         }
 
-        public static AttributeSyntax FindAttribute(this BaseTypeDeclarationSyntax typeDeclaration, SemanticModel model, string typeName)
+        public static AttributeSyntax FindAttribute(this BaseTypeDeclarationSyntax typeDeclaration, SemanticModel model,
+            string typeName)
         {
             return typeDeclaration.AttributeLists
                 .SelectMany(x => x.Attributes)

@@ -71,6 +71,8 @@ namespace MagicOnion.CodeGenerator
     {
         static void Main(string[] args)
         {
+            args = new string[] {"-i", "/Users/User/Desktop/games/VN/Vexz.Domain/Vexz.Domain.csproj", "-o", "cl5" };
+            
             var cmdArgs = new CommandlineArguments(args);
             if (!cmdArgs.IsParsed)
             {
