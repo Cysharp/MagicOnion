@@ -576,7 +576,11 @@ namespace MagicOnion.Server
                 var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
                 context.Result = bytes;
             }
+#if !NET45
             return Task.CompletedTask;
+#else
+            return Task.FromResult(0);
+#endif
         }
 
         public static async Task SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
