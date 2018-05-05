@@ -1,81 +1,100 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net46;net47;</TargetFrameworks>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net45;net46;net47</TargetFrameworks>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net46'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>DEBUG;NET_FRAMEWORK;net46;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net45'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>DEBUG;NET_FRAMEWORK;net45;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net46'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>RELEASE;NET_FRAMEWORK;net46;NON_UNITY;</DefineConstants>
-        <DocumentationFile>bin\Release\net46\MagicOnion.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net46'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>DEBUG;NET_FRAMEWORK;net46;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>DEBUG;NET_FRAMEWORK;NET47;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net45'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>RELEASE;NET_FRAMEWORK;net45;NON_UNITY;</DefineConstants>
+    <DocumentationFile>bin\Release\net45\MagicOnion.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net47'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
-        <DocumentationFile>bin\Release\net47\MagicOnion.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net46'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>RELEASE;NET_FRAMEWORK;net46;NON_UNITY;</DefineConstants>
+    <DocumentationFile>bin\Release\net46\MagicOnion.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>DEBUG;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>DEBUG;NET_FRAMEWORK;NET47;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>RELEASE;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
-        <DocumentationFile>bin\Release\netstandard2.0\MagicOnion.xml</DocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
+    <DocumentationFile>bin\Release\net47\MagicOnion.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <!-- NuGet -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>DEBUG;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
+  </PropertyGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net47' ">
-        <PackageReference Include="Grpc" Version="1.4.0" />
-        <PackageReference Include="MessagePack" Version="1.7.0" />
-    </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>RELEASE;NETSTANDARD1_5;NON_UNITY;</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\MagicOnion.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-        <PackageReference Include="Grpc" Version="1.4.0" />
-        <PackageReference Include="MessagePack" Version="1.7.0" />
-        <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-    </ItemGroup>
+  <!-- NuGet -->
 
-    <!-- T4 -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45'">
+    <PackageReference Include="Grpc" Version="1.4.0" />
+    <PackageReference Include="MessagePack" Version="1.7.0" />
+    <Reference Include="System.Runtime.Remoting" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net47'">
+    <PackageReference Include="Grpc" Version="1.4.0" />
+    <PackageReference Include="MessagePack" Version="1.7.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <None Update="DynamicArgumentTuple.tt">
-            <Generator>TextTemplatingFileGenerator</Generator>
-            <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
-        </None>
-    </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Grpc" Version="1.4.0" />
+    <PackageReference Include="MessagePack" Version="1.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="DynamicArgumentTuple.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
-        </Compile>
-    </ItemGroup>
+  <!-- T4 -->
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DynamicArgumentTuple.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DynamicArgumentTuple.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
 </Project>
