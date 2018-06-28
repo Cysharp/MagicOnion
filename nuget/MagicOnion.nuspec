@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>MagicOnion</id>
-        <version>0.5.2</version>
+        <version>0.5.3</version>
         <title>MagicOnion</title>
         <authors>neuecc</authors>
         <owners>neuecc</owners>
@@ -13,16 +13,16 @@
         <tags>gRPC, HTTP2</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.6">
-                <dependency id="Grpc" version="1.4.0" />
-                <dependency id="MessagePack" version="1.7.0" />
+                <dependency id="Grpc" version="1.12.0" />
+                <dependency id="MessagePack" version="1.7.3.4" />
             </group>
             <group targetFramework=".NETFramework4.7">
-                <dependency id="Grpc" version="1.4.0" />
-                <dependency id="MessagePack" version="1.7.0" />
+                <dependency id="Grpc" version="1.12.0" />
+                <dependency id="MessagePack" version="1.7.3.4" />
             </group>
             <group targetFramework=".NETStandard2.0">
-                <dependency id="Grpc" version="1.4.0" />
-                <dependency id="MessagePack" version="1.7.0" />
+                <dependency id="Grpc" version="1.12.0" />
+                <dependency id="MessagePack" version="1.7.3.4" />
                 <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" />
             </group>
         </dependencies>
@@ -34,6 +34,5 @@
         <file src="..\src\MagicOnion\bin\Release\net47\MagicOnion.xml" target="lib\net47" />
         <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.dll" target="lib\netstandard2.0" />
         <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.xml" target="lib\netstandard2.0" />
-        <file src="tools\*" target="tools" />
     </files>
 </package>

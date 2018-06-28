@@ -37,10 +37,11 @@ namespace MagicOnion.ConsoleClient
                 var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
                 //channel.ConnectAsync().Wait();
 
-                //var c = MagicOnionClient.Create<IStandard>(channel);
+                var c = MagicOnionClient.Create<IStandard>(channel);
 
-                //RunTest(c).GetAwaiter().GetResult();
-                RunChat(new ChannelContext(channel)).GetAwaiter().GetResult();
+                var a = c.Echo("foo", 10, 20, SharedLibrary.MyEnum2.B).GetAwaiter().GetResult();
+                Console.WriteLine(a.Sum);
+                //RunChat(new ChannelContext(channel)).GetAwaiter().GetResult();
                 return;
 
 
