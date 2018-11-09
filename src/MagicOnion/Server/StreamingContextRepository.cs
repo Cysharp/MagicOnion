@@ -12,11 +12,13 @@ using System.Threading.Tasks;
 namespace MagicOnion.Server
 {
     internal interface IStreamingContextInfo
+
     {
         object ServerStreamingContext { get; }
         void Complete();
     }
 
+    [Obsolete("Use Hub instead.")]
     public class StreamingContextInfo<T> : IStreamingContextInfo
     {
         readonly TaskCompletionSource<object> tcs;
@@ -47,6 +49,7 @@ namespace MagicOnion.Server
         }
     }
 
+    [Obsolete("Use Hub instead.")]
     public class StreamingContextRepository<TService> : IDisposable
     {
         // (ConcreteServiceType, TResponse) => Func<TService, ServerStreamingContext<TResponse>>;

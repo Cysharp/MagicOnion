@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
+    [Obsolete("Use Hub instead.")]
     public class StreamingContextGroup<TKey, TStreamingService>
     {
         readonly ConcurrentDictionary<TKey, StreamingContextRepository<TStreamingService>> repositories;
@@ -184,6 +185,7 @@ namespace MagicOnion.Server
         }
     }
 
+    [Obsolete("Use Hub instead.")]
     public class StreamingContextGroup<TKey, TValue, TStreamingService>
     {
         readonly ConcurrentDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>> repositories;

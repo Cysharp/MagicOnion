@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;net46;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45;net46;net471</TargetFrameworks>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -31,13 +31,13 @@
     <DocumentationFile>bin\Release\net46\MagicOnion.xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net471'">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DefineConstants>DEBUG;NET_FRAMEWORK;NET47;ENABLE_SAVE_ASSEMBLY;NON_UNITY;</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net47'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'net471'">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DefineConstants>RELEASE;NET_FRAMEWORK;NET47;NON_UNITY;</DefineConstants>
@@ -60,20 +60,24 @@
   <!-- NuGet -->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45'">
-    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="Grpc" Version="1.16.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net47'">
-    <PackageReference Include="Grpc" Version="1.12.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net471'">
+    <PackageReference Include="Grpc" Version="1.16.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="Grpc" Version="1.16.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
   </ItemGroup>
 
   <!-- T4 -->
