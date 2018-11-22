@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace MagicOnion.Server
 {
+    [Obsolete("Use Hub instead.")]
     public class ConnectionContext
     {
         #region instance
@@ -24,6 +25,7 @@ namespace MagicOnion.Server
 
         public CancellationToken ConnectionStatus { get; }
 
+        [Obsolete("Use Hub instead.")]
         public ConnectionContext(string connectionId, CancellationToken connectionStatus)
         {
             this.ConnectionId = connectionId;
@@ -108,11 +110,13 @@ namespace MagicOnion.Server
 
     public static class ConnectionContextExtensions
     {
+        [Obsolete("Use Hub instead.")]
         public static ConnectionContext GetConnectionContext<T>(this ServiceBase<T> service)
         {
             return service.Context.GetConnectionContext();
         }
 
+        [Obsolete("Use Hub instead.")]
         public static ConnectionContext GetConnectionContext(this ServiceContext context)
         {
             if (!ConnectionContext.TryGetConnectionId(context, out var id))

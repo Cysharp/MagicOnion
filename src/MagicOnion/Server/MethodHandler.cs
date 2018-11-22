@@ -1,16 +1,21 @@
 ﻿using Grpc.Core;
 using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
     public class MethodHandler : IEquatable<MethodHandler>
     {
+        static int methodHandlerIdBuild = 0;
         static readonly byte[] emptyBytes = new byte[0];
+
+        int methodHandlerId = 0;
 
         public string ServiceName { get; private set; }
         public Type ServiceType { get; private set; }
@@ -44,6 +49,8 @@ namespace MagicOnion.Server
 
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
+            this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
+
             this.ServiceType = classType;
             this.ServiceName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
@@ -318,7 +325,7 @@ namespace MagicOnion.Server
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
             {
                 Request = request
             };
@@ -386,7 +393,7 @@ namespace MagicOnion.Server
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
             {
                 RequestStream = requestStream
             };
@@ -434,7 +441,7 @@ namespace MagicOnion.Server
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
             {
                 ResponseStream = responseStream,
                 Request = request
@@ -478,7 +485,7 @@ namespace MagicOnion.Server
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
             {
                 RequestStream = requestStream,
                 ResponseStream = responseStream
@@ -542,10 +549,25 @@ namespace MagicOnion.Server
         {
             return ServiceName.Equals(other.ServiceName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
         }
+
+        public class UniqueEqualityComparer : IEqualityComparer<MethodHandler>
+        {
+            public bool Equals(MethodHandler x, MethodHandler y)
+            {
+                return x.methodHandlerId.Equals(y.methodHandlerId);
+            }
+
+            public int GetHashCode(MethodHandler obj)
+            {
+                return obj.methodHandlerId.GetHashCode();
+            }
+        }
     }
 
     internal class MethodHandlerResultHelper
     {
+        // TODO:ValueTask???
+
         public static async Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
         {
             if (result.hasRawValue && !context.IsIgnoreSerialization)

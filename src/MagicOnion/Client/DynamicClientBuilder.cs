@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
-    public static class AssemblyHolder
+    internal static class DynamicClientAssemblyHolder
     {
         public const string ModuleName = "MagicOnion.Client.DynamicClient";
 
         readonly static DynamicAssembly assembly;
         public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
 
-        static AssemblyHolder()
+        static DynamicClientAssemblyHolder()
         {
             assembly = new DynamicAssembly(ModuleName);
         }
@@ -47,11 +47,11 @@ namespace MagicOnion.Client
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
 
-            var module = AssemblyHolder.Module;
+            var module = DynamicClientAssemblyHolder.Module;
             var methodDefinitions = SearchDefinitions(t);
 
             var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
-            var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
+            var typeBuilder = module.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
             DefineStaticFields(typeBuilder, methodDefinitions);
             DefineStaticConstructor(typeBuilder, t, methodDefinitions);

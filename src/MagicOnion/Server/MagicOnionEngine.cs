@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -66,6 +67,7 @@ namespace MagicOnion.Server
         {
             var builder = ServerServiceDefinition.CreateBuilder();
             var handlers = new HashSet<MethodHandler>();
+            var streamingHubHandlers = new List<StreamingHubHandler>();
 
             var types = targetTypes
               .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
@@ -77,12 +79,20 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
-            Parallel.ForEach(types, /* new ParallelOptions { MaxDegreeOfParallelism = 1 },*/ classType =>
+            Parallel.ForEach(types, /* new ParallelOptions { MaxDegreeOfParallelism = 1 }, */ classType =>
             {
                 var className = classType.Name;
                 if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
                 {
                     throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
+                }
+
+                var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
+                HashSet<StreamingHubHandler> tempStreamingHubHandlers = null;
+                MethodHandler tempParentStreamingMethodHandler = null;
+                if (isStreamingHub)
+                {
+                    tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
                 }
 
                 foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
@@ -107,20 +117,49 @@ namespace MagicOnion.Server
                         continue;
                     }
 
-                    // create handler
-                    var handler = new MethodHandler(option, classType, methodInfo);
-                    lock (builder)
+                    // register for StreamingHub
+                    if (isStreamingHub && methodName != "Connect")
                     {
-                        if (!handlers.Add(handler))
+                        var streamingHandler = new StreamingHubHandler(option, classType, methodInfo);
+                        if (!tempStreamingHubHandlers.Add(streamingHandler))
                         {
                             throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                         }
-                        handler.RegisterHandler(builder);
+                        continue;
+                    }
+                    else
+                    {
+                        // create handler
+                        var handler = new MethodHandler(option, classType, methodInfo);
+                        lock (builder)
+                        {
+                            if (!handlers.Add(handler))
+                            {
+                                throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
+                            }
+                            handler.RegisterHandler(builder);
+                        }
+
+                        if (isStreamingHub && methodName == "Connect")
+                        {
+                            tempParentStreamingMethodHandler = handler;
+                        }
+                    }
+                }
+
+                if (isStreamingHub)
+                {
+                    lock (streamingHubHandlers)
+                    {
+                        streamingHubHandlers.AddRange(tempStreamingHubHandlers);
+                        StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
+                        // TODO:ConfigureFactory
+                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository());
                     }
                 }
             });
 
-            var result = new MagicOnionServiceDefinition(builder.Build(), handlers.ToArray());
+            var result = new MagicOnionServiceDefinition(builder.Build(), handlers.ToArray(), streamingHubHandlers.ToArray());
 
             sw.Stop();
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);

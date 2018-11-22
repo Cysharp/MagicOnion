@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using MagicOnion.Server.Hubs;
+using MessagePack;
 
 namespace MagicOnion.Server
 {
@@ -24,7 +25,6 @@ namespace MagicOnion.Server
         /// </summary>
         public bool DisableEmbeddedService { get; set; }
 
-
         /// <summary>
         /// Enable ServiceContext.Current option by AsyncLocal.
         /// </summary>
@@ -36,6 +36,16 @@ namespace MagicOnion.Server
         public MagicOnionFilterAttribute[] GlobalFilters { get; set; }
 
         /// <summary>
+        /// Global StreamingHub filters.
+        /// </summary>
+        public StreamingHubFilterAttribute[] GlobalStreamingHubFilters { get; set; }
+
+        /// <summary>
+        /// Default GroupRepository factory for StreamingHub.
+        /// </summary>
+        public IGroupRepositoryFactory DefaultGroupRepositoryFactory { get; set; }
+
+        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
@@ -45,6 +55,8 @@ namespace MagicOnion.Server
             this.FormatterResolver = MessagePackSerializer.DefaultResolver;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new MagicOnionFilterAttribute[0];
+            this.GlobalStreamingHubFilters = new StreamingHubFilterAttribute[0];
+            this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
             this.DisableEmbeddedService = false;
             this.EnableCurrentContext = false;
         }

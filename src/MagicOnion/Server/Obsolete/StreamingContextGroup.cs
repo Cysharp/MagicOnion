@@ -36,11 +36,13 @@ namespace MagicOnion.Server
             }
         }
 
+        [Obsolete("Use Hub instead.")]
         public StreamingContextGroup()
             : this(EqualityComparer<TKey>.Default)
         {
         }
 
+        [Obsolete("Use Hub instead.")]
         public StreamingContextGroup(IEqualityComparer<TKey> comparer)
         {
             this.repositories = new ConcurrentDictionary<TKey, StreamingContextRepository<TStreamingService>>(comparer);
@@ -214,11 +216,13 @@ namespace MagicOnion.Server
             }
         }
 
+        [Obsolete("Use Hub instead.")]
         public StreamingContextGroup()
-            : this(EqualityComparer<TKey>.Default)
+                : this(EqualityComparer<TKey>.Default)
         {
         }
 
+        [Obsolete("Use Hub instead.")]
         public StreamingContextGroup(IEqualityComparer<TKey> comparer)
         {
             this.repositories = new ConcurrentDictionary<TKey, Tuple<TValue, StreamingContextRepository<TStreamingService>>>(comparer);

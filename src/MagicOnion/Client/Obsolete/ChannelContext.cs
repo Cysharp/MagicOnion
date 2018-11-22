@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
+    [Obsolete("Use StreamingHub instead.")]
     public class ChannelContext : IDisposable
     {
         public const string HeaderKey = "connection_id";
@@ -35,6 +36,7 @@ namespace MagicOnion.Client
             }
         }
 
+        [Obsolete("Use StreamingHub instead.")]
         public ChannelContext(Channel channel, Func<string> connectionIdFactory = null, bool useSameId = true, int pingSecond = 15)
         {
             this.channel = channel;
@@ -123,16 +125,17 @@ namespace MagicOnion.Client
             }
         }
 
-        // TODO:more createClient overload.
+        [Obsolete("Use StreamingHub instead.")]
         public T CreateClient<T>()
-            where T : IService<T>
+                where T : IService<T>
         {
             return MagicOnionClient.Create<T>(channel)
                 .WithHeaders(new Metadata { { ChannelContext.HeaderKey, ConnectionId } });
         }
 
+        [Obsolete("Use StreamingHub instead.")]
         public T CreateClient<T>(Metadata metadata)
-            where T : IService<T>
+                where T : IService<T>
         {
             var newMetadata = new Metadata();
             for (int i = 0; i < metadata.Count; i++)
