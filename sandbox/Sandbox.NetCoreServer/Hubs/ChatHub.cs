@@ -1,6 +1,7 @@
 ﻿using MagicOnion;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,68 +11,55 @@ namespace Sandbox.NetCoreServer.Hubs
 {
     public interface IMessageReceiver
     {
-        Task OnReceiveMessage(int senderId, string message);
+        Task OnReceiveMessage(string senderUser, string message);
     }
 
     public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver>
     {
-        Task EchoAsync(string message);
-        Task<string> EchoRetrunAsync(string message);
+        Task<Nil> JoinAsync(string userName, string roomName);
+        Task<Nil> LeaveAsync();
+        Task SendMessageAsync(string message);
     }
 
     public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
     {
-        IGroup myHoge;
+        // insantiate per user connected and live while connecting.
+        string userName;
+        IGroup room;
+
+        // return Task<T> wait server completed.
+        public Task<Nil> JoinAsync(string userName, string roomName)
+        {
+            this.userName = userName;
+            this.room = Group.Add("InMemoryRoom:" + roomName, this.Context);
+
+            return NilTask;
+        }
+
+        // return Task is fire and forget(does not wait server completed).
+        public async Task SendMessageAsync(string message)
+        {
+            // broadcast to connected group(same roomname members).
+            await Broadcast(room).OnReceiveMessage(this.userName, message);
+        }
+
+        public async Task<Nil> LeaveAsync()
+        {
+            await BroadcastExceptSelf(room).OnReceiveMessage(userName, "SYSTEM_MESSAGE_LEAVE_USER");
+            room.Remove(this.Context);
+
+            return Nil.Default;
+        }
 
         protected override ValueTask OnConnecting()
         {
-            myHoge = Group.Add("HogeHoge", this.Context);
-            return CompletedTask;
+            return CompletedTask; // you can hook connecting event.
         }
 
         protected override ValueTask OnDisconnected()
         {
-            myHoge.Remove(this.Context);
+            room?.Remove(this.Context); // remove from group.
             return CompletedTask;
-        }
-
-        public async Task EchoAsync(string message)
-        {
-            Console.WriteLine("Echo here!!!");
-            await BroadcastExceptSelf(myHoge).OnReceiveMessage(1230, message);
-            await BroadcastExcept(myHoge, new[] { Guid.NewGuid() }).OnReceiveMessage(1230, message);
-
-
-            throw new Exception("hugahuga");
-
-        }
-
-        public Task<string> EchoRetrunAsync(string message)
-        {
-            throw new Exception("foo bar");
-
-            return Task.FromResult("foo bar:" + message);
-        }
-    }
-
-    public class TestBroadcaster : IMessageReceiver
-    {
-        readonly IGroup group;
-        readonly Guid except;
-        readonly Guid[] excepts;
-
-        public TestBroadcaster(IGroup group)
-        {
-            this.group = group;
-        }
-
-        public Task OnReceiveMessage(int senderId, string message)
-        {
-            // direct emit id:)
-
-         //   return group.WriteExceptAsync(470021452, new DynamicArgumentTuple<int, string>(senderId, message), );
-
-            return group.WriteAllAsync(470021452, new DynamicArgumentTuple<int, string>(senderId, message));
         }
     }
 }

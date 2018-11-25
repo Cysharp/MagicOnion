@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Sandbox.NetCoreServer
 {
-    class Program : IMessageReceiver
+    class Program
     {
         static async Task Main(string[] args)
         {
@@ -51,111 +51,125 @@ namespace Sandbox.NetCoreServer
 
 
 
+            var foo = new ClientProgram().Start("Foo", "TEST_ROOM");
+            var bar = new ClientProgram().Start("Bar", "TEST_ROOM");
 
-            while (true)
-            {
-                try
-                {
-                    var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-
-
-                    var fs = MagicOnionClient.Create<IMyFirstService>(channel);
-                    var v = await fs.SumAsync(10, 20);
-                    Console.WriteLine(v);
-
-                    
-                    //var hubCall = new ChatHubClient2(new DefaultCallInvoker(channel), null, default(CallOptions), null, null);
-
-                    //hubCall.__ConnectAndSubscribe(new Program());
-                    var hubCall = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(new DefaultCallInvoker(channel), new Program(), null, default(CallOptions), null, null);
-
-
-
-                    //await hubCall.EchoAsync("ほげほげ");
-
-                    var foooo = await hubCall.EchoRetrunAsync("zzzほげ");
-                    Console.WriteLine(foooo);
-
-                    await hubCall.WaitForDisconnect();
-
-
-                    //var foooo = await hubCall.EchoRetrunAsync("zzzほげ");
-                    //Console.WriteLine(foooo);
-                    Console.WriteLine("Disconnect detected.");
-                    Console.ReadLine();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            }
+            await Task.WhenAll(foo, bar);
+            //await foo;
         }
 
-        public Task OnReceiveMessage(int senderId, string message)
-        {
-            Console.WriteLine("Receive Here:" + senderId + ":" + message);
-
-            return Task.CompletedTask;
-        }
     }
 
 
-    public class MyReceiver : IMessageReceiver
+
+    public class ClientProgram : IMessageReceiver
     {
-        public Task OnReceiveMessage(int senderId, string message)
+        public async Task Start(string user, string room)
         {
-            throw new NotImplementedException();
+            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+
+            var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(channel, this);
+            // RegisterDisconnect(client);
+            try
+            {
+
+                await client.JoinAsync(user, room);
+
+                await client.SendMessageAsync("Who");
+                await client.SendMessageAsync("Bar");
+                await client.SendMessageAsync("Baz");
+
+                await client.LeaveAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                await client.DisposeAsync();
+            }
         }
 
-
-        public Task OnReceiveMessage2(int senderId, string message)
+        async void RegisterDisconnect(IChatHub client)
         {
+            try
+            {
+                // you can wait disconnected event
+                await client.WaitForDisconnect();
+            }
+            finally
+            {
+                // try-to-reconnect? logging event? etc...
+                Console.WriteLine("disconnected");
+            }
+        }
 
-            return Task.CompletedTask;
-            //            throw new NotImplementedException();
+#pragma warning disable CS1998
+
+        public async Task OnReceiveMessage(string senderUser, string message)
+        {
+            Console.WriteLine(senderUser + ":" + message);
         }
     }
 
 
-    public class ChatHubClient2 : StreamingHubClientBase<IChatHub, IMessageReceiver>, IChatHub
-    {
-        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+    //public class MyReceiver : IMessageReceiver
+    //{
+    //    public Task OnReceiveMessage(int senderId, string message)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public ChatHubClient2(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
-            : base(callInvoker, host, option, resolver, logger)
-        {
-        }
 
-        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod => method;
+    //    public Task OnReceiveMessage2(int senderId, string message)
+    //    {
 
-        public Task EchoAsync(string message)
-        {
-            return WriteMessageAsync<string>(1297107480, message);
-        }
+    //        return Task.CompletedTask;
+    //        //            throw new NotImplementedException();
+    //    }
+    //}
 
-        public Task<string> EchoRetrunAsync(string message)
-        {
-            return WriteMessageWithResponseAsync<string, string>(-1171618600, message);
-        }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
-        {
-            if (methodId == 470021452) // OnReceiveMessage
-            {
-                var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string>>(data, resolver);
-                return receiver.OnReceiveMessage(result.Item1, result.Item2);
-            }
+    //public class ChatHubClient2 : StreamingHubClientBase<IChatHub, IMessageReceiver>, IChatHub
+    //{
+    //    static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
-            return Task.CompletedTask;
-        }
+    //    public ChatHubClient2(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+    //        : base(callInvoker, host, option, resolver, logger)
+    //    {
+    //    }
 
-        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
-        {
-            if (methodId == -1171618600) // EchoReturnAsync
-            {
-                var result = LZ4MessagePackSerializer.Deserialize<string>(data, resolver);
-                ((TaskCompletionSource<string>)taskCompletionSource).TrySetResult(result);
-            }
-        }
-    }
+    //    protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod => method;
+
+    //    public Task EchoAsync(string message)
+    //    {
+    //        return WriteMessageAsync<string>(1297107480, message);
+    //    }
+
+    //    public Task<string> EchoRetrunAsync(string message)
+    //    {
+    //        return WriteMessageWithResponseAsync<string, string>(-1171618600, message);
+    //    }
+
+    //    protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+    //    {
+    //        if (methodId == 470021452) // OnReceiveMessage
+    //        {
+    //            var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string>>(data, resolver);
+    //            return receiver.OnReceiveMessage(result.Item1, result.Item2);
+    //        }
+
+    //        return Task.CompletedTask;
+    //    }
+
+    //    protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+    //    {
+    //        if (methodId == -1171618600) // EchoReturnAsync
+    //        {
+    //            var result = LZ4MessagePackSerializer.Deserialize<string>(data, resolver);
+    //            ((TaskCompletionSource<string>)taskCompletionSource).TrySetResult(result);
+    //        }
+    //    }
+    //}
 }

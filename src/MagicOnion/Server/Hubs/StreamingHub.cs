@@ -7,6 +7,7 @@ namespace MagicOnion.Server.Hubs
     public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
         where THubInterface : IStreamingHubMarker
     {
+        static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
         static protected readonly ValueTask CompletedTask = new ValueTask();
 
         public IGroupRepository Group { get; private set; }

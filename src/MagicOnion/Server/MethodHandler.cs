@@ -584,14 +584,16 @@ namespace MagicOnion.Server
     {
         static readonly ValueTask CopmletedValueTask = new ValueTask();
 
-        public static ValueTask NewEmptyValueTask<T>(T result) // ignore result.
+        public static ValueTask NewEmptyValueTask<T>(T result)
         {
+            // ignore result.
             return CopmletedValueTask;
         }
 
-        public static ValueTask TaskToEmptyValueTask<T>(Task<T> result)
+        public static async ValueTask TaskToEmptyValueTask<T>(Task<T> result)
         {
-            return CopmletedValueTask;
+            // wait and ignore result.
+            await result;
         }
 
         public static async ValueTask SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
