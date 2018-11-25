@@ -13,23 +13,33 @@ namespace DynamicCodeDumper
 {
     public interface IMessageReceiver
     {
-        Task OnReceiveMessage(int senderId, string message);
+        Task ZeroArgument();
+        Task OneArgument(int x);
+        Task MoreArgument(int x, string y, double z);
     }
-    public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver>
+
+    public interface ITestHub : IStreamingHub<ITestHub, IMessageReceiver>
     {
-        Task EchoAsync(string message);
-        Task<string> EchoRetrunAsync(string message);
+        Task ZeroArgument();
+        Task OneArgument(int x);
+        Task MoreArgument(int x, string y, double z);
+
+        Task<int> RetrunZeroArgument();
+        Task<string> RetrunOneArgument(int x);
+        Task<double> RetrunMoreArgument(int x, string y, double z);
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            //var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
-            //var builder = MagicOnion.Server.Hubs.AssemblyHolder.Save();
-            var _ = StreamingHubClientBuilder<IChatHub, IMessageReceiver>.ClientType;
-            var builder = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();
-            Verify(builder);
+            var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
+            var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
+
+            var __ = StreamingHubClientBuilder<ITestHub, IMessageReceiver>.ClientType;
+            var b = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();
+
+            Verify(a, b);
         }
 
         static void Verify(params AssemblyBuilder[] builders)

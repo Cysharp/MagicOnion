@@ -7,6 +7,7 @@ using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
 using Sandbox.NetCoreServer.Hubs;
+using Sandbox.NetCoreServer.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -53,19 +54,40 @@ namespace Sandbox.NetCoreServer
 
             while (true)
             {
-                var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-                //var hubCall = new ChatHubClient2(new DefaultCallInvoker(channel), null, default(CallOptions), null, null);
-
-                //hubCall.__ConnectAndSubscribe(new Program());
-                var hubCall = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(new DefaultCallInvoker(channel), new Program(),null, default(CallOptions), null, null);
+                try
+                {
+                    var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
 
 
+                    var fs = MagicOnionClient.Create<IMyFirstService>(channel);
+                    var v = await fs.SumAsync(10, 20);
+                    Console.WriteLine(v);
 
-                await hubCall.EchoAsync("ほげほげ");
-               var foooo = await hubCall.EchoRetrunAsync("ほげほげ");
-               Console.WriteLine(foooo);
-                Console.WriteLine("Press any key to stop.");
-                Console.ReadLine();
+                    
+                    //var hubCall = new ChatHubClient2(new DefaultCallInvoker(channel), null, default(CallOptions), null, null);
+
+                    //hubCall.__ConnectAndSubscribe(new Program());
+                    var hubCall = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(new DefaultCallInvoker(channel), new Program(), null, default(CallOptions), null, null);
+
+
+
+                    //await hubCall.EchoAsync("ほげほげ");
+
+                    var foooo = await hubCall.EchoRetrunAsync("zzzほげ");
+                    Console.WriteLine(foooo);
+
+                    await hubCall.WaitForDisconnect();
+
+
+                    //var foooo = await hubCall.EchoRetrunAsync("zzzほげ");
+                    //Console.WriteLine(foooo);
+                    Console.WriteLine("Disconnect detected.");
+                    Console.ReadLine();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using MagicOnion;
 using MagicOnion.Server;
+using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,11 +42,14 @@ namespace Sandbox.NetCoreServer.Hubs
             await BroadcastExcept(myHoge, new[] { Guid.NewGuid() }).OnReceiveMessage(1230, message);
 
 
+            throw new Exception("hugahuga");
 
         }
 
         public Task<string> EchoRetrunAsync(string message)
         {
+            throw new Exception("foo bar");
+
             return Task.FromResult("foo bar:" + message);
         }
     }

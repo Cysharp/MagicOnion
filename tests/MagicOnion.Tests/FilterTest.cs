@@ -27,11 +27,11 @@ namespace MagicOnion.Tests
 
         }
 
-        public SimpleFilter1(Func<ServiceContext, Task> next) : base(next)
+        public SimpleFilter1(Func<ServiceContext, ValueTask> next) : base(next)
         {
         }
 
-        public async override Task Invoke(ServiceContext context)
+        public async override ValueTask Invoke(ServiceContext context)
         {
             try
             {
@@ -64,11 +64,11 @@ namespace MagicOnion.Tests
             this.Y = y;
         }
 
-        public MultiFilter2(Func<ServiceContext, Task> next) : base(next)
+        public MultiFilter2(Func<ServiceContext, ValueTask> next) : base(next)
         {
         }
 
-        public override async Task Invoke(ServiceContext context)
+        public override async ValueTask Invoke(ServiceContext context)
         {
             try
             {
@@ -99,11 +99,11 @@ namespace MagicOnion.Tests
             this.msg = msg;
         }
 
-        public MoreThanFilter3(Func<ServiceContext, Task> next) : base(next)
+        public MoreThanFilter3(Func<ServiceContext, ValueTask> next) : base(next)
         {
         }
 
-        public async override Task Invoke(ServiceContext context)
+        public async override ValueTask Invoke(ServiceContext context)
         {
             try
             {
@@ -131,11 +131,11 @@ namespace MagicOnion.Tests
 
         }
 
-        public DumpFilter(Func<ServiceContext, Task> next) : base(next)
+        public DumpFilter(Func<ServiceContext, ValueTask> next) : base(next)
         {
         }
 
-        public override async Task Invoke(ServiceContext context)
+        public override async ValueTask Invoke(ServiceContext context)
         {
             try
             {

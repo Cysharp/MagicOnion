@@ -10,15 +10,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="..\MagicOnion.Tests.NetCore\obj\Debug\netcoreapp1.1\MagicOnion.Tests.NetCore.AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc" Version="1.4.0" />
-    <PackageReference Include="MessagePack" Version="1.7.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="Grpc" Version="1.16.0" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>

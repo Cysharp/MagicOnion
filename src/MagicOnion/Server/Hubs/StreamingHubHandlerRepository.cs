@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace MagicOnion.Server.Hubs
 {
     // Global cache of Streaming Handler
-    public static class StreamingHubHandlerRepository
+    internal static class StreamingHubHandlerRepository
     {
         static Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
             = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(new MethodHandler.UniqueEqualityComparer());

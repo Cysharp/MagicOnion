@@ -40,7 +40,7 @@ namespace MagicOnion.Server
         readonly IFormatterResolver resolver;
         readonly bool responseIsTask;
 
-        readonly Func<ServiceContext, Task> methodBody;
+        readonly Func<ServiceContext, ValueTask> methodBody;
         public Func<object, byte> serialize;
 
         // reflection cache
@@ -135,14 +135,22 @@ namespace MagicOnion.Server
                         {
                             if (!responseIsTask)
                             {
-                                callBody = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), callBody);
+                                callBody = Expression.Call(typeof(MethodHandlerResultHelper)
+                                    .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)
+                                    .MakeGenericMethod(MethodInfo.ReturnType), callBody);
+                            }
+                            else
+                            {
+                                callBody = Expression.Call(typeof(MethodHandlerResultHelper)
+                                    .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)
+                                    .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), callBody);
                             }
                         }
 
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
+                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -160,10 +168,10 @@ namespace MagicOnion.Server
                     try
                     {
                         var body = Expression.Call(instance, methodInfo);
+                        var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
                         if (MethodType == MethodType.ClientStreaming)
                         {
-                            var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
                             var finalMethod = (responseIsTask)
                                 ? typeof(MethodHandlerResultHelper).GetMethod("SerializeTaskClientStreamingResult", staticFlags).MakeGenericMethod(RequestType, UnwrappedResponseType)
                                 : typeof(MethodHandlerResultHelper).GetMethod("SerializeClientStreamingResult", staticFlags).MakeGenericMethod(RequestType, UnwrappedResponseType);
@@ -173,13 +181,21 @@ namespace MagicOnion.Server
                         {
                             if (!responseIsTask)
                             {
-                                body = Expression.Call(typeof(Task).GetMethod("FromResult").MakeGenericMethod(MethodInfo.ReturnType), body);
+                                body = Expression.Call(typeof(MethodHandlerResultHelper)
+                                    .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)
+                                    .MakeGenericMethod(MethodInfo.ReturnType), body);
+                            }
+                            else
+                            {
+                                body = Expression.Call(typeof(MethodHandlerResultHelper)
+                                    .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)
+                                    .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), body);
                             }
                         }
 
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, Task>)compiledBody);
+                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -252,10 +268,10 @@ namespace MagicOnion.Server
             }
         }
 
-        Func<ServiceContext, Task> BuildMethodBodyWithFilter(Func<ServiceContext, Task> methodBody)
+        Func<ServiceContext, ValueTask> BuildMethodBodyWithFilter(Func<ServiceContext, ValueTask> methodBody)
         {
             var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-            Func<ServiceContext, Task> next = methodBody;
+            Func<ServiceContext, ValueTask> next = methodBody;
 
             foreach (var filter in this.filters.Reverse())
             {
@@ -566,9 +582,19 @@ namespace MagicOnion.Server
 
     internal class MethodHandlerResultHelper
     {
-        // TODO:ValueTask???
+        static readonly ValueTask CopmletedValueTask = new ValueTask();
 
-        public static async Task SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
+        public static ValueTask NewEmptyValueTask<T>(T result) // ignore result.
+        {
+            return CopmletedValueTask;
+        }
+
+        public static ValueTask TaskToEmptyValueTask<T>(Task<T> result)
+        {
+            return CopmletedValueTask;
+        }
+
+        public static async ValueTask SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
         {
             if (result.hasRawValue && !context.IsIgnoreSerialization)
             {
@@ -579,7 +605,7 @@ namespace MagicOnion.Server
             }
         }
 
-        public static async Task SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
+        public static async ValueTask SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
         {
             var result = await taskResult.ConfigureAwait(false);
             if (result.hasRawValue && !context.IsIgnoreSerialization)
@@ -591,21 +617,18 @@ namespace MagicOnion.Server
             }
         }
 
-        public static Task SerializeClientStreamingResult<TRequest, TResponse>(ClientStreamingResult<TRequest, TResponse> result, ServiceContext context)
+        public static ValueTask SerializeClientStreamingResult<TRequest, TResponse>(ClientStreamingResult<TRequest, TResponse> result, ServiceContext context)
         {
             if (result.hasRawValue)
             {
                 var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
                 context.Result = bytes;
             }
-#if !NET45
-            return Task.CompletedTask;
-#else
-            return Task.FromResult(0);
-#endif
+
+            return default(ValueTask);
         }
 
-        public static async Task SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
+        public static async ValueTask SerializeTaskClientStreamingResult<TRequest, TResponse>(Task<ClientStreamingResult<TRequest, TResponse>> taskResult, ServiceContext context)
         {
             var result = await taskResult.ConfigureAwait(false);
             if (result.hasRawValue)

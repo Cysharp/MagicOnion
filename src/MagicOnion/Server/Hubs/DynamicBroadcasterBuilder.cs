@@ -46,13 +46,6 @@ namespace MagicOnion.Server.Hubs
         public static readonly Type BroadcasterType_ExceptOne;
         public static readonly Type BroadcasterType_ExceptMany;
 
-        // start from -2
-        static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
-
         static readonly MethodInfo groupWriteAllMethodInfo = typeof(IGroup).GetMethod(nameof(IGroup.WriteAllAsync));
         static readonly MethodInfo groupWriteExceptOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && !x.GetParameters().Last().ParameterType.IsArray);
         static readonly MethodInfo groupWriteExceptManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && x.GetParameters().Last().ParameterType.IsArray);
@@ -193,7 +186,7 @@ namespace MagicOnion.Server.Hubs
                 else
                 {
                     // call new DynamicArgumentTuple<T>
-                    callType = dynamicArgumentTupleTypes[parameters.Length - 2].MakeGenericType(parameters);
+                    callType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2].MakeGenericType(parameters);
                     il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
                 }
 
@@ -211,6 +204,12 @@ namespace MagicOnion.Server.Hubs
 
     internal static class BroadcasterHelper
     {
+        internal static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
+            .GetTypes()
+            .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
+            .OrderBy(x => x.GetGenericArguments().Length)
+            .ToArray();
+
         internal static MethodDefinition[] SearchDefinitions(Type interfaceType)
         {
             return interfaceType

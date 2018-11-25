@@ -20,7 +20,7 @@ namespace MagicOnion.Server.Hubs
         readonly StreamingHubFilterAttribute[] filters;
         readonly Type RequestType;
         readonly Type UnwrappedResponseType;
-        internal readonly IFormatterResolver resolver; // TODO:use this
+        internal readonly IFormatterResolver resolver;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
         // reflection cache

@@ -1,70 +1,15 @@
-﻿using Grpc.Core;
-using MessagePack;
+﻿using MessagePack;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
-using MagicOnion.Server.Hubs;
 
-namespace MagicOnion.Server
+namespace MagicOnion.Server.Hubs
 {
-    // TODO:create per request and set lock.
-    public class StreamingHubContext
-    {
-        /// <summary>Raw gRPC Context.</summary>
-        public ServiceContext ServiceContext { get; set; }
-        public object HubInstance { get; set; }
-
-        public ArraySegment<byte> Request { get; set; }
-
-        // helper for reflection
-        internal IFormatterResolver FormatterResolver => ServiceContext.FormatterResolver;
-        public Guid ConnectionId => ServiceContext.ContextId;
-
-        public AsyncLock AsyncWriterLock { get; internal set; }
-        internal int MessageId { get; set; }
-        internal int MethodId { get; set; }
-
-        // helper for reflection
-
-        internal async ValueTask WriteResponseMessage<T>(Task<T> value)
-        {
-            // MessageFormat:
-            // response:  [messageId, methodId, response]
-            byte[] buffer = null;
-            var offset = 0;
-            offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-            offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
-            offset += MessagePackBinary.WriteInt32(ref buffer, offset, MethodId);
-
-            var v2 = await value.ConfigureAwait(false);
-            offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, v2, FormatterResolver);
-            var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
-            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
-            }
-        }
-
-        internal ValueTask WrapToValueTask(Task task)
-        {
-            return new ValueTask(task);
-        }
-    }
-
-
-
-
-    // instantiate per call.
     public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
         where THubInterface : IStreamingHubMarker
     {
         static protected readonly ValueTask CompletedTask = new ValueTask();
 
-        public IGroupRepository Group { get; private set; } // TODO:set this.
+        public IGroupRepository Group { get; private set; }
 
         // Broadcast Commands
 
@@ -158,11 +103,13 @@ namespace MagicOnion.Server
                         var context = new StreamingHubContext() // create per invoke.
                         {
                             AsyncWriterLock = Context.AsyncWriterLock,
+                            FormatterResolver = handler.resolver,
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
                             MethodId = handler.MethodId,
                         };
+
                         await handler.MethodBody.Invoke(context);
                     }
                     else
@@ -184,22 +131,20 @@ namespace MagicOnion.Server
                         var context = new StreamingHubContext() // create per invoke.
                         {
                             AsyncWriterLock = Context.AsyncWriterLock,
+                            FormatterResolver = handler.resolver,
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
                             MethodId = handler.MethodId,
                             MessageId = messageId
                         };
+                        
                         await handler.MethodBody.Invoke(context);
                     }
                     else
                     {
                         throw new InvalidOperationException("foo bar baz"); // TODO:error message details.
                     }
-
-
-
-                    // await writer.WriteAsync(
                 }
                 else
                 {
@@ -212,12 +157,12 @@ namespace MagicOnion.Server
 
         Task IStreamingHub<THubInterface, TReceiver>.DisposeAsync()
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Invoke from client proxy only");
         }
 
         Task IStreamingHub<THubInterface, TReceiver>.WaitForDisconnect()
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Invoke from client proxy only");
         }
     }
 }

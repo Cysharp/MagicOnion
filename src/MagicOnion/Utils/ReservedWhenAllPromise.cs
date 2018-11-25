@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -8,7 +7,7 @@ using System.Threading.Tasks.Sources;
 
 namespace MagicOnion.Utils
 {
-    internal class ReservingWhenAllPromise : IValueTaskSource
+    public class ReservedWhenAllPromise : IValueTaskSource
     {
         static class ContinuationSentinel
         {
@@ -28,7 +27,7 @@ namespace MagicOnion.Utils
         SynchronizationContext syncContext;
         ExecutionContext execContext;
 
-        public ReservingWhenAllPromise(int reserveCount)
+        public ReservedWhenAllPromise(int reserveCount)
         {
             this.resultCount = reserveCount;
         }
@@ -156,7 +155,7 @@ namespace MagicOnion.Utils
 
         static void ExecutionContextCallback(object state)
         {
-            var t = (Tuple<Action<object>, ReservingWhenAllPromise>)state;
+            var t = (Tuple<Action<object>, ReservedWhenAllPromise>)state;
             var self = t.Item2;
             if (self.syncContext != null)
             {
@@ -172,7 +171,7 @@ namespace MagicOnion.Utils
 
         static void SynchronizationContextCallback(object state)
         {
-            var t = (Tuple<Action<object>, ReservingWhenAllPromise>)state;
+            var t = (Tuple<Action<object>, ReservedWhenAllPromise>)state;
             var self = t.Item2;
             var invokeState = self.state;
             self.state = null;

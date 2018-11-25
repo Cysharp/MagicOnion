@@ -154,7 +154,7 @@ namespace MagicOnion.Server
                         streamingHubHandlers.AddRange(tempStreamingHubHandlers);
                         StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
                         // TODO:ConfigureFactory
-                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository());
+                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository(option.FormatterResolver));
                     }
                 }
             });

@@ -124,8 +124,14 @@ namespace MagicOnion.Client
             }
             finally
             {
-                // await DisposeAsync(); // dangerous, deadlock!!!
-                waitForDisconnect.TrySetResult(null);
+                try
+                {
+                    await DisposeAsyncCore(false);
+                }
+                finally
+                {
+                    waitForDisconnect.TrySetResult(null);
+                }
             }
         }
 
@@ -174,7 +180,12 @@ namespace MagicOnion.Client
             return waitForDisconnect.Task;
         }
 
-        public async Task DisposeAsync()
+        public Task DisposeAsync()
+        {
+            return DisposeAsyncCore(true);
+        }
+
+        async Task DisposeAsyncCore(bool waitSubscription)
         {
             if (disposed) return;
             if (connection.RawStreamingCall == null) return;
@@ -187,9 +198,12 @@ namespace MagicOnion.Client
             cts.Dispose();
             try
             {
-                if (subscription != null)
+                if (waitSubscription)
                 {
-                    await subscription;
+                    if (subscription != null)
+                    {
+                        await subscription;
+                    }
                 }
 
                 // cleanup completion
