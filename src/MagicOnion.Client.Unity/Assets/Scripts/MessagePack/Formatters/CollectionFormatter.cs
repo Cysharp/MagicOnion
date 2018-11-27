@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-#if NETSTANDARD1_4
+#if NETSTANDARD
 using System.Collections.Concurrent;
 #endif
 
 namespace MessagePack.Formatters
 {
-    public class ArrayFormatter<T> : IMessagePackFormatter<T[]>
+    public sealed class ArrayFormatter<T> : IMessagePackFormatter<T[]>
     {
         public int Serialize(ref byte[] bytes, int offset, T[] value, IFormatterResolver formatterResolver)
         {
@@ -25,9 +25,9 @@ namespace MessagePack.Formatters
 
                 offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
 
-                foreach (var item in value)
+                for (int i = 0; i < value.Length; i++)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+                    offset += formatter.Serialize(ref bytes, offset, value[i], formatterResolver);
                 }
 
                 return offset - startOffset;
@@ -60,7 +60,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ByteArraySegmentFormatter : IMessagePackFormatter<ArraySegment<byte>>
+    public sealed class ByteArraySegmentFormatter : IMessagePackFormatter<ArraySegment<byte>>
     {
         public static readonly ByteArraySegmentFormatter Instance = new ByteArraySegmentFormatter();
 
@@ -90,13 +90,14 @@ namespace MessagePack.Formatters
             }
             else
             {
+                // use ReadBytesSegment? But currently straem api uses memory pool so can't save arraysegment...
                 var binary = MessagePackBinary.ReadBytes(bytes, offset, out readSize);
                 return new ArraySegment<byte>(binary, 0, binary.Length);
             }
         }
     }
 
-    public class ArraySegmentFormatter<T> : IMessagePackFormatter<ArraySegment<T>>
+    public sealed class ArraySegmentFormatter<T> : IMessagePackFormatter<ArraySegment<T>>
     {
         public int Serialize(ref byte[] bytes, int offset, ArraySegment<T> value, IFormatterResolver formatterResolver)
         {
@@ -133,6 +134,58 @@ namespace MessagePack.Formatters
             {
                 var array = formatterResolver.GetFormatterWithVerify<T[]>().Deserialize(bytes, offset, formatterResolver, out readSize);
                 return new ArraySegment<T>(array, 0, array.Length);
+            }
+        }
+    }
+
+    // List<T> is popular format, should avoid abstraction.
+    public sealed class ListFormatter<T> : IMessagePackFormatter<List<T>>
+    {
+        public int Serialize(ref byte[] bytes, int offset, List<T> value, IFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                return MessagePackBinary.WriteNil(ref bytes, offset);
+            }
+            else
+            {
+                var startOffset = offset;
+                var formatter = formatterResolver.GetFormatterWithVerify<T>();
+
+                var c = value.Count;
+                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, c);
+
+                for (int i = 0; i < c; i++)
+                {
+                    offset += formatter.Serialize(ref bytes, offset, value[i], formatterResolver);
+                }
+
+                return offset - startOffset;
+            }
+        }
+
+        public List<T> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        {
+            if (MessagePackBinary.IsNil(bytes, offset))
+            {
+                readSize = 1;
+                return null;
+            }
+            else
+            {
+                var startOffset = offset;
+                var formatter = formatterResolver.GetFormatterWithVerify<T>();
+
+                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                offset += readSize;
+                var list = new List<T>(len);
+                for (int i = 0; i < len; i++)
+                {
+                    list.Add(formatter.Deserialize(bytes, offset, formatterResolver, out readSize));
+                    offset += readSize;
+                }
+                readSize = offset - startOffset;
+                return list;
             }
         }
     }
@@ -182,7 +235,7 @@ namespace MessagePack.Formatters
                         {
                             while (e.MoveNext())
                             {
-#if NETSTANDARD1_4
+#if NETSTANDARD
                                 offset += formatter.Serialize(ref bytes, offset, e.Current, formatterResolver);
 #else
                                 offset += formatter.Serialize(ref bytes, (int)offset, (TElement)e.Current, (IFormatterResolver)formatterResolver);
@@ -213,7 +266,7 @@ namespace MessagePack.Formatters
                             while (e.MoveNext())
                             {
                                 count++;
-#if NETSTANDARD1_4
+#if NETSTANDARD
                                 var writeSize = formatter.Serialize(ref bytes, offset, e.Current, formatterResolver);
 #else
                                 var writeSize = formatter.Serialize(ref bytes, (int)offset, (TElement)e.Current, (IFormatterResolver)formatterResolver);
@@ -279,7 +332,7 @@ namespace MessagePack.Formatters
             {
                 return collection.Count;
             }
-#if NETSTANDARD1_4
+#if NETSTANDARD
             else
             {
                 var c2 = sequence as IReadOnlyCollection<TElement>;
@@ -320,7 +373,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class GenericCollectionFormatter<TElement, TCollection> : CollectionFormatterBase<TElement, TCollection>
+    public sealed class GenericCollectionFormatter<TElement, TCollection> : CollectionFormatterBase<TElement, TCollection>
          where TCollection : ICollection<TElement>, new()
     {
         protected override TCollection Create(int count)
@@ -334,30 +387,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ListFormatter<T> : CollectionFormatterBase<T, List<T>, List<T>.Enumerator, List<T>>
-    {
-        protected override void Add(List<T> collection, int index, T value)
-        {
-            collection.Add(value);
-        }
-
-        protected override List<T> Complete(List<T> intermediateCollection)
-        {
-            return intermediateCollection;
-        }
-
-        protected override List<T> Create(int count)
-        {
-            return new List<T>(count);
-        }
-
-        protected override List<T>.Enumerator GetSourceEnumerator(List<T> source)
-        {
-            return source.GetEnumerator();
-        }
-    }
-
-    public class LinkedListFormatter<T> : CollectionFormatterBase<T, LinkedList<T>, LinkedList<T>.Enumerator, LinkedList<T>>
+    public sealed class LinkedListFormatter<T> : CollectionFormatterBase<T, LinkedList<T>, LinkedList<T>.Enumerator, LinkedList<T>>
     {
         protected override void Add(LinkedList<T> collection, int index, T value)
         {
@@ -380,7 +410,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class QeueueFormatter<T> : CollectionFormatterBase<T, Queue<T>, Queue<T>.Enumerator, Queue<T>>
+    public sealed class QeueueFormatter<T> : CollectionFormatterBase<T, Queue<T>, Queue<T>.Enumerator, Queue<T>>
     {
         protected override int? GetCount(Queue<T> sequence)
         {
@@ -409,7 +439,7 @@ namespace MessagePack.Formatters
     }
 
     // should deserialize reverse order.
-    public class StackFormatter<T> : CollectionFormatterBase<T, T[], Stack<T>.Enumerator, Stack<T>>
+    public sealed class StackFormatter<T> : CollectionFormatterBase<T, T[], Stack<T>.Enumerator, Stack<T>>
     {
         protected override int? GetCount(Stack<T> sequence)
         {
@@ -438,7 +468,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class HashSetFormatter<T> : CollectionFormatterBase<T, HashSet<T>, HashSet<T>.Enumerator, HashSet<T>>
+    public sealed class HashSetFormatter<T> : CollectionFormatterBase<T, HashSet<T>, HashSet<T>.Enumerator, HashSet<T>>
     {
         protected override int? GetCount(HashSet<T> sequence)
         {
@@ -466,7 +496,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ReadOnlyCollectionFormatter<T> : CollectionFormatterBase<T, T[], ReadOnlyCollection<T>>
+    public sealed class ReadOnlyCollectionFormatter<T> : CollectionFormatterBase<T, T[], ReadOnlyCollection<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -484,7 +514,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceListFormatter<T> : CollectionFormatterBase<T, T[], IList<T>>
+    public sealed class InterfaceListFormatter<T> : CollectionFormatterBase<T, T[], IList<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -502,7 +532,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceCollectionFormatter<T> : CollectionFormatterBase<T, T[], ICollection<T>>
+    public sealed class InterfaceCollectionFormatter<T> : CollectionFormatterBase<T, T[], ICollection<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -520,7 +550,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceEnumerableFormatter<T> : CollectionFormatterBase<T, T[], IEnumerable<T>>
+    public sealed class InterfaceEnumerableFormatter<T> : CollectionFormatterBase<T, T[], IEnumerable<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -539,7 +569,7 @@ namespace MessagePack.Formatters
     }
 
     // [Key, [Array]]
-    public class InterfaceGroupingFormatter<TKey, TElement> : IMessagePackFormatter<IGrouping<TKey, TElement>>
+    public sealed class InterfaceGroupingFormatter<TKey, TElement> : IMessagePackFormatter<IGrouping<TKey, TElement>>
     {
         public int Serialize(ref byte[] bytes, int offset, IGrouping<TKey, TElement> value, IFormatterResolver formatterResolver)
         {
@@ -584,7 +614,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceLookupFormatter<TKey, TElement> : CollectionFormatterBase<IGrouping<TKey, TElement>, Dictionary<TKey, IGrouping<TKey, TElement>>, ILookup<TKey, TElement>>
+    public sealed class InterfaceLookupFormatter<TKey, TElement> : CollectionFormatterBase<IGrouping<TKey, TElement>, Dictionary<TKey, IGrouping<TKey, TElement>>, ILookup<TKey, TElement>>
     {
         protected override void Add(Dictionary<TKey, IGrouping<TKey, TElement>> collection, int index, IGrouping<TKey, TElement> value)
         {
@@ -673,9 +703,227 @@ namespace MessagePack.Formatters
         }
     }
 
-#if NETSTANDARD1_4
+    // NonGenerics
 
-    public class ObservableCollectionFormatter<T> : CollectionFormatterBase<T, ObservableCollection<T>>
+    public sealed class NonGenericListFormatter<T> : IMessagePackFormatter<T>
+        where T : class, IList, new()
+    {
+        public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                MessagePackBinary.WriteNil(ref bytes, offset);
+                return 1;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Count);
+            foreach (var item in value)
+            {
+                offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+            }
+
+            return offset - startOffset;
+        }
+
+        public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        {
+            if (MessagePackBinary.IsNil(bytes, offset))
+            {
+                readSize = 1;
+                return default(T);
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
+
+            var list = new T();
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(formatter.Deserialize(bytes, offset, formatterResolver, out readSize));
+                offset += readSize;
+            }
+
+            readSize = offset - startOffset;
+            return list;
+        }
+    }
+
+    public sealed class NonGenericInterfaceListFormatter : IMessagePackFormatter<IList>
+    {
+        public static readonly IMessagePackFormatter<IList> Instance = new NonGenericInterfaceListFormatter();
+
+        NonGenericInterfaceListFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, IList value, IFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                MessagePackBinary.WriteNil(ref bytes, offset);
+                return 1;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Count);
+            foreach (var item in value)
+            {
+                offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+            }
+
+            return offset - startOffset;
+        }
+
+        public IList Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        {
+            if (MessagePackBinary.IsNil(bytes, offset))
+            {
+                readSize = 1;
+                return default(IList);
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            offset += readSize;
+
+            var list = new object[count];
+            for (int i = 0; i < count; i++)
+            {
+                list[i] = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
+            }
+
+            readSize = offset - startOffset;
+            return list;
+        }
+    }
+
+    public sealed class NonGenericDictionaryFormatter<T> : IMessagePackFormatter<T>
+        where T : class, IDictionary, new()
+    {
+        public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                MessagePackBinary.WriteNil(ref bytes, offset);
+                return 1;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            offset += MessagePackBinary.WriteMapHeader(ref bytes, offset, value.Count);
+            foreach (DictionaryEntry item in value)
+            {
+                offset += formatter.Serialize(ref bytes, offset, item.Key, formatterResolver);
+                offset += formatter.Serialize(ref bytes, offset, item.Value, formatterResolver);
+            }
+
+            return offset - startOffset;
+        }
+
+        public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        {
+            if (MessagePackBinary.IsNil(bytes, offset))
+            {
+                readSize = 1;
+                return null;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            var count = MessagePackBinary.ReadMapHeader(bytes, offset, out readSize);
+            offset += readSize;
+
+            var dict = new T();
+            for (int i = 0; i < count; i++)
+            {
+                var key = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
+                var value = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
+                dict.Add(key, value);
+            }
+
+            readSize = offset - startOffset;
+            return dict;
+        }
+    }
+
+    public sealed class NonGenericInterfaceDictionaryFormatter : IMessagePackFormatter<IDictionary>
+    {
+        public static readonly IMessagePackFormatter<IDictionary> Instance = new NonGenericInterfaceDictionaryFormatter();
+
+        NonGenericInterfaceDictionaryFormatter()
+        {
+
+        }
+
+        public int Serialize(ref byte[] bytes, int offset, IDictionary value, IFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                MessagePackBinary.WriteNil(ref bytes, offset);
+                return 1;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            offset += MessagePackBinary.WriteMapHeader(ref bytes, offset, value.Count);
+            foreach (DictionaryEntry item in value)
+            {
+                offset += formatter.Serialize(ref bytes, offset, item.Key, formatterResolver);
+                offset += formatter.Serialize(ref bytes, offset, item.Value, formatterResolver);
+            }
+
+            return offset - startOffset;
+        }
+
+        public IDictionary Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        {
+            if (MessagePackBinary.IsNil(bytes, offset))
+            {
+                readSize = 1;
+                return null;
+            }
+
+            var formatter = formatterResolver.GetFormatterWithVerify<object>();
+            var startOffset = offset;
+
+            var count = MessagePackBinary.ReadMapHeader(bytes, offset, out readSize);
+            offset += readSize;
+
+            var dict = new Dictionary<object, object>(count);
+            for (int i = 0; i < count; i++)
+            {
+                var key = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
+                var value = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
+                dict.Add(key, value);
+            }
+
+            readSize = offset - startOffset;
+            return dict;
+        }
+    }
+
+#if NETSTANDARD
+
+    public sealed class ObservableCollectionFormatter<T> : CollectionFormatterBase<T, ObservableCollection<T>>
     {
         protected override void Add(ObservableCollection<T> collection, int index, T value)
         {
@@ -688,7 +936,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ReadOnlyObservableCollectionFormatter<T> : CollectionFormatterBase<T, ObservableCollection<T>, ReadOnlyObservableCollection<T>>
+    public sealed class ReadOnlyObservableCollectionFormatter<T> : CollectionFormatterBase<T, ObservableCollection<T>, ReadOnlyObservableCollection<T>>
     {
         protected override void Add(ObservableCollection<T> collection, int index, T value)
         {
@@ -706,7 +954,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceReadOnlyListFormatter<T> : CollectionFormatterBase<T, T[], IReadOnlyList<T>>
+    public sealed class InterfaceReadOnlyListFormatter<T> : CollectionFormatterBase<T, T[], IReadOnlyList<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -724,7 +972,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceReadOnlyCollectionFormatter<T> : CollectionFormatterBase<T, T[], IReadOnlyCollection<T>>
+    public sealed class InterfaceReadOnlyCollectionFormatter<T> : CollectionFormatterBase<T, T[], IReadOnlyCollection<T>>
     {
         protected override void Add(T[] collection, int index, T value)
         {
@@ -742,7 +990,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class InterfaceSetFormatter<T> : CollectionFormatterBase<T, HashSet<T>, ISet<T>>
+    public sealed class InterfaceSetFormatter<T> : CollectionFormatterBase<T, HashSet<T>, ISet<T>>
     {
         protected override void Add(HashSet<T> collection, int index, T value)
         {
@@ -760,7 +1008,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ConcurrentBagFormatter<T> : CollectionFormatterBase<T, System.Collections.Concurrent.ConcurrentBag<T>>
+    public sealed class ConcurrentBagFormatter<T> : CollectionFormatterBase<T, System.Collections.Concurrent.ConcurrentBag<T>>
     {
         protected override int? GetCount(ConcurrentBag<T> sequence)
         {
@@ -778,7 +1026,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ConcurrentQueueFormatter<T> : CollectionFormatterBase<T, System.Collections.Concurrent.ConcurrentQueue<T>>
+    public sealed class ConcurrentQueueFormatter<T> : CollectionFormatterBase<T, System.Collections.Concurrent.ConcurrentQueue<T>>
     {
         protected override int? GetCount(ConcurrentQueue<T> sequence)
         {
@@ -796,7 +1044,7 @@ namespace MessagePack.Formatters
         }
     }
 
-    public class ConcurrentStackFormatter<T> : CollectionFormatterBase<T, T[], ConcurrentStack<T>>
+    public sealed class ConcurrentStackFormatter<T> : CollectionFormatterBase<T, T[], ConcurrentStack<T>>
     {
         protected override int? GetCount(ConcurrentStack<T> sequence)
         {

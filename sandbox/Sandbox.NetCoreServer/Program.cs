@@ -49,7 +49,7 @@ namespace Sandbox.NetCoreServer
 
             server.Start();
 
-
+            Console.ReadLine();
 
             var foo = new ClientProgram().Start("Foo", "TEST_ROOM");
             var bar = new ClientProgram().Start("Bar", "TEST_ROOM");

@@ -1,9 +1,9 @@
-﻿#if ENABLE_UNSAFE_MSGPACK
-
+﻿using MessagePack.Formatters;
 using MessagePack.Internal;
 using MessagePack.LZ4;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 namespace MessagePack
@@ -52,7 +52,7 @@ namespace MessagePack
                     }
 
                     // LZ4 Decode
-                    LZ4Codec.Decode(bytes, offset, bytes.Length - offset, buffer, 0, length, true);
+                    LZ4Codec.Decode(bytes, offset, bytes.Length - offset, buffer, 0, length);
 
                     bytes = buffer; // use LZ4 bytes
                 }
@@ -61,6 +61,23 @@ namespace MessagePack
             var sb = new StringBuilder();
             ToJsonCore(bytes, 0, sb);
             return sb.ToString();
+        }
+
+        public static byte[] FromJson(string str)
+        {
+            using (var sr = new StringReader(str))
+            {
+                return FromJson(sr);
+            }
+        }
+
+        /// <summary>
+        /// From Json String to LZ4MessagePack binary
+        /// </summary>
+        public static byte[] FromJson(TextReader reader)
+        {
+            var buffer = MessagePackSerializer.FromJsonUnsafe(reader); // offset is guranteed from 0
+            return LZ4MessagePackSerializer.ToLZ4Binary(buffer);
         }
 
         static int ToJsonCore(byte[] bytes, int offset, StringBuilder builder)
@@ -86,7 +103,15 @@ namespace MessagePack
                     builder.Append(MessagePackBinary.ReadBoolean(bytes, offset, out readSize) ? "true" : "false");
                     break;
                 case MessagePackType.Float:
-                    builder.Append(MessagePackBinary.ReadDouble(bytes, offset, out readSize));
+                    var floatCode = bytes[offset];
+                    if (floatCode == MessagePackCode.Float32)
+                    {
+                        builder.Append(MessagePackBinary.ReadSingle(bytes, offset, out readSize).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        builder.Append(MessagePackBinary.ReadDouble(bytes, offset, out readSize).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
                     break;
                 case MessagePackType.String:
                     WriteJsonString(MessagePackBinary.ReadString(bytes, offset, out readSize), builder);
@@ -159,16 +184,50 @@ namespace MessagePack
                         return totalReadSize;
                     }
                 case MessagePackType.Extension:
-                    var ext = MessagePackBinary.ReadExtensionFormat(bytes, offset, out readSize);
-                    if (ext.TypeCode == ReservedMessagePackExtensionTypeCode.DateTime)
+                    var extHeader = MessagePackBinary.ReadExtensionFormatHeader(bytes, offset, out readSize);
+                    if (extHeader.TypeCode == ReservedMessagePackExtensionTypeCode.DateTime)
                     {
                         var dt = MessagePackBinary.ReadDateTime(bytes, offset, out readSize);
                         builder.Append("\"");
                         builder.Append(dt.ToString("o", CultureInfo.InvariantCulture));
                         builder.Append("\"");
                     }
+#if NETSTANDARD
+                    else if (extHeader.TypeCode == TypelessFormatter.ExtensionTypeCode)
+                    {
+                        int startOffset = offset;
+                        // prepare type name token
+                        offset += 6;
+                        var typeNameToken = new StringBuilder();
+                        var typeNameReadSize = ToJsonCore(bytes, offset, typeNameToken);
+                        offset += typeNameReadSize;
+                        int startBuilderLength = builder.Length;
+                        if (extHeader.Length > typeNameReadSize)
+                        {
+                            // object map or array
+                            var typeInside = MessagePackBinary.GetMessagePackType(bytes, offset);
+                            if (typeInside != MessagePackType.Array && typeInside != MessagePackType.Map)
+                                builder.Append("{");
+                            offset += ToJsonCore(bytes, offset, builder);
+                            // insert type name token to start of object map or array
+                            if (typeInside != MessagePackType.Array)
+                                typeNameToken.Insert(0, "\"$type\":");
+                            if (typeInside != MessagePackType.Array && typeInside != MessagePackType.Map)
+                                builder.Append("}");
+                            if (builder.Length - startBuilderLength > 2)
+                                typeNameToken.Append(",");
+                            builder.Insert(startBuilderLength + 1, typeNameToken.ToString());
+                        }
+                        else
+                        {
+                            builder.Append("{\"$type\":\"" + typeNameToken.ToString() + "}");
+                        }
+                        readSize = offset - startOffset;
+                    }
+#endif
                     else
                     {
+                        var ext = MessagePackBinary.ReadExtensionFormat(bytes, offset, out readSize);
                         builder.Append("[");
                         builder.Append(ext.TypeCode);
                         builder.Append(",");
@@ -231,5 +290,3 @@ namespace MessagePack
         }
     }
 }
-
-#endif

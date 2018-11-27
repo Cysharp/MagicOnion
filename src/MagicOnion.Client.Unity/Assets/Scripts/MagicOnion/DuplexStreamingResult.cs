@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
 using MessagePack;
 using System;
-using UniRx;
+using System.Threading.Tasks;
 
 namespace MagicOnion
 {
@@ -20,6 +20,8 @@ namespace MagicOnion
             this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
             this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
         }
+
+        public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;
 
         /// <summary>
         /// Async stream to read streaming responses.
@@ -46,7 +48,7 @@ namespace MagicOnion
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
-        public IObservable<Metadata> ResponseHeadersAsync
+        public Task<Metadata> ResponseHeadersAsync
         {
             get
             {

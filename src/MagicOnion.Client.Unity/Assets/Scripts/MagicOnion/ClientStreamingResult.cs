@@ -5,50 +5,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using UniRx;
+using System.Threading.Tasks;
 
 namespace MagicOnion
 {
     /// <summary>
     /// Wrapped AsyncClientStreamingCall.
     /// </summary>
-    public struct ClientStreamingResult<TRequest, TResponse> :  IDisposable
+    public struct ClientStreamingResult<TRequest, TResponse> : IDisposable
     {
+        internal readonly TResponse rawValue;
+        internal readonly bool hasRawValue;
         readonly AsyncClientStreamingCall<byte[], byte[]> inner;
         readonly MarshallingClientStreamWriter<TRequest> requestStream;
         readonly IFormatterResolver resolver;
 
+        public ClientStreamingResult(TResponse rawValue)
+        {
+            this.hasRawValue = true;
+            this.rawValue = rawValue;
+            this.inner = null;
+            this.requestStream = null;
+            this.resolver = null;
+        }
+
         public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
         {
+            this.hasRawValue = false;
+            this.rawValue = default(TResponse);
             this.inner = inner;
             this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
             this.resolver = resolver;
         }
 
+        async Task<TResponse> Deserialize()
+        {
+            var bytes = await inner.ResponseAsync.ConfigureAwait(false);
+            return LZ4MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
+        }
+
         /// <summary>
         /// Asynchronous call result.
         /// </summary>
-        public IObservable<TResponse> ResponseAsync
+        public Task<TResponse> ResponseAsync
         {
             get
             {
-                var r = resolver;
-                return inner.ResponseAsync.Select(x => LZ4MessagePackSerializer.Deserialize<TResponse>(x, r));
-            }
-        }
-
-        public IObservable<TResponse> ResponseAsyncOnMainThread
-        {
-            get
-            {
-                return ResponseAsync.ObserveOnMainThread();
+                if (hasRawValue)
+                {
+                    return Task.FromResult(rawValue);
+                }
+                else
+                {
+                    return Deserialize();
+                }
             }
         }
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
-        public IObservable<Metadata> ResponseHeadersAsync
+        public Task<Metadata> ResponseHeadersAsync
         {
             get
             {
@@ -65,6 +82,15 @@ namespace MagicOnion
             {
                 return this.requestStream;
             }
+        }
+
+        /// <summary>
+        /// Allows awaiting this object directly.
+        /// </summary>
+        /// <returns></returns>
+        public TaskAwaiter<TResponse> GetAwaiter()
+        {
+            return ResponseAsync.GetAwaiter();
         }
 
         /// <summary>

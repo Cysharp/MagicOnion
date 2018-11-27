@@ -1,6 +1,9 @@
-﻿using System;
+﻿#if !UNITY_WSA
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MessagePack.Internal
@@ -12,7 +15,25 @@ namespace MessagePack.Internal
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Nullable<>);
         }
 
-#if NETSTANDARD1_4
+        public static bool IsPublic(this System.Reflection.TypeInfo type)
+        {
+            return type.IsPublic;
+        }
+
+        public static bool IsAnonymous(this System.Reflection.TypeInfo type)
+        {
+            return type.GetCustomAttribute<CompilerGeneratedAttribute>() != null
+                && type.IsGenericType && type.Name.Contains("AnonymousType")
+                && (type.Name.StartsWith("<>") || type.Name.StartsWith("VB$"))
+                && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
+        }
+
+        public static bool IsIndexer(this System.Reflection.PropertyInfo propertyInfo)
+        {
+            return propertyInfo.GetIndexParameters().Length > 0;
+        }
+
+#if NETSTANDARD
 
         public static bool IsConstructedGenericType(this System.Reflection.TypeInfo type)
         {
@@ -32,3 +53,5 @@ namespace MessagePack.Internal
 #endif
     }
 }
+
+#endif

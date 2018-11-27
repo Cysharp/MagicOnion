@@ -1,8 +1,7 @@
 ﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Threading;
-using UniRx;
-using MessagePack;
 
 namespace MagicOnion.Client
 {
@@ -26,29 +25,29 @@ namespace MagicOnion.Client
 
         protected abstract MagicOnionClientBase<T> Clone();
 
-        public T WithCancellationToken(GrpcCancellationToken cancellationToken)
+        public virtual T WithCancellationToken(CancellationToken cancellationToken)
         {
             return WithOptions(this.option.WithCancellationToken(cancellationToken));
         }
 
-        public T WithDeadline(DateTime deadline)
+        public virtual T WithDeadline(DateTime deadline)
         {
             return WithOptions(this.option.WithDeadline(deadline));
         }
 
-        public T WithHeaders(Metadata headers)
+        public virtual T WithHeaders(Metadata headers)
         {
             return WithOptions(this.option.WithHeaders(headers));
         }
 
-        public T WithHost(string host)
+        public virtual T WithHost(string host)
         {
             var newInstance = Clone();
             newInstance.host = host;
             return (T)(object)newInstance;
         }
 
-        public T WithOptions(CallOptions option)
+        public virtual T WithOptions(CallOptions option)
         {
             var newInstance = Clone();
             newInstance.option = option;

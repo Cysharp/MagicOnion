@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_4
+﻿#if NETSTANDARD
 
 using System;
 using System.IO;
@@ -13,7 +13,13 @@ namespace MessagePack
     {
         public static class NonGeneric
         {
-            static readonly System.Collections.Generic.Dictionary<Type, CompiledMethods> serializes = new System.Collections.Generic.Dictionary<Type, CompiledMethods>();
+            static readonly Func<Type, CompiledMethods> CreateCompiledMethods;
+            static readonly MessagePack.Internal.ThreadsafeTypeKeyHashTable<CompiledMethods> serializes = new MessagePack.Internal.ThreadsafeTypeKeyHashTable<CompiledMethods>(capacity: 64);
+
+            static NonGeneric()
+            {
+                CreateCompiledMethods = t => new CompiledMethods(t);
+            }
 
             public static byte[] Serialize(Type type, object obj)
             {
@@ -55,22 +61,29 @@ namespace MessagePack
                 return GetOrAdd(type).deserialize4.Invoke(stream, resolver);
             }
 
+            public static object Deserialize(Type type, Stream stream, bool readStrict)
+            {
+                return GetOrAdd(type).deserialize5.Invoke(stream, readStrict);
+            }
+
+            public static object Deserialize(Type type, Stream stream, IFormatterResolver resolver, bool readStrict)
+            {
+                return GetOrAdd(type).deserialize6.Invoke(stream, resolver, readStrict);
+            }
+
+            public static object Deserialize(Type type, ArraySegment<byte> bytes)
+            {
+                return GetOrAdd(type).deserialize7.Invoke(bytes);
+            }
+
+            public static object Deserialize(Type type, ArraySegment<byte> bytes, IFormatterResolver resolver)
+            {
+                return GetOrAdd(type).deserialize8.Invoke(bytes, resolver);
+            }
+
             static CompiledMethods GetOrAdd(Type type)
             {
-                lock (serializes)
-                {
-                    CompiledMethods method;
-                    if (serializes.TryGetValue(type, out method))
-                    {
-                        return method;
-                    }
-                    else
-                    {
-                        method = new CompiledMethods(type);
-                        serializes.Add(type, method);
-                        return method;
-                    }
-                }
+                return serializes.GetOrAdd(type, CreateCompiledMethods);
             }
 
             class CompiledMethods
@@ -84,13 +97,18 @@ namespace MessagePack
                 public readonly Func<byte[], IFormatterResolver, object> deserialize2;
                 public readonly Func<Stream, object> deserialize3;
                 public readonly Func<Stream, IFormatterResolver, object> deserialize4;
+                public readonly Func<Stream, bool, object> deserialize5;
+                public readonly Func<Stream, IFormatterResolver, bool, object> deserialize6;
+
+                public readonly Func<ArraySegment<byte>, object> deserialize7;
+                public readonly Func<ArraySegment<byte>, IFormatterResolver, object> deserialize8;
 
                 public CompiledMethods(Type type)
                 {
                     var ti = type.GetTypeInfo();
                     {
                         // public static byte[] Serialize<T>(T obj)
-                        var serialize = GetMethod(type,new Type[] { null });
+                        var serialize = GetMethod(type, new Type[] { null });
 
                         var param1 = Expression.Parameter(typeof(object), "obj");
                         var body = Expression.Call(serialize, ti.IsValueType
@@ -175,7 +193,6 @@ namespace MessagePack
 
                         this.deserialize3 = lambda;
                     }
-
                     {
                         // public static T Deserialize<T>(Stream stream, IFormatterResolver resolver)
                         var deserialize = GetMethod(type, new Type[] { typeof(Stream), typeof(IFormatterResolver) });
@@ -186,6 +203,51 @@ namespace MessagePack
                         var lambda = Expression.Lambda<Func<Stream, IFormatterResolver, object>>(body, param1, param2).Compile();
 
                         this.deserialize4 = lambda;
+                    }
+                    {
+                        // public static T Deserialize<T>(Stream stream, bool readStrict)
+                        var deserialize = GetMethod(type, new Type[] { typeof(Stream), typeof(bool) });
+
+                        var param1 = Expression.Parameter(typeof(Stream), "stream");
+                        var param2 = Expression.Parameter(typeof(bool), "readStrict");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1, param2), typeof(object));
+                        var lambda = Expression.Lambda<Func<Stream, bool, object>>(body, param1, param2).Compile();
+
+                        this.deserialize5 = lambda;
+                    }
+                    {
+                        // public static T Deserialize<T>(Stream stream, IFormatterResolver resolver, bool readStrict)
+                        var deserialize = GetMethod(type, new Type[] { typeof(Stream), typeof(IFormatterResolver), typeof(bool) });
+
+                        var param1 = Expression.Parameter(typeof(Stream), "stream");
+                        var param2 = Expression.Parameter(typeof(IFormatterResolver), "resolver");
+                        var param3 = Expression.Parameter(typeof(bool), "readStrict");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1, param2, param3), typeof(object));
+                        var lambda = Expression.Lambda<Func<Stream, IFormatterResolver, bool, object>>(body, param1, param2, param3).Compile();
+
+                        this.deserialize6 = lambda;
+                    }
+
+                    {
+                        // public static T Deserialize<T>(ArraySegment<byte> bytes)
+                        var deserialize = GetMethod(type, new Type[] { typeof(ArraySegment<byte>) });
+
+                        var param1 = Expression.Parameter(typeof(ArraySegment<byte>), "bytes");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1), typeof(object));
+                        var lambda = Expression.Lambda<Func<ArraySegment<byte>, object>>(body, param1).Compile();
+
+                        this.deserialize7 = lambda;
+                    }
+                    {
+                        // public static T Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
+                        var deserialize = GetMethod(type, new Type[] { typeof(ArraySegment<byte>), typeof(IFormatterResolver) });
+
+                        var param1 = Expression.Parameter(typeof(ArraySegment<byte>), "bytes");
+                        var param2 = Expression.Parameter(typeof(IFormatterResolver), "resolver");
+                        var body = Expression.Convert(Expression.Call(deserialize, param1, param2), typeof(object));
+                        var lambda = Expression.Lambda<Func<ArraySegment<byte>, IFormatterResolver, object>>(body, param1, param2).Compile();
+
+                        this.deserialize8 = lambda;
                     }
                 }
 

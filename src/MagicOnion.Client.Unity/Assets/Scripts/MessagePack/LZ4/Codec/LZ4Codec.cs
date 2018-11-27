@@ -1,6 +1,4 @@
-﻿#if ENABLE_UNSAFE_MSGPACK
-
-#region license
+﻿#region license
 
 /*
 Copyright (c) 2013, Milosz Krajewski
@@ -35,7 +33,7 @@ namespace MessagePack.LZ4
 {
     public static partial class LZ4Codec
     {
-#region configuration
+        #region configuration
 
         /// <summary>
         /// Memory usage formula : N->2^N Bytes (examples : 10 -> 1KB; 12 -> 4KB ; 16 -> 64KB; 20 -> 1MB; etc.)
@@ -43,7 +41,7 @@ namespace MessagePack.LZ4
         /// Reduced memory usage can improve speed, due to cache effect
         /// Default value is 14, for 16KB, which nicely fits into Intel x86 L1 cache
         /// </summary>
-        private const int MEMORY_USAGE = 14;
+        private const int MEMORY_USAGE = 12; // modified use 12.
 
         /// <summary>
         /// Decreasing this value will make the algorithm skip faster data segments considered "incompressible"
@@ -54,9 +52,9 @@ namespace MessagePack.LZ4
         /// </summary>
         private const int NOTCOMPRESSIBLE_DETECTIONLEVEL = 6;
 
-#endregion
+        #endregion
 
-#region consts
+        #region consts
 
         private const int MINMATCH = 4;
 
@@ -116,9 +114,11 @@ namespace MessagePack.LZ4
         private const int MAX_NB_ATTEMPTS = 256;
         private const int OPTIMAL_ML = (ML_MASK - 1) + MINMATCH;
 
-#endregion
+        private const int BLOCK_COPY_LIMIT = 16;
 
-#region public interface (common)
+        #endregion
+
+        #region public interface (common)
 
         /// <summary>Gets maximum the length of the output.</summary>
         /// <param name="inputLength">Length of the input.</param>
@@ -128,15 +128,14 @@ namespace MessagePack.LZ4
             return inputLength + (inputLength / 255) + 16;
         }
 
-#endregion
+        #endregion
 
-#region internal interface (common)
+        #region internal interface (common)
 
         internal static void CheckArguments(
-            byte[] input, int inputOffset, ref int inputLength,
-            byte[] output, int outputOffset, ref int outputLength)
+            byte[] input, int inputOffset, int inputLength,
+            byte[] output, int outputOffset, int outputLength)
         {
-            if (inputLength < 0) inputLength = input.Length - inputOffset;
             if (inputLength == 0)
             {
                 outputLength = 0;
@@ -144,19 +143,16 @@ namespace MessagePack.LZ4
             }
 
             if (input == null) throw new ArgumentNullException("input");
-            if (inputOffset < 0 || inputOffset + inputLength > input.Length)
-                throw new ArgumentException("inputOffset and inputLength are invalid for given input");
+            if ((uint)inputOffset > (uint)input.Length) throw new ArgumentOutOfRangeException("inputOffset");
+            if ((uint)inputLength > (uint)input.Length - (uint)inputOffset) throw new ArgumentOutOfRangeException("inputLength");
 
-            if (outputLength < 0) outputLength = output.Length - outputOffset;
             if (output == null) throw new ArgumentNullException("output");
-            if (outputOffset < 0 || outputOffset + outputLength > output.Length)
-                throw new ArgumentException("outputOffset and outputLength are invalid for given output");
+            if ((uint)outputOffset > (uint)output.Length) throw new ArgumentOutOfRangeException("outputOffset");
+            if ((uint)outputLength > (uint)output.Length - (uint)outputOffset) throw new ArgumentOutOfRangeException("outputLength");
         }
 
-#endregion
+        #endregion
     }
 }
 
 // ReSharper restore InconsistentNaming
-
-#endif

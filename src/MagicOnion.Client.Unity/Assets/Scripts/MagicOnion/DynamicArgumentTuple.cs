@@ -1,4 +1,5 @@
 ﻿
+using System;
 using MessagePack;
 using MessagePack.Formatters;
 
@@ -6,7 +7,7 @@ namespace MagicOnion
 {
     // T2 ~ T20
 
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2>
     {
@@ -46,7 +47,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -71,11 +72,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2>(item1, item2);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3>
     {
@@ -121,7 +122,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -150,11 +151,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3>(item1, item2, item3);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4>
     {
@@ -206,7 +207,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -239,11 +240,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4>(item1, item2, item3, item4);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5>
     {
@@ -301,7 +302,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -338,11 +339,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5>(item1, item2, item3, item4, item5);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>
     {
@@ -406,7 +407,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -447,11 +448,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, item5, item6);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>
     {
@@ -521,7 +522,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -566,11 +567,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, item6, item7);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>
     {
@@ -646,7 +647,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -695,11 +696,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>(item1, item2, item3, item4, item5, item6, item7, item8);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>
     {
@@ -781,7 +782,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -834,11 +835,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(item1, item2, item3, item4, item5, item6, item7, item8, item9);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
     {
@@ -926,7 +927,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -983,11 +984,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
     {
@@ -1081,7 +1082,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -1142,11 +1143,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
     {
@@ -1246,7 +1247,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -1311,11 +1312,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
     {
@@ -1421,7 +1422,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -1490,11 +1491,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
     {
@@ -1606,7 +1607,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -1679,11 +1680,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
     {
@@ -1801,7 +1802,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -1878,11 +1879,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>
     {
@@ -2006,7 +2007,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -2087,11 +2088,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>
     {
@@ -2221,7 +2222,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -2306,11 +2307,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>
     {
@@ -2446,7 +2447,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -2535,11 +2536,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>
     {
@@ -2681,7 +2682,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -2774,11 +2775,11 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, item19);
         }
     }
-
+    
     [MessagePackObject]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>
     {
@@ -2926,7 +2927,7 @@ namespace MagicOnion
         public DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
             var startOffset = offset;
-
+            
             var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
             offset += readSize;
 
@@ -3023,7 +3024,7 @@ namespace MagicOnion
                 offset += readSize;
             }
 
-            readSize = offset - startOffset;
+            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>(item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, item11, item12, item13, item14, item15, item16, item17, item18, item19, item20);
         }
     }

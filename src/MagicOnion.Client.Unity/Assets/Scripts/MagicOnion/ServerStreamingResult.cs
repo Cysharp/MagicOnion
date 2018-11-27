@@ -1,14 +1,14 @@
 ﻿using Grpc.Core;
 using MessagePack;
 using System;
-using UniRx;
+using System.Threading.Tasks;
 
 namespace MagicOnion
 {
     /// <summary>
     /// Wrapped AsyncServerStreamingCall.
     /// </summary>
-    public struct ServerStreamingResult<TResponse> : IDisposable, IObservable<TResponse>
+    public struct ServerStreamingResult<TResponse> : IDisposable
     {
         readonly AsyncServerStreamingCall<byte[]> inner;
         readonly MarshallingAsyncStreamReader<TResponse> responseStream;
@@ -33,7 +33,7 @@ namespace MagicOnion
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
-        public IObservable<Metadata> ResponseHeadersAsync
+        public Task<Metadata> ResponseHeadersAsync
         {
             get
             {
@@ -75,16 +75,6 @@ namespace MagicOnion
             {
                 this.inner.Dispose();
             }
-        }
-
-        public IObservable<TResponse> AsObservable(bool observeOnMainThread = true)
-        {
-            return responseStream.AsObservable(observeOnMainThread, this);
-        }
-
-        public IDisposable Subscribe(IObserver<TResponse> observer)
-        {
-            return responseStream.Subscribe(observer, true, this);
         }
     }
 }

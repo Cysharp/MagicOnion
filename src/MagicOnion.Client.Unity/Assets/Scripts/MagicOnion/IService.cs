@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using System;
+using System.Threading;
 
 namespace MagicOnion
 {
@@ -14,7 +15,7 @@ namespace MagicOnion
         TSelf WithOptions(CallOptions option);
         TSelf WithHeaders(Metadata headers);
         TSelf WithDeadline(DateTime deadline);
-        TSelf WithCancellationToken(GrpcCancellationToken cancellationToken);
+        TSelf WithCancellationToken(CancellationToken cancellationToken);
         TSelf WithHost(string host);
     }
 }

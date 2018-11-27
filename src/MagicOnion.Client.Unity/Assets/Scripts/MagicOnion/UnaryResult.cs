@@ -1,53 +1,96 @@
-﻿using System;
-using Grpc.Core;
-using UniRx;
+﻿using Grpc.Core;
+using MagicOnion.CompilerServices;
 using MessagePack;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace MagicOnion
 {
     /// <summary>
     /// Wrapped AsyncUnaryCall.
     /// </summary>
-    public struct UnaryResult<TResponse> : IObservable<TResponse>
+    [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder<>))]
+    public struct UnaryResult<TResponse>
     {
+        internal readonly bool hasRawValue; // internal
+        internal readonly TResponse rawValue; // internal
+        internal readonly Task<TResponse> rawTaskValue; // internal
+
         readonly AsyncUnaryCall<byte[]> inner;
         readonly IFormatterResolver resolver;
 
+        public UnaryResult(TResponse rawValue)
+        {
+            this.hasRawValue = true;
+            this.rawValue = rawValue;
+            this.rawTaskValue = null;
+            this.inner = null;
+            this.resolver = null;
+        }
+
+        public UnaryResult(Task<TResponse> rawTaskValue)
+        {
+            this.hasRawValue = true;
+            this.rawValue = default(TResponse);
+            this.rawTaskValue = rawTaskValue;
+            this.inner = null;
+            this.resolver = null;
+        }
+
         public UnaryResult(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
         {
+            this.hasRawValue = false;
+            this.rawValue = default(TResponse);
+            this.rawTaskValue = null;
             this.inner = inner;
             this.resolver = resolver;
+        }
+
+        async Task<TResponse> Deserialize()
+        {
+            var bytes = await inner.ResponseAsync.ConfigureAwait(false);
+            return LZ4MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
         }
 
         /// <summary>
         /// Asynchronous call result.
         /// </summary>
-        public IObservable<TResponse> ResponseAsync
+        public Task<TResponse> ResponseAsync
         {
             get
             {
-                var m = resolver; // struct can not use field value in lambda(if avoid, we needs to implement SelectWithState)
-                return inner.ResponseAsync.Select(x => LZ4MessagePackSerializer.Deserialize<TResponse>(x, m));
-            }
-        }
-
-        public IObservable<TResponse> ResponseAsyncOnMainThread
-        {
-            get
-            {
-                return ResponseAsync.ObserveOnMainThread();
+                if (!hasRawValue)
+                {
+                    return Deserialize();
+                }
+                else if (rawTaskValue != null)
+                {
+                    return rawTaskValue;
+                }
+                else
+                {
+                    return Task.FromResult(rawValue);
+                }
             }
         }
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
-        public IObservable<Metadata> ResponseHeadersAsync
+        public Task<Metadata> ResponseHeadersAsync
         {
             get
             {
                 return inner.ResponseHeadersAsync;
             }
+        }
+
+        /// <summary>
+        /// Allows awaiting this object directly.
+        /// </summary>
+        public TaskAwaiter<TResponse> GetAwaiter()
+        {
+            return ResponseAsync.GetAwaiter();
         }
 
         /// <summary>
@@ -81,11 +124,6 @@ namespace MagicOnion
         public void Dispose()
         {
             inner.Dispose();
-        }
-
-        public IDisposable Subscribe(IObserver<TResponse> observer)
-        {
-            return ResponseAsyncOnMainThread.Subscribe(observer);
         }
     }
 }
