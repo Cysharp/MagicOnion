@@ -24,6 +24,11 @@ namespace MagicOnion.Server.Hubs
 
         internal async ValueTask WriteResponseMessage<T>(Task<T> value)
         {
+            if (MessageId == -1) // don't write.
+            {
+                return;
+            }
+
             // MessageFormat:
             // response:  [messageId, methodId, response]
             byte[] buffer = null; // TODO:byte buffer
@@ -41,9 +46,26 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        internal ValueTask WrapToValueTask(Task task)
+        internal async ValueTask WriteErrorMessage(Exception ex, bool isReturnExceptionStackTraceInErrorDetail)
         {
-            return new ValueTask(task);
+            // MessageFormat:
+            // error-response:  [messageId, Nil, StringMessage]
+            byte[] buffer = null; // TODO:byte buffer
+            var offset = 0;
+            offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
+            offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
+            offset += MessagePackBinary.WriteNil(ref buffer, offset);
+
+            var msg = (isReturnExceptionStackTraceInErrorDetail)
+                ? ex.ToString()
+                : "Internal Server Error";
+
+            offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, msg, FormatterResolver);
+            var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
+            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
+            {
+                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
+            }
         }
     }
 }

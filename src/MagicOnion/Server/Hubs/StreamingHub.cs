@@ -109,9 +109,17 @@ namespace MagicOnion.Server.Hubs
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
                             MethodId = handler.MethodId,
+                            MessageId = -1
                         };
 
-                        await handler.MethodBody.Invoke(context);
+                        try
+                        {
+                            await handler.MethodBody.Invoke(context);
+                        }
+                        catch (Exception ex)
+                        {
+                            // TODO:nanika error log.
+                        }
                     }
                     else
                     {
@@ -139,8 +147,16 @@ namespace MagicOnion.Server.Hubs
                             MethodId = handler.MethodId,
                             MessageId = messageId
                         };
-                        
-                        await handler.MethodBody.Invoke(context);
+
+                        try
+                        {
+                            await handler.MethodBody.Invoke(context);
+                        }
+                        catch (Exception ex)
+                        {
+                            // error-response:  [messageId, Nil, StringMessage]
+                            await context.WriteErrorMessage(ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                        }
                     }
                     else
                     {
@@ -155,6 +171,11 @@ namespace MagicOnion.Server.Hubs
         }
 
         // Interface methods for Client
+
+        THubInterface IStreamingHub<THubInterface, TReceiver>.FireAndForget()
+        {
+            throw new NotSupportedException("Invoke from client proxy only");
+        }
 
         Task IStreamingHub<THubInterface, TReceiver>.DisposeAsync()
         {

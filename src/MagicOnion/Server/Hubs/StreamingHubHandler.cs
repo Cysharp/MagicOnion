@@ -90,7 +90,7 @@ namespace MagicOnion.Server.Hubs
 
                 var finalMethod = (methodInfo.ReturnType.IsGenericType)
                     ? typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessage), flags).MakeGenericMethod(UnwrappedResponseType)
-                    : typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WrapToValueTask), flags);
+                    : typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessage), flags).MakeGenericMethod(typeof(Nil));
                 callBody = Expression.Call(contextArg, finalMethod, callBody);
 
                 var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);

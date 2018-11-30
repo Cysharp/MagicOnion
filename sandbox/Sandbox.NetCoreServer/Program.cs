@@ -73,6 +73,7 @@ namespace Sandbox.NetCoreServer
             try
             {
 
+
                 await client.JoinAsync(user, room);
 
                 await client.SendMessageAsync("Who");
@@ -142,6 +143,7 @@ namespace Sandbox.NetCoreServer
 
     //    protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod => method;
 
+
     //    public Task EchoAsync(string message)
     //    {
     //        return WriteMessageAsync<string>(1297107480, message);
@@ -150,6 +152,11 @@ namespace Sandbox.NetCoreServer
     //    public Task<string> EchoRetrunAsync(string message)
     //    {
     //        return WriteMessageWithResponseAsync<string, string>(-1171618600, message);
+    //    }
+
+    //    public IChatHub FireAndForget()
+    //    {
+    //        return new FireAndForgetClient(this); // TODO:use field cached.
     //    }
 
     //    protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
@@ -169,6 +176,46 @@ namespace Sandbox.NetCoreServer
     //        {
     //            var result = LZ4MessagePackSerializer.Deserialize<string>(data, resolver);
     //            ((TaskCompletionSource<string>)taskCompletionSource).TrySetResult(result);
+    //        }
+    //    }
+
+    //    class FireAndForgetClient :Object, IChatHub
+    //    {
+    //        ChatHubClient2 client;
+
+    //        public FireAndForgetClient(ChatHubClient2 client)
+    //        {
+    //            this.client = client; 
+    //        }
+
+    //        public Task DisposeAsync()
+    //        {
+    //            throw new NotSupportedException();
+    //        }
+
+    //        public IChatHub FireAndForget()
+    //        {
+    //            throw new NotSupportedException();
+    //        }
+
+    //        public Task WaitForDisconnect()
+    //        {
+    //            throw new NotSupportedException();
+    //        }
+
+    //        public Task<Nil> JoinAsync(string userName, string roomName)
+    //        {
+    //            throw new NotImplementedException();
+    //        }
+
+    //        public Task<Nil> LeaveAsync()
+    //        {
+    //            return client.WriteMessageAsyncFireAndForget<Nil, Nil>(1297107480, Nil.Default);
+    //        }
+
+    //        public Task SendMessageAsync(string message)
+    //        {
+    //            return client.WriteMessageAsync(1297107480, message);
     //        }
     //    }
     //}

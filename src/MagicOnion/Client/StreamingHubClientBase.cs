@@ -70,6 +70,7 @@ namespace MagicOnion.Client
                         // MessageFormat:
                         // broadcast: [methodId, [argument]]
                         // response:  [messageId, methodId, response]
+                        // error-response: [messageId, Nil, string]
 
                         var readSize = 0;
                         var offset = 0;
@@ -81,20 +82,30 @@ namespace MagicOnion.Client
                             var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                             offset += readSize;
 
-                            if (responseFutures.TryGetValue(messageId, out var future))
+                            if (responseFutures.TryRemove(messageId, out var future))
                             {
-                                var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                                offset += readSize;
+                                if (MessagePackBinary.IsNil(data, offset))
+                                {
+                                    offset += 1; // ReadNil
 
-                                try
-                                {
-                                    OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
+                                    var response = LZ4MessagePackSerializer.Deserialize<string>(new ArraySegment<byte>(data, offset, data.Length - offset));
+                                    (future as ITaskCompletion).TrySetException(new StreamingHubServerException(response));
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    if (!(future as ITaskCompletion).TrySetException(ex))
+                                    var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
+                                    offset += readSize;
+
+                                    try
                                     {
-                                        throw;
+                                        OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (!(future as ITaskCompletion).TrySetException(ex))
+                                        {
+                                            throw;
+                                        }
                                     }
                                 }
                             }
@@ -149,6 +160,12 @@ namespace MagicOnion.Client
             return connection.RawStreamingCall.RequestStream.WriteAsync(MessagePackBinary.FastCloneWithResize(buffer, offset));
         }
 
+        protected async Task<TResponse> WriteMessageAsyncFireAndForget<TRequest, TResponse>(int methodId, TRequest message)
+        {
+            await WriteMessageAsync(methodId, message).ConfigureAwait(false);
+            return default(TResponse);
+        }
+
         protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
@@ -167,7 +184,7 @@ namespace MagicOnion.Client
 
             await connection.RawStreamingCall.RequestStream.WriteAsync(MessagePackBinary.FastCloneWithResize(buffer, offset)).ConfigureAwait(false);
 
-            return await tcs.Task; // TODO:if server throws error, return forever? requires error handling.
+            return await tcs.Task; // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }
 
         void ThrowIfDisposed()
@@ -192,31 +209,56 @@ namespace MagicOnion.Client
 
             disposed = true;
 
-            await connection.RequestStream.CompleteAsync();
-            // TODO:complete and cancellation, which should be first???
-            cts.Cancel();
-            cts.Dispose();
             try
             {
-                if (waitSubscription)
+                await connection.RequestStream.CompleteAsync();
+            }
+            catch { } // ignore error?
+            finally
+            {
+                cts.Cancel();
+                cts.Dispose();
+                try
                 {
-                    if (subscription != null)
+                    if (waitSubscription)
                     {
-                        await subscription;
+                        if (subscription != null)
+                        {
+                            await subscription;
+                        }
+                    }
+
+                    // cleanup completion
+                    List<Exception> aggregateException = null;
+                    foreach (var item in responseFutures)
+                    {
+                        try
+                        {
+                            (item.Value as ITaskCompletion).TrySetCanceled();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!(ex is OperationCanceledException))
+                            {
+                                if (aggregateException != null)
+                                {
+                                    aggregateException = new List<Exception>();
+                                    aggregateException.Add(ex);
+                                }
+                            }
+                        }
+                    }
+                    if (aggregateException != null)
+                    {
+                        throw new AggregateException(aggregateException);
                     }
                 }
-
-                // cleanup completion
-                foreach (var item in responseFutures)
+                catch (Exception ex)
                 {
-                    (item.Value as ITaskCompletion).TrySetCanceled();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is OperationCanceledException))
-                {
-                    throw;
+                    if (!(ex is OperationCanceledException))
+                    {
+                        throw;
+                    }
                 }
             }
         }

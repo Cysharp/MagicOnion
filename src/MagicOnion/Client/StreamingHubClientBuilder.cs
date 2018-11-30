@@ -47,10 +47,13 @@ namespace MagicOnion.Client
         static class StreamingHubClientBuilder<TStreamingHub, TReceiver>
     {
         public static readonly Type ClientType;
+        // static readonly Type ClientFireAndForgetType;
 
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
         static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
         static readonly FieldInfo nilBytes = typeof(MagicOnionMarshallers).GetField("UnsafeNilBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+        static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes);
 
         static readonly MethodInfo callMessagePackDesrialize = typeof(LZ4MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
@@ -68,9 +71,17 @@ namespace MagicOnion.Client
 
             VerifyMethodDefinitions(typeBuilder, methodDefinitions);
 
-            var methodField = DefineStaticConstructor(typeBuilder, t);
-            DefineConstructor(typeBuilder, t, typeof(TReceiver));
-            DefineMethods(typeBuilder, t, typeof(TReceiver), methodField, methodDefinitions);
+            {
+                // Create FireAndForgetType first as nested type.
+                var typeBuilderEx = typeBuilder.DefineNestedType($"FireAndForgetClient", TypeAttributes.NestedPrivate, typeof(object), new Type[] { t });
+                var (fireAndForgetClientCtor, fireAndForgetField) = DefineFireAndForgetConstructor(typeBuilderEx, typeBuilder);
+                DefineMethodsFireAndForget(typeBuilderEx, t, fireAndForgetField, typeBuilder, methodDefinitions);
+                typeBuilderEx.CreateTypeInfo(); // ok to create nested type.
+
+                var methodField = DefineStaticConstructor(typeBuilder, t);
+                var clientField = DefineConstructor(typeBuilder, t, typeof(TReceiver), fireAndForgetClientCtor);
+                DefineMethods(typeBuilder, t, typeof(TReceiver), methodField, clientField, methodDefinitions);
+            }
 
             ClientType = typeBuilder.CreateTypeInfo().AsType();
         }
@@ -94,6 +105,7 @@ namespace MagicOnion.Client
                      || methodName == "ToString"
                      || methodName == "DisposeAsync"
                      || methodName == "WaitForDisconnect"
+                     || methodName == "FireAndForget"
                      )
                     {
                         return false;
@@ -138,7 +150,6 @@ namespace MagicOnion.Client
         static FieldInfo DefineStaticConstructor(TypeBuilder typeBuilder, Type interfaceType)
         {
             //  static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IFoo", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-
             var field = typeBuilder.DefineField("method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
 
             var cctor = typeBuilder.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, Type.EmptyTypes);
@@ -157,7 +168,7 @@ namespace MagicOnion.Client
             return field;
         }
 
-        static void DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType)
+        static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
             // .ctor(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger) :base(...)
             {
@@ -173,11 +184,43 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Ldarg_S, (byte)5);
                 il.Emit(OpCodes.Call, typeBuilder.BaseType
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First());
+
+                // { this.fireAndForgetClient = new FireAndForgetClient(this); }
+                var clientField = typeBuilder.DefineField("fireAndForgetClient", fireAndForgetClientCtor.DeclaringType, FieldAttributes.Private);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Newobj, fireAndForgetClientCtor);
+                il.Emit(OpCodes.Stfld, clientField);
+
                 il.Emit(OpCodes.Ret);
+
+                return clientField;
             }
         }
 
-        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, FieldInfo methodField, MethodDefinition[] definitions)
+        static (ConstructorInfo, FieldInfo) DefineFireAndForgetConstructor(TypeBuilder typeBuilder, Type parentClientType)
+        {
+            // .ctor(Parent client) { this.client = client }
+            {
+                var argTypes = new[] { parentClientType };
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
+                var clientField = typeBuilder.DefineField("client", parentClientType, FieldAttributes.Private);
+                var il = ctor.GetILGenerator();
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Call, typeof(object).GetConstructors().First());
+
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Stfld, clientField);
+
+                il.Emit(OpCodes.Ret);
+
+                return (ctor, clientField);
+            }
+        }
+
+        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, FieldInfo methodField, FieldInfo clientField, MethodDefinition[] definitions)
         {
             var baseType = typeof(StreamingHubClientBase<,>).MakeGenericType(interfaceType, receiverType);
             var resolverField = baseType.GetField("resolver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -215,6 +258,16 @@ namespace MagicOnion.Client
                     il.Emit(OpCodes.Call, baseType.GetMethod("WaitForDisconnect", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
                     il.Emit(OpCodes.Ret);
                 }
+                // TSelf FireAndForget();
+                {
+                    var method = typeBuilder.DefineMethod("FireAndForget", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType, Type.EmptyTypes);
+                    var il = method.GetILGenerator();
+
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldfld, clientField);
+                    il.Emit(OpCodes.Ret);
+                }
             }
 
             // receiver types borrow from DynamicBroadcastBuilder
@@ -226,7 +279,6 @@ namespace MagicOnion.Client
                     var il = method.GetILGenerator();
 
                     var labels = definitions
-                        .Where(x => x.MethodInfo.ReturnType.IsGenericType) // only Task<T>
                         .Select(x => new { def = x, label = il.DefineLabel() })
                         .ToArray();
 
@@ -246,8 +298,20 @@ namespace MagicOnion.Client
                         // ((TaskCompletionSource<T>)taskCompletionSource).TrySetResult(result);
 
                         // => ((TaskCompletionSource<T>)taskCompletionSource).TrySetResult(LZ4MessagePackSerializer.Deserialize<T>(data, resolver));
-                        var responseType = item.def.MethodInfo.ReturnType.GetGenericArguments()[0];
-                        var tcsType = typeof(TaskCompletionSource<>).MakeGenericType(responseType);
+
+                        Type responseType;
+                        Type tcsType;
+                        if (item.def.MethodInfo.ReturnType == typeof(Task))
+                        {
+                            // Task methods uses TaskCompletionSource<Nil>
+                            responseType = typeof(Nil);
+                            tcsType = typeof(TaskCompletionSource<Nil>);
+                        }
+                        else
+                        {
+                            responseType = item.def.MethodInfo.ReturnType.GetGenericArguments()[0];
+                            tcsType = typeof(TaskCompletionSource<>).MakeGenericType(responseType);
+                        }
 
                         il.MarkLabel(item.label);
 
@@ -370,9 +434,9 @@ namespace MagicOnion.Client
                 Type callType = null;
                 if (parameters.Length == 0)
                 {
-                    // use null.
-                    callType = typeof(byte[]);
-                    il.Emit(OpCodes.Ldnull);
+                    // use Nil.
+                    callType = typeof(Nil);
+                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default"));
                 }
                 else if (parameters.Length == 1)
                 {
@@ -388,8 +452,8 @@ namespace MagicOnion.Client
 
                 if (def.MethodInfo.ReturnType == typeof(Task))
                 {
-                    var mInfo = baseType.GetMethod("WriteMessageAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType));
+                    var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, typeof(Nil)));
                 }
                 else
                 {
@@ -400,6 +464,99 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Ret);
             }
         }
+
+        static void DefineMethodsFireAndForget(TypeBuilder typeBuilder, Type interfaceType, FieldInfo clientField, Type parentNestedType, MethodDefinition[] definitions)
+        {
+            {
+                // Task DisposeAsync();
+                {
+                    var method = typeBuilder.DefineMethod("DisposeAsync", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        typeof(Task), Type.EmptyTypes);
+                    var il = method.GetILGenerator();
+
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // Task WaitForDisconnect();
+                {
+                    var method = typeBuilder.DefineMethod("WaitForDisconnect", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        typeof(Task), Type.EmptyTypes);
+                    var il = method.GetILGenerator();
+
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf FireAndForget();
+                {
+                    var method = typeBuilder.DefineMethod("FireAndForget", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType, Type.EmptyTypes);
+                    var il = method.GetILGenerator();
+
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+            }
+
+            // Proxy Methods
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var def = definitions[i];
+                var parameters = def.MethodInfo.GetParameters().Select(x => x.ParameterType).ToArray();
+
+                var method = typeBuilder.DefineMethod(def.MethodInfo.Name, MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    def.MethodInfo.ReturnType,
+                    parameters);
+                var il = method.GetILGenerator();
+
+                // return client.WriteMessage***<T>(methodId, message);
+
+                // this.client.***
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldfld, clientField);
+
+                // arg1
+                il.EmitLdc_I4(def.MethodId);
+
+                // create request for arg2
+                for (int j = 0; j < parameters.Length; j++)
+                {
+                    il.Emit(OpCodes.Ldarg, j + 1);
+                }
+
+                Type callType = null;
+                if (parameters.Length == 0)
+                {
+                    // use Nil.
+                    callType = typeof(Nil);
+                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default"));
+                }
+                else if (parameters.Length == 1)
+                {
+                    // already loaded parameter.
+                    callType = parameters[0];
+                }
+                else
+                {
+                    // call new DynamicArgumentTuple<T>
+                    callType = def.RequestType;
+                    il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
+                }
+
+                if (def.MethodInfo.ReturnType == typeof(Task))
+                {
+                    var mInfo = parentNestedType.BaseType.GetMethod("WriteMessageAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType));
+                }
+                else
+                {
+                    var mInfo = parentNestedType.BaseType.GetMethod("WriteMessageAsyncFireAndForget", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
+                }
+
+                il.Emit(OpCodes.Ret);
+            }
+        }
+
 
         class MethodDefinition
         {
