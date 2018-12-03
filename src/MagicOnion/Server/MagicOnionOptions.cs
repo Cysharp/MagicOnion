@@ -46,6 +46,11 @@ namespace MagicOnion.Server
         public IGroupRepositoryFactory DefaultGroupRepositoryFactory { get; set; }
 
         /// <summary>
+        /// Add the extra typed option.
+        /// </summary>
+        public IServiceLocator ServiceLocator { get; set; }
+
+        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
@@ -59,6 +64,16 @@ namespace MagicOnion.Server
             this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
             this.DisableEmbeddedService = false;
             this.EnableCurrentContext = false;
+
+            this.ServiceLocator = DefaultServiceLocator.Instance;
+        }
+
+        internal void RegisterOptionToServiceLocator()
+        {
+            // call from engine initialization.
+            this.ServiceLocator.Register<IFormatterResolver>(FormatterResolver);
+            this.ServiceLocator.Register<IMagicOnionLogger>(MagicOnionLogger);
+            this.ServiceLocator.Register<IGroupRepositoryFactory>(DefaultGroupRepositoryFactory);
         }
     }
 }

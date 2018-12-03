@@ -58,6 +58,8 @@ namespace MagicOnion.Client
         static readonly MethodInfo callMessagePackDesrialize = typeof(LZ4MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
 
+        static readonly PropertyInfo completedTask = typeof(Task).GetProperty("CompletedTask", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
         static StreamingHubClientBuilder()
         {
             var t = typeof(TStreamingHub);
@@ -366,6 +368,10 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
+                            if (item.def.MethodInfo.ReturnType == typeof(void))
+                            {
+                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
+                            }
                             il.Emit(OpCodes.Ret);
                         }
                         else if (parameters.Length == 1)
@@ -377,6 +383,10 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Ldfld, resolverField);
                             il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(parameters[0].ParameterType));
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
+                            if (item.def.MethodInfo.ReturnType == typeof(void))
+                            {
+                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
+                            }
                             il.Emit(OpCodes.Ret);
                         }
                         else
@@ -399,6 +409,10 @@ namespace MagicOnion.Client
                             }
 
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
+                            if (item.def.MethodInfo.ReturnType == typeof(void))
+                            {
+                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
+                            }
                             il.Emit(OpCodes.Ret);
                         }
                     }

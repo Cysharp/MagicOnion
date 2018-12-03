@@ -9,12 +9,11 @@ namespace MagicOnion.Server.Hubs
 {
     public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IFormatterResolver resolver)
+        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
         {
-            return new ImmutableArrayGroupRepository(resolver);
+            return new ImmutableArrayGroupRepository(serviceLocator.GetService<IFormatterResolver>());
         }
     }
-
 
     public class ImmutableArrayGroupRepository : IGroupRepository
     {
@@ -50,7 +49,6 @@ namespace MagicOnion.Server.Hubs
         }
     }
 
-
     public class ImmutableArrayGroup : IGroup
     {
         readonly object gate = new object();
@@ -69,23 +67,29 @@ namespace MagicOnion.Server.Hubs
             this.members = ImmutableArray<ServiceContext>.Empty;
         }
 
-        public void Add(ServiceContext context)
+        public ValueTask AddAsync(ServiceContext context)
         {
             lock (gate)
             {
                 members = members.Add(context);
             }
+            return default(ValueTask);
         }
 
-        public void Remove(ServiceContext context)
+        public ValueTask<bool> RemoveAsync(ServiceContext context)
         {
             lock (gate)
             {
                 members = members.Remove(context);
                 if (members.Length == 0)
                 {
-                    parent.TryRemove(GroupName);
+                    if (parent.TryRemove(GroupName))
+                    {
+                        return new ValueTask<bool>(true);
+                    }
                 }
+
+                return new ValueTask<bool>(false);
             }
         }
 
@@ -144,16 +148,19 @@ namespace MagicOnion.Server.Hubs
                 }
 
                 promise.Add(WriteInAsyncLock(source[i], message));
-                NEXT:
+            NEXT:
                 continue;
             }
 
             await promise.AsValueTask().ConfigureAwait(false);
         }
 
-        public async Task WriteRawAsync(byte[] value, Guid[] exceptConnectionIds)
+        public async Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds)
         {
-            var message = value;
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+
             var source = members;
             var promise = new ReservedWhenAllPromise(source.Length);
 
@@ -178,7 +185,7 @@ namespace MagicOnion.Server.Hubs
                     }
 
                     promise.Add(WriteInAsyncLock(source[i], message));
-                    NEXT:
+                NEXT:
                     continue;
                 }
             }
@@ -209,7 +216,14 @@ namespace MagicOnion.Server.Hubs
         {
             using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
-                await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                try
+                {
+                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+                }
             }
         }
     }

@@ -6,7 +6,7 @@ namespace MagicOnion.Server.Hubs
 {
     public interface IGroupRepositoryFactory
     {
-        IGroupRepository CreateRepository(IFormatterResolver resolver);
+        IGroupRepository CreateRepository(IServiceLocator serviceLocator);
     }
 
     public interface IGroupRepository

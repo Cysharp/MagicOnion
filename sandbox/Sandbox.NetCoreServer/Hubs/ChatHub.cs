@@ -28,12 +28,12 @@ namespace Sandbox.NetCoreServer.Hubs
         IGroup room;
 
         // return Task<T> wait server completed.
-        public Task<Nil> JoinAsync(string userName, string roomName)
+        public async Task<Nil> JoinAsync(string userName, string roomName)
         {
             this.userName = userName;
-            this.room = Group.Add("InMemoryRoom:" + roomName, this.Context);
+            this.room = await Group.AddAsync("InMemoryRoom:" + roomName, this.Context);
 
-            return NilTask;
+            return Nil.Default;
         }
 
         // return Task is fire and forget(does not wait server completed).
@@ -46,7 +46,7 @@ namespace Sandbox.NetCoreServer.Hubs
         public async Task<Nil> LeaveAsync()
         {
             await BroadcastExceptSelf(room).OnReceiveMessage(userName, "SYSTEM_MESSAGE_LEAVE_USER");
-            room.Remove(this.Context);
+            await room.RemoveAsync(this.Context);
 
             return Nil.Default;
         }
@@ -56,10 +56,12 @@ namespace Sandbox.NetCoreServer.Hubs
             return CompletedTask; // you can hook connecting event.
         }
 
-        protected override ValueTask OnDisconnected()
+        protected override async ValueTask OnDisconnected()
         {
-            room?.Remove(this.Context); // remove from group.
-            return CompletedTask;
+            if (room != null)
+            {
+                await room.RemoveAsync(this.Context); // remove from group.
+            }
         }
     }
 }

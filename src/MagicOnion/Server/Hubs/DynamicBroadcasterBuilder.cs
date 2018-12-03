@@ -1,4 +1,5 @@
 ﻿using MagicOnion.Utils;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +50,8 @@ namespace MagicOnion.Server.Hubs
         static readonly MethodInfo groupWriteAllMethodInfo = typeof(IGroup).GetMethod(nameof(IGroup.WriteAllAsync));
         static readonly MethodInfo groupWriteExceptOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && !x.GetParameters().Last().ParameterType.IsArray);
         static readonly MethodInfo groupWriteExceptManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && x.GetParameters().Last().ParameterType.IsArray);
+
+        static readonly MethodInfo fireAndForget = typeof(BroadcasterHelper).GetMethod(nameof(BroadcasterHelper.FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static DynamicBroadcasterBuilder()
         {
@@ -157,6 +160,7 @@ namespace MagicOnion.Server.Hubs
 
                 // like this.
                 // return group.WriteAllAsync(9013131, new DynamicArgumentTuple<int, string>(senderId, message));
+                // BroadcasterHelper.FireAndForget(...)
 
                 // load group field
                 il.Emit(OpCodes.Ldarg_0);
@@ -174,9 +178,9 @@ namespace MagicOnion.Server.Hubs
                 Type callType = null;
                 if (parameters.Length == 0)
                 {
-                    // use null.
-                    callType = typeof(byte[]);
-                    il.Emit(OpCodes.Ldnull);
+                    // use Nil.
+                    callType = typeof(Nil);
+                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default"));
                 }
                 else if (parameters.Length == 1)
                 {
@@ -197,6 +201,12 @@ namespace MagicOnion.Server.Hubs
                 }
 
                 il.Emit(OpCodes.Callvirt, writeMethod.MakeGenericMethod(callType));
+
+                if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Call, fireAndForget);
+                }
+
                 il.Emit(OpCodes.Ret);
             }
         }

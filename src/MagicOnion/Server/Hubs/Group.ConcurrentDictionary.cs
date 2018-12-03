@@ -10,12 +10,11 @@ namespace MagicOnion.Server.Hubs
 {
     public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IFormatterResolver resolver)
+        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
         {
-            return new ConcurrentDictionaryGroupRepository(resolver);
+            return new ConcurrentDictionaryGroupRepository(serviceLocator.GetService<IFormatterResolver>());
         }
     }
-
 
     public class ConcurrentDictionaryGroupRepository : IGroupRepository
     {
@@ -71,15 +70,16 @@ namespace MagicOnion.Server.Hubs
             this.members = new ConcurrentDictionary<Guid, ServiceContext>();
         }
 
-        public void Add(ServiceContext context)
+        public ValueTask AddAsync(ServiceContext context)
         {
             if (members.TryAdd(context.ContextId, context))
             {
                 Interlocked.Increment(ref approximatelyLength);
             }
+            return default(ValueTask);
         }
 
-        public void Remove(ServiceContext context)
+        public ValueTask<bool> RemoveAsync(ServiceContext context)
         {
             if (members.TryRemove(context.ContextId, out _))
             {
@@ -87,8 +87,12 @@ namespace MagicOnion.Server.Hubs
             }
             if (members.Count == 0)
             {
-                parent.TryRemove(GroupName);
+                if (parent.TryRemove(GroupName))
+                {
+                    return new ValueTask<bool>(true);
+                }
             }
+            return new ValueTask<bool>(false);
         }
 
         // broadcast: [methodId, [argument]]
@@ -175,8 +179,8 @@ namespace MagicOnion.Server.Hubs
                         }
                     }
                     buffer[index++] = WriteInAsyncLock(item.Value, message);
-                    
-                    NEXT:
+
+                NEXT:
                     continue;
                 }
 
@@ -186,7 +190,49 @@ namespace MagicOnion.Server.Hubs
             {
                 ArrayPool<ValueTask>.Shared.Return(rent, true);
             }
+        }
 
+        public async Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds)
+        {
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+
+            var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+            try
+            {
+                var buffer = rent;
+                var index = 0;
+                foreach (var item in members)
+                {
+                    if (buffer.Length < index)
+                    {
+                        Array.Resize(ref buffer, buffer.Length * 2);
+                    }
+
+                    if (exceptConnectionIds != null)
+                    {
+                        foreach (var item2 in exceptConnectionIds)
+                        {
+                            if (item.Value.ContextId == item2)
+                            {
+                                buffer[index++] = default(ValueTask);
+                                goto NEXT;
+                            }
+                        }
+                    }
+                    buffer[index++] = WriteInAsyncLock(item.Value, message);
+
+                NEXT:
+                    continue;
+                }
+
+                await ToPromise(buffer, index).ConfigureAwait(false);
+            }
+            finally
+            {
+                ArrayPool<ValueTask>.Shared.Return(rent, true);
+            }
         }
 
         byte[] BuildMessage<T>(int methodId, T value)
@@ -212,7 +258,14 @@ namespace MagicOnion.Server.Hubs
         {
             using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
-                await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                try
+                {
+                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+                }
             }
         }
 

@@ -16,6 +16,9 @@ namespace DynamicCodeDumper
         Task ZeroArgument();
         Task OneArgument(int x);
         Task MoreArgument(int x, string y, double z);
+        void VoidZeroArgument();
+        void VoidOneArgument(int x);
+        void VoidMoreArgument(int x, string y, double z);
     }
 
     public interface ITestHub : IStreamingHub<ITestHub, IMessageReceiver>

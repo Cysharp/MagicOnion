@@ -1,56 +1,61 @@
 ﻿using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MessagePack;
-using MessagePack.Formatters;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Redis
 {
-    internal static class NativeGuidArrayFormatter
+    public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        static readonly IMessagePackFormatter<Guid> formatter = BinaryGuidFormatter.Instance;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Serialize(ref byte[] bytes, int offset, Guid[] value)
+        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
         {
-            if (value == null)
+            var resolver = serviceLocator.GetService<IFormatterResolver>();
+            var connection = serviceLocator.GetService<ConnectionMultiplexer>();
+            if (connection == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefultServiceLocator.Register(new ConnectionMultiplexer)}");
             }
 
-            var start = offset;
-            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
-            for (int i = 0; i < value.Length; i++)
-            {
-                offset += formatter.Serialize(ref bytes, offset, value[i], null);
-            }
-            return offset - start;
+            return new RedisGroupRepository(resolver, connection);
+        }
+    }
+
+    public class RedisGroupRepository : IGroupRepository
+    {
+        IFormatterResolver resolver;
+        ConnectionMultiplexer connection;
+
+        readonly Func<string, IGroup> factory;
+        ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
+
+        public RedisGroupRepository(IFormatterResolver resolver, ConnectionMultiplexer connection)
+        {
+            this.resolver = resolver;
+            this.factory = CreateGroup;
+            this.connection = connection;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Guid[] Deserialize(byte[] bytes, int offset, out int readSize)
+        public IGroup GetOrAdd(string groupName)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
-            {
-                readSize = 1;
-                return null;
-            }
+            return dictionary.GetOrAdd(groupName, factory);
+        }
 
-            var start = offset;
-            var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-            offset += readSize;
-            var result = new Guid[len];
-            for (int i = 0; i < len; i++)
-            {
-                result[i] = formatter.Deserialize(bytes, offset, null, out readSize);
-                offset += readSize;
-            }
-            readSize = offset - start;
-            return result;
+        IGroup CreateGroup(string groupName)
+        {
+            return new RedisGroup(groupName, resolver, new ConcurrentDictionaryGroup(groupName, this, resolver), connection.GetSubscriber());
+        }
+
+        public bool TryGet(string groupName, out IGroup group)
+        {
+            return dictionary.TryGetValue(groupName, out group);
+        }
+
+        public bool TryRemove(string groupName)
+        {
+            return dictionary.TryRemove(groupName, out _);
         }
     }
 
@@ -83,7 +88,7 @@ namespace MagicOnion.Redis
 
         public async ValueTask<bool> RemoveAsync(ServiceContext context)
         {
-            if (await inmemoryGroup.RemoveAsync(context))
+            if (await inmemoryGroup.RemoveAsync(context)) // if inmemoryGroup.Remove succeed, removed from.RedisGroupRepository.
             {
                 await mq.UnsubscribeAsync();
                 return true;

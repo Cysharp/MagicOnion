@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server.Hubs
 {
-    internal static class BroadcasterHelper
+    public static class BroadcasterHelper
     {
         internal static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
             .GetTypes()
@@ -60,16 +60,28 @@ namespace MagicOnion.Server.Hubs
                 }
                 map.Add(methodId, item);
 
-                if (item.MethodInfo.ReturnType != typeof(Task))
+                if (!(item.MethodInfo.ReturnType == typeof(void) || item.MethodInfo.ReturnType == typeof(Task)))
                 {
-                    throw new Exception($"Invalid definition, TReceiver's return type must only be `Task`. {item.MethodInfo.Name}.");
+                    throw new Exception($"Invalid definition, TReceiver's return type must only be `void` or `Task`. {item.MethodInfo.Name}.");
                 }
 
                 item.MethodId = methodId;
             }
         }
 
-        public class MethodDefinition
+        public static async void FireAndForget(Task task)
+        {
+            try
+            {
+                await task.ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "exception occured in client broadcast.");
+            }
+        }
+
+        internal class MethodDefinition
         {
             public string Path => ReceiverType.Name + "/" + MethodInfo.Name;
 

@@ -65,6 +65,8 @@ namespace MagicOnion.Server
 
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
         {
+            option.RegisterOptionToServiceLocator();
+
             var builder = ServerServiceDefinition.CreateBuilder();
             var handlers = new HashSet<MethodHandler>();
             var streamingHubHandlers = new List<StreamingHubHandler>();
@@ -154,7 +156,7 @@ namespace MagicOnion.Server
                         streamingHubHandlers.AddRange(tempStreamingHubHandlers);
                         StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
                         // TODO:ConfigureFactory
-                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository(option.FormatterResolver));
+                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository(option.ServiceLocator));
                     }
                 }
             });
