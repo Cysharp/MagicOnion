@@ -45,7 +45,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.NetCoreServer", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicCodeDumper", "sandbox\DynamicCodeDumper\DynamicCodeDumper.csproj", "{A2156D81-1A67-4EAC-8A74-3E459385E4A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Redis", "src\MagicOnion.Redis\MagicOnion.Redis.csproj", "{5637ED33-7EB8-4C30-94EE-947C58FDE363}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Redis", "src\MagicOnion.Redis\MagicOnion.Redis.csproj", "{5637ED33-7EB8-4C30-94EE-947C58FDE363}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.UniversalCodeGenerator", "src\MagicOnion.UniversalCodeGenerator\MagicOnion.UniversalCodeGenerator.csproj", "{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -113,6 +115,10 @@ Global
 		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,6 +139,7 @@ Global
 		{8174DFB5-0C46-440C-A225-C3A9851C2700} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{5637ED33-7EB8-4C30-94EE-947C58FDE363} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

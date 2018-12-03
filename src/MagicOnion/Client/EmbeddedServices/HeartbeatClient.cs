@@ -30,7 +30,9 @@ namespace MagicOnion.Client.EmbeddedServices
             : base(callInvoker, null)
         {
             this.connectionId = connectionId;
+#pragma warning disable CS0618
             this.option = this.option.WithHeaders(new Metadata { { ChannelContext.HeaderKey, connectionId } });
+#pragma warning restore CS0618
         }
 
         protected override MagicOnionClientBase<IMagicOnionEmbeddedHeartbeat> Clone()

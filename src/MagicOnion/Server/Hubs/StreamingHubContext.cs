@@ -21,6 +21,29 @@ namespace MagicOnion.Server.Hubs
         internal int MethodId { get; set; }
 
         // helper for reflection
+        internal async ValueTask WriteResponseMessageNil(Task value)
+        {
+            if (MessageId == -1) // don't write.
+            {
+                return;
+            }
+
+            // MessageFormat:
+            // response:  [messageId, methodId, response]
+            byte[] buffer = null; // TODO:byte buffer
+            var offset = 0;
+            offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
+            offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
+            offset += MessagePackBinary.WriteInt32(ref buffer, offset, MethodId);
+
+            await value.ConfigureAwait(false);
+            offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, Nil.Default, FormatterResolver);
+            var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
+            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
+            {
+                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
+            }
+        }
 
         internal async ValueTask WriteResponseMessage<T>(Task<T> value)
         {

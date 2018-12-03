@@ -19,7 +19,7 @@ namespace MagicOnion.Generator
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+    #line 1 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     public partial class CodeTemplate : CodeTemplateBase
     {
@@ -32,7 +32,7 @@ namespace MagicOnion.Generator
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
                     " 414\r\n#pragma warning disable 168\r\n\r\n");
             
-            #line 12 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 12 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? ("namespace " + Namespace + " {") : ""));
             
             #line default
@@ -40,270 +40,270 @@ namespace MagicOnion.Generator
             this.Write("\r\n    using MagicOnion;\r\n    using MagicOnion.Client;\r\n    using UniRx;\r\n    usin" +
                     "g Grpc.Core;\r\n    using MessagePack;\r\n\r\n");
             
-            #line 19 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 19 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  foreach(var interfaceDef in Interfaces) { 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 21 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 21 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(!interfaceDef.IsServiceDifinition) { 
             
             #line default
             #line hidden
             
-            #line 22 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 22 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 24 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 24 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    public interface ");
             
-            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
             #line hidden
             
-            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.InterfaceNames.Any()) { 
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(String.Join(", ", interfaceDef.InterfaceNames)));
             
             #line default
             #line hidden
             
-            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 28 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 28 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  foreach(var method in interfaceDef.Methods) { 
             
             #line default
             #line hidden
             this.Write("   \r\n");
             
-            #line 29 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 29 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(method.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 31 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 31 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 32 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 32 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture((isAsyncSuffix && method.MethodType == MethodType.Unary) ? method.AsyncToString() : method.ToString()));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 33 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 33 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(method.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 35 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 35 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 36 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 36 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    }\r\n");
             
-            #line 38 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 38 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 40 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 40 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 41 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 41 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 43 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 43 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.IsServiceDifinition) { 
             
             #line default
             #line hidden
             
-            #line 44 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 44 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 46 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 46 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 47 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 47 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  var clientName = interfaceDef.Name + "Client"; 
             
             #line default
             #line hidden
             this.Write("    public class ");
             
-            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
             this.Write(" : MagicOnionClientBase<");
             
-            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
             #line hidden
             this.Write(">, ");
             
-            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 48 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 50 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 50 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  foreach(var item in interfaceDef.Methods) { 
             
             #line default
             #line hidden
             
-            #line 51 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 51 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 53 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 53 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        static readonly Method<byte[], byte[]> ");
             
-            #line 54 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 54 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("Method;\r\n");
             
-            #line 55 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 55 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 57 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 57 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 58 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 58 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n        static ");
             
-            #line 60 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 60 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
             this.Write("()\r\n        {\r\n");
             
-            #line 62 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 62 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  foreach(var item in interfaceDef.Methods) { 
             
             #line default
             #line hidden
             
-            #line 63 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 63 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 65 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 65 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            ");
             
-            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("Method = new Method<byte[], byte[]>(MethodType.");
             
-            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.MethodType.ToString()));
             
             #line default
             #line hidden
             this.Write(", \"");
             
-            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
             #line hidden
             this.Write("\", \"");
             
-            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 66 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
@@ -311,34 +311,34 @@ namespace MagicOnion.Generator
             this.Write("\", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshall" +
                     "er);\r\n");
             
-            #line 67 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 67 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 69 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 69 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 70 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 70 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        }\r\n\r\n        ");
             
-            #line 73 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 73 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
             this.Write("()\r\n        {\r\n        }\r\n\r\n        public ");
             
-            #line 77 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 77 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
@@ -347,14 +347,14 @@ namespace MagicOnion.Generator
                     "voker, resolver)\r\n        {\r\n        }\r\n\r\n        protected override MagicOnionC" +
                     "lientBase<");
             
-            #line 82 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 82 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
             #line hidden
             this.Write("> Clone()\r\n        {\r\n            var clone = new ");
             
-            #line 84 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 84 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
@@ -363,7 +363,7 @@ namespace MagicOnion.Generator
                     "\r\n            clone.callInvoker = this.callInvoker;\r\n            clone.resolver " +
                     "= this.resolver;\r\n            return clone;\r\n        }\r\n\r\n        public new ");
             
-            #line 92 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 92 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
@@ -371,7 +371,7 @@ namespace MagicOnion.Generator
             this.Write(" WithHeaders(Metadata headers)\r\n        {\r\n            return base.WithHeaders(he" +
                     "aders);\r\n        }\r\n\r\n        public new ");
             
-            #line 97 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 97 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
@@ -380,7 +380,7 @@ namespace MagicOnion.Generator
                     "       return base.WithCancellationToken(cancellationToken);\r\n        }\r\n\r\n     " +
                     "   public new ");
             
-            #line 102 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 102 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
@@ -388,7 +388,7 @@ namespace MagicOnion.Generator
             this.Write(" WithDeadline(System.DateTime deadline)\r\n        {\r\n            return base.WithD" +
                     "eadline(deadline);\r\n        }\r\n\r\n        public new ");
             
-            #line 107 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 107 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
@@ -396,7 +396,7 @@ namespace MagicOnion.Generator
             this.Write(" WithHost(string host)\r\n        {\r\n            return base.WithHost(host);\r\n     " +
                     "   }\r\n\r\n        public new ");
             
-            #line 112 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 112 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             
             #line default
@@ -404,76 +404,76 @@ namespace MagicOnion.Generator
             this.Write(" WithOptions(CallOptions option)\r\n        {\r\n            return base.WithOptions(" +
                     "option);\r\n        }\r\n   \r\n");
             
-            #line 117 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 117 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  foreach(var item in interfaceDef.Methods) { 
             
             #line default
             #line hidden
             
-            #line 118 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 118 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 120 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 120 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        public ");
             
-            #line 121 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 121 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture((isAsyncSuffix && item.MethodType == MethodType.Unary) ? item.AsyncToString() : item.ToString()));
             
             #line default
             #line hidden
             this.Write("\r\n        {\r\n");
             
-            #line 123 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 123 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.MethodType == MethodType.Unary) { 
             
             #line default
             #line hidden
             this.Write("            var __request = ");
             
-            #line 124 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 124 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestObject()));
             
             #line default
             #line hidden
             this.Write(";\r\n            var __callResult = callInvoker.AsyncUnaryCall(");
             
-            #line 125 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 125 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("Method, base.host, base.option, __request);\r\n            return new UnaryResult<");
             
-            #line 126 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 126 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             
             #line default
             #line hidden
             this.Write(">(__callResult, base.resolver);\r\n");
             
-            #line 127 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 127 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } else if(item.MethodType ==MethodType.ServerStreaming) { 
             
             #line default
             #line hidden
             this.Write("            var __request = ");
             
-            #line 128 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 128 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestObject()));
             
             #line default
             #line hidden
             this.Write(";\r\n            var __callResult = callInvoker.AsyncServerStreamingCall(");
             
-            #line 129 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 129 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
@@ -481,14 +481,14 @@ namespace MagicOnion.Generator
             this.Write("Method, base.host, base.option, __request);\r\n            return new ServerStreami" +
                     "ngResult<");
             
-            #line 130 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 130 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             
             #line default
             #line hidden
             this.Write(">(__callResult, base.resolver);\r\n");
             
-            #line 131 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 131 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } else if(item.MethodType ==MethodType.ClientStreaming) { 
             
             #line default
@@ -496,28 +496,28 @@ namespace MagicOnion.Generator
             this.Write("            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[" +
                     "]>(");
             
-            #line 132 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 132 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("Method, base.host, base.option);\r\n            return new ClientStreamingResult<");
             
-            #line 133 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 133 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
             
             #line default
             #line hidden
             this.Write(", ");
             
-            #line 133 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 133 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             
             #line default
             #line hidden
             this.Write(">(__callResult, base.resolver);\r\n");
             
-            #line 134 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 134 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } else if(item.MethodType ==MethodType.DuplexStreaming) { 
             
             #line default
@@ -525,80 +525,80 @@ namespace MagicOnion.Generator
             this.Write("            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[" +
                     "]>(");
             
-            #line 135 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 135 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("Method, base.host, base.option);\r\n            return new DuplexStreamingResult<");
             
-            #line 136 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 136 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
             
             #line default
             #line hidden
             this.Write(", ");
             
-            #line 136 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 136 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             
             #line default
             #line hidden
             this.Write(">(__callResult, base.resolver);\r\n");
             
-            #line 137 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 137 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("        }\r\n");
             
-            #line 139 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 139 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(item.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 141 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 141 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 142 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 142 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    }\r\n");
             
-            #line 144 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 144 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif \r\n");
             
-            #line 146 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 146 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 147 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 147 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 148 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 148 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 149 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.CodeGenerator\Generator\CodeTemplate.tt"
+            #line 149 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? "}" : ""));
             
             #line default

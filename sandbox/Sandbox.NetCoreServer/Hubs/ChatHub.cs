@@ -11,13 +11,13 @@ namespace Sandbox.NetCoreServer.Hubs
 {
     public interface IMessageReceiver
     {
-        Task OnReceiveMessage(string senderUser, string message);
+        void OnReceiveMessage(string senderUser, string message);
     }
 
     public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver>
     {
-        Task<Nil> JoinAsync(string userName, string roomName);
-        Task<Nil> LeaveAsync();
+        Task JoinAsync(string userName, string roomName);
+        Task LeaveAsync();
         Task SendMessageAsync(string message);
     }
 
@@ -27,28 +27,24 @@ namespace Sandbox.NetCoreServer.Hubs
         string userName;
         IGroup room;
 
-        // return Task<T> wait server completed.
-        public async Task<Nil> JoinAsync(string userName, string roomName)
+        public async Task JoinAsync(string userName, string roomName)
         {
             this.userName = userName;
             this.room = await Group.AddAsync("InMemoryRoom:" + roomName, this.Context);
-
-            return Nil.Default;
         }
 
-        // return Task is fire and forget(does not wait server completed).
-        public async Task SendMessageAsync(string message)
+        public Task SendMessageAsync(string message)
         {
             // broadcast to connected group(same roomname members).
-            await Broadcast(room).OnReceiveMessage(this.userName, message);
+            Broadcast(room).OnReceiveMessage(this.userName, message);
+
+            return Task.CompletedTask;
         }
 
-        public async Task<Nil> LeaveAsync()
+        public async Task LeaveAsync()
         {
-            await BroadcastExceptSelf(room).OnReceiveMessage(userName, "SYSTEM_MESSAGE_LEAVE_USER");
+            BroadcastExceptSelf(room).OnReceiveMessage(userName, "SYSTEM_MESSAGE_LEAVE_USER");
             await room.RemoveAsync(this.Context);
-
-            return Nil.Default;
         }
 
         protected override ValueTask OnConnecting()

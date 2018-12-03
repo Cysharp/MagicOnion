@@ -69,11 +69,9 @@ namespace Sandbox.NetCoreServer
             var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
 
             var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(channel, this);
-            // RegisterDisconnect(client);
+            RegisterDisconnect(client);
             try
             {
-
-
                 await client.JoinAsync(user, room);
 
                 await client.SendMessageAsync("Who");
@@ -108,7 +106,7 @@ namespace Sandbox.NetCoreServer
 
 #pragma warning disable CS1998
 
-        public async Task OnReceiveMessage(string senderUser, string message)
+        public void OnReceiveMessage(string senderUser, string message)
         {
             Console.WriteLine(senderUser + ":" + message);
         }
