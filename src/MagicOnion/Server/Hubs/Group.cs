@@ -19,20 +19,22 @@ namespace MagicOnion.Server.Hubs
     public interface IGroup
     {
         string GroupName { get; }
-        void Add(ServiceContext context);
-        void Remove(ServiceContext context);
+        ValueTask AddAsync(ServiceContext context);
+        // Return Bool is removed from parent.
+        ValueTask<bool> RemoveAsync(ServiceContext context);
         Task WriteAllAsync<T>(int methodId, T value);
         Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId);
         Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds);
+        Task WriteRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds);
     }
 
     public static class GroupRepositoryExtensions
     {
-        public static IGroup Add(this IGroupRepository repository, string groupName, ServiceContext context)
+        public static async ValueTask<IGroup> AddAsync(this IGroupRepository repository, string groupName, ServiceContext context)
         {
             var group = repository.GetOrAdd(groupName);
-            group.Add(context);
-            return group; 
+            await group.AddAsync(context).ConfigureAwait(false);
+            return group;
         }
     }
 }

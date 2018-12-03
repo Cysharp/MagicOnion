@@ -151,6 +151,41 @@ namespace MagicOnion.Server.Hubs
             await promise.AsValueTask().ConfigureAwait(false);
         }
 
+        public async Task WriteRawAsync(byte[] value, Guid[] exceptConnectionIds)
+        {
+            var message = value;
+            var source = members;
+            var promise = new ReservedWhenAllPromise(source.Length);
+
+            if (exceptConnectionIds == null)
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    promise.Add(WriteInAsyncLock(source[i], message));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in exceptConnectionIds)
+                    {
+                        if (source[i].ContextId == item)
+                        {
+                            promise.Add(default(ValueTask));
+                            goto NEXT;
+                        }
+                    }
+
+                    promise.Add(WriteInAsyncLock(source[i], message));
+                    NEXT:
+                    continue;
+                }
+            }
+
+            await promise.AsValueTask().ConfigureAwait(false);
+        }
+
         byte[] BuildMessage<T>(int methodId, T value)
         {
             var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);

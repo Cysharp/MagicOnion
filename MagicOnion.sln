@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{7F61607D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.CodeGenerator", "src\MagicOnion.CodeGenerator\MagicOnion.CodeGenerator.csproj", "{9633B452-A984-46A6-9A92-B6291561BA09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.HttpGateway", "src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj", "{FCE03661-803E-4629-944F-45DB6B444320}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.HttpGateway", "src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj", "{FCE03661-803E-4629-944F-45DB6B444320}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedProjectLibrary", "sandbox\SharedProjectLibrary\SharedProjectLibrary.shproj", "{5526FA31-4F38-4FF7-96EE-A73BF495E1EE}"
 EndProject
@@ -37,13 +37,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetStandardShare", "sandbox
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.ConsoleServer2", "sandbox\Sandbox.ConsoleServer2\Sandbox.ConsoleServer2.csproj", "{7CF23E57-381B-428D-B44A-D5328A71414B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Tests.NetCore", "tests\MagicOnion.Tests.NetCore\MagicOnion.Tests.NetCore.csproj", "{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Tests.NetCore", "tests\MagicOnion.Tests.NetCore\MagicOnion.Tests.NetCore.csproj", "{A0E9C1EA-6E7F-4CF1-81D2-21EAC6ACAE67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.NetCoreApp", "sandbox\Sandbox.NetCoreApp\Sandbox.NetCoreApp.csproj", "{C2ADB989-07E8-46AC-8495-AE496F69C5C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.NetCoreApp", "sandbox\Sandbox.NetCoreApp\Sandbox.NetCoreApp.csproj", "{C2ADB989-07E8-46AC-8495-AE496F69C5C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.NetCoreServer", "sandbox\Sandbox.NetCoreServer\Sandbox.NetCoreServer.csproj", "{8174DFB5-0C46-440C-A225-C3A9851C2700}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.NetCoreServer", "sandbox\Sandbox.NetCoreServer\Sandbox.NetCoreServer.csproj", "{8174DFB5-0C46-440C-A225-C3A9851C2700}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicCodeDumper", "sandbox\DynamicCodeDumper\DynamicCodeDumper.csproj", "{A2156D81-1A67-4EAC-8A74-3E459385E4A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Redis", "src\MagicOnion.Redis\MagicOnion.Redis.csproj", "{5637ED33-7EB8-4C30-94EE-947C58FDE363}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -107,6 +109,10 @@ Global
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5637ED33-7EB8-4C30-94EE-947C58FDE363}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{C2ADB989-07E8-46AC-8495-AE496F69C5C0} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{8174DFB5-0C46-440C-A225-C3A9851C2700} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{5637ED33-7EB8-4C30-94EE-947C58FDE363} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
