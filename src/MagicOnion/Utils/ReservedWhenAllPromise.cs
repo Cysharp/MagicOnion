@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NON_UNITY
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
@@ -179,3 +181,5 @@ namespace MagicOnion.Utils
         }
     }
 }
+
+#endif

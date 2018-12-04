@@ -10,10 +10,13 @@
 #pragma warning disable 168
 
 <#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
+    using Grpc.Core;
+    using Grpc.Core.Logging;
     using MagicOnion;
     using MagicOnion.Client;
-    using Grpc.Core;
     using MessagePack;
+    using System;
+    using System.Threading.Tasks;
 <#  foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; #>
 
 <# if(interfaceDef.IsIfDebug) { #>
@@ -41,25 +44,35 @@
 
         protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
-<#  foreach(var item in receiverDef.Methods) { #>
-            if (methodId == <#= item.HubId #>) // <#= item.Name #>
+            switch (methodId)
             {
-                <#= item.ToHubOnBroadcastMessage().line1 #>
-                <#= item.ToHubOnBroadcastMessage().line2 #>
-            }
+<#  foreach(var item in receiverDef.Methods) { #>
+                case <#= item.HubId #>: // <#= item.Name #>
+                {
+                    <#= item.ToHubOnBroadcastMessage().line1 #>
+                    <#= item.ToHubOnBroadcastMessage().line2 #>
+                }
 <#  } // end foreach(receiverDef.Methods) #>
-            return Task.CompletedTask;
+                default:
+                    return Task.CompletedTask;
+            }
         }
 
         protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
         {
-<#  foreach(var item in interfaceDef.Methods) { #>
-            if (methodId == <#= item.HubId #>) // <#= item.Name #>
+            switch (methodId)
             {
-                <#= item.ToHubOnResponseEvent().line1 #>
-                <#= item.ToHubOnResponseEvent().line2 #>
-            }
+<#  foreach(var item in interfaceDef.Methods) { #>
+                case <#= item.HubId #>: // <#= item.Name #>
+                {
+                    <#= item.ToHubOnResponseEvent().line1 #>
+                    <#= item.ToHubOnResponseEvent().line2 #>
+                    break;
+                }
 <#  } // end foreach(interfaceDef.Methods) #>
+                default:
+                    break;
+            }
         }
    
 <# foreach(var item in interfaceDef.Methods) { #>
@@ -83,6 +96,21 @@
             public FireAndForgetClient(<#= clientName #> parentClient)
             {
                 this.__parent = parentClient;
+            }
+
+            public <#= interfaceDef.FullName #> FireAndForget()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task DisposeAsync()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task WaitForDisconnect()
+            {
+                throw new NotSupportedException();
             }
 
 <# foreach(var item in interfaceDef.Methods) { #>

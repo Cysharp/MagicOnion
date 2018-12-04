@@ -47,6 +47,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Redis", "src\Mag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.UniversalCodeGenerator", "src\MagicOnion.UniversalCodeGenerator\MagicOnion.UniversalCodeGenerator.csproj", "{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src_unity", "src_unity", "{5C86A5C9-ECE1-4FB9-B48C-A9DCF9C3FECC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "src\MagicOnion.Client.Unity\Assembly-CSharp.csproj", "{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		sandbox\SharedProjectLibrary\SharedProjectLibrary.projitems*{5526fa31-4f38-4ff7-96ee-a73bf495e1ee}*SharedItemsImports = 13
@@ -113,6 +117,10 @@ Global
 		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,6 +141,7 @@ Global
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{5637ED33-7EB8-4C30-94EE-947C58FDE363} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{4D10B1BA-494D-4FAF-ADC8-FA5156533EDB} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3} = {5C86A5C9-ECE1-4FB9-B48C-A9DCF9C3FECC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

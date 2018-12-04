@@ -69,7 +69,7 @@
             return base.WithHeaders(headers);
         }
 
-        public new <#= interfaceDef.Name #> WithCancellationToken(GrpcCancellationToken cancellationToken)
+        public new <#= interfaceDef.Name #> WithCancellationToken(System.Threading.CancellationToken cancellationToken)
         {
             return base.WithCancellationToken(cancellationToken);
         }

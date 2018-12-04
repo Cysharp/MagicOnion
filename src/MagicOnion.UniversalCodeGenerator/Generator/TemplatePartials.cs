@@ -24,6 +24,7 @@ namespace MagicOnion.Generator
         public string Namespace { get; set; }
         public bool UnuseUnityAttribute { get; set; }
         public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
+        public (InterfaceDefinition hubDef, InterfaceDefinition receiverDef)[] HubInterfaces { get; set; }
     }
 
     public partial class ResolverTemplate

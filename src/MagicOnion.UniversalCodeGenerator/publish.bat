@@ -1,0 +1,3 @@
+dotnet publish MagicOnion.UniversalCodeGenerator.csproj -c Release --self-contained -r win-x64 -o ./bin/MagicOnionCodeGenerator/win-x64
+dotnet publish MagicOnion.UniversalCodeGenerator.csproj -c Release --self-contained -r linux-x64 -o ./bin/MagicOnionCodeGenerator/linux-x64
+dotnet publish MagicOnion.UniversalCodeGenerator.csproj -c Release --self-contained -r osx-x64 -o ./bin/MagicOnionCodeGenerator/osx-x64

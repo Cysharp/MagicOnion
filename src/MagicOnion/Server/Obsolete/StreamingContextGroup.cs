@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY
+
+using Grpc.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -345,3 +347,5 @@ namespace MagicOnion.Server
         }
     }
 }
+
+#endif

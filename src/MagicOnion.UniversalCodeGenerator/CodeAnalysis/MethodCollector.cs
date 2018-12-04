@@ -11,6 +11,7 @@ namespace MagicOnion.CodeAnalysis
     {
         public static ReferenceSymbols Global;
 
+        public readonly INamedTypeSymbol Void;
         public readonly INamedTypeSymbol Task;
         public readonly INamedTypeSymbol TaskOfT;
         public readonly INamedTypeSymbol UnaryResult;
@@ -25,6 +26,7 @@ namespace MagicOnion.CodeAnalysis
 
         public ReferenceSymbols(Compilation compilation)
         {
+            Void = compilation.GetTypeByMetadataName("System.Void");
             TaskOfT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
             Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             UnaryResult = compilation.GetTypeByMetadataName("MagicOnion.UnaryResult`1");
@@ -238,7 +240,7 @@ namespace MagicOnion.CodeAnalysis
                 methodType = MethodType.Other;
                 requestType = null;
                 responseType = null;
-                unwrappedOriginalResponseType = (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : null;
+                unwrappedOriginalResponseType = (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : retType;
             }
         }
 

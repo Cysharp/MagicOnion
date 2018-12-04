@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY
+
+using Grpc.Core;
 using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
 
@@ -46,3 +48,5 @@ namespace MagicOnion.Client.EmbeddedServices
         }
     }
 }
+
+#endif

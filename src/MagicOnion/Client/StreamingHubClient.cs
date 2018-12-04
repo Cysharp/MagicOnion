@@ -17,9 +17,29 @@ namespace MagicOnion.Client
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var type = StreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType;
+#if NON_UNITY
             var client = (StreamingHubClientBase<TStreamingHub, TReceiver>)Activator.CreateInstance(type, new object[] { callInvoker, host, option, resolver, logger });
+#else
+            var client = (StreamingHubClientBase<TStreamingHub, TReceiver>)(object)StreamingHubClientRegistry<TStreamingHub, TReceiver>.Create(callInvoker, receiver, host, option, resolver, logger);
+#endif
             client.__ConnectAndSubscribe(receiver);
             return (TStreamingHub)(object)client;
+        }
+    }
+
+    public static class StreamingHubClientRegistry<TStreamingHub, TReceiver>
+        where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+    {
+        static Func<CallInvoker, TReceiver, string, CallOptions, IFormatterResolver, ILogger, TStreamingHub> consturtor;
+
+        public static void Register(Func<CallInvoker, TReceiver, string, CallOptions, IFormatterResolver, ILogger, TStreamingHub> ctor)
+        {
+            consturtor = ctor;
+        }
+
+        public static TStreamingHub Create(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+        {
+            return consturtor(callInvoker, receiver, host, option, resolver, logger);
         }
     }
 }

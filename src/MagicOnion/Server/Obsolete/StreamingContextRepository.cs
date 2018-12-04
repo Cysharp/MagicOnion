@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NON_UNITY
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -201,3 +203,5 @@ namespace MagicOnion.Server
         }
     }
 }
+
+#endif

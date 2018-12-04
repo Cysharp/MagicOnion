@@ -37,7 +37,17 @@ namespace <#= Namespace #>
 <# if(interfaceDef.IsIfDebug) { #>
 #endif
 <# } #>
+<# } // foreach #>
+
+<# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
 <# } #>
+            StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= clientName #>(a, b, c, d, e));
+<# if(interfaceDef.IsIfDebug) { #>
+#endif
+<# } #>
+<# } // foreach #>
         }
     }
 }

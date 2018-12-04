@@ -1,4 +1,7 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY
+#pragma warning disable CS0618 // Type or member is obsolete
+
+using Grpc.Core;
 using MessagePack;
 using System.Threading.Tasks;
 
@@ -43,3 +46,7 @@ namespace MagicOnion.Server.EmbeddedServices
         }
     }
 }
+
+#endif
+
+#pragma warning restore CS0618 // Type or member is obsolete

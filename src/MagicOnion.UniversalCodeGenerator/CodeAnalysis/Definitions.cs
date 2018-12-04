@@ -201,7 +201,7 @@ namespace MagicOnion.CodeAnalysis
             if (Parameters.Length == 0)
             {
                 parameterType = "Nil";
-                line2 = $"{Name}(result)";
+                line2 = $"{Name}()";
             }
             else if (Parameters.Length == 1)
             {
@@ -218,7 +218,7 @@ namespace MagicOnion.CodeAnalysis
                 line2 = $"{Name}({line2})";
             }
 
-            if (OriginalResponseTypeSymbol == ReferenceSymbols.Global.Task)
+            if (OriginalResponseTypeSymbol == ReferenceSymbols.Global.Void)
             {
                 line2 = "receiver." + line2 + "; return Task.CompletedTask;";
             }
