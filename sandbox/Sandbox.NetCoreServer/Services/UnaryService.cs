@@ -2,6 +2,7 @@
 
 using MagicOnion;
 using MagicOnion.Server;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,17 +12,45 @@ namespace Sandbox.NetCoreServer.Services
 {
     public interface IMyFirstService : IService<IMyFirstService>
     {
+        UnaryResult<Nil> ZeroAsync();
+        UnaryResult<TestEnum> OneAsync(int z);
         UnaryResult<string> SumAsync(int x, int y);
+        UnaryResult<OreOreResponse> OreOreAsync(OreOreRequest z);
+        UnaryResult<OreOreResponse[]> OreOre2Async(OreOreRequest z);
+        UnaryResult<List<OreOreResponse>> OreOre3Async(OreOreRequest z);
+
+        // use hub instead:)
+
+        Task<ClientStreamingResult<int, string>> ClientStreamingSampleAsync();
+        Task<ServerStreamingResult<string>> ServertSreamingSampleAsync(int x, int y, int z);
+        Task<DuplexStreamingResult<int, string>> DuplexStreamingSampleAync();
     }
 
-    public class UnaryService : ServiceBase<IMyFirstService>, IMyFirstService
+    public enum TestEnum
     {
-        [MyFirstFilter]
-        public async UnaryResult<string> SumAsync(int x, int y)
-        {
-            return (x + y).ToString();
-        }
+
     }
+
+
+    public class OreOreRequest
+    {
+
+    }
+
+
+    public class OreOreResponse
+    {
+
+    }
+
+    //public class UnaryService : ServiceBase<IMyFirstService>, IMyFirstService
+    //{
+    //    [MyFirstFilter]
+    //    public async UnaryResult<string> SumAsync(int x, int y)
+    //    {
+    //        return (x + y).ToString();
+    //    }
+    //}
 
     public class MyFirstFilter : MagicOnionFilterAttribute
     {

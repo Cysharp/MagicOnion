@@ -17,22 +17,22 @@ namespace MagicOnion
     // Utility and Extension methods for Roslyn
     internal static class RoslynExtensions
     {
-        public static async Task<Compilation> GetCompilationFromProject(string csprojPath,
-            params string[] preprocessorSymbols)
+        public static async Task<Compilation> GetCompilationFromProject(string csprojPath, params string[] preprocessorSymbols)
         {
             var analyzerOptions = new AnalyzerManagerOptions();
-            analyzerOptions.LogWriter = Console.Out;
+            // analyzerOptions.LogWriter = Console.Out;
 
             var manager = new AnalyzerManager();
             var projectAnalyzer = manager.GetProject(csprojPath); // addproj
-            projectAnalyzer.AddBuildLogger(new Microsoft.Build.Logging.ConsoleLogger(Microsoft.Build.Framework.LoggerVerbosity.Normal));
+            // projectAnalyzer.AddBuildLogger(new Microsoft.Build.Logging.ConsoleLogger(Microsoft.Build.Framework.LoggerVerbosity.Minimal));
 
-            var workspace = manager.GetWorkspace();
+            var workspace = manager.GetWorkspaceWithPreventBuildEvent();
 
             workspace.WorkspaceFailed += WorkSpaceFailed;
             var project = workspace.CurrentSolution.Projects.First();
-            project = project.WithParseOptions(
-                (project.ParseOptions as CSharpParseOptions).WithPreprocessorSymbols(preprocessorSymbols));
+            project = project
+                .WithParseOptions((project.ParseOptions as CSharpParseOptions).WithPreprocessorSymbols(preprocessorSymbols))
+                .WithCompilationOptions((project.CompilationOptions as CSharpCompilationOptions).WithAllowUnsafe(true));
 
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
             return compilation;
@@ -49,7 +49,10 @@ namespace MagicOnion
             // "Clean" and "Build" is listed in default
             // Modify to designtime system https://github.com/dotnet/project-system/blob/master/docs/design-time-builds.md#targets-that-run-during-design-time-builds
             // that prevent Pre/PostBuildEvent
+
+            // info article: https://qiita.com/skitoy4321/items/9edfb094549f5167a57f
             envopts.TargetsToBuild.Clear();
+            envopts.TargetsToBuild.Add("Clean");
             envopts.TargetsToBuild.Add("ResolveAssemblyReferencesDesignTime");
             envopts.TargetsToBuild.Add("ResolveProjectReferencesDesignTime");
             envopts.TargetsToBuild.Add("ResolveComReferencesDesignTime");

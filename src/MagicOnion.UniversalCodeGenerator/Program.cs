@@ -19,7 +19,6 @@ namespace MagicOnion.CodeGenerator
         public string InputPath { get; private set; }
         public string OutputPath { get; private set; }
         public bool UnuseUnityAttr { get; private set; }
-        public bool IsAsyncSuffix { get; private set; }
         public List<string> ConditionalSymbols { get; private set; }
         public string NamespaceRoot { get; private set; }
 
@@ -29,7 +28,6 @@ namespace MagicOnion.CodeGenerator
         {
             ConditionalSymbols = new List<string>();
             NamespaceRoot = "MagicOnion";
-            IsAsyncSuffix = false;
 
             var option = new OptionSet()
             {
@@ -38,7 +36,6 @@ namespace MagicOnion.CodeGenerator
                 { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer", _ => { UnuseUnityAttr = true; } },
                 { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
                 { "n|namespace=", "[optional, default=MagicOnion]Set namespace root name", x => { NamespaceRoot = x; } },
-                { "a|asyncsuffix", "[optional, default=false]Use methodName to async suffix", _ => { IsAsyncSuffix = true; } },
             };
             if (args.Length == 0)
             {
@@ -90,7 +87,8 @@ namespace MagicOnion.CodeGenerator
             sw.Restart();
             Console.WriteLine("Method Collect Start");
 
-            var definitions = collector.Visit();
+            var definitions = collector.CollectServiceInterface();
+            var hubDefinitions = collector.CollectHubInterface();
 
             GenericSerializationInfo[] genericInfos;
             EnumSerializationInfo[] enumInfos;
@@ -124,7 +122,16 @@ namespace MagicOnion.CodeGenerator
                 .Select(x => new CodeTemplate()
                 {
                     Namespace = x.Key,
-                    isAsyncSuffix = cmdArgs.IsAsyncSuffix,
+                    Interfaces = x.ToArray()
+                })
+                .ToArray();
+
+            var hubTexts = hubDefinitions
+                .GroupBy(x => x.hubDefinition.Namespace)
+                .OrderBy(x => x.Key)
+                .Select(x => new HubTemplate()
+                {
+                    Namespace = x.Key,
                     Interfaces = x.ToArray()
                 })
                 .ToArray();
@@ -148,6 +155,12 @@ namespace MagicOnion.CodeGenerator
             {
                 sb.AppendLine(item.TransformText());
             }
+
+            foreach (var item in hubTexts)
+            {
+                sb.AppendLine(item.TransformText());
+            }
+
             Output(cmdArgs.OutputPath, sb.ToString());
 
             Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());

@@ -12,6 +12,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>mscorlib</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>System.Core</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Generator\CodeTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CodeTemplate.cs</LastGenOutput>
@@ -20,6 +32,11 @@
     <None Update="Generator\EnumTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+      <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+    </None>
+    <None Update="Generator\HubTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>HubTemplate.cs</LastGenOutput>
       <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
     </None>
     <None Update="Generator\RegisterTemplate.tt">
@@ -48,6 +65,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>EnumTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Generator\HubTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>HubTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Generator\RegisterTemplate.cs">
       <DesignTime>True</DesignTime>

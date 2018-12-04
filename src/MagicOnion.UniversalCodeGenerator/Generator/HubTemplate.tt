@@ -1,0 +1,112 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.CodeAnalysis" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 168
+
+<#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
+    using MagicOnion;
+    using MagicOnion.Client;
+    using Grpc.Core;
+    using MessagePack;
+<#  foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; #>
+
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+<# var clientName = interfaceDef.Name + "Client"; #>
+    public class <#= clientName #> : StreamingHubClientBase<<#= interfaceDef.FullName #>, <#= receiverDef.FullName #>>, <#= interfaceDef.FullName #>
+    {
+        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "<#= interfaceDef.Name #>", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+
+        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
+
+        readonly <#= interfaceDef.FullName #> __fireAndForgetClient;
+
+        public <#= clientName #>(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+            : base(callInvoker, host, option, resolver, logger)
+        {
+            this.__fireAndForgetClient = new FireAndForgetClient(this);
+        }
+        
+        public <#= interfaceDef.FullName #> FireAndForget()
+        {
+            return __fireAndForgetClient;
+        }
+
+        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        {
+<#  foreach(var item in receiverDef.Methods) { #>
+            if (methodId == <#= item.HubId #>) // <#= item.Name #>
+            {
+                <#= item.ToHubOnBroadcastMessage().line1 #>
+                <#= item.ToHubOnBroadcastMessage().line2 #>
+            }
+<#  } // end foreach(receiverDef.Methods) #>
+            return Task.CompletedTask;
+        }
+
+        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+        {
+<#  foreach(var item in interfaceDef.Methods) { #>
+            if (methodId == <#= item.HubId #>) // <#= item.Name #>
+            {
+                <#= item.ToHubOnResponseEvent().line1 #>
+                <#= item.ToHubOnResponseEvent().line2 #>
+            }
+<#  } // end foreach(interfaceDef.Methods) #>
+        }
+   
+<# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } // end if(IsIfDebug) #>
+        public <#= item.ToString() #>
+        {
+            return <#= item.ToHubWriteMessage() #>;
+        }
+
+<# if(item.IsIfDebug) { #>
+#endif
+<# } // end if(IsIfDebug) #>
+<# } // end foreach(interfaceDef.Methods) #>
+
+        class FireAndForgetClient : <#= interfaceDef.FullName #>
+        {
+            readonly <#= clientName #> __parent;
+
+            public FireAndForgetClient(<#= clientName #> parentClient)
+            {
+                this.__parent = parentClient;
+            }
+
+<# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } // end if(IsIfDebug) #>
+            public <#= item.ToString() #>
+            {
+                return __parent.<#= item.ToHubFireAndForgetWriteMessage() #>;
+            }
+
+<# if(item.IsIfDebug) { #>
+#endif
+<# } // end if(IsIfDebug) #>
+<# } // end foreach(interfaceDef.Methods) #>
+        }
+    }
+<# if(interfaceDef.IsIfDebug) { #>
+#endif 
+<# } // end if(IsIfDebug) #>
+<# } // end foreach(Interfaces) #>
+<#= Namespace != null ? "}" : "" #>
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

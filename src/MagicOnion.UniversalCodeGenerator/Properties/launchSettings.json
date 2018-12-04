@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MagicOnion.UniversalCodeGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "-i \"C:\\GitHubRepositories\\MagicOnion\\sandbox\\Sandbox.NetCoreServer\\Sandbox.NetCoreServer.csproj\" -o \"C:\\Users\\S04451\\Documents\\GitHub\\neuecc\\test.cs\""
+    }
+  }
+}

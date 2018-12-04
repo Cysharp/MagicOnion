@@ -19,7 +19,7 @@ namespace MagicOnion.Generator
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+    #line 1 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     public partial class RegisterTemplate : RegisterTemplateBase
     {
@@ -30,9 +30,9 @@ namespace MagicOnion.Generator
         public virtual string TransformText()
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 168\r\nnamespace ");
+                    " 414\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             
-            #line 11 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 12 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
@@ -51,7 +51,7 @@ namespace MagicOnion.Generator
 
 ");
             
-            #line 23 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 24 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  if( !UnuseUnityAttribute) { 
             
             #line default
@@ -59,7 +59,7 @@ namespace MagicOnion.Generator
             this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
                     "oadType.BeforeSceneLoad)]\r\n");
             
-            #line 25 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 26 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default
@@ -67,59 +67,60 @@ namespace MagicOnion.Generator
             this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
                     "turn;\r\n            isRegistered = true;\r\n\r\n");
             
-            #line 31 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 32 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; 
             
             #line default
             #line hidden
             
-            #line 32 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 33 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#if DEBUG\r\n");
             
-            #line 34 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 35 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            MagicOnionClientRegistry<");
             
-            #line 35 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 36 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
             
             #line default
             #line hidden
             this.Write(">.Register((x, y) => new ");
             
-            #line 35 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 36 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
             this.Write("(x, y));\r\n");
             
-            #line 36 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 37 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
             
             #line default
             #line hidden
             this.Write("#endif\r\n");
             
-            #line 38 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 39 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 39 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
+            #line 40 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\RegisterTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("        }\r\n    }\r\n}");
+            this.Write("        }\r\n    }\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 414\r\n" +
+                    "#pragma warning restore 612\r\n#pragma warning restore 618");
             return this.GenerationEnvironment.ToString();
         }
     }

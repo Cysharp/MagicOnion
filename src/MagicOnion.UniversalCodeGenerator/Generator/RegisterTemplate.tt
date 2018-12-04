@@ -8,6 +8,7 @@
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
+
 namespace <#= Namespace #>
 {
     using global::System;
@@ -40,3 +41,8 @@ namespace <#= Namespace #>
         }
     }
 }
+
+#pragma warning restore 168
+#pragma warning restore 414
+#pragma warning restore 612
+#pragma warning restore 618

@@ -18,7 +18,7 @@ namespace MagicOnion.Generator
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+    #line 1 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "15.0.0.0")]
     public partial class ResolverTemplate : ResolverTemplateBase
     {
@@ -31,14 +31,14 @@ namespace MagicOnion.Generator
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
                     " 414\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             
-            #line 11 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 11 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n    public class ");
             
-            #line 16 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 16 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -46,14 +46,14 @@ namespace MagicOnion.Generator
             this.Write(" : global::MessagePack.IFormatterResolver\r\n    {\r\n        public static readonly " +
                     "global::MessagePack.IFormatterResolver Instance = new ");
             
-            #line 18 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 18 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
             #line hidden
             this.Write("();\r\n\r\n        ");
             
-            #line 20 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 20 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -76,7 +76,7 @@ namespace MagicOnion.Generator
             {
                 var f = ");
             
-            #line 36 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 36 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -92,7 +92,7 @@ namespace MagicOnion.Generator
 
     internal static class ");
             
-            #line 45 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 45 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -100,7 +100,7 @@ namespace MagicOnion.Generator
             this.Write("GetFormatterHelper\r\n    {\r\n        static readonly global::System.Collections.Gen" +
                     "eric.Dictionary<Type, int> lookup;\r\n\r\n        static ");
             
-            #line 49 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 49 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -108,35 +108,35 @@ namespace MagicOnion.Generator
             this.Write("GetFormatterHelper()\r\n        {\r\n            lookup = new global::System.Collecti" +
                     "ons.Generic.Dictionary<Type, int>(");
             
-            #line 51 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 51 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(registerInfos.Length));
             
             #line default
             #line hidden
             this.Write(")\r\n            {\r\n");
             
-            #line 53 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 53 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
             
             #line default
             #line hidden
             this.Write("                {typeof(");
             
-            #line 54 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 54 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.FullName));
             
             #line default
             #line hidden
             this.Write("), ");
             
-            #line 54 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 54 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(" },\r\n");
             
-            #line 55 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 55 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  } 
             
             #line default
@@ -149,14 +149,6 @@ namespace MagicOnion.Generator
             int key;
             if (!lookup.TryGetValue(t, out key))
             {
-                if (t == typeof(UniRx.Unit))
-                {
-                    return MagicOnion.Resolvers.UniRxIntegrate.UnitFormatter.Instance;
-                }
-                else if (t == typeof(Nullable<UniRx.Unit>))
-                {
-                    return MagicOnion.Resolvers.UniRxIntegrate.NullableUnitFormatter.Instance;
-                }
                 return null;
             }
 
@@ -164,67 +156,35 @@ namespace MagicOnion.Generator
             {
 ");
             
-            #line 77 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 69 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
             
             #line default
             #line hidden
             this.Write("                case ");
             
-            #line 78 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 70 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(": return new ");
             
-            #line 78 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 70 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName:  FormatterNamespace + "." + x.FormatterName));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 79 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 71 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nname" +
-                    "space ");
-            
-            #line 86 "C:\Users\S04451\Documents\GitHub\neuecc\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
-            
-            #line default
-            #line hidden
-            this.Write(".UniRxIntegrate\r\n{\r\n    using System;\r\n    using UniRx;\r\n    using MessagePack;\r\n" +
-                    "    using MessagePack.Formatters;\r\n\r\n    public class UnitFormatter : IMessagePa" +
-                    "ckFormatter<Unit>\r\n    {\r\n        public static readonly IMessagePackFormatter<U" +
-                    "nit> Instance = new UnitFormatter();\r\n\r\n        UnitFormatter()\r\n        {\r\n\r\n  " +
-                    "      }\r\n\r\n        public int Serialize(ref byte[] bytes, int offset, Unit value" +
-                    ", IFormatterResolver typeResolver)\r\n        {\r\n            return MessagePackBin" +
-                    "ary.WriteNil(ref bytes, offset);\r\n        }\r\n\r\n        public Unit Deserialize(b" +
-                    "yte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)\r\n   " +
-                    "     {\r\n            if (bytes[offset] == MessagePackCode.Nil)\r\n            {\r\n  " +
-                    "              readSize = 1;\r\n                return Unit.Default;\r\n            }" +
-                    "\r\n            else\r\n            {\r\n                throw new InvalidOperationExc" +
-                    "eption(string.Format(\"code is invalid. code:{0} format:{1}\", bytes[offset], Mess" +
-                    "agePackCode.ToFormatName(bytes[offset])));\r\n            }\r\n        }\r\n    }\r\n\r\n " +
-                    "   public class NullableUnitFormatter : IMessagePackFormatter<Unit?>\r\n    {\r\n   " +
-                    "     public static readonly IMessagePackFormatter<Unit?> Instance = new Nullable" +
-                    "UnitFormatter();\r\n\r\n        NullableUnitFormatter()\r\n        {\r\n\r\n        }\r\n\r\n " +
-                    "       public int Serialize(ref byte[] bytes, int offset, Unit? value, IFormatte" +
-                    "rResolver typeResolver)\r\n        {\r\n            return MessagePackBinary.WriteNi" +
-                    "l(ref bytes, offset);\r\n        }\r\n\r\n        public Unit? Deserialize(byte[] byte" +
-                    "s, int offset, IFormatterResolver typeResolver, out int readSize)\r\n        {\r\n  " +
-                    "          if (bytes[offset] == MessagePackCode.Nil)\r\n            {\r\n            " +
-                    "    readSize = 1;\r\n                return Unit.Default;\r\n            }\r\n        " +
-                    "    else\r\n            {\r\n                throw new InvalidOperationException(str" +
-                    "ing.Format(\"code is invalid. code:{0} format:{1}\", bytes[offset], MessagePackCod" +
-                    "e.ToFormatName(bytes[offset])));\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n\r\n#pragm" +
-                    "a warning disable 168\r\n#pragma warning restore 414\r\n#pragma warning restore 618\r" +
-                    "\n#pragma warning restore 612");
+            this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n#pra" +
+                    "gma warning restore 168\r\n#pragma warning restore 414\r\n#pragma warning restore 61" +
+                    "2\r\n#pragma warning restore 618");
             return this.GenerationEnvironment.ToString();
         }
     }

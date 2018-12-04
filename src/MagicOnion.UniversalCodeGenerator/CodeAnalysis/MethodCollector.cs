@@ -1,12 +1,16 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using MagicOnion.Utils;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace MagicOnion.CodeAnalysis
 {
     public class ReferenceSymbols
     {
+        public static ReferenceSymbols Global;
+
         public readonly INamedTypeSymbol Task;
         public readonly INamedTypeSymbol TaskOfT;
         public readonly INamedTypeSymbol UnaryResult;
@@ -14,6 +18,10 @@ namespace MagicOnion.CodeAnalysis
         public readonly INamedTypeSymbol ServerStreamingResult;
         public readonly INamedTypeSymbol DuplexStreamingResult;
         public readonly INamedTypeSymbol GenerateDefineIf;
+        public readonly INamedTypeSymbol IServiceMarker;
+        public readonly INamedTypeSymbol IStreamingHubMarker;
+        public readonly INamedTypeSymbol IStreamingHub;
+        public readonly INamedTypeSymbol MethodIdAttribute;
 
         public ReferenceSymbols(Compilation compilation)
         {
@@ -24,6 +32,12 @@ namespace MagicOnion.CodeAnalysis
             DuplexStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.DuplexStreamingResult`2");
             ServerStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ServerStreamingResult`1");
             GenerateDefineIf = compilation.GetTypeByMetadataName("MagicOnion.GenerateDefineIfAttribute");
+            IStreamingHubMarker = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHubMarker");
+            IServiceMarker = compilation.GetTypeByMetadataName("MagicOnion.IServiceMarker");
+            IStreamingHub = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHub`2");
+            MethodIdAttribute = compilation.GetTypeByMetadataName("MagicOnion.Server.Hubs.MethodIdAttribute");
+
+            Global = this;
         }
     }
 
@@ -38,10 +52,9 @@ namespace MagicOnion.CodeAnalysis
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes);
 
         readonly string csProjPath;
-        readonly INamedTypeSymbol[] serviceTypes;
-        readonly INamedTypeSymbol[] interfaces;
+        readonly INamedTypeSymbol[] serviceInterfaces;
+        readonly INamedTypeSymbol[] hubInterfaces;
         readonly ReferenceSymbols typeReferences;
-        readonly INamedTypeSymbol baseInterface;
 
         public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols)
         {
@@ -49,54 +62,81 @@ namespace MagicOnion.CodeAnalysis
             var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.ToArray()).GetAwaiter().GetResult();
             this.typeReferences = new ReferenceSymbols(compilation);
 
-            var marker = compilation.GetTypeByMetadataName("MagicOnion.IServiceMarker");
-
-            baseInterface = compilation.GetTypeByMetadataName("MagicOnion.IService`1");
-
-            serviceTypes = compilation.GetNamedTypeSymbols()
-                .Where(t => t.AllInterfaces.Any(x => x == marker))
+            var bothInterfaces = compilation.GetNamedTypeSymbols()
+                .Where(x => x.TypeKind == TypeKind.Interface)
+                .Where(x =>
+                {
+                    var all = x.AllInterfaces;
+                    if (all.Any(y => y == typeReferences.IServiceMarker) || all.Any(y => y == typeReferences.IStreamingHubMarker))
+                    {
+                        return true;
+                    }
+                    return false;
+                })
                 .ToArray();
 
-            interfaces = serviceTypes
-                .Concat(serviceTypes.SelectMany(x => x.AllInterfaces))
+            serviceInterfaces = bothInterfaces
+                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker))
                 .Distinct()
-                .Where(x => x != marker)
-                .Where(t => t != baseInterface)
-                .Where(x => !x.IsGenericType || x.ConstructedFrom != baseInterface)
+                .ToArray();
+
+            hubInterfaces = bothInterfaces
+                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IStreamingHubMarker))
+                .Distinct()
                 .ToArray();
         }
 
-        // not visitor pattern:)
-        public InterfaceDefinition[] Visit()
+        public InterfaceDefinition[] CollectServiceInterface()
         {
-            return interfaces
+            return serviceInterfaces
                 .Select(x => new InterfaceDefinition()
                 {
                     Name = x.ToDisplayString(shortTypeNameFormat),
+                    FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                    IsServiceDifinition = false,
-                    InterfaceNames = x.Interfaces.Select(y => y.ToDisplayString()).ToArray(),
+                    IsServiceDifinition = true,
                     IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(CreateMethodDefinition)
                         .ToArray()
                 })
-                .Concat(serviceTypes
-                    .Select(x => new InterfaceDefinition
+                .ToArray();
+        }
+
+        public (InterfaceDefinition hubDefinition, InterfaceDefinition receiverDefintion)[] CollectHubInterface()
+        {
+            return hubInterfaces
+                .Select(x =>
+                {
+                    var hubDefinition = new InterfaceDefinition()
                     {
                         Name = x.ToDisplayString(shortTypeNameFormat),
+                        FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                        IsServiceDifinition = true,
-                        InterfaceNames = new string[0],
                         IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
-                        Methods = x.GetAllInterfaceMembers() //with base interface method
+                        Methods = x.GetMembers()
                             .OfType<IMethodSymbol>()
-                            .Distinct(MethodNameComparer.Instance)
-                            .Where(y => y.ContainingType.ConstructedFrom != baseInterface)
                             .Select(CreateMethodDefinition)
                             .ToArray()
-                    }))
+                    };
+
+                    var receiver = x.AllInterfaces.First(y => y.ConstructedFrom == this.typeReferences.IStreamingHub).TypeArguments[1];
+
+                    var receiverDefinition = new InterfaceDefinition()
+                    {
+                        Name = receiver.ToDisplayString(shortTypeNameFormat),
+                        FullName = receiver.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        Namespace = receiver.ContainingNamespace.IsGlobalNamespace ? null : receiver.ContainingNamespace.ToDisplayString(),
+                        IsIfDebug = receiver.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                        Methods = receiver.GetMembers()
+                            .OfType<IMethodSymbol>()
+                            .Select(CreateMethodDefinition)
+                            .ToArray()
+                    };
+
+                    return (hubDefinition, receiverDefinition);
+                })
                 .ToArray();
         }
 
@@ -121,6 +161,14 @@ namespace MagicOnion.CodeAnalysis
             string responseType;
             ITypeSymbol unwrappedOriginalResponseType;
             ExtractRequestResponseType(y, out t, out requestType, out responseType, out unwrappedOriginalResponseType);
+
+            var id = FNV1A32.GetHashCode(y.Name);
+            var idAttr = y.GetAttributes().FindAttributeShortName("MethodIdAttribute");
+            if (idAttr != null)
+            {
+                id = (int)idAttr.ConstructorArguments[0].Value;
+            }
+
             return new MethodDefinition
             {
                 Name = y.Name,
@@ -128,7 +176,9 @@ namespace MagicOnion.CodeAnalysis
                 RequestType = requestType,
                 ResponseType = responseType,
                 UnwrappedOriginalResposneTypeSymbol = unwrappedOriginalResponseType,
+                OriginalResponseTypeSymbol = y.ReturnType,
                 IsIfDebug = y.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                HubId = id,
                 Parameters = y.Parameters.Select(p =>
                 {
                     return new ParameterDefinition
@@ -184,7 +234,11 @@ namespace MagicOnion.CodeAnalysis
             }
             else
             {
-                throw new Exception("Invalid Return Type, method:" + method.Name + " returnType:" + method.ReturnType);
+                // no validation
+                methodType = MethodType.Other;
+                requestType = null;
+                responseType = null;
+                unwrappedOriginalResponseType = (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : null;
             }
         }
 
@@ -209,6 +263,32 @@ namespace MagicOnion.CodeAnalysis
             }
 
             return "default(" + p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) + ")";
+        }
+    }
+}
+
+namespace MagicOnion.Utils
+{
+    public static class FNV1A32
+    {
+        public static int GetHashCode(string str)
+        {
+            return GetHashCode(Encoding.UTF8.GetBytes(str));
+        }
+
+        public static int GetHashCode(byte[] obj)
+        {
+            uint hash = 0;
+            if (obj != null)
+            {
+                hash = 2166136261;
+                for (int i = 0; i < obj.Length; i++)
+                {
+                    hash = unchecked((obj[i] ^ hash) * 16777619);
+                }
+            }
+
+            return unchecked((int)hash);
         }
     }
 }

@@ -35,10 +35,10 @@ namespace MagicOnion.Server.Hubs
             var map = new Dictionary<int, StreamingHubHandler>();
             foreach (var item in hubHandlers)
             {
-                var hash = FNV1A32.GetHashCode(item.MethodInfo.Name);
+                var hash = item.MethodId;
                 if (map.ContainsKey(hash))
                 {
-                    throw new InvalidOperationException($"StreamingHubHandler.MethodName found duplicate hashCode name. Please rename to avoid conflict. {map[hash]} and {item.MethodInfo.Name}");
+                    throw new InvalidOperationException($"StreamingHubHandler.MethodName found duplicate hashCode name. Please rename or use [MethodId] to avoid conflict. {map[hash]} and {item.MethodInfo.Name}");
                 }
                 map.Add(hash, item);
                 list.Add((hash, item));

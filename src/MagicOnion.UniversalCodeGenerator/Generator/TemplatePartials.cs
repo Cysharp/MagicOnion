@@ -10,8 +10,13 @@ namespace MagicOnion.Generator
     public partial class CodeTemplate
     {
         public string Namespace { get; set; }
-        public bool isAsyncSuffix { get; set; }
         public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
+    }
+
+    public partial class HubTemplate
+    {
+        public string Namespace { get; set; }
+        public (InterfaceDefinition hubDef, InterfaceDefinition receiverDef)[] Interfaces { get; set; }
     }
 
     public partial class RegisterTemplate

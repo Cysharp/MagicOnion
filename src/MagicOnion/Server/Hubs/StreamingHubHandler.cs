@@ -33,7 +33,7 @@ namespace MagicOnion.Server.Hubs
             this.HubType = classType;
             this.HubName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
-            this.MethodId = FNV1A32.GetHashCode(methodInfo.Name); // TODO:GetFromAttribute or FNV1A32
+            this.MethodId = FNV1A32.GetHashCode(methodInfo.Name); // TODO:GetFromAttribute(from interface method!) or FNV1A32
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
             this.resolver = options.FormatterResolver;
 

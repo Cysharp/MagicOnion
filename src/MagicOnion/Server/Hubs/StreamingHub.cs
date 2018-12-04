@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace MagicOnion.Server.Hubs
 {
     public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
-        where THubInterface : IStreamingHubMarker
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
     {
         static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
         static protected readonly ValueTask CompletedTask = new ValueTask();

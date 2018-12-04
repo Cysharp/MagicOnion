@@ -27,7 +27,7 @@ namespace Sandbox.NetCoreServer
             //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
 
             Environment.SetEnvironmentVariable("SETTINGS_MAX_HEADER_LIST_SIZE", "1000000");
-
+            
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
