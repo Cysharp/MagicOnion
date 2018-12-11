@@ -67,6 +67,11 @@ namespace MagicOnion.Server.Hubs
             this.members = ImmutableArray<ServiceContext>.Empty;
         }
 
+        public ValueTask<int> GetMemberCountAsync()
+        {
+            return new ValueTask<int>(members.Length);
+        }
+
         public ValueTask AddAsync(ServiceContext context)
         {
             lock (gate)
@@ -95,87 +100,96 @@ namespace MagicOnion.Server.Hubs
 
         // broadcast: [methodId, [argument]]
 
-        public async Task WriteAllAsync<T>(int methodId, T value)
+        public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
         {
             var message = BuildMessage(methodId, value);
 
             var source = members;
-            var promise = new ReservedWhenAllPromise(source.Length);
-            for (int i = 0; i < source.Length; i++)
-            {
-                promise.Add(WriteInAsyncLock(source[i], message));
-            }
 
-            await promise.AsValueTask().ConfigureAwait(false);
-        }
-
-        public async Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId)
-        {
-            var message = BuildMessage(methodId, value);
-
-            var source = members;
-            var promise = new ReservedWhenAllPromise(source.Length);
-            for (int i = 0; i < source.Length; i++)
-            {
-                if (source[i].ContextId == connectionId)
-                {
-                    promise.Add(default(ValueTask));
-                }
-                else
-                {
-                    promise.Add(WriteInAsyncLock(source[i], message));
-                }
-            }
-
-            await promise.AsValueTask().ConfigureAwait(false);
-        }
-
-        public async Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds)
-        {
-            var message = BuildMessage(methodId, value);
-
-            var source = members;
-            var promise = new ReservedWhenAllPromise(source.Length);
-            for (int i = 0; i < source.Length; i++)
-            {
-                foreach (var item in connectionIds)
-                {
-                    if (source[i].ContextId == item)
-                    {
-                        promise.Add(default(ValueTask));
-                        goto NEXT;
-                    }
-                }
-
-                promise.Add(WriteInAsyncLock(source[i], message));
-            NEXT:
-                continue;
-            }
-
-            await promise.AsValueTask().ConfigureAwait(false);
-        }
-
-        public async Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds)
-        {
-            // oh, copy is bad but current gRPC interface only accepts byte[]...
-            var message = new byte[msg.Count];
-            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
-
-            var source = members;
-            var promise = new ReservedWhenAllPromise(source.Length);
-
-            if (exceptConnectionIds == null)
+            if (fireAndForget)
             {
                 for (int i = 0; i < source.Length; i++)
                 {
-                    promise.Add(WriteInAsyncLock(source[i], message));
+                    WriteInAsyncLockVoid(source[i], message);
                 }
+                return Task.CompletedTask;
             }
             else
             {
+                var promise = new ReservedWhenAllPromise(source.Length);
                 for (int i = 0; i < source.Length; i++)
                 {
-                    foreach (var item in exceptConnectionIds)
+                    promise.Add(WriteInAsyncLock(source[i], message));
+                }
+
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+
+            var source = members;
+            if (fireAndForget)
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (source[i].ContextId != connectionId)
+                    {
+                        WriteInAsyncLockVoid(source[i], message);
+                    }
+                }
+                return Task.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (source[i].ContextId == connectionId)
+                    {
+                        promise.Add(default(ValueTask));
+                    }
+                    else
+                    {
+                        promise.Add(WriteInAsyncLock(source[i], message));
+                    }
+                }
+
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+
+            var source = members;
+            if (fireAndForget)
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in connectionIds)
+                    {
+                        if (source[i].ContextId == item)
+                        {
+                            goto NEXT;
+                        }
+                    }
+
+                    WriteInAsyncLockVoid(source[i], message);
+                NEXT:
+                    continue;
+                }
+                return Task.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in connectionIds)
                     {
                         if (source[i].ContextId == item)
                         {
@@ -188,9 +202,78 @@ namespace MagicOnion.Server.Hubs
                 NEXT:
                     continue;
                 }
-            }
 
-            await promise.AsValueTask().ConfigureAwait(false);
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+        {
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+
+            var source = members;
+            if (fireAndForget)
+            {
+                if (exceptConnectionIds == null)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        WriteInAsyncLockVoid(source[i], message);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        foreach (var item in exceptConnectionIds)
+                        {
+                            if (source[i].ContextId == item)
+                            {
+                                goto NEXT;
+                            }
+                        }
+                        WriteInAsyncLockVoid(source[i], message);
+
+                    NEXT:
+                        continue;
+                    }
+                }
+                return Task.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+
+                if (exceptConnectionIds == null)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        promise.Add(WriteInAsyncLock(source[i], message));
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        foreach (var item in exceptConnectionIds)
+                        {
+                            if (source[i].ContextId == item)
+                            {
+                                promise.Add(default(ValueTask));
+                                goto NEXT;
+                            }
+                        }
+
+                        promise.Add(WriteInAsyncLock(source[i], message));
+                    NEXT:
+                        continue;
+                    }
+                }
+
+                return promise.AsValueTask().AsTask();
+            }
         }
 
         byte[] BuildMessage<T>(int methodId, T value)
@@ -212,7 +295,23 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
+        static async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
+        {
+            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
+            {
+                try
+                {
+                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+                }
+            }
+        }
+
+        // async void is better than return Task when fire-and-forget to avoid create unnecessary promise.
+        static async void WriteInAsyncLockVoid(ServiceContext context, byte[] value)
         {
             using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {

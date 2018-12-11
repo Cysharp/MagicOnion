@@ -198,12 +198,14 @@ namespace MagicOnion.CodeAnalysis
         void ExtractRequestResponseType(IMethodSymbol method, out MethodType methodType, out string requestType, out string responseType, out ITypeSymbol unwrappedOriginalResponseType)
         {
             var retType = method.ReturnType as INamedTypeSymbol;
+            ITypeSymbol retType2 = null;
 
             var constructedFrom = retType.ConstructedFrom;
             if (constructedFrom == typeReferences.TaskOfT)
             {
-                retType = retType.TypeArguments[0] as INamedTypeSymbol;
-                constructedFrom = retType.ConstructedFrom;
+                retType2 = retType.TypeArguments[0];
+                retType = retType2 as INamedTypeSymbol;
+                constructedFrom = retType?.ConstructedFrom;
             }
 
             if (constructedFrom == typeReferences.UnaryResult)
@@ -240,7 +242,7 @@ namespace MagicOnion.CodeAnalysis
                 methodType = MethodType.Other;
                 requestType = null;
                 responseType = null;
-                unwrappedOriginalResponseType = (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : retType;
+                unwrappedOriginalResponseType =  (retType == null) ? retType2 : (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : retType;
             }
         }
 

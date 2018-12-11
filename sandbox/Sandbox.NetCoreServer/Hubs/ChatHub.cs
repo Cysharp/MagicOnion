@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace Sandbox.NetCoreServer.Hubs
 {
-    public interface IMessageReceiver
+    public interface IMessageReceiver2
     {
         void OnReceiveMessage(string senderUser, string message);
     }
 
-    public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver>
+    public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver2>
     {
         Task JoinAsync(string userName, string roomName);
         Task LeaveAsync();
         Task SendMessageAsync(string message);
     }
 
-    public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
+    public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver2>, IChatHub
     {
         // insantiate per user connected and live while connecting.
         string userName;

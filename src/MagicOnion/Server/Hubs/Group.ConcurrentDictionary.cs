@@ -53,6 +53,7 @@ namespace MagicOnion.Server.Hubs
 
     public class ConcurrentDictionaryGroup : IGroup
     {
+        // ConcurrentDictionary.Count is slow, use external counter.
         int approximatelyLength;
 
         readonly IGroupRepository parent;
@@ -68,6 +69,11 @@ namespace MagicOnion.Server.Hubs
             this.parent = parent;
             this.resolver = resolver;
             this.members = new ConcurrentDictionary<Guid, ServiceContext>();
+        }
+
+        public ValueTask<int> GetMemberCountAsync()
+        {
+            return new ValueTask<int>(approximatelyLength);
         }
 
         public ValueTask AddAsync(ServiceContext context)
@@ -97,122 +103,129 @@ namespace MagicOnion.Server.Hubs
 
         // broadcast: [methodId, [argument]]
 
-        public async Task WriteAllAsync<T>(int methodId, T value)
+        public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
         {
             var message = BuildMessage(methodId, value);
 
-            var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-            try
+            if (fireAndForget)
             {
-                var buffer = rent;
-                var index = 0;
                 foreach (var item in members)
                 {
-                    if (buffer.Length < index)
-                    {
-                        Array.Resize(ref buffer, buffer.Length * 2);
-                    }
-                    buffer[index++] = WriteInAsyncLock(item.Value, message);
+                    WriteInAsyncLockVoid(item.Value, message);
                 }
-
-                await ToPromise(buffer, index).ConfigureAwait(false);
+                return Task.CompletedTask;
             }
-            finally
+            else
             {
-                ArrayPool<ValueTask>.Shared.Return(rent, true);
-            }
-        }
-
-        public async Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId)
-        {
-            var message = BuildMessage(methodId, value);
-            var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-            try
-            {
-                var buffer = rent;
-                var index = 0;
-                foreach (var item in members)
+                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                ValueTask promise;
+                try
                 {
-                    if (buffer.Length < index)
+                    var buffer = rent;
+                    var index = 0;
+                    foreach (var item in members)
                     {
-                        Array.Resize(ref buffer, buffer.Length * 2);
-                    }
-                    if (item.Value.ContextId == connectionId)
-                    {
-                        buffer[index++] = default(ValueTask);
-                    }
-                    else
-                    {
+                        if (buffer.Length < index)
+                        {
+                            Array.Resize(ref buffer, buffer.Length * 2);
+                        }
                         buffer[index++] = WriteInAsyncLock(item.Value, message);
                     }
-                }
 
-                await ToPromise(buffer, index).ConfigureAwait(false);
-            }
-            finally
-            {
-                ArrayPool<ValueTask>.Shared.Return(rent, true);
+                    promise = ToPromise(buffer, index);
+                }
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                return promise.AsTask();
             }
         }
 
-        public async Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds)
+        public Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
         {
             var message = BuildMessage(methodId, value);
-            var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-            try
+            if (fireAndForget)
             {
-                var buffer = rent;
-                var index = 0;
                 foreach (var item in members)
                 {
-                    if (buffer.Length < index)
+                    if (item.Value.ContextId != connectionId)
                     {
-                        Array.Resize(ref buffer, buffer.Length * 2);
+                        WriteInAsyncLockVoid(item.Value, message);
+                    }
+                }
+                return Task.CompletedTask;
+            }
+            else
+            {
+                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                ValueTask promise;
+                try
+                {
+                    var buffer = rent;
+                    var index = 0;
+                    foreach (var item in members)
+                    {
+                        if (buffer.Length < index)
+                        {
+                            Array.Resize(ref buffer, buffer.Length * 2);
+                        }
+                        if (item.Value.ContextId == connectionId)
+                        {
+                            buffer[index++] = default(ValueTask);
+                        }
+                        else
+                        {
+                            buffer[index++] = WriteInAsyncLock(item.Value, message);
+                        }
                     }
 
+                    promise = ToPromise(buffer, index);
+                }
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                return promise.AsTask();
+            }
+        }
+
+        public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+            if (fireAndForget)
+            {
+                foreach (var item in members)
+                {
                     foreach (var item2 in connectionIds)
                     {
                         if (item.Value.ContextId == item2)
                         {
-                            buffer[index++] = default(ValueTask);
                             goto NEXT;
                         }
                     }
-                    buffer[index++] = WriteInAsyncLock(item.Value, message);
-
+                    WriteInAsyncLockVoid(item.Value, message);
                 NEXT:
                     continue;
                 }
-
-                await ToPromise(buffer, index).ConfigureAwait(false);
+                return Task.CompletedTask;
             }
-            finally
+            else
             {
-                ArrayPool<ValueTask>.Shared.Return(rent, true);
-            }
-        }
-
-        public async Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds)
-        {
-            // oh, copy is bad but current gRPC interface only accepts byte[]...
-            var message = new byte[msg.Count];
-            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
-
-            var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-            try
-            {
-                var buffer = rent;
-                var index = 0;
-                foreach (var item in members)
+                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                ValueTask promise;
+                try
                 {
-                    if (buffer.Length < index)
+                    var buffer = rent;
+                    var index = 0;
+                    foreach (var item in members)
                     {
-                        Array.Resize(ref buffer, buffer.Length * 2);
-                    }
+                        if (buffer.Length < index)
+                        {
+                            Array.Resize(ref buffer, buffer.Length * 2);
+                        }
 
-                    if (exceptConnectionIds != null)
-                    {
-                        foreach (var item2 in exceptConnectionIds)
+                        foreach (var item2 in connectionIds)
                         {
                             if (item.Value.ContextId == item2)
                             {
@@ -220,18 +233,105 @@ namespace MagicOnion.Server.Hubs
                                 goto NEXT;
                             }
                         }
+                        buffer[index++] = WriteInAsyncLock(item.Value, message);
+
+                    NEXT:
+                        continue;
                     }
-                    buffer[index++] = WriteInAsyncLock(item.Value, message);
 
-                NEXT:
-                    continue;
+                    promise = ToPromise(buffer, index);
                 }
-
-                await ToPromise(buffer, index).ConfigureAwait(false);
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                return promise.AsTask();
             }
-            finally
+        }
+
+        public Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+        {
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+            if (fireAndForget)
             {
-                ArrayPool<ValueTask>.Shared.Return(rent, true);
+                if (exceptConnectionIds == null)
+                {
+                    foreach (var item in members)
+                    {
+                        WriteInAsyncLockVoid(item.Value, message);
+                    }
+                    return Task.CompletedTask;
+                }
+                else
+                {
+                    foreach (var item in members)
+                    {
+                        foreach (var item2 in exceptConnectionIds)
+                        {
+                            if (item.Value.ContextId == item2)
+                            {
+                                goto NEXT;
+                            }
+                        }
+                        WriteInAsyncLockVoid(item.Value, message);
+                    NEXT:
+                        continue;
+                    }
+                    return Task.CompletedTask;
+                }
+            }
+            else
+            {
+                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                ValueTask promise;
+                try
+                {
+                    var buffer = rent;
+                    var index = 0;
+                    if (exceptConnectionIds == null)
+                    {
+                        foreach (var item in members)
+                        {
+                            if (buffer.Length < index)
+                            {
+                                Array.Resize(ref buffer, buffer.Length * 2);
+                            }
+
+                            buffer[index++] = WriteInAsyncLock(item.Value, message);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in members)
+                        {
+                            if (buffer.Length < index)
+                            {
+                                Array.Resize(ref buffer, buffer.Length * 2);
+                            }
+
+                            foreach (var item2 in exceptConnectionIds)
+                            {
+                                if (item.Value.ContextId == item2)
+                                {
+                                    buffer[index++] = default(ValueTask);
+                                    goto NEXT;
+                                }
+                            }
+                            buffer[index++] = WriteInAsyncLock(item.Value, message);
+
+                        NEXT:
+                            continue;
+                        }
+                    }
+                    promise = ToPromise(buffer, index);
+                }
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                return promise.AsTask();
             }
         }
 
@@ -254,7 +354,22 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
+        static async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
+        {
+            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
+            {
+                try
+                {
+                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+                }
+            }
+        }
+
+        static async void WriteInAsyncLockVoid(ServiceContext context, byte[] value)
         {
             using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {

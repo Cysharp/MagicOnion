@@ -19,6 +19,14 @@ namespace Sandbox.NetCoreServer.Services
         UnaryResult<OreOreResponse[]> OreOre2Async(OreOreRequest z);
         UnaryResult<List<OreOreResponse>> OreOre3Async(OreOreRequest z);
 
+
+        Task<UnaryResult<Nil>> LegacyZeroAsync();
+        Task<UnaryResult<TestEnum>> LegacyOneAsync(int z);
+        Task<UnaryResult<string>> LegacySumAsync(int x, int y);
+        Task<UnaryResult<OreOreResponse>> LegacyOreOreAsync(OreOreRequest z);
+        Task<UnaryResult<OreOreResponse[]>> LegacyOreOre2Async(OreOreRequest z);
+        Task<UnaryResult<List<OreOreResponse>>> LegacyOreOre3Async(OreOreRequest z);
+
         // use hub instead:)
 
         Task<ClientStreamingResult<int, string>> ClientStreamingSampleAsync();

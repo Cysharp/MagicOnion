@@ -98,7 +98,11 @@
 <# if(item.MethodType == MethodType.Unary) { #>
             var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncUnaryCall(<#= item.Name #>Method, base.host, base.option, __request);
+<# if(item.IsResponseTypeTaskOfT) { #>
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver));
+<# } else { #>
             return new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver);
+<# } #>
 <# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
             var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, base.host, base.option, __request);

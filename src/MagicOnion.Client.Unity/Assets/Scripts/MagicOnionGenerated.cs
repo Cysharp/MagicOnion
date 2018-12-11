@@ -23,8 +23,8 @@ namespace MagicOnion
 
             MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y));
 
-            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IChatHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IChatHubClient(a, b, c, d, e));
-            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.ITestHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver2>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.ITestHubClient(a, b, c, d, e));
+            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IChatHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver2>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IChatHubClient(a, b, c, d, e));
+            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.ITestHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.ITestHubClient(a, b, c, d, e));
         }
     }
 }
@@ -78,15 +78,16 @@ namespace MagicOnion.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(7)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(8)
             {
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 0 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 1 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, string, double>), 2 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 3 },
-                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 4 },
-                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 5 },
-                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 6 },
+                {typeof(global::Sandbox.NetCoreServer.Hubs.TestObject[]), 4 },
+                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 5 },
+                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 6 },
+                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 7 },
             };
         }
 
@@ -104,9 +105,10 @@ namespace MagicOnion.Resolvers
                 case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
                 case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, string, double>(default(int), default(string), default(double));
                 case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
-                case 4: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 5: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 6: return new MagicOnion.Formatters.Sandbox.NetCoreServer.Services.TestEnumFormatter();
+                case 4: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.TestObject>();
+                case 5: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 6: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 7: return new MagicOnion.Formatters.Sandbox.NetCoreServer.Services.TestEnumFormatter();
                 default: return null;
             }
         }
@@ -166,6 +168,12 @@ namespace Sandbox.NetCoreServer.Services {
         static readonly Method<byte[], byte[]> OreOreAsyncMethod;
         static readonly Method<byte[], byte[]> OreOre2AsyncMethod;
         static readonly Method<byte[], byte[]> OreOre3AsyncMethod;
+        static readonly Method<byte[], byte[]> LegacyZeroAsyncMethod;
+        static readonly Method<byte[], byte[]> LegacyOneAsyncMethod;
+        static readonly Method<byte[], byte[]> LegacySumAsyncMethod;
+        static readonly Method<byte[], byte[]> LegacyOreOreAsyncMethod;
+        static readonly Method<byte[], byte[]> LegacyOreOre2AsyncMethod;
+        static readonly Method<byte[], byte[]> LegacyOreOre3AsyncMethod;
         static readonly Method<byte[], byte[]> ClientStreamingSampleAsyncMethod;
         static readonly Method<byte[], byte[]> ServertSreamingSampleAsyncMethod;
         static readonly Method<byte[], byte[]> DuplexStreamingSampleAyncMethod;
@@ -178,6 +186,12 @@ namespace Sandbox.NetCoreServer.Services {
             OreOreAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOreAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             OreOre2AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOre2Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             OreOre3AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOre3Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyZeroAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyZeroAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOneAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOneAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacySumAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacySumAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOreAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOreAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOre2AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOre2Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOre3AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOre3Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             ClientStreamingSampleAsyncMethod = new Method<byte[], byte[]>(MethodType.ClientStreaming, "IMyFirstService", "ClientStreamingSampleAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             ServertSreamingSampleAsyncMethod = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IMyFirstService", "ServertSreamingSampleAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             DuplexStreamingSampleAyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IMyFirstService", "DuplexStreamingSampleAync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -263,6 +277,42 @@ namespace Sandbox.NetCoreServer.Services {
             var __callResult = callInvoker.AsyncUnaryCall(OreOre3AsyncMethod, base.host, base.option, __request);
             return new UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__callResult, base.resolver);
         }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::MessagePack.Nil>> LegacyZeroAsync()
+        {
+            var __request = MagicOnionMarshallers.UnsafeNilBytes;
+            var __callResult = callInvoker.AsyncUnaryCall(LegacyZeroAsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver));
+        }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum>> LegacyOneAsync(int z)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(LegacyOneAsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum>(__callResult, base.resolver));
+        }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<string>> LegacySumAsync(int x, int y)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(LegacySumAsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<string>(__callResult, base.resolver));
+        }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse>> LegacyOreOreAsync(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOreAsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse>(__callResult, base.resolver));
+        }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]>> LegacyOreOre2Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOre2AsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]>(__callResult, base.resolver));
+        }
+        public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>> LegacyOreOre3Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOre3AsyncMethod, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__callResult, base.resolver));
+        }
         public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<int, string>> ClientStreamingSampleAsync()
         {
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreamingSampleAsyncMethod, base.host, base.option);
@@ -300,7 +350,7 @@ namespace Sandbox.NetCoreServer.Hubs {
     using System;
     using System.Threading.Tasks;
 
-    public class IChatHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IChatHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver>, global::Sandbox.NetCoreServer.Hubs.IChatHub
+    public class IChatHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IChatHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver2>, global::Sandbox.NetCoreServer.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
@@ -418,7 +468,7 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
     }
 
-    public class ITestHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.ITestHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver2>, global::Sandbox.NetCoreServer.Hubs.ITestHub
+    public class ITestHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.ITestHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver>, global::Sandbox.NetCoreServer.Hubs.ITestHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "ITestHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
@@ -471,6 +521,26 @@ namespace Sandbox.NetCoreServer.Hubs {
                     var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string, double>>(data, resolver);
                     receiver.VoidMoreArgument(result.Item1, result.Item2, result.Item3); return Task.CompletedTask;
                 }
+                case -2034765446: // OneArgument2
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject>(data, resolver);
+                    return receiver.OneArgument2(result);
+                }
+                case 676118308: // VoidOneArgument2
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject>(data, resolver);
+                    receiver.VoidOneArgument2(result); return Task.CompletedTask;
+                }
+                case -2017987827: // OneArgument3
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(data, resolver);
+                    return receiver.OneArgument3(result);
+                }
+                case 692895927: // VoidOneArgument3
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(data, resolver);
+                    receiver.VoidOneArgument3(result); return Task.CompletedTask;
+                }
                 default:
                     return Task.CompletedTask;
             }
@@ -516,6 +586,30 @@ namespace Sandbox.NetCoreServer.Hubs {
                     ((TaskCompletionSource<double>)taskCompletionSource).TrySetResult(result);
                     break;
                 }
+                case -2034765446: // OneArgument2
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case -168691754: // RetrunOneArgument2
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject>(data, resolver);
+                    ((TaskCompletionSource<global::Sandbox.NetCoreServer.Hubs.TestObject>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case -2017987827: // OneArgument3
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case -151914135: // RetrunOneArgument3
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(data, resolver);
+                    ((TaskCompletionSource<global::Sandbox.NetCoreServer.Hubs.TestObject[]>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
                 default:
                     break;
             }
@@ -549,6 +643,26 @@ namespace Sandbox.NetCoreServer.Hubs {
         public global::System.Threading.Tasks.Task<double> RetrunMoreArgument(int x, string y, double z)
         {
             return WriteMessageWithResponseAsync<DynamicArgumentTuple<int, string, double>, double> (-1898269861, new DynamicArgumentTuple<int, string, double>(x, y, z));
+        }
+
+        public global::System.Threading.Tasks.Task OneArgument2(global::Sandbox.NetCoreServer.Hubs.TestObject x)
+        {
+            return WriteMessageWithResponseAsync<global::Sandbox.NetCoreServer.Hubs.TestObject, Nil>(-2034765446, x);
+        }
+
+        public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.TestObject> RetrunOneArgument2(global::Sandbox.NetCoreServer.Hubs.TestObject x)
+        {
+            return WriteMessageWithResponseAsync<global::Sandbox.NetCoreServer.Hubs.TestObject, global::Sandbox.NetCoreServer.Hubs.TestObject> (-168691754, x);
+        }
+
+        public global::System.Threading.Tasks.Task OneArgument3(global::Sandbox.NetCoreServer.Hubs.TestObject[] x)
+        {
+            return WriteMessageWithResponseAsync<global::Sandbox.NetCoreServer.Hubs.TestObject[], Nil>(-2017987827, x);
+        }
+
+        public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.TestObject[]> RetrunOneArgument3(global::Sandbox.NetCoreServer.Hubs.TestObject[] x)
+        {
+            return WriteMessageWithResponseAsync<global::Sandbox.NetCoreServer.Hubs.TestObject[], global::Sandbox.NetCoreServer.Hubs.TestObject[]> (-151914135, x);
         }
 
 
@@ -604,6 +718,26 @@ namespace Sandbox.NetCoreServer.Hubs {
             public global::System.Threading.Tasks.Task<double> RetrunMoreArgument(int x, string y, double z)
             {
                 return __parent.WriteMessageAsyncFireAndForget<DynamicArgumentTuple<int, string, double>, double> (-1898269861, new DynamicArgumentTuple<int, string, double>(x, y, z));
+            }
+
+            public global::System.Threading.Tasks.Task OneArgument2(global::Sandbox.NetCoreServer.Hubs.TestObject x)
+            {
+                return __parent.WriteMessageAsync<global::Sandbox.NetCoreServer.Hubs.TestObject>(-2034765446, x);
+            }
+
+            public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.TestObject> RetrunOneArgument2(global::Sandbox.NetCoreServer.Hubs.TestObject x)
+            {
+                return __parent.WriteMessageAsyncFireAndForget<global::Sandbox.NetCoreServer.Hubs.TestObject, global::Sandbox.NetCoreServer.Hubs.TestObject> (-168691754, x);
+            }
+
+            public global::System.Threading.Tasks.Task OneArgument3(global::Sandbox.NetCoreServer.Hubs.TestObject[] x)
+            {
+                return __parent.WriteMessageAsync<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(-2017987827, x);
+            }
+
+            public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.TestObject[]> RetrunOneArgument3(global::Sandbox.NetCoreServer.Hubs.TestObject[] x)
+            {
+                return __parent.WriteMessageAsyncFireAndForget<global::Sandbox.NetCoreServer.Hubs.TestObject[], global::Sandbox.NetCoreServer.Hubs.TestObject[]> (-151914135, x);
             }
 
         }

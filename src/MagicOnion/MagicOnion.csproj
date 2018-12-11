@@ -63,11 +63,13 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
   </ItemGroup>
 
-  <!-- T4 -->
+  <!-- Exclude -->
 
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <None Remove="\**\*.meta"/>
   </ItemGroup>
+
+    <!-- T4 -->
 
   <ItemGroup>
     <None Update="DynamicArgumentTuple.tt">

@@ -58,6 +58,15 @@ namespace MagicOnion.CodeAnalysis
         public ITypeSymbol UnwrappedOriginalResposneTypeSymbol { get; set; }
         public ITypeSymbol OriginalResponseTypeSymbol { get; set; }
 
+
+        public bool IsResponseTypeTaskOfT
+        {
+            get
+            {
+                return (OriginalResponseTypeSymbol as INamedTypeSymbol)?.ConstructedFrom == ReferenceSymbols.Global.TaskOfT;
+            }
+        }
+
         public string ReturnType
         {
             get

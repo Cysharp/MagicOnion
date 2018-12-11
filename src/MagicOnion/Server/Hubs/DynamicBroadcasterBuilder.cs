@@ -48,8 +48,8 @@ namespace MagicOnion.Server.Hubs
         public static readonly Type BroadcasterType_ExceptMany;
 
         static readonly MethodInfo groupWriteAllMethodInfo = typeof(IGroup).GetMethod(nameof(IGroup.WriteAllAsync));
-        static readonly MethodInfo groupWriteExceptOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && !x.GetParameters().Last().ParameterType.IsArray);
-        static readonly MethodInfo groupWriteExceptManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && x.GetParameters().Last().ParameterType.IsArray);
+        static readonly MethodInfo groupWriteExceptOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && !x.GetParameters()[2].ParameterType.IsArray);
+        static readonly MethodInfo groupWriteExceptManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && x.GetParameters()[2].ParameterType.IsArray);
 
         static readonly MethodInfo fireAndForget = typeof(BroadcasterHelper).GetMethod(nameof(BroadcasterHelper.FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -198,6 +198,15 @@ namespace MagicOnion.Server.Hubs
                 {
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, exceptField);
+                }
+
+                if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Ldc_I4_1); // fireAndForget = true
+                }
+                else
+                {
+                    il.Emit(OpCodes.Ldc_I4_0); // fireAndForget = false
                 }
 
                 il.Emit(OpCodes.Callvirt, writeMethod.MakeGenericMethod(callType));
