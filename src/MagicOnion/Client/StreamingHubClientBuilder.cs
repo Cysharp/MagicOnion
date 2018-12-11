@@ -76,7 +76,10 @@ namespace MagicOnion.Client
             {
                 // Create FireAndForgetType first as nested type.
                 var typeBuilderEx = typeBuilder.DefineNestedType($"FireAndForgetClient", TypeAttributes.NestedPrivate, typeof(object), new Type[] { t });
-                var (fireAndForgetClientCtor, fireAndForgetField) = DefineFireAndForgetConstructor(typeBuilderEx, typeBuilder);
+                var tuple = DefineFireAndForgetConstructor(typeBuilderEx, typeBuilder);
+                var fireAndForgetClientCtor = tuple.Item1;
+                var fireAndForgetField = tuple.Item2;
+
                 DefineMethodsFireAndForget(typeBuilderEx, t, fireAndForgetField, typeBuilder, methodDefinitions);
                 typeBuilderEx.CreateTypeInfo(); // ok to create nested type.
 
@@ -200,7 +203,7 @@ namespace MagicOnion.Client
             }
         }
 
-        static (ConstructorInfo, FieldInfo) DefineFireAndForgetConstructor(TypeBuilder typeBuilder, Type parentClientType)
+        static Tuple<ConstructorInfo, FieldInfo> DefineFireAndForgetConstructor(TypeBuilder typeBuilder, Type parentClientType)
         {
             // .ctor(Parent client) { this.client = client }
             {
@@ -218,7 +221,7 @@ namespace MagicOnion.Client
 
                 il.Emit(OpCodes.Ret);
 
-                return (ctor, clientField);
+                return Tuple.Create(ctor, clientField);
             }
         }
 

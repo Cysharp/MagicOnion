@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NON_UNITY
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -152,3 +154,5 @@ namespace MagicOnion.Utils
         }
     }
 }
+
+#endif

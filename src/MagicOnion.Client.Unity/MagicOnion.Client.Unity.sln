@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.Unity", "MagicOnion.Client.Unity.csproj", "{FC97D9BD-61F5-3962-BB8F-BEE4E690335E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC97D9BD-61F5-3962-BB8F-BEE4E690335E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC97D9BD-61F5-3962-BB8F-BEE4E690335E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC97D9BD-61F5-3962-BB8F-BEE4E690335E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC97D9BD-61F5-3962-BB8F-BEE4E690335E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
