@@ -8,6 +8,7 @@ using System.Text;
 using MagicOnion.Utils;
 using System.Threading;
 using System.Threading.Tasks;
+using MagicOnion.Server;
 
 namespace MagicOnion.Client
 {
@@ -20,6 +21,7 @@ namespace MagicOnion.Client
         readonly ILogger logger;
 
         protected readonly IFormatterResolver resolver;
+        readonly AsyncLock asyncLock = new AsyncLock();
 
         DuplexStreamingResult<byte[], byte[]> connection;
         protected TReceiver receiver;
@@ -146,7 +148,7 @@ namespace MagicOnion.Client
             }
         }
 
-        protected Task WriteMessageAsync<T>(int methodId, T message)
+        protected async Task WriteMessageAsync<T>(int methodId, T message)
         {
             ThrowIfDisposed();
 
@@ -157,7 +159,11 @@ namespace MagicOnion.Client
             offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
             offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
 
-            return connection.RawStreamingCall.RequestStream.WriteAsync(MessagePackBinary.FastCloneWithResize(buffer, offset));
+            var v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+            using (await asyncLock.LockAsync())
+            {
+                await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
+            }
         }
 
         protected async Task<TResponse> WriteMessageAsyncFireAndForget<TRequest, TResponse>(int methodId, TRequest message)
@@ -182,7 +188,12 @@ namespace MagicOnion.Client
             offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
             offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
 
-            await connection.RawStreamingCall.RequestStream.WriteAsync(MessagePackBinary.FastCloneWithResize(buffer, offset)).ConfigureAwait(false);
+            var v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+
+            using (await asyncLock.LockAsync())
+            {
+                await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
+            }
 
             return await tcs.Task; // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }

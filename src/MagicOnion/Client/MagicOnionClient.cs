@@ -1,5 +1,4 @@
 ﻿using Grpc.Core;
-using MagicOnion.Client;
 using MessagePack;
 using System;
 
@@ -30,32 +29,31 @@ namespace MagicOnion.Client
         {
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
 
-#if NON_UNITY
-            var t = DynamicClientBuilder<T>.ClientType;
-            return (T)Activator.CreateInstance(t, invoker, resolver);
+            var ctor = MagicOnionClientRegistry<T>.consturtor;
+            if (ctor == null)
+            {
+#if (ENABLE_IL2CPP && !UNITY_EDITOR)
+                throw new InvalidOperationException("Does not registered client factory, dynamic code generation is not supported on IL2CPP. Please use code generator(moc).");
 #else
-            return MagicOnionClientRegistry<T>.Create(invoker, resolver);
+                var t = DynamicClientBuilder<T>.ClientType;
+                return (T)Activator.CreateInstance(t, invoker, resolver);
 #endif
+            }
+            else
+            {
+                return ctor(invoker, resolver);
+            }
         }
     }
-
-#if !NON_UNITY
 
     public static class MagicOnionClientRegistry<T>
         where T : IService<T>
     {
-        static Func<CallInvoker, IFormatterResolver, T> consturtor;
+        public static Func<CallInvoker, IFormatterResolver, T> consturtor;
 
         public static void Register(Func<CallInvoker, IFormatterResolver, T> ctor)
         {
             consturtor = ctor;
         }
-
-        public static T Create(CallInvoker invoker, IFormatterResolver resolver)
-        {
-            return consturtor(invoker, resolver);
-        }
     }
-
-#endif
 }

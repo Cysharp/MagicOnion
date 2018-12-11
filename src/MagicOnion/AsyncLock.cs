@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Server
+namespace MagicOnion
 {
     public class AsyncLock
     {
@@ -13,9 +13,13 @@ namespace MagicOnion.Server
             this.semaphore = new SemaphoreSlim(1, 1);
         }
 
+#if NON_UNITY
         public async ValueTask<LockReleaser> LockAsync()
+#else
+        public async Task<LockReleaser> LockAsync()
+#endif
         {
-            await semaphore.WaitAsync();
+            await semaphore.WaitAsync().ConfigureAwait(false);
             return new LockReleaser(semaphore);
         }
 

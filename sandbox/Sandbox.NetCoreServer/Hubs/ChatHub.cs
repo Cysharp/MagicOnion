@@ -30,13 +30,16 @@ namespace Sandbox.NetCoreServer.Hubs
         public async Task JoinAsync(string userName, string roomName)
         {
             this.userName = userName;
-            this.room = await Group.AddAsync("InMemoryRoom:" + roomName, this.Context);
+            this.room = await Group.AddAsync("InMemoryRoom:" + roomName);
         }
 
         public Task SendMessageAsync(string message)
         {
             // broadcast to connected group(same roomname members).
-            Broadcast(room).OnReceiveMessage(this.userName, message);
+            if (room != null)
+            {
+                Broadcast(room).OnReceiveMessage(this.userName, message);
+            }
 
             return Task.CompletedTask;
         }

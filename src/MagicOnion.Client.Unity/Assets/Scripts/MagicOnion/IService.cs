@@ -1,0 +1,1 @@
+../../../../MagicOnion/IService.cs

@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server.Hubs
@@ -16,6 +15,27 @@ namespace MagicOnion.Server.Hubs
         bool TryRemove(string groupName);
     }
 
+    public class HubGroupRepository
+    {
+        readonly ServiceContext serviceContext;
+        readonly IGroupRepository repository;
+
+        public IGroupRepository RawGroupRepository => repository;
+
+        public HubGroupRepository(ServiceContext serviceContext, IGroupRepository repository)
+        {
+            this.serviceContext = serviceContext;
+            this.repository = repository;
+        }
+
+        public async ValueTask<IGroup> AddAsync(string groupName)
+        {
+            var group = repository.GetOrAdd(groupName);
+            await group.AddAsync(serviceContext).ConfigureAwait(false);
+            return group;
+        }
+    }
+
     public interface IGroup
     {
         string GroupName { get; }
@@ -27,15 +47,5 @@ namespace MagicOnion.Server.Hubs
         Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget);
         Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget);
         Task WriteRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget);
-    }
-
-    public static class GroupRepositoryExtensions
-    {
-        public static async ValueTask<IGroup> AddAsync(this IGroupRepository repository, string groupName, ServiceContext context)
-        {
-            var group = repository.GetOrAdd(groupName);
-            await group.AddAsync(context).ConfigureAwait(false);
-            return group;
-        }
     }
 }

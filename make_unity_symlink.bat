@@ -3,6 +3,7 @@ mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\AsyncStreamReade
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\ClientStreamingResult.cs" "..\..\..\..\MagicOnion\ClientStreamingResult.cs"
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\DuplexStreamingResult.cs" "..\..\..\..\MagicOnion\DuplexStreamingResult.cs"
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\DynamicArgumentTuple.cs" "..\..\..\..\MagicOnion\DynamicArgumentTuple.cs"
+mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\AsyncLock.cs" "..\..\..\..\MagicOnion\AsyncLock.cs"
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\GenerateDefineDebugAttribute.cs" "..\..\..\..\MagicOnion\GenerateDefineDebugAttribute.cs"
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\IgnoreAttribute.cs" "..\..\..\..\MagicOnion\IgnoreAttribute.cs"
 mklink ".\src\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\IService.cs" "..\..\..\..\MagicOnion\IService.cs"

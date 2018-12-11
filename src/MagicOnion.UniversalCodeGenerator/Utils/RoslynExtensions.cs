@@ -45,20 +45,34 @@ namespace MagicOnion
 
         public static AdhocWorkspace GetWorkspaceWithPreventBuildEvent(this AnalyzerManager manager)
         {
+            // info article: https://qiita.com/skitoy4321/items/9edfb094549f5167a57f
+            var projPath = manager.Projects.First().Value.ProjectFile.Path;
+            var tempPath = Path.Combine(new FileInfo(projPath).Directory.FullName, "__buildtemp") + System.IO.Path.DirectorySeparatorChar;
+
             var envopts = new EnvironmentOptions();
             // "Clean" and "Build" is listed in default
             // Modify to designtime system https://github.com/dotnet/project-system/blob/master/docs/design-time-builds.md#targets-that-run-during-design-time-builds
             // that prevent Pre/PostBuildEvent
 
-            // info article: https://qiita.com/skitoy4321/items/9edfb094549f5167a57f
             envopts.TargetsToBuild.Clear();
-            envopts.TargetsToBuild.Add("Clean");
+            // Clean should not use(if use pre/post build, dll was deleted).
+            // envopts.TargetsToBuild.Add("Clean");
             envopts.TargetsToBuild.Add("ResolveAssemblyReferencesDesignTime");
             envopts.TargetsToBuild.Add("ResolveProjectReferencesDesignTime");
             envopts.TargetsToBuild.Add("ResolveComReferencesDesignTime");
             envopts.TargetsToBuild.Add("Compile");
-
-            return GetWorkspace(manager, envopts);
+            envopts.GlobalProperties["IntermediateOutputPath"] = tempPath;
+            try
+            {
+                return GetWorkspace(manager, envopts);
+            }
+            finally
+            {
+                if (Directory.Exists(tempPath))
+                {
+                    Directory.Delete(tempPath, true);
+                }
+            }
         }
 
         public static AdhocWorkspace GetWorkspace(this AnalyzerManager manager, EnvironmentOptions envOptions)

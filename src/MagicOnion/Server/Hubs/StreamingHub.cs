@@ -10,7 +10,7 @@ namespace MagicOnion.Server.Hubs
         static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
         static protected readonly ValueTask CompletedTask = new ValueTask();
 
-        public IGroupRepository Group { get; private set; }
+        public HubGroupRepository Group { get; private set; }
 
         // Broadcast Commands
 
@@ -62,7 +62,8 @@ namespace MagicOnion.Server.Hubs
             var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
             Context.AsyncWriterLock = new AsyncLock();
 
-            Group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
+            var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
+            this.Group = new HubGroupRepository(this.Context, group);
             try
             {
                 await OnConnecting();

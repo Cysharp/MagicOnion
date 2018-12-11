@@ -27,7 +27,7 @@ namespace Sandbox.NetCoreServer
             //Environment.SetEnvironmentVariable("GRPC_TRACE", "all");
 
             Environment.SetEnvironmentVariable("SETTINGS_MAX_HEADER_LIST_SIZE", "1000000");
-            
+
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
             var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
@@ -51,66 +51,84 @@ namespace Sandbox.NetCoreServer
 
             Console.ReadLine();
 
-            var foo = new ClientProgram().Start("Foo", "TEST_ROOM");
-            var bar = new ClientProgram().Start("Bar", "TEST_ROOM");
+            {
+                var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+                var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
 
-            await Task.WhenAll(foo, bar);
-            //await foo;
+                Console.WriteLine("Call to Server");
+                await client.JoinAsync("me", "foo");
+                await Task.WhenAll(
+                    client.SendMessageAsync("a"),
+                    client.SendMessageAsync("b"),
+                    client.SendMessageAsync("c"),
+                    client.SendMessageAsync("d"),
+                    client.SendMessageAsync("e"));
+
+                Console.WriteLine("OK to Send");
+            }
         }
 
     }
 
-
-
-    public class ClientProgram : IMessageReceiver
+    class Receiver : IMessageReceiver2
     {
-        public async Task Start(string user, string room)
-        {
-            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-
-            var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(channel, this);
-            RegisterDisconnect(client);
-            try
-            {
-                await client.JoinAsync(user, room);
-
-                await client.SendMessageAsync("Who");
-                await client.SendMessageAsync("Bar");
-                await client.SendMessageAsync("Baz");
-
-                await client.LeaveAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            finally
-            {
-                await client.DisposeAsync();
-            }
-        }
-
-        async void RegisterDisconnect(IChatHub client)
-        {
-            try
-            {
-                // you can wait disconnected event
-                await client.WaitForDisconnect();
-            }
-            finally
-            {
-                // try-to-reconnect? logging event? etc...
-                Console.WriteLine("disconnected");
-            }
-        }
-
-#pragma warning disable CS1998
-
         public void OnReceiveMessage(string senderUser, string message)
         {
             Console.WriteLine(senderUser + ":" + message);
         }
     }
+
+
+    //    public class ClientProgram : 
+
+    //    {
+    //        public async Task Start(string user, string room)
+    //        {
+    //            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+
+    //            var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver>(channel, this);
+    //            RegisterDisconnect(client);
+    //            try
+    //            {
+    //                await client.JoinAsync(user, room);
+
+    //                await client.SendMessageAsync("Who");
+    //                await client.SendMessageAsync("Bar");
+    //                await client.SendMessageAsync("Baz");
+
+    //                await client.LeaveAsync();
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                Console.WriteLine(ex);
+    //            }
+    //            finally
+    //            {
+    //                await client.DisposeAsync();
+    //            }
+    //        }
+
+    //        async void RegisterDisconnect(IChatHub client)
+    //        {
+    //            try
+    //            {
+    //                // you can wait disconnected event
+    //                await client.WaitForDisconnect();
+    //            }
+    //            finally
+    //            {
+    //                // try-to-reconnect? logging event? etc...
+    //                Console.WriteLine("disconnected");
+    //            }
+    //        }
+
+    //#pragma warning disable CS1998
+
+    //        public void OnReceiveMessage(string senderUser, string message)
+    //        {
+    //            Console.WriteLine(senderUser + ":" + message);
+    //        }
+    //    }
 
 
 
