@@ -3,6 +3,22 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server.Hubs
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class GroupConfigurationAttribute : Attribute
+    {
+        Type type;
+
+        public GroupConfigurationAttribute(Type groupRepositoryFactoryType)
+        {
+            this.type = groupRepositoryFactoryType;
+        }
+
+        public IGroupRepositoryFactory Create()
+        {
+            return (IGroupRepositoryFactory)Activator.CreateInstance(type);
+        }
+    }
+
     public interface IGroupRepositoryFactory
     {
         IGroupRepository CreateRepository(IServiceLocator serviceLocator);

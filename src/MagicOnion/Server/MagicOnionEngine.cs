@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server
@@ -81,85 +82,101 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
-            Parallel.ForEach(types, /* new ParallelOptions { MaxDegreeOfParallelism = 1 }, */ classType =>
+            try
             {
-                var className = classType.Name;
-                if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
+                Parallel.ForEach(types, /* new ParallelOptions { MaxDegreeOfParallelism = 1 }, */ classType =>
                 {
-                    throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
-                }
-
-                var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
-                HashSet<StreamingHubHandler> tempStreamingHubHandlers = null;
-                MethodHandler tempParentStreamingMethodHandler = null;
-                if (isStreamingHub)
-                {
-                    tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
-                }
-
-                foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
-                    if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
-
-                    var methodName = methodInfo.Name;
-
-                    // ignore default methods
-                    if (methodName == "Equals"
-                     || methodName == "GetHashCode"
-                     || methodName == "GetType"
-                     || methodName == "ToString"
-                     || methodName == "WithOptions"
-                     || methodName == "WithHeaders"
-                     || methodName == "WithDeadline"
-                     || methodName == "WithCancellationToken"
-                     || methodName == "WithHost"
-                     )
+                    var className = classType.Name;
+                    if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
                     {
-                        continue;
+                        throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
                     }
 
-                    // register for StreamingHub
-                    if (isStreamingHub && methodName != "Connect")
+                    var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
+                    HashSet<StreamingHubHandler> tempStreamingHubHandlers = null;
+                    MethodHandler tempParentStreamingMethodHandler = null;
+                    if (isStreamingHub)
                     {
-                        var streamingHandler = new StreamingHubHandler(option, classType, methodInfo);
-                        if (!tempStreamingHubHandlers.Add(streamingHandler))
+                        tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
+                    }
+
+                    foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
+                        if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
+
+                        var methodName = methodInfo.Name;
+
+                        // ignore default methods
+                        if (methodName == "Equals"
+                             || methodName == "GetHashCode"
+                             || methodName == "GetType"
+                             || methodName == "ToString"
+                             || methodName == "WithOptions"
+                             || methodName == "WithHeaders"
+                             || methodName == "WithDeadline"
+                             || methodName == "WithCancellationToken"
+                             || methodName == "WithHost"
+                             )
                         {
-                            throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
+                            continue;
                         }
-                        continue;
-                    }
-                    else
-                    {
-                        // create handler
-                        var handler = new MethodHandler(option, classType, methodInfo);
-                        lock (builder)
+
+                        // register for StreamingHub
+                        if (isStreamingHub && methodName != "Connect")
                         {
-                            if (!handlers.Add(handler))
+                            var streamingHandler = new StreamingHubHandler(option, classType, methodInfo);
+                            if (!tempStreamingHubHandlers.Add(streamingHandler))
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                             }
-                            handler.RegisterHandler(builder);
+                            continue;
                         }
-
-                        if (isStreamingHub && methodName == "Connect")
+                        else
                         {
-                            tempParentStreamingMethodHandler = handler;
+                            // create handler
+                            var handler = new MethodHandler(option, classType, methodInfo);
+                            lock (builder)
+                            {
+                                if (!handlers.Add(handler))
+                                {
+                                    throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
+                                }
+                                handler.RegisterHandler(builder);
+                            }
+
+                            if (isStreamingHub && methodName == "Connect")
+                            {
+                                tempParentStreamingMethodHandler = handler;
+                            }
                         }
                     }
-                }
 
-                if (isStreamingHub)
-                {
-                    lock (streamingHubHandlers)
+                    if (isStreamingHub)
                     {
-                        streamingHubHandlers.AddRange(tempStreamingHubHandlers);
-                        StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
-                        // TODO:ConfigureFactory
-                        StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, option.DefaultGroupRepositoryFactory.CreateRepository(option.ServiceLocator));
+                        lock (streamingHubHandlers)
+                        {
+                            streamingHubHandlers.AddRange(tempStreamingHubHandlers);
+                            StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
+                            IGroupRepositoryFactory factory;
+                            var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
+                            if (attr != null)
+                            {
+                                factory = attr.Create();
+                            }
+                            else
+                            {
+                                factory = option.DefaultGroupRepositoryFactory;
+                            }
+                            StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, factory.CreateRepository(option.ServiceLocator));
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (AggregateException agex)
+            {
+                ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
+            }
 
             var result = new MagicOnionServiceDefinition(builder.Build(), handlers.ToArray(), streamingHubHandlers.ToArray());
 

@@ -29,7 +29,7 @@ namespace MagicOnion.Server
         // options
 
         internal readonly bool isReturnExceptionStackTraceInErrorDetail;
-        readonly IMagicOnionLogger logger;
+        internal readonly IMagicOnionLogger logger;
         readonly bool enableCurrentContext;
 
         // use for request handling.

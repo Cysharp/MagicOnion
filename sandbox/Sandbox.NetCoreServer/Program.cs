@@ -49,8 +49,6 @@ namespace Sandbox.NetCoreServer
 
             server.Start();
 
-            Console.ReadLine();
-
             {
                 var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
                 var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
@@ -174,7 +172,7 @@ namespace Sandbox.NetCoreServer
 
     //    public IChatHub FireAndForget()
     //    {
-    //        return new FireAndForgetClient(this); // TODO:use field cached.
+    //        return new FireAndForgetClient(this); 
     //    }
 
     //    protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)

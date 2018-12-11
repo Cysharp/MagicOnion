@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -89,7 +90,6 @@
     <Compile Include="Assets\Scripts\MagicOnion\Server\Hubs\MethodIdAttribute.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\ServerStreamingResult.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\UnaryResult.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncMethodBuilderAttribute.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncStreamReaderExtensions.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\ChannelExtensions.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\CompileStopperDuringPlayMode.cs" />

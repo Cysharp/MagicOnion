@@ -11,21 +11,23 @@ namespace MagicOnion.Server.Hubs
     {
         public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
         {
-            return new ImmutableArrayGroupRepository(serviceLocator.GetService<IFormatterResolver>());
+            return new ImmutableArrayGroupRepository(serviceLocator.GetService<IFormatterResolver>(), serviceLocator.GetService<IMagicOnionLogger>());
         }
     }
 
     public class ImmutableArrayGroupRepository : IGroupRepository
     {
         IFormatterResolver resolver;
+        IMagicOnionLogger logger;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public ImmutableArrayGroupRepository(IFormatterResolver resolver)
+        public ImmutableArrayGroupRepository(IFormatterResolver resolver, IMagicOnionLogger logger)
         {
             this.resolver = resolver;
             this.factory = CreateGroup;
+            this.logger = logger;
         }
 
         public IGroup GetOrAdd(string groupName)
@@ -35,7 +37,7 @@ namespace MagicOnion.Server.Hubs
 
         IGroup CreateGroup(string groupName)
         {
-            return new ImmutableArrayGroup(groupName, this, resolver);
+            return new ImmutableArrayGroup(groupName, this, resolver, logger);
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -54,16 +56,18 @@ namespace MagicOnion.Server.Hubs
         readonly object gate = new object();
         readonly IGroupRepository parent;
         readonly IFormatterResolver resolver;
+        readonly IMagicOnionLogger logger;
 
         ImmutableArray<ServiceContext> members;
 
         public string GroupName { get; }
 
-        public ImmutableArrayGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver)
+        public ImmutableArrayGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
         {
             this.GroupName = groupName;
             this.parent = parent;
             this.resolver = resolver;
+            this.logger = logger;
             this.members = ImmutableArray<ServiceContext>.Empty;
         }
 
@@ -112,6 +116,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     WriteInAsyncLockVoid(source[i], message);
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
                 return Task.CompletedTask;
             }
             else
@@ -121,7 +126,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     promise.Add(WriteInAsyncLock(source[i], message));
                 }
-
+                logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
                 return promise.AsValueTask().AsTask();
             }
         }
@@ -133,18 +138,22 @@ namespace MagicOnion.Server.Hubs
             var source = members;
             if (fireAndForget)
             {
+                var writeCount = 0;
                 for (int i = 0; i < source.Length; i++)
                 {
                     if (source[i].ContextId != connectionId)
                     {
                         WriteInAsyncLockVoid(source[i], message);
+                        writeCount++;
                     }
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var promise = new ReservedWhenAllPromise(source.Length);
+                var writeCount = 0;
                 for (int i = 0; i < source.Length; i++)
                 {
                     if (source[i].ContextId == connectionId)
@@ -154,9 +163,11 @@ namespace MagicOnion.Server.Hubs
                     else
                     {
                         promise.Add(WriteInAsyncLock(source[i], message));
+                        writeCount++;
                     }
                 }
 
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsValueTask().AsTask();
             }
         }
@@ -168,6 +179,7 @@ namespace MagicOnion.Server.Hubs
             var source = members;
             if (fireAndForget)
             {
+                var writeCount = 0;
                 for (int i = 0; i < source.Length; i++)
                 {
                     foreach (var item in connectionIds)
@@ -179,14 +191,17 @@ namespace MagicOnion.Server.Hubs
                     }
 
                     WriteInAsyncLockVoid(source[i], message);
+                    writeCount++;
                 NEXT:
                     continue;
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var promise = new ReservedWhenAllPromise(source.Length);
+                var writeCount = 0;
                 for (int i = 0; i < source.Length; i++)
                 {
                     foreach (var item in connectionIds)
@@ -199,10 +214,12 @@ namespace MagicOnion.Server.Hubs
                     }
 
                     promise.Add(WriteInAsyncLock(source[i], message));
+                    writeCount++;
                 NEXT:
                     continue;
                 }
 
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsValueTask().AsTask();
             }
         }
@@ -216,11 +233,13 @@ namespace MagicOnion.Server.Hubs
             var source = members;
             if (fireAndForget)
             {
+                var writeCount = 0;
                 if (exceptConnectionIds == null)
                 {
                     for (int i = 0; i < source.Length; i++)
                     {
                         WriteInAsyncLockVoid(source[i], message);
+                        writeCount++;
                     }
                 }
                 else
@@ -235,22 +254,24 @@ namespace MagicOnion.Server.Hubs
                             }
                         }
                         WriteInAsyncLockVoid(source[i], message);
-
+                        writeCount++;
                     NEXT:
                         continue;
                     }
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var promise = new ReservedWhenAllPromise(source.Length);
-
+                var writeCount = 0;
                 if (exceptConnectionIds == null)
                 {
                     for (int i = 0; i < source.Length; i++)
                     {
                         promise.Add(WriteInAsyncLock(source[i], message));
+                        writeCount++;
                     }
                 }
                 else
@@ -267,11 +288,13 @@ namespace MagicOnion.Server.Hubs
                         }
 
                         promise.Add(WriteInAsyncLock(source[i], message));
+                        writeCount++;
                     NEXT:
                         continue;
                     }
                 }
 
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsValueTask().AsTask();
             }
         }

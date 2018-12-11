@@ -109,22 +109,31 @@ namespace MagicOnion.Server.Hubs
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
+                            Path = handler.ToString(),
                             MethodId = handler.MethodId,
-                            MessageId = -1
+                            MessageId = -1,
+                            Timestamp = DateTime.UtcNow
                         };
 
+                        var isErrorOrInterrupted = false;
+                        Context.MethodHandler.logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
                         try
                         {
                             await handler.MethodBody.Invoke(context);
                         }
                         catch (Exception ex)
                         {
-                            // TODO:nanika error log.
+                            isErrorOrInterrupted = true;
+                            LogError(ex, context);
+                        }
+                        finally
+                        {
+                            Context.MethodHandler.logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
                         }
                     }
                     else
                     {
-                        throw new InvalidOperationException("foo bar baz"); // TODO:error message details.
+                        throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
                     }
                 }
                 else if (length == 3)
@@ -145,23 +154,33 @@ namespace MagicOnion.Server.Hubs
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
+                            Path = handler.ToString(),
                             MethodId = handler.MethodId,
-                            MessageId = messageId
+                            MessageId = messageId,
+                            Timestamp = DateTime.UtcNow
                         };
 
+                        var isErrorOrInterrupted = false;
+                        Context.MethodHandler.logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
                         try
                         {
                             await handler.MethodBody.Invoke(context);
                         }
                         catch (Exception ex)
                         {
+                            LogError(ex, context);
+
                             // error-response:  [messageId, Nil, StringMessage]
                             await context.WriteErrorMessage(ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                        }
+                        finally
+                        {
+                            Context.MethodHandler.logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
                         }
                     }
                     else
                     {
-                        throw new InvalidOperationException("foo bar baz"); // TODO:error message details.
+                        throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
                     }
                 }
                 else
@@ -169,6 +188,11 @@ namespace MagicOnion.Server.Hubs
                     throw new InvalidOperationException("Invalid data format.");
                 }
             }
+        }
+
+        void LogError(Exception ex, StreamingHubContext context)
+        {
+            Logger.Error(ex, "StreamingHubHandler throws exception occured in " + context.Path);
         }
 
         // Interface methods for Client

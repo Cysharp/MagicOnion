@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Server
 {
@@ -60,6 +61,30 @@ namespace MagicOnion.Server
             foreach (var x in inner)
             {
                 x.ReadFromStream(context, readData, type, complete);
+            }
+        }
+
+        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        {
+            foreach (var x in inner)
+            {
+                x.BeginInvokeHubMethod(context, request, type);
+            }
+        }
+
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+            foreach (var x in inner)
+            {
+                x.EndInvokeHubMethod(context, responseSize, type, elapsed, isErrorOrInterrupted);
+            }
+        }
+
+        public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
+        {
+            foreach (var x in inner)
+            {
+                x.InvokeHubBroadcast(groupName, responseSize, broadcastGroupCount);
             }
         }
     }

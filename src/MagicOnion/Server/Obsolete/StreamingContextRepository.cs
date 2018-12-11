@@ -65,7 +65,7 @@ namespace MagicOnion.Server
         public bool IsDisposed => isDisposed;
         public ConnectionContext ConnectionContext { get; }
 
-        // TODO:Obsolete?
+        [Obsolete("Use Hub instead.")]
         public StreamingContextRepository(ConnectionContext connectionContext)
         {
             this.ConnectionContext = connectionContext;

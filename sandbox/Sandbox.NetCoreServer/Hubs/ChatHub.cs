@@ -16,11 +16,13 @@ namespace Sandbox.NetCoreServer.Hubs
 
     public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver2>
     {
+        [MethodId(100)]
         Task JoinAsync(string userName, string roomName);
         Task LeaveAsync();
         Task SendMessageAsync(string message);
     }
 
+    [GroupConfiguration(typeof(ConcurrentDictionaryGroupRepositoryFactory))]
     public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver2>, IChatHub
     {
         // insantiate per user connected and live while connecting.

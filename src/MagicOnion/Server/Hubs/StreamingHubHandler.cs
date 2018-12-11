@@ -18,10 +18,13 @@ namespace MagicOnion.Server.Hubs
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
         readonly StreamingHubFilterAttribute[] filters;
-        readonly Type RequestType;
+        internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
         internal readonly IFormatterResolver resolver;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
+
+        readonly string toStringCache;
+        readonly int getHashCodeCache;
 
         // reflection cache
         // Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
@@ -30,10 +33,20 @@ namespace MagicOnion.Server.Hubs
 
         public StreamingHubHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
+            var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
+            var interfaceMethod = hubInterface.GetMethods().First(x => x.Name == methodInfo.Name);
+
+
             this.HubType = classType;
-            this.HubName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0].Name;
+            this.HubName = hubInterface.Name;
             this.MethodInfo = methodInfo;
-            this.MethodId = FNV1A32.GetHashCode(methodInfo.Name); // TODO:GetFromAttribute(from interface method!) or FNV1A32
+            // Validation for Id
+            if (methodInfo.GetCustomAttribute<MethodIdAttribute>() != null)
+            {
+                throw new InvalidOperationException($"Hub Implementation can not add [MethodId], you should add hub `interface`. {classType.Name}/{methodInfo.Name}");
+            }
+            this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
+
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
             this.resolver = options.FormatterResolver;
 
@@ -53,6 +66,15 @@ namespace MagicOnion.Server.Hubs
                 .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true))
                 .OrderBy(x => x.Order)
                 .ToArray();
+
+            // validation filter
+            if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)
+            {
+                throw new InvalidOperationException($"StreamingHub method can not add [MagicOnionFilter], you should add [StreamingHubFilter]. {classType.Name}/{methodInfo.Name}");
+            }
+
+            this.toStringCache = HubName + "/" + MethodInfo.Name;
+            this.getHashCodeCache = HubName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
 
             // ValueTask (StreamingHubContext context) =>
             // {
@@ -145,12 +167,12 @@ namespace MagicOnion.Server.Hubs
 
         public override string ToString()
         {
-            return HubName + "/" + MethodInfo.Name;
+            return toStringCache;
         }
 
         public override int GetHashCode()
         {
-            return HubName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
+            return getHashCodeCache;
         }
 
         public bool Equals(StreamingHubHandler other)

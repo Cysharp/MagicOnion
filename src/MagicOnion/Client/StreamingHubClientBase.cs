@@ -152,14 +152,30 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-            // TODO:Buffer.Rent
-            byte[] buffer = null;
-            var offset = 0;
-            offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-            offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-            offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
+#if NON_UNITY
+            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
+#else
+            var rent = MessagePack.Internal.BufferPool.Default.Rent();
+#endif
+            var buffer = rent;
+            byte[] v;
+            try
+            {
+                var offset = 0;
+                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
+                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
+                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
 
-            var v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+                v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+            }
+            finally
+            {
+#if NON_UNITY
+                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
+#else
+                MessagePack.Internal.BufferPool.Default.Return(rent);
+#endif
+            }
             using (await asyncLock.LockAsync())
             {
                 await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
@@ -180,16 +196,30 @@ namespace MagicOnion.Client
             var tcs = new TaskCompletionSourceEx<TResponse>(); // use Ex
             responseFutures[mid] = (object)tcs;
 
-            // TODO:Rent Pool
-            byte[] buffer = null;
-            var offset = 0;
-            offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-            offset += MessagePackBinary.WriteInt32(ref buffer, offset, mid);
-            offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-            offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
-
-            var v = MessagePackBinary.FastCloneWithResize(buffer, offset);
-
+#if NON_UNITY
+            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
+#else
+            var rent = MessagePack.Internal.BufferPool.Default.Rent();
+#endif
+            var buffer = rent;
+            byte[] v;
+            try
+            {
+                var offset = 0;
+                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
+                offset += MessagePackBinary.WriteInt32(ref buffer, offset, mid);
+                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
+                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
+                v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+            }
+            finally
+            {
+#if NON_UNITY
+                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
+#else
+                MessagePack.Internal.BufferPool.Default.Return(rent);
+#endif
+            }
             using (await asyncLock.LockAsync())
             {
                 await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);

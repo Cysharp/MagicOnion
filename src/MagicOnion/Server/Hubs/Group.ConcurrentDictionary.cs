@@ -12,21 +12,23 @@ namespace MagicOnion.Server.Hubs
     {
         public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
         {
-            return new ConcurrentDictionaryGroupRepository(serviceLocator.GetService<IFormatterResolver>());
+            return new ConcurrentDictionaryGroupRepository(serviceLocator.GetService<IFormatterResolver>(), serviceLocator.GetService<IMagicOnionLogger>());
         }
     }
 
     public class ConcurrentDictionaryGroupRepository : IGroupRepository
     {
         IFormatterResolver resolver;
+        IMagicOnionLogger logger;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public ConcurrentDictionaryGroupRepository(IFormatterResolver resolver)
+        public ConcurrentDictionaryGroupRepository(IFormatterResolver resolver, IMagicOnionLogger logger)
         {
             this.resolver = resolver;
             this.factory = CreateGroup;
+            this.logger = logger;
         }
 
         public IGroup GetOrAdd(string groupName)
@@ -36,7 +38,7 @@ namespace MagicOnion.Server.Hubs
 
         IGroup CreateGroup(string groupName)
         {
-            return new ConcurrentDictionaryGroup(groupName, this, resolver);
+            return new ConcurrentDictionaryGroup(groupName, this, resolver, logger);
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -58,16 +60,18 @@ namespace MagicOnion.Server.Hubs
 
         readonly IGroupRepository parent;
         readonly IFormatterResolver resolver;
+        readonly IMagicOnionLogger logger;
 
         ConcurrentDictionary<Guid, ServiceContext> members;
 
         public string GroupName { get; }
 
-        public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver)
+        public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
         {
             this.GroupName = groupName;
             this.parent = parent;
             this.resolver = resolver;
+            this.logger = logger;
             this.members = new ConcurrentDictionary<Guid, ServiceContext>();
         }
 
@@ -109,15 +113,19 @@ namespace MagicOnion.Server.Hubs
 
             if (fireAndForget)
             {
+                var writeCount = 0;
                 foreach (var item in members)
                 {
                     WriteInAsyncLockVoid(item.Value, message);
+                    writeCount++;
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                var writeCount = 0;
                 ValueTask promise;
                 try
                 {
@@ -130,6 +138,7 @@ namespace MagicOnion.Server.Hubs
                             Array.Resize(ref buffer, buffer.Length * 2);
                         }
                         buffer[index++] = WriteInAsyncLock(item.Value, message);
+                        writeCount++;
                     }
 
                     promise = ToPromise(buffer, index);
@@ -138,6 +147,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     ArrayPool<ValueTask>.Shared.Return(rent, true);
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsTask();
             }
         }
@@ -147,18 +157,22 @@ namespace MagicOnion.Server.Hubs
             var message = BuildMessage(methodId, value);
             if (fireAndForget)
             {
+                var writeCount = 0;
                 foreach (var item in members)
                 {
                     if (item.Value.ContextId != connectionId)
                     {
                         WriteInAsyncLockVoid(item.Value, message);
+                        writeCount++;
                     }
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                var writeCount = 0;
                 ValueTask promise;
                 try
                 {
@@ -177,6 +191,7 @@ namespace MagicOnion.Server.Hubs
                         else
                         {
                             buffer[index++] = WriteInAsyncLock(item.Value, message);
+                            writeCount++;
                         }
                     }
 
@@ -186,6 +201,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     ArrayPool<ValueTask>.Shared.Return(rent, true);
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsTask();
             }
         }
@@ -195,6 +211,7 @@ namespace MagicOnion.Server.Hubs
             var message = BuildMessage(methodId, value);
             if (fireAndForget)
             {
+                var writeCount = 0;
                 foreach (var item in members)
                 {
                     foreach (var item2 in connectionIds)
@@ -205,15 +222,18 @@ namespace MagicOnion.Server.Hubs
                         }
                     }
                     WriteInAsyncLockVoid(item.Value, message);
+                    writeCount++;
                 NEXT:
                     continue;
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return Task.CompletedTask;
             }
             else
             {
                 var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
                 ValueTask promise;
+                var writeCount = 0;
                 try
                 {
                     var buffer = rent;
@@ -234,6 +254,7 @@ namespace MagicOnion.Server.Hubs
                             }
                         }
                         buffer[index++] = WriteInAsyncLock(item.Value, message);
+                        writeCount++;
 
                     NEXT:
                         continue;
@@ -245,6 +266,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     ArrayPool<ValueTask>.Shared.Return(rent, true);
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsTask();
             }
         }
@@ -258,14 +280,18 @@ namespace MagicOnion.Server.Hubs
             {
                 if (exceptConnectionIds == null)
                 {
+                    var writeCount = 0;
                     foreach (var item in members)
                     {
                         WriteInAsyncLockVoid(item.Value, message);
+                        writeCount++;
                     }
+                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                     return Task.CompletedTask;
                 }
                 else
                 {
+                    var writeCount = 0;
                     foreach (var item in members)
                     {
                         foreach (var item2 in exceptConnectionIds)
@@ -276,15 +302,18 @@ namespace MagicOnion.Server.Hubs
                             }
                         }
                         WriteInAsyncLockVoid(item.Value, message);
+                        writeCount++;
                     NEXT:
                         continue;
                     }
+                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                     return Task.CompletedTask;
                 }
             }
             else
             {
                 var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
+                var writeCount = 0;
                 ValueTask promise;
                 try
                 {
@@ -300,6 +329,7 @@ namespace MagicOnion.Server.Hubs
                             }
 
                             buffer[index++] = WriteInAsyncLock(item.Value, message);
+                            writeCount++;
                         }
                     }
                     else
@@ -320,6 +350,7 @@ namespace MagicOnion.Server.Hubs
                                 }
                             }
                             buffer[index++] = WriteInAsyncLock(item.Value, message);
+                            writeCount++;
 
                         NEXT:
                             continue;
@@ -331,6 +362,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     ArrayPool<ValueTask>.Shared.Return(rent, true);
                 }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
                 return promise.AsTask();
             }
         }
