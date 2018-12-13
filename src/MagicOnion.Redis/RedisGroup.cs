@@ -88,6 +88,13 @@ namespace MagicOnion.Redis
 
         public string GroupName { get; }
 
+
+        public IInMemoryStorage<T> GetInMemoryStorage<T>()
+            where T : class
+        {
+            throw new NotSupportedException("InMemoryStorage does not support in RedisGroup.");
+        }
+
         public async ValueTask AddAsync(ServiceContext context)
         {
             await database.StringIncrementAsync(counterKey, 1).ConfigureAwait(false);

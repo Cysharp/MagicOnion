@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc" Version="1.16.0" />
+    <PackageReference Include="MessagePack.UnityShims" Version="1.7.3.4" />
   </ItemGroup>
 
   <ItemGroup>

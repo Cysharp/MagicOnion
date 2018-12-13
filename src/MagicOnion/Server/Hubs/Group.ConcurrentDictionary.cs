@@ -58,11 +58,14 @@ namespace MagicOnion.Server.Hubs
         // ConcurrentDictionary.Count is slow, use external counter.
         int approximatelyLength;
 
+        readonly object gate = new object();
+
         readonly IGroupRepository parent;
         readonly IFormatterResolver resolver;
         readonly IMagicOnionLogger logger;
 
         ConcurrentDictionary<Guid, ServiceContext> members;
+        IInMemoryStorage inmemoryStorage;
 
         public string GroupName { get; }
 
@@ -80,6 +83,24 @@ namespace MagicOnion.Server.Hubs
             return new ValueTask<int>(approximatelyLength);
         }
 
+        public IInMemoryStorage<T> GetInMemoryStorage<T>()
+            where T : class
+        {
+            lock (gate)
+            {
+                if (inmemoryStorage == null)
+                {
+                    inmemoryStorage = new DefaultInMemoryStorage<T>();
+                }
+                else if (!(inmemoryStorage is IInMemoryStorage<T>))
+                {
+                    throw new ArgumentException("already initialized inmemory-storage by another type, inmemory-storage only use single type");
+                }
+
+                return (IInMemoryStorage<T>)inmemoryStorage;
+            }
+        }
+
         public ValueTask AddAsync(ServiceContext context)
         {
             if (members.TryAdd(context.ContextId, context))
@@ -94,7 +115,12 @@ namespace MagicOnion.Server.Hubs
             if (members.TryRemove(context.ContextId, out _))
             {
                 Interlocked.Decrement(ref approximatelyLength);
+                if (inmemoryStorage != null)
+                {
+                    inmemoryStorage.Remove(context.ContextId);
+                }
             }
+
             if (members.Count == 0)
             {
                 if (parent.TryRemove(GroupName))

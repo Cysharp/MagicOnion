@@ -8,6 +8,8 @@ namespace MagicOnion
     {
         readonly SemaphoreSlim semaphore;
 
+        public static readonly ValueTask<LockReleaser> EmptyLock = new ValueTask<LockReleaser>(new LockReleaser(null));
+
         public AsyncLock()
         {
             this.semaphore = new SemaphoreSlim(1, 1);
@@ -34,7 +36,7 @@ namespace MagicOnion
 
             public void Dispose()
             {
-                semaphore.Release();
+                semaphore?.Release();
             }
         }
     }

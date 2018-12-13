@@ -59,6 +59,7 @@ namespace MagicOnion.Server.Hubs
         readonly IMagicOnionLogger logger;
 
         ImmutableArray<ServiceContext> members;
+        IInMemoryStorage inmemoryStorage;
 
         public string GroupName { get; }
 
@@ -76,6 +77,24 @@ namespace MagicOnion.Server.Hubs
             return new ValueTask<int>(members.Length);
         }
 
+        public IInMemoryStorage<T> GetInMemoryStorage<T>()
+            where T : class
+        {
+            lock (gate)
+            {
+                if (inmemoryStorage == null)
+                {
+                    inmemoryStorage = new DefaultInMemoryStorage<T>();
+                }
+                else if (!(inmemoryStorage is IInMemoryStorage<T>))
+                {
+                    throw new ArgumentException("already initialized inmemory-storage by another type, inmemory-storage only use single type");
+                }
+
+                return (IInMemoryStorage<T>)inmemoryStorage;
+            }
+        }
+
         public ValueTask AddAsync(ServiceContext context)
         {
             lock (gate)
@@ -90,6 +109,11 @@ namespace MagicOnion.Server.Hubs
             lock (gate)
             {
                 members = members.Remove(context);
+                if (inmemoryStorage != null)
+                {
+                    inmemoryStorage.Remove(context.ContextId);
+                }
+
                 if (members.Length == 0)
                 {
                     if (parent.TryRemove(GroupName))
