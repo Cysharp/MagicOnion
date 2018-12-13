@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using MagicOnion.CompilerServices;
+using MagicOnion.CompilerServices; // require this using in AsyncMethodBuilder
 using MessagePack;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -9,7 +9,9 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncUnaryCall.
     /// </summary>
+#if NON_UNITY || (CSHARP_7_OR_LATER || (UNITY_2018_3_OR_NEWER && (NET_STANDARD_2_0 || NET_4_6)))
     [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder<>))]
+#endif
     public struct UnaryResult<TResponse>
     {
         internal readonly bool hasRawValue; // internal

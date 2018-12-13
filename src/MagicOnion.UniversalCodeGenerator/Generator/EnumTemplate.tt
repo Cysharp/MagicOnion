@@ -6,6 +6,7 @@
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
 namespace MagicOnion.Formatters.<#= Namespace #>
@@ -32,6 +33,7 @@ namespace MagicOnion.Formatters.<#= Namespace #>
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618

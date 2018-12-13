@@ -84,7 +84,8 @@ namespace MagicOnion.Client
                             var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                             offset += readSize;
 
-                            if (responseFutures.TryRemove(messageId, out var future))
+                            object future;
+                            if (responseFutures.TryRemove(messageId, out future))
                             {
                                 if (MessagePackBinary.IsNil(data, offset))
                                 {

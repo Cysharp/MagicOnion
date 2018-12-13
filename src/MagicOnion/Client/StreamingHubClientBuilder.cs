@@ -22,7 +22,7 @@ namespace MagicOnion.Client
         public const string ModuleName = "MagicOnion.Client.StreamingHubClient";
 
         readonly static DynamicAssembly assembly;
-        public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
+        public static DynamicAssembly Assembly { get { return assembly; } }
 
         static StreamingHubClientAssemblyHolder()
         {
@@ -51,7 +51,6 @@ namespace MagicOnion.Client
 
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
         static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        static readonly FieldInfo nilBytes = typeof(MagicOnionMarshallers).GetField("UnsafeNilBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes);
 
@@ -65,11 +64,11 @@ namespace MagicOnion.Client
             var t = typeof(TStreamingHub);
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
-            var module = StreamingHubClientAssemblyHolder.Module;
+            var asm = StreamingHubClientAssemblyHolder.Assembly;
             var methodDefinitions = SearchDefinitions(t);
 
             var parentType = typeof(StreamingHubClientBase<,>).MakeGenericType(typeof(TStreamingHub), typeof(TReceiver));
-            var typeBuilder = module.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}StreamingHubClient_{Guid.NewGuid().ToString()}", TypeAttributes.Public, parentType, new Type[] { t });
+            var typeBuilder = asm.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}StreamingHubClient_{Guid.NewGuid().ToString()}", TypeAttributes.Public, parentType, new Type[] { t });
 
             VerifyMethodDefinitions(typeBuilder, methodDefinitions);
 
@@ -203,7 +202,7 @@ namespace MagicOnion.Client
             }
         }
 
-        static Tuple<ConstructorInfo, FieldInfo> DefineFireAndForgetConstructor(TypeBuilder typeBuilder, Type parentClientType)
+        static Tuple<ConstructorBuilder, FieldBuilder> DefineFireAndForgetConstructor(TypeBuilder typeBuilder, Type parentClientType)
         {
             // .ctor(Parent client) { this.client = client }
             {

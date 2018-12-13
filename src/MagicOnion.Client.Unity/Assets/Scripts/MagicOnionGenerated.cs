@@ -339,6 +339,7 @@ namespace Sandbox.NetCoreServer.Services {
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
 namespace Sandbox.NetCoreServer.Hubs {

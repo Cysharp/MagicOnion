@@ -29,37 +29,38 @@ namespace MagicOnion.Generator
         public virtual string TransformText()
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 168\r\n\r\nnamespace MagicOnion.Formatters.");
+                    " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace Magi" +
+                    "cOnion.Formatters.");
             
-            #line 11 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 12 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n");
             
-            #line 16 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 17 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
  foreach(var info in enumSerializationInfos) { 
             
             #line default
             #line hidden
             this.Write("    public sealed class ");
             
-            #line 17 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 18 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
             
             #line default
             #line hidden
             this.Write("Formatter : global::MessagePack.Formatters.IMessagePackFormatter<");
             
-            #line 17 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 18 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             
             #line default
             #line hidden
             this.Write(">\r\n    {\r\n        public int Serialize(ref byte[] bytes, int offset, ");
             
-            #line 19 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 20 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             
             #line default
@@ -67,21 +68,21 @@ namespace MagicOnion.Generator
             this.Write(" value, global::MessagePack.IFormatterResolver formatterResolver)\r\n        {\r\n   " +
                     "         return MessagePackBinary.Write");
             
-            #line 21 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 22 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(ref bytes, offset, (");
             
-            #line 21 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 22 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
             
             #line default
             #line hidden
             this.Write(")value);\r\n        }\r\n        \r\n        public ");
             
-            #line 24 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 25 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             
             #line default
@@ -89,27 +90,27 @@ namespace MagicOnion.Generator
             this.Write(" Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver for" +
                     "matterResolver, out int readSize)\r\n        {\r\n            return (");
             
-            #line 26 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 27 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             
             #line default
             #line hidden
             this.Write(")MessagePackBinary.Read");
             
-            #line 26 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 27 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
             
             #line default
             #line hidden
             this.Write("(bytes, offset, out readSize);\r\n        }\r\n    }\r\n\r\n");
             
-            #line 30 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
+            #line 31 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\EnumTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 414\r\n#pragma warning " +
-                    "restore 612\r\n#pragma warning restore 618");
+            this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning " +
+                    "restore 414\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
             return this.GenerationEnvironment.ToString();
         }
     }

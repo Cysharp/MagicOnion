@@ -29,16 +29,16 @@ namespace MagicOnion.Generator
         public virtual string TransformText()
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 168\r\n\r\nnamespace ");
+                    " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             
-            #line 11 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 12 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n    public class ");
             
-            #line 16 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 17 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -46,14 +46,14 @@ namespace MagicOnion.Generator
             this.Write(" : global::MessagePack.IFormatterResolver\r\n    {\r\n        public static readonly " +
                     "global::MessagePack.IFormatterResolver Instance = new ");
             
-            #line 18 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 19 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
             #line hidden
             this.Write("();\r\n\r\n        ");
             
-            #line 20 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 21 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -76,7 +76,7 @@ namespace MagicOnion.Generator
             {
                 var f = ");
             
-            #line 36 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 37 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -92,7 +92,7 @@ namespace MagicOnion.Generator
 
     internal static class ");
             
-            #line 45 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 46 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -100,7 +100,7 @@ namespace MagicOnion.Generator
             this.Write("GetFormatterHelper\r\n    {\r\n        static readonly global::System.Collections.Gen" +
                     "eric.Dictionary<Type, int> lookup;\r\n\r\n        static ");
             
-            #line 49 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 50 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             
             #line default
@@ -108,35 +108,35 @@ namespace MagicOnion.Generator
             this.Write("GetFormatterHelper()\r\n        {\r\n            lookup = new global::System.Collecti" +
                     "ons.Generic.Dictionary<Type, int>(");
             
-            #line 51 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 52 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(registerInfos.Length));
             
             #line default
             #line hidden
             this.Write(")\r\n            {\r\n");
             
-            #line 53 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 54 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
             
             #line default
             #line hidden
             this.Write("                {typeof(");
             
-            #line 54 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 55 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.FullName));
             
             #line default
             #line hidden
             this.Write("), ");
             
-            #line 54 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 55 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(" },\r\n");
             
-            #line 55 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 56 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  } 
             
             #line default
@@ -156,35 +156,35 @@ namespace MagicOnion.Generator
             {
 ");
             
-            #line 69 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 70 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
             
             #line default
             #line hidden
             this.Write("                case ");
             
-            #line 70 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 71 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             
             #line default
             #line hidden
             this.Write(": return new ");
             
-            #line 70 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 71 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName:  FormatterNamespace + "." + x.FormatterName));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 71 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
+            #line 72 "C:\GitHubRepositories\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\ResolverTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n#pra" +
-                    "gma warning restore 168\r\n#pragma warning restore 414\r\n#pragma warning restore 61" +
-                    "2\r\n#pragma warning restore 618");
+                    "gma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning restore 41" +
+                    "4\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
             return this.GenerationEnvironment.ToString();
         }
     }
