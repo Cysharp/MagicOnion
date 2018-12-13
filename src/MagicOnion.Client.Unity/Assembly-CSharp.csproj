@@ -8,8 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -71,7 +70,6 @@
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\PingClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClientBase.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Client\Obsolete\ChannelContext.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClientBase.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClientBuilder.cs" />
@@ -769,7 +767,6 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b7/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

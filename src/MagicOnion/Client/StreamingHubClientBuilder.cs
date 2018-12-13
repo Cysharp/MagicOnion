@@ -24,7 +24,7 @@ namespace MagicOnion.Client
         public const string ModuleName = "MagicOnion.Client.StreamingHubClient";
 
         readonly static DynamicAssembly assembly;
-        public static DynamicAssembly Assembly { get { return assembly; } }
+        internal static DynamicAssembly Assembly { get { return assembly; } }
 
         static StreamingHubClientAssemblyHolder()
         {

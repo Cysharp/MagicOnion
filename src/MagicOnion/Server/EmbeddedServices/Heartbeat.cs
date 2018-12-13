@@ -1,5 +1,4 @@
 ﻿#if NON_UNITY
-#pragma warning disable CS0618 // Type or member is obsolete
 
 using Grpc.Core;
 using MessagePack;
@@ -19,9 +18,6 @@ namespace MagicOnion.Server.EmbeddedServices
         {
             var streaming = GetDuplexStreamingContext<Nil, Nil>();
 
-            var id = ConnectionContext.GetConnectionId(Context);
-            var cancellationTokenSource = ConnectionContext.Register(id);
-
             try
             {
                 // send to connect complete.
@@ -36,11 +32,6 @@ namespace MagicOnion.Server.EmbeddedServices
             {
                 // ok, cancelled.
             }
-            finally
-            {
-                ConnectionContext.Unregister(id);
-                cancellationTokenSource.Cancel();
-            }
 
             return streaming.Result();
         }
@@ -48,5 +39,3 @@ namespace MagicOnion.Server.EmbeddedServices
 }
 
 #endif
-
-#pragma warning restore CS0618 // Type or member is obsolete

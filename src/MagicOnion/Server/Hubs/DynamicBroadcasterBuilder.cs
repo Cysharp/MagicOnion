@@ -19,7 +19,7 @@ namespace MagicOnion.Server.Hubs
         public const string ModuleName = "MagicOnion.Server.Hubs.DynamicBroadcaster";
 
         readonly static DynamicAssembly assembly;
-        public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
+        internal static DynamicAssembly Assembly { get { return assembly; } }
 
         static AssemblyHolder()
         {
@@ -59,24 +59,24 @@ namespace MagicOnion.Server.Hubs
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Broadcaster Proxy only allows interface. Type:" + ti.Name);
 
-            var module = AssemblyHolder.Module;
+            var asm = AssemblyHolder.Assembly;
             var methodDefinitions = BroadcasterHelper.SearchDefinitions(t);
             BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
 
             {
-                var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Broadcaster_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
+                var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Broadcaster_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, ctor) = DefineConstructor(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteAllMethodInfo, null);
                 BroadcasterType = typeBuilder.CreateTypeInfo().AsType();
             }
             {
-                var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptOne_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
+                var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptOne_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, except, ctor) = DefineConstructor2(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteExceptOneMethodInfo, except);
                 BroadcasterType_ExceptOne = typeBuilder.CreateTypeInfo().AsType();
             }
             {
-                var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptMany_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
+                var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptMany_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, except, ctor) = DefineConstructor3(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteExceptManyMethodInfo, except);
                 BroadcasterType_ExceptMany = typeBuilder.CreateTypeInfo().AsType();
