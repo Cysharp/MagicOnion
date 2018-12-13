@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NON_UNITY || !NET_STANDARD_2_0
+
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -66,3 +68,5 @@ namespace MagicOnion.Utils
 #endif
     }
 }
+
+#endif

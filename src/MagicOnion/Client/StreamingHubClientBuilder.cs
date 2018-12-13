@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY || !NET_STANDARD_2_0
+
+using Grpc.Core;
 using Grpc.Core.Logging;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
@@ -586,3 +588,5 @@ namespace MagicOnion.Client
         }
     }
 }
+
+#endif

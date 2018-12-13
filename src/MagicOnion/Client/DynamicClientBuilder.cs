@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY || !NET_STANDARD_2_0
+
+using Grpc.Core;
 using MagicOnion.Utils;
 using MessagePack;
 using System;
@@ -482,3 +484,5 @@ namespace MagicOnion.Client
         }
     }
 }
+
+#endif

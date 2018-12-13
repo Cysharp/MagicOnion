@@ -20,7 +20,7 @@ namespace MagicOnion.Client
             StreamingHubClientBase<TStreamingHub, TReceiver> client = null;
             if (ctor == null)
             {
-#if (ENABLE_IL2CPP && !UNITY_EDITOR)
+#if ((ENABLE_IL2CPP && !UNITY_EDITOR) || NET_STANDARD_2_0)
                 throw new InvalidOperationException("Does not registered client factory, dynamic code generation is not supported on IL2CPP. Please use code generator(moc).");
 #else
                 var type = StreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType;
