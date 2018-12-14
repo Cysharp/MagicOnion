@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using Grpc.Core;
+using MessagePack;
 using System;
 using System.Threading.Tasks;
 
@@ -166,12 +167,14 @@ namespace MagicOnion.Server.Hubs
                         {
                             await handler.MethodBody.Invoke(context);
                         }
+                        catch (ReturnStatusException ex)
+                        {
+                            await context.WriteErrorMessage((int)ex.StatusCode, ex.Detail, null, false);
+                        }
                         catch (Exception ex)
                         {
                             LogError(ex, context);
-
-                            // error-response:  [messageId, Nil, StringMessage]
-                            await context.WriteErrorMessage(ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                            await context.WriteErrorMessage((int)StatusCode.Internal, "Erorr on " + handler.ToString(), ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
                         }
                         finally
                         {

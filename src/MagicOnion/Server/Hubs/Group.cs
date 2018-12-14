@@ -144,7 +144,7 @@ namespace MagicOnion.Server.Hubs
         IInMemoryStorage<T> GetInMemoryStorage<T>() where T : class;
         ValueTask<int> GetMemberCountAsync();
         ValueTask AddAsync(ServiceContext context);
-        // Return Bool is removed from parent.
+        /// <summary>Note: return bool is `removed from parent`.</summary>
         ValueTask<bool> RemoveAsync(ServiceContext context);
         Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget);
         Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget);

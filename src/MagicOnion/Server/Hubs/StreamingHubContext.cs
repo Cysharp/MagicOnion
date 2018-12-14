@@ -1,11 +1,27 @@
 ﻿using MessagePack;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server.Hubs
 {
     public class StreamingHubContext
     {
+        ConcurrentDictionary<string, object> items;
+
+        /// <summary>Object storage per invoke.</summary>
+        public ConcurrentDictionary<string, object> Items
+        {
+            get
+            {
+                lock (this) // lock per self! is this dangerous?
+                {
+                    if (items == null) items = new ConcurrentDictionary<string, object>();
+                }
+                return items;
+            }
+        }
+
         /// <summary>Raw gRPC Context.</summary>
         public ServiceContext ServiceContext { get; internal set; }
         public object HubInstance { get; internal set; }
@@ -97,25 +113,32 @@ namespace MagicOnion.Server.Hubs
             responseType = typeof(T);
         }
 
-        internal async ValueTask WriteErrorMessage(Exception ex, bool isReturnExceptionStackTraceInErrorDetail)
+        internal async ValueTask WriteErrorMessage(int statusCode, string detail, Exception ex, bool isReturnExceptionStackTraceInErrorDetail)
         {
             // MessageFormat:
-            // error-response:  [messageId, Nil, StringMessage]
+            // error-response:  [messageId, statusCode, detail, StringMessage]
             var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
             var buffer = rent;
             byte[] result;
             try
             {
                 var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
+                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 4);
                 offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
-                offset += MessagePackBinary.WriteNil(ref buffer, offset);
+                offset += MessagePackBinary.WriteInt32(ref buffer, offset, statusCode);
+                offset += MessagePackBinary.WriteString(ref buffer, offset, detail);
 
                 var msg = (isReturnExceptionStackTraceInErrorDetail)
                     ? ex.ToString()
-                    : "Internal Server Error";
-
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, msg, FormatterResolver);
+                    : null;
+                if (msg != null)
+                {
+                    offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, msg, FormatterResolver);
+                }
+                else
+                {
+                    offset += MessagePackBinary.WriteNil(ref buffer, offset);
+                }
                 result = MessagePackBinary.FastCloneWithResize(buffer, offset);
             }
             finally

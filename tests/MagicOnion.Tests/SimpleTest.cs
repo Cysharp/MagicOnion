@@ -15,6 +15,7 @@ namespace MagicOnion.Tests
     {
         UnaryResult<int> Unary1(int x, int y);
         Task<UnaryResult<int>> Unary1Task(int x, int y);
+        UnaryResult<int> Unary2(int x, int y);
 
         ClientStreamingResult<int, string> ClientStreaming1();
         Task<ClientStreamingResult<int, string>> ClientStreaming1Task();
@@ -103,6 +104,16 @@ namespace MagicOnion.Tests
             await Task.Yield();
             return UnaryResult(x + y);
         }
+
+#pragma warning disable CS1998
+
+        public async UnaryResult<int> Unary2(int x, int y)
+        {
+            return x + y;
+        }
+
+#pragma warning restore CS1998
+
     }
 
     [Collection(nameof(AllAssemblyGrpcServerFixture))]

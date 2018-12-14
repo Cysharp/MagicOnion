@@ -72,7 +72,7 @@ namespace MagicOnion.Client
                         // MessageFormat:
                         // broadcast: [methodId, [argument]]
                         // response:  [messageId, methodId, response]
-                        // error-response: [messageId, Nil, string]
+                        // error-response: [messageId, statusCode, detail, StringMessage]
 
                         var readSize = 0;
                         var offset = 0;
@@ -87,30 +87,39 @@ namespace MagicOnion.Client
                             object future;
                             if (responseFutures.TryRemove(messageId, out future))
                             {
-                                if (MessagePackBinary.IsNil(data, offset))
-                                {
-                                    offset += 1; // ReadNil
+                                var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
+                                offset += readSize;
 
-                                    var response = LZ4MessagePackSerializer.Deserialize<string>(new ArraySegment<byte>(data, offset, data.Length - offset));
-                                    (future as ITaskCompletion).TrySetException(new StreamingHubServerException(response));
+                                try
+                                {
+                                    OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                                    offset += readSize;
-
-                                    try
+                                    if (!(future as ITaskCompletion).TrySetException(ex))
                                     {
-                                        OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if (!(future as ITaskCompletion).TrySetException(ex))
-                                        {
-                                            throw;
-                                        }
+                                        throw;
                                     }
                                 }
+                            }
+                        }
+                        else if (arrayLength == 4)
+                        {
+                            var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
+                            offset += readSize;
+
+                            object future;
+                            if (responseFutures.TryRemove(messageId, out future))
+                            {
+                                var statusCode = MessagePackBinary.ReadInt32(data, offset, out readSize);
+                                offset += readSize;
+
+                                var detail = MessagePackBinary.ReadString(data, offset, out readSize);
+                                offset += readSize;
+
+                                var error = LZ4MessagePackSerializer.Deserialize<string>(new ArraySegment<byte>(data, offset, data.Length - offset));
+
+                                (future as ITaskCompletion).TrySetException(new RpcException(new Status((StatusCode)statusCode, detail), error));
                             }
                         }
                         else
