@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,12 +6,20 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\GitHubRepositories\MagicOnion\sandbox\Sandbox.NetCoreServer\Sandbox.NetCoreServer.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Grpc" Version="1.16.0" />
+    <PackageReference Include="Grpc" Version="1.17.0" />
     <PackageReference Include="MessagePack.UnityShims" Version="1.7.3.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion\MagicOnion.csproj" />
   </ItemGroup>
 

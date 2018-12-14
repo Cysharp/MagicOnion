@@ -73,6 +73,7 @@ namespace MagicOnion.Server.Hubs
             finally
             {
                 await OnDisconnected();
+                await this.Group.DisposeAsync();
             }
 
             return streamingContext.Result();

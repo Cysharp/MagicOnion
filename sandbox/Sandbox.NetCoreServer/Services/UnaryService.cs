@@ -51,14 +51,51 @@ namespace Sandbox.NetCoreServer.Services
 
     }
 
-    //public class UnaryService : ServiceBase<IMyFirstService>, IMyFirstService
-    //{
-    //    [MyFirstFilter]
-    //    public async UnaryResult<string> SumAsync(int x, int y)
-    //    {
-    //        return (x + y).ToString();
-    //    }
-    //}
+    /// <summary>
+    /// 計算処理をするサービス予定は未定。
+    /// </summary>
+    public interface ICalcSerivce
+    {
+        /// <summary>
+        /// ダミーです1。
+        /// </summary>
+        UnaryResult<string> Dump1Async(int x, int y);
+        /// <summary>
+        /// ダミーです2。
+        /// </summary>
+        UnaryResult<string> Dump2Async(int x, int y);
+        /// <summary>
+        /// 足したりします。
+        /// </summary>
+        /// <param name="x">多分X。</param>
+        /// <param name="y">多分Y。</param>
+        /// <returns>何故かString。</returns>
+        UnaryResult<string> SumAsync(int x, int y);
+    }
+
+    public class UnaryService : ServiceBase<ICalcSerivce>, ICalcSerivce
+    {
+        public UnaryResult<string> Dump1Async(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UnaryResult<string> Dump2Async(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UnaryResult<string> DumpAsync(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        [MyFirstFilter]
+        public async UnaryResult<string> SumAsync(int x, int y)
+        {
+            return (x + y).ToString();
+        }
+    }
 
     public class MyFirstFilter : MagicOnionFilterAttribute
     {

@@ -37,8 +37,10 @@ namespace MagicOnion.Server.Hubs
     {
         readonly ServiceContext serviceContext;
         readonly IGroupRepository repository;
+        readonly ConcurrentBag<IGroup> addedGroups = new ConcurrentBag<IGroup>();
 
         public IGroupRepository RawGroupRepository => repository;
+
 
         public HubGroupRepository(ServiceContext serviceContext, IGroupRepository repository)
         {
@@ -53,6 +55,7 @@ namespace MagicOnion.Server.Hubs
         {
             var group = repository.GetOrAdd(groupName);
             await group.AddAsync(serviceContext).ConfigureAwait(false);
+            addedGroups.Add(group);
             return group;
         }
 
@@ -72,6 +75,7 @@ namespace MagicOnion.Server.Hubs
                 else
                 {
                     await group.AddAsync(serviceContext).ConfigureAwait(false);
+                    addedGroups.Add(group);
                     return (true, group);
                 }
             }
@@ -80,6 +84,7 @@ namespace MagicOnion.Server.Hubs
             {
                 group = repository.GetOrAdd(groupName);
                 await group.AddAsync(serviceContext).ConfigureAwait(false);
+                addedGroups.Add(group);
                 return (true, group);
             }
             else
@@ -96,6 +101,7 @@ namespace MagicOnion.Server.Hubs
         {
             var group = repository.GetOrAdd(groupName);
             await group.AddAsync(serviceContext).ConfigureAwait(false);
+            addedGroups.Add(group);
 
             var storage = group.GetInMemoryStorage<TStorage>();
             storage.Set(serviceContext.ContextId, data);
@@ -120,6 +126,7 @@ namespace MagicOnion.Server.Hubs
                 else
                 {
                     await group.AddAsync(serviceContext).ConfigureAwait(false);
+                    addedGroups.Add(group);
                     var storage = group.GetInMemoryStorage<TStorage>();
                     storage.Set(serviceContext.ContextId, data);
                     return (true, group, storage);
@@ -134,6 +141,14 @@ namespace MagicOnion.Server.Hubs
             else
             {
                 return (false, null, null);
+            }
+        }
+
+        internal async ValueTask DisposeAsync()
+        {
+            foreach (var item in addedGroups)
+            {
+                await item.RemoveAsync(serviceContext);
             }
         }
     }

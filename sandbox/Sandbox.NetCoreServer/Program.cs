@@ -2,15 +2,22 @@
 using Grpc.Core.Logging;
 using MagicOnion;
 using MagicOnion.Client;
+using MagicOnion.HttpGateway.Swagger;
 using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
 using MessagePack.Resolvers;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Sandbox.NetCoreServer.Hubs;
 using Sandbox.NetCoreServer.Services;
 using System;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,9 +27,6 @@ namespace Sandbox.NetCoreServer
     {
         static async Task Main(string[] args)
         {
-            CheckUnsfeResolver();
-            return;
-
             const string GrpcHost = "localhost";
 
             Console.WriteLine("Server:::");
@@ -52,6 +56,25 @@ namespace Sandbox.NetCoreServer
             };
 
             server.Start();
+
+            // test webhost
+
+        // NuGet: Microsoft.AspNetCore.Server.Kestrel
+        var webHost = new WebHostBuilder()
+            .ConfigureServices(collection =>
+            {
+                // Add MagicOnionServiceDefinition for reference from Startup.
+                collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
+            })
+            .UseKestrel()
+            .UseStartup<Startup>()
+            .UseUrls("http://localhost:5432")
+            .Build();
+
+        webHost.Run();
+
+            Console.ReadLine();
+
 
             {
                 var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
@@ -95,6 +118,26 @@ namespace Sandbox.NetCoreServer
 
 
             Console.WriteLine(string.Join(", ", doudarou2));
+        }
+    }
+
+    public class Startup
+    {
+        // Inject MagicOnionServiceDefinition from DIl
+        public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
+        {
+            // Optional:Summary to Swagger
+            var xmlName = "Sandbox.NetCoreServer.xml";
+            var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+
+            // HttpGateway has two middlewares.
+            // One is SwaggerView(MagicOnionSwaggerMiddleware)
+            // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
+            app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
+            {
+                XmlDocumentPath = xmlPath
+            });
+            app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
         }
     }
 

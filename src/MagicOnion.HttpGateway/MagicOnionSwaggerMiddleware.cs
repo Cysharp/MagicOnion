@@ -1,9 +1,6 @@
 ﻿using MagicOnion.HttpGateway.Swagger;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

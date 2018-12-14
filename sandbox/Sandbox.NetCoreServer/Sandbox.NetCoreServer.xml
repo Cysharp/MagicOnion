@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sandbox.NetCoreServer</name>
+    </assembly>
+    <members>
+        <member name="T:Sandbox.NetCoreServer.Services.ICalcSerivce">
+            <summary>
+            計算処理をするサービス予定は未定。
+            </summary>
+        </member>
+        <member name="M:Sandbox.NetCoreServer.Services.ICalcSerivce.Dump1Async(System.Int32,System.Int32)">
+            <summary>
+            ダミーです1。
+            </summary>
+        </member>
+        <member name="M:Sandbox.NetCoreServer.Services.ICalcSerivce.Dump2Async(System.Int32,System.Int32)">
+            <summary>
+            ダミーです2。
+            </summary>
+        </member>
+        <member name="M:Sandbox.NetCoreServer.Services.ICalcSerivce.SumAsync(System.Int32,System.Int32)">
+            <summary>
+            足したりします。
+            </summary>
+            <param name="x">多分X。</param>
+            <param name="y">多分Y。</param>
+            <returns>何故かString。</returns>
+        </member>
+    </members>
+</doc>
