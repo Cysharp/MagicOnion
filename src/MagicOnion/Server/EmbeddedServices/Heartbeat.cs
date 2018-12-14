@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY
+
+using Grpc.Core;
 using MessagePack;
 using System.Threading.Tasks;
 
@@ -16,9 +18,6 @@ namespace MagicOnion.Server.EmbeddedServices
         {
             var streaming = GetDuplexStreamingContext<Nil, Nil>();
 
-            var id = ConnectionContext.GetConnectionId(Context);
-            var cancellationTokenSource = ConnectionContext.Register(id);
-
             try
             {
                 // send to connect complete.
@@ -33,13 +32,10 @@ namespace MagicOnion.Server.EmbeddedServices
             {
                 // ok, cancelled.
             }
-            finally
-            {
-                ConnectionContext.Unregister(id);
-                cancellationTokenSource.Cancel();
-            }
 
             return streaming.Result();
         }
     }
 }
+
+#endif

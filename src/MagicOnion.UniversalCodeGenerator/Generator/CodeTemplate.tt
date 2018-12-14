@@ -1,0 +1,134 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.CodeAnalysis" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+<#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
+    using MagicOnion;
+    using MagicOnion.Client;
+    using Grpc.Core;
+    using MessagePack;
+<# foreach(var interfaceDef in Interfaces) { #>
+
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+<# var clientName = interfaceDef.Name + "Client"; #>
+    public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.FullName #>>, <#= interfaceDef.FullName #>
+    {
+<# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+        static readonly Method<byte[], byte[]> <#= item.Name #>Method;
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
+<# } #>
+
+        static <#= clientName #>()
+        {
+<# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+            <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
+<# } #>
+        }
+
+        <#= clientName #>()
+        {
+        }
+
+        public <#= clientName #>(CallInvoker callInvoker, IFormatterResolver resolver)
+            : base(callInvoker, resolver)
+        {
+        }
+
+        protected override MagicOnionClientBase<<#= interfaceDef.Name #>> Clone()
+        {
+            var clone = new <#= clientName #>();
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            clone.resolver = this.resolver;
+            return clone;
+        }
+
+        public new <#= interfaceDef.Name #> WithHeaders(Metadata headers)
+        {
+            return base.WithHeaders(headers);
+        }
+
+        public new <#= interfaceDef.Name #> WithCancellationToken(System.Threading.CancellationToken cancellationToken)
+        {
+            return base.WithCancellationToken(cancellationToken);
+        }
+
+        public new <#= interfaceDef.Name #> WithDeadline(System.DateTime deadline)
+        {
+            return base.WithDeadline(deadline);
+        }
+
+        public new <#= interfaceDef.Name #> WithHost(string host)
+        {
+            return base.WithHost(host);
+        }
+
+        public new <#= interfaceDef.Name #> WithOptions(CallOptions option)
+        {
+            return base.WithOptions(option);
+        }
+   
+<# foreach(var item in interfaceDef.Methods) { #>
+<# if(item.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+        public <#= item.ToString() #>
+        {
+<# if(item.MethodType == MethodType.Unary) { #>
+            var __request = <#= item.RequestObject() #>;
+            var __callResult = callInvoker.AsyncUnaryCall(<#= item.Name #>Method, base.host, base.option, __request);
+<# if(item.IsResponseTypeTaskOfT) { #>
+            return System.Threading.Tasks.Task.FromResult(new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver));
+<# } else { #>
+            return new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver);
+<# } #>
+<# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
+            var __request = <#= item.RequestObject() #>;
+            var __callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, base.host, base.option, __request);
+            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, base.resolver));
+<# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
+            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
+            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver));
+<# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
+            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
+            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver));
+<# } #>
+        }
+<# if(item.IsIfDebug) { #>
+#endif
+<# } #>
+<# } #>
+    }
+<# if(interfaceDef.IsIfDebug) { #>
+#endif 
+<# } #>
+<# } #>
+<#= Namespace != null ? "}" : "" #>
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

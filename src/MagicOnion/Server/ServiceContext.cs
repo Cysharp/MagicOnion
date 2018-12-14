@@ -40,6 +40,8 @@ namespace MagicOnion.Server
             }
         }
 
+        public Guid ContextId { get; private set; }
+
         public DateTime Timestamp { get; private set; }
 
         public Type ServiceType { get; private set; }
@@ -63,9 +65,14 @@ namespace MagicOnion.Server
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }
         internal IMagicOnionLogger MagicOnionLogger { get; private set; }
+        internal MethodHandler MethodHandler { get; private set; }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger)
+        // used in StreamingHub
+        internal AsyncLock AsyncWriterLock { get; set; }
+
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler)
         {
+            this.ContextId = Guid.NewGuid();
             this.ServiceType = serviceType;
             this.MethodInfo = methodInfo;
             this.AttributeLookup = attributeLookup;
@@ -74,6 +81,7 @@ namespace MagicOnion.Server
             this.Timestamp = DateTime.UtcNow;
             this.FormatterResolver = resolver;
             this.MagicOnionLogger = logger;
+            this.MethodHandler = methodHandler;
         }
 
         /// <summary>

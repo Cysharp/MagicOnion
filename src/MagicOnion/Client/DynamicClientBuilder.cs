@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#if NON_UNITY || !NET_STANDARD_2_0
+
+using Grpc.Core;
 using MagicOnion.Utils;
 using MessagePack;
 using System;
@@ -10,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
-    public static class AssemblyHolder
+    internal static class DynamicClientAssemblyHolder
     {
         public const string ModuleName = "MagicOnion.Client.DynamicClient";
 
         readonly static DynamicAssembly assembly;
-        public static ModuleBuilder Module { get { return assembly.ModuleBuilder; } }
+        public static DynamicAssembly Assembly { get { return assembly; } }
 
-        static AssemblyHolder()
+        static DynamicClientAssemblyHolder()
         {
             assembly = new DynamicAssembly(ModuleName);
         }
@@ -47,11 +49,11 @@ namespace MagicOnion.Client
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
 
-            var module = AssemblyHolder.Module;
+            var asm = DynamicClientAssemblyHolder.Assembly;
             var methodDefinitions = SearchDefinitions(t);
 
             var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
-            var typeBuilder = module.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
+            var typeBuilder = asm.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
             DefineStaticFields(typeBuilder, methodDefinitions);
             DefineStaticConstructor(typeBuilder, t, methodDefinitions);
@@ -148,7 +150,6 @@ namespace MagicOnion.Client
                 emptyCtor = ctor;
             }
 
-            ConstructorInfo invokerCtor;
             // .ctor(CallInvoker, IFormatterResolver):base(callInvoker, resolver)
             {
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker), typeof(IFormatterResolver) });
@@ -159,8 +160,6 @@ namespace MagicOnion.Client
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker), typeof(IFormatterResolver) }, null));
                 il.Emit(OpCodes.Ret);
-
-                invokerCtor = ctor;
             }
 
             return emptyCtor;
@@ -485,3 +484,5 @@ namespace MagicOnion.Client
         }
     }
 }
+
+#endif

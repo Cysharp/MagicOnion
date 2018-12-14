@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿#if !UNITY_WSA
+
+using System;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace MessagePack.Internal
@@ -11,7 +14,10 @@ namespace MessagePack.Internal
         readonly AssemblyBuilder assemblyBuilder;
         readonly ModuleBuilder moduleBuilder;
 
-        public ModuleBuilder ModuleBuilder { get { return moduleBuilder; } }
+        // don't expose ModuleBuilder
+        // public ModuleBuilder ModuleBuilder { get { return moduleBuilder; } }
+
+        readonly object gate = new object();
 
         public DynamicAssembly(string moduleName)
         {
@@ -20,7 +26,7 @@ namespace MessagePack.Internal
             this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
 #else
-#if NETSTANDARD1_4
+#if NETSTANDARD
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
 #else
             this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
@@ -28,6 +34,32 @@ namespace MessagePack.Internal
 
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
 #endif
+        }
+
+        // requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161
+
+        public TypeBuilder DefineType(string name, TypeAttributes attr)
+        {
+            lock (gate)
+            {
+                return moduleBuilder.DefineType(name, attr);
+            }
+        }
+
+        public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent)
+        {
+            lock (gate)
+            {
+                return moduleBuilder.DefineType(name, attr, parent);
+            }
+        }
+
+        public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent, Type[] interfaces)
+        {
+            lock (gate)
+            {
+                return moduleBuilder.DefineType(name, attr, parent, interfaces);
+            }
         }
 
 #if NET_35
@@ -41,3 +73,5 @@ namespace MessagePack.Internal
 #endif
     }
 }
+
+#endif

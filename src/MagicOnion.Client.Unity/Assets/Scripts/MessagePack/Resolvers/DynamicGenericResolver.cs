@@ -1,20 +1,23 @@
-﻿using MessagePack.Formatters;
+﻿#if !UNITY_WSA
+
+using MessagePack.Formatters;
 using System.Linq;
 using MessagePack.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.Collections;
 
-#if NETSTANDARD1_4
+#if NETSTANDARD
 using System.Threading.Tasks;
 #endif
 
 namespace MessagePack.Resolvers
 {
-    public class DynamicGenericResolver : IFormatterResolver
+    public sealed class DynamicGenericResolver : IFormatterResolver
     {
-        public static IFormatterResolver Instance = new DynamicGenericResolver();
+        public static readonly IFormatterResolver Instance = new DynamicGenericResolver();
 
         DynamicGenericResolver()
         {
@@ -59,7 +62,7 @@ namespace MessagePack.Internal
               {typeof(SortedList<,>), typeof(SortedListFormatter<,>)},
               {typeof(ILookup<,>), typeof(InterfaceLookupFormatter<,>)},
               {typeof(IGrouping<,>), typeof(InterfaceGroupingFormatter<,>)},
-#if NETSTANDARD1_4
+#if NETSTANDARD
               {typeof(ObservableCollection<>), typeof(ObservableCollectionFormatter<>)},
               {typeof(ReadOnlyObservableCollection<>),(typeof(ReadOnlyObservableCollectionFormatter<>))},
               {typeof(IReadOnlyList<>), typeof(InterfaceReadOnlyListFormatter<>)},
@@ -86,7 +89,7 @@ namespace MessagePack.Internal
                 var rank = t.GetArrayRank();
                 if (rank == 1)
                 {
-                    if (t.GetElementType() == typeof(byte[])) // byte[] is also supported in builtin formatter.
+                    if (t.GetElementType() == typeof(byte)) // byte[] is also supported in builtin formatter.
                     {
                         return ByteArrayFormatter.Instance;
                     }
@@ -126,7 +129,7 @@ namespace MessagePack.Internal
                     return CreateInstance(typeof(NullableFormatter<>), new[] { nullableElementType });
                 }
 
-#if NETSTANDARD1_4
+#if NETSTANDARD
 
                 // ValueTask
                 else if (genericType == typeof(ValueTask<>))
@@ -266,6 +269,26 @@ namespace MessagePack.Internal
                     }
                 }
             }
+            else
+            {
+                // NonGeneric Collection
+                if (t == typeof(IList))
+                {
+                    return NonGenericInterfaceListFormatter.Instance;
+                }
+                else if (t == typeof(IDictionary))
+                {
+                    return NonGenericInterfaceDictionaryFormatter.Instance;
+                }
+                if (typeof(IList).GetTypeInfo().IsAssignableFrom(ti) && ti.DeclaredConstructors.Any(x => x.GetParameters().Length == 0))
+                {
+                    return Activator.CreateInstance(typeof(NonGenericListFormatter<>).MakeGenericType(t));
+                }
+                else if (typeof(IDictionary).GetTypeInfo().IsAssignableFrom(ti) && ti.DeclaredConstructors.Any(x => x.GetParameters().Length == 0))
+                {
+                    return Activator.CreateInstance(typeof(NonGenericDictionaryFormatter<>).MakeGenericType(t));
+                }
+            }
 
             return null;
         }
@@ -276,3 +299,5 @@ namespace MessagePack.Internal
         }
     }
 }
+
+#endif

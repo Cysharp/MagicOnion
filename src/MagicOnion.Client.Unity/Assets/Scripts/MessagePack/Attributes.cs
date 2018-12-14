@@ -35,7 +35,7 @@ namespace MessagePack
     {
     }
 
-    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class UnionAttribute : Attribute
     {
         public int Key { get; private set; }
@@ -52,5 +52,24 @@ namespace MessagePack
     public class SerializationConstructorAttribute : Attribute
     {
 
+    }
+
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public class MessagePackFormatterAttribute : Attribute
+    {
+        public Type FormatterType { get; private set; }
+        public object[] Arguments { get; private set; }
+
+        public MessagePackFormatterAttribute(Type formatterType)
+        {
+            this.FormatterType = formatterType;
+        }
+
+        public MessagePackFormatterAttribute(Type formatterType, params object[] arguments)
+        {
+            this.FormatterType = formatterType;
+            this.Arguments = arguments;
+        }
     }
 }

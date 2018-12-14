@@ -115,8 +115,6 @@ namespace MagicOnion
             {
                 // start from T2
                 var tupleTypeBase = dynamicArgumentTupleTypes[parameters.Length - 2];
-                var formatterTypeBase = dynamicArgumentTupleFormatterTypes[parameters.Length - 2];
-
                 var t = tupleTypeBase.MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                 return t;
             }

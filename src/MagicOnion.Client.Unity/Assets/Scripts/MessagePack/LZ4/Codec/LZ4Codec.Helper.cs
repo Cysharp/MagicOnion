@@ -1,36 +1,66 @@
-﻿#if ENABLE_UNSAFE_MSGPACK
-
-using System;
+﻿using System;
 
 namespace MessagePack.LZ4
 {
     public static partial class LZ4Codec
     {
+#if NETSTANDARD
+
         public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
             if (IntPtr.Size == 4)
             {
-                return LZ4Codec.Encode32(input, inputOffset, inputLength, output, outputOffset, outputLength);
+                return LZ4Codec.Encode32Unsafe(input, inputOffset, inputLength, output, outputOffset, outputLength);
             }
             else
             {
-                return LZ4Codec.Encode64(input, inputOffset, inputLength, output, outputOffset, outputLength);
+                return LZ4Codec.Encode64Unsafe(input, inputOffset, inputLength, output, outputOffset, outputLength);
             }
         }
 
-        public static int Decode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength, bool knownOutputLength)
+        public static int Decode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
         {
             if (IntPtr.Size == 4)
             {
-                return LZ4Codec.Decode32(input, inputOffset, inputLength, output, outputOffset, outputLength, knownOutputLength);
+                return LZ4Codec.Decode32Unsafe(input, inputOffset, inputLength, output, outputOffset, outputLength);
             }
             else
             {
-                return LZ4Codec.Decode64(input, inputOffset, inputLength, output, outputOffset, outputLength, knownOutputLength);
+                return LZ4Codec.Decode64Unsafe(input, inputOffset, inputLength, output, outputOffset, outputLength);
             }
         }
 
-        internal unsafe static class HashTablePool
+#else
+
+        // use 'Safe' code for Unity because in IL2CPP gots strange behaviour.
+
+        public static int Encode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return LZ4Codec.Encode32Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
+            }
+            else
+            {
+                return LZ4Codec.Encode64Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
+            }
+        }
+
+        public static int Decode(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int outputLength)
+        {
+            if (IntPtr.Size == 4)
+            {
+                return LZ4Codec.Decode32Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
+            }
+            else
+            {
+                return LZ4Codec.Decode64Safe(input, inputOffset, inputLength, output, outputOffset, outputLength);
+            }
+        }
+
+#endif
+
+        internal static class HashTablePool
         {
             [ThreadStatic]
             static ushort[] ushortPool;
@@ -39,7 +69,7 @@ namespace MessagePack.LZ4
             static uint[] uintPool;
 
             [ThreadStatic]
-            static byte*[] bytePool;
+            static int[] intPool;
 
             public static ushort[] GetUShortHashTablePool()
             {
@@ -67,20 +97,19 @@ namespace MessagePack.LZ4
                 return uintPool;
             }
 
-            public static byte*[] GetByteHashTablePool()
+            public static int[] GetIntHashTablePool()
             {
-                if (bytePool == null)
+                if (intPool == null)
                 {
-                    bytePool = new byte*[HASH_TABLESIZE];
+                    intPool = new int[HASH_TABLESIZE];
                 }
                 else
                 {
-                    Array.Clear(bytePool, 0, bytePool.Length);
+                    Array.Clear(intPool, 0, intPool.Length);
                 }
-                return bytePool;
+                return intPool;
             }
         }
     }
 }
 
-#endif

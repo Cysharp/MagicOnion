@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !UNITY_METRO
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +9,8 @@ using System.Text;
 
 namespace System.Reflection
 {
+#if !(NET_4_6 || NET_STANDARD_2_0)
+
     public class TypeInfo
     {
         readonly Type type;
@@ -14,6 +18,22 @@ namespace System.Reflection
         public TypeInfo(Type type)
         {
             this.type = type;
+        }
+
+        public string Name
+        {
+            get
+            {
+                return type.Name;
+            }
+        }
+
+        public TypeAttributes Attributes
+        {
+            get
+            {
+                return type.Attributes;
+            }
         }
 
         public bool IsClass
@@ -24,11 +44,51 @@ namespace System.Reflection
             }
         }
 
+        public bool IsPublic
+        {
+            get
+            {
+                return type.IsPublic;
+            }
+        }
+
+        public bool IsInterface
+        {
+            get
+            {
+                return type.IsInterface;
+            }
+        }
+
+        public bool IsAbstract
+        {
+            get
+            {
+                return type.IsAbstract;
+            }
+        }
+
+        public bool IsArray
+        {
+            get
+            {
+                return type.IsArray;
+            }
+        }
+
         public bool IsValueType
         {
             get
             {
                 return type.IsValueType;
+            }
+        }
+
+        public bool IsNestedPublic
+        {
+            get
+            {
+                return type.IsNestedPublic;
             }
         }
 
@@ -61,6 +121,11 @@ namespace System.Reflection
         public MethodInfo GetDeclaredMethod(string name)
         {
             return type.GetMethod(name);
+        }
+
+        public IEnumerable<MethodInfo> GetDeclaredMethods(string name)
+        {
+            return type.GetMethods().Where(x => x.Name == name);
         }
 
         public Type[] GenericTypeArguments
@@ -97,6 +162,27 @@ namespace System.Reflection
             return type.GetMethods();
         }
 
+        public bool IsAssignableFrom(TypeInfo c)
+        {
+            return type.IsAssignableFrom(c.AsType());
+        }
+
+        public PropertyInfo GetDeclaredProperty(string name)
+        {
+            return type.GetProperty(name);
+        }
+
+        public  FieldInfo GetField(string name, BindingFlags flags)
+        {
+            return type.GetField(name, flags);
+        }
+
+        public  PropertyInfo GetProperty(string name, BindingFlags flags)
+        {
+            return type.GetProperty(name, flags);
+        }
+
+
         public T GetCustomAttribute<T>(bool inherit = true)
             where T : Attribute
         {
@@ -109,12 +195,12 @@ namespace System.Reflection
         }
     }
 
+#endif
+
     public static class ReflectionExtensions
     {
-        public static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
-        {
-            return type.GetMethod(name, types);
-        }
+
+#if !(NET_4_6 || NET_STANDARD_2_0)
 
         public static TypeInfo GetTypeInfo(this Type type)
         {
@@ -126,7 +212,12 @@ namespace System.Reflection
             return new TypeInfo(type.CreateType());
         }
 
-        public static MethodInfo GetRuntimeMethods(this Type type, string name)
+        public static MethodInfo GetRuntimeMethod(this Type type, string name, Type[] types)
+        {
+            return type.GetMethod(name, types);
+        }
+
+        public static MethodInfo GetRuntimeMethod(this Type type, string name)
         {
             return type.GetMethod(name);
         }
@@ -173,5 +264,28 @@ namespace System.Reflection
         {
             return type.GetCustomAttributes(inherit).OfType<T>().FirstOrDefault();
         }
+
+#else
+
+        public static bool IsConstructedGenericType(this TypeInfo type)
+        {
+            return type.IsConstructedGenericType;
+        }
+
+#endif
     }
+
+#if !NET_4_6
+    public static class CustomAttributeExtensions
+    {
+        public static T GetCustomAttribute<T>(MemberInfo memberInfo, bool inherit)
+        {
+            return (T)memberInfo.GetCustomAttributes(typeof(T), inherit).FirstOrDefault();
+        }
+    }
+
+#endif
 }
+
+
+#endif

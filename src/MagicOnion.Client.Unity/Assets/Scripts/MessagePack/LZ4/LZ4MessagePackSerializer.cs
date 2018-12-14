@@ -1,8 +1,5 @@
-﻿#if ENABLE_UNSAFE_MSGPACK
-
-using MessagePack.Internal;
+﻿using MessagePack.Internal;
 using System;
-using System.Linq;
 using System.IO;
 using MessagePack.LZ4;
 
@@ -80,7 +77,7 @@ namespace MessagePack
                 var lz4Length = LZ4Codec.Encode(serializedData.Array, serializedData.Offset, serializedData.Count, bytes, offset, bytes.Length - offset);
 
                 // write extension header(always 6 bytes)
-                extHeaderOffset += MessagePackBinary.WriteExtensionFormatHeaderForceExt32(ref bytes, extHeaderOffset, (sbyte)ExtensionTypeCode, lz4Length + 5);
+                extHeaderOffset += MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(ref bytes, extHeaderOffset, (sbyte)ExtensionTypeCode, lz4Length + 5);
 
                 // write length(always 5 bytes)
                 MessagePackBinary.WriteInt32ForceInt32Block(ref bytes, extHeaderOffset, serializedData.Count);
@@ -89,10 +86,20 @@ namespace MessagePack
             }
         }
 
+        public static byte[] ToLZ4Binary(ArraySegment<byte> messagePackBinary)
+        {
+            var buffer = ToLZ4BinaryCore(messagePackBinary);
+            return MessagePackBinary.FastCloneWithResize(buffer.Array, buffer.Count);
+        }
+
         static ArraySegment<byte> SerializeCore<T>(T obj, IFormatterResolver resolver)
         {
             var serializedData = MessagePackSerializer.SerializeUnsafe(obj, resolver);
+            return ToLZ4BinaryCore(serializedData);
+        }
 
+        static ArraySegment<byte> ToLZ4BinaryCore(ArraySegment<byte> serializedData)
+        {
             if (serializedData.Count < NotCompressionSize)
             {
                 return serializedData;
@@ -115,7 +122,7 @@ namespace MessagePack
                 var lz4Length = LZ4Codec.Encode(serializedData.Array, serializedData.Offset, serializedData.Count, buffer, offset, buffer.Length - offset);
 
                 // write extension header(always 6 bytes)
-                extHeaderOffset += MessagePackBinary.WriteExtensionFormatHeaderForceExt32(ref buffer, extHeaderOffset, (sbyte)ExtensionTypeCode, lz4Length + 5);
+                extHeaderOffset += MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(ref buffer, extHeaderOffset, (sbyte)ExtensionTypeCode, lz4Length + 5);
 
                 // write length(always 5 bytes)
                 MessagePackBinary.WriteInt32ForceInt32Block(ref buffer, extHeaderOffset, serializedData.Count);
@@ -131,9 +138,17 @@ namespace MessagePack
 
         public static T Deserialize<T>(byte[] bytes, IFormatterResolver resolver)
         {
-            if (resolver == null) resolver = MessagePackSerializer.DefaultResolver;
-
             return DeserializeCore<T>(new ArraySegment<byte>(bytes, 0, bytes.Length), resolver);
+        }
+
+        public static T Deserialize<T>(ArraySegment<byte> bytes)
+        {
+            return DeserializeCore<T>(bytes, null);
+        }
+
+        public static T Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
+        {
+            return DeserializeCore<T>(bytes, resolver);
         }
 
         public static T Deserialize<T>(Stream stream)
@@ -143,20 +158,146 @@ namespace MessagePack
 
         public static T Deserialize<T>(Stream stream, IFormatterResolver resolver)
         {
-            if (resolver == null) resolver = MessagePackSerializer.DefaultResolver;
+            return Deserialize<T>(stream, resolver, false);
+        }
 
-            var buffer = MessagePack.Internal.InternalMemoryPool.GetBuffer(); // use MessagePackSerializer.Pool!
+        public static T Deserialize<T>(Stream stream, bool readStrict)
+        {
+            return Deserialize<T>(stream, MessagePackSerializer.DefaultResolver, readStrict);
+        }
 
-            var len = FillFromStream(stream, ref buffer);
-            return DeserializeCore<T>(new ArraySegment<byte>(buffer, 0, len), resolver);
+        public static T Deserialize<T>(Stream stream, IFormatterResolver resolver, bool readStrict)
+        {
+            if (!readStrict)
+            {
+                var buffer = MessagePack.Internal.InternalMemoryPool.GetBuffer(); // use MessagePackSerializer.Pool!
+                var len = FillFromStream(stream, ref buffer);
+                return DeserializeCore<T>(new ArraySegment<byte>(buffer, 0, len), resolver);
+            }
+            else
+            {
+                int blockSize;
+                var bytes = MessagePackBinary.ReadMessageBlockFromStreamUnsafe(stream, false, out blockSize);
+                return DeserializeCore<T>(new ArraySegment<byte>(bytes, 0, blockSize), resolver);
+            }
+        }
+
+        public static byte[] Decode(Stream stream, bool readStrict = false)
+        {
+            if (!readStrict)
+            {
+                var buffer = MessagePack.Internal.InternalMemoryPool.GetBuffer(); // use MessagePackSerializer.Pool!
+                var len = FillFromStream(stream, ref buffer);
+                return Decode(new ArraySegment<byte>(buffer, 0, len));
+            }
+            else
+            {
+                int blockSize;
+                var bytes = MessagePackBinary.ReadMessageBlockFromStreamUnsafe(stream, false, out blockSize);
+                return Decode(new ArraySegment<byte>(bytes, 0, blockSize));
+            }
+        }
+
+        public static byte[] Decode(byte[] bytes)
+        {
+            return Decode(new ArraySegment<byte>(bytes, 0, bytes.Length));
+        }
+
+        public static byte[] Decode(ArraySegment<byte> bytes)
+        {
+            int readSize;
+            if (MessagePackBinary.GetMessagePackType(bytes.Array, bytes.Offset) == MessagePackType.Extension)
+            {
+                var header = MessagePackBinary.ReadExtensionFormatHeader(bytes.Array, bytes.Offset, out readSize);
+                if (header.TypeCode == ExtensionTypeCode)
+                {
+                    // decode lz4
+                    var offset = bytes.Offset + readSize;
+                    var length = MessagePackBinary.ReadInt32(bytes.Array, offset, out readSize);
+                    offset += readSize;
+
+                    var buffer = new byte[length]; // use new buffer.
+
+                    // LZ4 Decode
+                    var len = bytes.Count + bytes.Offset - offset;
+                    LZ4Codec.Decode(bytes.Array, offset, len, buffer, 0, length);
+
+                    return buffer;
+                }
+            }
+
+            if (bytes.Offset == 0 && bytes.Array.Length == bytes.Count)
+            {
+                // return same reference
+                return bytes.Array;
+            }
+            else
+            {
+                var result = new byte[bytes.Count];
+                Buffer.BlockCopy(bytes.Array, bytes.Offset, result, 0, result.Length);
+                return result;
+            }
+        }
+
+
+        /// <summary>
+        /// Get the war memory pool byte[]. The result can not share across thread and can not hold and can not call LZ4Deserialize before use it.
+        /// </summary>
+        public static byte[] DecodeUnsafe(byte[] bytes)
+        {
+            return DecodeUnsafe(new ArraySegment<byte>(bytes, 0, bytes.Length));
+        }
+
+        /// <summary>
+        /// Get the war memory pool byte[]. The result can not share across thread and can not hold and can not call LZ4Deserialize before use it.
+        /// </summary>
+        public static byte[] DecodeUnsafe(ArraySegment<byte> bytes)
+        {
+            int readSize;
+            if (MessagePackBinary.GetMessagePackType(bytes.Array, bytes.Offset) == MessagePackType.Extension)
+            {
+                var header = MessagePackBinary.ReadExtensionFormatHeader(bytes.Array, bytes.Offset, out readSize);
+                if (header.TypeCode == ExtensionTypeCode)
+                {
+                    // decode lz4
+                    var offset = bytes.Offset + readSize;
+                    var length = MessagePackBinary.ReadInt32(bytes.Array, offset, out readSize);
+                    offset += readSize;
+
+                    var buffer = LZ4MemoryPool.GetBuffer(); // use LZ4 Pool(Unsafe)
+                    if (buffer.Length < length)
+                    {
+                        buffer = new byte[length];
+                    }
+
+                    // LZ4 Decode
+                    var len = bytes.Count + bytes.Offset - offset;
+                    LZ4Codec.Decode(bytes.Array, offset, len, buffer, 0, length);
+
+                    return buffer; // return pooled bytes.
+                }
+            }
+
+            if (bytes.Offset == 0 && bytes.Array.Length == bytes.Count)
+            {
+                // return same reference
+                return bytes.Array;
+            }
+            else
+            {
+                var result = new byte[bytes.Count];
+                Buffer.BlockCopy(bytes.Array, bytes.Offset, result, 0, result.Length);
+                return result;
+            }
         }
 
         static T DeserializeCore<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
         {
+            if (resolver == null) resolver = MessagePackSerializer.DefaultResolver;
             var formatter = resolver.GetFormatterWithVerify<T>();
 
             int readSize;
-            if (MessagePackBinary.GetMessagePackType(bytes.Array, 0) == MessagePackType.Extension)
+            if (MessagePackBinary.GetMessagePackType(bytes.Array, bytes.Offset) == MessagePackType.Extension)
             {
                 var header = MessagePackBinary.ReadExtensionFormatHeader(bytes.Array, bytes.Offset, out readSize);
                 if (header.TypeCode == ExtensionTypeCode)
@@ -173,7 +314,8 @@ namespace MessagePack
                     }
 
                     // LZ4 Decode
-                    LZ4Codec.Decode(bytes.Array, offset, bytes.Count - offset, buffer, 0, length, true);
+                    var len = bytes.Count + bytes.Offset - offset;
+                    LZ4Codec.Decode(bytes.Array, offset, len, buffer, 0, length);
 
                     return formatter.Deserialize(buffer, 0, resolver, out readSize);
                 }
@@ -217,5 +359,3 @@ namespace MessagePack.Internal
         }
     }
 }
-
-#endif

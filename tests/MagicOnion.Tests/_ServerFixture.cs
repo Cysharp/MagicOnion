@@ -66,6 +66,12 @@ namespace MagicOnion.Tests
             return MagicOnionClient.Create<T>(DefaultChannel);
         }
 
+        public TStreamingHub CreateStreamingHubClient<TStreamingHub, TReceiver>(TReceiver receiver)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            return StreamingHubClient.Connect<TStreamingHub, TReceiver>(DefaultChannel, receiver);
+        }
+
         public void Dispose()
         {
             DefaultChannel.ShutdownAsync().Wait();

@@ -2,6 +2,18 @@
 using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
 
+#if !NON_UNITY
+
+namespace MagicOnion.Server.EmbeddedServices
+{
+    public interface IMagicOnionEmbeddedPing : IService<IMagicOnionEmbeddedPing>
+    {
+        UnaryResult<Nil> Ping();
+    }
+}
+
+#endif
+
 namespace MagicOnion.Client.EmbeddedServices
 {
     [Ignore]

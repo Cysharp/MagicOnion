@@ -1,79 +1,79 @@
-﻿using UnityEngine;
-using RuntimeUnitTestToolkit;
-using UniRx;
-using System.Collections;
-using Grpc.Core;
-using MagicOnion.Client;
-using Sandbox.ConsoleServer;
-using System.Collections.Generic;
-using System;
+﻿//using UnityEngine;
+//using RuntimeUnitTestToolkit;
+//using UniRx;
+//using System.Collections;
+//using Grpc.Core;
+//using MagicOnion.Client;
+//using Sandbox.ConsoleServer;
+//using System.Collections.Generic;
+//using System;
 
-namespace MagicOnion.Tests
-{
-    public class SimpleTest
-    {
-        IMyFirstService GetClient()
-        {
-            return UnitTestClient.Create<IMyFirstService>();
-        }
+//namespace MagicOnion.Tests
+//{
+//    public class SimpleTest
+//    {
+//        IMyFirstService GetClient()
+//        {
+//            return UnitTestClient.Create<IMyFirstService>();
+//        }
 
-        public IEnumerator Unary()
-        {
-            var r = GetClient().SumAsync(1, 10).ResponseAsync.ToYieldInstruction();
-            yield return r;
+//        public IEnumerator Unary()
+//        {
+//            var r = GetClient().SumAsync(1, 10).ResponseAsync.ToYieldInstruction();
+//            yield return r;
 
-            r.Result.Is("11");
-        }
+//            r.Result.Is("11");
+//        }
 
-        public IEnumerator ClientStreaming()
-        {
-            var client = GetClient().StreamingOne();
+//        public IEnumerator ClientStreaming()
+//        {
+//            var client = GetClient().StreamingOne();
 
-            yield return client.RequestStream.WriteAsync(1000).ToYieldInstruction();
-            yield return client.RequestStream.WriteAsync(2000).ToYieldInstruction();
-            yield return client.RequestStream.WriteAsync(3000).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(1000).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(2000).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(3000).ToYieldInstruction();
 
-            yield return client.RequestStream.CompleteAsync().ToYieldInstruction();
+//            yield return client.RequestStream.CompleteAsync().ToYieldInstruction();
 
-            var r = client.ResponseAsync.ToYieldInstruction();
-            yield return r;
+//            var r = client.ResponseAsync.ToYieldInstruction();
+//            yield return r;
 
-            r.Result.Is("finished");
-        }
+//            r.Result.Is("finished");
+//        }
 
-        public IEnumerator ServerStreaming()
-        {
-            var client = GetClient().StreamingTwo(10, 20, 3);
+//        public IEnumerator ServerStreaming()
+//        {
+//            var client = GetClient().StreamingTwo(10, 20, 3);
 
-            var list = new List<string>();
-            yield return client.ResponseStream.ForEachAsync(x =>
-            {
-                list.Add(x);
-            }).ToYieldInstruction();
+//            var list = new List<string>();
+//            yield return client.ResponseStream.ForEachAsync(x =>
+//            {
+//                list.Add(x);
+//            }).ToYieldInstruction();
 
-            list.IsCollection("30", "60", "90");
-        }
+//            list.IsCollection("30", "60", "90");
+//        }
 
-        public IEnumerator DuplexStreaming()
-        {
-            var client = GetClient().StreamingThree();
+//        public IEnumerator DuplexStreaming()
+//        {
+//            var client = GetClient().StreamingThree();
 
-            var l = new List<string>();
-            var responseAwaiter = client.ResponseStream.ForEachAsync(x =>
-            {
-                l.Add(x);
-            })
-            .ToYieldInstruction();
+//            var l = new List<string>();
+//            var responseAwaiter = client.ResponseStream.ForEachAsync(x =>
+//            {
+//                l.Add(x);
+//            })
+//            .ToYieldInstruction();
 
-            yield return client.RequestStream.WriteAsync(1).ToYieldInstruction();
-            yield return client.RequestStream.WriteAsync(2).ToYieldInstruction();
-            yield return client.RequestStream.WriteAsync(3).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(1).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(2).ToYieldInstruction();
+//            yield return client.RequestStream.WriteAsync(3).ToYieldInstruction();
 
-            yield return client.RequestStream.CompleteAsync().ToYieldInstruction();
+//            yield return client.RequestStream.CompleteAsync().ToYieldInstruction();
 
-            yield return responseAwaiter;
+//            yield return responseAwaiter;
 
-            l.IsCollection("test1", "test2", "finish");
-        }
-    }
-}
+//            l.IsCollection("test1", "test2", "finish");
+//        }
+//    }
+//}

@@ -1,0 +1,60 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.CodeAnalysis" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+namespace <#= Namespace #>
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+
+    public static partial class MagicOnionInitializer
+    {
+        static bool isRegistered = false;
+
+<# if( !UnuseUnityAttribute) { #>
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+<# } #>
+        public static void Register()
+        {
+            if(isRegistered) return;
+            isRegistered = true;
+
+<# foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y) => new <#= clientName #>(x, y));
+<# if(interfaceDef.IsIfDebug) { #>
+#endif
+<# } #>
+<# } // foreach #>
+
+<# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# if(interfaceDef.IsIfDebug) { #>
+#if DEBUG
+<# } #>
+            StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= clientName #>(a, b, c, d, e));
+<# if(interfaceDef.IsIfDebug) { #>
+#endif
+<# } #>
+<# } // foreach #>
+        }
+    }
+}
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 612
+#pragma warning restore 618

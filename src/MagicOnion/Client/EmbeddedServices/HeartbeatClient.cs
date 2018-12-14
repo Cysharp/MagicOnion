@@ -3,13 +3,24 @@ using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
 using System.Threading.Tasks;
 
+#if !NON_UNITY
+
+namespace MagicOnion.Server.EmbeddedServices
+{
+    public interface IMagicOnionEmbeddedHeartbeat : IService<IMagicOnionEmbeddedHeartbeat>
+    {
+        Task<DuplexStreamingResult<Nil, Nil>> Connect();
+    }
+}
+
+#endif
+
 namespace MagicOnion.Client.EmbeddedServices
 {
     [Ignore]
     public class HeartbeatClient : MagicOnionClientBase<IMagicOnionEmbeddedHeartbeat>, IMagicOnionEmbeddedHeartbeat
     {
         static readonly Method<byte[], byte[]> DuplexStreamingAsyncMethod;
-        readonly string connectionId;
 
         static HeartbeatClient()
         {
@@ -20,22 +31,20 @@ namespace MagicOnion.Client.EmbeddedServices
         {
         }
 
-        public HeartbeatClient(Channel channel, string connectionId)
-            : this(new DefaultCallInvoker(channel), connectionId)
+        public HeartbeatClient(Channel channel)
+            : this(new DefaultCallInvoker(channel))
         {
 
         }
 
-        public HeartbeatClient(CallInvoker callInvoker, string connectionId)
+        public HeartbeatClient(CallInvoker callInvoker)
             : base(callInvoker, null)
         {
-            this.connectionId = connectionId;
-            this.option = this.option.WithHeaders(new Metadata { { ChannelContext.HeaderKey, connectionId } });
         }
 
         protected override MagicOnionClientBase<IMagicOnionEmbeddedHeartbeat> Clone()
         {
-            var clone = new HeartbeatClient(this.callInvoker, connectionId);
+            var clone = new HeartbeatClient(this.callInvoker);
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;

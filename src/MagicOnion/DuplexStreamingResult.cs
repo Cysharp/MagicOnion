@@ -21,6 +21,8 @@ namespace MagicOnion
             this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
         }
 
+        public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;
+
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>

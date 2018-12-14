@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using MagicOnion.Server.Hubs;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
@@ -13,6 +14,10 @@ namespace MagicOnion.Server
 
         void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
         void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
+
+        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
+        void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
 
         void WriteToStream(ServiceContext context, byte[] writeData, Type type);
         void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
@@ -41,6 +46,18 @@ namespace MagicOnion.Server
         }
 
         public void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+        }
+
+        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        {
+        }
+
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+        }
+
+        public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
         {
         }
     }
@@ -102,6 +119,24 @@ namespace MagicOnion.Server
                     return ((int)type).ToString();
             }
         }
+
+        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count}");
+
+        }
+
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+            var msg = isErrorOrInterrupted ? "error" : "";
+            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
+        }
+
+        public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
+
+        }
     }
 
     /// <summary>
@@ -155,6 +190,14 @@ namespace MagicOnion.Server
             return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
         }
 
+        string ToJson(ArraySegment<byte> bytes)
+        {
+            if (bytes == null || bytes.Count == 0) return "";
+            if (bytes.Count >= 5000) return "log is too large.";
+
+            return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
+        }
+
         // enum.ToString is slow.
         string MethodTypeToString(MethodType type)
         {
@@ -171,6 +214,22 @@ namespace MagicOnion.Server
                 default:
                     return ((int)type).ToString();
             }
+        }
+
+        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request)}");
+        }
+
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+            var msg = isErrorOrInterrupted ? "error" : "";
+            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
+        }
+
+        public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
         }
     }
 
@@ -236,6 +295,17 @@ namespace MagicOnion.Server
             return "dump:" + MessagePackSerializer.ToJson(reSerialized);
         }
 
+        string ToJson(ArraySegment<byte> bytes, Type type, IFormatterResolver resolver)
+        {
+            if (bytes == null || bytes.Count == 0) return "";
+            if (bytes.Count >= 5000) return "log is too large.";
+
+            var reData = LZ4MessagePackSerializer.NonGeneric.Deserialize(type, bytes, resolver);
+            var reSerialized = MessagePackSerializer.NonGeneric.Serialize(type, reData, dumpResolver);
+
+            return "dump:" + MessagePackSerializer.ToJson(reSerialized);
+        }
+
         // enum.ToString is slow.
         string MethodTypeToString(MethodType type)
         {
@@ -252,6 +322,21 @@ namespace MagicOnion.Server
                 default:
                     return ((int)type).ToString();
             }
+        }
+        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request, type, context.FormatterResolver)}");
+        }
+
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        {
+            var msg = isErrorOrInterrupted ? "error" : "";
+            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
+        }
+
+        public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
+        {
+            GrpcEnvironment.Logger.Debug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
         }
     }
 

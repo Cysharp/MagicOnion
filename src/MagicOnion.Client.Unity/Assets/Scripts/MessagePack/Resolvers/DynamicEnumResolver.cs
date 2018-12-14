@@ -1,21 +1,26 @@
-﻿using System;
+﻿#if !UNITY_WSA
+
+using System;
 using MessagePack.Formatters;
 using MessagePack.Internal;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 
 namespace MessagePack.Resolvers
 {
     /// <summary>
     /// EnumResolver by dynamic code generation, serialized underlying type.
     /// </summary>
-    public class DynamicEnumResolver : IFormatterResolver
+    public sealed class DynamicEnumResolver : IFormatterResolver
     {
-        public static DynamicEnumResolver Instance = new DynamicEnumResolver();
+        public static readonly DynamicEnumResolver Instance = new DynamicEnumResolver();
 
         const string ModuleName = "MessagePack.Resolvers.DynamicEnumResolver";
 
         static readonly DynamicAssembly assembly;
+
+        static int nameSequence = 0;
 
         DynamicEnumResolver()
         {
@@ -79,7 +84,7 @@ namespace MessagePack.Resolvers
             var underlyingType = Enum.GetUnderlyingType(enumType);
             var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(enumType);
 
-            var typeBuilder = assembly.ModuleBuilder.DefineType("MessagePack.Formatters." + enumType.FullName.Replace(".", "_") + "Formatter", TypeAttributes.Public | TypeAttributes.Sealed, null, new[] { formatterType });
+            var typeBuilder = assembly.DefineType("MessagePack.Formatters." + enumType.FullName.Replace(".", "_") + "Formatter" + Interlocked.Increment(ref nameSequence), TypeAttributes.Public | TypeAttributes.Sealed, null, new[] { formatterType });
 
             // int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver);
             {
@@ -91,7 +96,7 @@ namespace MessagePack.Resolvers
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
-                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetTypeInfo().GetDeclaredMethod("Write" + underlyingType.Name));
+                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetRuntimeMethod("Write" + underlyingType.Name, new[] { typeof(byte[]).MakeByRefType(), typeof(int), underlyingType }));
                 il.Emit(OpCodes.Ret);
             }
 
@@ -105,7 +110,7 @@ namespace MessagePack.Resolvers
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetTypeInfo().GetDeclaredMethod("Read" + underlyingType.Name));
+                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetRuntimeMethod("Read" + underlyingType.Name, new[] { typeof(byte[]), typeof(int), typeof(int).MakeByRefType() }));
                 il.Emit(OpCodes.Ret);
             }
 
@@ -113,3 +118,5 @@ namespace MessagePack.Resolvers
         }
     }
 }
+
+#endif

@@ -1,38 +1,51 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-    <metadata>
-        <id>MagicOnion</id>
-        <version>0.5.3</version>
-        <title>MagicOnion</title>
-        <authors>neuecc</authors>
-        <owners>neuecc</owners>
-        <projectUrl>https://github.com/neuecc/MagicOnion</projectUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>gRPC based HTTP2 RPC Streaming Framework for .NET, .NET Core and Unity.</description>
-        <releaseNotes>update dependency.</releaseNotes>
-        <tags>gRPC, HTTP2</tags>
-        <dependencies>
-            <group targetFramework=".NETFramework4.6">
-                <dependency id="Grpc" version="1.12.0" />
-                <dependency id="MessagePack" version="1.7.3.4" />
-            </group>
-            <group targetFramework=".NETFramework4.7">
-                <dependency id="Grpc" version="1.12.0" />
-                <dependency id="MessagePack" version="1.7.3.4" />
-            </group>
-            <group targetFramework=".NETStandard2.0">
-                <dependency id="Grpc" version="1.12.0" />
-                <dependency id="MessagePack" version="1.7.3.4" />
-                <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" />
-            </group>
-        </dependencies>
-    </metadata>
-    <files>
-        <file src="..\src\MagicOnion\bin\Release\net46\MagicOnion.dll" target="lib\net46" />
-        <file src="..\src\MagicOnion\bin\Release\net46\MagicOnion.xml" target="lib\net46" />
-        <file src="..\src\MagicOnion\bin\Release\net47\MagicOnion.dll" target="lib\net47" />
-        <file src="..\src\MagicOnion\bin\Release\net47\MagicOnion.xml" target="lib\net47" />
-        <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.dll" target="lib\netstandard2.0" />
-        <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.xml" target="lib\netstandard2.0" />
-    </files>
+  <metadata>
+    <id>MagicOnion</id>
+    <version>2.0.3</version>
+    <title>MagicOnion</title>
+    <authors>neuecc</authors>
+    <owners>neuecc</owners>
+    <projectUrl>https://github.com/cysharp/MagicOnion</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Unified Realtime/API Engine for .NET Core and Unity.</description>
+    <releaseNotes>Ver.2.0</releaseNotes>
+    <tags>gRPC, HTTP2</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="Grpc" version="1.17.0" />
+        <dependency id="MessagePack" version="1.7.3.4" />
+        <dependency id="System.Buffers" version="4.5.0" />
+        <dependency id="System.Collections.Immutable" version="1.5.0" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.2" />
+      </group>
+      <group targetFramework=".NETFramework4.7.1">
+        <dependency id="Grpc" version="1.17.0" />
+        <dependency id="MessagePack" version="1.7.3.4" />
+        <dependency id="System.Buffers" version="4.5.0" />
+        <dependency id="System.Collections.Immutable" version="1.5.0" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.2" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" />
+
+        <dependency id="Grpc" version="1.17.0" />
+        <dependency id="MessagePack" version="1.7.3.4" />
+        <dependency id="System.Buffers" version="4.5.0" />
+        <dependency id="System.Collections.Immutable" version="1.5.0" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.1" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.2" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\src\MagicOnion\bin\Release\net46\MagicOnion.dll" target="lib\net46" />
+    <file src="..\src\MagicOnion\bin\Release\net46\MagicOnion.xml" target="lib\net46" />
+    <file src="..\src\MagicOnion\bin\Release\net471\MagicOnion.dll" target="lib\net471" />
+    <file src="..\src\MagicOnion\bin\Release\net471\MagicOnion.xml" target="lib\net471" />
+    <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.dll" target="lib\netstandard2.0" />
+    <file src="..\src\MagicOnion\bin\Release\netstandard2.0\MagicOnion.xml" target="lib\netstandard2.0" />
+  </files>
 </package>
