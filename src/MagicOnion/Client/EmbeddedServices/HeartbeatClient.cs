@@ -3,6 +3,18 @@ using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
 using System.Threading.Tasks;
 
+#if !NON_UNITY
+
+namespace MagicOnion.Server.EmbeddedServices
+{
+    public interface IMagicOnionEmbeddedHeartbeat : IService<IMagicOnionEmbeddedHeartbeat>
+    {
+        Task<DuplexStreamingResult<Nil, Nil>> Connect();
+    }
+}
+
+#endif
+
 namespace MagicOnion.Client.EmbeddedServices
 {
     [Ignore]

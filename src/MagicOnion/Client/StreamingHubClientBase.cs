@@ -230,7 +230,7 @@ namespace MagicOnion.Client
                 MessagePack.Internal.BufferPool.Default.Return(rent);
 #endif
             }
-            using (await asyncLock.LockAsync())
+            using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
                 await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
             }

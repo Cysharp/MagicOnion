@@ -6,6 +6,7 @@ using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
+using MessagePack.Resolvers;
 using Sandbox.NetCoreServer.Hubs;
 using Sandbox.NetCoreServer.Services;
 using System;
@@ -19,6 +20,9 @@ namespace Sandbox.NetCoreServer
     {
         static async Task Main(string[] args)
         {
+            CheckUnsfeResolver();
+            return;
+
             const string GrpcHost = "localhost";
 
             Console.WriteLine("Server:::");
@@ -66,6 +70,39 @@ namespace Sandbox.NetCoreServer
             }
         }
 
+        static void CheckUnsfeResolver()
+        {
+            UnsafeDirectBlitResolver.Register<Foo>();
+            CompositeResolver.RegisterAndSetAsDefault(
+                UnsafeDirectBlitResolver.Instance,
+
+                BuiltinResolver.Instance
+                
+                );
+
+            var f = new Foo { A = 10, B = 9999, C = 9999999 };
+            var doudarou = MessagePackSerializer.Serialize(f, UnsafeDirectBlitResolver.Instance);
+            var two = MessagePackSerializer.Deserialize<Foo>(doudarou);
+
+
+            var f2 = new[]{
+                new Foo { A = 10, B = 9999, C = 9999999 },
+                new Foo { A = 101, B = 43, C = 234 },
+                new Foo { A = 20, B = 5666, C = 1111 },
+            };
+            var doudarou2 = MessagePackSerializer.Serialize(f2, UnsafeDirectBlitResolver.Instance);
+            var two2 = MessagePackSerializer.Deserialize<Foo[]>(doudarou2);
+
+
+            Console.WriteLine(string.Join(", ", doudarou2));
+        }
+    }
+
+    public struct Foo
+    {
+        public byte A;
+        public long B;
+        public int C;
     }
 
     class Receiver : IMessageReceiver2

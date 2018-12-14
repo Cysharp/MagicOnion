@@ -8,7 +8,9 @@ namespace MagicOnion
     {
         readonly SemaphoreSlim semaphore;
 
+#if NON_UNITY
         public static readonly ValueTask<LockReleaser> EmptyLock = new ValueTask<LockReleaser>(new LockReleaser(null));
+#endif
 
         public AsyncLock()
         {
