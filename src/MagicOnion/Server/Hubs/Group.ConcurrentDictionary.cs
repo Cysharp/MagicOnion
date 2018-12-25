@@ -146,7 +146,7 @@ namespace MagicOnion.Server.Hubs
                     writeCount++;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return Task.CompletedTask;
+                return TaskEx.CompletedTask;
             }
             else
             {
@@ -193,7 +193,7 @@ namespace MagicOnion.Server.Hubs
                     }
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return Task.CompletedTask;
+                return TaskEx.CompletedTask;
             }
             else
             {
@@ -253,7 +253,7 @@ namespace MagicOnion.Server.Hubs
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return Task.CompletedTask;
+                return TaskEx.CompletedTask;
             }
             else
             {
@@ -313,7 +313,7 @@ namespace MagicOnion.Server.Hubs
                         writeCount++;
                     }
                     logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                    return Task.CompletedTask;
+                    return TaskEx.CompletedTask;
                 }
                 else
                 {
@@ -333,7 +333,7 @@ namespace MagicOnion.Server.Hubs
                         continue;
                     }
                     logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                    return Task.CompletedTask;
+                    return TaskEx.CompletedTask;
                 }
             }
             else
