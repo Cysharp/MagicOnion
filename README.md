@@ -710,9 +710,9 @@ static async Task DuplexStreamRun(IMyFirstService client)
 
 Author Info
 ---
-This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).
-He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).
-He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.
+This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
+He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
+He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.  
 He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
 
 License
