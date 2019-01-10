@@ -6,11 +6,19 @@ Unified Realtime/API Engine for .NET Core and Unity.
 
 What is it?
 ---
-MagicOnion is Realtime Network Engine like [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR), [Socket.io](https://socket.io/) and RPC-Web API Framework like any web-framework.
+MagicOnion is an Realtime Network Engine like [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR), [Socket.io](https://socket.io/) and RPC-Web API Framework like any web-framework.
 
-MagicOnion is built on [gRPC](https://grpc.io/) so using fast(HTTP/2) and compact(binary) network transport but does not requires .proto and generate. Share the C# interface and classes, that's all.
+MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(binary) network transport. It does not requires `.proto` and generate unlike plain gRPC. Protocol schema can share a C# interface and classes.
 
-MagicOnion supports communication between. NET Core servers for Microservices, communication with C # Client (WPF, Xamarin ...), and Unity Game Engine to . NET Core Server communication.
+![image](https://user-images.githubusercontent.com/46207/50965239-c4fdb000-1514-11e9-8365-304c776ffd77.png)
+
+> Share interface as schema and request as API Service seems like normal C# code
+
+![image](https://user-images.githubusercontent.com/46207/50965825-7bae6000-1516-11e9-9501-dc91582f4d1b.png)
+
+> StreamingHub realtime service, broadcast data to many connected clients
+
+MagicOnion is for Microservices(communicate between .NET Core Servers), API Service(for WinForms/WPF like WCF), Native Client's API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
 
 Quick Start
 ---
@@ -19,7 +27,6 @@ for .NET 4.6, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity sup
 ```
 Install-Package MagicOnion
 ```
-
 MagicOnion has two sides, `Service` for like web-api and `StreamingHub` for relatime communication. At first, see define `Service`.
 
 ```csharp
@@ -33,6 +40,7 @@ using System;
 public interface IMyFirstService : IService<IMyFirstService>
 {
     // Return type must be `UnaryResult<T>` or `Task<UnaryResult<T>>`.
+    // If you can use C# 7.0 or newer, recommend to use `UnaryResult<T>`.
     UnaryResult<int> SumAsync(int x, int y);
 }
 
@@ -95,7 +103,7 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
 
 StreamingHub
 ---
-StreamingHub is fully-typed realtime server<->client communication framework.
+StreamingHub is a fully-typed realtime server<->client communication framework.
 
 ```csharp
 // Server -> Client definition
@@ -175,7 +183,255 @@ public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGami
 }
 ```
 
-MagicOnion has redis-backplane for group broadcast, you can use `MagicOnion.Redis` package.
+Filter
+---
+MagicOnion filter is powerful feature to hook before-after invoke. It is useful than gRPC server interceptor.
+
+![image](https://user-images.githubusercontent.com/46207/50969421-cb465900-1521-11e9-8824-8a34cc52bbe4.png)
+
+```csharp
+// You can attach per class/method like [SampleFilter]
+// for StreamingHub methods, implement StreamingHubFilterAttribute instead.
+public class SampleFilterAttribute : MagicOnionFilterAttribute
+{
+    // constructor convention rule. requires Func<ServiceContext, Task> next.
+    public SampleFilterAttribute(Func<ServiceContext, Task> next) : base(next) { }
+
+    // other constructor, use base(null)
+    public SampleFilterAttribute() : base(null) { }
+
+    public override async ValueTask Invoke(ServiceContext context)
+    {
+        try
+        {
+            /* on before */
+            await Next(context); // next
+            /* on after */
+        }
+        catch
+        {
+            /* on exception */
+            throw;
+        }
+        finally
+        {
+            /* on finally */
+        }
+    }
+}
+```
+
+Here is example of what kind of filter can be stacked.
+
+![image](https://user-images.githubusercontent.com/46207/50969539-2bd59600-1522-11e9-84ab-15dd85e3dcac.png)
+
+GlobalFilter can attach to MagicOnionOptions.
+
+ServiceContext and Lifecycle
+---
+Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it is 
+
+| Property | Description |
+| --- | --- |
+| `ConcurrentDictionary<string, object>` Items | Object storage per request/connection. |
+| `Guid` ContextId | Unieuq ID per request(Service)/connection(StreamingHub). |
+| `DateTime` Timestamp | Timestamp that request/connection is started time. |
+| `Type` ServiceType | Invoked Class. |
+| `MethodInfo` MethodInfo | Invoked Method. |
+| `ILookup<Type, Attribute> AttributeLookup | Cached Attributes that merged both service and method. |
+| `ServerCallContext` CallContext | Raw gRPC Context. |
+| `IFormatterResolver` FormatterResolver | Using MessagePack resolver. |
+
+`Items` is useful, for example authentication filter add UserId to Items and take out from service method.
+
+> If using StreamingHub, ServiceContext means per connected context so `Items` is not per method invoke. `StreamingHubContext.Items` supports per streaming hub method request but currently can not take from streaming hub method(only use in StreamingHubFilter). [Issue:#67](https://github.com/Cysharp/MagicOnion/issues/67), it will fix.
+
+MagicOnion supports get current context globaly like HttpContext.Current. `ServiceContext.Current` can get it but it requires `MagicOnionOptions.EnableCurrentContext = true`, default is false.
+
+Lifecycle image of ServiceBase
+
+```
+gRPC In(
+    var context = new ServiceContext();
+    Filter.Invoke(context, 
+        var service = new ServiceImpl();
+        service.ServiceContext = context;
+        service.MethodInvoke(
+            /* method impl */
+        )
+    )
+)
+```
+
+Lifecycle image of StreamingHub(StreamingHub is inherited from ServiceBase)
+
+```
+gRPC In(
+    var context = new ServiceContext();
+    Filter.Invoke(context, 
+        var hub = new StreamingHubImpl();
+        hub.ServiceContext = context;
+        hub.Connect(
+            while (connecting) {
+                Streaming In(
+                    var streamingHubContext = new StreamingHubContext(context);
+                    StreamingHubFilter.Invoke(streamingHubContext,
+                        hub.MethodInvoke(
+                            /* method impl */
+                        )
+                    )
+                )
+            }
+        )
+    )
+)
+```
+
+StreamingHub instance is shared while connecting so StreamingHub's field can use cache area of connection.
+
+MagicOnionOption/Loggin
+---
+`MagicOnionOption` can pass to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
+
+| Property | Description |
+| --- | --- |
+| `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
+| `bool` DisableEmbeddedService | Disable embedded service(ex:heartbeat), default is false. |
+| `MagicOnionFilterAttribute[]` GlobalFilters | Global MagicOnion filters. |
+| `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
+| `StreamingHubFilterAttribute[]` Global StreamingHub filters. | GlobalStreamingHubFilters |
+| `IGroupRepositoryFactory` DefaultGroupRepositoryFactory | Default GroupRepository factory for StreamingHub, default is ``. |
+| `IServiceLocator` ServiceLocator | Add the extra typed option. |
+| `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
+| `IFormatterResolver` FormatterResolver | MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default). |
+
+`IMagicOnionLogger` is structured logger of MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+
+If you want to add many loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
+
+ExceptionHandling and StatusCode
+---
+If you are return custom status code from server to client, you can use `throw new ReturnStatusException`.
+
+```csharp
+public Task SendMessageAsync(string message)
+{
+    if (message.Contains("foo"))
+    {
+        //
+        throw new ReturnStatusException((Grpc.Core.StatusCode)99, "invalid");
+    }
+
+    // ....
+```
+
+Client can receive exception as gRPC's `RpcException`. If performance centric to avoid exception throw, you can use raw gRPC CallContext.Status(`ServiceContext.CallCaontext.Status`) and set status directly.
+
+MagicOnion's engine catched exception(except ReturnStatusException), set `StatusCode.Unknown` and client received gRPC's `RpcException`. If `MagicOnionOption.IsReturnExceptionStackTraceInErrorDetail` is true, client can receive StackTrace of server exception, it is very useful for debugging but has critical issue about sercurity so should only to enable debug build.
+
+Group and GroupConfiguration
+---
+StreamingHub's broadcast system is called Group. It can get from StreamingHub impl method, `this.Group`(this.Group type is `HubGroupRepository`, not `IGroup`).
+
+Current connection can add to group by `this.Group.AddAsync(string groupName)`, return value(`IGroup`) is joined group broadcaster so cache to field. It is enable per connection(if disconnected, automaticaly leaved from group). If you want to use some restriction, you can use `TryAddAsync(string groupName, int incluciveLimitCount, bool createIfEmpty)`.
+
+`IGroup` can pass to StreamingHub.`Broadcast`, `BroadcastExceptSelf`, `BroadcastExcept` and calls client proxy.
+
+```csharp
+public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
+{
+    string userName;
+    IGroup room;
+
+    public async Task JoinAsync(string userName, string roomName)
+    {
+        this.userName = userName;
+        this.room = await Group.AddAsync(roomName);
+    }
+
+    public async Task SendMessageAsync(string message)
+    {
+        Broadcast(room).OnReceiveMessage(userName, message);
+    }
+}
+```
+
+> GroupRepository is created per StreamingHub type
+
+> If you want to create ServerSide loop and broadcast out of StreamingHub, you can pass Broadcast(room) result but it is unnatural, I'll add support kit of create server-side loop  
+
+Group has in-memory storage, it can store extra data to group member. It can set `Group.AddAsync(string groupName, TStorage data)` instead of standard AddAsync.
+
+Data is can get from `group.GetInMemoryStorage<T>` and can invoke `AllValues`, `Set(Guid connectionId, T Value)`, `Get(Guid connectionId)`.
+
+> StreamingHub's ConnectionId is ServiceContext.ContextId
+
+Default MagicOnion's group is inmemory and using `ImmutableArrayGroup`. This group implementation is tuned for small room, not enter/leave frequently. If large room and enter/leave frequently design, you can use `ConcurrentDictionaryGroup`. It can configure by `GroupConfigurationAttribute` or `MagicOnionOptions.DefaultGroupRepositoryFactory`.
+
+```csharp
+// use ***GroupRepositoryFactory type.
+[GroupConfiguration(typeof(ConcurrentDictionaryGroupRepositoryFactory))]
+public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
+{
+    // ...
+}
+```
+
+MagicOnion has distribute system called redis-backplane for group broadcast.
+
+![image](https://user-images.githubusercontent.com/46207/50974777-5f6aed00-152f-11e9-97f3-ba2a0c97f0eb.png)
+
+* Install-Package MagicOnion.Redis
+
+```csharp
+// set RedisGroupRepositoryFactory
+[GroupConfiguration(typeof(RedisGroupRepositoryFactory))]
+public class ...
+{
+}
+
+// configure ConnectionMultiplexer(StackExchange.Redis) to MagicOnionOption.ServiceLocator
+var option = new MagicOnionOption();
+option.ServiceLocator.Register(new ConnectionMultiplexer(...));
+```
+
+Zero deserialization mapping
+---
+In RPC, especially in real-time communication involving frequent transmission of data, it is often the serialization process where data is converted before being sent that limits the performance. In MagicOnion, serialization is done by my MessagePack for C#, which is the fastest binary serializer for C#, so it cannot be a limiting factor. Also, in addition to performance, it also provides flexibility regarding data in that variables of any type can be sent as long as they can be serialized by MessagePack for C#.
+
+Also, taking advantage of the fact that both the client and the server run on C# and data stored on internal memory are expected to share the same layout, I added an option to do mapping through memory copy without serialization/deserialization in case of a value-type variable.
+
+Especialy in Unity, this is can combinate with `MessageaPack.UnityShims` package of NuGet.
+
+```csharp
+// It supports standard struct-type variables that are provided by Unity, such as Vector3, and arrays containing them, as well as custom struct-type variables and their arrays.
+// I recommend doing this explicitly using [StructLayout(LayoutKind.Explicit)] to accurately match the size.
+public struct CustomStruct
+{
+    public long Id;
+    public int Hp;
+    public int Mp;
+    public byte Status;
+}
+ 
+// ---- Register the following code when initializing.
+ 
+// By registering it, T and T[] can be handled using zero deserialization mapping.
+UnsafeDirectBlitResolver.Register<CustomStruct>();
+ 
+// The struct-type above as well as Unity-provided struct-types (Vector2, Rect, etc.), and their arrays are registered as standards.
+CompositeResolver.RegisterAndSetAsDefault(
+    UnsafeDirectBlitResolver.Instance,
+    MessagePack.Unity.Extension.UnityBlitResolver.Instance
+    );
+ 
+// --- Now the communication will be in the format above when they are used for transmission.
+await client.SendAsync(new CustomStruct { Hp = 99 });
+```
+
+Nothing needs to be processed here, so it promises the best performance theoretically possible in terms of transmission speed. However, since these struct-type variables need to be copied, I recommend handling everything as ref as a rule when you need to define a large struct-type, or it might slow down the process.
+
+I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
 
 Project Structure
 ---
@@ -185,7 +441,7 @@ If creates Server-Client project, I recommend make three projects. `Server`, `Se
 
 ServerDefinition is only defined interface(`IService<>`, `IStreamingHub<,>`)(and some share request/response types).
 
-If debugging, I recommend use [SwitchStartupProject](https://marketplace.visualstudio.com/items?itemName=vs-publisher-141975.SwitchStartupProject) and launch both Server and Client.
+If debugging, I recommend use [SwitchStartupProject](https://marketplace.visualstudio.com/items?itemName=vs-publisher-141975.SwitchStartupProjectforVS2017) exteinson of VisualStudio and launch both Server and Client.
 
 ```json
 "MultiProjectConfigurations": {
@@ -212,9 +468,96 @@ Assembly.CSharp(Unity)
 - ref ClientLib(by dll)
 ```
 
+Alternatively, using the definition of the interface placed on the Unity side, if you use a reference as a link of csproj(or refer to the directory of .NET Core csproj), you can simply configure it.
+
+Swagger
+---
+MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
+
+* Install-Package MagicOnion.HttpGateway
+
+HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
+
+```csharp
+static void Main(string[] args)
+{
+    // gRPC definition.
+    GrpcEnvironment.SetLogger(new ConsoleLogger());
+    var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
+    {
+        MagicOnionLogger = new MagicOnionLogToGrpcLogger()
+    });
+    var server = new global::Grpc.Core.Server
+    {
+        Services = { service },
+        Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
+    };
+    server.Start();
+
+    // NuGet: Microsoft.AspNetCore.Server.Kestrel
+    var webHost = new WebHostBuilder()
+        .ConfigureServices(collection =>
+        {
+            // Add MagicOnionServiceDefinition for reference from Startup.
+            collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
+        })
+        .UseKestrel()
+        .UseStartup<Startup>()
+        .UseUrls("http://localhost:5432")
+        .Build();
+
+    webHost.Run(); // Hosting HTTP/1
+}
+
+// WebAPI Startup configuration.
+public class Startup
+{
+    // Inject MagicOnionServiceDefinition from DIl
+    public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
+    {
+        // Optional:Add Summary to Swagger
+        // var xmlName = "Sandbox.NetCoreServer.xml";
+        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+
+        // HttpGateway requires two middlewares.
+        // One is SwaggerView(MagicOnionSwaggerMiddleware)
+        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
+        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
+        {
+            // XmlDocumentPath = xmlPath
+        });
+        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
+    }
+}
+```
+
+Open `http://localhost:5432`, you can see swagger view.
+
+![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
+
+Unity Supports
+---
+You can download `MagicOnion.Unity.*.*.*.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
+
+MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
+
+Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application.
+
+```
+moc arguments help:
+  -i, --input=VALUE          [required]Input path of analyze csproj
+  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
+  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
+  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
+  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
+  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
+```
+
+Please try it to run iOS/Android etc.
+
 Raw gRPC APIs
 ---
-MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). I don't recommend to use it(should use StreamingHub).
+MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especialy DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
 
 ```csharp
 // Definitions
@@ -364,128 +707,13 @@ static async Task DuplexStreamRun(IMyFirstService client)
     });
 }
 ```
-Swagger
+
+Author Info
 ---
-MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
-
-* Install-Package MagicOnion.HttpGateway
-
-HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
-
-```csharp
-static void Main(string[] args)
-{
-    // gRPC definition.
-    GrpcEnvironment.SetLogger(new ConsoleLogger());
-    var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
-    {
-        MagicOnionLogger = new MagicOnionLogToGrpcLogger()
-    });
-    var server = new global::Grpc.Core.Server
-    {
-        Services = { service },
-        Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
-    };
-    server.Start();
-
-    // NuGet: Microsoft.AspNetCore.Server.Kestrel
-    var webHost = new WebHostBuilder()
-        .ConfigureServices(collection =>
-        {
-            // Add MagicOnionServiceDefinition for reference from Startup.
-            collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
-        })
-        .UseKestrel()
-        .UseStartup<Startup>()
-        .UseUrls("http://localhost:5432")
-        .Build();
-
-    webHost.Run(); // Hosting HTTP/1
-}
-
-// WebAPI Startup configuration.
-public class Startup
-{
-    // Inject MagicOnionServiceDefinition from DIl
-    public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
-    {
-        // Optional:Add Summary to Swagger
-        // var xmlName = "Sandbox.NetCoreServer.xml";
-        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
-
-        // HttpGateway requires two middlewares.
-        // One is SwaggerView(MagicOnionSwaggerMiddleware)
-        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
-        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
-        {
-            // XmlDocumentPath = xmlPath
-        });
-        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
-    }
-}
-```
-
-Open `http://localhost:5432`, you can see swagger view.
-
-![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
-
-Filter
----
-You can hook before-after invoke method by async filter.
-
-```csharp
-// You can attach per class/method like [SampleFilter]
-// for StreamingHub methods, implement StreamingHubFilterAttribute instead.
-public class SampleFilterAttribute : MagicOnionFilterAttribute
-{
-    // constructor convention rule. requires Func<ServiceContext, Task> next.
-    public SampleFilterAttribute(Func<ServiceContext, Task> next) : base(next) { }
-
-    // other constructor, use base(null)
-    public SampleFilterAttribute() : base(null) { }
-
-    public override async ValueTask Invoke(ServiceContext context)
-    {
-        try
-        {
-            /* on before */
-            await Next(context); // next
-            /* on after */
-        }
-        catch
-        {
-            /* on exception */
-            throw;
-        }
-        finally
-        {
-            /* on finally */
-        }
-    }
-}
-```
-
-Filter can attach global to MagicOnionOptions.
-
-Unity Supports
----
-You can download `MagicOnion.Unity.*.*.*.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
-
-MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
-
-Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application.
-
-```
-moc arguments help:
-  -i, --input=VALUE          [required]Input path of analyze csproj
-  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
-  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
-  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
-  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
-```
-
-Please try it to run iOS/Android etc.
+This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).
+He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).
+He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.
+He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
 
 License
 ---
