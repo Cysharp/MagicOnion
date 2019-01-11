@@ -138,20 +138,17 @@ namespace MagicOnion
 
         public unsafe int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
         {
-            // Note: require byte header? maybe this is not valid msgpack-format.
-
-            MessagePackBinary.EnsureCapacity(ref bytes, offset, size);
-            Unsafe.WriteUnaligned(ref Unsafe.Add(ref bytes[0], offset), value);
-            return size;
+            var headerSize = MessagePackBinaryEx.WriteBytesHeaderWithEnsureCount(ref bytes, offset, size);
+            Unsafe.WriteUnaligned(ref Unsafe.Add(ref bytes[0], offset + headerSize), value);
+            return headerSize + size;
         }
 
         public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
         {
-            ValidateRead(bytes, offset);
+            var segment = MessagePackBinary.ReadBytesSegment(bytes, offset, out readSize);
+            ValidateRead(segment.Array, segment.Offset);
 
-            var value = Unsafe.ReadUnaligned<T>(ref bytes[offset]);
-            readSize = size;
-            return value;
+            return Unsafe.ReadUnaligned<T>(ref segment.Array[segment.Offset]);
         }
 
         void ValidateRead(byte[] bytes, int offset)
@@ -159,6 +156,47 @@ namespace MagicOnion
             if (bytes.Length - offset < size)
             {
                 throw new InvalidOperationException("Overflow");
+            }
+        }
+    }
+
+    internal static class MessagePackBinaryEx
+    {
+        public static int WriteBytesHeaderWithEnsureCount(ref byte[] dest, int dstOffset, int count)
+        {
+            if (count <= byte.MaxValue)
+            {
+                var size = 2;
+                MessagePackBinary.EnsureCapacity(ref dest, dstOffset, size + count);
+                dest[dstOffset] = MessagePackCode.Bin8;
+                dest[dstOffset + 1] = (byte)count;
+                return size;
+            }
+            else if (count <= UInt16.MaxValue)
+            {
+                var size = 3;
+                MessagePackBinary.EnsureCapacity(ref dest, dstOffset, size + count);
+                unchecked
+                {
+                    dest[dstOffset] = MessagePackCode.Bin16;
+                    dest[dstOffset + 1] = (byte)(count >> 8);
+                    dest[dstOffset + 2] = (byte)(count);
+                }
+                return size;
+            }
+            else
+            {
+                var size = 5;
+                MessagePackBinary.EnsureCapacity(ref dest, dstOffset, size + count);
+                unchecked
+                {
+                    dest[dstOffset] = MessagePackCode.Bin32;
+                    dest[dstOffset + 1] = (byte)(count >> 24);
+                    dest[dstOffset + 2] = (byte)(count >> 16);
+                    dest[dstOffset + 3] = (byte)(count >> 8);
+                    dest[dstOffset + 4] = (byte)(count);
+                }
+                return size;
             }
         }
     }
