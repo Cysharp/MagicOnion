@@ -470,6 +470,25 @@ Assembly.CSharp(Unity)
 
 Alternatively, using the definition of the interface placed on the Unity side, if you use a reference as a link of csproj(or refer to the directory of .NET Core csproj), you can simply configure it.
 
+Hosting
+---
+I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2) to host .NET Core app. `MagicOnion.Hosting` package helps to build to use MagicOnion.
+
+* Install-Package MagicOnion.Hosting
+
+```csharp
+// with the `Microsoft.Extensions.Hosting` package.
+static async Task Main(string[] args)
+{
+    // IHostBuilder.UseMagicOnion to enable MagicOnion
+    await new HostBuilder()
+        .UseMagicOnion(new[] { new ServerPort("localhost", 12345, ServerCredentials.Insecure) })
+        .RunConsoleAsync();
+}
+```
+
+If you can want to load configuration, set logging, etc, see .NET Generic Host documantation.
+
 Swagger
 ---
 MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
