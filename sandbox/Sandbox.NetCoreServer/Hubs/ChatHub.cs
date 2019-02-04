@@ -12,6 +12,7 @@ namespace Sandbox.NetCoreServer.Hubs
     public interface IMessageReceiver2
     {
         void OnReceiveMessage(string senderUser, string message);
+        void Foo2(Foo foo2);
     }
 
     public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver2>

@@ -150,6 +150,11 @@ namespace Sandbox.NetCoreServer
 
     class Receiver : IMessageReceiver2
     {
+        public void Foo2(Foo foo2)
+        {
+            throw new NotImplementedException();
+        }
+
         public void OnReceiveMessage(string senderUser, string message)
         {
             Console.WriteLine(senderUser + ":" + message);

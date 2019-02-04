@@ -2,7 +2,7 @@
   "profiles": {
     "MagicOnion.UniversalCodeGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "-i \"C:\\GitHubRepositories\\MagicOnion\\sandbox\\Sandbox.NetCoreServer\\Sandbox.NetCoreServer.csproj\" -o \"C:\\GitHubRepositories\\MagicOnion\\src\\MagicOnion.Client.Unity\\Assets\\Scripts\\MagicOnionGenerated.cs\""
+      "commandLineArgs": "-i \"C:\\Git\\MagicOnion\\sandbox\\Sandbox.NetCoreServer\\Sandbox.NetCoreServer.csproj\" -o \"C:\\Git\\MagicOnion\\src\\MagicOnion.Client.Unity\\Assets\\Scripts\\MagicOnionGenerated.cs\""
     }
   }
 }

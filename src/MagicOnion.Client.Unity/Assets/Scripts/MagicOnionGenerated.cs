@@ -1,6 +1,7 @@
 ﻿#pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
 namespace MagicOnion
@@ -23,6 +24,7 @@ namespace MagicOnion
 
             MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y));
 
+            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IGamingHub, Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IGamingHubClient(a, b, c, d, e));
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IChatHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver2>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IChatHubClient(a, b, c, d, e));
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.ITestHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.ITestHubClient(a, b, c, d, e));
         }
@@ -30,12 +32,14 @@ namespace MagicOnion
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
 namespace MagicOnion.Resolvers
@@ -78,16 +82,19 @@ namespace MagicOnion.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(8)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(11)
             {
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 0 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 1 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<int, string, double>), 2 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 3 },
-                {typeof(global::Sandbox.NetCoreServer.Hubs.TestObject[]), 4 },
-                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 5 },
-                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 6 },
-                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 7 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>), 0 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 1 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 2 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<int, string, double>), 3 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>), 4 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 5 },
+                {typeof(global::Sandbox.NetCoreServer.Hubs.Player[]), 6 },
+                {typeof(global::Sandbox.NetCoreServer.Hubs.TestObject[]), 7 },
+                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 8 },
+                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 9 },
+                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 10 },
             };
         }
 
@@ -101,14 +108,17 @@ namespace MagicOnion.Resolvers
 
             switch (key)
             {
-                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
-                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
-                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, string, double>(default(int), default(string), default(double));
-                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
-                case 4: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.TestObject>();
-                case 5: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 6: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 7: return new MagicOnion.Formatters.Sandbox.NetCoreServer.Services.TestEnumFormatter();
+                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(default(global::UnityEngine.Vector3), default(global::UnityEngine.Quaternion));
+                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
+                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
+                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, string, double>(default(int), default(string), default(double));
+                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(default(string), default(string), default(global::UnityEngine.Vector3), default(global::UnityEngine.Quaternion));
+                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
+                case 6: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.Player>();
+                case 7: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.TestObject>();
+                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 9: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 10: return new MagicOnion.Formatters.TestEnumFormatter();
                 default: return null;
             }
         }
@@ -116,15 +126,17 @@ namespace MagicOnion.Resolvers
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
-namespace MagicOnion.Formatters.Sandbox.NetCoreServer.Services
+namespace MagicOnion.Formatters
 {
     using System;
     using MessagePack;
@@ -146,12 +158,14 @@ namespace MagicOnion.Formatters.Sandbox.NetCoreServer.Services
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
+#pragma warning disable 219
 #pragma warning disable 168
 
 namespace Sandbox.NetCoreServer.Services {
@@ -333,6 +347,7 @@ namespace Sandbox.NetCoreServer.Services {
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
@@ -350,6 +365,134 @@ namespace Sandbox.NetCoreServer.Hubs {
     using MessagePack;
     using System;
     using System.Threading.Tasks;
+
+    public class IGamingHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IGamingHub, global::Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>, global::Sandbox.NetCoreServer.Hubs.IGamingHub
+    {
+        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IGamingHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+
+        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
+
+        readonly global::Sandbox.NetCoreServer.Hubs.IGamingHub __fireAndForgetClient;
+
+        public IGamingHubClient(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+            : base(callInvoker, host, option, resolver, logger)
+        {
+            this.__fireAndForgetClient = new FireAndForgetClient(this);
+        }
+        
+        public global::Sandbox.NetCoreServer.Hubs.IGamingHub FireAndForget()
+        {
+            return __fireAndForgetClient;
+        }
+
+        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+                case -1297457280: // OnJoin
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
+                    receiver.OnJoin(result); return Task.CompletedTask;
+                }
+                case 532410095: // OnLeave
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
+                    receiver.OnLeave(result); return Task.CompletedTask;
+                }
+                case 1429874301: // OnMove
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
+                    receiver.OnMove(result); return Task.CompletedTask;
+                }
+                default:
+                    return Task.CompletedTask;
+            }
+        }
+
+        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+                case -733403293: // JoinAsync
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player[]>(data, resolver);
+                    ((TaskCompletionSource<global::Sandbox.NetCoreServer.Hubs.Player[]>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case 1368362116: // LeaveAsync
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case -99261176: // MoveAsync
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+   
+        public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.Player[]> JoinAsync(string roomName, string userName, global::UnityEngine.Vector3 position, global::UnityEngine.Quaternion rotation)
+        {
+            return WriteMessageWithResponseAsync<DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>, global::Sandbox.NetCoreServer.Hubs.Player[]> (-733403293, new DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(roomName, userName, position, rotation));
+        }
+
+        public global::System.Threading.Tasks.Task LeaveAsync()
+        {
+            return WriteMessageWithResponseAsync<Nil, Nil>(1368362116, Nil.Default);
+        }
+
+        public global::System.Threading.Tasks.Task MoveAsync(global::UnityEngine.Vector3 position, global::UnityEngine.Quaternion rotation)
+        {
+            return WriteMessageWithResponseAsync<DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>, Nil>(-99261176, new DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(position, rotation));
+        }
+
+
+        class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.IGamingHub
+        {
+            readonly IGamingHubClient __parent;
+
+            public FireAndForgetClient(IGamingHubClient parentClient)
+            {
+                this.__parent = parentClient;
+            }
+
+            public global::Sandbox.NetCoreServer.Hubs.IGamingHub FireAndForget()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task DisposeAsync()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task WaitForDisconnect()
+            {
+                throw new NotSupportedException();
+            }
+
+            public global::System.Threading.Tasks.Task<global::Sandbox.NetCoreServer.Hubs.Player[]> JoinAsync(string roomName, string userName, global::UnityEngine.Vector3 position, global::UnityEngine.Quaternion rotation)
+            {
+                return __parent.WriteMessageAsyncFireAndForget<DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>, global::Sandbox.NetCoreServer.Hubs.Player[]> (-733403293, new DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(roomName, userName, position, rotation));
+            }
+
+            public global::System.Threading.Tasks.Task LeaveAsync()
+            {
+                return __parent.WriteMessageAsync<Nil>(1368362116, Nil.Default);
+            }
+
+            public global::System.Threading.Tasks.Task MoveAsync(global::UnityEngine.Vector3 position, global::UnityEngine.Quaternion rotation)
+            {
+                return __parent.WriteMessageAsync<DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>>(-99261176, new DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(position, rotation));
+            }
+
+        }
+    }
 
     public class IChatHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IChatHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver2>, global::Sandbox.NetCoreServer.Hubs.IChatHub
     {
@@ -379,6 +522,11 @@ namespace Sandbox.NetCoreServer.Hubs {
                     var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<string, string>>(data, resolver);
                     receiver.OnReceiveMessage(result.Item1, result.Item2); return Task.CompletedTask;
                 }
+                case -277016929: // Foo2
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Foo>(data, resolver);
+                    receiver.Foo2(result); return Task.CompletedTask;
+                }
                 default:
                     return Task.CompletedTask;
             }
@@ -388,7 +536,7 @@ namespace Sandbox.NetCoreServer.Hubs {
         {
             switch (methodId)
             {
-                case -733403293: // JoinAsync
+                case 100: // JoinAsync
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
                     ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
@@ -413,7 +561,7 @@ namespace Sandbox.NetCoreServer.Hubs {
    
         public global::System.Threading.Tasks.Task JoinAsync(string userName, string roomName)
         {
-            return WriteMessageWithResponseAsync<DynamicArgumentTuple<string, string>, Nil>(-733403293, new DynamicArgumentTuple<string, string>(userName, roomName));
+            return WriteMessageWithResponseAsync<DynamicArgumentTuple<string, string>, Nil>(100, new DynamicArgumentTuple<string, string>(userName, roomName));
         }
 
         public global::System.Threading.Tasks.Task LeaveAsync()
@@ -453,7 +601,7 @@ namespace Sandbox.NetCoreServer.Hubs {
 
             public global::System.Threading.Tasks.Task JoinAsync(string userName, string roomName)
             {
-                return __parent.WriteMessageAsync<DynamicArgumentTuple<string, string>>(-733403293, new DynamicArgumentTuple<string, string>(userName, roomName));
+                return __parent.WriteMessageAsync<DynamicArgumentTuple<string, string>>(100, new DynamicArgumentTuple<string, string>(userName, roomName));
             }
 
             public global::System.Threading.Tasks.Task LeaveAsync()
@@ -746,6 +894,7 @@ namespace Sandbox.NetCoreServer.Hubs {
 }
 
 #pragma warning restore 168
+#pragma warning restore 219
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612

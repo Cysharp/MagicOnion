@@ -334,7 +334,7 @@ namespace MagicOnion.CodeAnalysis
         public string FullName { get; set; }
         public string UnderlyingType { get; set; }
 
-        public string FormatterName => Namespace + "." + Name + "Formatter()";
+        public string FormatterName => Name + "Formatter()";
 
         public bool Equals(EnumSerializationInfo other)
         {

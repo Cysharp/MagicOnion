@@ -107,7 +107,7 @@ namespace MagicOnion.CodeGenerator
                 .OrderBy(x => x.Key)
                 .Select(x => new EnumTemplate()
                 {
-                    Namespace = x.Key,
+                    Namespace = cmdArgs.NamespaceRoot + ".Formatters",
                     enumSerializationInfos = x.ToArray()
                 })
                 .ToArray();
