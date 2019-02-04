@@ -22,8 +22,6 @@ namespace MagicOnion.Server
             return BuildServerServiceDefinition(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
         }
 
-#if NET_FRAMEWORK
-
         /// <summary>
         /// Search MagicOnion service from all assemblies.
         /// </summary>
@@ -31,18 +29,6 @@ namespace MagicOnion.Server
         {
             return BuildServerServiceDefinition(AppDomain.CurrentDomain.GetAssemblies(), options);
         }
-
-#else
-
-        /// <summary>
-        /// Search MagicOnion service from entry assembly.
-        /// </summary>
-        public static MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-        {
-            return BuildServerServiceDefinition(new[] { Assembly.GetEntryAssembly() }, options);
-        }
-
-#endif
 
         /// <summary>
         /// Search MagicOnion service from target assemblies. ex: new[]{ typeof(Startup).GetTypeInfo().Assembly }
