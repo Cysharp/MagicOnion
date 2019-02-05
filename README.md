@@ -456,7 +456,7 @@ If debugging, I recommend use [SwitchStartupProject](https://marketplace.visuals
 
 It can step-in/out seamlessly in server and client.
 
-for Unity, you can't share by DLL(because can't share `IServer<>` because it is different reference both Unity and Server), so I recommends use [Shared Project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects), this techinique is for xamarin but it works for Unity. Project structure is like this.
+for Unity, you can't share by DLL(because can't share `IServer<>` because it is different reference both Unity and Server), so I recommends use [Shared Project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects), this technique is for xamarin but it works for Unity. Project structure is like this.
 
 ```
 Server
@@ -468,7 +468,7 @@ Assembly.CSharp(Unity)
 - ref ClientLib(by dll)
 ```
 
-Alternatively, using the definition of the interface placed on the Unity side, if you use a reference as a link of csproj(or refer to the directory of .NET Core csproj), you can simply configure it.
+Alternatively, using the definition of the interface placed on the Unity side, if you use a reference as a link of csproj(or refer to the directory, directory can link by `<Compile Include="target_dir", Link="your_path\%(RecursiveDir)%(FileName)%(Extension)">` to write csproj directly), you can simply configure it.
 
 Hosting
 ---
