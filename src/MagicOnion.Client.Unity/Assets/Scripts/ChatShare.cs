@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
+using MagicOnion.Server.Hubs;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sandbox
+namespace Sandbox.NetCoreServer.Hubs
 {
     [MessagePackObject]
     public struct RoomMember
@@ -77,15 +78,7 @@ namespace Sandbox
         public Quaternion Rotation { get; set; }
     }
 
-    public class Foo
-    {
-        public void Hage()
-        {
 
-
-
-        }
-    }
     public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
     {
         Task<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
@@ -97,7 +90,6 @@ namespace Sandbox
     {
         Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
 
-        // 委譲したメソッドを立てるのが面倒な場合は（面倒）これをそのまま公開したりしても勿論別に良い。
         IGamingHub client;
 
         public async Task<GameObject> ConnectAsync(Channel grpcChannel, string roomName, string playerName)
@@ -110,10 +102,9 @@ namespace Sandbox
                 (this as IGamingHubReceiver).OnJoin(player);
             }
 
-            return players[playerName]; // 名前だけでマッチとか脆弱の極みですが、まぁサンプルなので。
+            return players[playerName]; 
         }
 
-        // サーバーへ送るメソッド群
 
         public Task LeaveAsync()
         {
@@ -125,19 +116,15 @@ namespace Sandbox
             return client.MoveAsync(position, rotation);
         }
 
-        // 後始末するもの
         public Task DisposeAsync()
         {
             return client.DisposeAsync();
         }
 
-        // 正常/異常終了を監視できる。これを待ってリトライかけたりなど。
         public Task WaitForDisconnect()
         {
             return client.WaitForDisconnect();
         }
-
-        // サーバーからBroadcastされたものを受信するメソッド
 
         void IGamingHubReceiver.OnJoin(Player player)
         {

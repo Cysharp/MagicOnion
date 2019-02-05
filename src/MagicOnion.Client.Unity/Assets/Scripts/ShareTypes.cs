@@ -206,6 +206,7 @@ namespace Sandbox.NetCoreServer.Hubs
     public interface IMessageReceiver2
     {
         void OnReceiveMessage(string senderUser, string message);
+        void Foo2(Foo foo2);
     }
 
     public interface IChatHub : IStreamingHub<IChatHub, IMessageReceiver2>
@@ -213,5 +214,18 @@ namespace Sandbox.NetCoreServer.Hubs
         Task JoinAsync(string userName, string roomName);
         Task LeaveAsync();
         Task SendMessageAsync(string message);
+    }
+}
+
+namespace Sandbox.NetCoreServer
+{
+    public class Foo
+    {
+        public void Hage()
+        {
+
+
+
+        }
     }
 }

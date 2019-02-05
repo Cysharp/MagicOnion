@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}</ProjectGuid>
+    <ProjectGuid>{F3A182B7-61BF-AE43-6404-55719AC94602}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -53,136 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scenes\Sandbox.cs" />
-     <Compile Include="Assets\Scenes\TestExecution.cs" />
-     <Compile Include="Assets\Scripts\ChatShare.cs" />
-     <Compile Include="Assets\Scripts\Loader.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\AsyncLock.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\AsyncStreamReaderExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\DynamicClientBuilder.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\HeartbeatClient.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\PingClient.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClient.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClientBase.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClient.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClientBase.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClientBuilder.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\ClientStreamingResult.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\CompilerServices\AsyncUnaryResultMethodBuilder.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\DuplexStreamingResult.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\DynamicArgumentTuple.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\GenerateDefineDebugAttribute.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\IgnoreAttribute.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\IService.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\IStreamingHub.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\MagicOnionMarshallers.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\MetadataExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\ReturnStatusException.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Server\Hubs\BroadcasterHelper.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Server\Hubs\MethodIdAttribute.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\ServerStreamingResult.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\UnaryResult.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncMethodBuilderAttribute.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncStreamReaderExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\ChannelExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\CompileStopperDuringPlayMode.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\EditorWindowSupportsCallInvoker.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\MagicOnionWindow.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\UnityDebugLogger.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Unity\UnsafeBlitResolver.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\AsyncLocalShim.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\DynamicAssembly.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\FNV1A32.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\ILGeneratorExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\ReflectionExtensions.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\ReservedWhenAllPromise.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\TaskCompletionSourceEx.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\TaskEx.cs" />
-     <Compile Include="Assets\Scripts\MagicOnion\Utils\UniqueHashDictionary.cs" />
-     <Compile Include="Assets\Scripts\MagicOnionGenerated.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Attributes.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\FloatBits.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\CollectionFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\DictionaryFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\DynamicObjectTypeFallbackFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\EnumAsStringFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\ForceSizePrimitiveFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\IgnoreFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\IMessagePackFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\MultiDimentionalArrayFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\NullableFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\OldSpecFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\PrimitiveFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\PrimitiveObjectFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\StandardClassLibraryFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\TupleFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\TypelessFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\UnsafeBinaryFormatters.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Formatters\ValueTupleFormatter.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\IFormatterResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\IMessagePackSerializationCallbackReceiver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ArrayPool.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\AsymmetricKeyHashTable.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\AutomataDictionary.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ByteArrayComparer.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ByteArrayStringHashTable.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\DynamicAssembly.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ExpressionUtility.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\FarmHash.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\GuidBits.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ILGeneratorExtensions.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ReflectionExtensions.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\ThreadsafeTypeKeyHashTable.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\TinyJsonReader.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\UnsafeMemory.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Internal\UnsafeMemory.Low.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Helper.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Safe.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Safe32.Dirty.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Safe64.Dirty.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Unsafe.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Unsafe32.Dirty.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\Codec\LZ4Codec.Unsafe64.Dirty.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\LZ4MessagePackSerializer.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\LZ4MessagePackSerializer.JSON.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\LZ4\LZ4MessagePackSerializer.NonGeneric.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\MessagePackBinary.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\MessagePackCode.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\MessagePackSerializer.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\MessagePackSerializer.Json.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\MessagePackSerializer.NonGeneric.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Nil.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\AttributeFormatterResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\BuiltinResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\CompositeResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\DynamicEnumAsStringResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\DynamicEnumResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\DynamicGenericResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\DynamicObjectResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\DynamicUnionResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\NativeDateTimeResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\OldSpecResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\PrimitiveObjectResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\StandardResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\TypelessContractlessStandardResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\TypelessObjectResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Resolvers\UnsafeBinaryResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Shims\Reflection.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\StringEncoding.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Unity\Formatters.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\Unity\UnityResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\UnsafeExtensions\UnityBlitResolver.cs" />
-     <Compile Include="Assets\Scripts\MessagePack\UnsafeExtensions\UnsafeBlitFormatter.cs" />
-     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\Assert.cs" />
-     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\ChainingAssertion.Unity.cs" />
-     <Compile Include="Assets\Scripts\RuntimeUnitTestToolkit\UnitTestRunner.cs" />
-     <Compile Include="Assets\Scripts\ShareTypes.cs" />
-     <Compile Include="Assets\Scripts\Tests\ArgumentPatternTest.cs" />
-     <Compile Include="Assets\Scripts\Tests\HeartbeatTest.cs" />
-     <Compile Include="Assets\Scripts\Tests\MetadataTest.cs" />
-     <Compile Include="Assets\Scripts\Tests\SimpleTest.cs" />
-     <Compile Include="Assets\Scripts\Tests\StandardTest.cs" />
+     <Compile Include="Assets\Scripts\Editor\PackageExport.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
@@ -285,6 +156,9 @@
  <Reference Include="UnityEngine.SharedInternalsModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.SharedInternalsModule.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEngine.SpatialTrackingModule">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.SpatialTrackingModule.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.SpriteMaskModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.SpriteMaskModule.dll</HintPath>
  </Reference>
@@ -381,6 +255,12 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.UI">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.TestRunner">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/TestRunner/Editor/UnityEditor.TestRunner.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.TestRunner">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/TestRunner/UnityEngine.TestRunner.dll</HintPath>
  </Reference>
@@ -390,14 +270,35 @@
  <Reference Include="UnityEngine.Timeline">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/Timeline/RuntimeEditor/UnityEngine.Timeline.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Timeline">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/Timeline/Editor/UnityEditor.Timeline.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Networking">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/Networking/Editor/UnityEditor.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.GoogleAudioSpatializer">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnityGoogleAudioSpatializer/Editor/UnityEditor.GoogleAudioSpatializer.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.GoogleAudioSpatializer">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnityGoogleAudioSpatializer/RuntimeEditor/UnityEngine.GoogleAudioSpatializer.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.SpatialTracking">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/Editor/UnityEditor.SpatialTracking.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.VR">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Graphs">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+ <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="Google.Protobuf">
  <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Google.Protobuf/lib/net45/Google.Protobuf.dll</HintPath>
@@ -408,6 +309,9 @@
  <Reference Include="System.Interactive.Async">
  <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Interactive.Async/lib/net45/System.Interactive.Async.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEditor.Advertisements">
+ <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.Analytics.Editor">
  <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
  </Reference>
@@ -416,6 +320,9 @@
  </Reference>
  <Reference Include="Unity.Analytics.Tracker">
  <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.Purchasing">
+ <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.purchasing@2.0.3/Editor/UnityEditor.Purchasing.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -771,6 +678,10 @@
  <Reference Include="Boo.Lang">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp.csproj">
+      <Project>{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
