@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>MagicOnion.Redis</id>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <title>MagicOnion</title>
     <authors>neuecc</authors>
     <owners>neuecc</owners>
@@ -13,7 +13,7 @@
     <tags>gRPC, HTTP2</tags>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="MagicOnion" version="2.0.3" />
+        <dependency id="MagicOnion" version="2.0.4" />
         <dependency id="StackExchange.Redis" version="2.0.519" />
       </group>
     </dependencies>

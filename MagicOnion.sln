@@ -15,6 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion", "src\MagicOnio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{7F61607D-5772-4E41-9D37-04E6AE7E47BA}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\MagicOnion.Hosting.nuspec = nuget\MagicOnion.Hosting.nuspec
 		nuget\MagicOnion.HttpGateway.nuspec = nuget\MagicOnion.HttpGateway.nuspec
 		nuget\MagicOnion.nuspec = nuget\MagicOnion.nuspec
 		nuget\MagicOnion.Redis.nuspec = nuget\MagicOnion.Redis.nuspec
@@ -38,9 +39,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src_unity", "src_unity", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "src\MagicOnion.Client.Unity\Assembly-CSharp.csproj", "{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Hosting", "src\MagicOnion.Hosting\MagicOnion.Hosting.csproj", "{72B2FD95-57B6-400B-95D0-96E19EBCF44B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Hosting", "src\MagicOnion.Hosting\MagicOnion.Hosting.csproj", "{72B2FD95-57B6-400B-95D0-96E19EBCF44B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Hosting.Tests", "tests\MagicOnion.Hosting.Tests\MagicOnion.Hosting.Tests.csproj", "{5A381446-409B-4532-8B1A-877D996F7575}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Hosting.Tests", "tests\MagicOnion.Hosting.Tests\MagicOnion.Hosting.Tests.csproj", "{5A381446-409B-4532-8B1A-877D996F7575}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
