@@ -18,7 +18,7 @@ MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(bina
 
 > StreamingHub realtime service, broadcast data to many connected clients
 
-MagicOnion is for Microservices(communicate between .NET Core Servers), API Service(for WinForms/WPF like WCF), Native Client's API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
+MagicOnion is for Microservices(communicate between .NET Core Servers like Orleans, ServiceFabric, AMBROSIA), API Service(for WinForms/WPF like WCF, ASP.NET Core MVC), Native Client’s API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
 
 Quick Start
 ---
