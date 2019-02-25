@@ -86,12 +86,10 @@ namespace MagicOnion.Server
                         tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
                     }
 
-                    foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+                    void AddMethodHandler(MethodInfo methodInfo, string methodName)
                     {
-                        if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
-                        if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
-
-                        var methodName = methodInfo.Name;
+                        if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) return;
+                        if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) return; // ignore
 
                         // ignore default methods
                         if (methodName == "Equals"
@@ -105,7 +103,7 @@ namespace MagicOnion.Server
                              || methodName == "WithHost"
                              )
                         {
-                            continue;
+                            return;
                         }
 
                         // register for StreamingHub
@@ -116,12 +114,12 @@ namespace MagicOnion.Server
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                             }
-                            continue;
+                            return;
                         }
                         else
                         {
                             // create handler
-                            var handler = new MethodHandler(option, classType, methodInfo);
+                            var handler = new MethodHandler(option, classType, methodInfo, methodName);
                             lock (builder)
                             {
                                 if (!handlers.Add(handler))
@@ -136,6 +134,23 @@ namespace MagicOnion.Server
                                 tempParentStreamingMethodHandler = handler;
                             }
                         }
+                    }
+
+                    foreach(var interfaceMap in classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))
+                                                    .Select(x => x.GenericTypeArguments[0]).Select(x => classType.GetInterfaceMap(x)))
+                    {
+                        for(int i = 0; i < interfaceMap.InterfaceMethods.Length; ++i)
+                        {
+                            var methodInfo = interfaceMap.TargetMethods[i];
+                            if (methodInfo.IsPublic) continue; // ignore
+                            //if (!methodInfo.Name.Contains("-")) continue; // ignore if the override method is NOT created by F#.
+                            AddMethodHandler(methodInfo, interfaceMap.InterfaceMethods[i].Name);
+                        }
+                    }
+
+                    foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        AddMethodHandler(methodInfo, methodInfo.Name);
                     }
 
                     if (isStreamingHub)

@@ -18,6 +18,7 @@ namespace MagicOnion.Server
         int methodHandlerId = 0;
 
         public string ServiceName { get; private set; }
+        public string MethodName { get; private set; }
         public Type ServiceType { get; private set; }
         public MethodInfo MethodInfo { get; private set; }
         public MethodType MethodType { get; private set; }
@@ -47,13 +48,14 @@ namespace MagicOnion.Server
         static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
 
-        public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
+        public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo, string methodName)
         {
             this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
 
             this.ServiceType = classType;
             this.ServiceName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
             this.MethodInfo = methodInfo;
+            this.MethodName = methodName;
             MethodType mt;
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
             this.MethodType = mt;
@@ -292,7 +294,7 @@ namespace MagicOnion.Server
 
         internal void RegisterHandler(ServerServiceDefinition.Builder builder)
         {
-            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodInfo.Name, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
             switch (this.MethodType)
             {
