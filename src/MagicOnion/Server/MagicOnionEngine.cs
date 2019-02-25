@@ -136,8 +136,10 @@ namespace MagicOnion.Server
                         }
                     }
 
-                    foreach(var interfaceMap in classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))
-                                                    .Select(x => x.GenericTypeArguments[0]).Select(x => classType.GetInterfaceMap(x)))
+                    var inheritInterfaces = isStreamingHub ? 
+                            classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).Select(x => x.GenericTypeArguments[0]) :
+                            classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))      .Select(x => x.GenericTypeArguments[0]);
+                    foreach (var interfaceMap in inheritInterfaces.Select(x => classType.GetInterfaceMap(x)))
                     {
                         for(int i = 0; i < interfaceMap.InterfaceMethods.Length; ++i)
                         {
