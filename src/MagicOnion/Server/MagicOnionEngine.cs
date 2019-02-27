@@ -80,30 +80,37 @@ namespace MagicOnion.Server
 
                     var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
                     HashSet<StreamingHubHandler> tempStreamingHubHandlers = null;
-                    MethodHandler tempParentStreamingMethodHandler = null;
                     if (isStreamingHub)
                     {
                         tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
                     }
 
-                    void AddMethodHandler(MethodInfo methodInfo, string methodName)
+                    var inheritInterface = classType.GetInterfaces()
+                        .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == (isStreamingHub ? typeof(IStreamingHub<,>) : typeof(IService<>)))
+                        .GenericTypeArguments[0];
+                    var interfaceMap = classType.GetInterfaceMap(inheritInterface);
+
+                    for (int i = 0; i < interfaceMap.TargetMethods.Length; ++i)
                     {
-                        if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) return;
-                        if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) return; // ignore
+                        var methodInfo = interfaceMap.TargetMethods[i];
+                        var methodName = interfaceMap.InterfaceMethods[i].Name;
+
+                        if (methodInfo.IsSpecialName && (methodInfo.Name.StartsWith("set_") || methodInfo.Name.StartsWith("get_"))) continue;
+                        if (methodInfo.GetCustomAttribute<IgnoreAttribute>(false) != null) continue; // ignore
 
                         // ignore default methods
                         if (methodName == "Equals"
-                             || methodName == "GetHashCode"
-                             || methodName == "GetType"
-                             || methodName == "ToString"
-                             || methodName == "WithOptions"
-                             || methodName == "WithHeaders"
-                             || methodName == "WithDeadline"
-                             || methodName == "WithCancellationToken"
-                             || methodName == "WithHost"
-                             )
+                                || methodName == "GetHashCode"
+                                || methodName == "GetType"
+                                || methodName == "ToString"
+                                || methodName == "WithOptions"
+                                || methodName == "WithHeaders"
+                                || methodName == "WithDeadline"
+                                || methodName == "WithCancellationToken"
+                                || methodName == "WithHost"
+                                )
                         {
-                            return;
+                            continue;
                         }
 
                         // register for StreamingHub
@@ -114,7 +121,7 @@ namespace MagicOnion.Server
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                             }
-                            return;
+                            continue;
                         }
                         else
                         {
@@ -128,39 +135,25 @@ namespace MagicOnion.Server
                                 }
                                 handler.RegisterHandler(builder);
                             }
-
-                            if (isStreamingHub && methodName == "Connect")
-                            {
-                                tempParentStreamingMethodHandler = handler;
-                            }
                         }
-                    }
-
-                    var inheritInterfaces = isStreamingHub ? 
-                            classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).Select(x => x.GenericTypeArguments[0]) :
-                            classType.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>))      .Select(x => x.GenericTypeArguments[0]);
-                    foreach (var interfaceMap in inheritInterfaces.Select(x => classType.GetInterfaceMap(x)))
-                    {
-                        for(int i = 0; i < interfaceMap.InterfaceMethods.Length; ++i)
-                        {
-                            var methodInfo = interfaceMap.TargetMethods[i];
-                            if (methodInfo.IsPublic) continue; // ignore
-                            //if (!methodInfo.Name.Contains("-")) continue; // ignore if the override method is NOT created by F#.
-                            AddMethodHandler(methodInfo, interfaceMap.InterfaceMethods[i].Name);
-                        }
-                    }
-
-                    foreach (var methodInfo in classType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-                    {
-                        AddMethodHandler(methodInfo, methodInfo.Name);
                     }
 
                     if (isStreamingHub)
                     {
+                        var connectHandler = new MethodHandler(option, classType, classType.GetMethod("Connect"), "Connect");
+                        lock (builder)
+                        {
+                            if (!handlers.Add(connectHandler))
+                            {
+                                throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
+                            }
+                            connectHandler.RegisterHandler(builder);
+                        }
+
                         lock (streamingHubHandlers)
                         {
                             streamingHubHandlers.AddRange(tempStreamingHubHandlers);
-                            StreamingHubHandlerRepository.RegisterHandler(tempParentStreamingMethodHandler, tempStreamingHubHandlers.ToArray());
+                            StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers.ToArray());
                             IGroupRepositoryFactory factory;
                             var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                             if (attr != null)
@@ -171,7 +164,7 @@ namespace MagicOnion.Server
                             {
                                 factory = option.DefaultGroupRepositoryFactory;
                             }
-                            StreamingHubHandlerRepository.AddGroupRepository(tempParentStreamingMethodHandler, factory.CreateRepository(option.ServiceLocator));
+                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.ServiceLocator));
                         }
                     }
                 });
