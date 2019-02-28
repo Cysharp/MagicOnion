@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>MagicOnion.Hosting</id>
-    <version>2.0.4</version>
+    <version>2.0.5</version>
     <title>MagicOnion.Hosting</title>
     <authors>neuecc</authors>
     <owners>neuecc</owners>
@@ -13,7 +13,7 @@
     <tags>gRPC, HTTP2</tags>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="MagicOnion" version="2.0.4"/>
+        <dependency id="MagicOnion" version="2.0.5"/>
         <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="2.2.0"/>
       </group>
     </dependencies>

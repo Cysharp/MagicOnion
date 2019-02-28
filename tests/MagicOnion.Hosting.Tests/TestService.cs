@@ -1,3 +1,5 @@
+#pragma warning disable CS1998
+
 using System;
 using MagicOnion;
 using MagicOnion.Server;
@@ -16,3 +18,4 @@ namespace MagicOnion.Hosting.Tests
         }
     }
 }
+#pragma warning restore CS1998

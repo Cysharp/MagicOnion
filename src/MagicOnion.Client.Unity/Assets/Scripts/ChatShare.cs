@@ -94,7 +94,7 @@ namespace Sandbox.NetCoreServer.Hubs
 
         public async Task<GameObject> ConnectAsync(Channel grpcChannel, string roomName, string playerName)
         {
-            var client = StreamingHubClient.Connect<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
+            client = StreamingHubClient.Connect<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
 
             var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
             foreach (var player in roomPlayers)
