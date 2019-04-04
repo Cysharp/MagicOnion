@@ -727,6 +727,10 @@ static async Task DuplexStreamRun(IMyFirstService client)
 }
 ```
 
+How to build
+---
+using VS2019. Some Unity files using symbolic link to sharing code. In windows, requires `core.symlinks = true` .gitconfig and allows to create symboloic link privilege(or git clone on admin) and set enrvironemnt variable like this command `setx MSYS winsymlinks:nativestrict`(privilege).
+
 Author Info
 ---
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
