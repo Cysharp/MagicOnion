@@ -11,8 +11,8 @@ jobs:
     executor: dotnet
     steps:
       - checkout
-      - run: dotnet build ./src/MagicOnion/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Annotation/ -c Debug
+      - run: dotnet build ./src/MagicOnion/ -c Debug -netstandard2.0
+      - run: dotnet build ./src/MagicOnion.Annotation/ -c Debug -netstandard2.0
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
       - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
