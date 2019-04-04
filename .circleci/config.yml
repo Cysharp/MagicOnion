@@ -11,14 +11,20 @@ jobs:
     executor: dotnet
     steps:
       - checkout
-      - run: dotnet build -c Debug
-      - run: dotnet test -c Debug --no-build
+      - run: dotnet build ./src/MagicOnion/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Annotation/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
+      - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
+      - run: dotnet build ./src/MagicOnion.UniversalCodeGenerator/ -c Debug
+      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
+      - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
   build-push:
     executor: dotnet
     steps:
       - checkout
-      - run: dotnet build -c Release -p:Version=${CIRCLE_TAG}
-      - run: dotnet test -c Release --no-build
+      # - run: dotnet build -c Release -p:Version=${CIRCLE_TAG}
+      # - run: dotnet test -c Release --no-build
       # - run: dotnet pack ./src/MicroBatchFramework/MicroBatchFramework.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       # - run: dotnet pack ./src/MicroBatchFramework.WebHosting/MicroBatchFramework.WebHosting.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       # - store_artifacts:
