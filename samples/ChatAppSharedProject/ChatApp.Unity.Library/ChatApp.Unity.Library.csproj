@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C64C3A37-6C33-4F31-9554-44FC9D38F54E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ChatApp.Unity.Library</RootNamespace>
+    <AssemblyName>ChatApp.Unity.Library</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\ChatApp.Unity\Assets\Plugins\ChatApp.Library\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ENABLE_UNSAFE_MSGPACK UNITY_2018_3_OR_NEWER NET_4_6 CSHARP_7_OR_LATER</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Grpc.Core">
+      <HintPath>.\Grpc.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Grpc.Core.Api">
+      <HintPath>.\Grpc.Core.Api.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Interactive.Async">
+      <HintPath>.\System.Interactive.Async.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>.\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Generated\MagicOnion.Generated.cs" />
+    <Compile Include="Generated\MessagePack.Generated.cs" />
+    <Compile Include="MagicOnion\AsyncLock.cs" />
+    <Compile Include="MagicOnion\AsyncStreamReaderExtensions.cs" />
+    <Compile Include="MagicOnion\ClientStreamingResult.cs" />
+    <Compile Include="MagicOnion\Client\DynamicClientBuilder.cs" />
+    <Compile Include="MagicOnion\Client\EmbeddedServices\HeartbeatClient.cs" />
+    <Compile Include="MagicOnion\Client\EmbeddedServices\PingClient.cs" />
+    <Compile Include="MagicOnion\Client\MagicOnionClient.cs" />
+    <Compile Include="MagicOnion\Client\MagicOnionClientBase.cs" />
+    <Compile Include="MagicOnion\Client\StreamingHubClient.cs" />
+    <Compile Include="MagicOnion\Client\StreamingHubClientBase.cs" />
+    <Compile Include="MagicOnion\Client\StreamingHubClientBuilder.cs" />
+    <Compile Include="MagicOnion\CompilerServices\AsyncUnaryResultMethodBuilder.cs" />
+    <Compile Include="MagicOnion\DuplexStreamingResult.cs" />
+    <Compile Include="MagicOnion\DynamicArgumentTuple.cs" />
+    <Compile Include="MagicOnion\GenerateDefineDebugAttribute.cs" />
+    <Compile Include="MagicOnion\IgnoreAttribute.cs" />
+    <Compile Include="MagicOnion\IService.cs" />
+    <Compile Include="MagicOnion\IStreamingHub.cs" />
+    <Compile Include="MagicOnion\MagicOnionMarshallers.cs" />
+    <Compile Include="MagicOnion\MetadataExtensions.cs" />
+    <Compile Include="MagicOnion\ReturnStatusException.cs" />
+    <Compile Include="MagicOnion\ServerStreamingResult.cs" />
+    <Compile Include="MagicOnion\Server\Hubs\BroadcasterHelper.cs" />
+    <Compile Include="MagicOnion\Server\Hubs\MethodIdAttribute.cs" />
+    <Compile Include="MagicOnion\UnaryResult.cs" />
+    <Compile Include="MagicOnion\Unity\AsyncMethodBuilderAttribute.cs" />
+    <Compile Include="MagicOnion\Unity\AsyncStreamReaderExtensions.cs" />
+    <Compile Include="MagicOnion\Unity\ChannelExtensions.cs" />
+    <Compile Include="MagicOnion\Unity\CompileStopperDuringPlayMode.cs" />
+    <Compile Include="MagicOnion\Unity\EditorWindowSupportsCallInvoker.cs" />
+    <Compile Include="MagicOnion\Unity\MagicOnionWindow.cs" />
+    <Compile Include="MagicOnion\Unity\UnityDebugLogger.cs" />
+    <Compile Include="MagicOnion\Unity\UnsafeBlitResolver.cs" />
+    <Compile Include="MagicOnion\Utils\AsyncLocalShim.cs" />
+    <Compile Include="MagicOnion\Utils\DynamicAssembly.cs" />
+    <Compile Include="MagicOnion\Utils\FNV1A32.cs" />
+    <Compile Include="MagicOnion\Utils\ILGeneratorExtensions.cs" />
+    <Compile Include="MagicOnion\Utils\ReflectionExtensions.cs" />
+    <Compile Include="MagicOnion\Utils\ReservedWhenAllPromise.cs" />
+    <Compile Include="MagicOnion\Utils\TaskCompletionSourceEx.cs" />
+    <Compile Include="MagicOnion\Utils\TaskEx.cs" />
+    <Compile Include="MagicOnion\Utils\UniqueHashDictionary.cs" />
+    <Compile Include="MessagePack\Attributes.cs" />
+    <Compile Include="MessagePack\FloatBits.cs" />
+    <Compile Include="MessagePack\Formatters\CollectionFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\DictionaryFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\DynamicObjectTypeFallbackFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\EnumAsStringFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\ForceSizePrimitiveFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\IgnoreFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\IMessagePackFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\MultiDimentionalArrayFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\NullableFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\OldSpecFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\PrimitiveFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\PrimitiveObjectFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\StandardClassLibraryFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\TupleFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\TypelessFormatter.cs" />
+    <Compile Include="MessagePack\Formatters\UnsafeBinaryFormatters.cs" />
+    <Compile Include="MessagePack\Formatters\ValueTupleFormatter.cs" />
+    <Compile Include="MessagePack\IFormatterResolver.cs" />
+    <Compile Include="MessagePack\IMessagePackSerializationCallbackReceiver.cs" />
+    <Compile Include="MessagePack\Internal\ArrayPool.cs" />
+    <Compile Include="MessagePack\Internal\AsymmetricKeyHashTable.cs" />
+    <Compile Include="MessagePack\Internal\AutomataDictionary.cs" />
+    <Compile Include="MessagePack\Internal\ByteArrayComparer.cs" />
+    <Compile Include="MessagePack\Internal\ByteArrayStringHashTable.cs" />
+    <Compile Include="MessagePack\Internal\DynamicAssembly.cs" />
+    <Compile Include="MessagePack\Internal\ExpressionUtility.cs" />
+    <Compile Include="MessagePack\Internal\FarmHash.cs" />
+    <Compile Include="MessagePack\Internal\GuidBits.cs" />
+    <Compile Include="MessagePack\Internal\ILGeneratorExtensions.cs" />
+    <Compile Include="MessagePack\Internal\ReflectionExtensions.cs" />
+    <Compile Include="MessagePack\Internal\ThreadsafeTypeKeyHashTable.cs" />
+    <Compile Include="MessagePack\Internal\TinyJsonReader.cs" />
+    <Compile Include="MessagePack\Internal\UnsafeMemory.cs" />
+    <Compile Include="MessagePack\Internal\UnsafeMemory.Low.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Helper.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Safe.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Safe32.Dirty.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Safe64.Dirty.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Unsafe.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Unsafe32.Dirty.cs" />
+    <Compile Include="MessagePack\LZ4\Codec\LZ4Codec.Unsafe64.Dirty.cs" />
+    <Compile Include="MessagePack\LZ4\LZ4MessagePackSerializer.cs" />
+    <Compile Include="MessagePack\LZ4\LZ4MessagePackSerializer.JSON.cs" />
+    <Compile Include="MessagePack\LZ4\LZ4MessagePackSerializer.NonGeneric.cs" />
+    <Compile Include="MessagePack\MessagePackBinary.cs" />
+    <Compile Include="MessagePack\MessagePackCode.cs" />
+    <Compile Include="MessagePack\MessagePackSerializer.cs" />
+    <Compile Include="MessagePack\MessagePackSerializer.Json.cs" />
+    <Compile Include="MessagePack\MessagePackSerializer.NonGeneric.cs" />
+    <Compile Include="MessagePack\Nil.cs" />
+    <Compile Include="MessagePack\Resolvers\AttributeFormatterResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\BuiltinResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\CompositeResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\ContractlessReflectionObjectResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\DynamicEnumAsStringResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\DynamicEnumResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\DynamicGenericResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\DynamicObjectResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\DynamicUnionResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\NativeDateTimeResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\OldSpecResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\PrimitiveObjectResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\StandardResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\TypelessContractlessStandardResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\TypelessObjectResolver.cs" />
+    <Compile Include="MessagePack\Resolvers\UnsafeBinaryResolver.cs" />
+    <Compile Include="MessagePack\Shims\Reflection.cs" />
+    <Compile Include="MessagePack\StringEncoding.cs" />
+    <Compile Include="MessagePack\Unity\Formatters.cs" />
+    <Compile Include="MessagePack\Unity\UnityResolver.cs" />
+    <Compile Include="MessagePack\UnsafeExtensions\UnityBlitResolver.cs" />
+    <Compile Include="MessagePack\UnsafeExtensions\UnsafeBlitFormatter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="..\ChatApp.Shared\ChatApp.Shared.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>$(ProjectDir)GeneratorTools\MagicOnionCodeGenerator\win-x64\moc.exe -i "$(SolutionDir)..\ChatApp.Server\ChatApp.Server.csproj" -o "$(ProjectDir)Generated\MagicOnion.Generated.cs"
+$(ProjectDir)GeneratorTools\MessagePackUniversalCodeGenerator\win-x64\mpc.exe -i "$(ProjectPath)" -o "$(ProjectDir)Generated\MessagePack.Generated.cs"</PreBuildEvent>
+  </PropertyGroup>
+</Project>

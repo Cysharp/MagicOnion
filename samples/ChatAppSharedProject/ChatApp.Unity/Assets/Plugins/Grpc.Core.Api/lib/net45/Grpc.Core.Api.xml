@@ -1,0 +1,1067 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Grpc.Core.Api</name>
+    </assembly>
+    <members>
+        <member name="T:Grpc.Core.AuthContext">
+            <summary>
+            Authentication context for a call.
+            AuthContext is the only reliable source of truth when it comes to authenticating calls.
+            Using any other call/context properties for authentication purposes is wrong and inherently unsafe.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AuthContext.#ctor(System.String,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Grpc.Core.AuthProperty}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Core.AuthContext"/> class.
+            </summary>
+            <param name="peerIdentityPropertyName">Peer identity property name.</param>
+            <param name="properties">Multimap of auth properties by name.</param>
+        </member>
+        <member name="P:Grpc.Core.AuthContext.IsPeerAuthenticated">
+            <summary>
+            Returns <c>true</c> if the peer is authenticated.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthContext.PeerIdentityPropertyName">
+            <summary>
+            Gets the name of the property that indicates the peer identity. Returns <c>null</c>
+            if the peer is not authenticated.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthContext.PeerIdentity">
+            <summary>
+            Gets properties that represent the peer identity (there can be more than one). Returns an empty collection
+            if the peer is not authenticated.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthContext.Properties">
+            <summary>
+            Gets the auth properties of this context.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AuthContext.FindPropertiesByName(System.String)">
+            <summary>
+            Returns the auth properties with given name (there can be more than one).
+            If no properties of given name exist, an empty collection will be returned.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.AuthProperty">
+            <summary>
+            A property of an <see cref="T:Grpc.Core.AuthContext"/>.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthProperty.Name">
+            <summary>
+            Gets the name of the property.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthProperty.Value">
+            <summary>
+            Gets the string value of the property.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthProperty.ValueBytes">
+            <summary>
+            Gets the binary value of the property.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AuthProperty.Create(System.String,System.Byte[])">
+            <summary>
+            Creates an instance of <c>AuthProperty</c>.
+            </summary>
+            <param name="name">the name</param>
+            <param name="valueBytes">the binary value of the property</param>
+        </member>
+        <member name="P:Grpc.Core.AuthProperty.ValueBytesUnsafe">
+            <summary>
+            Gets the binary value of the property (without making a defensive copy).
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AuthProperty.CreateUnsafe(System.String,System.Byte[])">
+            <summary>
+            Creates and instance of <c>AuthProperty</c> without making a defensive copy of <c>valueBytes</c>.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.ContextPropagationOptions">
+            <summary>
+            Options for <see cref="T:Grpc.Core.ContextPropagationToken"/>.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.ContextPropagationOptions.Default">
+            <summary>
+            The context propagation options that will be used by default.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ContextPropagationOptions.#ctor(System.Boolean,System.Boolean)">
+            <summary>
+            Creates new context propagation options.
+            </summary>
+            <param name="propagateDeadline">If set to <c>true</c> parent call's deadline will be propagated to the child call.</param>
+            <param name="propagateCancellation">If set to <c>true</c> parent call's cancellation token will be propagated to the child call.</param>
+        </member>
+        <member name="P:Grpc.Core.ContextPropagationOptions.IsPropagateDeadline">
+            <summary><c>true</c> if parent call's deadline should be propagated to the child call.</summary>
+        </member>
+        <member name="P:Grpc.Core.ContextPropagationOptions.IsPropagateCancellation">
+            <summary><c>true</c> if parent call's cancellation token should be propagated to the child call.</summary>
+        </member>
+        <member name="T:Grpc.Core.ContextPropagationToken">
+            <summary>
+            Token for propagating context of server side handlers to child calls.
+            In situations when a backend is making calls to another backend,
+            it makes sense to propagate properties like deadline and cancellation 
+            token of the server call to the child call.
+            Underlying gRPC implementation may provide other "opaque" contexts (like tracing context) that
+            are not explicitly accesible via the public C# API, but this token still allows propagating them.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.DeserializationContext">
+            <summary>
+            Provides access to the payload being deserialized when deserializing messages.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.DeserializationContext.PayloadLength">
+            <summary>
+            Get the total length of the payload in bytes.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.DeserializationContext.PayloadAsNewBuffer">
+            <summary>
+            Gets the entire payload as a newly allocated byte array.
+            Once the byte array is returned, the byte array becomes owned by the caller and won't be ever accessed or reused by gRPC again.
+            NOTE: Obtaining the buffer as a newly allocated byte array is the simplest way of accessing the payload,
+            but it can have important consequences in high-performance scenarios.
+            In particular, using this method usually requires copying of the entire buffer one extra time.
+            Also, allocating a new buffer each time can put excessive pressure on GC, especially if
+            the payload is more than 86700 bytes large (which means the newly allocated buffer will be placed in LOH,
+            and LOH object can only be garbage collected via a full ("stop the world") GC run).
+            NOTE: Deserializers are expected not to call this method more than once per received message
+            (as there is no practical reason for doing so) and <c>DeserializationContext</c> implementations are free to assume so.
+            </summary>
+            <returns>byte array containing the entire payload.</returns>
+        </member>
+        <member name="T:Grpc.Core.IAsyncStreamReader`1">
+            <summary>
+            A stream of messages to be read.
+            Messages can be awaited <c>await reader.MoveNext()</c>, that returns <c>true</c>
+            if there is a message available and <c>false</c> if there are no more messages
+            (i.e. the stream has been closed).
+            <para>
+            On the client side, the last invocation of <c>MoveNext()</c> either returns <c>false</c>
+            if the call has finished successfully or throws <c>RpcException</c> if call finished
+            with an error. Once the call finishes, subsequent invocations of <c>MoveNext()</c> will
+            continue yielding the same result (returning <c>false</c> or throwing an exception).
+            </para>
+            <para>
+            On the server side, <c>MoveNext()</c> does not throw exceptions.
+            In case of a failure, the request stream will appear to be finished
+            (<c>MoveNext</c> will return <c>false</c>) and the <c>CancellationToken</c>
+            associated with the call will be cancelled to signal the failure.
+            </para>
+            <para>
+            <c>MoveNext()</c> operations can be cancelled via a cancellation token. Cancelling
+            an individual read operation has the same effect as cancelling the entire call
+            (which will also result in the read operation returning prematurely), but the per-read cancellation
+            tokens passed to MoveNext() only result in cancelling the call if the read operation haven't finished
+            yet.
+            </para>
+            </summary>
+            <typeparam name="T">The message type.</typeparam>
+        </member>
+        <member name="T:Grpc.Core.IAsyncStreamWriter`1">
+            <summary>
+            A writable stream of messages.
+            </summary>
+            <typeparam name="T">The message type.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.IAsyncStreamWriter`1.WriteAsync(`0)">
+            <summary>
+            Writes a single asynchronously. Only one write can be pending at a time.
+            </summary>
+            <param name="message">the message to be written. Cannot be null.</param>
+        </member>
+        <member name="P:Grpc.Core.IAsyncStreamWriter`1.WriteOptions">
+            <summary>
+            Write options that will be used for the next write.
+            If null, default options will be used.
+            Once set, this property maintains its value across subsequent
+            writes.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.IServerStreamWriter`1">
+            <summary>
+            A writable stream of messages that is used in server-side handlers.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Marshaller`1">
+            <summary>
+            Encapsulates the logic for serializing and deserializing messages.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Marshaller`1.#ctor(System.Func{`0,System.Byte[]},System.Func{System.Byte[],`0})">
+            <summary>
+            Initializes a new marshaller from simple serialize/deserialize functions.
+            </summary>
+            <param name="serializer">Function that will be used to serialize messages.</param>
+            <param name="deserializer">Function that will be used to deserialize messages.</param>
+        </member>
+        <member name="M:Grpc.Core.Marshaller`1.#ctor(System.Action{`0,Grpc.Core.SerializationContext},System.Func{Grpc.Core.DeserializationContext,`0})">
+            <summary>
+            Initializes a new marshaller from serialize/deserialize fuctions that can access serialization and deserialization
+            context. Compared to the simple serializer/deserializer functions, using the contextual version provides more
+            flexibility and can lead to increased efficiency (and better performance).
+            Note: This constructor is part of an experimental API that can change or be removed without any prior notice.
+            </summary>
+            <param name="serializer">Function that will be used to serialize messages.</param>
+            <param name="deserializer">Function that will be used to deserialize messages.</param>
+        </member>
+        <member name="P:Grpc.Core.Marshaller`1.Serializer">
+            <summary>
+            Gets the serializer function.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Marshaller`1.Deserializer">
+            <summary>
+            Gets the deserializer function.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Marshaller`1.ContextualSerializer">
+            <summary>
+            Gets the serializer function.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Marshaller`1.ContextualDeserializer">
+            <summary>
+            Gets the serializer function.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Marshallers">
+            <summary>
+            Utilities for creating marshallers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Marshallers.Create``1(System.Func{``0,System.Byte[]},System.Func{System.Byte[],``0})">
+            <summary>
+            Creates a marshaller from specified serializer and deserializer.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Marshallers.Create``1(System.Action{``0,Grpc.Core.SerializationContext},System.Func{Grpc.Core.DeserializationContext,``0})">
+            <summary>
+            Creates a marshaller from specified contextual serializer and deserializer.
+            Note: This method is part of an experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Marshallers.StringMarshaller">
+            <summary>
+            Returns a marshaller for <c>string</c> type. This is useful for testing.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Metadata">
+            <summary>
+            A collection of metadata entries that can be exchanged during a call.
+            gRPC supports these types of metadata:
+            <list type="bullet">
+            <item><term>Request headers</term><description>are sent by the client at the beginning of a remote call before any request messages are sent.</description></item>
+            <item><term>Response headers</term><description>are sent by the server at the beginning of a remote call handler before any response messages are sent.</description></item>
+            <item><term>Response trailers</term><description>are sent by the server at the end of a remote call along with resulting call status.</description></item>
+            </list>
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Metadata.BinaryHeaderSuffix">
+            <summary>
+            All binary headers should have this suffix.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Metadata.Empty">
+            <summary>
+            An read-only instance of metadata containing no entries.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Metadata.CompressionRequestAlgorithmMetadataKey">
+            <summary>
+            To be used in initial metadata to request specific compression algorithm
+            for given call. Direct selection of compression algorithms is an internal
+            feature and is not part of public API.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.#ctor">
+            <summary>
+            Initializes a new instance of <c>Metadata</c>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Freeze">
+            <summary>
+            Makes this object read-only.
+            </summary>
+            <returns>this object</returns>
+        </member>
+        <member name="M:Grpc.Core.Metadata.IndexOf(Grpc.Core.Metadata.Entry)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Insert(System.Int32,Grpc.Core.Metadata.Entry)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.RemoveAt(System.Int32)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Item(System.Int32)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(Grpc.Core.Metadata.Entry)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.String)">
+            <summary>
+            Adds a new ASCII-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.Byte[])">
+            <summary>
+            Adds a new binary-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Clear">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Contains(Grpc.Core.Metadata.Entry)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.CopyTo(Grpc.Core.Metadata.Entry[],System.Int32)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Count">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.IsReadOnly">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Remove(Grpc.Core.Metadata.Entry)">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetEnumerator">
+            <summary>
+            <see cref="T:IList`1"/>
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Metadata.Entry">
+            <summary>
+            Metadata entry
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.#ctor(System.String,System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Core.Metadata.Entry"/> struct with a binary value.
+            </summary>
+            <param name="key">Metadata key. Gets converted to lowercase. Needs to have suffix indicating a binary valued metadata entry. Can only contain lowercase alphanumeric characters, underscores, hyphens and dots.</param>
+            <param name="valueBytes">Value bytes.</param>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Core.Metadata.Entry"/> struct with an ASCII value.
+            </summary>
+            <param name="key">Metadata key. Gets converted to lowercase. Must not use suffix indicating a binary valued metadata entry. Can only contain lowercase alphanumeric characters, underscores, hyphens and dots.</param>
+            <param name="value">Value string. Only ASCII characters are allowed.</param>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Entry.Key">
+            <summary>
+            Gets the metadata entry key.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Entry.ValueBytes">
+            <summary>
+            Gets the binary value of this metadata entry.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Entry.Value">
+            <summary>
+            Gets the string value of this metadata entry.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Metadata.Entry.IsBinary">
+            <summary>
+            Returns <c>true</c> if this entry is a binary-value entry.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Grpc.Core.Metadata.Entry"/>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.GetSerializedValueUnsafe">
+            <summary>
+            Gets the serialized value for this entry. For binary metadata entries, this leaks
+            the internal <c>valueBytes</c> byte array and caller must not change contents of it.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.CreateUnsafe(System.String,System.Byte[])">
+            <summary>
+            Creates a binary value or ascii value metadata entry from data received from the native layer.
+            We trust C core to give us well-formed data, so we don't perform any checks or defensive copying.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Entry.HasBinaryHeaderSuffix(System.String)">
+            <summary>
+            Returns <c>true</c> if the key has "-bin" binary header suffix.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.MethodType">
+            <summary>
+            Method types supported by gRPC.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.MethodType.Unary">
+            <summary>Single request sent from client, single response received from server.</summary>
+        </member>
+        <member name="F:Grpc.Core.MethodType.ClientStreaming">
+            <summary>Stream of request sent from client, single response received from server.</summary>
+        </member>
+        <member name="F:Grpc.Core.MethodType.ServerStreaming">
+            <summary>Single request sent from client, stream of responses received from server.</summary>
+        </member>
+        <member name="F:Grpc.Core.MethodType.DuplexStreaming">
+            <summary>Both server and client can stream arbitrary number of requests and responses simultaneously.</summary>
+        </member>
+        <member name="T:Grpc.Core.IMethod">
+            <summary>
+            A non-generic representation of a remote method.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.IMethod.Type">
+            <summary>
+            Gets the type of the method.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.IMethod.ServiceName">
+            <summary>
+            Gets the name of the service to which this method belongs.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.IMethod.Name">
+            <summary>
+            Gets the unqualified name of the method.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.IMethod.FullName">
+            <summary>
+            Gets the fully qualified name of the method. On the server side, methods are dispatched
+            based on this name.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Method`2">
+            <summary>
+            A description of a remote method.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.Method`2.#ctor(Grpc.Core.MethodType,System.String,System.String,Grpc.Core.Marshaller{`0},Grpc.Core.Marshaller{`1})">
+            <summary>
+            Initializes a new instance of the <c>Method</c> class.
+            </summary>
+            <param name="type">Type of method.</param>
+            <param name="serviceName">Name of service this method belongs to.</param>
+            <param name="name">Unqualified name of the method.</param>
+            <param name="requestMarshaller">Marshaller used for request messages.</param>
+            <param name="responseMarshaller">Marshaller used for response messages.</param>
+        </member>
+        <member name="P:Grpc.Core.Method`2.Type">
+            <summary>
+            Gets the type of the method.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Method`2.ServiceName">
+            <summary>
+            Gets the name of the service to which this method belongs.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Method`2.Name">
+            <summary>
+            Gets the unqualified name of the method.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Method`2.RequestMarshaller">
+            <summary>
+            Gets the marshaller used for request messages.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Method`2.ResponseMarshaller">
+            <summary>
+            Gets the marshaller used for response messages.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Method`2.FullName">
+            <summary>
+            Gets the fully qualified name of the method. On the server side, methods are dispatched
+            based on this name.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Method`2.GetFullName(System.String,System.String)">
+            <summary>
+            Gets full name of the method including the service name.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.RpcException">
+            <summary>
+            Thrown when remote procedure call fails. Every <c>RpcException</c> is associated with a resulting <see cref="P:Grpc.Core.RpcException.Status"/> of the call.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status)">
+            <summary>
+            Creates a new <c>RpcException</c> associated with given status.
+            </summary>
+            <param name="status">Resulting status of a call.</param>
+        </member>
+        <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status,System.String)">
+            <summary>
+            Creates a new <c>RpcException</c> associated with given status and message.
+            </summary>
+            <param name="status">Resulting status of a call.</param>
+            <param name="message">The exception message.</param> 
+        </member>
+        <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status,Grpc.Core.Metadata)">
+            <summary>
+            Creates a new <c>RpcException</c> associated with given status and trailing response metadata.
+            </summary>
+            <param name="status">Resulting status of a call.</param>
+            <param name="trailers">Response trailing metadata.</param> 
+        </member>
+        <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status,Grpc.Core.Metadata,System.String)">
+            <summary>
+            Creates a new <c>RpcException</c> associated with given status, message and trailing response metadata.
+            </summary>
+            <param name="status">Resulting status of a call.</param>
+            <param name="trailers">Response trailing metadata.</param>
+            <param name="message">The exception message.</param>
+        </member>
+        <member name="P:Grpc.Core.RpcException.Status">
+            <summary>
+            Resulting status of the call.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.RpcException.StatusCode">
+            <summary>
+            Returns the status code of the call, as a convenient alternative to <see cref="P:Grpc.Core.RpcException.StatusCode">Status.StatusCode</see>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.RpcException.Trailers">
+            <summary>
+            Gets the call trailing metadata.
+            Trailers only have meaningful content for client-side calls (in which case they represent the trailing metadata sent by the server when closing the call).
+            Instances of <c>RpcException</c> thrown by the server-side part of the stack will have trailers always set to empty.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.SerializationContext">
+            <summary>
+            Provides storage for payload when serializing a message.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.SerializationContext.Complete(System.Byte[])">
+            <summary>
+            Use the byte array as serialized form of current message and mark serialization process as complete.
+            Complete() can only be called once. By calling this method the caller gives up the ownership of the
+            payload which must not be accessed afterwards.
+            </summary>
+            <param name="payload">the serialized form of current message</param>
+        </member>
+        <member name="T:Grpc.Core.ServerCallContext">
+            <summary>
+            Context for a server-side call.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerCallContext.#ctor">
+            <summary>
+            Creates a new instance of <c>ServerCallContext</c>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerCallContext.WriteResponseHeadersAsync(Grpc.Core.Metadata)">
+            <summary>
+            Asynchronously sends response headers for the current call to the client. This method may only be invoked once for each call and needs to be invoked
+            before any response messages are written. Writing the first response message implicitly sends empty response headers if <c>WriteResponseHeadersAsync</c> haven't
+            been called yet.
+            </summary>
+            <param name="responseHeaders">The response headers to send.</param>
+            <returns>The task that finished once response headers have been written.</returns>
+        </member>
+        <member name="M:Grpc.Core.ServerCallContext.CreatePropagationToken(Grpc.Core.ContextPropagationOptions)">
+            <summary>
+            Creates a propagation token to be used to propagate call context to a child call.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.Method">
+            <summary>Name of method called in this RPC.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.Host">
+            <summary>Name of host called in this RPC.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.Peer">
+            <summary>Address of the remote endpoint in URI format.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.Deadline">
+            <summary>Deadline for this RPC.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.RequestHeaders">
+            <summary>Initial metadata sent by client.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.CancellationToken">
+            <summary>Cancellation token signals when call is cancelled.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.ResponseTrailers">
+            <summary>Trailers to send back to client after RPC finishes.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.Status">
+            <summary> Status to send back to client after RPC finishes.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.WriteOptions">
+            <summary>
+            Allows setting write options for the following write.
+            For streaming response calls, this property is also exposed as on IServerStreamWriter for convenience.
+            Both properties are backed by the same underlying value.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.AuthContext">
+            <summary>
+            Gets the <c>AuthContext</c> associated with this call.
+            Note: Access to AuthContext is an experimental API that can change without any prior notice.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.UserState">
+            <summary>
+            Gets a dictionary that can be used by the various interceptors and handlers of this
+            call to store arbitrary state.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerCallContext.WriteResponseHeadersAsyncCore(Grpc.Core.Metadata)">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="M:Grpc.Core.ServerCallContext.CreatePropagationTokenCore(Grpc.Core.ContextPropagationOptions)">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.MethodCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.HostCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.PeerCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.DeadlineCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.RequestHeadersCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.CancellationTokenCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.ResponseTrailersCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.StatusCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.WriteOptionsCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.AuthContextCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.UserStateCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="T:Grpc.Core.UnaryServerMethod`2">
+            <summary>
+            Server-side handler for unary call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+        </member>
+        <member name="T:Grpc.Core.ClientStreamingServerMethod`2">
+            <summary>
+            Server-side handler for client streaming call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+        </member>
+        <member name="T:Grpc.Core.ServerStreamingServerMethod`2">
+            <summary>
+            Server-side handler for server streaming call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+        </member>
+        <member name="T:Grpc.Core.DuplexStreamingServerMethod`2">
+            <summary>
+            Server-side handler for bidi streaming call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+        </member>
+        <member name="T:Grpc.Core.ServerServiceDefinition">
+            <summary>
+            Stores mapping of methods to server call handlers.
+            Normally, the <c>ServerServiceDefinition</c> objects will be created by the <c>BindService</c> factory method 
+            that is part of the autogenerated code for a protocol buffers service definition.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.BindService(Grpc.Core.ServiceBinderBase)">
+            <summary>
+            Forwards all the previously stored <c>AddMethod</c> calls to the service binder.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.CreateBuilder">
+            <summary>
+            Creates a new builder object for <c>ServerServiceDefinition</c>.
+            </summary>
+            <returns>The builder object.</returns>
+        </member>
+        <member name="T:Grpc.Core.ServerServiceDefinition.Builder">
+            <summary>
+            Builder class for <see cref="T:Grpc.Core.ServerServiceDefinition"/>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.#ctor">
+            <summary>
+            Creates a new instance of builder.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.UnaryServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a single request - single response method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+            <returns>This builder instance.</returns>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.ClientStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a client streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+            <returns>This builder instance.</returns>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.ServerStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a server streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+            <returns>This builder instance.</returns>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.DuplexStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a bidirectional streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+            <returns>This builder instance.</returns>
+        </member>
+        <member name="M:Grpc.Core.ServerServiceDefinition.Builder.Build">
+            <summary>
+            Creates an immutable <c>ServerServiceDefinition</c> from this builder.
+            </summary>
+            <returns>The <c>ServerServiceDefinition</c> object.</returns>
+        </member>
+        <member name="T:Grpc.Core.ServiceBinderBase">
+            <summary>
+            Allows binding server-side method implementations in alternative serving stacks.
+            Instances of this class are usually populated by the <c>BindService</c> method
+            that is part of the autogenerated code for a protocol buffers service definition.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.ServiceBinderBase.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.UnaryServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a single request - single response method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+        </member>
+        <member name="M:Grpc.Core.ServiceBinderBase.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.ClientStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a client streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+        </member>
+        <member name="M:Grpc.Core.ServiceBinderBase.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.ServerStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a server streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+        </member>
+        <member name="M:Grpc.Core.ServiceBinderBase.AddMethod``2(Grpc.Core.Method{``0,``1},Grpc.Core.DuplexStreamingServerMethod{``0,``1})">
+            <summary>
+            Adds a definition for a bidirectional streaming method.
+            </summary>
+            <typeparam name="TRequest">The request message class.</typeparam>
+            <typeparam name="TResponse">The response message class.</typeparam>
+            <param name="method">The method.</param>
+            <param name="handler">The method handler.</param>
+        </member>
+        <member name="T:Grpc.Core.Status">
+            <summary>
+            Represents RPC result, which consists of <see cref="P:Grpc.Core.Status.StatusCode"/> and an optional detail string.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Status.DefaultSuccess">
+            <summary>
+            Default result of a successful RPC. StatusCode=OK, empty details message.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Status.DefaultCancelled">
+            <summary>
+            Default result of a cancelled RPC. StatusCode=Cancelled, empty details message.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Status.#ctor(Grpc.Core.StatusCode,System.String)">
+            <summary>
+            Creates a new instance of <c>Status</c>.
+            </summary>
+            <param name="statusCode">Status code.</param>
+            <param name="detail">Detail.</param>
+        </member>
+        <member name="P:Grpc.Core.Status.StatusCode">
+            <summary>
+            Gets the gRPC status code. OK indicates success, all other values indicate an error.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Status.Detail">
+            <summary>
+            Gets the detail.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Status.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents the current <see cref="T:Grpc.Core.Status"/>.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.StatusCode">
+            <summary>
+            Result of a remote procedure call.
+            Based on grpc_status_code from grpc/status.h
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.OK">
+            <summary>Not an error; returned on success.</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Cancelled">
+            <summary>The operation was cancelled (typically by the caller).</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Unknown">
+            <summary>
+            Unknown error.  An example of where this error may be returned is
+            if a Status value received from another address space belongs to
+            an error-space that is not known in this address space.  Also
+            errors raised by APIs that do not return enough error information
+            may be converted to this error.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.InvalidArgument">
+            <summary>
+            Client specified an invalid argument.  Note that this differs
+            from FAILED_PRECONDITION.  INVALID_ARGUMENT indicates arguments
+            that are problematic regardless of the state of the system
+            (e.g., a malformed file name).
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.DeadlineExceeded">
+            <summary>
+            Deadline expired before operation could complete.  For operations
+            that change the state of the system, this error may be returned
+            even if the operation has completed successfully.  For example, a
+            successful response from a server could have been delayed long
+            enough for the deadline to expire.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.NotFound">
+            <summary>Some requested entity (e.g., file or directory) was not found.</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.AlreadyExists">
+            <summary>Some entity that we attempted to create (e.g., file or directory) already exists.</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.PermissionDenied">
+            <summary>
+            The caller does not have permission to execute the specified
+            operation.  PERMISSION_DENIED must not be used for rejections
+            caused by exhausting some resource (use RESOURCE_EXHAUSTED
+            instead for those errors).  PERMISSION_DENIED must not be
+            used if the caller can not be identified (use UNAUTHENTICATED
+            instead for those errors).
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Unauthenticated">
+            <summary>The request does not have valid authentication credentials for the operation.</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.ResourceExhausted">
+            <summary>
+            Some resource has been exhausted, perhaps a per-user quota, or
+            perhaps the entire file system is out of space.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.FailedPrecondition">
+            <summary>
+            Operation was rejected because the system is not in a state
+            required for the operation's execution.  For example, directory
+            to be deleted may be non-empty, an rmdir operation is applied to
+            a non-directory, etc.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Aborted">
+            <summary>
+            The operation was aborted, typically due to a concurrency issue
+            like sequencer check failures, transaction aborts, etc.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.OutOfRange">
+            <summary>
+            Operation was attempted past the valid range.  E.g., seeking or
+            reading past end of file.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Unimplemented">
+            <summary>Operation is not implemented or not supported/enabled in this service.</summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Internal">
+            <summary>
+            Internal errors.  Means some invariants expected by underlying
+            system has been broken.  If you see one of these errors,
+            something is very broken.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.Unavailable">
+            <summary>
+            The service is currently unavailable.  This is a most likely a
+            transient condition and may be corrected by retrying with
+            a backoff.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.StatusCode.DataLoss">
+            <summary>Unrecoverable data loss or corruption.</summary>
+        </member>
+        <member name="T:Grpc.Core.Utils.GrpcPreconditions">
+            <summary>
+            Utility methods to simplify checking preconditions in the code.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckArgument(System.Boolean)">
+            <summary>
+            Throws <see cref="T:System.ArgumentException"/> if condition is false.
+            </summary>
+            <param name="condition">The condition.</param>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckArgument(System.Boolean,System.String)">
+            <summary>
+            Throws <see cref="T:System.ArgumentException"/> with given message if condition is false.
+            </summary>
+            <param name="condition">The condition.</param>
+            <param name="errorMessage">The error message.</param>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckNotNull``1(``0)">
+            <summary>
+            Throws <see cref="T:System.ArgumentNullException"/> if reference is null.
+            </summary>
+            <param name="reference">The reference.</param>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckNotNull``1(``0,System.String)">
+            <summary>
+            Throws <see cref="T:System.ArgumentNullException"/> if reference is null.
+            </summary>
+            <param name="reference">The reference.</param>
+            <param name="paramName">The parameter name.</param>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckState(System.Boolean)">
+            <summary>
+            Throws <see cref="T:System.InvalidOperationException"/> if condition is false.
+            </summary>
+            <param name="condition">The condition.</param>
+        </member>
+        <member name="M:Grpc.Core.Utils.GrpcPreconditions.CheckState(System.Boolean,System.String)">
+            <summary>
+            Throws <see cref="T:System.InvalidOperationException"/> with given message if condition is false.
+            </summary>
+            <param name="condition">The condition.</param>
+            <param name="errorMessage">The error message.</param>
+        </member>
+        <member name="T:Grpc.Core.WriteFlags">
+            <summary>
+            Flags for write operations.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.WriteFlags.BufferHint">
+            <summary>
+            Hint that the write may be buffered and need not go out on the wire immediately.
+            gRPC is free to buffer the message until the next non-buffered
+            write, or until write stream completion, but it need not buffer completely or at all.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.WriteFlags.NoCompress">
+            <summary>
+            Force compression to be disabled for a particular write.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.WriteOptions">
+            <summary>
+            Options for write operations.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.WriteOptions.Default">
+            <summary>
+            Default write options.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.WriteOptions.#ctor(Grpc.Core.WriteFlags)">
+            <summary>
+            Initializes a new instance of <c>WriteOptions</c> class.
+            </summary>
+            <param name="flags">The write flags.</param>
+        </member>
+        <member name="P:Grpc.Core.WriteOptions.Flags">
+            <summary>
+            Gets the write flags.
+            </summary>
+        </member>
+    </members>
+</doc>
