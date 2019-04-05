@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" Link="LinkFromUnity\%(RecursiveDir)%(FileName)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MagicOnion" Version="2.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="LinkFromUnity\" />
+  </ItemGroup>
+
+</Project>
