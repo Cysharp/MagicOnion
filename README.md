@@ -456,19 +456,9 @@ If debugging, I recommend use [SwitchStartupProject](https://marketplace.visuals
 
 It can step-in/out seamlessly in server and client.
 
-for Unity, you can't share by DLL(because can't share `IServer<>` because it is different reference both Unity and Server), so I recommends use [Shared Project](https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/shared-projects), this technique is for xamarin but it works for Unity. Project structure is like this.
+for Unity, you can't share by DLL(because can't share `IServer<>` because it is different reference both Unity and Server). It is slightly complex so we provides sample project and explanation.
 
-```
-Server
-- ref SharedProject
-SharedProject
-ClientLib(build to Unity dir)
-- ref SharedProject
-Assembly.CSharp(Unity)
-- ref ClientLib(by dll)
-```
-
-Alternatively, using the definition of the interface placed on the Unity side, if you use a reference as a link of csproj(or refer to the directory, directory can link by `<Compile Include="target_dir", Link="your_path\%(RecursiveDir)%(FileName)%(Extension)">` to write csproj directly), you can simply configure it.
+see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
 Hosting
 ---
@@ -573,6 +563,8 @@ moc arguments help:
 ```
 
 Please try it to run iOS/Android etc.
+
+Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
 Raw gRPC APIs
 ---
