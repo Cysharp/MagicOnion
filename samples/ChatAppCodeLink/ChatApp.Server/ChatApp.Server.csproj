@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" Link="LinkFromUnity\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" LinkBase="LinkFromUnity" />
   </ItemGroup>
 
   <ItemGroup>
