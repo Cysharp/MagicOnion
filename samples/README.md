@@ -15,7 +15,7 @@ And from the Server side, do Code link of the folder for Shared of Unity project
 Add the following specification to `ChatApp.Server.csproj`.  
 ```
 <ItemGroup>
-  <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" Link="LinkFromUnity\%(RecursiveDir)%(FileName)%(Extension)" />
+  <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" LinkBase="LinkFromUnity" />
 </ItemGroup>
 ```
 ![image](https://user-images.githubusercontent.com/38392460/55617417-fd88ef00-57ce-11e9-96c8-d1796ce614db.PNG)
