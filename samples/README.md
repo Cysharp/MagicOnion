@@ -13,7 +13,7 @@ Create a Shared folder in the Unity project, and store the source code that you 
 
 And from the Server side, do Code link of the folder for Shared of Unity project.  
 Add the following specification to `ChatApp.Server.csproj`.  
-```
+```xml
 <ItemGroup>
   <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" LinkBase="LinkFromUnity" />
 </ItemGroup>
@@ -51,7 +51,7 @@ See above for the auto generation tool.
 In the sample, source code is automatically generated from EditorMenu as an example.  
 Please check the source code in the sample directly for details.  
 The following excerpt is only part.  
-```
+```csharp
 var psi = new ProcessStartInfo()
 {
     CreateNoWindow = true,
@@ -80,7 +80,7 @@ $(ProjectDir)GeneratorTools\MessagePackUniversalCodeGenerator\win-x64\mpc.exe -i
 ## Registration of Resolver
 When using MagicOnion, it is necessary to perform Resolver registration processing in advance when the application is started on the Unity side.  
 In the sample, a method using the attribute of RuntimeInitializeOnLoadMethod is prepared, and registration processing is performed.  
-```
+```csharp
 [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 static void RegisterResolvers()
 {
@@ -97,7 +97,7 @@ static void RegisterResolvers()
 ## Cleaning up Hub and Channel
 Hubs and Channels that are no longer needed need to be released.  
 In the sample, processing is performed at the end of Scene.  
-```
+```csharp
 async void OnDestroy()
 {
     //Clean up Hub and channel
