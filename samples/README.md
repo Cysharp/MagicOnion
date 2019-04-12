@@ -94,6 +94,18 @@ static void RegisterResolvers()
 }
 ```
 
+## Cleaning up Hub and Channel
+Hubs and Channels that are no longer needed need to be released.  
+In the sample, processing is performed at the end of Scene.  
+```
+async void OnDestroy()
+{
+    //Clean up Hub and channel
+    await this.streamingClient.DisposeAsync();
+    await this.channel.ShutdownAsync();
+}
+```
+
 ## How to run the app
 1. Launch `ChatApp.Server` from VisualStudio.  
 2. Run `ChatScene` from UnityEditor.  
