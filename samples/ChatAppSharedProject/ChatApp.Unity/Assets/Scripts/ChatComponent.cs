@@ -8,6 +8,7 @@ namespace Assets.Scripts
 {
     public class ChatComponent : MonoBehaviour, IChatHubReceiver
     {
+        private Channel channel;
         private IChatHub streamingClient;
         private IChatService client;
 
@@ -25,25 +26,30 @@ namespace Assets.Scripts
 
         public InputField ReportInput;
 
+
         void Start()
         {
             this.InitializeClient();
             this.InitializeUi();
         }
 
-        void Update()
-        {
 
+        async void OnDestroy()
+        {
+            //Clean up Hub and channel
+            await this.streamingClient.DisposeAsync();
+            await this.channel.ShutdownAsync();
         }
 
 
         private void InitializeClient()
         {
             // Initialize the Hub
-            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-            this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(channel, this);
-            this.client = MagicOnionClient.Create<IChatService>(channel);
+            this.channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+            this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
+            this.client = MagicOnionClient.Create<IChatService>(this.channel);
         }
+
 
         private void InitializeUi()
         {
