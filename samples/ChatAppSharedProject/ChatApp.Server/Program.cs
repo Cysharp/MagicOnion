@@ -1,27 +1,20 @@
 ﻿using Grpc.Core;
+using MagicOnion.Hosting;
 using MagicOnion.Server;
-using System;
+using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace ChatApp.Server
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
 
-            var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
-
-            // localhost:12345
-            var server = new global::Grpc.Core.Server
-            {
-                Services = { service },
-                Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
-            };
-
-            server.Start();
-
-            Console.ReadLine();
+            await new HostBuilder()
+                .UseMagicOnion(new[] { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }, new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true })
+                .RunConsoleAsync();
         }
     }
 }
