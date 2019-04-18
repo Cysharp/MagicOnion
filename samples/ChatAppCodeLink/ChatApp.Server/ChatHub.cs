@@ -1,5 +1,5 @@
-﻿using Assets.Scripts.ServerShared.Hubs;
-using Assets.Scripts.ServerShared.MessagePackObjects;
+﻿using ChatApp.Shared.Hubs;
+using ChatApp.Shared.MessagePackObjects;
 using MagicOnion.Server.Hubs;
 using System.Collections.Generic;
 using System.Threading.Tasks;

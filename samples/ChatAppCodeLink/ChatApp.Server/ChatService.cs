@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.ServerShared.Services;
+﻿using ChatApp.Shared.Services;
 using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
