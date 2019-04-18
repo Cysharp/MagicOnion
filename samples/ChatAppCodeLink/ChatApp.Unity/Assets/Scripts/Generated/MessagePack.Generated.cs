@@ -45,8 +45,8 @@ namespace MessagePack.Resolvers
         {
             lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
             {
-                {typeof(global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest), 0 },
-                {typeof(global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse), 1 },
+                {typeof(global::ChatApp.Shared.MessagePackObjects.JoinRequest), 0 },
+                {typeof(global::ChatApp.Shared.MessagePackObjects.MessageResponse), 1 },
             };
         }
 
@@ -57,8 +57,8 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects.JoinRequestFormatter();
-                case 1: return new MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects.MessageResponseFormatter();
+                case 0: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.JoinRequestFormatter();
+                case 1: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.MessageResponseFormatter();
                 default: return null;
             }
         }
@@ -77,16 +77,16 @@ namespace MessagePack.Resolvers
 #pragma warning disable 414
 #pragma warning disable 168
 
-namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
+namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
 {
     using System;
     using MessagePack;
 
 
-    public sealed class JoinRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest>
+    public sealed class JoinRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.JoinRequest>
     {
 
-        public int Serialize(ref byte[] bytes, int offset, global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest value, global::MessagePack.IFormatterResolver formatterResolver)
+        public int Serialize(ref byte[] bytes, int offset, global::ChatApp.Shared.MessagePackObjects.JoinRequest value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
             var startOffset = offset;
@@ -96,7 +96,7 @@ namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
             return offset - startOffset;
         }
 
-        public global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
+        public global::ChatApp.Shared.MessagePackObjects.JoinRequest Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
         {
             if (global::MessagePack.MessagePackBinary.IsNil(bytes, offset))
             {
@@ -131,7 +131,7 @@ namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
 
             readSize = offset - startOffset;
 
-            var ____result = new global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest();
+            var ____result = new global::ChatApp.Shared.MessagePackObjects.JoinRequest();
             ____result.RoomName = __RoomName__;
             ____result.UserName = __UserName__;
             return ____result;
@@ -139,10 +139,10 @@ namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
     }
 
 
-    public sealed class MessageResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse>
+    public sealed class MessageResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.MessageResponse>
     {
 
-        public int Serialize(ref byte[] bytes, int offset, global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse value, global::MessagePack.IFormatterResolver formatterResolver)
+        public int Serialize(ref byte[] bytes, int offset, global::ChatApp.Shared.MessagePackObjects.MessageResponse value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
             var startOffset = offset;
@@ -152,7 +152,7 @@ namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
             return offset - startOffset;
         }
 
-        public global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
+        public global::ChatApp.Shared.MessagePackObjects.MessageResponse Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
         {
             if (global::MessagePack.MessagePackBinary.IsNil(bytes, offset))
             {
@@ -187,7 +187,7 @@ namespace MessagePack.Formatters.Assets.Scripts.ServerShared.MessagePackObjects
 
             readSize = offset - startOffset;
 
-            var ____result = new global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse();
+            var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
             ____result.UserName = __UserName__;
             ____result.Message = __Message__;
             return ____result;

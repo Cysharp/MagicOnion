@@ -1,6 +1,6 @@
-﻿using Assets.Scripts.ServerShared.Hubs;
-using Assets.Scripts.ServerShared.MessagePackObjects;
-using Assets.Scripts.ServerShared.Services;
+﻿using ChatApp.Shared.Hubs;
+using ChatApp.Shared.MessagePackObjects;
+using ChatApp.Shared.Services;
 using Grpc.Core;
 using MagicOnion.Client;
 using UnityEngine;
