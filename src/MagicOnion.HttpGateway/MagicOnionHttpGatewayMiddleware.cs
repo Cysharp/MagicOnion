@@ -47,16 +47,9 @@ namespace MagicOnion.HttpGateway
                     var args = new List<object>();
                     var typeArgs = new List<Type>();
 
-                    var dic = new Dictionary<string, string>();
-
                     foreach (var p in handler.MethodInfo.GetParameters())
                     {
                         typeArgs.Add(p.ParameterType);
-
-                        if (dic.ContainsKey(p.Name))
-                        {
-                            continue;
-                        }
 
                         StringValues stringValues;
                         if (httpContext.Request.Form.TryGetValue(p.Name, out stringValues))
