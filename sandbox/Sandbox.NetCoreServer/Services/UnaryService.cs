@@ -56,6 +56,8 @@ namespace Sandbox.NetCoreServer.Services
     /// </summary>
     public interface ICalcSerivce
     {
+        UnaryResult<string> DumpAsync(int x);
+
         /// <summary>
         /// ダミーです1。
         /// </summary>
@@ -86,6 +88,11 @@ namespace Sandbox.NetCoreServer.Services
         }
 
         public UnaryResult<string> DumpAsync(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UnaryResult<string> DumpAsync(int x)
         {
             throw new NotImplementedException();
         }
