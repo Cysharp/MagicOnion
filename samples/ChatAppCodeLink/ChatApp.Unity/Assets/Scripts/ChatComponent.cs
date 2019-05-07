@@ -3,6 +3,7 @@ using ChatApp.Shared.MessagePackObjects;
 using ChatApp.Shared.Services;
 using Grpc.Core;
 using MagicOnion.Client;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ namespace Assets.Scripts
         private IChatService client;
 
         private bool isJoin;
+        private bool isSelfDisConnected;
 
         public Text ChatText;
 
@@ -28,6 +30,10 @@ namespace Assets.Scripts
 
         public InputField ReportInput;
 
+        public Button SendReportButton;
+
+        public Button DisconnectButon;
+
 
         void Start()
         {
@@ -38,7 +44,7 @@ namespace Assets.Scripts
 
         async void OnDestroy()
         {
-            //Clean up Hub and channel
+            // Clean up Hub and channel
             await this.streamingClient.DisposeAsync();
             await this.channel.ShutdownAsync();
         }
@@ -49,6 +55,7 @@ namespace Assets.Scripts
             // Initialize the Hub
             this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
             this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
+            this.RegisterDisconnectEvent(streamingClient);
             this.client = MagicOnionClient.Create<IChatService>(this.channel);
         }
 
@@ -57,11 +64,66 @@ namespace Assets.Scripts
         {
             this.isJoin = false;
 
-            this.SendMessageButton.gameObject.SetActive(false);
+            this.SendMessageButton.interactable = false;
             this.ChatText.text = string.Empty;
             this.Input.text = string.Empty;
             this.Input.placeholder.GetComponent<Text>().text = "Please enter your name.";
             this.JoinOrLeaveButtonText.text = "Enter the room";
+        }
+
+
+        private async void RegisterDisconnectEvent(IChatHub streamingClient)
+        {
+            try
+            {
+                // you can wait disconnected event
+                await streamingClient.WaitForDisconnect();
+            }
+            finally
+            {
+                // try-to-reconnect? logging event? close? etc...
+                Debug.Log("disconnected server.");
+
+                if (this.isSelfDisConnected)
+                {
+                    // there is no particular meaning
+                    await Task.Delay(2000);
+
+                    // reconnect
+                    this.ReconnectServer();
+                }
+            }
+        }
+
+
+        public async void DisconnectServer()
+        {
+            this.isSelfDisConnected = true;
+
+            this.JoinOrLeaveButton.interactable = false;
+            this.SendMessageButton.interactable = false;
+            this.SendReportButton.interactable = false;
+            this.DisconnectButon.interactable = false;
+
+            if (this.isJoin)
+                this.JoinOrLeave();
+
+            await this.streamingClient.DisposeAsync();
+        }
+
+
+        private void ReconnectServer()
+        {
+            this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
+            this.RegisterDisconnectEvent(streamingClient);
+            Debug.Log("Reconnected server.");
+
+            this.JoinOrLeaveButton.interactable = true;
+            this.SendMessageButton.interactable = false;
+            this.SendReportButton.interactable = true;
+            this.DisconnectButon.interactable = true;
+
+            this.isSelfDisConnected = false;
         }
 
 
@@ -80,7 +142,7 @@ namespace Assets.Scripts
                 await this.streamingClient.JoinAsync(request);
 
                 this.isJoin = true;
-                this.SendMessageButton.gameObject.SetActive(true);
+                this.SendMessageButton.interactable = true;
                 this.JoinOrLeaveButtonText.text = "Leave the room";
                 this.Input.text = string.Empty;
                 this.Input.placeholder.GetComponent<Text>().text = "Please enter a comment.";
