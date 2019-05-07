@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 
-namespace Assets.Scripts.ServerShared.MessagePackObjects
+namespace ChatApp.Shared.MessagePackObjects
 {
     /// <summary>
     /// Room participation information

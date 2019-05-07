@@ -1,6 +1,6 @@
-﻿using Assets.Scripts.ServerShared.MessagePackObjects;
+﻿using ChatApp.Shared.MessagePackObjects;
 
-namespace Assets.Scripts.ServerShared.Hubs
+namespace ChatApp.Shared.Hubs
 {
     /// <summary>
     /// Server -> Client API

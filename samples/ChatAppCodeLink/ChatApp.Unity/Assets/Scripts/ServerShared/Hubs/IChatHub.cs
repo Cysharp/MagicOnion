@@ -1,9 +1,9 @@
-﻿using Assets.Scripts.ServerShared.MessagePackObjects;
+﻿using ChatApp.Shared.MessagePackObjects;
 using MagicOnion;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.ServerShared.Hubs
+namespace ChatApp.Shared.Hubs
 {
     /// <summary>
     /// Client -> Server API (Streaming)

@@ -1,7 +1,7 @@
 ﻿using MagicOnion;
 using MessagePack;
 
-namespace Assets.Scripts.ServerShared.Services
+namespace ChatApp.Shared.Services
 {
     /// <summary>
     /// Client -> Server API

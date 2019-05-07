@@ -22,9 +22,9 @@ namespace MagicOnion
             if(isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<Assets.Scripts.ServerShared.Services.IChatService>.Register((x, y) => new Assets.Scripts.ServerShared.Services.IChatServiceClient(x, y));
+            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y) => new ChatApp.Shared.Services.IChatServiceClient(x, y));
 
-            StreamingHubClientRegistry<Assets.Scripts.ServerShared.Hubs.IChatHub, Assets.Scripts.ServerShared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new Assets.Scripts.ServerShared.Hubs.IChatHubClient(a, b, c, d, e));
+            StreamingHubClientRegistry<ChatApp.Shared.Hubs.IChatHub, ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.IChatHubClient(a, b, c, d, e));
         }
     }
 }
@@ -118,13 +118,13 @@ namespace MagicOnion.Resolvers
 #pragma warning disable 219
 #pragma warning disable 168
 
-namespace Assets.Scripts.ServerShared.Services {
+namespace ChatApp.Shared.Services {
     using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
 
-    public class IChatServiceClient : MagicOnionClientBase<global::Assets.Scripts.ServerShared.Services.IChatService>, global::Assets.Scripts.ServerShared.Services.IChatService
+    public class IChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
         static readonly Method<byte[], byte[]> SendReportAsyncMethod;
 
@@ -197,7 +197,7 @@ namespace Assets.Scripts.ServerShared.Services {
 #pragma warning disable 219
 #pragma warning disable 168
 
-namespace Assets.Scripts.ServerShared.Hubs {
+namespace ChatApp.Shared.Hubs {
     using Grpc.Core;
     using Grpc.Core.Logging;
     using MagicOnion;
@@ -206,13 +206,13 @@ namespace Assets.Scripts.ServerShared.Hubs {
     using System;
     using System.Threading.Tasks;
 
-    public class IChatHubClient : StreamingHubClientBase<global::Assets.Scripts.ServerShared.Hubs.IChatHub, global::Assets.Scripts.ServerShared.Hubs.IChatHubReceiver>, global::Assets.Scripts.ServerShared.Hubs.IChatHub
+    public class IChatHubClient : StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
         protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
 
-        readonly global::Assets.Scripts.ServerShared.Hubs.IChatHub __fireAndForgetClient;
+        readonly global::ChatApp.Shared.Hubs.IChatHub __fireAndForgetClient;
 
         public IChatHubClient(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
             : base(callInvoker, host, option, resolver, logger)
@@ -220,7 +220,7 @@ namespace Assets.Scripts.ServerShared.Hubs {
             this.__fireAndForgetClient = new FireAndForgetClient(this);
         }
         
-        public global::Assets.Scripts.ServerShared.Hubs.IChatHub FireAndForget()
+        public global::ChatApp.Shared.Hubs.IChatHub FireAndForget()
         {
             return __fireAndForgetClient;
         }
@@ -241,7 +241,7 @@ namespace Assets.Scripts.ServerShared.Hubs {
                 }
                 case -552695459: // OnSendMessage
                 {
-                    var result = LZ4MessagePackSerializer.Deserialize<global::Assets.Scripts.ServerShared.MessagePackObjects.MessageResponse>(data, resolver);
+                    var result = LZ4MessagePackSerializer.Deserialize<global::ChatApp.Shared.MessagePackObjects.MessageResponse>(data, resolver);
                     receiver.OnSendMessage(result); return Task.CompletedTask;
                 }
                 default:
@@ -282,9 +282,9 @@ namespace Assets.Scripts.ServerShared.Hubs {
             }
         }
    
-        public global::System.Threading.Tasks.Task JoinAsync(global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest request)
+        public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
         {
-            return WriteMessageWithResponseAsync<global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest, Nil>(-733403293, request);
+            return WriteMessageWithResponseAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest, Nil>(-733403293, request);
         }
 
         public global::System.Threading.Tasks.Task LeaveAsync()
@@ -303,7 +303,7 @@ namespace Assets.Scripts.ServerShared.Hubs {
         }
 
 
-        class FireAndForgetClient : global::Assets.Scripts.ServerShared.Hubs.IChatHub
+        class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
         {
             readonly IChatHubClient __parent;
 
@@ -312,7 +312,7 @@ namespace Assets.Scripts.ServerShared.Hubs {
                 this.__parent = parentClient;
             }
 
-            public global::Assets.Scripts.ServerShared.Hubs.IChatHub FireAndForget()
+            public global::ChatApp.Shared.Hubs.IChatHub FireAndForget()
             {
                 throw new NotSupportedException();
             }
@@ -327,9 +327,9 @@ namespace Assets.Scripts.ServerShared.Hubs {
                 throw new NotSupportedException();
             }
 
-            public global::System.Threading.Tasks.Task JoinAsync(global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest request)
+            public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
             {
-                return __parent.WriteMessageAsync<global::Assets.Scripts.ServerShared.MessagePackObjects.JoinRequest>(-733403293, request);
+                return __parent.WriteMessageAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest>(-733403293, request);
             }
 
             public global::System.Threading.Tasks.Task LeaveAsync()

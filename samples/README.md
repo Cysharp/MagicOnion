@@ -1,6 +1,6 @@
 # MagicOnionSample
 Provides a sample of a simple chat app using MagicOnion.  
-There are two types of samples, a simplified version using `Code link` and a technical version using `SharedProject`.  
+There are two types of samples, a simplified version using `Code link` and a another version using `SharedProject`.  
 
 Please see here about MagicOnion itself.  
 https://github.com/Cysharp/MagicOnion
