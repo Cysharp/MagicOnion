@@ -46,6 +46,7 @@ namespace MagicOnion.HttpGateway
                     //object parameters
                     var args = new List<object>();
                     var typeArgs = new List<Type>();
+
                     foreach (var p in handler.MethodInfo.GetParameters())
                     {
                         typeArgs.Add(p.ParameterType);
@@ -107,7 +108,8 @@ namespace MagicOnion.HttpGateway
                         }
                     }
 
-                    deserializedObject = MagicOnionMarshallers.InsantiateDynamicArgumentTuple(typeArgs.ToArray(), args.ToArray());
+                    deserializedObject = typeArgs.Count == 1 ?
+                        args[0] : MagicOnionMarshallers.InsantiateDynamicArgumentTuple(typeArgs.ToArray(), args.ToArray());
                 }
                 else
                 {

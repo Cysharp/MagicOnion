@@ -177,10 +177,24 @@ namespace MagicOnion.HttpGateway.Swagger
                         }
                     }
 
+
+                    var type = "formData";
+
+                    if (parameterInfos.Length == 1)
+                    {
+                        var parameterType = parameterInfos[0].ParameterType;
+                        if (!parameterType.IsValueType &&
+                        parameterType != typeof(object) &&
+                        parameterType != typeof(string))
+                        {
+                            type = "body";
+                        }
+                    }
+
                     return new Parameter
                     {
                         name = x.Name,
-                        @in = parameterInfos.Length == 1 ? "body" : "formData",
+                        @in = type,
                         type = swaggerDataType,
                         description = parameterXmlComment,
                         required = !x.IsOptional,
