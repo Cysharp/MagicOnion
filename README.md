@@ -401,7 +401,7 @@ In RPC, especially in real-time communication involving frequent transmission of
 
 Also, taking advantage of the fact that both the client and the server run on C# and data stored on internal memory are expected to share the same layout, I added an option to do mapping through memory copy without serialization/deserialization in case of a value-type variable.
 
-Especialy in Unity, this is can combinate with `MessageaPack.UnityShims` package of NuGet.
+Especially in Unity, this is can combinate with `MessageaPack.UnityShims` package of NuGet.
 
 ```csharp
 // It supports standard struct-type variables that are provided by Unity, such as Vector3, and arrays containing them, as well as custom struct-type variables and their arrays.
@@ -568,7 +568,7 @@ Project structure and code generation sample, see [samples](https://github.com/C
 
 Raw gRPC APIs
 ---
-MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especialy DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
+MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
 
 ```csharp
 // Definitions
