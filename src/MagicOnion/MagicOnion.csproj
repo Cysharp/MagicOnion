@@ -69,4 +69,17 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
+  <!-- Copy files for unity MagicOnion -->
+  <PropertyGroup>
+    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\</DestinationRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;_AssemblyInfo.cs;UnsafeDirectBlitResolver.cs;" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="$(ProjectDir)Server\Hubs\BroadcasterHelper.cs" DestinationFiles="$(DestinationRoot)Server\Hubs\BroadcasterHelper.cs" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(ProjectDir)Server\Hubs\MethodIdAttribute.cs" DestinationFiles="$(DestinationRoot)Server\Hubs\MethodIdAttribute.cs" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
