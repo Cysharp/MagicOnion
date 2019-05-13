@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MagicOnion.HttpGateway.Swagger.Schemas;
+using Microsoft.AspNetCore.Http;
 using System;
 
 namespace MagicOnion.HttpGateway.Swagger

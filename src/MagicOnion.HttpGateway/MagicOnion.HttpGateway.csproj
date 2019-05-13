@@ -1,54 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>NON_UNITY</DefineConstants>
-    <Company>Cysharp</Company>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>NON_UNITY</DefineConstants>
+        <Company>Cysharp</Company>
 
-    <!-- NuGet -->
-    <PackageId>MagicOnion.HttpGateway</PackageId>
-    <PackageVersion>$(Version)</PackageVersion>
-    <Authors>Cysharp</Authors>
-    <Copyright>Cysharp</Copyright>
-    <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
-    <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>gRPC, HTTP2</PackageTags>
+        <!-- NuGet -->
+        <PackageId>MagicOnion.HttpGateway</PackageId>
+        <PackageVersion>$(Version)</PackageVersion>
+        <Authors>Cysharp</Authors>
+        <Copyright>Cysharp</Copyright>
+        <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
+        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>gRPC, HTTP2</PackageTags>
 
-  </PropertyGroup>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Swagger\SwaggerUI\index.html" />
-    <None Remove="Swagger\SwaggerUI\o2c.html" />
-    <None Remove="Swagger\SwaggerUI\swagger-ui.js" />
-    <None Remove="Swagger\SwaggerUI\swagger-ui.min.js" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Grpc" Version="1.20.1" />
+        <PackageReference Include="MessagePack" Version="1.7.3.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Swagger\SwaggerUI\**\*" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MagicOnion\MagicOnion.csproj">
+            <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
+            <Name>MagicOnion</Name>
+        </ProjectReference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Grpc" Version="1.20.1" />
-    <PackageReference Include="MessagePack" Version="1.7.3.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\MagicOnion\MagicOnion.csproj">
-      <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
-      <Name>MagicOnion</Name>
-    </ProjectReference>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Swagger\SwaggerUI\*" />
+    </ItemGroup>
 
 </Project>

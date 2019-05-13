@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MagicOnion.HttpGateway.Swagger
+namespace MagicOnion.HttpGateway.Swagger.Schemas
 {
     public class SwaggerDocument
     {

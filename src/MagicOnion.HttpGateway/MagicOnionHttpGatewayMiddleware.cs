@@ -150,6 +150,7 @@ namespace MagicOnion.HttpGateway
             catch (Exception ex)
             {
                 httpContext.Response.StatusCode = 500;
+                httpContext.Response.ContentType = "text/plain";
                 await httpContext.Response.WriteAsync(ex.ToString());
             }
         }

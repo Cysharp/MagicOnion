@@ -1,4 +1,5 @@
-﻿using MagicOnion.Server;
+﻿using MagicOnion.HttpGateway.Swagger.Schemas;
+using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -22,11 +23,11 @@ namespace MagicOnion.HttpGateway.Swagger
 
         ILookup<Tuple<string, string>, XmlCommentStructure> xDocLookup;
 
-        public SwaggerDefinitionBuilder(SwaggerOptions options, HttpContext httpContext, IReadOnlyList<MethodHandler> handlers)
+        public SwaggerDefinitionBuilder(SwaggerOptions options, HttpContext httpContext, IEnumerable<MethodHandler> handlers)
         {
             this.options = options;
             this.httpContext = httpContext;
-            this.handlers = handlers;
+            this.handlers = handlers.Where(x => x.MethodType == Grpc.Core.MethodType.Unary).ToArray();
         }
 
         public byte[] BuildSwaggerJson()
@@ -35,12 +36,14 @@ namespace MagicOnion.HttpGateway.Swagger
             {
                 if (options.XmlDocumentPath != null && !File.Exists(options.XmlDocumentPath))
                 {
-                    return Encoding.UTF8.GetBytes("Xml doesn't exists at " + options.XmlDocumentPath);
+                    xDocLookup = null;
                 }
-
-                xDocLookup = (options.XmlDocumentPath != null)
-                    ? BuildXmlMemberCommentStructure(options.XmlDocumentPath)
-                    : null;
+                else
+                {
+                    xDocLookup = (options.XmlDocumentPath != null)
+                        ? BuildXmlMemberCommentStructure(options.XmlDocumentPath)
+                        : null;
+                }
 
                 var doc = new SwaggerDocument();
                 doc.info = options.Info;
@@ -50,9 +53,8 @@ namespace MagicOnion.HttpGateway.Swagger
                 doc.paths = new Dictionary<string, PathItem>();
                 doc.definitions = new Dictionary<string, Schema>();
 
-
                 // tags.
-                var xmlServiceName = (options.XmlDocumentPath != null)
+                var xmlServiceName = (xDocLookup != null)
                     ? BuildXmlTypeSummary(options.XmlDocumentPath)
                     : null;
 
@@ -75,7 +77,7 @@ namespace MagicOnion.HttpGateway.Swagger
                     .ToArray();
 
                 // Unary only
-                foreach (var item in handlers.Where(x => x.MethodType == Grpc.Core.MethodType.Unary))
+                foreach (var item in handlers)
                 {
                     XmlCommentStructure xmlComment = null;
                     if (xDocLookup != null)
@@ -89,7 +91,11 @@ namespace MagicOnion.HttpGateway.Swagger
                         tags = new[] { item.ServiceName },
                         summary = (xmlComment != null) ? xmlComment.Summary : "",
                         description = (xmlComment != null) ? xmlComment.Remarks : "",
-                        parameters = parameters
+                        parameters = parameters,
+                        responses = new Dictionary<string, Response>
+                        {
+                            {"default", new Response { description = "done operation"} },
+                        }
                     };
 
                     doc.paths.Add("/" + item.ToString(), new PathItem { post = operation }); // everything post.
@@ -115,7 +121,7 @@ namespace MagicOnion.HttpGateway.Swagger
             }
         }
 
-        Parameter[] BuildParameters(IDictionary<string, Schema> definitions, XmlCommentStructure xmlComment, MethodInfo method)
+        Schemas.Parameter[] BuildParameters(IDictionary<string, Schema> definitions, XmlCommentStructure xmlComment, MethodInfo method)
         {
             var parameterInfos = method.GetParameters();
             var parameters = parameterInfos
@@ -136,7 +142,7 @@ namespace MagicOnion.HttpGateway.Swagger
 
                     var collectionType = GetCollectionType(x.ParameterType);
                     var items = collectionType != null
-                        ? new PartialSchema { type = ToSwaggerDataType(collectionType), }
+                        ? new PartialSchema { type = ToSwaggerDataType(collectionType) }
                         : null;
 
                     string defaultObjectExample = null;
@@ -150,7 +156,7 @@ namespace MagicOnion.HttpGateway.Swagger
                         if (collectionType != null)
                         {
                             // Current Swagger-UI's enum array selector is too buggy...
-                            // items.@enum = enumValues;
+                            //items.@enum = enumValues;
                             defaultObjectExample = string.Join("\r\n", Enum.GetNames(collectionType));
                         }
                         else
@@ -165,43 +171,22 @@ namespace MagicOnion.HttpGateway.Swagger
                     {
                         BuildSchema(definitions, x.ParameterType);
                         refSchema = new Schema { @ref = BuildSchema(definitions, x.ParameterType) };
-                        if (parameterInfos.Length != 1)
-                        {
-#if NET_FRAMEWORK
-                            var unknownObj = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(x.ParameterType);
-#else
-                            var unknownObj = Activator.CreateInstance(x.ParameterType);
-#endif
-
-                            defaultObjectExample = JsonConvert.SerializeObject(unknownObj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
-                        }
+                        var unknownObj = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(x.ParameterType);
+                        defaultObjectExample = JsonConvert.SerializeObject(unknownObj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
+                        swaggerDataType = "string"; // object can not attach formData.
                     }
 
-
-                    var type = "formData";
-
-                    if (parameterInfos.Length == 1)
-                    {
-                        var parameterType = parameterInfos[0].ParameterType;
-                        if (!parameterType.IsValueType &&
-                        parameterType != typeof(object) &&
-                        parameterType != typeof(string))
-                        {
-                            type = "body";
-                        }
-                    }
-
-                    return new Parameter
+                    return new Schemas.Parameter
                     {
                         name = x.Name,
-                        @in = type,
+                        @in = "formData",
                         type = swaggerDataType,
                         description = parameterXmlComment,
                         required = !x.IsOptional,
                         @default = defaultObjectExample ?? ((x.IsOptional) ? defaultValue : null),
                         items = items,
                         @enum = enums,
-                        collectionFormat = "multi",
+                        collectionFormat = "multi", // csv or multi
                         schema = refSchema
                     };
                 })
@@ -294,7 +279,7 @@ namespace MagicOnion.HttpGateway.Swagger
             schema = new Schema
             {
                 type = "object",
-                properties = props
+                properties = props,
             };
 
             definitions.Add(fullName, schema);

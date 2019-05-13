@@ -27,11 +27,6 @@ namespace Sandbox.NetCoreServer
     {
         static async Task Main(string[] args)
         {
-            //MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ChatHub) }, new MagicOnionOptions());
-            var mychannel = new Channel("127.0.0.1", ChannelCredentials.Insecure);
-            var client3 = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(mychannel, (IMessageReceiver2)null);
-
-
             const string GrpcHost = "localhost";
 
             Console.WriteLine("Server:::");
