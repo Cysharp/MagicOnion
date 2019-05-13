@@ -1,24 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>DEBUG;NETSTANDARD;NON_UNITY;</DefineConstants>
-  </PropertyGroup>
+    <DefineConstants>NON_UNITY</DefineConstants>
+    <Company>Cysharp</Company>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU' AND '$(TargetFramework)' == 'netstandard2.0'">
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>RELEASE;NETSTANDARD;NON_UNITY;</DefineConstants>
-    <DocumentationFile>bin\Release\netstandard2.0\MagicOnion.HttpGateway.xml</DocumentationFile>
+    <!-- NuGet -->
+    <PackageId>MagicOnion.HttpGateway</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <Authors>Cysharp</Authors>
+    <Copyright>Cysharp</Copyright>
+    <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
+    <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>gRPC, HTTP2</PackageTags>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,10 +49,6 @@
       <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
       <Name>MagicOnion</Name>
     </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
