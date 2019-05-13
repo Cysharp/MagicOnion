@@ -25,6 +25,7 @@ namespace MagicOnion
             MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y));
 
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IGamingHub, Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IGamingHubClient(a, b, c, d, e));
+            StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IBugReproductionHub, Sandbox.NetCoreServer.Hubs.IBugReproductionHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IBugReproductionHubClient(a, b, c, d, e));
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IChatHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver2>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IChatHubClient(a, b, c, d, e));
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.ITestHub, Sandbox.NetCoreServer.Hubs.IMessageReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.ITestHubClient(a, b, c, d, e));
         }
@@ -385,27 +386,27 @@ namespace Sandbox.NetCoreServer.Hubs {
             return __fireAndForgetClient;
         }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
             switch (methodId)
             {
                 case -1297457280: // OnJoin
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
-                    receiver.OnJoin(result); return Task.CompletedTask;
+                    receiver.OnJoin(result); break;
                 }
                 case 532410095: // OnLeave
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
-                    receiver.OnLeave(result); return Task.CompletedTask;
+                    receiver.OnLeave(result); break;
                 }
                 case 1429874301: // OnMove
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.Player>(data, resolver);
-                    receiver.OnMove(result); return Task.CompletedTask;
+                    receiver.OnMove(result); break;
                 }
                 default:
-                    return Task.CompletedTask;
+                    break;
             }
         }
 
@@ -494,6 +495,108 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
     }
 
+    public class IBugReproductionHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub, global::Sandbox.NetCoreServer.Hubs.IBugReproductionHubReceiver>, global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub
+    {
+        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IBugReproductionHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+
+        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
+
+        readonly global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub __fireAndForgetClient;
+
+        public IBugReproductionHubClient(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+            : base(callInvoker, host, option, resolver, logger)
+        {
+            this.__fireAndForgetClient = new FireAndForgetClient(this);
+        }
+        
+        public global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub FireAndForget()
+        {
+            return __fireAndForgetClient;
+        }
+
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+                case -735457744: // OnCall
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    receiver.OnCall(); break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+                case -733403293: // JoinAsync
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                case 904214259: // CallAsync
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+   
+        public global::System.Threading.Tasks.Task JoinAsync()
+        {
+            return WriteMessageWithResponseAsync<Nil, Nil>(-733403293, Nil.Default);
+        }
+
+        public global::System.Threading.Tasks.Task CallAsync()
+        {
+            return WriteMessageWithResponseAsync<Nil, Nil>(904214259, Nil.Default);
+        }
+
+
+        class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub
+        {
+            readonly IBugReproductionHubClient __parent;
+
+            public FireAndForgetClient(IBugReproductionHubClient parentClient)
+            {
+                this.__parent = parentClient;
+            }
+
+            public global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub FireAndForget()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task DisposeAsync()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task WaitForDisconnect()
+            {
+                throw new NotSupportedException();
+            }
+
+            public global::System.Threading.Tasks.Task JoinAsync()
+            {
+                return __parent.WriteMessageAsync<Nil>(-733403293, Nil.Default);
+            }
+
+            public global::System.Threading.Tasks.Task CallAsync()
+            {
+                return __parent.WriteMessageAsync<Nil>(904214259, Nil.Default);
+            }
+
+        }
+    }
+
     public class IChatHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IChatHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver2>, global::Sandbox.NetCoreServer.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -513,22 +616,22 @@ namespace Sandbox.NetCoreServer.Hubs {
             return __fireAndForgetClient;
         }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
             switch (methodId)
             {
                 case 470021452: // OnReceiveMessage
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<string, string>>(data, resolver);
-                    receiver.OnReceiveMessage(result.Item1, result.Item2); return Task.CompletedTask;
+                    receiver.OnReceiveMessage(result.Item1, result.Item2); break;
                 }
                 case -277016929: // Foo2
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Foo>(data, resolver);
-                    receiver.Foo2(result); return Task.CompletedTask;
+                    receiver.Foo2(result); break;
                 }
                 default:
-                    return Task.CompletedTask;
+                    break;
             }
         }
 
@@ -636,62 +739,62 @@ namespace Sandbox.NetCoreServer.Hubs {
             return __fireAndForgetClient;
         }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
             switch (methodId)
             {
                 case 908152736: // ZeroArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
-                    return receiver.ZeroArgument();
+                    receiver.ZeroArgument(); break;
                 }
                 case -707027732: // OneArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<int>(data, resolver);
-                    return receiver.OneArgument(result);
+                    receiver.OneArgument(result); break;
                 }
                 case -897846353: // MoreArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string, double>>(data, resolver);
-                    return receiver.MoreArgument(result.Item1, result.Item2, result.Item3);
+                    receiver.MoreArgument(result.Item1, result.Item2, result.Item3); break;
                 }
                 case 454186482: // VoidZeroArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
-                    receiver.VoidZeroArgument(); return Task.CompletedTask;
+                    receiver.VoidZeroArgument(); break;
                 }
                 case -1221768450: // VoidOneArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<int>(data, resolver);
-                    receiver.VoidOneArgument(result); return Task.CompletedTask;
+                    receiver.VoidOneArgument(result); break;
                 }
                 case 1213039077: // VoidMoreArgument
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string, double>>(data, resolver);
-                    receiver.VoidMoreArgument(result.Item1, result.Item2, result.Item3); return Task.CompletedTask;
+                    receiver.VoidMoreArgument(result.Item1, result.Item2, result.Item3); break;
                 }
                 case -2034765446: // OneArgument2
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject>(data, resolver);
-                    return receiver.OneArgument2(result);
+                    receiver.OneArgument2(result); break;
                 }
                 case 676118308: // VoidOneArgument2
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject>(data, resolver);
-                    receiver.VoidOneArgument2(result); return Task.CompletedTask;
+                    receiver.VoidOneArgument2(result); break;
                 }
                 case -2017987827: // OneArgument3
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(data, resolver);
-                    return receiver.OneArgument3(result);
+                    receiver.OneArgument3(result); break;
                 }
                 case 692895927: // VoidOneArgument3
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::Sandbox.NetCoreServer.Hubs.TestObject[]>(data, resolver);
-                    receiver.VoidOneArgument3(result); return Task.CompletedTask;
+                    receiver.VoidOneArgument3(result); break;
                 }
                 default:
-                    return Task.CompletedTask;
+                    break;
             }
         }
 

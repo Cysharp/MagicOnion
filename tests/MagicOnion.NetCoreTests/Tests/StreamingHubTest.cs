@@ -17,15 +17,15 @@ namespace MagicOnion.Tests
 {
     public interface IMessageReceiver
     {
-        Task ZeroArgument();
-        Task OneArgument(int x);
-        Task MoreArgument(int x, string y, double z);
+        //Task ZeroArgument();
+        //Task OneArgument(int x);
+        //Task MoreArgument(int x, string y, double z);
         void VoidZeroArgument();
         void VoidOneArgument(int x);
         void VoidMoreArgument(int x, string y, double z);
-        Task OneArgument2(TestObject x);
+        //Task OneArgument2(TestObject x);
         void VoidOneArgument2(TestObject x);
-        Task OneArgument3(TestObject[] x);
+        //Task OneArgument3(TestObject[] x);
         void VoidOneArgument3(TestObject[] x);
     }
 
@@ -75,25 +75,25 @@ namespace MagicOnion.Tests
         public async Task MoreArgument(int x, string y, double z)
         {
             Broadcast(group).VoidMoreArgument(x, y, z);
-            await Broadcast(group).MoreArgument(x, y, z);
+            //await Broadcast(group).MoreArgument(x, y, z);
         }
 
         public async Task OneArgument(int x)
         {
             Broadcast(group).VoidOneArgument(x);
-            await Broadcast(group).OneArgument(x);
+            //            await Broadcast(group).OneArgument(x);
         }
 
         public async Task OneArgument2(TestObject x)
         {
             Broadcast(group).VoidOneArgument2(x);
-            await Broadcast(group).OneArgument2(x);
+            //await Broadcast(group).OneArgument2(x);
         }
 
         public async Task OneArgument3(TestObject[] x)
         {
             Broadcast(group).VoidOneArgument3(x);
-            await Broadcast(group).OneArgument3(x);
+            //await Broadcast(group).OneArgument3(x);
         }
 
         public Task<double> RetrunMoreArgument(int x, string y, double z)
@@ -124,7 +124,7 @@ namespace MagicOnion.Tests
         public async Task ZeroArgument()
         {
             Broadcast(group).VoidZeroArgument();
-            await Broadcast(group).ZeroArgument();
+            //await Broadcast(group).ZeroArgument();
         }
     }
 
@@ -147,7 +147,7 @@ namespace MagicOnion.Tests
             client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
             await client.ZeroArgument();
             await voidZeroTask.Task;
-            await zeroTask.Task;
+            //await zeroTask.Task;
             // ok, pass.
 
             await client.DisposeAsync();
@@ -158,9 +158,9 @@ namespace MagicOnion.Tests
         {
             var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
             await client.OneArgument(100);
-            var x = await oneTask.Task;
+            //var x = await oneTask.Task;
             var y = await voidoneTask.Task;
-            x.Should().Be(100);
+            //x.Should().Be(100);
             y.Should().Be(100);
             await client.DisposeAsync();
         }
@@ -170,9 +170,9 @@ namespace MagicOnion.Tests
         {
             var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
             await client.MoreArgument(100, "foo", 10.3);
-            var x = await moreTask.Task;
+            //var x = await moreTask.Task;
             var y = await voidmoreTask.Task;
-            x.Should().Be((100, "foo", 10.3));
+            //x.Should().Be((100, "foo", 10.3));
             y.Should().Be((100, "foo", 10.3));
             await client.DisposeAsync();
         }
@@ -208,10 +208,10 @@ namespace MagicOnion.Tests
             var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
             await client.OneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
             {
-                var v = await one2Task.Task;
-                v.X.Should().Be(10);
-                v.Y.Should().Be(99);
-                v.Z.Should().Be(100);
+                //var v = await one2Task.Task;
+                //v.X.Should().Be(10);
+                //v.Y.Should().Be(99);
+                //v.Z.Should().Be(100);
             }
             {
                 var v = await voidone2Task.Task;
@@ -243,19 +243,19 @@ namespace MagicOnion.Tests
                 new TestObject() { X = 4, Y = 59, Z = 300 },
             });
             {
-                var v = await one3Task.Task;
+                //var v = await one3Task.Task;
 
-                v[0].X.Should().Be(10);
-                v[0].Y.Should().Be(99);
-                v[0].Z.Should().Be(100);
+                //v[0].X.Should().Be(10);
+                //v[0].Y.Should().Be(99);
+                //v[0].Z.Should().Be(100);
 
-                v[1].X.Should().Be(5);
-                v[1].Y.Should().Be(39);
-                v[1].Z.Should().Be(200);
+                //v[1].X.Should().Be(5);
+                //v[1].Y.Should().Be(39);
+                //v[1].Z.Should().Be(200);
 
-                v[2].X.Should().Be(4);
-                v[2].Y.Should().Be(59);
-                v[2].Z.Should().Be(300);
+                //v[2].X.Should().Be(4);
+                //v[2].Y.Should().Be(59);
+                //v[2].Z.Should().Be(300);
             }
             {
                 var v = await voidone3Task.Task;
@@ -301,29 +301,29 @@ namespace MagicOnion.Tests
 
 
 
-        TaskCompletionSource<(int, string, double)> moreTask = new TaskCompletionSource<(int, string, double)>();
-        async Task IMessageReceiver.MoreArgument(int x, string y, double z)
-        {
-            moreTask.TrySetResult((x, y, z));
-        }
+        //TaskCompletionSource<(int, string, double)> moreTask = new TaskCompletionSource<(int, string, double)>();
+        //async Task IMessageReceiver.MoreArgument(int x, string y, double z)
+        //{
+        //    moreTask.TrySetResult((x, y, z));
+        //}
 
-        TaskCompletionSource<int> oneTask = new TaskCompletionSource<int>();
-        async Task IMessageReceiver.OneArgument(int x)
-        {
-            oneTask.TrySetResult(x);
-        }
+        //TaskCompletionSource<int> oneTask = new TaskCompletionSource<int>();
+        //async Task IMessageReceiver.OneArgument(int x)
+        //{
+        //    oneTask.TrySetResult(x);
+        //}
 
-        TaskCompletionSource<TestObject> one2Task = new TaskCompletionSource<TestObject>();
-        async Task IMessageReceiver.OneArgument2(TestObject x)
-        {
-            one2Task.TrySetResult(x);
-        }
+        //TaskCompletionSource<TestObject> one2Task = new TaskCompletionSource<TestObject>();
+        //async Task IMessageReceiver.OneArgument2(TestObject x)
+        //{
+        //    one2Task.TrySetResult(x);
+        //}
 
-        TaskCompletionSource<TestObject[]> one3Task = new TaskCompletionSource<TestObject[]>();
-        async Task IMessageReceiver.OneArgument3(TestObject[] x)
-        {
-            one3Task.TrySetResult(x);
-        }
+        //TaskCompletionSource<TestObject[]> one3Task = new TaskCompletionSource<TestObject[]>();
+        //async Task IMessageReceiver.OneArgument3(TestObject[] x)
+        //{
+        //    one3Task.TrySetResult(x);
+        //}
 
         TaskCompletionSource<(int, string, double)> voidmoreTask = new TaskCompletionSource<(int, string, double)>();
         void IMessageReceiver.VoidMoreArgument(int x, string y, double z)
@@ -355,11 +355,11 @@ namespace MagicOnion.Tests
             voidZeroTask.TrySetResult(null);
         }
 
-        TaskCompletionSource<object> zeroTask = new TaskCompletionSource<object>();
-        async Task IMessageReceiver.ZeroArgument()
-        {
-            zeroTask.TrySetResult(null);
-        }
+        //TaskCompletionSource<object> zeroTask = new TaskCompletionSource<object>();
+        //async Task IMessageReceiver.ZeroArgument()
+        //{
+        //    zeroTask.TrySetResult(null);
+        //}
 
         public void Dispose()
         {

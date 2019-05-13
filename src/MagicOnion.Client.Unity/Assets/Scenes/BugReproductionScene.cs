@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
+using Sandbox.NetCoreServer.Hubs;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,16 +32,28 @@ public class BugReproductionScene : MonoBehaviour, IBugReproductionHubReceiver
     {
         Debug.Log("OnCall!!");
     }
+
+    async void OnDestroy()
+    {
+        await client.DisposeAsync();
+        await channel.ShutdownAsync();
+    }
 }
 
-public interface IBugReproductionHubReceiver
-{
-    void OnCall();
-}
 
-public interface IBugReproductionHub : IStreamingHub<IBugReproductionHub, IBugReproductionHubReceiver>
+namespace Sandbox.NetCoreServer.Hubs
 {
-    Task JoinAsync();
 
-    Task CallAsync();
+    public interface IBugReproductionHubReceiver
+    {
+        void OnCall();
+    }
+
+    public interface IBugReproductionHub : IStreamingHub<IBugReproductionHub, IBugReproductionHubReceiver>
+    {
+        Task JoinAsync();
+
+        Task CallAsync();
+    }
+
 }
