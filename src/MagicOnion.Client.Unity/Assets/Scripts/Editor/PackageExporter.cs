@@ -16,11 +16,11 @@ namespace UnityEditorUtility
         {
             // configure
             var root = "Scripts/MagicOnion";
-            var exportPath = "../../nuget/MagicOnion.Unity.unitypackage";
+            var exportPath = "./MagicOnion.Client.Unity.unitypackage";
 
             var path = Path.Combine(Application.dataPath, root);
             var assets = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                .Where(x => Path.GetExtension(x) == ".cs")
+                .Where(x => Path.GetExtension(x) == ".cs" || Path.GetExtension(x) == ".asmdef" || Path.GetExtension(x) == ".json")
                 .Select(x => "Assets" + x.Replace(Application.dataPath, "").Replace(@"\", "/"))
                 .ToArray();
 

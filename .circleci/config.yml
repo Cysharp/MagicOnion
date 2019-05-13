@@ -26,10 +26,10 @@ jobs:
       - run:
           name: Export unitypackage
           command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
-          working_directory: src/MagicOnion.Unity
+          working_directory: src/MagicOnion.Client.Unity
       - store_artifacts:
-          path: src/MagicOnion.Unity/MagicOnion.Unity.unitypackage
-          destination: /MagicOnion.Unity.unitypackage
+          path: src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+          destination: /MagicOnion.Client.Unity.unitypackage
   # .NET Core debug/test, release/push
   build-test:
     executor: dotnet
