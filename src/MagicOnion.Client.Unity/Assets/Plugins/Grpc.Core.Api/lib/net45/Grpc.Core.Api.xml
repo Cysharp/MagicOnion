@@ -4,6 +4,259 @@
         <name>Grpc.Core.Api</name>
     </assembly>
     <members>
+        <member name="T:Grpc.Core.AsyncAuthInterceptor">
+            <summary>
+            Asynchronous authentication interceptor for <see cref="T:Grpc.Core.CallCredentials"/>.
+            </summary>
+            <param name="context">The interceptor context.</param>
+            <param name="metadata">Metadata to populate with entries that will be added to outgoing call's headers.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Grpc.Core.AuthInterceptorContext">
+            <summary>
+            Context for an RPC being intercepted by <see cref="T:Grpc.Core.AsyncAuthInterceptor"/>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AuthInterceptorContext.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of <c>AuthInterceptorContext</c>.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthInterceptorContext.ServiceUrl">
+            <summary>
+            The fully qualified service URL for the RPC being called.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AuthInterceptorContext.MethodName">
+            <summary>
+            The method name of the RPC being called.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.AsyncClientStreamingCall`2">
+            <summary>
+            Return type for client streaming calls.
+            </summary>
+            <typeparam name="TRequest">Request message type for this call.</typeparam>
+            <typeparam name="TResponse">Response message type for this call.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},System.Threading.Tasks.Task{`1},System.Threading.Tasks.Task{Grpc.Core.Metadata},System.Func{Grpc.Core.Status},System.Func{Grpc.Core.Metadata},System.Action)">
+            <summary>
+            Creates a new AsyncClientStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="P:Grpc.Core.AsyncClientStreamingCall`2.ResponseAsync">
+            <summary>
+            Asynchronous call result.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncClientStreamingCall`2.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncClientStreamingCall`2.RequestStream">
+            <summary>
+            Async stream to send streaming requests.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.GetAwaiter">
+            <summary>
+            Allows awaiting this object directly.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:Grpc.Core.AsyncDuplexStreamingCall`2">
+            <summary>
+            Return type for bidirectional streaming calls.
+            </summary>
+            <typeparam name="TRequest">Request message type for this call.</typeparam>
+            <typeparam name="TResponse">Response message type for this call.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},Grpc.Core.IAsyncStreamReader{`1},System.Threading.Tasks.Task{Grpc.Core.Metadata},System.Func{Grpc.Core.Status},System.Func{Grpc.Core.Metadata},System.Action)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="P:Grpc.Core.AsyncDuplexStreamingCall`2.ResponseStream">
+            <summary>
+            Async stream to read streaming responses.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncDuplexStreamingCall`2.RequestStream">
+            <summary>
+            Async stream to send streaming requests.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncDuplexStreamingCall`2.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and response stream has been fully read), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:Grpc.Core.AsyncServerStreamingCall`1">
+            <summary>
+            Return type for server streaming calls.
+            </summary>
+            <typeparam name="TResponse">Response message type for this call.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.#ctor(Grpc.Core.IAsyncStreamReader{`0},System.Threading.Tasks.Task{Grpc.Core.Metadata},System.Func{Grpc.Core.Status},System.Func{Grpc.Core.Metadata},System.Action)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="P:Grpc.Core.AsyncServerStreamingCall`1.ResponseStream">
+            <summary>
+            Async stream to read streaming responses.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncServerStreamingCall`1.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (response stream has been fully read), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
+        <member name="T:Grpc.Core.AsyncUnaryCall`1">
+            <summary>
+            Return type for single request - single response call.
+            </summary>
+            <typeparam name="TResponse">Response message type for this call.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.#ctor(System.Threading.Tasks.Task{`0},System.Threading.Tasks.Task{Grpc.Core.Metadata},System.Func{Grpc.Core.Status},System.Func{Grpc.Core.Metadata},System.Action)">
+            <summary>
+            Creates a new AsyncUnaryCall object with the specified properties.
+            </summary>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="P:Grpc.Core.AsyncUnaryCall`1.ResponseAsync">
+            <summary>
+            Asynchronous call result.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.AsyncUnaryCall`1.ResponseHeadersAsync">
+            <summary>
+            Asynchronous access to response headers.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.GetAwaiter">
+            <summary>
+            Allows awaiting this object directly.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.GetStatus">
+            <summary>
+            Gets the call status if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.GetTrailers">
+            <summary>
+            Gets the call trailing metadata if the call has already finished.
+            Throws InvalidOperationException otherwise.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.Dispose">
+            <summary>
+            Provides means to cleanup after the call.
+            If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+            Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+            As a result, all resources being used by the call should be released eventually.
+            </summary>
+            <remarks>
+            Normally, there is no need for you to dispose the call unless you want to utilize the
+            "Cancel" semantics of invoking <c>Dispose</c>.
+            </remarks>
+        </member>
         <member name="T:Grpc.Core.AuthContext">
             <summary>
             Authentication context for a call.
@@ -85,6 +338,250 @@
             Creates and instance of <c>AuthProperty</c> without making a defensive copy of <c>valueBytes</c>.
             </summary>
         </member>
+        <member name="T:Grpc.Core.BindServiceMethodAttribute">
+            <summary>
+            Specifies the location of the service bind method for a gRPC service.
+            The bind method is typically generated code and is used to register a service's
+            methods with the server on startup.
+            
+            The bind method signature takes a <see cref="T:Grpc.Core.ServiceBinderBase"/> and an optional
+            instance of the service base class, e.g. <c>static void BindService(ServiceBinderBase, GreeterService)</c>.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.BindServiceMethodAttribute.#ctor(System.Type,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Grpc.Core.BindServiceMethodAttribute"/> class.
+            </summary>
+            <param name="bindType">The type the service bind method is defined on.</param>
+            <param name="bindMethodName">The name of the service bind method.</param>
+        </member>
+        <member name="P:Grpc.Core.BindServiceMethodAttribute.BindType">
+            <summary>
+            Gets the type the service bind method is defined on.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.BindServiceMethodAttribute.BindMethodName">
+            <summary>
+            Gets the name of the service bind method.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.CallCredentials">
+            <summary>
+            Client-side call credentials. Provide authorization with per-call granularity.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallCredentials.Compose(Grpc.Core.CallCredentials[])">
+            <summary>
+            Composes multiple multiple <c>CallCredentials</c> objects into
+            a single <c>CallCredentials</c> object.
+            </summary>
+            <param name="credentials">credentials to compose</param>
+            <returns>The new <c>CompositeCallCredentials</c></returns>
+        </member>
+        <member name="M:Grpc.Core.CallCredentials.FromInterceptor(Grpc.Core.AsyncAuthInterceptor)">
+            <summary>
+            Creates a new instance of <c>CallCredentials</c> class from an
+            interceptor that can attach metadata to outgoing calls.
+            </summary>
+            <param name="interceptor">authentication interceptor</param>
+        </member>
+        <member name="M:Grpc.Core.CallCredentials.InternalPopulateConfiguration(Grpc.Core.CallCredentialsConfiguratorBase,System.Object)">
+            <summary>
+            Populates this call credential instances.
+            You never need to invoke this, part of internal implementation.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.CallCredentialsConfiguratorBase">
+            <summary>
+            Base class for objects that can consume configuration from <c>CallCredentials</c> objects.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallCredentialsConfiguratorBase.SetCompositeCredentials(System.Object,System.Collections.Generic.IReadOnlyList{Grpc.Core.CallCredentials})">
+            <summary>
+            Consumes configuration for composite call credentials.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallCredentialsConfiguratorBase.SetAsyncAuthInterceptorCredentials(System.Object,Grpc.Core.AsyncAuthInterceptor)">
+            <summary>
+            Consumes configuration for call credentials created from <c>AsyncAuthInterceptor</c>
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Internal.CallFlags">
+            <summary>
+            Flags to enable special call behaviors (client-side only).
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Internal.CallFlags.IdempotentRequest">
+            <summary>
+            The call is idempotent (retrying the call doesn't change the outcome of the operation).
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Internal.CallFlags.WaitForReady">
+            <summary>
+            If channel is in <c>ChannelState.TransientFailure</c>, attempt waiting for the channel to recover
+            instead of failing the call immediately.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.Internal.CallFlags.CacheableRequest">
+            <summary>
+            The call is cacheable. gRPC is free to use GET verb */
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.CallInvoker">
+            <summary>
+            Abstraction of client-side RPC invocation.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallInvoker.BlockingUnaryCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a simple remote call in a blocking fashion.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallInvoker.AsyncUnaryCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a simple remote call asynchronously.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallInvoker.AsyncServerStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions,``0)">
+            <summary>
+            Invokes a server streaming call asynchronously.
+            In server streaming scenario, client sends on request and server responds with a stream of responses.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallInvoker.AsyncClientStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions)">
+            <summary>
+            Invokes a client streaming call asynchronously.
+            In client streaming scenario, client sends a stream of requests and server responds with a single response.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallInvoker.AsyncDuplexStreamingCall``2(Grpc.Core.Method{``0,``1},System.String,Grpc.Core.CallOptions)">
+            <summary>
+            Invokes a duplex streaming call asynchronously.
+            In duplex streaming scenario, client sends a stream of requests and server responds with a stream of responses.
+            The response stream is completely independent and both side can be sending messages at the same time.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.CallOptions">
+            <summary>
+            Options for calls made by client.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.#ctor(Grpc.Core.Metadata,System.Nullable{System.DateTime},System.Threading.CancellationToken,Grpc.Core.WriteOptions,Grpc.Core.ContextPropagationToken,Grpc.Core.CallCredentials)">
+            <summary>
+            Creates a new instance of <c>CallOptions</c> struct.
+            </summary>
+            <param name="headers">Headers to be sent with the call.</param>
+            <param name="deadline">Deadline for the call to finish. null means no deadline.</param>
+            <param name="cancellationToken">Can be used to request cancellation of the call.</param>
+            <param name="writeOptions">Write options that will be used for this call.</param>
+            <param name="propagationToken">Context propagation token obtained from <see cref="T:Grpc.Core.ServerCallContext"/>.</param>
+            <param name="credentials">Credentials to use for this call.</param>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.Headers">
+            <summary>
+            Headers to send at the beginning of the call.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.Deadline">
+            <summary>
+            Call deadline.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.CancellationToken">
+            <summary>
+            Token that can be used for cancelling the call on the client side.
+            Cancelling the token will request cancellation
+            of the remote call. Best effort will be made to deliver the cancellation
+            notification to the server and interaction of the call with the server side
+            will be terminated. Unless the call finishes before the cancellation could
+            happen (there is an inherent race),
+            the call will finish with <c>StatusCode.Cancelled</c> status.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.WriteOptions">
+            <summary>
+            Write options that will be used for this call.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.PropagationToken">
+            <summary>
+            Token for propagating parent call context.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.Credentials">
+            <summary>
+            Credentials to use for this call.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.IsWaitForReady">
+            <summary>
+            If <c>true</c> and and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
+            instead of failing immediately (which is the default "FailFast" semantics).
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.CallOptions.Flags">
+            <summary>
+            Flags to use for this call.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithHeaders(Grpc.Core.Metadata)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>Headers</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="headers">The headers.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithDeadline(System.DateTime)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>Deadline</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="deadline">The deadline.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithCancellationToken(System.Threading.CancellationToken)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>CancellationToken</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithWriteOptions(Grpc.Core.WriteOptions)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>WriteOptions</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="writeOptions">The write options.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithPropagationToken(Grpc.Core.ContextPropagationToken)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>PropagationToken</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="propagationToken">The context propagation token.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithCredentials(Grpc.Core.CallCredentials)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>Credentials</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="credentials">The call credentials.</param>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithWaitForReady(System.Boolean)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with "WaitForReady" semantics enabled/disabled.
+            <see cref="P:Grpc.Core.CallOptions.IsWaitForReady"/>.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.CallOptions.WithFlags(Grpc.Core.Internal.CallFlags)">
+            <summary>
+            Returns new instance of <see cref="T:Grpc.Core.CallOptions"/> with
+            <c>Flags</c> set to the value provided. Values of all other fields are preserved.
+            </summary>
+            <param name="flags">The call flags.</param>
+        </member>
         <member name="T:Grpc.Core.ContextPropagationOptions">
             <summary>
             Options for <see cref="T:Grpc.Core.ContextPropagationToken"/>.
@@ -138,7 +635,7 @@
             Also, allocating a new buffer each time can put excessive pressure on GC, especially if
             the payload is more than 86700 bytes large (which means the newly allocated buffer will be placed in LOH,
             and LOH object can only be garbage collected via a full ("stop the world") GC run).
-            NOTE: Deserializers are expected not to call this method more than once per received message
+            NOTE: Deserializers are expected not to call this method (or other payload accessor methods) more than once per received message
             (as there is no practical reason for doing so) and <c>DeserializationContext</c> implementations are free to assume so.
             </summary>
             <returns>byte array containing the entire payload.</returns>
@@ -190,6 +687,372 @@
             Once set, this property maintains its value across subsequent
             writes.
             </summary>
+        </member>
+        <member name="T:Grpc.Core.IClientStreamWriter`1">
+            <summary>
+            Client-side writable stream of messages with Close capability.
+            </summary>
+            <typeparam name="T">The message type.</typeparam>
+        </member>
+        <member name="M:Grpc.Core.IClientStreamWriter`1.CompleteAsync">
+            <summary>
+            Completes/closes the stream. Can only be called once there is no pending write. No writes should follow calling this.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.ClientInterceptorContext`2">
+            <summary>
+            Carries along the context associated with intercepted invocations on the client side.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.ClientInterceptorContext`2.#ctor(Grpc.Core.Method{`0,`1},System.String,Grpc.Core.CallOptions)">
+            <summary>
+            Creates a new instance of <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2" />
+            with the specified method, host, and call options.
+            </summary>
+            <param name="method">A <see cref="T:Grpc.Core.Method`2"/> object representing the method to be invoked.</param>
+            <param name="host">The host to dispatch the current call to.</param>
+            <param name="options">A <see cref="T:Grpc.Core.CallOptions"/> instance containing the call options of the current call.</param>
+        </member>
+        <member name="P:Grpc.Core.Interceptors.ClientInterceptorContext`2.Method">
+            <summary>
+            Gets the <see cref="T:Grpc.Core.Method`2"/> instance
+            representing the method to be invoked.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Interceptors.ClientInterceptorContext`2.Host">
+            <summary>
+            Gets the host that the currect invocation will be dispatched to.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Interceptors.ClientInterceptorContext`2.Options">
+            <summary>
+            Gets the <see cref="T:Grpc.Core.CallOptions"/> structure representing the
+            call options associated with the current invocation.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor">
+            <summary>
+            Serves as the base class for gRPC interceptors.
+            </summary>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor.BlockingUnaryCallContinuation`2">
+            <summary>
+            Represents a continuation for intercepting simple blocking invocations.
+            A delegate of this type is passed to the BlockingUnaryCall method
+            when an outgoing invocation is being intercepted and calling the
+            delegate will invoke the next interceptor in the chain, or the underlying
+            call invoker if called from the last interceptor. The interceptor is
+            allowed to call it zero, one, or multiple times, passing it the appropriate
+            context and request values as it sees fit.
+            </summary>
+            <typeparam name="TRequest">Request message type for this invocation.</typeparam>
+            <typeparam name="TResponse">Response message type for this invocation.</typeparam>
+            <param name="request">The request value to continue the invocation with.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            instance to pass to the next step in the invocation process.
+            </param>
+            <returns>
+            The response value of the invocation to return to the caller.
+            The interceptor can choose to return the return value of the
+            continuation delegate or an arbitrary value as it sees fit.
+            </returns>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor.AsyncUnaryCallContinuation`2">
+            <summary>
+            Represents a continuation for intercepting simple asynchronous invocations.
+            A delegate of this type is passed to the AsyncUnaryCall method
+            when an outgoing invocation is being intercepted and calling the
+            delegate will invoke the next interceptor in the chain, or the underlying
+            call invoker if called from the last interceptor. The interceptor is
+            allowed to call it zero, one, or multiple times, passing it the appropriate
+            request value and context as it sees fit.
+            </summary>
+            <typeparam name="TRequest">Request message type for this invocation.</typeparam>
+            <typeparam name="TResponse">Response message type for this invocation.</typeparam>
+            <param name="request">The request value to continue the invocation with.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            instance to pass to the next step in the invocation process.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncUnaryCall`1" />
+            representing an asynchronous invocation of a unary RPC.
+            The interceptor can choose to return the same object returned from
+            the continuation delegate or an arbitrarily constructed instance as it sees fit.
+            </returns>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor.AsyncServerStreamingCallContinuation`2">
+            <summary>
+            Represents a continuation for intercepting asynchronous server-streaming invocations.
+            A delegate of this type is passed to the AsyncServerStreamingCall method
+            when an outgoing invocation is being intercepted and calling the
+            delegate will invoke the next interceptor in the chain, or the underlying
+            call invoker if called from the last interceptor. The interceptor is
+            allowed to call it zero, one, or multiple times, passing it the appropriate
+            request value and context as it sees fit.
+            </summary>
+            <typeparam name="TRequest">Request message type for this invocation.</typeparam>
+            <typeparam name="TResponse">Response message type for this invocation.</typeparam>
+            <param name="request">The request value to continue the invocation with.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            instance to pass to the next step in the invocation process.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncServerStreamingCall`1" />
+            representing an asynchronous invocation of a server-streaming RPC.
+            The interceptor can choose to return the same object returned from
+            the continuation delegate or an arbitrarily constructed instance as it sees fit.
+            </returns>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor.AsyncClientStreamingCallContinuation`2">
+            <summary>
+            Represents a continuation for intercepting asynchronous client-streaming invocations.
+            A delegate of this type is passed to the AsyncClientStreamingCall method
+            when an outgoing invocation is being intercepted and calling the
+            delegate will invoke the next interceptor in the chain, or the underlying
+            call invoker if called from the last interceptor. The interceptor is
+            allowed to call it zero, one, or multiple times, passing it the appropriate
+            request value and context as it sees fit.
+            </summary>
+            <typeparam name="TRequest">Request message type for this invocation.</typeparam>
+            <typeparam name="TResponse">Response message type for this invocation.</typeparam>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            instance to pass to the next step in the invocation process.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncClientStreamingCall`2" />
+            representing an asynchronous invocation of a client-streaming RPC.
+            The interceptor can choose to return the same object returned from
+            the continuation delegate or an arbitrarily constructed instance as it sees fit.
+            </returns>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.Interceptor.AsyncDuplexStreamingCallContinuation`2">
+            <summary>
+            Represents a continuation for intercepting asynchronous duplex invocations.
+            A delegate of this type is passed to the AsyncDuplexStreamingCall method
+            when an outgoing invocation is being intercepted and calling the
+            delegate will invoke the next interceptor in the chain, or the underlying
+            call invoker if called from the last interceptor. The interceptor is
+            allowed to call it zero, one, or multiple times, passing it the appropriate
+            request value and context as it sees fit.
+            </summary>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            instance to pass to the next step in the invocation process.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncDuplexStreamingCall`2" />
+            representing an asynchronous invocation of a duplex-streaming RPC.
+            The interceptor can choose to return the same object returned from
+            the continuation delegate or an arbitrarily constructed instance as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.BlockingUnaryCall``2(``0,Grpc.Core.Interceptors.ClientInterceptorContext{``0,``1},Grpc.Core.Interceptors.Interceptor.BlockingUnaryCallContinuation{``0,``1})">
+            <summary>
+            Intercepts a blocking invocation of a simple remote call.
+            </summary>
+            <param name="request">The request message of the invocation.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            associated with the current invocation.
+            </param>
+            <param name="continuation">
+            The callback that continues the invocation process.
+            This can be invoked zero or more times by the interceptor.
+            The interceptor can invoke the continuation passing the given
+            request value and context arguments, or substitute them as it sees fit.
+            </param>
+            <returns>
+            The response message of the current invocation.
+            The interceptor can simply return the return value of the
+            continuation delegate passed to it intact, or an arbitrary
+            value as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.AsyncUnaryCall``2(``0,Grpc.Core.Interceptors.ClientInterceptorContext{``0,``1},Grpc.Core.Interceptors.Interceptor.AsyncUnaryCallContinuation{``0,``1})">
+            <summary>
+            Intercepts an asynchronous invocation of a simple remote call.
+            </summary>
+            <param name="request">The request message of the invocation.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            associated with the current invocation.
+            </param>
+            <param name="continuation">
+            The callback that continues the invocation process.
+            This can be invoked zero or more times by the interceptor.
+            The interceptor can invoke the continuation passing the given
+            request value and context arguments, or substitute them as it sees fit.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncUnaryCall`1" />
+            representing an asynchronous unary invocation.
+            The interceptor can simply return the return value of the
+            continuation delegate passed to it intact, or construct its
+            own substitute as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.AsyncServerStreamingCall``2(``0,Grpc.Core.Interceptors.ClientInterceptorContext{``0,``1},Grpc.Core.Interceptors.Interceptor.AsyncServerStreamingCallContinuation{``0,``1})">
+            <summary>
+            Intercepts an asynchronous invocation of a streaming remote call.
+            </summary>
+            <param name="request">The request message of the invocation.</param>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            associated with the current invocation.
+            </param>
+            <param name="continuation">
+            The callback that continues the invocation process.
+            This can be invoked zero or more times by the interceptor.
+            The interceptor can invoke the continuation passing the given
+            request value and context arguments, or substitute them as it sees fit.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncServerStreamingCall`1" />
+            representing an asynchronous server-streaming invocation.
+            The interceptor can simply return the return value of the
+            continuation delegate passed to it intact, or construct its
+            own substitute as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.AsyncClientStreamingCall``2(Grpc.Core.Interceptors.ClientInterceptorContext{``0,``1},Grpc.Core.Interceptors.Interceptor.AsyncClientStreamingCallContinuation{``0,``1})">
+            <summary>
+            Intercepts an asynchronous invocation of a client streaming call.
+            </summary>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            associated with the current invocation.
+            </param>
+            <param name="continuation">
+            The callback that continues the invocation process.
+            This can be invoked zero or more times by the interceptor.
+            The interceptor can invoke the continuation passing the given
+            context argument, or substitute as it sees fit.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncClientStreamingCall`2" />
+            representing an asynchronous client-streaming invocation.
+            The interceptor can simply return the return value of the
+            continuation delegate passed to it intact, or construct its
+            own substitute as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.AsyncDuplexStreamingCall``2(Grpc.Core.Interceptors.ClientInterceptorContext{``0,``1},Grpc.Core.Interceptors.Interceptor.AsyncDuplexStreamingCallContinuation{``0,``1})">
+            <summary>
+            Intercepts an asynchronous invocation of a duplex streaming call.
+            </summary>
+            <param name="context">
+            The <see cref="T:Grpc.Core.Interceptors.ClientInterceptorContext`2"/>
+            associated with the current invocation.
+            </param>
+            <param name="continuation">
+            The callback that continues the invocation process.
+            This can be invoked zero or more times by the interceptor.
+            The interceptor can invoke the continuation passing the given
+            context argument, or substitute as it sees fit.
+            </param>
+            <returns>
+            An instance of <see cref="T:Grpc.Core.AsyncDuplexStreamingCall`2" />
+            representing an asynchronous duplex-streaming invocation.
+            The interceptor can simply return the return value of the
+            continuation delegate passed to it intact, or construct its
+            own substitute as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.UnaryServerHandler``2(``0,Grpc.Core.ServerCallContext,Grpc.Core.UnaryServerMethod{``0,``1})">
+            <summary>
+            Server-side handler for intercepting and incoming unary call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+            <param name="request">The request value of the incoming invocation.</param>
+            <param name="context">
+            An instance of <see cref="T:Grpc.Core.ServerCallContext" /> representing
+            the context of the invocation.
+            </param>
+            <param name="continuation">
+            A delegate that asynchronously proceeds with the invocation, calling
+            the next interceptor in the chain, or the service request handler,
+            in case of the last interceptor and return the response value of
+            the RPC. The interceptor can choose to call it zero or more times
+            at its discretion.
+            </param>
+            <returns>
+            A future representing the response value of the RPC. The interceptor
+            can simply return the return value from the continuation intact,
+            or an arbitrary response value as it sees fit.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.ClientStreamingServerHandler``2(Grpc.Core.IAsyncStreamReader{``0},Grpc.Core.ServerCallContext,Grpc.Core.ClientStreamingServerMethod{``0,``1})">
+            <summary>
+            Server-side handler for intercepting client streaming call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+            <param name="requestStream">The request stream of the incoming invocation.</param>
+            <param name="context">
+            An instance of <see cref="T:Grpc.Core.ServerCallContext" /> representing
+            the context of the invocation.
+            </param>
+            <param name="continuation">
+            A delegate that asynchronously proceeds with the invocation, calling
+            the next interceptor in the chain, or the service request handler,
+            in case of the last interceptor and return the response value of
+            the RPC. The interceptor can choose to call it zero or more times
+            at its discretion.
+            </param>
+            <returns>
+            A future representing the response value of the RPC. The interceptor
+            can simply return the return value from the continuation intact,
+            or an arbitrary response value as it sees fit. The interceptor has
+            the ability to wrap or substitute the request stream when calling
+            the continuation.
+            </returns>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.ServerStreamingServerHandler``2(``0,Grpc.Core.IServerStreamWriter{``1},Grpc.Core.ServerCallContext,Grpc.Core.ServerStreamingServerMethod{``0,``1})">
+            <summary>
+            Server-side handler for intercepting server streaming call.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+            <param name="request">The request value of the incoming invocation.</param>
+            <param name="responseStream">The response stream of the incoming invocation.</param>
+            <param name="context">
+            An instance of <see cref="T:Grpc.Core.ServerCallContext" /> representing
+            the context of the invocation.
+            </param>
+            <param name="continuation">
+            A delegate that asynchronously proceeds with the invocation, calling
+            the next interceptor in the chain, or the service request handler,
+            in case of the last interceptor and the interceptor can choose to
+            call it zero or more times at its discretion. The interceptor has
+            the ability to wrap or substitute the request value and the response stream
+            when calling the continuation.
+            </param>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.Interceptor.DuplexStreamingServerHandler``2(Grpc.Core.IAsyncStreamReader{``0},Grpc.Core.IServerStreamWriter{``1},Grpc.Core.ServerCallContext,Grpc.Core.DuplexStreamingServerMethod{``0,``1})">
+            <summary>
+            Server-side handler for intercepting bidirectional streaming calls.
+            </summary>
+            <typeparam name="TRequest">Request message type for this method.</typeparam>
+            <typeparam name="TResponse">Response message type for this method.</typeparam>
+            <param name="requestStream">The request stream of the incoming invocation.</param>
+            <param name="responseStream">The response stream of the incoming invocation.</param>
+            <param name="context">
+            An instance of <see cref="T:Grpc.Core.ServerCallContext" /> representing
+            the context of the invocation.
+            </param>
+            <param name="continuation">
+            A delegate that asynchronously proceeds with the invocation, calling
+            the next interceptor in the chain, or the service request handler,
+            in case of the last interceptor and the interceptor can choose to
+            call it zero or more times at its discretion. The interceptor has
+            the ability to wrap or substitute the request and response streams
+            when calling the continuation.
+            </param>
         </member>
         <member name="T:Grpc.Core.IServerStreamWriter`1">
             <summary>
@@ -651,6 +1514,12 @@
             Note: Access to AuthContext is an experimental API that can change without any prior notice.
             </summary>
         </member>
+        <member name="P:Grpc.Core.ServerCallContext.UserState">
+            <summary>
+            Gets a dictionary that can be used by the various interceptors and handlers of this
+            call to store arbitrary state.
+            </summary>
+        </member>
         <member name="M:Grpc.Core.ServerCallContext.WriteResponseHeadersAsyncCore(Grpc.Core.Metadata)">
             <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
@@ -685,6 +1554,9 @@
             <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
         <member name="P:Grpc.Core.ServerCallContext.AuthContextCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
+        </member>
+        <member name="P:Grpc.Core.ServerCallContext.UserStateCore">
             <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
         <member name="T:Grpc.Core.UnaryServerMethod`2">
@@ -966,7 +1838,8 @@
             <summary>
             The service is currently unavailable.  This is a most likely a
             transient condition and may be corrected by retrying with
-            a backoff.
+            a backoff. Note that it is not always safe to retry
+            non-idempotent operations.
             </summary>
         </member>
         <member name="F:Grpc.Core.StatusCode.DataLoss">
@@ -1015,6 +1888,28 @@
             </summary>
             <param name="condition">The condition.</param>
             <param name="errorMessage">The error message.</param>
+        </member>
+        <member name="T:Grpc.Core.VersionInfo">
+            <summary>
+            Provides info about current version of gRPC.
+            See https://codingforsmarties.wordpress.com/2016/01/21/how-to-version-assemblies-destined-for-nuget/
+            for rationale about assembly versioning.
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.VersionInfo.CurrentAssemblyVersion">
+            <summary>
+            Current <c>AssemblyVersion</c> attribute of gRPC C# assemblies
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.VersionInfo.CurrentAssemblyFileVersion">
+            <summary>
+            Current <c>AssemblyFileVersion</c> of gRPC C# assemblies
+            </summary>
+        </member>
+        <member name="F:Grpc.Core.VersionInfo.CurrentVersion">
+            <summary>
+            Current version of gRPC C#
+            </summary>
         </member>
         <member name="T:Grpc.Core.WriteFlags">
             <summary>

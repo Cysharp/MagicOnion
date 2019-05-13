@@ -1,14 +1,14 @@
 fileFormatVersion: 2
-guid: 4b6e77fbdb92b1f4f8a3ea5d3752ebd1
+guid: cb634ddbaed75c344a6b79bc91ca996e
+timeCreated: 1531219386
+licenseType: Free
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
-  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
-  isExplicitlyReferenced: 0
   platformData:
   - first:
       '': Any
@@ -20,6 +20,8 @@ PluginImporter:
         Exclude Linux: 0
         Exclude Linux64: 0
         Exclude LinuxUniversal: 0
+        Exclude OSXIntel: 0
+        Exclude OSXIntel64: 0
         Exclude OSXUniversal: 0
         Exclude Win: 1
         Exclude Win64: 0
@@ -74,6 +76,18 @@ PluginImporter:
       settings:
         CPU: AnyCPU
   - first:
+      Standalone: OSXIntel
+    second:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+  - first:
+      Standalone: OSXIntel64
+    second:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+  - first:
       Standalone: OSXUniversal
     second:
       enabled: 1
@@ -96,7 +110,6 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        AddToEmbeddedBinaries: false
         CompileFlags: 
         FrameworkDependencies: 
   userData: 
