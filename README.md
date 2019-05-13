@@ -1,6 +1,6 @@
 MagicOnion
 ===
-[![Releases](https://img.shields.io/github/release/neuecc/MagicOnion.svg)](https://github.com/neuecc/MagicOnion/releases)
+[![CircleCI](https://circleci.com/gh/Cysharp/MagicOnion.svg?style=svg)](https://circleci.com/gh/Cysharp/MagicOnion) [![Releases](https://img.shields.io/github/release/Cysharp/MagicOnion.svg)](https://github.com/Cysharp/MagicOnion/releases)
 
 Unified Realtime/API Engine for .NET Core and Unity.
 
