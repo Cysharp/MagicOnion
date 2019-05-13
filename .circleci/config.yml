@@ -75,6 +75,10 @@ workflows:
   version: 2
   build-and-push:
     jobs:
+      - build-unity:
+          filters:
+            tags:
+              only: /.*/
       - build-test:
           filters:
             tags:
