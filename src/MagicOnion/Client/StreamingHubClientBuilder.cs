@@ -72,7 +72,7 @@ namespace MagicOnion.Client
             var parentType = typeof(StreamingHubClientBase<,>).MakeGenericType(typeof(TStreamingHub), typeof(TReceiver));
             var typeBuilder = asm.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}StreamingHubClient_{Guid.NewGuid().ToString()}", TypeAttributes.Public, parentType, new Type[] { t });
 
-            VerifyMethodDefinitions(typeBuilder, methodDefinitions);
+            VerifyMethodDefinitions(methodDefinitions);
 
             {
                 // Create FireAndForgetType first as nested type.
@@ -127,7 +127,7 @@ namespace MagicOnion.Client
                 .ToArray();
         }
 
-        static void VerifyMethodDefinitions(TypeBuilder typeBuilder, MethodDefinition[] definitions)
+        static void VerifyMethodDefinitions(MethodDefinition[] definitions)
         {
             var map = new Dictionary<int, MethodDefinition>(definitions.Length);
             foreach (var item in definitions)
@@ -135,14 +135,14 @@ namespace MagicOnion.Client
                 var methodId = item.MethodInfo.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(item.MethodInfo.Name);
                 if (map.ContainsKey(methodId))
                 {
-                    throw new Exception($"TReceiver does not allows duplicate methodId(hash code). Please change name or use MethodIdAttribute. {map[methodId].MethodInfo.Name} and {item.MethodInfo.Name}");
+                    throw new Exception($"TStreamingHub does not allows duplicate methodId(hash code). Please change name or use MethodIdAttribute. {map[methodId].MethodInfo.Name} and {item.MethodInfo.Name}");
                 }
                 map.Add(methodId, item);
 
                 if (!(item.MethodInfo.ReturnType.IsGenericType && item.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
                    && item.MethodInfo.ReturnType != typeof(Task))
                 {
-                    throw new Exception($"Invalid definition, TReceiver's return type must only be `Task` or `Task<T>`. {item.MethodInfo.Name}.");
+                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `Task` or `Task<T>`. {item.MethodInfo.Name}.");
                 }
 
                 item.MethodId = methodId;
@@ -335,13 +335,13 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Ret);
                     }
                 }
-                // protected abstract Task OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+                // protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
                 {
                     var methodDefinitions = BroadcasterHelper.SearchDefinitions(receiverType);
                     BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
 
                     var method = typeBuilder.DefineMethod("OnBroadcastEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                        typeof(Task), new[] { typeof(int), typeof(ArraySegment<byte>) });
+                        typeof(void), new[] { typeof(int), typeof(ArraySegment<byte>) });
                     var il = method.GetILGenerator();
 
                     var labels = methodDefinitions
@@ -356,7 +356,6 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Beq, item.label);
                     }
                     // else
-                    il.Emit(OpCodes.Call, typeof(Task).GetProperty("CompletedTask").GetGetMethod());
                     il.Emit(OpCodes.Ret);
 
                     foreach (var item in labels)
@@ -372,10 +371,6 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            if (item.def.MethodInfo.ReturnType == typeof(void))
-                            {
-                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
-                            }
                             il.Emit(OpCodes.Ret);
                         }
                         else if (parameters.Length == 1)
@@ -387,10 +382,6 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Ldfld, resolverField);
                             il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(parameters[0].ParameterType));
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            if (item.def.MethodInfo.ReturnType == typeof(void))
-                            {
-                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
-                            }
                             il.Emit(OpCodes.Ret);
                         }
                         else
@@ -413,10 +404,6 @@ namespace MagicOnion.Client
                             }
 
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            if (item.def.MethodInfo.ReturnType == typeof(void))
-                            {
-                                il.Emit(OpCodes.Call, completedTask.GetGetMethod());
-                            }
                             il.Emit(OpCodes.Ret);
                         }
                     }

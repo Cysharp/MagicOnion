@@ -227,14 +227,7 @@ namespace MagicOnion.CodeAnalysis
                 line2 = $"{Name}({line2})";
             }
 
-            if (OriginalResponseTypeSymbol == ReferenceSymbols.Global.Void)
-            {
-                line2 = "receiver." + line2 + "; return Task.CompletedTask;";
-            }
-            else
-            {
-                line2 = "return receiver." + line2 + ";";
-            }
+            line2 = "receiver." + line2 + "; break;";
 
             var line1 = $"var result = LZ4MessagePackSerializer.Deserialize<{parameterType}>(data, resolver);";
             return (line1, line2);

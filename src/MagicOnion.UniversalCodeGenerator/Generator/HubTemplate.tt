@@ -43,7 +43,7 @@
             return __fireAndForgetClient;
         }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
             switch (methodId)
             {
@@ -55,7 +55,7 @@
                 }
 <#  } // end foreach(receiverDef.Methods) #>
                 default:
-                    return Task.CompletedTask;
+                    break;
             }
         }
 

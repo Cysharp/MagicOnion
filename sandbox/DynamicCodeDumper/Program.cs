@@ -13,9 +13,9 @@ namespace DynamicCodeDumper
 {
     public interface IMessageReceiver
     {
-        Task ZeroArgument();
-        Task OneArgument(int x);
-        Task MoreArgument(int x, string y, double z);
+        //Task ZeroArgument();
+        //Task OneArgument(int x);
+        //Task MoreArgument(int x, string y, double z);
         void VoidZeroArgument();
         void VoidOneArgument(int x);
         void VoidMoreArgument(int x, string y, double z);

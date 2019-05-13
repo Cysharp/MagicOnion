@@ -57,14 +57,15 @@ namespace MagicOnion.Client
         }
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
-        protected abstract Task OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+        protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
 
         async Task StartSubscribe()
         {
+            var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var reader = connection.RawStreamingCall.ResponseStream;
             try
             {
-                while (await reader.MoveNext(cts.Token))
+                while (await reader.MoveNext(cts.Token).ConfigureAwait(false)) // avoid Post to SyncContext(it losts one-frame per operation)
                 {
                     try
                     {
@@ -73,23 +74,19 @@ namespace MagicOnion.Client
                         // broadcast: [methodId, [argument]]
                         // response:  [messageId, methodId, response]
                         // error-response: [messageId, statusCode, detail, StringMessage]
-
                         var readSize = 0;
                         var offset = 0;
                         var arrayLength = MessagePackBinary.ReadArrayHeader(data, offset, out readSize);
                         offset += readSize;
-
                         if (arrayLength == 3)
                         {
                             var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                             offset += readSize;
-
                             object future;
                             if (responseFutures.TryRemove(messageId, out future))
                             {
                                 var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                                 offset += readSize;
-
                                 try
                                 {
                                     OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
@@ -107,18 +104,14 @@ namespace MagicOnion.Client
                         {
                             var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                             offset += readSize;
-
                             object future;
                             if (responseFutures.TryRemove(messageId, out future))
                             {
                                 var statusCode = MessagePackBinary.ReadInt32(data, offset, out readSize);
                                 offset += readSize;
-
                                 var detail = MessagePackBinary.ReadString(data, offset, out readSize);
                                 offset += readSize;
-
                                 var error = LZ4MessagePackSerializer.Deserialize<string>(new ArraySegment<byte>(data, offset, data.Length - offset));
-
                                 (future as ITaskCompletion).TrySetException(new RpcException(new Status((StatusCode)statusCode, detail), error));
                             }
                         }
@@ -126,13 +119,33 @@ namespace MagicOnion.Client
                         {
                             var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
                             offset += readSize;
-
-                            await OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                            if (syncContext != null)
+                            {
+                                var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
+                                syncContext.Post(state =>
+                                {
+                                    var t = (Tuple<int, byte[], int, int>)state;
+                                    OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
+                                }, tuple);
+                            }
+                            else
+                            {
+                                OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        logger?.Error(ex, "Error on consume received message, but keep subscribe.");
+                        const string msg = "Error on consume received message, but keep subscribe.";
+                        // log post on main thread.
+                        if (syncContext != null)
+                        {
+                            syncContext.Post(state => logger.Error((Exception)state, msg), ex);
+                        }
+                        else
+                        {
+                            logger.Error(ex, msg);
+                        }
                     }
                 }
             }
@@ -142,13 +155,26 @@ namespace MagicOnion.Client
                 {
                     return;
                 }
-
-                logger?.Error(ex, "Error on subscribing message.");
+                const string msg = "Error on subscribing message.";
+                // log post on main thread.
+                if (syncContext != null)
+                {
+                    syncContext.Post(state => logger.Error((Exception)state, msg), ex);
+                }
+                else
+                {
+                    logger.Error(ex, msg);
+                }
             }
             finally
             {
                 try
                 {
+                    // set syncContext before await
+                    if (syncContext != null && SynchronizationContext.Current == null)
+                    {
+                        SynchronizationContext.SetSynchronizationContext(syncContext);
+                    }
                     await DisposeAsyncCore(false);
                 }
                 finally
@@ -157,6 +183,7 @@ namespace MagicOnion.Client
                 }
             }
         }
+
 
         protected async Task WriteMessageAsync<T>(int methodId, T message)
         {
