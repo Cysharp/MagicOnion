@@ -9,14 +9,14 @@ using UnityEngine;
 
 namespace UnityEditorUtility
 {
-    public static class PackageExport
+    public static class PackageExporter
     {
         [MenuItem("Tools/Export Unitypackage")]
         public static void Export()
         {
             // configure
             var root = "Scripts/MagicOnion";
-            var exportPath = "../../nuget/MagicOnion.Unity.Version-Rename.unitypackage";
+            var exportPath = "../../nuget/MagicOnion.Unity.unitypackage";
 
             var path = Path.Combine(Application.dataPath, root);
             var assets = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)

@@ -60,7 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Editor\PackageExport.cs" />
+    <Compile Include="Assets\Scripts\Editor\PackageExporter.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
