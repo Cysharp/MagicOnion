@@ -1,5 +1,6 @@
 ﻿using MagicOnion.CodeAnalysis;
 using MagicOnion.Generator;
+using MicroBatchFramework;
 using Microsoft.CodeAnalysis;
 using Mono.Options;
 using System;
@@ -12,74 +13,29 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.CodeGenerator
 {
-    class CommandlineArguments
+    public class Program : BatchBase
     {
-        // moc.exe
-
-        public string InputPath { get; private set; }
-        public string OutputPath { get; private set; }
-        public bool UnuseUnityAttr { get; private set; }
-        public List<string> ConditionalSymbols { get; private set; }
-        public string NamespaceRoot { get; private set; }
-
-        public bool IsParsed { get; set; }
-
-        public CommandlineArguments(string[] args)
+        static async Task Main(string[] args)
         {
-            ConditionalSymbols = new List<string>();
-            NamespaceRoot = "MagicOnion";
-
-            var option = new OptionSet()
-            {
-                { "i|input=", "[required]Input path of analyze csproj", x => { InputPath = x; } },
-                { "o|output=", "[required]Output path(file) or directory base(in separated mode)", x => { OutputPath = x; } },
-                { "u|unuseunityattr", "[optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer", _ => { UnuseUnityAttr = true; } },
-                { "c|conditionalsymbol=", "[optional, default=empty]conditional compiler symbol", x => { ConditionalSymbols.AddRange(x.Split(',')); } },
-                { "n|namespace=", "[optional, default=MagicOnion]Set namespace root name", x => { NamespaceRoot = x; } },
-            };
-            if (args.Length == 0)
-            {
-                goto SHOW_HELP;
-            }
-            else
-            {
-                option.Parse(args);
-
-                if (InputPath == null || OutputPath == null)
-                {
-                    Console.WriteLine("Invalid Argument:" + string.Join(" ", args));
-                    Console.WriteLine();
-                    goto SHOW_HELP;
-                }
-
-                IsParsed = true;
-                return;
-            }
-
-        SHOW_HELP:
-            Console.WriteLine("moc arguments help:");
-            option.WriteOptionDescriptions(Console.Out);
-            IsParsed = false;
+            await BatchHost.CreateDefaultBuilder().RunBatchEngineAsync<Program>(args);
         }
-    }
 
-
-    class Program
-    {
-        static void Main(string[] args)
+        public void Run(
+            [Option("i", "Input path of analyze csproj.")]string input,
+            [Option("o", "Output path(file) or directory base(in separated mode).")]string output,
+            [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
+            [Option("c", "Conditional compiler symbol.")]string @namespace = "MagicOnion",
+            [Option("n", "Set namespace root name.")]string[] conditionalSymbol = null)
         {
-            var cmdArgs = new CommandlineArguments(args);
-            if (!cmdArgs.IsParsed)
-            {
-                return;
-            }
+            // Prepare args
+            conditionalSymbol = conditionalSymbol ?? new string[0];
 
             // Generator Start...
 
             var sw = Stopwatch.StartNew();
-            Console.WriteLine("Project Compilation Start:" + cmdArgs.InputPath);
+            Console.WriteLine("Project Compilation Start:" + input);
 
-            var collector = new MethodCollector(cmdArgs.InputPath, cmdArgs.ConditionalSymbols);
+            var collector = new MethodCollector(input, conditionalSymbol);
 
             Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();
@@ -93,8 +49,8 @@ namespace MagicOnion.CodeGenerator
             GenericSerializationInfo[] genericInfos;
             EnumSerializationInfo[] enumInfos;
             ExtractResolverInfo(definitions, out genericInfos, out enumInfos);
-            ExtractResolverInfo(hubDefinitions.Select(x=>x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2);
-            ExtractResolverInfo(hubDefinitions.Select(x=>x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3);
+            ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2);
+            ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3);
             enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().ToArray();
             genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().ToArray();
 
@@ -107,15 +63,15 @@ namespace MagicOnion.CodeGenerator
                 .OrderBy(x => x.Key)
                 .Select(x => new EnumTemplate()
                 {
-                    Namespace = cmdArgs.NamespaceRoot + ".Formatters",
+                    Namespace = @namespace + ".Formatters",
                     enumSerializationInfos = x.ToArray()
                 })
                 .ToArray();
 
             var resolverTemplate = new ResolverTemplate()
             {
-                Namespace = cmdArgs.NamespaceRoot + ".Resolvers",
-                FormatterNamespace = cmdArgs.NamespaceRoot + ".Formatters",
+                Namespace = @namespace + ".Resolvers",
+                FormatterNamespace = @namespace + ".Formatters",
                 ResolverName = "MagicOnionResolver",
                 registerInfos = genericInfos.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enumInfos.OrderBy(x => x.FullName)).ToArray()
             };
@@ -142,10 +98,10 @@ namespace MagicOnion.CodeGenerator
 
             var registerTemplate = new RegisterTemplate
             {
-                Namespace = cmdArgs.NamespaceRoot,
+                Namespace = @namespace,
                 Interfaces = definitions.Where(x => x.IsServiceDifinition).ToArray(),
                 HubInterfaces = hubDefinitions,
-                UnuseUnityAttribute = cmdArgs.UnuseUnityAttr
+                UnuseUnityAttribute = unuseUnityAttr
             };
 
             var sb = new StringBuilder();
@@ -166,7 +122,7 @@ namespace MagicOnion.CodeGenerator
                 sb.AppendLine(item.TransformText());
             }
 
-            Output(cmdArgs.OutputPath, sb.ToString());
+            Output(output, sb.ToString());
 
             Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
             Console.WriteLine();
