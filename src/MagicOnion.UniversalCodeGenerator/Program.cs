@@ -24,8 +24,8 @@ namespace MagicOnion.CodeGenerator
             [Option("i", "Input path of analyze csproj.")]string input,
             [Option("o", "Output path(file) or directory base(in separated mode).")]string output,
             [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
-            [Option("c", "Conditional compiler symbol.")]string @namespace = "MagicOnion",
-            [Option("n", "Set namespace root name.")]string[] conditionalSymbol = null)
+            [Option("n", "Conditional compiler symbol.")]string @namespace = "MagicOnion",
+            [Option("c", "Set namespace root name.")]string[] conditionalSymbol = null)
         {
             // Prepare args
             conditionalSymbol = conditionalSymbol ?? new string[0];
