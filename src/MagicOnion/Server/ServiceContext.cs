@@ -58,6 +58,8 @@ namespace MagicOnion.Server
 
         public IFormatterResolver FormatterResolver { get; private set; }
 
+        public IServiceLocator ServiceLocator { get; private set; }
+
         // internal, used from there methods.
         internal bool IsIgnoreSerialization { get; set; }
         internal byte[] Request { get; set; }
@@ -70,7 +72,7 @@ namespace MagicOnion.Server
         // used in StreamingHub
         internal AsyncLock AsyncWriterLock { get; set; }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler)
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator)
         {
             this.ContextId = Guid.NewGuid();
             this.ServiceType = serviceType;
@@ -82,6 +84,7 @@ namespace MagicOnion.Server
             this.FormatterResolver = resolver;
             this.MagicOnionLogger = logger;
             this.MethodHandler = methodHandler;
+            this.ServiceLocator = serviceLocator;
         }
 
         /// <summary>

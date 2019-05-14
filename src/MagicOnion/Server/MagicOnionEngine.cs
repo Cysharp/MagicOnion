@@ -75,7 +75,8 @@ namespace MagicOnion.Server
                     var className = classType.Name;
                     if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
                     {
-                        throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
+                        // supports paramaterless constructor after v2.1(DI support).
+                        // throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", classType.FullName));
                     }
 
                     var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);

@@ -7,11 +7,13 @@ using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
+using MagicOnion.Hosting;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Sandbox.NetCoreServer.Hubs;
 using Sandbox.NetCoreServer.Services;
 using System;
@@ -27,6 +29,8 @@ namespace Sandbox.NetCoreServer
     {
         static async Task Main(string[] args)
         {
+            // ServiceLocatorHelper.CreateService<UnaryService, ICalcSerivce>(null);
+
             const string GrpcHost = "localhost";
 
             Console.WriteLine("Server:::");
@@ -38,7 +42,7 @@ namespace Sandbox.NetCoreServer
 
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
-            var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
+            var options = new MagicOnionOptions(true)
             {
                 // MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
@@ -47,31 +51,39 @@ namespace Sandbox.NetCoreServer
                 },
                 EnableCurrentContext = true,
                 DisableEmbeddedService = true,
-            });
-
-            var server = new global::Grpc.Core.Server
-            {
-                Services = { service },
-                Ports = { new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure) }
             };
 
-            server.Start();
+            var magicOnionRun = new HostBuilder().UseMagicOnion(options, new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure)).RunConsoleAsync();
+            //var service = MagicOnionEngine.BuildServerServiceDefinition();
+
+            //var server = new global::Grpc.Core.Server
+            //{
+            //    Services = { service },
+            //    Ports = { new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure) }
+            //};
+
+            //server.Start();
 
             // test webhost
 
-        // NuGet: Microsoft.AspNetCore.Server.Kestrel
-        var webHost = new WebHostBuilder()
-            .ConfigureServices(collection =>
-            {
-                // Add MagicOnionServiceDefinition for reference from Startup.
-                collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
-            })
-            .UseKestrel()
-            .UseStartup<Startup>()
-            .UseUrls("http://localhost:5432")
-            .Build();
+            // NuGet: Microsoft.AspNetCore.Server.Kestrel
+            //var webHost = new WebHostBuilder()
+            //    .ConfigureServices(collection =>
+            //    {
+            //        // Add MagicOnionServiceDefinition for reference from Startup.
+            //        collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
+            //    })
+            //    .UseKestrel()
+            //    .UseStartup<Startup>()
+            //    .UseUrls("http://localhost:5432")
+            //    .Build();
 
-        webHost.Run();
+            //webHost.RunAsync();
+
+
+
+
+            //webHost.Run();
 
             Console.ReadLine();
 
@@ -91,6 +103,9 @@ namespace Sandbox.NetCoreServer
 
                 Console.WriteLine("OK to Send");
             }
+
+            await magicOnionRun;
+
         }
 
         static void CheckUnsfeResolver()
@@ -100,7 +115,7 @@ namespace Sandbox.NetCoreServer
                 UnsafeDirectBlitResolver.Instance,
 
                 BuiltinResolver.Instance
-                
+
                 );
 
             var f = new Foo { A = 10, B = 9999, C = 9999999 };

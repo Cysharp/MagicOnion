@@ -15,10 +15,12 @@
     <PackageReference Include="MessagePack.UnityShims" Version="1.7.3.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.Hosting\MagicOnion.Hosting.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion\MagicOnion.csproj" />
   </ItemGroup>
