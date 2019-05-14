@@ -31,6 +31,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Hosting.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.NetCoreTests", "tests\MagicOnion.NetCoreTests\MagicOnion.NetCoreTests.csproj", "{9130778E-4B00-436C-BD1F-1DFDF95AD2CC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5A3F5158-7B17-4586-9885-9E60C1393185}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server", "samples\ChatApp\ChatApp.Server\ChatApp.Server.csproj", "{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +81,10 @@ Global
 		{9130778E-4B00-436C-BD1F-1DFDF95AD2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9130778E-4B00-436C-BD1F-1DFDF95AD2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9130778E-4B00-436C-BD1F-1DFDF95AD2CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +100,7 @@ Global
 		{72B2FD95-57B6-400B-95D0-96E19EBCF44B} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{5A381446-409B-4532-8B1A-877D996F7575} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{9130778E-4B00-436C-BD1F-1DFDF95AD2CC} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE} = {5A3F5158-7B17-4586-9885-9E60C1393185}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) -->
-        <TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
+        <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) but currently removed(for CI) -->
+        <!--<TargetFrameworks>netstandard2.0;net471</TargetFrameworks>-->
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <SignAssembly>true</SignAssembly>
