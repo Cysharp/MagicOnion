@@ -105,6 +105,9 @@ namespace MagicOnion.Hosting
                     }
                 }
 
+                // store service definition
+                services.AddSingleton<MagicOnionServiceDefinition>(serviceDefinition);
+
                 // should transient or singleton?
                 // in AddHostedService<T> implementation, singleton is used
                 // https://github.com/aspnet/Extensions/blob/8b2482fa68c548e904e4aa1ae38a29c72dcd32a5/src/Hosting/Abstractions/src/ServiceCollectionHostedServiceExtensions.cs#L18

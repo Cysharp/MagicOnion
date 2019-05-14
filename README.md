@@ -546,7 +546,7 @@ Open `http://localhost:5432`, you can see swagger view.
 
 Unity Supports
 ---
-You can download `MagicOnion.Unity.*.*.*.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
+You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
 
 MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
 
@@ -718,10 +718,6 @@ static async Task DuplexStreamRun(IMyFirstService client)
     });
 }
 ```
-
-How to build
----
-using VS2019. Some Unity files using symbolic link to sharing code. In windows, requires `core.symlinks = true` .gitconfig and allows to create symboloic link privilege(or git clone on admin) and set enrvironemnt variable like this command `setx MSYS winsymlinks:nativestrict`(privilege).
 
 Author Info
 ---

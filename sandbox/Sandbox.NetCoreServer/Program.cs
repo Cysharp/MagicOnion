@@ -44,7 +44,7 @@ namespace Sandbox.NetCoreServer
 
             var options = new MagicOnionOptions(true)
             {
-                // MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
+                //MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 GlobalFilters = new MagicOnionFilterAttribute[]
                 {
@@ -53,58 +53,53 @@ namespace Sandbox.NetCoreServer
                 DisableEmbeddedService = true,
             };
 
-            var magicOnionRun = new HostBuilder().UseMagicOnion(options, new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure)).RunConsoleAsync();
-            //var service = MagicOnionEngine.BuildServerServiceDefinition();
 
-            //var server = new global::Grpc.Core.Server
-            //{
-            //    Services = { service },
-            //    Ports = { new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure) }
-            //};
-
-            //server.Start();
+            var magicOnionHost = MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+                .UseMagicOnion(options, new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+                .UseConsoleLifetime()
+                .Build();
+            var magicOnionRun = magicOnionHost.RunAsync();
 
             // test webhost
 
             // NuGet: Microsoft.AspNetCore.Server.Kestrel
-            //var webHost = new WebHostBuilder()
-            //    .ConfigureServices(collection =>
-            //    {
-            //        // Add MagicOnionServiceDefinition for reference from Startup.
-            //        collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
-            //    })
-            //    .UseKestrel()
-            //    .UseStartup<Startup>()
-            //    .UseUrls("http://localhost:5432")
-            //    .Build();
+            var webHost = new WebHostBuilder()
+                .ConfigureServices(collection =>
+                {
+                    // Add MagicOnionServiceDefinition for reference from Startup.
+                    collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
+                })
+                .UseKestrel()
+                .UseStartup<Startup>()
+                .UseUrls("http://localhost:5432")
+                .Build();
 
-            //webHost.RunAsync();
-
-
+            await Task.WhenAll(webHost.RunAsync(), magicOnionRun);
 
 
             //webHost.Run();
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
 
-            {
-                var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-                var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
+            //{
+            //    var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+            //    var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
 
-                Console.WriteLine("Call to Server");
-                await client.JoinAsync("me", "foo");
-                await Task.WhenAll(
-                    client.SendMessageAsync("a"),
-                    client.SendMessageAsync("b"),
-                    client.SendMessageAsync("c"),
-                    client.SendMessageAsync("d"),
-                    client.SendMessageAsync("e"));
+            //    Console.WriteLine("Call to Server");
+            //    await client.JoinAsync("me", "foo");
+            //    await Task.WhenAll(
+            //        client.SendMessageAsync("a"),
+            //        client.SendMessageAsync("b"),
+            //        client.SendMessageAsync("c"),
+            //        client.SendMessageAsync("d"),
+            //        client.SendMessageAsync("e"));
 
-                Console.WriteLine("OK to Send");
-            }
+            //    Console.WriteLine("OK to Send");
+            //    await client.DisposeAsync();
+            //    await channel.ShutdownAsync();
+            //}
 
-            await magicOnionRun;
 
         }
 
