@@ -12,8 +12,10 @@ namespace ChatApp.Server
         {
             GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
 
-            await new HostBuilder()
-                .UseMagicOnion(new[] { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }, new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true })
+            await MagicOnionHost.CreateDefaultBuilder()
+                .UseMagicOnion(
+                    new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+                    new ServerPort("localhost", 12345, ServerCredentials.Insecure))
                 .RunConsoleAsync();
         }
     }

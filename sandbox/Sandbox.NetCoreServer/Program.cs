@@ -58,7 +58,6 @@ namespace Sandbox.NetCoreServer
                 .UseMagicOnion(options, new ServerPort("localhost", 12345, ServerCredentials.Insecure))
                 .UseConsoleLifetime()
                 .Build();
-            var magicOnionRun = magicOnionHost.RunAsync();
 
             // test webhost
 
@@ -74,7 +73,7 @@ namespace Sandbox.NetCoreServer
                 .UseUrls("http://localhost:5432")
                 .Build();
 
-            await Task.WhenAll(webHost.RunAsync(), magicOnionRun);
+            await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
 
 
             //webHost.Run();

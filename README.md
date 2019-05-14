@@ -101,9 +101,13 @@ Console.WriteLine("Client Received:" + result);
 
 MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules. 
 
+> for Server Hosting, We recommend to use `MagicOnion.Hosting`, it is easy to host and wait terminate signal, load from config, support DI, etc. see [MagicOnion#hosting](https://github.com/Cysharp/MagicOnion#hosting) section.
+
 StreamingHub
 ---
 StreamingHub is a fully-typed realtime server<->client communication framework.
+
+This sample is for Unity(use Vector3, GameObject, etc) but StreamingHub supports .NET Core, too.
 
 ```csharp
 // Server -> Client definition
@@ -183,6 +187,86 @@ public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGami
 }
 ```
 
+You can write client like this.
+
+```csharp
+public class GamingHubClient : IGamingHubReceiver
+{
+    Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
+ 
+    IGamingHub client;
+ 
+    public async Task<GameObject> ConnectAsync(Channel grpcChannel, string roomName, string playerName)
+    {
+        var client = StreamingHubClient.Connect<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
+ 
+        var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
+        foreach (var player in roomPlayers)
+        {
+            (this as IGamingHubReceiver).OnJoin(player);
+        }
+ 
+        return players[playerName];
+    }
+ 
+    // methods send to server.
+ 
+    public Task LeaveAsync()
+    {
+        return client.LeaveAsync();
+    }
+ 
+    public Task MoveAsync(Vector3 position, Quaternion rotation)
+    {
+        return client.MoveAsync(position, rotation);
+    }
+ 
+    // dispose client-connection before channel.ShutDownAsync is important!
+    public Task DisposeAsync()
+    {
+        return client.DisposeAsync();
+    }
+ 
+    // You can watch connection state, use this for retry etc.
+    public Task WaitForDisconnect()
+    {
+        return client.WaitForDisconnect();
+    }
+ 
+    // Receivers of message from server.
+ 
+    void IGamingHubReceiver.OnJoin(Player player)
+    {
+        Debug.Log("Join Player:" + player.Name);
+ 
+        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.name = player.Name;
+        cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
+        players[player.Name] = cube;
+    }
+ 
+    void IGamingHubReceiver.OnLeave(Player player)
+    {
+        Debug.Log("Leave Player:" + player.Name);
+ 
+        if (players.TryGetValue(player.Name, out var cube))
+        {
+            GameObject.Destroy(cube);
+        }
+    }
+ 
+    void IGamingHubReceiver.OnMove(Player player)
+    {
+        Debug.Log("Move Player:" + player.Name);
+ 
+        if (players.TryGetValue(player.Name, out var cube))
+        {
+            cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
+        }
+    }
+}
+```
+
 Filter
 ---
 MagicOnion filter is powerful feature to hook before-after invoke. It is useful than gRPC server interceptor.
@@ -241,6 +325,7 @@ Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it
 | `ILookup<Type, Attribute> AttributeLookup | Cached Attributes that merged both service and method. |
 | `ServerCallContext` CallContext | Raw gRPC Context. |
 | `IFormatterResolver` FormatterResolver | Using MessagePack resolver. |
+| `IServiceLocator` ServiceLocator | Get the registered service. |
 
 `Items` is useful, for example authentication filter add UserId to Items and take out from service method.
 
@@ -467,17 +552,55 @@ I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspne
 * Install-Package MagicOnion.Hosting
 
 ```csharp
-// with the `Microsoft.Extensions.Hosting` package.
+// using MagicOnion.Hosting
 static async Task Main(string[] args)
 {
-    // IHostBuilder.UseMagicOnion to enable MagicOnion
-    await new HostBuilder()
-        .UseMagicOnion(new[] { new ServerPort("localhost", 12345, ServerCredentials.Insecure) })
+    // you can use new HostBuilder() instead of CreateDefaultBuilder
+    await MagicOnionHost.CreateDefaultBuilder()
+        .UseMagicOnion(
+            new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+            new ServerPort("localhost", 12345, ServerCredentials.Insecure))
         .RunConsoleAsync();
 }
 ```
 
 If you can want to load configuration, set logging, etc, see .NET Generic Host documantation.
+
+CreateDefaultBuilder's setup details is same as [MicroBatchFramework](https://github.com/Cysharp/MicroBatchFramework), it is similar as `WebHost.CreateDefaultBuilder` on ASP.NET Core. for the details, see [MicroBatchFramework#configure-configuration](https://github.com/Cysharp/MicroBatchFramework#configure-configuration)
+
+DI
+---
+You can use DI(constructor injection) by GenericHost.
+
+```csharp
+static async Task Main(string[] args)
+{
+    await MagicOnionHost.CreateDefaultBuilder()
+        .ConfigureServices((hostContext, services) =>
+        {
+            // DI, you can register types on this section.
+
+            // mapping config json to IOption<MyConfig>
+            // requires "Microsoft.Extensions.Options.ConfigurationExtensions" package
+            services.Configure<MyConfig>(hostContext.Configuration);
+        })
+        .RunConsoleAsync();
+}
+
+public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+{
+    IOptions<MyConfig> config;
+    ILogger<MyFirstService> logger;
+
+    public MyFirstService(IOptions<MyConfig> config, ILogger<MyFirstService> logger)
+    {
+        this.config = config;
+        this.logger = logger;
+    }
+
+    // ...
+}
+```
 
 Swagger
 ---
@@ -490,32 +613,28 @@ HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Se
 ```csharp
 static void Main(string[] args)
 {
-    // gRPC definition.
-    GrpcEnvironment.SetLogger(new ConsoleLogger());
-    var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
-    {
-        MagicOnionLogger = new MagicOnionLogToGrpcLogger()
-    });
-    var server = new global::Grpc.Core.Server
-    {
-        Services = { service },
-        Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
-    };
-    server.Start();
+    // setup MagicOnion hosting.
+    var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
+        .UseMagicOnion(
+            new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+            new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+        .UseConsoleLifetime()
+        .Build();
 
     // NuGet: Microsoft.AspNetCore.Server.Kestrel
     var webHost = new WebHostBuilder()
         .ConfigureServices(collection =>
         {
             // Add MagicOnionServiceDefinition for reference from Startup.
-            collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
+            collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
         })
         .UseKestrel()
         .UseStartup<Startup>()
         .UseUrls("http://localhost:5432")
         .Build();
 
-    webHost.Run(); // Hosting HTTP/1
+    // Run and wait both.
+    await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
 }
 
 // WebAPI Startup configuration.
