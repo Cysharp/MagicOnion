@@ -64,7 +64,7 @@ jobs:
       - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r linux-x64 -o ./bin/moc/linux-x64
       - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r osx-x64 -o ./bin/moc/osx-x64
       - run: apt update && apt install zip -y
-      - run: zip -r moc.zip ./bin/moc
+      - run: zip -r moc.zip ./src/MagicOnion.UniversalCodeGenerator/bin/moc
       - store_artifacts:
           path: moc.zip
           destination: moc.zip
