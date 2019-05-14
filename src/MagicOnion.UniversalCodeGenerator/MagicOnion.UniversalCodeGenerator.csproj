@@ -4,10 +4,15 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp2.1</TargetFramework>
         <RootNamespace>MagicOnion.CodeGenerator</RootNamespace>
-        <ToolCommandName>dotnet-moc</ToolCommandName>
-        <PackAsTool>true</PackAsTool>
+        <!--<ToolCommandName>dotnet-moc</ToolCommandName>
+        <PackAsTool>true</PackAsTool>-->
         <AssemblyName>moc</AssemblyName>
+        <CodeAnalysisRuleSet>NoWarn.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="NoWarn.ruleset" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Buildalyzer.Workspaces" Version="2.2.0" />
@@ -24,6 +29,10 @@
         <Reference Include="System.Core">
             <HintPath>System.Core</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Resource Include="NoWarn.ruleset" />
     </ItemGroup>
 
     <ItemGroup>
