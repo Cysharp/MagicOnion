@@ -32,6 +32,7 @@ namespace MagicOnion.Server
         internal readonly bool isReturnExceptionStackTraceInErrorDetail;
         internal readonly IMagicOnionLogger logger;
         readonly bool enableCurrentContext;
+        readonly IServiceLocator serviceLocator;
 
         // use for request handling.
 
@@ -47,13 +48,18 @@ namespace MagicOnion.Server
         // reflection cache
         static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
+        static readonly MethodInfo register = typeof(IServiceLocator).GetMethods()
+            .First(x => x.Name == nameof(IServiceLocator.Register) && x.GetParameters().Length == 0);
+        static readonly MethodInfo createService = typeof(ServiceLocatorHelper).GetMethod(nameof(ServiceLocatorHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         public MethodHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo, string methodName)
         {
             this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
 
+            var serviceInterfaceType = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0];
+
             this.ServiceType = classType;
-            this.ServiceName = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0].Name;
+            this.ServiceName = serviceInterfaceType.Name;
             this.MethodInfo = methodInfo;
             this.MethodName = methodName;
             MethodType mt;
@@ -82,11 +88,15 @@ namespace MagicOnion.Server
             this.isReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
             this.logger = options.MagicOnionLogger;
             this.enableCurrentContext = options.EnableCurrentContext;
+            this.serviceLocator = options.ServiceLocator;
+
+            // register DI
+            register.MakeGenericMethod(classType).Invoke(this.serviceLocator, null);
 
             // prepare lambda parameters
+            var createServiceMethodInfo = createService.MakeGenericMethod(classType, serviceInterfaceType);
             var contextArg = Expression.Parameter(typeof(ServiceContext), "context");
-            var contextBind = Expression.Bind(classType.GetProperty("Context"), contextArg);
-            var instance = Expression.MemberInit(Expression.New(classType), contextBind);
+            var instance = Expression.Call(createServiceMethodInfo, contextArg);
 
             switch (MethodType)
             {
@@ -343,7 +353,7 @@ namespace MagicOnion.Server
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator)
             {
                 Request = request
             };
@@ -411,7 +421,7 @@ namespace MagicOnion.Server
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator)
             {
                 RequestStream = requestStream
             };
@@ -459,7 +469,7 @@ namespace MagicOnion.Server
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator)
             {
                 ResponseStream = responseStream,
                 Request = request
@@ -503,7 +513,7 @@ namespace MagicOnion.Server
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator)
             {
                 RequestStream = requestStream,
                 ResponseStream = responseStream

@@ -7,11 +7,13 @@ using MagicOnion.Server;
 using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
+using MagicOnion.Hosting;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Sandbox.NetCoreServer.Hubs;
 using Sandbox.NetCoreServer.Services;
 using System;
@@ -27,6 +29,8 @@ namespace Sandbox.NetCoreServer
     {
         static async Task Main(string[] args)
         {
+            // ServiceLocatorHelper.CreateService<UnaryService, ICalcSerivce>(null);
+
             const string GrpcHost = "localhost";
 
             Console.WriteLine("Server:::");
@@ -38,59 +42,65 @@ namespace Sandbox.NetCoreServer
 
             GrpcEnvironment.SetLogger(new ConsoleLogger());
 
-            var service = MagicOnionEngine.BuildServerServiceDefinition(new MagicOnionOptions(true)
+            var options = new MagicOnionOptions(true)
             {
-                // MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
+                //MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 GlobalFilters = new MagicOnionFilterAttribute[]
                 {
                 },
                 EnableCurrentContext = true,
                 DisableEmbeddedService = true,
-            });
-
-            var server = new global::Grpc.Core.Server
-            {
-                Services = { service },
-                Ports = { new ServerPort(GrpcHost, 12345, ServerCredentials.Insecure) }
             };
 
-            server.Start();
+
+            var magicOnionHost = MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+                .UseMagicOnion(options, new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+                .UseConsoleLifetime()
+                .Build();
+            var magicOnionRun = magicOnionHost.RunAsync();
 
             // test webhost
 
-        // NuGet: Microsoft.AspNetCore.Server.Kestrel
-        var webHost = new WebHostBuilder()
-            .ConfigureServices(collection =>
-            {
-                // Add MagicOnionServiceDefinition for reference from Startup.
-                collection.Add(new ServiceDescriptor(typeof(MagicOnionServiceDefinition), service));
-            })
-            .UseKestrel()
-            .UseStartup<Startup>()
-            .UseUrls("http://localhost:5432")
-            .Build();
+            // NuGet: Microsoft.AspNetCore.Server.Kestrel
+            var webHost = new WebHostBuilder()
+                .ConfigureServices(collection =>
+                {
+                    // Add MagicOnionServiceDefinition for reference from Startup.
+                    collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
+                })
+                .UseKestrel()
+                .UseStartup<Startup>()
+                .UseUrls("http://localhost:5432")
+                .Build();
 
-        webHost.Run();
-
-            Console.ReadLine();
+            await Task.WhenAll(webHost.RunAsync(), magicOnionRun);
 
 
-            {
-                var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-                var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
+            //webHost.Run();
 
-                Console.WriteLine("Call to Server");
-                await client.JoinAsync("me", "foo");
-                await Task.WhenAll(
-                    client.SendMessageAsync("a"),
-                    client.SendMessageAsync("b"),
-                    client.SendMessageAsync("c"),
-                    client.SendMessageAsync("d"),
-                    client.SendMessageAsync("e"));
+            //Console.ReadLine();
 
-                Console.WriteLine("OK to Send");
-            }
+
+            //{
+            //    var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+            //    var client = StreamingHubClient.Connect<IChatHub, IMessageReceiver2>(channel, new Receiver());
+
+            //    Console.WriteLine("Call to Server");
+            //    await client.JoinAsync("me", "foo");
+            //    await Task.WhenAll(
+            //        client.SendMessageAsync("a"),
+            //        client.SendMessageAsync("b"),
+            //        client.SendMessageAsync("c"),
+            //        client.SendMessageAsync("d"),
+            //        client.SendMessageAsync("e"));
+
+            //    Console.WriteLine("OK to Send");
+            //    await client.DisposeAsync();
+            //    await channel.ShutdownAsync();
+            //}
+
+
         }
 
         static void CheckUnsfeResolver()
@@ -100,7 +110,7 @@ namespace Sandbox.NetCoreServer
                 UnsafeDirectBlitResolver.Instance,
 
                 BuiltinResolver.Instance
-                
+
                 );
 
             var f = new Foo { A = 10, B = 9999, C = 9999999 };

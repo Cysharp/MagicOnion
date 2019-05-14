@@ -2,6 +2,7 @@
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,6 +30,11 @@ namespace Sandbox.NetCoreServer.Hubs
         // insantiate per user connected and live while connecting.
         string userName;
         IGroup room;
+
+        public ChatHub(ILogger<ChatHub> hoggaer)
+        {
+
+        }
 
         public async Task JoinAsync(string userName, string roomName)
         {

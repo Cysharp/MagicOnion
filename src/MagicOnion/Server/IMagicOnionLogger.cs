@@ -135,7 +135,6 @@ namespace MagicOnion.Server
         public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
         {
             GrpcEnvironment.Logger.Debug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
-
         }
     }
 

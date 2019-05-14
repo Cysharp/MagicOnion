@@ -1,15 +1,19 @@
-﻿namespace MagicOnion.Server
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace MagicOnion.Server
 {
     public interface IServiceLocator
     {
         T GetService<T>();
-        void Register<T>(T service);
-        void Unregister<T>();
+        void Register<T>(); // transient
+        void Register<T>(T singleton);
     }
 
     public class DefaultServiceLocator : IServiceLocator
     {
-        public static readonly DefaultServiceLocator Instance = new DefaultServiceLocator();
+        public static readonly IServiceLocator Instance = new DefaultServiceLocator();
 
         DefaultServiceLocator()
         {
@@ -18,22 +22,39 @@
 
         public T GetService<T>()
         {
-            return Cache<T>.cache;
+            return Cache<T>.cache();
         }
 
-        public void Register<T>(T service)
+        public void Register<T>(T singleton)
         {
-            Cache<T>.cache = service;
+            Cache<T>.cache = () => singleton;
         }
 
-        public void Unregister<T>()
+        public void Register<T>()
         {
-            Cache<T>.cache = default(T);
+            if (!typeof(T).GetConstructors().Any(x => x.GetParameters().Length == 0))
+            {
+                throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", typeof(T).FullName));
+            }
+
+            var factory = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+            Cache<T>.cache = factory;
         }
 
         static class Cache<T>
         {
-            public static T cache;
+            public static Func<T> cache;
+        }
+    }
+
+    internal static class ServiceLocatorHelper
+    {
+        internal static TServiceBase CreateService<TServiceBase, TServiceInterface>(ServiceContext context)
+            where TServiceBase : ServiceBase<TServiceInterface>
+        {
+            var instance = context.ServiceLocator.GetService<TServiceBase>();
+            instance.Context = context;
+            return instance;
         }
     }
 }
