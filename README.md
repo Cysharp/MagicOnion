@@ -611,30 +611,37 @@ MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) int
 HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
 
 ```csharp
-static void Main(string[] args)
+// using MagicOnion.Hosting;
+// using Microsoft.Extensions.DependencyInjection;
+// using Microsoft.Extensions.Hosting;
+
+class Program
 {
-    // setup MagicOnion hosting.
-    var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
-        .UseMagicOnion(
-            new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
-            new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-        .UseConsoleLifetime()
-        .Build();
+    static async Task Main(string[] args)
+    {
+        // setup MagicOnion hosting.
+        var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
+            .UseMagicOnion(
+                new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+                new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+            .UseConsoleLifetime()
+            .Build();
 
-    // NuGet: Microsoft.AspNetCore.Server.Kestrel
-    var webHost = new WebHostBuilder()
-        .ConfigureServices(collection =>
-        {
-            // Add MagicOnionServiceDefinition for reference from Startup.
-            collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
-        })
-        .UseKestrel()
-        .UseStartup<Startup>()
-        .UseUrls("http://localhost:5432")
-        .Build();
+        // NuGet: Microsoft.AspNetCore.Server.Kestrel
+        var webHost = new WebHostBuilder()
+            .ConfigureServices(collection =>
+            {
+                // Add MagicOnionServiceDefinition for reference from Startup.
+                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
+            })
+            .UseKestrel()
+            .UseStartup<Startup>()
+            .UseUrls("http://localhost:5432")
+            .Build();
 
-    // Run and wait both.
-    await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
+        // Run and wait both.
+        await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
+    }
 }
 
 // WebAPI Startup configuration.
