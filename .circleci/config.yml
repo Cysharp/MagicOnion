@@ -47,7 +47,7 @@ jobs:
     steps:
       - checkout
       # build .NET Core projects
-      - run: dotnet build ./src/MagicOnion/ -c Release -f netstandard2.0 -p:Version=${CIRCLE_TAG}
+      - run: dotnet build ./src/MagicOnion/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:Version=${CIRCLE_TAG}
