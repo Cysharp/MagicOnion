@@ -35,7 +35,7 @@ jobs:
     executor: dotnet
     steps:
       - checkout
-      - run: dotnet build ./src/MagicOnion/ -c Debug -f netstandard2.0
+      - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
       - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
@@ -52,8 +52,8 @@ jobs:
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:Version=${CIRCLE_TAG}
       # tests
-      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
-      - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
+      # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
+      # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
       # pack nuget
       - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
