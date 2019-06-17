@@ -3,6 +3,7 @@ using MessagePack;
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,6 +60,7 @@ namespace MagicOnion.Server.Hubs
         int approximatelyLength;
 
         readonly object gate = new object();
+        readonly HashSet<string> atomicGate = new HashSet<string>();
 
         readonly IGroupRepository parent;
         readonly IFormatterResolver resolver;
@@ -68,6 +70,8 @@ namespace MagicOnion.Server.Hubs
         IInMemoryStorage inmemoryStorage;
 
         public string GroupName { get; }
+
+        public bool IsEmpty => approximatelyLength == 0;
 
         public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
         {
@@ -98,6 +102,22 @@ namespace MagicOnion.Server.Hubs
                 }
 
                 return (IInMemoryStorage<T>)inmemoryStorage;
+            }
+        }
+
+        public (bool, T) AtomicRegister<T>(string key, Func<T> action)
+        {
+            lock (atomicGate)
+            {
+                if (atomicGate.Contains(key))
+                {
+                    return (false, default);
+                }
+                else
+                {
+                    atomicGate.Add(key);
+                    return (true, action());
+                }
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -156,6 +157,8 @@ namespace MagicOnion.Server.Hubs
     public interface IGroup
     {
         string GroupName { get; }
+        bool IsEmpty { get; }
+        (bool, T) AtomicRegister<T>(string key, Func<T> action);
         IInMemoryStorage<T> GetInMemoryStorage<T>() where T : class;
         ValueTask<int> GetMemberCountAsync();
         ValueTask AddAsync(ServiceContext context);
@@ -175,7 +178,7 @@ namespace MagicOnion.Server.Hubs
     public interface IInMemoryStorage<T> : IInMemoryStorage
         where T : class
     {
-        ICollection<T> AllValues { get; }
+        IEnumerable<T> AllValues { get; }
         void Set(Guid connectionId, T value);
         T Get(Guid connectionId);
     }
@@ -185,7 +188,8 @@ namespace MagicOnion.Server.Hubs
     {
         readonly ConcurrentDictionary<Guid, T> storage = new ConcurrentDictionary<Guid, T>();
 
-        public ICollection<T> AllValues => storage.Values;
+        // ConcurrentDictionary.Values collect all values(in lock) and create new List, should avoid.
+        public IEnumerable<T> AllValues => storage.Select(x => x.Value);
 
         public void Set(Guid id, T value)
         {
@@ -202,6 +206,27 @@ namespace MagicOnion.Server.Hubs
         public void Remove(Guid id)
         {
             storage.TryRemove(id, out _);
+        }
+    }
+
+    public static class GroupBroadcastExtensions
+    {
+        public static TReceiver Broadcast<TReceiver>(this IGroup group)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
+            return (TReceiver)Activator.CreateInstance(type, group);
+        }
+
+        public static TReceiver BroadcastExcept<TReceiver>(this IGroup group, Guid except)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, except });
+        }
+
+        public static TReceiver BroadcastExcept<TReceiver>(this IGroup group, Guid[] excepts)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts });
         }
     }
 }

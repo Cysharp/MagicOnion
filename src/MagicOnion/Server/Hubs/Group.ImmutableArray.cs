@@ -2,6 +2,7 @@
 using MessagePack;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
@@ -54,6 +55,7 @@ namespace MagicOnion.Server.Hubs
     public class ImmutableArrayGroup : IGroup
     {
         readonly object gate = new object();
+        readonly HashSet<string> atomicGate = new HashSet<string>();
         readonly IGroupRepository parent;
         readonly IFormatterResolver resolver;
         readonly IMagicOnionLogger logger;
@@ -62,6 +64,8 @@ namespace MagicOnion.Server.Hubs
         IInMemoryStorage inmemoryStorage;
 
         public string GroupName { get; }
+
+        public bool IsEmpty => members.Length == 0;
 
         public ImmutableArrayGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
         {
@@ -92,6 +96,22 @@ namespace MagicOnion.Server.Hubs
                 }
 
                 return (IInMemoryStorage<T>)inmemoryStorage;
+            }
+        }
+
+        public (bool, T) AtomicRegister<T>(string key, Func<T> action)
+        {
+            lock (atomicGate)
+            {
+                if (atomicGate.Contains(key))
+                {
+                    return (false, default);
+                }
+                else
+                {
+                    atomicGate.Add(key);
+                    return (true, action());
+                }
             }
         }
 
@@ -216,7 +236,7 @@ namespace MagicOnion.Server.Hubs
 
                     WriteInAsyncLockVoid(source[i], message);
                     writeCount++;
-                NEXT:
+                    NEXT:
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -239,7 +259,7 @@ namespace MagicOnion.Server.Hubs
 
                     promise.Add(WriteInAsyncLock(source[i], message));
                     writeCount++;
-                NEXT:
+                    NEXT:
                     continue;
                 }
 
@@ -279,7 +299,7 @@ namespace MagicOnion.Server.Hubs
                         }
                         WriteInAsyncLockVoid(source[i], message);
                         writeCount++;
-                    NEXT:
+                        NEXT:
                         continue;
                     }
                 }
@@ -313,7 +333,7 @@ namespace MagicOnion.Server.Hubs
 
                         promise.Add(WriteInAsyncLock(source[i], message));
                         writeCount++;
-                    NEXT:
+                        NEXT:
                         continue;
                     }
                 }

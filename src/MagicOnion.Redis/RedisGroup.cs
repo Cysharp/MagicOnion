@@ -95,6 +95,19 @@ namespace MagicOnion.Redis
             throw new NotSupportedException("InMemoryStorage does not support in RedisGroup.");
         }
 
+        public bool IsEmpty
+        {
+            get
+            {
+                throw new NotSupportedException("IsEmpty does not support in RedisGroup.");
+            }
+        }
+
+        public (bool, T) AtomicRegister<T>(string key, Func<T> action)
+        {
+            throw new NotSupportedException("AtomicRegister does not support in RedisGroup.");
+        }
+
         public async ValueTask AddAsync(ServiceContext context)
         {
             await database.StringIncrementAsync(counterKey, 1).ConfigureAwait(false);
