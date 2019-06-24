@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="OpenTelemetry" Version="0.1.0-alpha-86593" />
         <PackageReference Include="OpenTelemetry.Abstractions" Version="0.1.0-alpha-86593" />
     </ItemGroup>
 
