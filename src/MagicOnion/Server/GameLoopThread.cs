@@ -10,19 +10,37 @@ namespace MagicOnion.Server
         bool MoveNext();
     }
 
+    public interface IGameLoopLogger
+    {
+        void Elapsed(int threadNumber, int processCount, int elapsedMilliseconds);
+        void UnhandledException(int threadNumber, Exception exception);
+    }
+
+    class NullGameLoopLogger : IGameLoopLogger
+    {
+        public void Elapsed(int threadNumber, int processCount, int elapsedMilliseconds)
+        {
+        }
+
+        public void UnhandledException(int threadNumber, Exception exception)
+        {
+        }
+    }
+
     public sealed class GameLoopThreadPool
     {
         readonly GameLoopThread[] threads;
         int index = -1;
 
-        public GameLoopThreadPool(int frameMilliseconds)
+        public GameLoopThreadPool(int targetFramerate, int threadPoolCount = -1, IGameLoopLogger logger = null)
         {
-            int threadPoolCount = Math.Max(1, Environment.ProcessorCount);
+            if (threadPoolCount < 0) threadPoolCount = Environment.ProcessorCount;
+            threadPoolCount = Math.Max(1, threadPoolCount);
 
             var pool = new GameLoopThread[threadPoolCount];
             for (int i = 0; i < pool.Length; i++)
             {
-                pool[i] = new GameLoopThread(frameMilliseconds, i);
+                pool[i] = new GameLoopThread(targetFramerate, i, logger);
             }
 
             this.threads = pool;
@@ -44,7 +62,7 @@ namespace MagicOnion.Server
 
         readonly object runningAndQueueLock = new object();
         readonly object arrayLock = new object();
-        readonly Action<Exception> unhandledExceptionCallback;
+        readonly IGameLoopLogger logger;
 
         readonly Stopwatch stopwatch = new Stopwatch();
         bool isStopped = false;
@@ -54,12 +72,10 @@ namespace MagicOnion.Server
         IGameLoopAction[] loopItems = new IGameLoopAction[InitialSize];
         MinimumQueue<IGameLoopAction> waitQueue = new MinimumQueue<IGameLoopAction>(InitialSize);
 
-        public GameLoopThread(int frameMilliseconds, int threadNumber)
+        public GameLoopThread(int targetFrameRate, int threadNumber, IGameLoopLogger logger)
         {
-            // TODO:...
-            // this.unhandledExceptionCallback = ex => Debug.LogException(ex);
-
-            this.frameMilliseconds = frameMilliseconds;
+            this.logger = logger ?? new NullGameLoopLogger();
+            this.frameMilliseconds = 1000 / targetFrameRate;
             this.thread = new Thread(new ParameterizedThreadStart(RunInThread), 32 * 1024) // Stack, 32K
             {
                 Name = "GameLoopThread" + threadNumber,
@@ -101,11 +117,14 @@ namespace MagicOnion.Server
         {
             while (!isStopped)
             {
+                stopwatch.Restart();
+
                 lock (runningAndQueueLock)
                 {
                     running = true;
                 }
 
+                var processCount = 0;
                 lock (arrayLock)
                 {
                     var j = tail - 1;
@@ -118,6 +137,7 @@ namespace MagicOnion.Server
                         {
                             try
                             {
+                                processCount++;
                                 if (!action.MoveNext())
                                 {
                                     loopItems[i] = null;
@@ -132,7 +152,7 @@ namespace MagicOnion.Server
                                 loopItems[i] = null;
                                 try
                                 {
-                                    unhandledExceptionCallback(ex);
+                                    logger.UnhandledException(threadNumber, ex);
                                 }
                                 catch { }
                             }
@@ -146,6 +166,7 @@ namespace MagicOnion.Server
                             {
                                 try
                                 {
+                                    processCount++;
                                     if (!fromTail.MoveNext())
                                     {
                                         loopItems[j] = null;
@@ -167,7 +188,7 @@ namespace MagicOnion.Server
                                     j--;
                                     try
                                     {
-                                        unhandledExceptionCallback(ex);
+                                        logger.UnhandledException(threadNumber, ex);
                                     }
                                     catch { }
                                     continue; // next j
@@ -201,8 +222,15 @@ namespace MagicOnion.Server
                     }
                 }
 
-                // TODO:sleep logic.
-                Thread.Sleep(frameMilliseconds);
+                stopwatch.Stop();
+                var elapsed = (int)stopwatch.ElapsedMilliseconds;
+                logger.Elapsed(threadNumber, processCount, elapsed);
+
+                var restRate = frameMilliseconds - elapsed;
+                if (restRate > 0)
+                {
+                    Thread.Sleep(restRate);
+                }
             }
         }
 

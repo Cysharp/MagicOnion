@@ -158,7 +158,8 @@ namespace MagicOnion.Server.Hubs
     {
         string GroupName { get; }
         bool IsEmpty { get; }
-        (bool, T) AtomicRegister<T>(string key, Func<T> action);
+        (bool, T) AtomicInvoke<T>(string key, Func<T> action);
+        bool AtomicInvoke(string key, Action action);
         IInMemoryStorage<T> GetInMemoryStorage<T>() where T : class;
         ValueTask<int> GetMemberCountAsync();
         ValueTask AddAsync(ServiceContext context);
@@ -211,19 +212,19 @@ namespace MagicOnion.Server.Hubs
 
     public static class GroupBroadcastExtensions
     {
-        public static TReceiver Broadcast<TReceiver>(this IGroup group)
+        public static TReceiver CreateBroadcaster<TReceiver>(this IGroup group)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
             return (TReceiver)Activator.CreateInstance(type, group);
         }
 
-        public static TReceiver BroadcastExcept<TReceiver>(this IGroup group, Guid except)
+        public static TReceiver CreateBroadcasterExcept<TReceiver>(this IGroup group, Guid except)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
             return (TReceiver)Activator.CreateInstance(type, new object[] { group, except });
         }
 
-        public static TReceiver BroadcastExcept<TReceiver>(this IGroup group, Guid[] excepts)
+        public static TReceiver CreateBroadcasterExcept<TReceiver>(this IGroup group, Guid[] excepts)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
             return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts });

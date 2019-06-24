@@ -105,7 +105,7 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        public (bool, T) AtomicRegister<T>(string key, Func<T> action)
+        public (bool, T) AtomicInvoke<T>(string key, Func<T> action)
         {
             lock (atomicGate)
             {
@@ -117,6 +117,23 @@ namespace MagicOnion.Server.Hubs
                 {
                     atomicGate.Add(key);
                     return (true, action());
+                }
+            }
+        }
+
+        public bool AtomicInvoke(string key, Action action)
+        {
+            lock (atomicGate)
+            {
+                if (atomicGate.Contains(key))
+                {
+                    return false;
+                }
+                else
+                {
+                    atomicGate.Add(key);
+                    action();
+                    return true;
                 }
             }
         }

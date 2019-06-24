@@ -103,9 +103,14 @@ namespace MagicOnion.Redis
             }
         }
 
-        public (bool, T) AtomicRegister<T>(string key, Func<T> action)
+        public (bool, T) AtomicInvoke<T>(string key, Func<T> action)
         {
-            throw new NotSupportedException("AtomicRegister does not support in RedisGroup.");
+            throw new NotSupportedException("AtomicInvoke does not support in RedisGroup.");
+        }
+
+        public bool AtomicInvoke(string key, Action action)
+        {
+            throw new NotSupportedException("AtomicInvoke does not support in RedisGroup.");
         }
 
         public async ValueTask AddAsync(ServiceContext context)

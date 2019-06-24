@@ -27,6 +27,22 @@ namespace Sandbox.NetCoreServer
 {
     class Program
     {
+        class TestGameLoopLogger : IGameLoopLogger
+        {
+            long before;
+
+            public void Elapsed(int threadNumber, int processCount, int elapsedMilliseconds)
+            {
+                var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                Console.WriteLine(threadNumber + ":" + elapsedMilliseconds + ", " + (now - before));
+                before = now;
+            }
+
+            public void UnhandledException(int threadNumber, Exception exception)
+            {
+            }
+        }
+
         static async Task Main(string[] args)
         {
             // ServiceLocatorHelper.CreateService<UnaryService, ICalcSerivce>(null);

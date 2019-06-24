@@ -18,25 +18,25 @@ namespace MagicOnion.Server.Hubs
         [Ignore]
         protected TReceiver Broadcast(IGroup group)
         {
-            return group.Broadcast<TReceiver>();
+            return group.CreateBroadcaster<TReceiver>();
         }
 
         [Ignore]
         protected TReceiver BroadcastExceptSelf(IGroup group)
         {
-            return group.BroadcastExcept<TReceiver>(Context.ContextId);
+            return group.CreateBroadcasterExcept<TReceiver>(Context.ContextId);
         }
 
         [Ignore]
         protected TReceiver BroadcastExcept(IGroup group, Guid except)
         {
-            return group.BroadcastExcept<TReceiver>(except);
+            return group.CreateBroadcasterExcept<TReceiver>(except);
         }
 
         [Ignore]
         protected TReceiver BroadcastExcept(IGroup group, Guid[] excepts)
         {
-            return group.BroadcastExcept<TReceiver>(excepts);
+            return group.CreateBroadcasterExcept<TReceiver>(excepts);
         }
 
         /// <summary>
