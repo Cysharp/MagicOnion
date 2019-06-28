@@ -223,11 +223,13 @@ namespace MagicOnion.CodeGenerator
                 if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
                 {
                     var array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
-                    if (embeddedTypes.Contains(array.ToString())) continue;
-                    MakeArray(array, genericInfos);
-                    if (array.ElementType.TypeKind == TypeKind.Enum)
+                    if (!embeddedTypes.Contains(array.ToString()))
                     {
-                        MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                        MakeArray(array, genericInfos);
+                        if (array.ElementType.TypeKind == TypeKind.Enum)
+                        {
+                            MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                        }
                     }
                 }
                 else if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
