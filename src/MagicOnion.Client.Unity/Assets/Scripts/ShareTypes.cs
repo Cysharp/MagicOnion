@@ -215,6 +215,11 @@ namespace Sandbox.NetCoreServer.Hubs
         Task LeaveAsync();
         Task SendMessageAsync(string message);
     }
+
+    public interface ITestService : IService<ITestService>
+    {
+        UnaryResult<long[]> FooBarBaz(string x, long y);
+    }
 }
 
 namespace Sandbox.NetCoreServer
