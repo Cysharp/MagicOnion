@@ -22,6 +22,7 @@ namespace MagicOnion
             if(isRegistered) return;
             isRegistered = true;
 
+            MagicOnionClientRegistry<Sandbox.NetCoreServer.Hubs.ITestService>.Register((x, y) => new Sandbox.NetCoreServer.Hubs.ITestServiceClient(x, y));
             MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y));
 
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IGamingHub, Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IGamingHubClient(a, b, c, d, e));
@@ -163,6 +164,85 @@ namespace MagicOnion.Formatters
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+namespace Sandbox.NetCoreServer.Hubs {
+    using MagicOnion;
+    using MagicOnion.Client;
+    using Grpc.Core;
+    using MessagePack;
+
+    public class ITestServiceClient : MagicOnionClientBase<global::Sandbox.NetCoreServer.Hubs.ITestService>, global::Sandbox.NetCoreServer.Hubs.ITestService
+    {
+        static readonly Method<byte[], byte[]> FooBarBazMethod;
+
+        static ITestServiceClient()
+        {
+            FooBarBazMethod = new Method<byte[], byte[]>(MethodType.Unary, "ITestService", "FooBarBaz", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+        }
+
+        ITestServiceClient()
+        {
+        }
+
+        public ITestServiceClient(CallInvoker callInvoker, IFormatterResolver resolver)
+            : base(callInvoker, resolver)
+        {
+        }
+
+        protected override MagicOnionClientBase<ITestService> Clone()
+        {
+            var clone = new ITestServiceClient();
+            clone.host = this.host;
+            clone.option = this.option;
+            clone.callInvoker = this.callInvoker;
+            clone.resolver = this.resolver;
+            return clone;
+        }
+
+        public new ITestService WithHeaders(Metadata headers)
+        {
+            return base.WithHeaders(headers);
+        }
+
+        public new ITestService WithCancellationToken(System.Threading.CancellationToken cancellationToken)
+        {
+            return base.WithCancellationToken(cancellationToken);
+        }
+
+        public new ITestService WithDeadline(System.DateTime deadline)
+        {
+            return base.WithDeadline(deadline);
+        }
+
+        public new ITestService WithHost(string host)
+        {
+            return base.WithHost(host);
+        }
+
+        public new ITestService WithOptions(CallOptions option)
+        {
+            return base.WithOptions(option);
+        }
+   
+        public global::MagicOnion.UnaryResult<long[]> FooBarBaz(string x, long y)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, long>(x, y), base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(FooBarBazMethod, base.host, base.option, __request);
+            return new UnaryResult<long[]>(__callResult, base.resolver);
+        }
+    }
+}
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
