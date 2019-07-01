@@ -35,7 +35,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5A3F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server", "samples\ChatApp\ChatApp.Server\ChatApp.Server.csproj", "{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.OpenTelemetry", "src\MagicOnion.OpenTelemetry\MagicOnion.OpenTelemetry.csproj", "{39136B3A-3CD6-42EC-ACFB-4067230D241E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.OpenTelemetry", "src\MagicOnion.OpenTelemetry\MagicOnion.OpenTelemetry.csproj", "{39136B3A-3CD6-42EC-ACFB-4067230D241E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-201F-4255-9ADA-622B52D2A6ED}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.circleci\config.yml = .circleci\config.yml
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

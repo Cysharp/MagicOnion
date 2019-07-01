@@ -84,19 +84,20 @@ namespace MagicOnion.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(11)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(12)
             {
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::UnityEngine.Vector3, global::UnityEngine.Quaternion>), 0 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int, int>), 1 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, int>), 2 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<int, string, double>), 3 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>), 4 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 5 },
-                {typeof(global::Sandbox.NetCoreServer.Hubs.Player[]), 6 },
-                {typeof(global::Sandbox.NetCoreServer.Hubs.TestObject[]), 7 },
-                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 8 },
-                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 9 },
-                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 10 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, long>), 4 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>), 5 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<string, string>), 6 },
+                {typeof(global::Sandbox.NetCoreServer.Hubs.Player[]), 7 },
+                {typeof(global::Sandbox.NetCoreServer.Hubs.TestObject[]), 8 },
+                {typeof(global::Sandbox.NetCoreServer.Services.OreOreResponse[]), 9 },
+                {typeof(global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>), 10 },
+                {typeof(global::Sandbox.NetCoreServer.Services.TestEnum), 11 },
             };
         }
 
@@ -114,13 +115,14 @@ namespace MagicOnion.Resolvers
                 case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>(default(int), default(int), default(int));
                 case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, int>(default(int), default(int));
                 case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<int, string, double>(default(int), default(string), default(double));
-                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(default(string), default(string), default(global::UnityEngine.Vector3), default(global::UnityEngine.Quaternion));
-                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
-                case 6: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.Player>();
-                case 7: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.TestObject>();
-                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 9: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
-                case 10: return new MagicOnion.Formatters.TestEnumFormatter();
+                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, long>(default(string), default(long));
+                case 5: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string, global::UnityEngine.Vector3, global::UnityEngine.Quaternion>(default(string), default(string), default(global::UnityEngine.Vector3), default(global::UnityEngine.Quaternion));
+                case 6: return new global::MagicOnion.DynamicArgumentTupleFormatter<string, string>(default(string), default(string));
+                case 7: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.Player>();
+                case 8: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Hubs.TestObject>();
+                case 9: return new global::MessagePack.Formatters.ArrayFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 10: return new global::MessagePack.Formatters.ListFormatter<global::Sandbox.NetCoreServer.Services.OreOreResponse>();
+                case 11: return new MagicOnion.Formatters.TestEnumFormatter();
                 default: return null;
             }
         }
