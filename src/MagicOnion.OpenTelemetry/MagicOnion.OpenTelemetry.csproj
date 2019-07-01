@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RestoreAdditionalProjectSources>
+            https://www.myget.org/F/opentelemetry/api/v3/index.json;
+        </RestoreAdditionalProjectSources>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenTelemetry" Version="0.1.0-alpha-86593" />
+        <PackageReference Include="OpenTelemetry.Abstractions" Version="0.1.0-alpha-86593" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
+    </ItemGroup>
+
+</Project>

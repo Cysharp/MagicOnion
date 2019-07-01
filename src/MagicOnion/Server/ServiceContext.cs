@@ -72,6 +72,30 @@ namespace MagicOnion.Server
         // used in StreamingHub
         internal AsyncLock AsyncWriterLock { get; set; }
 
+        /// <summary>Get Raw Request.</summary>
+        public byte[] GetRawRequest()
+        {
+            return Request;
+        }
+
+        /// <summary>Set Raw Request, you can set before method body was called.</summary>
+        public void SetRawRequest(byte[] request)
+        {
+            Request = request;
+        }
+
+        /// <summary>Can get after method body was finished.</summary>
+        public byte[] GetRawResponse()
+        {
+            return Result;
+        }
+
+        /// <summary>Can set after method body was finished.</summary>
+        public void SetRawResponse(byte[] response)
+        {
+            Result = response;
+        }
+
         public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator)
         {
             this.ContextId = Guid.NewGuid();
