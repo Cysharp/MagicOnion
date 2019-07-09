@@ -112,6 +112,15 @@ private async void RegisterDisconnectEvent(IChatHub streamingClient)
 }
 ```
 
+## Dynamic coexistence of Server and Unity project files.
+The Server project is removed every time Unity regenerates a solution file.  
+With a class that extends `AssetPostprocessor` and a method of `OnGeneratedSlnSolution`
+An arbitrary project file is automatically included when a solution file is generated.  
+This ensures that the Server and Unity project files co-exist.  
+  
+The Sample implementation is as follows:.
+https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs
+
 
 ## How to run the app
 1. Launch `ChatApp.Server` from VisualStudio.  
