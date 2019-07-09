@@ -170,7 +170,7 @@ workflows:
           
 ```
 
-Here is the sample of deploy [Google Cloud PlatformÅiGCPÅj](https://console.cloud.google.com/) by CircleCI.
+Here is the sample of deploy [Google Cloud Platform(GCP)](https://console.cloud.google.com/) by CircleCI.
 ```yml
 version: 2.1
 orbs:
