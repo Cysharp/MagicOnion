@@ -122,7 +122,6 @@ The Sample implementation is as follows:.
 https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs
 
 ## Pack to Docker and deploy
----
 If you hosting the samples on a server, recommend to use container. Add Dockerfile like below.
 
 ```dockerfile
