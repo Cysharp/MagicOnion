@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.3</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://www.myget.org/F/opentelemetry/api/v3/index.json;
+    </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,10 +15,15 @@
 
   <ItemGroup>
     <PackageReference Include="MagicOnion.Hosting" Version="2.1.0" />
+    <PackageReference Include="OpenTelemetry" Version="0.1.0-alpha-86593" />
+    <PackageReference Include="OpenTelemetry.Abstractions" Version="0.1.0-alpha-86593" />
+    <PackageReference Include="OpenTelemetry.Exporter.Stackdriver" Version="0.1.0-alpha-86593" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.1.0-alpha-86593" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="LinkFromUnity\" />
+    <Folder Include="MagicOnion.OpenTelemetry\" />
   </ItemGroup>
 
 </Project>

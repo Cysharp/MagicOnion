@@ -1,8 +1,14 @@
-﻿using Grpc.Core;
+﻿using System.Threading.Tasks;
+using Grpc.Core;
 using MagicOnion.Hosting;
+using MagicOnion.OpenTelemetry;
 using MagicOnion.Server;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading.Tasks;
+using OpenTelemetry.Exporter.Prometheus;
+using OpenTelemetry.Stats;
+using OpenTelemetry.Tags;
+using OpenTelemetry.Trace;
 
 namespace ChatApp.Server
 {
@@ -12,9 +18,21 @@ namespace ChatApp.Server
         {
             GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
 
-            await MagicOnionHost.CreateDefaultBuilder()
+            var options = new PrometheusExporterOptions { Url = "http://localhost:9182/metrics/" };
+            var exporter = new PrometheusExporter(options, Stats.ViewManager);
+            exporter.Start();
+
+            await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+                .ConfigureServices(collection =>
+                {
+                    collection.AddSingleton<ITracer>(Tracing.Tracer);
+                })
                 .UseMagicOnion(
-                    new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+                    new MagicOnionOptions()
+                    {
+                        GlobalFilters = new[] { new OpenTelemetryCollectorFilter(null) },
+                        MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger)
+                    },
                     new ServerPort("localhost", 12345, ServerCredentials.Insecure))
                 .RunConsoleAsync();
         }
