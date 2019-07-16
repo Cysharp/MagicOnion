@@ -1,31 +1,120 @@
-﻿using Grpc.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using OpenTelemetry.Stats;
+using OpenTelemetry.Stats.Aggregations;
 using OpenTelemetry.Stats.Measures;
 using OpenTelemetry.Tags;
 using OpenTelemetry.Trace;
-using System;
-using System.Threading.Tasks;
 
 namespace MagicOnion.OpenTelemetry
 {
     public class OpenTelemetryCollectorLogger : IMagicOnionLogger
     {
-        static readonly IMeasureDouble BuildServiceDefinition = MeasureDouble.Create("MagicOnion/measure/BuildServiceDefinition", "Service build time.", "ms");
-
-        static readonly IMeasureDouble UnaryElapsed = MeasureDouble.Create("MagicOnion/measure/UnaryElapsed", "Unary API elapsed time.", "ms");
-        static readonly IMeasureLong UnaryResponseSize = MeasureLong.Create("MagicOnion/measure/UnaryResponseSize", "Unary API response size.", "bytes");
-        static readonly IMeasureLong UnaryErrorCount = MeasureLong.Create("MagicOnion/measure/UnaryErrorCount", "Unary API error Count.", "num");
-
-        static readonly IMeasureDouble StreamingHubElapsed = MeasureDouble.Create("MagicOnion/measure/StreamingHubElapsed", "StreamingHub API elapsed time.", "ms");
-        static readonly IMeasureLong StreamingHubResponseSize = MeasureLong.Create("MagicOnion/measure/StreamingHubResponseSize", "StreamingHub API response size.", "bytes");
-        static readonly IMeasureLong StreamingHubErrorCount = MeasureLong.Create("MagicOnion/measure/StreamingHubErrorCount", "StreamingHub API error Count.", "num");
-
-        static readonly IMeasureLong ConnectCount = MeasureLong.Create("MagicOnion/measure/Connect", "StreamingHub connect count.", "num");
-        static readonly IMeasureLong DisconnectCount = MeasureLong.Create("MagicOnion/measure/Disconnect", "StreamingHub disconnect count.", "num");
-
         static readonly TagKey MethodKey = TagKey.Create("MagicOnion/keys/Method");
+        static readonly List<TagKey> MethodKeys = new List<TagKey>() { MethodKey };
+
+        #region BuildServiceDefinition
+        static readonly string BuildServiceDefinitionName = "MagicOnion/measure/BuildServiceDefinition";
+        static readonly IMeasureDouble BuildServiceDefinition = MeasureDouble.Create(BuildServiceDefinitionName, "Service build time.", "ms");
+        private static readonly IView BuildServiceDefinitionView = View.Create(
+            name: ViewName.Create(BuildServiceDefinitionName),
+            description: string.Empty,
+            measure: BuildServiceDefinition,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region UnaryResponseSize
+        static readonly string UnaryResponseSizeName = "MagicOnion/measure/UnaryResponseSize";
+        static readonly IMeasureLong UnaryResponseSize = MeasureLong.Create(UnaryResponseSizeName, "Unary API response size.", "bytes");
+        private static readonly IView UnaryResponseSizeView = View.Create(
+            name: ViewName.Create(UnaryResponseSizeName),
+            description: string.Empty,
+            measure: UnaryResponseSize,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region UnaryErrorCount
+        static readonly string UnaryErrorCountName = "MagicOnion/measure/UnaryErrorCount";
+        static readonly IMeasureLong UnaryErrorCount = MeasureLong.Create(UnaryErrorCountName, "Unary API error Count.", "num");
+        private static readonly IView UnaryErrorCountView = View.Create(
+            name: ViewName.Create(UnaryErrorCountName),
+            description: string.Empty,
+            measure: UnaryErrorCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region UnaryElapsed
+        static readonly string UnaryElapsedName = "MagicOnion/measure/UnaryElapsed";
+        static readonly IMeasureDouble UnaryElapsed = MeasureDouble.Create(UnaryElapsedName, "Unary API elapsed time.", "ms");
+        private static readonly IView UnaryElapsedView = View.Create(
+            name: ViewName.Create(UnaryElapsedName),
+            description: string.Empty,
+            measure: UnaryElapsed,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region StreamingHubErrorCount
+        static readonly string StreamingHubErrorCountName = "MagicOnion/measure/StreamingHubErrorCount";
+        static readonly IMeasureLong StreamingHubErrorCount = MeasureLong.Create(StreamingHubErrorCountName, "StreamingHub API error Count.", "num");
+        private static readonly IView StreamingHubErrorCountView = View.Create(
+            name: ViewName.Create(StreamingHubErrorCountName),
+            description: string.Empty,
+            measure: StreamingHubErrorCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region StreamingHubElapsed
+        static readonly string StreamingHubElapsedName = "MagicOnion/measure/StreamingHubElapsed";
+        static readonly IMeasureDouble StreamingHubElapsed = MeasureDouble.Create(StreamingHubElapsedName, "StreamingHub API elapsed time.", "ms");
+        private static readonly IView StreamingHubElapsedView = View.Create(
+            name: ViewName.Create(StreamingHubElapsedName),
+            description: string.Empty,
+            measure: StreamingHubElapsed,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region StreamingHubResponseSize
+        static readonly string StreamingHubResponseSizeName = "MagicOnion/measure/StreamingHubResponseSize";
+        static readonly IMeasureLong StreamingHubResponseSize = MeasureLong.Create(StreamingHubResponseSizeName, "StreamingHub API response size.", "bytes");
+        private static readonly IView StreamingHubResponseSizeView = View.Create(
+            name: ViewName.Create(StreamingHubResponseSizeName),
+            description: string.Empty,
+            measure: StreamingHubResponseSize,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region ConnectCount
+        static readonly string ConnectCountName = "MagicOnion/measure/Connect";
+        static readonly IMeasureLong ConnectCount = MeasureLong.Create(ConnectCountName, "StreamingHub connect count.", "num");
+        private static readonly IView ConnectCountView = View.Create(
+            name: ViewName.Create(ConnectCountName),
+            description: string.Empty,
+            measure: ConnectCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region DisconnectCount
+        static readonly string DisconnectCountName = "MagicOnion/measure/Disconnect";
+        static readonly IMeasureLong DisconnectCount = MeasureLong.Create(DisconnectCountName, "StreamingHub disconnect count.", "num");
+        private static readonly IView DisconnectCountView = View.Create(
+            name: ViewName.Create(DisconnectCountName),
+            description: string.Empty,
+            measure: DisconnectCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
 
         readonly IStatsRecorder statsRecorder;
         readonly ITagger tagger;
@@ -36,6 +125,17 @@ namespace MagicOnion.OpenTelemetry
             this.statsRecorder = statsRecorder;
             this.tagger = tagger;
             this.defaultTags = defaultTags ?? TagContext.Empty;
+
+            // Viewの登録
+            Stats.ViewManager.RegisterView(BuildServiceDefinitionView);
+            Stats.ViewManager.RegisterView(UnaryResponseSizeView);
+            Stats.ViewManager.RegisterView(UnaryErrorCountView);
+            Stats.ViewManager.RegisterView(UnaryElapsedView);
+            Stats.ViewManager.RegisterView(ConnectCountView);
+            Stats.ViewManager.RegisterView(DisconnectCountView);
+            Stats.ViewManager.RegisterView(StreamingHubErrorCountView);
+            Stats.ViewManager.RegisterView(StreamingHubElapsedView);
+            Stats.ViewManager.RegisterView(StreamingHubResponseSizeView);
         }
 
         ITagContext CreateTag(ServiceContext context)
@@ -144,11 +244,11 @@ namespace MagicOnion.OpenTelemetry
                 try
                 {
                     span.SetAttribute("component", "grpc");
-                    span.SetAttribute("request.size", context.GetRawRequest().LongLength);
+                    //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
 
                     await Next(context);
 
-                    span.SetAttribute("response.size", context.GetRawResponse().LongLength);
+                    //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
                     span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
                     span.Status = ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
                 }
