@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ChatApp.Server": {
+      "commandName": "Project"
+    }
+  }
+}

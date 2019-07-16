@@ -1,0 +1,52 @@
+version: '3'
+services:
+  magiconion:
+    image: magiconion_chatsample:dev
+    build:
+      context: .
+      dockerfile: ChatApp.Server/Dockerfile
+    ports:
+      - 12345:12345
+      - 9182:9182
+    restart: always
+  prometheus:
+    image: prom/prometheus:v2.11.1
+    container_name: prometheus
+    volumes:
+      # persistent prometheus database
+      - ./prometheus/data/:/prometheus
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/config/alert.rules:/etc/prometheus/alert.rules
+    ports:
+      - "9090:9090"
+    restart: always
+  exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - 9100:9100
+    restart: always
+  cAdvisor:
+    image: google/cadvisor:latest
+    container_name: docker-container
+    ports:
+      - 8080:8080
+    restart: always
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      # persistent grafana database
+      - ./grafana/:/var/lib/grafana
+    ports:
+      - 3000:3000
+    restart: always
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager/config.yml:/etc/alertmanager/config.yml
+    command: "--config.file=/etc/alertmanager/config.yml"
+    ports:
+      - 9093:9093
+    restart: always
