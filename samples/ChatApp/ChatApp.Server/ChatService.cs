@@ -7,6 +7,11 @@ namespace ChatApp.Server
 {
     public class ChatService : ServiceBase<IChatService>, IChatService
     {
+        public UnaryResult<Nil> GenerateException(string message)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public UnaryResult<Nil> SendReportAsync(string message)
         {
             Logger.Debug($"{message}");

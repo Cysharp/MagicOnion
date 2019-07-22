@@ -1,6 +1,7 @@
 ﻿using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using MagicOnion.Server.Hubs;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,7 +15,6 @@ namespace ChatApp.Server
     {
         private IGroup room;
         private string myName;
-
 
         public async Task JoinAsync(JoinRequest request)
         {
@@ -33,20 +33,35 @@ namespace ChatApp.Server
             this.Broadcast(this.room).OnLeave(this.myName);
         }
 
-
         public async Task SendMessageAsync(string message)
         {
-            var response = new MessageResponse {  UserName = this.myName, Message = message };
+            var response = new MessageResponse { UserName = this.myName, Message = message };
             this.Broadcast(this.room).OnSendMessage(response);
 
             await Task.CompletedTask;
         }
 
+        public Task GenerateException(string message)
+        {
+            throw new Exception(message);
+        }
+
+        public Task UnaryGenerateException(string message)
+        {
+            throw new Exception(message);
+        }
 
         // It is not called because it is a method as a sample of arguments.
         public Task SampleMethod(List<int> sampleList, Dictionary<int, string> sampleDictionary)
         {
             throw new System.NotImplementedException();
+        }
+
+        protected override ValueTask OnDisconnected()
+        {
+            // handle disconnection if needed.
+            // on disconnecting, if automatically removed this connection from group.
+            return CompletedTask;
         }
     }
 }
