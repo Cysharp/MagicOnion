@@ -8,6 +8,10 @@ services:
     ports:
       - 12345:12345
       - 9182:9182
+    environment:
+      - PROMETHEUS_EXPORTER_HOST=+
+      - PROMETHEUS_EXPORTER_PORT=9182
+      - MAGICONION_HOST=0.0.0.0
     restart: always
   prometheus:
     image: prom/prometheus:v2.11.1

@@ -2241,7 +2241,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.02, y: 0.02}
   m_AnchorMax: {x: 0.98, y: 0.98}
-  m_AnchoredPosition: {x: 0, y: 5.5300217}
+  m_AnchoredPosition: {x: 0, y: 5.530022}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1522127879
@@ -2427,6 +2427,7 @@ MonoBehaviour:
   SendReportButton: {fileID: 190778108}
   DisconnectButon: {fileID: 1096149281}
   ExceptionButton: {fileID: 2120537443}
+  UnaryExceptionButton: {fileID: 0}
 --- !u!1 &1671399961
 GameObject:
   m_ObjectHideFlags: 0
@@ -2647,7 +2648,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 817501238}
   m_Direction: 3
   m_Value: 1
-  m_Size: 0.99999994
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
