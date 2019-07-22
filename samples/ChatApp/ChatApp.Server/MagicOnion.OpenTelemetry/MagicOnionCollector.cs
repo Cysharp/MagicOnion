@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -153,7 +153,7 @@ namespace MagicOnion.OpenTelemetry
 
         public void EndBuildServiceDefinition(double elapsed)
         {
-            statsRecorder.NewMeasureMap().Put(BuildServiceDefinition, elapsed).Record(defaultTags);
+            statsRecorder.NewMeasureMap().Put(BuildServiceDefinition, elapsed).Record(CreateTag(nameof(BuildServiceDefinition)));
         }
 
         public void BeginInvokeMethod(ServiceContext context, byte[] request, Type type)
