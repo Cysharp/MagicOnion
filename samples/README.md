@@ -129,7 +129,6 @@ This ensures that the Server and Unity project files co-exist.
 The Sample implementation is as follows:.
 https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs
 
-
 ## How to run the app
 1. Launch `ChatApp.Server` from VisualStudio.  
 2. Run `ChatScene` from UnityEditor.  
