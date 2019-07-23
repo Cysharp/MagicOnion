@@ -24,7 +24,7 @@ services:
     ports:
       - "9090:9090"
     restart: always
-  exporter:
+  node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
     ports:
@@ -32,13 +32,19 @@ services:
     restart: always
   cAdvisor:
     image: google/cadvisor:latest
-    container_name: docker-container
+    container_name: cAdvisor
+    volumes:
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
     ports:
       - 8080:8080
     restart: always
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    depends_on:
+      - prometheus
     volumes:
       # persistent grafana database
       - ./grafana/:/var/lib/grafana
