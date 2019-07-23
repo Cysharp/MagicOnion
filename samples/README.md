@@ -6,7 +6,8 @@ https://github.com/Cysharp/MagicOnion
 
 ## Getting started
 
-Sample Serverside MagicOnion and telemetry containers can ran with docker-compose, run `docker-compose build` then `docker-compose up`. (make sure docker is installed and file system sharing is enabled.)
+Sample Serverside MagicOnion can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
+If you want run MagiconOnion with telemetry containers please run with docker-compose, run `docker-compose build` then run `docker-compose up`. (make sure docker is installed and file system sharing is enabled.)
 
 Sample Clientside Unity can ran with Unity 2019.1.10f1, then start on unity editor.
 
