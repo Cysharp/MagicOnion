@@ -176,13 +176,6 @@ namespace Assets.Scripts
             await this.streamingClient.GenerateException("client exception(streaminghub)!");
         }
 
-        public async void UnaryGenerateException()
-        {
-            // unary
-            // todo: recover from exception and re-connect
-            await this.client.GenerateException("client exception(unary)！");
-        }
-
         public async void SampleMethod()
         {
             throw new System.NotImplementedException();
@@ -209,12 +202,19 @@ namespace Assets.Scripts
         #endregion
 
 
-        #region Client -> Server
+        #region Client -> Server (Unary)
         public async void SendReport()
         {
             await this.client.SendReportAsync(this.ReportInput.text);
 
             this.ReportInput.text = string.Empty;
+        }
+
+        public async void UnaryGenerateException()
+        {
+            // unary
+            // todo: recover from exception and re-connect
+            await this.client.GenerateException("client exception(unary)！");
         }
         #endregion
     }
