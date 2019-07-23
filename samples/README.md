@@ -4,6 +4,13 @@ Provides a sample of a simple chat app using MagicOnion.
 Please see here about MagicOnion itself.  
 https://github.com/Cysharp/MagicOnion
 
+## Getting started
+
+Sample Serverside MagicOnion and telemetry containers can ran with docker-compose, run `docker-compose build` then `docker-compose up`. (make sure docker is installed and file system sharing is enabled.)
+
+Sample Clientside Unity can ran with Unity 2019.1.10f1, then start on unity editor.
+
+Now unity client automatically connect to MagicOnion, try chat app!
 
 ## Solution configuration
 Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
@@ -127,3 +134,85 @@ https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/
 2. Run `ChatScene` from UnityEditor.  
 
 If you want to connect simultaneously and chat, build Unity and launch it from the exe file.
+
+## Telemetry
+
+Sample offers Telemetly collected via OpenTelemetry.
+
+When you launch docker-compose, followings set of service will launch for you.
+
+* **MagicOnion** stats export on http://localhost:9182/metrics/.
+* **cAdvisor** launch on http://localhost:8080.
+* **Prometheus** launch on http://localhost:9090.
+* **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
+* optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
+
+To configure grafana dashboard, follow the steps.
+
+* add DataSource: Data Souces> add > Prometheus (prometheus URL will be https://prometheus:9090)
+* add Dashboard:
+    * **Prometheus 2.0 Stats** dashboard: open Data Source > prometheus > dashboard tab > add Prometheus 2.0 Stats
+    * **Docker and Host Monitoring w/ Prometheus** dashboard (cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/179
+    * **MagicOnion Overview** dashboard (MagicOnion & cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/10584
+    * optional: **node_exporter 1.8** dashboard: open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/1860
+
+Now you can observe MagicOnion metrics throw Grafana.
+
+![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
+
+To configure your metrics, open `MagicOnion.sln` > samples > `ChatApp.Server` project > `MagicOnionCollector.cs`.
+
+OpenTelemetryCollectorLogger implements IMagicOnionLogger and hook it's timing to collect metrics.
+
+```csharp
+namespace MagicOnion.Server
+{
+    public interface IMagicOnionLogger
+    {
+        void BeginBuildServiceDefinition();
+        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
+        void EndBuildServiceDefinition(double elapsed);
+        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
+        void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
+        void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
+        void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
+        void WriteToStream(ServiceContext context, byte[] writeData, Type type);
+    }
+}
+```
+
+To implement your own metrics, define `IView` and register it `Stats.ViewManager.RegisterView(YOUR_VIEW);`, then send metrics.
+There are several way to send metrics.
+
+* Send each metrics each line.
+
+```chsarp
+statsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record(CreateTag(context));
+```
+
+* Put many metrics and send at once: 
+
+```csharp
+var map = statsRecorder.NewMeasureMap(); map.Put(UnaryElapsed, elapsed);
+map.Put(UnaryElapsed, elapsed);
+map.Put(UnaryResponseSize, response.LongLength);
+if (isErrorOrInterrupted)
+{
+    map.Put(UnaryErrorCount, 1);
+}
+
+map.Record(CreateTag(context));
+```
+
+* create tag scope and set number of metrics.
+
+```csharp
+var tagContextBuilder = Tagger.CurrentBuilder.Put(FrontendKey, TagValue.Create("mobile-ios9.3.5"));
+using (var scopedTags = tagContextBuilder.BuildScoped())
+{
+    StatsRecorder.NewMeasureMap().Put(VideoSize, values[0] * MiB).Record();
+}
+```
+
+Make sure your View's column, and metrics tag is matched. Otherwise none of metrics will shown.
