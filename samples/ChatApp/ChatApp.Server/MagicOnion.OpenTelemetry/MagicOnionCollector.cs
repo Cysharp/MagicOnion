@@ -116,6 +116,28 @@ namespace MagicOnion.OpenTelemetry
             columns: MethodKeys);
         #endregion
 
+        #region StreamingRequest
+        static readonly string StreamingRequestCountName = "MagicOnion/measure/StreamingRequest";
+        static readonly IMeasureLong StreamingRequestCount = MeasureLong.Create(StreamingRequestCountName, "StreamingHub request count.", "num");
+        private static readonly IView StreamingRequestCountView = View.Create(
+            name: ViewName.Create(StreamingRequestCountName),
+            description: string.Empty,
+            measure: StreamingRequestCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
+        #region UnaryRequest
+        static readonly string UnaryRequestCountName = "MagicOnion/measure/UnaryRequest";
+        static readonly IMeasureLong UnaryRequestCount = MeasureLong.Create(UnaryRequestCountName, "Unary request count.", "num");
+        private static readonly IView UnaryRequestCountView = View.Create(
+            name: ViewName.Create(UnaryRequestCountName),
+            description: string.Empty,
+            measure: UnaryRequestCount,
+            aggregation: Sum.Create(),
+            columns: MethodKeys);
+        #endregion
+
         readonly IStatsRecorder statsRecorder;
         readonly ITagger tagger;
         readonly ITagContext defaultTags;
@@ -132,6 +154,8 @@ namespace MagicOnion.OpenTelemetry
             Stats.ViewManager.RegisterView(UnaryResponseSizeView);
             Stats.ViewManager.RegisterView(ConnectCountView);
             Stats.ViewManager.RegisterView(DisconnectCountView);
+            Stats.ViewManager.RegisterView(StreamingRequestCountView);
+            Stats.ViewManager.RegisterView(UnaryRequestCountView);
             Stats.ViewManager.RegisterView(StreamingHubErrorCountView);
             Stats.ViewManager.RegisterView(StreamingHubElapsedView);
             Stats.ViewManager.RegisterView(StreamingHubResponseSizeView);
@@ -167,6 +191,10 @@ namespace MagicOnion.OpenTelemetry
             {
                 statsRecorder.NewMeasureMap().Put(ConnectCount, 1).Record(CreateTag(context));
             }
+            else if (context.MethodType == MethodType.Unary)
+            {
+                statsRecorder.NewMeasureMap().Put(UnaryRequestCount, 1).Record(CreateTag(context));
+            }
         }
 
         public void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted)
@@ -192,6 +220,7 @@ namespace MagicOnion.OpenTelemetry
 
         public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
         {
+            statsRecorder.NewMeasureMap().Put(StreamingRequestCount, 1).Record(CreateTag(context));
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
