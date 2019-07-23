@@ -29,16 +29,19 @@ scrape_configs:
     static_configs:
     - targets:
         -  prometheus:9090
-        -  node-exporter:9100
+        # if you want
+        #-  node-exporter:9100
 
-  - job_name: 'docker-container'
+  - job_name: 'cAdvisor'
     scrape_interval: 5s
     static_configs:
     - targets:
-       - 'docker-container:8080'
+       - 'cAdvisor:8080'
 
   - job_name: 'magiconion'
     scrape_interval: 5s
     static_configs:
     - targets:
        - 'magiconion:9182'
+      labels:
+        group: "magiconion"
