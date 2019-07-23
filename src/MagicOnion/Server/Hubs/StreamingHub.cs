@@ -174,6 +174,7 @@ namespace MagicOnion.Server.Hubs
                         }
                         catch (Exception ex)
                         {
+                            isErrorOrInterrupted = true;
                             LogError(ex, context);
                             await context.WriteErrorMessage((int)StatusCode.Internal, "Erorr on " + handler.ToString(), ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
                         }
