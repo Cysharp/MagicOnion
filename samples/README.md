@@ -145,6 +145,7 @@ When you launch docker-compose, followings set of service will launch for you.
 * **cAdvisor** launch on http://localhost:8080.
 * **Prometheus** launch on http://localhost:9090.
 * **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
+* **Alertmanager** to notify alert to Slack.
 * optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
 
 To configure grafana dashboard, follow the steps.
@@ -159,6 +160,8 @@ To configure grafana dashboard, follow the steps.
 Now you can observe MagicOnion metrics throw Grafana.
 
 ![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
+
+To configure alert, modify `prometheus/config/alert.rules` and set slack incoming url on `alertmanager/config.yml`.
 
 To configure your metrics, open `MagicOnion.sln` > samples > `ChatApp.Server` project > `MagicOnionCollector.cs`.
 
