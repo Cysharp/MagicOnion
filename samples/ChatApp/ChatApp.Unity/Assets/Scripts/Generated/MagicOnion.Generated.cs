@@ -285,12 +285,6 @@ namespace ChatApp.Shared.Hubs {
                     ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
                     break;
                 }
-                case 1192209272: // UnaryGenerateException
-                {
-                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
                 case -852153394: // SampleMethod
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
@@ -320,11 +314,6 @@ namespace ChatApp.Shared.Hubs {
         public global::System.Threading.Tasks.Task GenerateException(string message)
         {
             return WriteMessageWithResponseAsync<string, Nil>(517938971, message);
-        }
-
-        public global::System.Threading.Tasks.Task UnaryGenerateException(string message)
-        {
-            return WriteMessageWithResponseAsync<string, Nil>(1192209272, message);
         }
 
         public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)
@@ -375,11 +364,6 @@ namespace ChatApp.Shared.Hubs {
             public global::System.Threading.Tasks.Task GenerateException(string message)
             {
                 return __parent.WriteMessageAsync<string>(517938971, message);
-            }
-
-            public global::System.Threading.Tasks.Task UnaryGenerateException(string message)
-            {
-                return __parent.WriteMessageAsync<string>(1192209272, message);
             }
 
             public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)

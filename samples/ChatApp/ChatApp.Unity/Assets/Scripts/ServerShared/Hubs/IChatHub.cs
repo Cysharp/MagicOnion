@@ -19,8 +19,6 @@ namespace ChatApp.Shared.Hubs
 
         Task GenerateException(string message);
 
-        Task UnaryGenerateException(string message);
-
         // It is not called because it is a method as a sample of arguments.
         Task SampleMethod(List<int> sampleList, Dictionary<int, string> sampleDictionary);
     }

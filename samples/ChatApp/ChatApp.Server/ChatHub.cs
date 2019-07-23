@@ -46,11 +46,6 @@ namespace ChatApp.Server
             throw new Exception(message);
         }
 
-        public Task UnaryGenerateException(string message)
-        {
-            throw new Exception(message);
-        }
-
         // It is not called because it is a method as a sample of arguments.
         public Task SampleMethod(List<int> sampleList, Dictionary<int, string> sampleDictionary)
         {
