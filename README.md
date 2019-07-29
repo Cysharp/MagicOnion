@@ -914,7 +914,7 @@ static async Task DuplexStreamRun(IMyFirstService client)
 
 SSL/TLS
 ---
-As [official gRPC doc](https://grpc.io/docs/guides/auth/) notes, gRPC supports SSL/TLS and MagicOnion also support SSL/TLS. 
+As [official gRPC doc](https://grpc.io/docs/guides/auth/) notes gRPC supports SSL/TLS, and MagicOnion also support SSL/TLS. 
 
 > gRPC has SSL/TLS integration and promotes the use of SSL/TLS to authenticate the server, and to encrypt all the data exchanged between the client and the server. Optional mechanisms are available for clients to provide certificates for mutual authentication
 
@@ -957,7 +957,7 @@ Make sure `CN=xxxx` should match to domain that your MagicOnion Server will reci
 
 > ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
 
-**simulate dummy domain on localhost**
+### simulate dummy domain on localhost
 
 Editting `hosts` file is the simple way to redirect dummy domain request to your localhost.
 
@@ -989,7 +989,7 @@ pinging to dummy.example.com [127.0.0.1] 32 bytes data:
 127.0.0.1 response: bytecount =32 time <1ms TTL=128
 ```
 
-**server configuration**
+### server configuration
 
 > NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy them.
 
@@ -1052,7 +1052,7 @@ Application started. Press Ctrl+C to shut down.
 Hosting environment: Production
 ```
 
-**client configuration**
+### client configuration
 
 > NOTE: Client will use **server.crt**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
 
