@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -28,7 +29,7 @@ namespace ChatApp.Server
             var exporter = new PrometheusExporter(
                 new PrometheusExporterOptions()
                 {
-                    // put exporterHost "+" to listen to all hostnames and 0.0.0.0.
+                    // put PROMETHEUS_EXPORTER_HOST "+" to listen to all hostnames and 0.0.0.0.
                     Url = $"http://{exporterHost}:{exporterPort}/metrics/",
                 },
                 Stats.ViewManager);
@@ -45,8 +46,13 @@ namespace ChatApp.Server
                     {
                         GlobalFilters = new[] { new OpenTelemetryCollectorFilter(null) },
                         GlobalStreamingHubFilters = new[] { new OpenTelemetryHubCollectorFilter(null) },
-                        MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger)
+                        MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, new TagContext(new Dictionary<TagKey, TagValue>
+                        {
+                            // add version to all default metrics
+                            { TagKey.Create("version"), TagValue.Create("1.0.0") },
+                        }))
                     },
+                    // put MAGICONION_HOST "0.0.0.0" to listen to all ip address 0.0.0.0.
                     new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, ServerCredentials.Insecure))
                 .RunConsoleAsync();
         }
