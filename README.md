@@ -925,27 +925,27 @@ I will explain how to setup "SSL/TLS MagicOnion on localhost" with following 4 s
 * [server configuration](https://github.com/Cysharp/MagicOnion#server-configuration)
 * [client configuration](https://github.com/Cysharp/MagicOnion#client-configuration)
 
-I will use [samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server) for server project, and [samples/ChatApp/ChatApp.Unity](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity) for client project.
+Let's use [samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server) for server project, and [samples/ChatApp/ChatApp.Unity](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity) for client project.
 
 ### generate certificate
 
-Certificates are required to establish SSL/TLS with Server/Client connection.
+Certificates are required to establish SSL/TLS with Server/Client channel connection.
 Let's use [OpenSSL](https://github.com/openssl/openssl) to create required certificates.
 
 Following command will create 3 files `server.csr`, `server.key` and `server.crt`.
-gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt for create SSL/TLS channel connection.
+gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt.
 
 ```shell
 # move to your server project
 $ cd MagicOnion/samples/ChatApp/ChatApp.Server
 
 # generate certificates
-# NOTE: please match domain name to magic onion server host domain name
+# NOTE: CN=xxxx should match domain name to magic onion server pointing domain name
 $ openssl genrsa 2048 > server.key
 $ openssl req -new -sha256 -key server.key -out server.csr -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com"
 $ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
 
-# server will use server.crt and server.key, leave generated certificates
+# server will use server.crt and server.key, leave generated certificates.
 
 # client will use server.crt, copy certificate to StreamingAssets folder.
 $ mkdir ../ChatApp.Unity/Assets/StreamingAssets
@@ -961,8 +961,8 @@ Make sure `CN=xxxx` should match to domain that your MagicOnion Server will reci
 
 Editting `hosts` file is the simple way to redirect dummy domain request to your localhost.
 
-Let's set your CN, example is `dummy.example.com`, to you hosts. 
-Ppen hosts file and add your entry.
+Let's set your CN to you hosts, example is `dummy.example.com`. 
+Open hosts file and add your entry.
 
 ```shell
 # NOTE: edit hosts to test on localhost
@@ -991,7 +991,7 @@ pinging to dummy.example.com [127.0.0.1] 32 bytes data:
 
 **server configuration**
 
-> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
+> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy them.
 
 Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
 
@@ -1013,7 +1013,8 @@ Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging li
 </Project>
 ```
 
-Open `samples/ChatApp/ChatApp.Server/Program.cs`, there are default Insecure channel definition with `ServerCredentials.Insecure`, you need change this to use `SslServerCredentials`.
+Open `samples/ChatApp/ChatApp.Server/Program.cs`, there are default Insecure channel definition with `ServerCredentials.Insecure`.
+What you need is change this line to use `SslServerCredentials`.
 
 ```csharp
 new ServerPort("localhost", 12345, ServerCredentials.Insecure))
@@ -1055,7 +1056,9 @@ Hosting environment: Production
 
 > NOTE: Client will use **server.crt**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
 
-Open `samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs`, channel creation is defined in `InitializeClient()`.
+Open `samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs`, channel creation is defined as `ChannelCredentials.Insecure` in `InitializeClient()`.
+What you need tois change this line to use `SslCredentials`.
+
 
 ```csharp
 this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
