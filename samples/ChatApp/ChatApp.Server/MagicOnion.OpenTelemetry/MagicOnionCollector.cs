@@ -100,61 +100,61 @@ namespace MagicOnion.OpenTelemetry
                 columns: TagKeys);
             var unaryRequestCountView = View.Create(
                 name: ViewName.Create(UnaryRequestCountName),
-                description: string.Empty,
+                description: "Request count for Unary request.",
                 measure: UnaryRequestCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var unaryResponseSizeView = View.Create(
                 name: ViewName.Create(UnaryResponseSizeName),
-                description: "Response size for Unary Response.",
+                description: "Response size for Unary response.",
                 measure: UnaryResponseSize,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var unaryErrorCountView = View.Create(
                 name: ViewName.Create(UnaryErrorCountName),
-                description: "Error counts for Unary.",
+                description: "Error count for Unary request.",
                 measure: UnaryErrorCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var unaryElapsedView = View.Create(
                 name: ViewName.Create(UnaryElapsedName),
-                description: string.Empty,
+                description: "Elapsed time for Unary request.",
                 measure: UnaryElapsed,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var streamingHubErrorCountView = View.Create(
                 name: ViewName.Create(StreamingHubErrorCountName),
-                description: string.Empty,
+                description: "Error count for Streaminghub request.",
                 measure: StreamingHubErrorCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var streamingHubElapsedView = View.Create(
                 name: ViewName.Create(StreamingHubElapsedName),
-                description: string.Empty,
+                description: "Elapsed time for Streaminghub request.",
                 measure: StreamingHubElapsed,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var streamingHubRequestCountView = View.Create(
                 name: ViewName.Create(StreamingHubRequestCountName),
-                description: string.Empty,
+                description: "Request count for Streaminghub request.",
                 measure: StreamingHubRequestCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var streamingHubResponseSizeView = View.Create(
                 name: ViewName.Create(StreamingHubResponseSizeName),
-                description: string.Empty,
+                description: "Response size for Streaminghub request.",
                 measure: StreamingHubResponseSize,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var connectCountView = View.Create(
                 name: ViewName.Create(ConnectCountName),
-                description: string.Empty,
+                description: "Connect count for Streaminghub request. ConnectCount - DisconnectCount = current connect count. (successfully disconnected)",
                 measure: ConnectCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
             var disconnectCountView = View.Create(
                 name: ViewName.Create(DisconnectCountName),
-                description: string.Empty,
+                description: "Disconnect count for Streaminghub request. ConnectCount - DisconnectCount = current connect count. (successfully disconnected)",
                 measure: DisconnectCount,
                 aggregation: Sum.Create(),
                 columns: TagKeys);
@@ -279,7 +279,7 @@ namespace MagicOnion.OpenTelemetry
     }
 
     /// <summary>
-    /// global filter. handle Unary and most outside logging.
+    /// Global filter. Handle Unary and most outside logging.
     /// </summary>
     public class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
     {
@@ -328,7 +328,7 @@ namespace MagicOnion.OpenTelemetry
     }
 
     /// <summary>
-    /// streamingHub Filter. handle Streaming Hub logging.
+    /// StreamingHub Filter. Handle Streaming Hub logging.
     /// </summary>
     public class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
     {
