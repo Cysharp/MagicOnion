@@ -18,4 +18,14 @@
     <Folder Include="LinkFromUnity\" />
   </ItemGroup>
 
+  <!-- FOR SSL/TLS SUPPORT -->
+  <ItemGroup>
+    <None Update="server.crt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="server.key">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

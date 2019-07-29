@@ -912,6 +912,169 @@ static async Task DuplexStreamRun(IMyFirstService client)
 }
 ```
 
+SSL/TLS
+---
+As [official gRPC doc](https://grpc.io/docs/guides/auth/) notes, gRPC supports SSL/TLS and MagicOnion also support SSL/TLS. 
+
+> gRPC has SSL/TLS integration and promotes the use of SSL/TLS to authenticate the server, and to encrypt all the data exchanged between the client and the server. Optional mechanisms are available for clients to provide certificates for mutual authentication
+
+I will explain how to setup "SSL/TLS MagicOnion on localhost" with following 4 steps.
+
+* [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate)
+* [simulate dummy domain on localhost](https://github.com/Cysharp/MagicOnion#simulate-dummy-domain-on-localhost)
+* [server configuration](https://github.com/Cysharp/MagicOnion#server-configuration)
+* [client configuration](https://github.com/Cysharp/MagicOnion#client-configuration)
+
+I will use [samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server) for server project, and [samples/ChatApp/ChatApp.Unity](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity) for client project.
+
+### generate certificate
+
+Certificates are required to establish SSL/TLS with Server/Client connection.
+Let's use [OpenSSL](https://github.com/openssl/openssl) to create required certificates.
+
+Following command will create 3 files `server.csr`, `server.key` and `server.crt`.
+gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt for create SSL/TLS channel connection.
+
+```shell
+# move to your server project
+$ cd MagicOnion/samples/ChatApp/ChatApp.Server
+
+# generate certificates
+# NOTE: please match domain name to magic onion server host domain name
+$ openssl genrsa 2048 > server.key
+$ openssl req -new -sha256 -key server.key -out server.csr -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com"
+$ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
+
+# server will use server.crt and server.key, leave generated certificates
+
+# client will use server.crt, copy certificate to StreamingAssets folder.
+$ mkdir ../ChatApp.Unity/Assets/StreamingAssets
+$ cp server.crt ../ChatApp.Unity/Assets/StreamingAssets/server.crt
+```
+
+Please modify `/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com` as you need.
+Make sure `CN=xxxx` should match to domain that your MagicOnion Server will recieve request from your client.
+
+> ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
+
+**simulate dummy domain on localhost**
+
+Editting `hosts` file is the simple way to redirect dummy domain request to your localhost.
+
+Let's set your CN, example is `dummy.example.com`, to you hosts. 
+Ppen hosts file and add your entry.
+
+```shell
+# NOTE: edit hosts to test on localhost
+# Windows: (use scoop to install sudo, or open elevated cmd or notepad.)
+PS> sudo notepad c:\windows\system32\drivers\etc\hosts
+# macos:
+$ sudo vim /private/etc/hosts
+# Linux:
+$ sudo vim /etc/hosts
+```
+
+Entry format would be similar to this, please follow to your platform hosts rule.
+
+```shell
+127.0.0.1	dummy.example.com
+```
+
+After modifying hosts, `ping` to your dummy domain and confirm localhost is responding.
+
+```shell
+$ ping dummy.example.com
+
+pinging to dummy.example.com [127.0.0.1] 32 bytes data:
+127.0.0.1 response: bytecount =32 time <1ms TTL=128
+```
+
+**server configuration**
+
+> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
+
+Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
+
+```xml
+  <ItemGroup>
+    <Folder Include="LinkFromUnity\" />
+  </ItemGroup>
+
+  <!-- FOR SSL/TLS SUPPORT -->
+  <ItemGroup>
+    <None Update="server.crt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="server.key">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
+```
+
+Open `samples/ChatApp/ChatApp.Server/Program.cs`, there are default Insecure channel definition with `ServerCredentials.Insecure`, you need change this to use `SslServerCredentials`.
+
+```csharp
+new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+```
+
+Add following lines before `await MagicOnionHost.CreateDefaultBuilder()`
+
+```csharp
+var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+var certificates = new System.Collections.Generic.List<KeyCertificatePair> { new KeyCertificatePair(System.IO.File.ReadAllText("server.crt"), System.IO.File.ReadAllText("server.key")) };
+var credential = new SslServerCredentials(certificates);
+```
+
+You may required following using namespaces.
+
+```csharp
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.IO;
+```
+
+Replace existing `new ServerPort("localhost", 12345, ServerCredentials.Insecure))` line with following.
+
+```csharp
+new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
+```
+
+> NOTE: Replace `localhost` to `127.0.0.1` enforce IPv4 connection.
+
+Debug run server on Visual Studio, any IDE or docker.
+
+```shell
+D0729 11:08:21.767387 Grpc.Core.Internal.NativeExtension gRPC native library loaded successfully.
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Production
+```
+
+**client configuration**
+
+> NOTE: Client will use **server.crt**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
+
+Open `samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs`, channel creation is defined in `InitializeClient()`.
+
+```csharp
+this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+```
+
+Replace this line to following.
+
+```csharp
+var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
+this.channel = new Channel("dummy.example.com", 12345, serverCred);
+```
+
+Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOnion Server.
+
+![image](https://user-images.githubusercontent.com/3856350/62017554-1be97f00-b1f2-11e9-9769-70464fe6d425.png)
+
+> NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show `disconnected server.` log.
+
+
 Author Info
 ---
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
