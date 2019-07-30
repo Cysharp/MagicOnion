@@ -24,8 +24,8 @@ namespace ChatApp.Server
                 .UseMagicOnion(
                     new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
                     new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-                // for SSL/TLS Connection
-                //new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
+                    // for SSL/TLS Connection
+                    //new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
                 .RunConsoleAsync();
         }
     }
