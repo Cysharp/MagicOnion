@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -35,6 +35,11 @@ namespace ChatApp.Server
                 Stats.ViewManager);
             exporter.Start();
 
+            // for SSL/TLS connection
+            //var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            //var certificates = new List<KeyCertificatePair> { new KeyCertificatePair(File.ReadAllText("server.crt"), File.ReadAllText("server.key")) };
+            //var credential = new SslServerCredentials(certificates);
+
             await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
                 .ConfigureServices(collection =>
                 {
@@ -54,6 +59,8 @@ namespace ChatApp.Server
                     },
                     // put MAGICONION_HOST "0.0.0.0" to listen to all ip address 0.0.0.0.
                     new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, ServerCredentials.Insecure))
+                    // for SSL/TLS Connection
+                    //new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
                 .RunConsoleAsync();
         }
     }
