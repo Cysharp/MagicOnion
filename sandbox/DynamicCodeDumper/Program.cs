@@ -36,13 +36,13 @@ namespace DynamicCodeDumper
     {
         static void Main(string[] args)
         {
-            var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
-            var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
+            //var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
+            //var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
 
-            var __ = StreamingHubClientBuilder<ITestHub, IMessageReceiver>.ClientType;
-            var b = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();
+            //var __ = StreamingHubClientBuilder<ITestHub, IMessageReceiver>.ClientType;
+            //var b = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();
 
-            Verify(a, b);
+            //Verify(a, b);
         }
 
         static void Verify(params AssemblyBuilder[] builders)
