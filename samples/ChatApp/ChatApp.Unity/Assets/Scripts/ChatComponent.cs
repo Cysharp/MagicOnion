@@ -176,7 +176,6 @@ namespace Assets.Scripts
         {
             // hub
             if (!this.isJoin) return;
-            // todo: recover from exception and re-connect
             await this.streamingClient.GenerateException("client exception(streaminghub)!");
         }
 
@@ -217,7 +216,6 @@ namespace Assets.Scripts
         public async void UnaryGenerateException()
         {
             // unary
-            // todo: recover from exception and re-connect
             await this.client.GenerateException("client exception(unary)！");
         }
         #endregion
