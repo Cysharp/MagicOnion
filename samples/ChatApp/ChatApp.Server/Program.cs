@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MagicOnion.Hosting;
 using MagicOnion.Server;
 using Microsoft.Extensions.Configuration;

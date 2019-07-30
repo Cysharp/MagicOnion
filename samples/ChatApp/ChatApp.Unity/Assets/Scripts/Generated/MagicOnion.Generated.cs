@@ -126,10 +126,12 @@ namespace ChatApp.Shared.Services {
 
     public class IChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
+        static readonly Method<byte[], byte[]> GenerateExceptionMethod;
         static readonly Method<byte[], byte[]> SendReportAsyncMethod;
 
         static IChatServiceClient()
         {
+            GenerateExceptionMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "GenerateException", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             SendReportAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "SendReportAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
         }
 
@@ -177,6 +179,12 @@ namespace ChatApp.Shared.Services {
             return base.WithOptions(option);
         }
    
+        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GenerateException(string message)
+        {
+            var __request = LZ4MessagePackSerializer.Serialize(message, base.resolver);
+            var __callResult = callInvoker.AsyncUnaryCall(GenerateExceptionMethod, base.host, base.option, __request);
+            return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
+        }
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> SendReportAsync(string message)
         {
             var __request = LZ4MessagePackSerializer.Serialize(message, base.resolver);
@@ -271,6 +279,12 @@ namespace ChatApp.Shared.Hubs {
                     ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
                     break;
                 }
+                case 517938971: // GenerateException
+                {
+                    var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
+                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
+                    break;
+                }
                 case -852153394: // SampleMethod
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<Nil>(data, resolver);
@@ -295,6 +309,11 @@ namespace ChatApp.Shared.Hubs {
         public global::System.Threading.Tasks.Task SendMessageAsync(string message)
         {
             return WriteMessageWithResponseAsync<string, Nil>(-601690414, message);
+        }
+
+        public global::System.Threading.Tasks.Task GenerateException(string message)
+        {
+            return WriteMessageWithResponseAsync<string, Nil>(517938971, message);
         }
 
         public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)
@@ -340,6 +359,11 @@ namespace ChatApp.Shared.Hubs {
             public global::System.Threading.Tasks.Task SendMessageAsync(string message)
             {
                 return __parent.WriteMessageAsync<string>(-601690414, message);
+            }
+
+            public global::System.Threading.Tasks.Task GenerateException(string message)
+            {
+                return __parent.WriteMessageAsync<string>(517938971, message);
             }
 
             public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)

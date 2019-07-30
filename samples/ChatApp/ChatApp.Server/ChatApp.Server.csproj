@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.3</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://www.myget.org/F/opentelemetry/api/v3/index.json;
+    </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>

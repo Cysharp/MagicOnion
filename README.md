@@ -1078,6 +1078,260 @@ Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOni
 > NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show `disconnected server.` log.
 
 
+Telemetry
+---
+
+You can configure Telemetry for MagicOnion with `MagicOnion.OpenTelemetry` package.
+Let's see overview and how to try on localhost.
+
+* overview
+* examples of implementation
+* try visualization on localhost
+* metrics customization
+* implement your own metrics
+
+### overview
+
+MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Prometheus](https://prometheus.io/), [StackDriver](https://cloud.google.com/stackdriver/pricing), [Zipkin](https://zipkin.io/) and others.
+
+You can collect telemetry and use exporter on MagicOnion Serverside.
+
+### examples of implementation
+
+What you need to do for Telemetry is followings.
+
+* configure exporter.
+* add reference to the MagicOnion.OpenTelemetry.
+* configure DI for OpenTelemetry-dotnet.
+* configure filters/logger for telemetry.
+
+Let's follow the steps. 
+
+**configure exporeter**
+
+Before implementing exporeters, I've recommend check samples offering on [opentelemetry\-dotnet/samples/Exporters at master · open\-telemetry/opentelemetry\-dotnet](https://github.com/open-telemetry/opentelemetry-dotnet/tree/master/samples/Exporters).
+
+Here's prometheus exporter sample implementation, paste this before `MagicOnionHost.CreateDefaultBuilder()`.
+This implementation allow prometheus to collect MagicOnion metrics from http://localhost:9184/metrics.
+
+```csharp
+# Program.cs
+var exporter = new PrometheusExporter(
+    new PrometheusExporterOptions()
+    {
+        Url = $"http://localhost:9184/metrics/",
+    },
+    Stats.ViewManager);
+exporter.Start();
+
+// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+```
+
+If you are running on any VM, Container or Kubernetes, you can configure exporter host & port by through ConfigurationBuilder.
+Following example allow you to change exporter host/port by environment variables `PROMETHEUS_EXPORTER_HOST` & `PROMETHEUS_EXPORTER_PORT`.
+
+```csharp
+# Program.cs
+var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+var exporterHost = config.GetValue<string>("PROMETHEUS_EXPORTER_HOST", "localhost");
+var exporterPort = config.GetValue<string>("PROMETHEUS_EXPORTER_PORT", "9182");
+var exporter = new PrometheusExporter(
+    new PrometheusExporterOptions()
+    {
+        Url = $"http://{exporterHost}:{exporterPort}/metrics/",
+    },
+    Stats.ViewManager);
+exporter.Start();
+
+// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+```
+
+**add reference to the MagicOnion.OpenTelemetry**
+
+Please add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
+
+```shell
+dotnet add package MagicOnion.OpenTelemetry
+```
+
+You are ready to configure MagicOnion Filter & Logger for OpenTelemetry.
+
+**configure DI for OpenTelemetry-dotnet**
+
+opentelemetry-dotnet requires DI for `ITracer` and `ISampler`.
+Make sure register them in DI with MagicOnion Builder.
+
+```csharp
+# Program.cs
+await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+    .ConfigureServices(collection =>
+    {
+        collection.AddSingleton<ITracer>(Tracing.Tracer);
+        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
+    })
+    .UseMagicOnion(....)
+```
+
+**configure filters/logger for telemetry**
+
+Use `MagicOnionOptions` to register filters and logger for telemetry.
+You can collect MagicOnion metrics with `MagicOnionFilter`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorFilter` and `OpenTelemetryHubCollectorFilter` for you.
+Also register MagicOnionLogger to collect metrics on each hook point prepared on `IMagicOnionLogger`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorLogger` for you.
+
+```csharp
+await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+    .ConfigureServices(collection =>
+    {
+        collection.AddSingleton<ITracer>(Tracing.Tracer);
+        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
+    })
+    .UseMagicOnion(
+        new MagicOnionOptions()
+        {
+            GlobalFilters = new[] { new OpenTelemetryCollectorFilter(null) },
+            GlobalStreamingHubFilters = new[] { new OpenTelemetryHubCollectorFilter(null) },
+            MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null))
+        },
+        new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+    .RunConsoleAsync();
+```
+
+All implementation is done! Let's Debug run Server and confirm you can see metrics on http://localhost:9182/metrics.
+
+![image](https://user-images.githubusercontent.com/3856350/62096698-83213500-b2bf-11e9-88ff-52ef673ac4f5.png)
+
+You may find `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition"}` are collected, and other metrics will shown as #HELP.
+They will export when Unary/StreamingHub request is comming.
+
+If you want insert your own tag to default metrics, please add `ITagContext` when register `OpenTelemetryCollectorLogger`.
+Following will add verion tag for each metrics.
+
+```csharp
+MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, new TagContext(new Dictionary<TagKey, TagValue>
+{
+    // add version to all default metrics
+    { TagKey.Create("version"), TagValue.Create("1.0.0") },
+}))
+```
+
+Now each metrics contains `version` tag like `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition",version="1.0.0"}`.
+
+### try visualization on localhost
+
+You can try Prometheus collecter and visualize metrics on Grafana, all these operation can be done by docker-compose.
+Please follow the steps.
+
+* Apply above `examples of implementation` settings to the [MagicOnion/samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server).
+
+* Copy all items in [MagicOnion/docs/telemetry](https://github.com/Cysharp/MagicOnion/tree/master/docs/telemetry) directory to [MagicOnion/samples/ChatApp].
+
+```shell
+# Windows
+> xcopy MagicOnion\docs\telemetry MagicOnion\samples\ChatApp /H /E
+# Bash
+$ cp -rT MagicOnion/docs/telemetry MagicOnion/samples/ChatApp
+```
+
+* Build & Launch docker-compose, you are all systems are up and running on your localhost.
+
+```shell
+$ cd MagicOnion/samples/ChatApp
+$ docker-compose build
+$ docker-compose up
+
+Creating network "chatapp_default" with the default driver
+Creating alertmanager         ... done
+Creating prometheus           ... done
+Creating chatapp_magiconion_1 ... done
+Creating cAdvisor             ... done
+Creating grafana              ... done
+```
+
+When you launch docker-compose, followings set of service will launch for you.
+
+* **MagicOnion** stats export on http://localhost:9182/metrics/.
+* **cAdvisor** launch on http://localhost:8080.
+* **Prometheus** launch on http://localhost:9090.
+* **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
+* **Alertmanager** to notify alert to Slack.
+* optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
+
+To configure Grafana dashboard, follow the steps.
+
+* add DataSource: Data Souces> add > Prometheus (prometheus URL will be http://prometheus:9090)
+* add Dashboard:
+    * **Prometheus 2.0 Stats** dashboard: open Data Source > prometheus > dashboard tab > add Prometheus 2.0 Stats
+    * **Docker and Host Monitoring w/ Prometheus** dashboard (cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/179
+    * **MagicOnion Overview** dashboard (MagicOnion & cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/10584
+    * optional: **node_exporter 1.8** dashboard: open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/1860
+
+Now you can observe MagicOnion metrics through Grafana.
+
+![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
+
+To configure alert eather, modify `prometheus/config/alert.rules` and set slack incoming url on `alertmanager/config.yml`.
+
+### implement your own metrics
+
+Implement `IMagicOnionLogger` to configure your metrics. You can collect metrics when following callbacks are invoked by filter.
+
+```csharp
+namespace MagicOnion.Server
+{
+    public interface IMagicOnionLogger
+    {
+        void BeginBuildServiceDefinition();
+        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
+        void EndBuildServiceDefinition(double elapsed);
+        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
+        void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
+        void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
+        void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
+        void WriteToStream(ServiceContext context, byte[] writeData, Type type);
+    }
+}
+```
+
+When implement your own metrics, define `IView` and register it `Stats.ViewManager.RegisterView(YOUR_VIEW);`, then send metrics.
+
+There are several way to send metrics.
+
+> Send each metrics each line.
+
+```csharp
+statsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record(TagContext);
+```
+
+> Put many metrics and send at once: 
+
+```csharp
+var map = statsRecorder.NewMeasureMap(); map.Put(YOUR_METRICS, 1);
+map.Put(YOUR_METRICS2, 2);
+map.Put(YOUR_METRICS3, 10);
+if (isErrorOrInterrupted)
+{
+    map.Put(YOUR_METRICS4, 3);
+}
+
+map.Record(TagContext);
+```
+
+> create tag scope and set number of metrics.
+
+```csharp
+var tagContextBuilder = Tagger.CurrentBuilder.Put(FrontendKey, TagValue.Create("mobile-ios9.3.5"));
+using (var scopedTags = tagContextBuilder.BuildScoped())
+{
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record();
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS2, 2).Record();
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS3, 10).Record();
+}
+```
+
+Make sure your View's column, and metrics TagKey is matched. Otherwise none of metrics will shown.
+
+
 Author Info
 ---
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  

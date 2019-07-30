@@ -34,6 +34,8 @@ namespace Assets.Scripts
         public Button SendReportButton;
 
         public Button DisconnectButon;
+        public Button ExceptionButton;
+        public Button UnaryExceptionButton;
 
 
         void Start()
@@ -73,6 +75,7 @@ namespace Assets.Scripts
             this.Input.text = string.Empty;
             this.Input.placeholder.GetComponent<Text>().text = "Please enter your name.";
             this.JoinOrLeaveButtonText.text = "Enter the room";
+            this.ExceptionButton.interactable = false;
         }
 
 
@@ -108,6 +111,8 @@ namespace Assets.Scripts
             this.SendMessageButton.interactable = false;
             this.SendReportButton.interactable = false;
             this.DisconnectButon.interactable = false;
+            this.ExceptionButton.interactable = false;
+            this.UnaryExceptionButton.interactable = false;
 
             if (this.isJoin)
                 this.JoinOrLeave();
@@ -126,6 +131,8 @@ namespace Assets.Scripts
             this.SendMessageButton.interactable = false;
             this.SendReportButton.interactable = true;
             this.DisconnectButon.interactable = true;
+            this.ExceptionButton.interactable = true;
+            this.UnaryExceptionButton.interactable = true;
 
             this.isSelfDisConnected = false;
         }
@@ -150,6 +157,7 @@ namespace Assets.Scripts
                 this.JoinOrLeaveButtonText.text = "Leave the room";
                 this.Input.text = string.Empty;
                 this.Input.placeholder.GetComponent<Text>().text = "Please enter a comment.";
+                this.ExceptionButton.interactable = true;
             }
         }
 
@@ -162,6 +170,18 @@ namespace Assets.Scripts
             await this.streamingClient.SendMessageAsync(this.Input.text);
 
             this.Input.text = string.Empty;
+        }
+
+        public async void GenerateException()
+        {
+            // hub
+            if (!this.isJoin) return;
+            await this.streamingClient.GenerateException("client exception(streaminghub)!");
+        }
+
+        public async void SampleMethod()
+        {
+            throw new System.NotImplementedException();
         }
         #endregion
 
@@ -185,12 +205,18 @@ namespace Assets.Scripts
         #endregion
 
 
-        #region Client -> Server
+        #region Client -> Server (Unary)
         public async void SendReport()
         {
             await this.client.SendReportAsync(this.ReportInput.text);
 
             this.ReportInput.text = string.Empty;
+        }
+
+        public async void UnaryGenerateException()
+        {
+            // unary
+            await this.client.GenerateException("client exception(unary)！");
         }
         #endregion
     }

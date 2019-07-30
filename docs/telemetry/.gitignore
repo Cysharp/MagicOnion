@@ -1,0 +1,2 @@
+grafana/grafana.db
+prometheus/data/**/*
