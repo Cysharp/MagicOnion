@@ -3,6 +3,7 @@ using ChatApp.Shared.MessagePackObjects;
 using ChatApp.Shared.Services;
 using Grpc.Core;
 using MagicOnion.Client;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,6 +55,9 @@ namespace Assets.Scripts
         {
             // Initialize the Hub
             this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+            // for SSL/TLS connection
+            //var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
+            //this.channel = new Channel("test.example.com", 12345, serverCred);
             this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
             this.RegisterDisconnectEvent(streamingClient);
             this.client = MagicOnionClient.Create<IChatService>(this.channel);
