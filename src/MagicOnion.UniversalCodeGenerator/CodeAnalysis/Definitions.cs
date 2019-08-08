@@ -119,6 +119,27 @@ namespace MagicOnion.CodeAnalysis
             }
         }
 
+        public string UnaryRequestObject
+        {
+            get
+            {
+                if (Parameters.Length == 0)
+                {
+                    return $"Nil.Default";
+                }
+                else if (Parameters.Length == 1)
+                {
+                    return Parameters[0].ParameterName;
+                }
+                else
+                {
+                    var typeArgs = string.Join(", ", Parameters.Select(x => x.TypeName));
+                    var parameterNames = string.Join(", ", Parameters.Select(x => x.ParameterName));
+                    return $"new DynamicArgumentTuple<{typeArgs}>({parameterNames})";
+                }
+            }
+        }
+
         public string RequestObject()
         {
             if (Parameters.Length == 0)

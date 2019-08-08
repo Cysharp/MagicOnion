@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
+using System;
 
 #if !NON_UNITY
 
@@ -37,7 +38,7 @@ namespace MagicOnion.Client.EmbeddedServices
         }
 
         public PingClient(CallInvoker callInvoker)
-            : base(callInvoker, null)
+            : base(callInvoker, null, Array.Empty<IClientFilter>())
         {
         }
 
@@ -53,8 +54,13 @@ namespace MagicOnion.Client.EmbeddedServices
 
         public UnaryResult<Nil> Ping()
         {
-            var __callResult = callInvoker.AsyncUnaryCall<byte[], byte[]>(Method, base.host, base.option, MagicOnionMarshallers.UnsafeNilBytes);
-            return new UnaryResult<Nil>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance);
+            return InvokeAsync<byte[], Nil>("IMagicOnionEmbeddedPing/Ping", MagicOnionMarshallers.UnsafeNilBytes, __ctx =>
+            {
+                var __self = (PingClient)__ctx.Client;
+                var __request = MagicOnionMarshallers.UnsafeNilBytes;
+                var __callResult = __self.callInvoker.AsyncUnaryCall(PingClient.Method, __self.host, __ctx.CallOptions, __request);
+                return new ResponseContext<int>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance);
+            });
         }
     }
 }

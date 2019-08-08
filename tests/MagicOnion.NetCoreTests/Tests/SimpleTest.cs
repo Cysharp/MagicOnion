@@ -137,7 +137,8 @@ namespace MagicOnion.Tests
             var r = await client.Unary1(10, 20);
             r.Should().Be(30);
 
-            var r2 = await await client.Unary1Task(1000, 2000);
+            var r0 = await client.Unary1Task(1000, 2000);
+            var r2 = await r0; 
             r2.Should().Be(3000);
         }
 

@@ -1,4 +1,4 @@
-﻿<#@ template language="C#" #>
+﻿<#@ template language="C#" linePragmas="false" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
@@ -34,7 +34,7 @@ namespace <#= Namespace #>
 <# if(interfaceDef.IsIfDebug) { #>
 #if DEBUG
 <# } #>
-            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y) => new <#= clientName #>(x, y));
+            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y, z) => new <#= clientName #>(x, y, z));
 <# if(interfaceDef.IsIfDebug) { #>
 #endif
 <# } #>
