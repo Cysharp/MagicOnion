@@ -14,6 +14,13 @@ namespace MagicOnion.Client
         protected IFormatterResolver resolver;
         protected IClientFilter[] filters;
 
+        static protected ResponseContext CreateResponseContext<TResponse>(RequestContext context, Method<byte[], byte[]> method)
+        {
+            var self = context.Client;
+            var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, MagicOnionMarshallers.UnsafeNilBytes);
+            return new ResponseContext<TResponse>(callResult, self.resolver);
+        }
+
         static protected ResponseContext CreateResponseContext<TRequest, TResponse>(RequestContext context, Method<byte[], byte[]> method)
         {
             var self = context.Client;

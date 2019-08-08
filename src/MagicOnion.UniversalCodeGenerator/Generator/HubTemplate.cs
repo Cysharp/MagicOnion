@@ -18,12 +18,9 @@ namespace MagicOnion.Generator
     /// <summary>
     /// Class to produce the template output
     /// </summary>
-    
-    #line 1 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class HubTemplate : HubTemplateBase
     {
-#line hidden
         /// <summary>
         /// Create the template output
         /// </summary>
@@ -31,93 +28,33 @@ namespace MagicOnion.Generator
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
                     " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\n");
-            
-            #line 13 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? ("namespace " + Namespace + " {") : ""));
-            
-            #line default
-            #line hidden
             this.Write("\r\n    using Grpc.Core;\r\n    using Grpc.Core.Logging;\r\n    using MagicOnion;\r\n    " +
                     "using MagicOnion.Client;\r\n    using MessagePack;\r\n    using System;\r\n    using S" +
                     "ystem.Threading.Tasks;\r\n");
-            
-            #line 21 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
   foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; 
-            
-            #line default
-            #line hidden
             this.Write("\r\n");
-            
-            #line 23 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#if DEBUG\r\n");
-            
-            #line 25 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } 
-            
-            #line default
-            #line hidden
-            
-            #line 26 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  var clientName = interfaceDef.Name + "Client"; 
-            
-            #line default
-            #line hidden
             this.Write("    public class ");
-            
-            #line 27 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            
-            #line default
-            #line hidden
             this.Write(" : StreamingHubClientBase<");
-            
-            #line 27 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write(", ");
-            
-            #line 27 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write(">, ");
-            
-            #line 27 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write("\r\n    {\r\n        static readonly Method<byte[], byte[]> method = new Method<byte[" +
                     "], byte[]>(MethodType.DuplexStreaming, \"");
-            
-            #line 29 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
-            
-            #line default
-            #line hidden
             this.Write("\", \"Connect\", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.Thro" +
                     "ughMarshaller);\r\n\r\n        protected override Method<byte[], byte[]> DuplexStrea" +
                     "mingAsyncMethod { get { return method; } }\r\n\r\n        readonly ");
-            
-            #line 33 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write(" __fireAndForgetClient;\r\n\r\n        public ");
-            
-            #line 35 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            
-            #line default
-            #line hidden
             this.Write(@"(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
             : base(callInvoker, host, option, resolver, logger)
         {
@@ -125,56 +62,21 @@ namespace MagicOnion.Generator
         }
         
         public ");
-            
-            #line 41 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write(" FireAndForget()\r\n        {\r\n            return __fireAndForgetClient;\r\n        }" +
                     "\r\n\r\n        protected override void OnBroadcastEvent(int methodId, ArraySegment<" +
                     "byte> data)\r\n        {\r\n            switch (methodId)\r\n            {\r\n");
-            
-            #line 50 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
   foreach(var item in receiverDef.Methods) { 
-            
-            #line default
-            #line hidden
             this.Write("                case ");
-            
-            #line 51 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
-            
-            #line default
-            #line hidden
             this.Write(": // ");
-            
-            #line 51 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                {\r\n                    ");
-            
-            #line 53 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnBroadcastMessage().line1));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                    ");
-            
-            #line 54 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnBroadcastMessage().line2));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                }\r\n");
-            
-            #line 56 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
   } // end foreach(receiverDef.Methods) 
-            
-            #line default
-            #line hidden
             this.Write(@"                default:
                     break;
             }
@@ -185,131 +87,41 @@ namespace MagicOnion.Generator
             switch (methodId)
             {
 ");
-            
-            #line 66 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
   foreach(var item in interfaceDef.Methods) { 
-            
-            #line default
-            #line hidden
             this.Write("                case ");
-            
-            #line 67 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
-            
-            #line default
-            #line hidden
             this.Write(": // ");
-            
-            #line 67 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                {\r\n                    ");
-            
-            #line 69 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnResponseEvent().line1));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                    ");
-            
-            #line 70 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnResponseEvent().line2));
-            
-            #line default
-            #line hidden
             this.Write("\r\n                    break;\r\n                }\r\n");
-            
-            #line 73 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
   } // end foreach(interfaceDef.Methods) 
-            
-            #line default
-            #line hidden
             this.Write("                default:\r\n                    break;\r\n            }\r\n        }\r\n " +
                     "  \r\n");
-            
-            #line 79 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  foreach(var item in interfaceDef.Methods) { 
-            
-            #line default
-            #line hidden
-            
-            #line 80 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(item.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#if DEBUG\r\n");
-            
-            #line 82 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end if(IsIfDebug) 
-            
-            #line default
-            #line hidden
             this.Write("        public ");
-            
-            #line 83 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
-            
-            #line default
-            #line hidden
             this.Write("\r\n        {\r\n            return ");
-            
-            #line 85 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubWriteMessage()));
-            
-            #line default
-            #line hidden
             this.Write(";\r\n        }\r\n\r\n");
-            
-            #line 88 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(item.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#endif\r\n");
-            
-            #line 90 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end if(IsIfDebug) 
-            
-            #line default
-            #line hidden
-            
-            #line 91 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end foreach(interfaceDef.Methods) 
-            
-            #line default
-            #line hidden
             this.Write("\r\n        class FireAndForgetClient : ");
-            
-            #line 93 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write("\r\n        {\r\n            readonly ");
-            
-            #line 95 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            
-            #line default
-            #line hidden
             this.Write(" __parent;\r\n\r\n            public FireAndForgetClient(");
-            
-            #line 97 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            
-            #line default
-            #line hidden
             this.Write(" parentClient)\r\n            {\r\n                this.__parent = parentClient;\r\n   " +
                     "         }\r\n\r\n            public ");
-            
-            #line 102 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
-            
-            #line default
-            #line hidden
             this.Write(@" FireAndForget()
             {
                 throw new NotSupportedException();
@@ -326,93 +138,30 @@ namespace MagicOnion.Generator
             }
 
 ");
-            
-            #line 117 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  foreach(var item in interfaceDef.Methods) { 
-            
-            #line default
-            #line hidden
-            
-            #line 118 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(item.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#if DEBUG\r\n");
-            
-            #line 120 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end if(IsIfDebug) 
-            
-            #line default
-            #line hidden
             this.Write("            public ");
-            
-            #line 121 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
-            
-            #line default
-            #line hidden
             this.Write("\r\n            {\r\n                return __parent.");
-            
-            #line 123 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubFireAndForgetWriteMessage()));
-            
-            #line default
-            #line hidden
             this.Write(";\r\n            }\r\n\r\n");
-            
-            #line 126 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(item.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#endif\r\n");
-            
-            #line 128 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end if(IsIfDebug) 
-            
-            #line default
-            #line hidden
-            
-            #line 129 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end foreach(interfaceDef.Methods) 
-            
-            #line default
-            #line hidden
             this.Write("        }\r\n    }\r\n");
-            
-            #line 132 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  if(interfaceDef.IsIfDebug) { 
-            
-            #line default
-            #line hidden
             this.Write("#endif \r\n");
-            
-            #line 134 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end if(IsIfDebug) 
-            
-            #line default
-            #line hidden
-            
-            #line 135 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
  } // end foreach(Interfaces) 
-            
-            #line default
-            #line hidden
-            
-            #line 136 "C:\Git\MagicOnion\src\MagicOnion.UniversalCodeGenerator\Generator\HubTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? "}" : ""));
-            
-            #line default
-            #line hidden
             this.Write("\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning res" +
                     "tore 414\r\n#pragma warning restore 618\r\n#pragma warning restore 612");
             return this.GenerationEnvironment.ToString();
         }
     }
-    
-    #line default
-    #line hidden
     #region Base class
     /// <summary>
     /// Base class for this transformation

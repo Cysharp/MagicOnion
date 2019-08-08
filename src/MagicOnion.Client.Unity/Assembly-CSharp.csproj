@@ -67,9 +67,11 @@
     <Compile Include="Assets\Scripts\Loader.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\AsyncLock.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\AsyncStreamReaderExtensions.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Client\ClientFilter.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\DynamicClientBuilder.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\HeartbeatClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\EmbeddedServices\PingClient.cs" />
+    <Compile Include="Assets\Scripts\MagicOnion\Client\InterceptInvokeHelper.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClient.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\MagicOnionClientBase.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Client\StreamingHubClient.cs" />
@@ -90,12 +92,7 @@
     <Compile Include="Assets\Scripts\MagicOnion\Server\Hubs\MethodIdAttribute.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\ServerStreamingResult.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\UnaryResult.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncMethodBuilderAttribute.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\AsyncStreamReaderExtensions.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\ChannelExtensions.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\CompileStopperDuringPlayMode.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\EditorWindowSupportsCallInvoker.cs" />
-    <Compile Include="Assets\Scripts\MagicOnion\Unity\MagicOnionWindow.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\UnityDebugLogger.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Unity\UnsafeBlitResolver.cs" />
     <Compile Include="Assets\Scripts\MagicOnion\Utils\AsyncLocalShim.cs" />
@@ -192,19 +189,19 @@
     <Compile Include="Assets\Scripts\Tests\SimpleTest.cs" />
     <Compile Include="Assets\Scripts\Tests\StandardTest.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -408,25 +405,31 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="Google.Protobuf">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Google.Protobuf/lib/net45/Google.Protobuf.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Google.Protobuf/lib/net45/Google.Protobuf.dll</HintPath>
     </Reference>
     <Reference Include="Grpc.Core">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Grpc.Core/lib/net45/Grpc.Core.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Grpc.Core/lib/net45/Grpc.Core.dll</HintPath>
     </Reference>
     <Reference Include="Grpc.Core.Api">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Grpc.Core.Api/lib/net45/Grpc.Core.Api.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Grpc.Core.Api/lib/net45/Grpc.Core.Api.dll</HintPath>
     </Reference>
     <Reference Include="System.Interactive.Async">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Interactive.Async/lib/net45/System.Interactive.Async.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Interactive.Async/lib/net45/System.Interactive.Async.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>C:/Git/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Scripts/NetStandardLibraries/System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Scripts/NetStandardLibraries/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

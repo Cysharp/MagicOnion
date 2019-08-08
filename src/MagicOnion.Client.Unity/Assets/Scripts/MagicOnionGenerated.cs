@@ -22,8 +22,8 @@ namespace MagicOnion
             if(isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<Sandbox.NetCoreServer.Hubs.ITestService>.Register((x, y) => new Sandbox.NetCoreServer.Hubs.ITestServiceClient(x, y));
-            MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y));
+            MagicOnionClientRegistry<Sandbox.NetCoreServer.Hubs.ITestService>.Register((x, y, z) => new Sandbox.NetCoreServer.Hubs.ITestServiceClient(x, y, z));
+            MagicOnionClientRegistry<Sandbox.NetCoreServer.Services.IMyFirstService>.Register((x, y, z) => new Sandbox.NetCoreServer.Services.IMyFirstServiceClient(x, y, z));
 
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IGamingHub, Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IGamingHubClient(a, b, c, d, e));
             StreamingHubClientRegistry<Sandbox.NetCoreServer.Hubs.IBugReproductionHub, Sandbox.NetCoreServer.Hubs.IBugReproductionHubReceiver>.Register((a, _, b, c, d, e) => new Sandbox.NetCoreServer.Hubs.IBugReproductionHubClient(a, b, c, d, e));
@@ -173,7 +173,8 @@ namespace MagicOnion.Formatters
 #pragma warning disable 168
 
 namespace Sandbox.NetCoreServer.Hubs {
-    using MagicOnion;
+    using System;
+	using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
@@ -181,18 +182,20 @@ namespace Sandbox.NetCoreServer.Hubs {
     public class ITestServiceClient : MagicOnionClientBase<global::Sandbox.NetCoreServer.Hubs.ITestService>, global::Sandbox.NetCoreServer.Hubs.ITestService
     {
         static readonly Method<byte[], byte[]> FooBarBazMethod;
+        static readonly Func<RequestContext, ResponseContext> FooBarBazDelegate;
 
         static ITestServiceClient()
         {
             FooBarBazMethod = new Method<byte[], byte[]>(MethodType.Unary, "ITestService", "FooBarBaz", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            FooBarBazDelegate = _FooBarBaz;
         }
 
         ITestServiceClient()
         {
         }
 
-        public ITestServiceClient(CallInvoker callInvoker, IFormatterResolver resolver)
-            : base(callInvoker, resolver)
+        public ITestServiceClient(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+            : base(callInvoker, resolver, filters)
         {
         }
 
@@ -203,6 +206,7 @@ namespace Sandbox.NetCoreServer.Hubs {
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
             clone.resolver = this.resolver;
+            clone.filters = filters;
             return clone;
         }
 
@@ -231,11 +235,14 @@ namespace Sandbox.NetCoreServer.Hubs {
             return base.WithOptions(option);
         }
    
+        static ResponseContext _FooBarBaz(RequestContext __context)
+        {
+            return CreateResponseContext<DynamicArgumentTuple<string, long>, long[]>(__context, FooBarBazMethod);
+        }
+
         public global::MagicOnion.UnaryResult<long[]> FooBarBaz(string x, long y)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<string, long>(x, y), base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(FooBarBazMethod, base.host, base.option, __request);
-            return new UnaryResult<long[]>(__callResult, base.resolver);
+            return InvokeAsync<DynamicArgumentTuple<string, long>, long[]>("ITestService/FooBarBaz", new DynamicArgumentTuple<string, long>(x, y), FooBarBazDelegate);
         }
     }
 }
@@ -243,8 +250,8 @@ namespace Sandbox.NetCoreServer.Hubs {
 #pragma warning restore 168
 #pragma warning restore 219
 #pragma warning restore 414
-#pragma warning restore 618
 #pragma warning restore 612
+#pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -252,7 +259,8 @@ namespace Sandbox.NetCoreServer.Hubs {
 #pragma warning disable 168
 
 namespace Sandbox.NetCoreServer.Services {
-    using MagicOnion;
+    using System;
+	using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
@@ -260,17 +268,29 @@ namespace Sandbox.NetCoreServer.Services {
     public class IMyFirstServiceClient : MagicOnionClientBase<global::Sandbox.NetCoreServer.Services.IMyFirstService>, global::Sandbox.NetCoreServer.Services.IMyFirstService
     {
         static readonly Method<byte[], byte[]> ZeroAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> ZeroAsyncDelegate;
         static readonly Method<byte[], byte[]> OneAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> OneAsyncDelegate;
         static readonly Method<byte[], byte[]> SumAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> SumAsyncDelegate;
         static readonly Method<byte[], byte[]> OreOreAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> OreOreAsyncDelegate;
         static readonly Method<byte[], byte[]> OreOre2AsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> OreOre2AsyncDelegate;
         static readonly Method<byte[], byte[]> OreOre3AsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> OreOre3AsyncDelegate;
         static readonly Method<byte[], byte[]> LegacyZeroAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacyZeroAsyncDelegate;
         static readonly Method<byte[], byte[]> LegacyOneAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacyOneAsyncDelegate;
         static readonly Method<byte[], byte[]> LegacySumAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacySumAsyncDelegate;
         static readonly Method<byte[], byte[]> LegacyOreOreAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacyOreOreAsyncDelegate;
         static readonly Method<byte[], byte[]> LegacyOreOre2AsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacyOreOre2AsyncDelegate;
         static readonly Method<byte[], byte[]> LegacyOreOre3AsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> LegacyOreOre3AsyncDelegate;
         static readonly Method<byte[], byte[]> ClientStreamingSampleAsyncMethod;
         static readonly Method<byte[], byte[]> ServertSreamingSampleAsyncMethod;
         static readonly Method<byte[], byte[]> DuplexStreamingSampleAyncMethod;
@@ -278,17 +298,29 @@ namespace Sandbox.NetCoreServer.Services {
         static IMyFirstServiceClient()
         {
             ZeroAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "ZeroAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            ZeroAsyncDelegate = _ZeroAsync;
             OneAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OneAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            OneAsyncDelegate = _OneAsync;
             SumAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "SumAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            SumAsyncDelegate = _SumAsync;
             OreOreAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOreAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            OreOreAsyncDelegate = _OreOreAsync;
             OreOre2AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOre2Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            OreOre2AsyncDelegate = _OreOre2Async;
             OreOre3AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "OreOre3Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            OreOre3AsyncDelegate = _OreOre3Async;
             LegacyZeroAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyZeroAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyZeroAsyncDelegate = _LegacyZeroAsync;
             LegacyOneAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOneAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOneAsyncDelegate = _LegacyOneAsync;
             LegacySumAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacySumAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacySumAsyncDelegate = _LegacySumAsync;
             LegacyOreOreAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOreAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOreAsyncDelegate = _LegacyOreOreAsync;
             LegacyOreOre2AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOre2Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOre2AsyncDelegate = _LegacyOreOre2Async;
             LegacyOreOre3AsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IMyFirstService", "LegacyOreOre3Async", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            LegacyOreOre3AsyncDelegate = _LegacyOreOre3Async;
             ClientStreamingSampleAsyncMethod = new Method<byte[], byte[]>(MethodType.ClientStreaming, "IMyFirstService", "ClientStreamingSampleAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             ServertSreamingSampleAsyncMethod = new Method<byte[], byte[]>(MethodType.ServerStreaming, "IMyFirstService", "ServertSreamingSampleAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             DuplexStreamingSampleAyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IMyFirstService", "DuplexStreamingSampleAync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -298,8 +330,8 @@ namespace Sandbox.NetCoreServer.Services {
         {
         }
 
-        public IMyFirstServiceClient(CallInvoker callInvoker, IFormatterResolver resolver)
-            : base(callInvoker, resolver)
+        public IMyFirstServiceClient(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+            : base(callInvoker, resolver, filters)
         {
         }
 
@@ -310,6 +342,7 @@ namespace Sandbox.NetCoreServer.Services {
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
             clone.resolver = this.resolver;
+            clone.filters = filters;
             return clone;
         }
 
@@ -338,89 +371,128 @@ namespace Sandbox.NetCoreServer.Services {
             return base.WithOptions(option);
         }
    
+        static ResponseContext _ZeroAsync(RequestContext __context)
+        {
+            return CreateResponseContext<global::MessagePack.Nil>(__context, ZeroAsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> ZeroAsync()
         {
-            var __request = MagicOnionMarshallers.UnsafeNilBytes;
-            var __callResult = callInvoker.AsyncUnaryCall(ZeroAsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
+            return InvokeAsync<Nil, global::MessagePack.Nil>("IMyFirstService/ZeroAsync", Nil.Default, ZeroAsyncDelegate);
         }
+        static ResponseContext _OneAsync(RequestContext __context)
+        {
+            return CreateResponseContext<int, global::Sandbox.NetCoreServer.Services.TestEnum>(__context, OneAsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum> OneAsync(int z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(OneAsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum>(__callResult, base.resolver);
+            return InvokeAsync<int, global::Sandbox.NetCoreServer.Services.TestEnum>("IMyFirstService/OneAsync", z, OneAsyncDelegate);
         }
+        static ResponseContext _SumAsync(RequestContext __context)
+        {
+            return CreateResponseContext<DynamicArgumentTuple<int, int>, string>(__context, SumAsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<string> SumAsync(int x, int y)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(SumAsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<string>(__callResult, base.resolver);
+            return InvokeAsync<DynamicArgumentTuple<int, int>, string>("IMyFirstService/SumAsync", new DynamicArgumentTuple<int, int>(x, y), SumAsyncDelegate);
         }
+        static ResponseContext _OreOreAsync(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse>(__context, OreOreAsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse> OreOreAsync(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(OreOreAsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse>(__callResult, base.resolver);
+            return InvokeAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse>("IMyFirstService/OreOreAsync", z, OreOreAsyncDelegate);
         }
+        static ResponseContext _OreOre2Async(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse[]>(__context, OreOre2AsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]> OreOre2Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(OreOre2AsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]>(__callResult, base.resolver);
+            return InvokeAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse[]>("IMyFirstService/OreOre2Async", z, OreOre2AsyncDelegate);
         }
+        static ResponseContext _OreOre3Async(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__context, OreOre3AsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>> OreOre3Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(OreOre3AsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__callResult, base.resolver);
+            return InvokeAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>("IMyFirstService/OreOre3Async", z, OreOre3AsyncDelegate);
         }
+        static ResponseContext _LegacyZeroAsync(RequestContext __context)
+        {
+            return CreateResponseContext<global::MessagePack.Nil>(__context, LegacyZeroAsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::MessagePack.Nil>> LegacyZeroAsync()
         {
-            var __request = MagicOnionMarshallers.UnsafeNilBytes;
-            var __callResult = callInvoker.AsyncUnaryCall(LegacyZeroAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver));
+            return InvokeTaskAsync<Nil, global::MessagePack.Nil>("IMyFirstService/LegacyZeroAsync", Nil.Default, LegacyZeroAsyncDelegate);
         }
+        static ResponseContext _LegacyOneAsync(RequestContext __context)
+        {
+            return CreateResponseContext<int, global::Sandbox.NetCoreServer.Services.TestEnum>(__context, LegacyOneAsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum>> LegacyOneAsync(int z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(LegacyOneAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.TestEnum>(__callResult, base.resolver));
+            return InvokeTaskAsync<int, global::Sandbox.NetCoreServer.Services.TestEnum>("IMyFirstService/LegacyOneAsync", z, LegacyOneAsyncDelegate);
         }
+        static ResponseContext _LegacySumAsync(RequestContext __context)
+        {
+            return CreateResponseContext<DynamicArgumentTuple<int, int>, string>(__context, LegacySumAsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<string>> LegacySumAsync(int x, int y)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int>(x, y), base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(LegacySumAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<string>(__callResult, base.resolver));
+            return InvokeTaskAsync<DynamicArgumentTuple<int, int>, string>("IMyFirstService/LegacySumAsync", new DynamicArgumentTuple<int, int>(x, y), LegacySumAsyncDelegate);
         }
+        static ResponseContext _LegacyOreOreAsync(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse>(__context, LegacyOreOreAsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse>> LegacyOreOreAsync(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOreAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse>(__callResult, base.resolver));
+            return InvokeTaskAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse>("IMyFirstService/LegacyOreOreAsync", z, LegacyOreOreAsyncDelegate);
         }
+        static ResponseContext _LegacyOreOre2Async(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse[]>(__context, LegacyOreOre2AsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]>> LegacyOreOre2Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOre2AsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::Sandbox.NetCoreServer.Services.OreOreResponse[]>(__callResult, base.resolver));
+            return InvokeTaskAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::Sandbox.NetCoreServer.Services.OreOreResponse[]>("IMyFirstService/LegacyOreOre2Async", z, LegacyOreOre2AsyncDelegate);
         }
+        static ResponseContext _LegacyOreOre3Async(RequestContext __context)
+        {
+            return CreateResponseContext<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__context, LegacyOreOre3AsyncMethod);
+        }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>> LegacyOreOre3Async(global::Sandbox.NetCoreServer.Services.OreOreRequest z)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(z, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(LegacyOreOre3AsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>(__callResult, base.resolver));
+            return InvokeTaskAsync<global::Sandbox.NetCoreServer.Services.OreOreRequest, global::System.Collections.Generic.List<global::Sandbox.NetCoreServer.Services.OreOreResponse>>("IMyFirstService/LegacyOreOre3Async", z, LegacyOreOre3AsyncDelegate);
         }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<int, string>> ClientStreamingSampleAsync()
         {
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreamingSampleAsyncMethod, base.host, base.option);
             return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<int, string>(__callResult, base.resolver));
         }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<string>> ServertSreamingSampleAsync(int x, int y, int z)
         {
             var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServertSreamingSampleAsyncMethod, base.host, base.option, __request);
             return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<string>(__callResult, base.resolver));
         }
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<int, string>> DuplexStreamingSampleAync()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingSampleAyncMethod, base.host, base.option);
@@ -432,8 +504,8 @@ namespace Sandbox.NetCoreServer.Services {
 #pragma warning restore 168
 #pragma warning restore 219
 #pragma warning restore 414
-#pragma warning restore 618
 #pragma warning restore 612
+#pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414

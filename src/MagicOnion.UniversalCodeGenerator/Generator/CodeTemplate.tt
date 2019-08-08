@@ -1,4 +1,4 @@
-﻿<#@ template language="C#" #>
+﻿<#@ template language="C#" linePragmas="false" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
@@ -11,7 +11,8 @@
 #pragma warning disable 168
 
 <#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
-    using MagicOnion;
+    using System;
+	using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
@@ -28,6 +29,9 @@
 #if DEBUG
 <# } #>
         static readonly Method<byte[], byte[]> <#= item.Name #>Method;
+<# if(item.MethodType == MethodType.Unary) { #>
+        static readonly Func<RequestContext, ResponseContext> <#= item.Name #>Delegate;
+<# } #>
 <# if(item.IsIfDebug) { #>
 #endif
 <# } #>
@@ -40,6 +44,9 @@
 #if DEBUG
 <# } #>
             <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+<# if(item.MethodType == MethodType.Unary) { #>
+            <#= item.Name #>Delegate = _<#= item.Name #>;
+<# } #>
 <# if(item.IsIfDebug) { #>
 #endif
 <# } #>
@@ -50,8 +57,8 @@
         {
         }
 
-        public <#= clientName #>(CallInvoker callInvoker, IFormatterResolver resolver)
-            : base(callInvoker, resolver)
+        public <#= clientName #>(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+            : base(callInvoker, resolver, filters)
         {
         }
 
@@ -62,6 +69,7 @@
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
             clone.resolver = this.resolver;
+            clone.filters = filters;
             return clone;
         }
 
@@ -94,15 +102,24 @@
 <# if(item.IsIfDebug) { #>
 #if DEBUG
 <# } #>
+<# if(item.MethodType == MethodType.Unary) { #>
+        static ResponseContext _<#= item.Name #>(RequestContext __context)
+        {
+<# if(item.Parameters.Length == 0) { #>
+            return CreateResponseContext<<#= item.ResponseType #>>(__context, <#= item.Name #>Method);
+<# } else { #>
+            return CreateResponseContext<<#= item.RequestMarshallerType #>, <#= item.ResponseType #>>(__context, <#= item.Name #>Method);
+<# } #>
+        }
+<# } #>
+
         public <#= item.ToString() #>
         {
 <# if(item.MethodType == MethodType.Unary) { #>
-            var __request = <#= item.RequestObject() #>;
-            var __callResult = callInvoker.AsyncUnaryCall(<#= item.Name #>Method, base.host, base.option, __request);
 <# if(item.IsResponseTypeTaskOfT) { #>
-            return System.Threading.Tasks.Task.FromResult(new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver));
+            return InvokeTaskAsync<<#= item.RequestMarshallerType #>, <#= item.ResponseType #>>("<#= interfaceDef.Name + "/" + item.Name #>", <#= item.UnaryRequestObject #>, <#= item.Name #>Delegate);
 <# } else { #>
-            return new UnaryResult<<#= item.ResponseType #>>(__callResult, base.resolver);
+            return InvokeAsync<<#= item.RequestMarshallerType #>, <#= item.ResponseType #>>("<#= interfaceDef.Name + "/" + item.Name #>", <#= item.UnaryRequestObject #>, <#= item.Name #>Delegate);
 <# } #>
 <# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
             var __request = <#= item.RequestObject() #>;
@@ -130,5 +147,5 @@
 #pragma warning restore 168
 #pragma warning restore 219
 #pragma warning restore 414
-#pragma warning restore 618
 #pragma warning restore 612
+#pragma warning restore 618
