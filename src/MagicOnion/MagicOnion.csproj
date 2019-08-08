@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) but currently removed(for CI) -->
-        <!--<TargetFrameworks>netstandard2.0;net471</TargetFrameworks>-->
-        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
+        <!--<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <SignAssembly>true</SignAssembly>
@@ -75,6 +75,10 @@
     </PropertyGroup>
     <ItemGroup>
         <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;UnsafeDirectBlitResolver.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <TargetFiles Remove="Client\ClientFilter.cs" />
+      <TargetFiles Remove="Client\InterceptInvokeHelper.cs" />
     </ItemGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Copy SourceFiles="$(ProjectDir)Server\Hubs\BroadcasterHelper.cs" DestinationFiles="$(DestinationRoot)Server\Hubs\BroadcasterHelper.cs" SkipUnchangedFiles="true" />

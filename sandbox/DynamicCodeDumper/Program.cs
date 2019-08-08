@@ -32,12 +32,49 @@ namespace DynamicCodeDumper
         Task<double> RetrunMoreArgument(int x, string y, double z);
     }
 
+    public interface ITestService : IService<ITestService>
+    {
+        UnaryResult<int> Sum(int x, int y);
+        Task<UnaryResult<int>> Sum2(int x, int y);
+
+
+        UnaryResult<MyResponse> Unary1(int x, int y, string z = "unknown");
+        UnaryResult<MyResponse> Unary2(MyRequest req);
+        UnaryResult<MyResponse> Unary3();
+        UnaryResult<Nil> Unary4();
+        UnaryResult<MyStructResponse> Unary5(MyStructRequest req);
+    }
+
+    public class MyRequest
+    {
+    }
+
+    public class MyResponse
+    {
+    }
+    public struct MyStructRequest
+    {
+    }
+
+    public struct MyStructResponse
+    {
+    }
+    public struct Nil
+    {
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
             //var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
             //var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
+            
+                var _ = DynamicClientBuilder<ITestService>.ClientType;
+            var c = MagicOnion.Client.DynamicClientAssemblyHolder.Save();
+            Verify(c);
+
+            //var _ = MagicOnionClient.Create<ITestHub>((Channel)null, null);
 
             //var __ = StreamingHubClientBuilder<ITestHub, IMessageReceiver>.ClientType;
             //var b = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();
