@@ -118,3 +118,6 @@ nuget/tools/*
 nuget/*.nupkg
 nuget/*.unitypackage
 .vs/
+
+# Jetbrains Rider
+.idea/
