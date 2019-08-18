@@ -6,7 +6,7 @@ namespace MagicOnion.Hosting
 {
     public class ServiceLocatorBridge : IServiceLocator
     {
-        internal IServiceProvider provider; // set after register service completed.
+        IServiceProvider provider;
         readonly IServiceCollection serviceCollection;
 
         public ServiceLocatorBridge(IServiceCollection serviceCollection)
@@ -16,37 +16,27 @@ namespace MagicOnion.Hosting
 
         public T GetService<T>()
         {
-            if (provider == null)
-            {
-                // get raw before provider create.
-                foreach (var item in serviceCollection)
-                {
-                    if (item.ServiceType == typeof(T))
-                    {
-                        if (item.Lifetime == ServiceLifetime.Singleton)
-                        {
-                            return (T)item.ImplementationInstance;
-                        }
-                        else if (item.Lifetime == ServiceLifetime.Transient)
-                        {
-                            return (T)Activator.CreateInstance(item.ServiceType);
-                        }
-                    }
-                }
-                throw new Exception("Service does not found in ServiceCollection.");
-            }
+            if (provider == null) throw new InvalidOperationException("ServiceProvider has already been built.");
 
             return provider.GetService<T>();
         }
 
         public void Register<T>()
         {
+            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
             serviceCollection.AddTransient(typeof(T));
         }
 
         public void Register<T>(T singleton)
         {
+            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
             serviceCollection.AddSingleton(typeof(T), singleton);
+        }
+
+        public void Build()
+        {
+            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
+            provider = this.serviceCollection.BuildServiceProvider();
         }
     }
 }
