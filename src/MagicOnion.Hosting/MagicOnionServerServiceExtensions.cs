@@ -142,6 +142,13 @@ namespace MagicOnion.Hosting
 
                 // Register MagicOnionServiceDefinition (when using HttpGateway, it requests MagicOnionServiceDefinition via host's ServiceProvider)
                 services.AddMagicOnionHostedServiceDefinition(Options.DefaultName, types, searchAssemblies);
+
+                // Options: Hosting startup configuration
+                services.AddOptions<MagicOnionHostingOptions>(Options.DefaultName)
+                    .Configure(hostingOptions =>
+                    {
+                        hostingOptions.Service = options;
+                    });
             });
         }
 
