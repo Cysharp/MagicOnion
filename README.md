@@ -632,7 +632,7 @@ class Program
             .ConfigureServices(collection =>
             {
                 // Add MagicOnionServiceDefinition for reference from Startup.
-                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionServiceDefinition>());
+                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
             })
             .UseKestrel()
             .UseStartup<Startup>()
