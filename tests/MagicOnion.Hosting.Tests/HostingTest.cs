@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration.Memory;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
+using MagicOnion.Server;
+using System.Linq;
 
 namespace MagicOnion.Hosting.Tests
 {
@@ -242,6 +244,62 @@ namespace MagicOnion.Hosting.Tests
                     Assert.True(options.ServerPorts[0].UseInsecureConnection);
                     Assert.Empty(options.ServerPorts[0].ServerCredentials);
                 }
+            }
+        }
+
+        [Fact]
+        public async Task TestHostingConfigurationServiceDefinition()
+        {
+            using (var host = new HostBuilder()
+                .UseMagicOnion(types: new[] { typeof(TestServiceImpl) })
+                .Build())
+            {
+                Assert.NotNull(host.Services.GetService<MagicOnionHostedServiceDefinition>());
+                Assert.NotNull(host.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
+            }
+        }
+
+        [Fact]
+        public async Task TestHostingConfigurationServiceDefinitionMulti()
+        {
+            using (var host = new HostBuilder()
+                .UseMagicOnion(types: new[] { typeof(TestServiceImpl) })
+                .UseMagicOnion("Secondary", types: new[] { typeof(TestServiceImpl) })
+                .Build())
+            {
+                Assert.NotNull(host.Services.GetService<MagicOnionHostedServiceDefinition>());
+                Assert.NotNull(host.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
+                Assert.Equal(2, host.Services.GetServices<MagicOnionHostedServiceDefinition>().Count());
+                Assert.Contains(host.Services.GetServices<MagicOnionHostedServiceDefinition>(), x => x.Name == "" /* Default is empty */);
+                Assert.Contains(host.Services.GetServices<MagicOnionHostedServiceDefinition>(), x => x.Name == "Secondary");
+            }
+        }
+
+        [Fact]
+        public async Task TestHostingConfigurationWithDI()
+        {
+            var randomPort = new Random().Next(10000, 20000);
+            using (var host = new HostBuilder()
+                .UseMagicOnion(types: new[] { typeof(TestServiceWithDIImpl) })
+                .ConfigureServices(services =>
+                {
+                    services.Configure<MagicOnionHostingOptions>(options =>
+                    {
+                        options.ServerPorts = new[] { new MagicOnionHostingServerPortOptions { Host = "localhost", Port = randomPort, UseInsecureConnection = true } };
+                    });
+                })
+                .Build())
+            {
+                host.Start();
+                var channel = new Channel("localhost", randomPort, ChannelCredentials.Insecure);
+                var client = MagicOnion.Client.MagicOnionClient.Create<ITestService>(channel);
+                for (int i = 0; i < 10; i++)
+                {
+                    var ret = await client.Sum(i, i);
+                    Assert.Equal(i * 2, ret);
+                }
+
+                await host.StopAsync();
             }
         }
     }

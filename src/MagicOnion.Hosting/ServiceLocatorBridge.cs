@@ -16,27 +16,30 @@ namespace MagicOnion.Hosting
 
         public T GetService<T>()
         {
-            if (provider == null) throw new InvalidOperationException("ServiceProvider has already been built.");
+            if (provider == null)
+            {
+                provider = serviceCollection.BuildServiceProvider();
+            }
 
             return provider.GetService<T>();
         }
 
         public void Register<T>()
         {
-            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
             serviceCollection.AddTransient(typeof(T));
+            provider = null;
         }
 
         public void Register<T>(T singleton)
         {
-            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
             serviceCollection.AddSingleton(typeof(T), singleton);
+            provider = null;
         }
 
         public void Build()
         {
-            if (provider != null) throw new InvalidOperationException("ServiceProvider has already been built.");
             provider = this.serviceCollection.BuildServiceProvider();
+            provider = null;
         }
     }
 }
