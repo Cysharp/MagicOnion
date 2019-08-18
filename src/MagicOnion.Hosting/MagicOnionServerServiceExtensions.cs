@@ -96,11 +96,11 @@ namespace MagicOnion.Hosting
                     var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MagicOnionServerService>();
                     var serviceDefinition = serviceProvider.GetServices<MagicOnionHostedServiceDefinition>().Single(x => x.Name == configurationName);
 
-                    return CreateMagicOnionHostedService(logger, services, hostingOptions.Service, serverPorts, serviceDefinition.ServiceDefinition, hostingOptions.ChannelOptions.ToChannelOptions());
+                    return CreateMagicOnionHostedService(logger, serverPorts, serviceDefinition.ServiceDefinition, hostingOptions.ChannelOptions.ToChannelOptions());
                 });
 
                 // Register MagicOnionServiceDefinition (when using HttpGateway, it requests MagicOnionServiceDefinition via host's ServiceProvider)
-                services.AddMagicOnionServiceDefinition(configurationName, types, searchAssemblies);
+                services.AddMagicOnionHostedServiceDefinition(configurationName, types, searchAssemblies);
 
                 // Options: Hosting startup configuration
                 services.AddOptions<MagicOnionHostingOptions>(configurationName)
@@ -137,15 +137,15 @@ namespace MagicOnion.Hosting
                     var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MagicOnionServerService>();
                     var serviceDefinition = serviceProvider.GetService<MagicOnionHostedServiceDefinition>();
 
-                    return CreateMagicOnionHostedService(logger, services, options, ports, serviceDefinition.ServiceDefinition, channelOptions);
+                    return CreateMagicOnionHostedService(logger, ports, serviceDefinition.ServiceDefinition, channelOptions);
                 });
 
                 // Register MagicOnionServiceDefinition (when using HttpGateway, it requests MagicOnionServiceDefinition via host's ServiceProvider)
-                services.AddMagicOnionServiceDefinition(Options.DefaultName, types, searchAssemblies);
+                services.AddMagicOnionHostedServiceDefinition(Options.DefaultName, types, searchAssemblies);
             });
         }
 
-        private static void AddMagicOnionServiceDefinition(
+        private static void AddMagicOnionHostedServiceDefinition(
             this IServiceCollection services,
             string configurationName = null,
             IEnumerable<Type> types = null,
@@ -186,17 +186,12 @@ namespace MagicOnion.Hosting
                     }
                 }
 
-                // Build a ServiceProvider in the ServiceLocatorBridge (after this, it doesn't accept service registration)
-                serviceLocator.Build();
-
                 return new MagicOnionHostedServiceDefinition(configurationName, serviceDefinition);
             });
         }
 
         private static MagicOnionServerService CreateMagicOnionHostedService(
             ILogger logger,
-            IServiceCollection services,
-            MagicOnionOptions options,
             IEnumerable<ServerPort> ports,
             MagicOnionServiceDefinition serviceDefinition,
             IEnumerable<ChannelOption> channelOptions = null

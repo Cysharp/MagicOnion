@@ -35,11 +35,5 @@ namespace MagicOnion.Hosting
             serviceCollection.AddSingleton(typeof(T), singleton);
             provider = null;
         }
-
-        public void Build()
-        {
-            provider = this.serviceCollection.BuildServiceProvider();
-            provider = null;
-        }
     }
 }
