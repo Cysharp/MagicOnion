@@ -95,7 +95,7 @@ namespace MagicOnion.Hosting
 
                     var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MagicOnionServerService>();
 
-                    return CreateMagicOnionHostedService(logger, services, hostingOptions.Service, serverPorts, types, searchAssemblies, hostingOptions.ChannelOptions?.ToChannelOptions());
+                    return CreateMagicOnionHostedService(logger, services, hostingOptions.Service, serverPorts, types, searchAssemblies, hostingOptions.ChannelOptions.ToChannelOptions());
                 });
 
                 // Options: Hosting startup configuration

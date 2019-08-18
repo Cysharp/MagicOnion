@@ -25,7 +25,7 @@ namespace MagicOnion.Hosting
         /// <summary>
         /// gRPC channel options.
         /// </summary>
-        public MagicOnionHostingServerChannelOptionsOptions ChannelOptions { get; set; } = null;
+        public MagicOnionHostingServerChannelOptionsOptions ChannelOptions { get; set; } = new MagicOnionHostingServerChannelOptionsOptions();
     }
 
     public class MagicOnionHostingServerPortOptions
