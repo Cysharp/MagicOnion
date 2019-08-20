@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sandbox.Hosting
@@ -31,6 +32,7 @@ namespace Sandbox.Hosting
                             options.Service.GlobalFilters = new[] { new MyFilterAttribute(null) };
                         }
                         options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
+                        options.ChannelOptions.Add(new ChannelOption("grpc.keepalive_time_ms", 10000));
                     });
                     services.Configure<MagicOnionHostingOptions>("MagicOnion-Management", options =>
                     {
