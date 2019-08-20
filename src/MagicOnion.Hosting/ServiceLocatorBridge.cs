@@ -6,7 +6,7 @@ namespace MagicOnion.Hosting
 {
     public class ServiceLocatorBridge : IServiceLocator
     {
-        internal IServiceProvider provider; // set after register service completed.
+        IServiceProvider provider;
         readonly IServiceCollection serviceCollection;
 
         public ServiceLocatorBridge(IServiceCollection serviceCollection)
@@ -18,22 +18,7 @@ namespace MagicOnion.Hosting
         {
             if (provider == null)
             {
-                // get raw before provider create.
-                foreach (var item in serviceCollection)
-                {
-                    if (item.ServiceType == typeof(T))
-                    {
-                        if (item.Lifetime == ServiceLifetime.Singleton)
-                        {
-                            return (T)item.ImplementationInstance;
-                        }
-                        else if (item.Lifetime == ServiceLifetime.Transient)
-                        {
-                            return (T)Activator.CreateInstance(item.ServiceType);
-                        }
-                    }
-                }
-                throw new Exception("Service does not found in ServiceCollection.");
+                provider = serviceCollection.BuildServiceProvider();
             }
 
             return provider.GetService<T>();
@@ -42,11 +27,13 @@ namespace MagicOnion.Hosting
         public void Register<T>()
         {
             serviceCollection.AddTransient(typeof(T));
+            provider = null;
         }
 
         public void Register<T>(T singleton)
         {
             serviceCollection.AddSingleton(typeof(T), singleton);
+            provider = null;
         }
     }
 }
