@@ -145,8 +145,8 @@ namespace MagicOnion.Hosting.Tests
                         new KeyValuePair<string, string>("MagicOnion:Service:DisableEmbeddedService", "true"),
                         new KeyValuePair<string, string>("MagicOnion:Service:IsReturnExceptionStackTraceInErrorDetail", "true"),
 
-                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:MaxReceiveMessageLength", "12345"),
-                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:Census", "false"),
+                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:grpc.max_receive_message_length", "12345"),
+                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:grpc.census", "false"),
 
                         new KeyValuePair<string, string>("MagicOnion:ServerPorts:0:Host", "host.example.local"),
                         new KeyValuePair<string, string>("MagicOnion:ServerPorts:0:Port", "9876"),
@@ -190,8 +190,8 @@ namespace MagicOnion.Hosting.Tests
                     {
                         new KeyValuePair<string, string>("MagicOnion:Service:DisableEmbeddedService", "true"),
                         new KeyValuePair<string, string>("MagicOnion:Service:IsReturnExceptionStackTraceInErrorDetail", "true"),
-                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:MaxReceiveMessageLength", "12345"),
-                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:Census", "false"),
+                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:grpc.max_receive_message_length", "12345"),
+                        new KeyValuePair<string, string>("MagicOnion:ChannelOptions:grpc.census", "false"),
                         new KeyValuePair<string, string>("MagicOnion:ServerPorts:0:Host", "host.example.local"),
                         new KeyValuePair<string, string>("MagicOnion:ServerPorts:0:Port", "9876"),
                         new KeyValuePair<string, string>("MagicOnion:ServerPorts:0:UseInsecureConnection", "false"),
@@ -200,8 +200,8 @@ namespace MagicOnion.Hosting.Tests
 
                         new KeyValuePair<string, string>("MagicOnion-Secondary:Service:DisableEmbeddedService", "false"),
                         new KeyValuePair<string, string>("MagicOnion-Secondary:Service:IsReturnExceptionStackTraceInErrorDetail", "false"),
-                        new KeyValuePair<string, string>("MagicOnion-Secondary:ChannelOptions:MaxReceiveMessageLength", "54321"),
-                        new KeyValuePair<string, string>("MagicOnion-Secondary:ChannelOptions:Census", "true"),
+                        new KeyValuePair<string, string>("MagicOnion-Secondary:ChannelOptions:grpc.max_receive_message_length", "54321"),
+                        new KeyValuePair<string, string>("MagicOnion-Secondary:ChannelOptions:grpc.census", "true"),
                         new KeyValuePair<string, string>("MagicOnion-Secondary:ServerPorts:0:Host", "secondary.example.local"),
                         new KeyValuePair<string, string>("MagicOnion-Secondary:ServerPorts:0:Port", "12345"),
                         new KeyValuePair<string, string>("MagicOnion-Secondary:ServerPorts:0:UseInsecureConnection", "true"),
