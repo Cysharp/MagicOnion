@@ -13,17 +13,14 @@ namespace MagicOnion.Server
             set { order = value; }
         }
 
-        protected Func<ServiceContext, ValueTask> Next { get; private set; }
-
         /// <summary>
         /// This constructor used by MagicOnionEngine when register handler.
         /// </summary>
-        public MagicOnionFilterAttribute(Func<ServiceContext, ValueTask> next)
+        public MagicOnionFilterAttribute()
         {
-            this.Next = next;
         }
 
-        public abstract ValueTask Invoke(ServiceContext context);
+        public abstract ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next);
 
         protected static void SetStatusCode(ServiceContext context, Grpc.Core.StatusCode statusCode, string detail)
         {

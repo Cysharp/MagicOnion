@@ -13,16 +13,13 @@ namespace MagicOnion.Server.Hubs
             set { order = value; }
         }
 
-        protected Func<StreamingHubContext, ValueTask> Next { get; private set; }
-
         /// <summary>
         /// This constructor used by MagicOnionEngine when register handler.
         /// </summary>
-        public StreamingHubFilterAttribute(Func<StreamingHubContext, ValueTask> next)
+        public StreamingHubFilterAttribute()
         {
-            this.Next = next;
         }
 
-        public abstract ValueTask Invoke(StreamingHubContext context);
+        public abstract ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next);
     }
 }

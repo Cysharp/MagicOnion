@@ -106,23 +106,12 @@ namespace Sandbox.NetCoreServer.Services
 
     public class MyFirstFilter : MagicOnionFilterAttribute
     {
-        public MyFirstFilter()
-            : base(null)
-        {
-
-        }
-
-        public MyFirstFilter(Func<ServiceContext, ValueTask> next)
-            : base(next)
-        {
-        }
-
-        public override ValueTask Invoke(ServiceContext context)
+        public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             try
             {
                 Console.WriteLine("BF");
-                return Next(context);
+                return next(context);
             }
             finally
             {

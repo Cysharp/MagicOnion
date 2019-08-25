@@ -46,9 +46,6 @@ namespace Sandbox.NetCoreServer
             {
                 //MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
-                GlobalFilters = new MagicOnionFilterAttribute[]
-                {
-                },
                 EnableCurrentContext = true,
                 DisableEmbeddedService = true,
             };

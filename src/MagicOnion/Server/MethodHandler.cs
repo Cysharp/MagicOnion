@@ -25,7 +25,7 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly MagicOnionFilterAttribute[] filters;
+        readonly MagicOnionFilterDescriptor<MagicOnionFilterAttribute>[] filters;
 
         // options
 
@@ -79,8 +79,10 @@ namespace MagicOnion.Server
                 .ToLookup(x => x.GetType());
 
             this.filters = options.GlobalFilters
-                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true))
-                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true))
+                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x, x.Order)))
+                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x.Type, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x.Type, x.Order)))
                 .OrderBy(x => x.Order)
                 .ToArray();
 
@@ -282,21 +284,13 @@ namespace MagicOnion.Server
 
         Func<ServiceContext, ValueTask> BuildMethodBodyWithFilter(Func<ServiceContext, ValueTask> methodBody)
         {
-            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
             Func<ServiceContext, ValueTask> next = methodBody;
 
-            foreach (var filter in this.filters.Reverse())
+            foreach (var filterDescriptor in this.filters.Reverse())
             {
-                var fields = filter.GetType().GetFields(flags);
-
-                var newFilter = (MagicOnionFilterAttribute)Activator.CreateInstance(filter.GetType(), new object[] { next });
-                // copy all data.
-                foreach (var item in fields)
-                {
-                    item.SetValue(newFilter, item.GetValue(filter));
-                }
-
-                next = newFilter.Invoke;
+                var newFilter = filterDescriptor.GetOrCreateInstance(serviceLocator);
+                var next_ = next; // capture reference
+                next = (ctx) => newFilter.Invoke(ctx, next_);
             }
 
             return next;

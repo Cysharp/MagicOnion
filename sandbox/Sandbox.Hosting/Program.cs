@@ -1,11 +1,12 @@
 ﻿using Grpc.Core;
-using Grpc.Core.Logging;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Hosting;
 using MagicOnion.Server;
+using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -29,7 +30,11 @@ namespace Sandbox.Hosting
                     {
                         if (hostContext.HostingEnvironment.IsDevelopment())
                         {
-                            options.Service.GlobalFilters = new[] { new MyFilterAttribute(null) };
+                            options.Service.GlobalStreamingHubFilters.Add<MyStreamingHubFilterAttribute>();
+                            // options.Service.GlobalStreamingHubFilters.Add(new MyStreamingHubFilterAttribute(logger));
+
+                            options.Service.GlobalFilters.Add<MyFilterAttribute>();
+                            // options.Service.GlobalFilters.Add(new MyFilterAttribute(logger));
                         }
                         options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
                         options.ChannelOptions.Add(new ChannelOption("grpc.keepalive_time_ms", 10000));
@@ -53,15 +58,37 @@ namespace Sandbox.Hosting
         }
     }
 
+    public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
+    {
+        private readonly ILogger _logger;
+
+        public MyStreamingHubFilterAttribute(ILogger<MyStreamingHubFilterAttribute> logger)
+        {
+            _logger = logger;
+        }
+
+        public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+        {
+            _logger.LogInformation($"MyStreamingHubFilter Begin: {context.Path}");
+            await next(context);
+            _logger.LogInformation($"MyStreamingHubFilter End: {context.Path}");
+        }
+    }
+
     public class MyFilterAttribute : MagicOnionFilterAttribute
     {
-        public MyFilterAttribute(Func<ServiceContext, ValueTask> next) : base(next) { }
+        private readonly ILogger _logger;
 
-        public override async ValueTask Invoke(ServiceContext context)
+        public MyFilterAttribute(ILogger<MyFilterAttribute> logger)
         {
-            Console.WriteLine($"MyFilter Begin: {context.CallContext.Method}");
-            await Next(context);
-            Console.WriteLine($"MyFilter End: {context.CallContext.Method}");
+            _logger = logger;
+        }
+
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            _logger.LogInformation($"MyFilter Begin: {context.CallContext.Method}");
+            await next(context);
+            _logger.LogInformation($"MyFilter End: {context.CallContext.Method}");
         }
     }
 
@@ -71,6 +98,10 @@ namespace Sandbox.Hosting
     }
     public class MyService : ServiceBase<IMyService>, IMyService
     {
+        public MyService()
+        {
+
+        }
         public async UnaryResult<string> HelloAsync()
         {
             return "Konnichiwa";

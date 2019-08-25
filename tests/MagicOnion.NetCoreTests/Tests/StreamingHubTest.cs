@@ -406,13 +406,10 @@ namespace MagicOnion.Tests
         public static bool calledBefore;
         public static bool calledAfter;
 
-        public StreamingHubTestFilterAttribute(Func<StreamingHubContext, ValueTask> next) : base(next) { }
-        public StreamingHubTestFilterAttribute() : base(null) { }
-
-        public override async ValueTask Invoke(StreamingHubContext context)
+        public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
             context.Items["HubFilter1_AF"] = "BeforeOK";
-            await Next.Invoke(context);
+            await next.Invoke(context);
             context.Items["HubFilter1_BF"] = "AfterOK";
         }
     }

@@ -283,17 +283,18 @@ namespace MagicOnion.OpenTelemetry
     /// </summary>
     public class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
     {
-        public OpenTelemetryCollectorFilter(Func<ServiceContext, ValueTask> next) :
-            base(next)
+        readonly ITracer tracer;
+        readonly ISampler sampler;
+
+        public OpenTelemetryCollectorFilter(ITracer tracer, ISampler sampler)
         {
+            this.tracer = tracer;
+            this.sampler = sampler;
         }
 
-        public override async ValueTask Invoke(ServiceContext context)
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
-
-            var tracer = context.ServiceLocator.GetService<ITracer>();
-            var sampler = context.ServiceLocator.GetService<ISampler>();
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             var spanBuilder = tracer.SpanBuilder(context.CallContext.Method, SpanKind.Server);
@@ -309,7 +310,7 @@ namespace MagicOnion.OpenTelemetry
                     span.SetAttribute("component", "grpc");
                     //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
 
-                    await Next(context);
+                    await next(context);
 
                     //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
                     span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
@@ -332,16 +333,18 @@ namespace MagicOnion.OpenTelemetry
     /// </summary>
     public class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
     {
-        public OpenTelemetryHubCollectorFilter(Func<StreamingHubContext, ValueTask> next) : base(next)
+        readonly ITracer tracer;
+        readonly ISampler sampler;
+
+        public OpenTelemetryHubCollectorFilter(ITracer tracer, ISampler sampler)
         {
+            this.tracer = tracer;
+            this.sampler = sampler;
         }
 
-        public override async ValueTask Invoke(StreamingHubContext context)
+        public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
-
-            var tracer = context.ServiceContext.ServiceLocator.GetService<ITracer>();
-            var sampler = context.ServiceContext.ServiceLocator.GetService<ISampler>();
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             var spanBuilder = tracer.SpanBuilder(context.ServiceContext.CallContext.Method, SpanKind.Server);
@@ -357,7 +360,7 @@ namespace MagicOnion.OpenTelemetry
                     span.SetAttribute("component", "grpc");
                     //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
 
-                    await Next(context);
+                    await next(context);
 
                     //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
                     span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
