@@ -38,6 +38,8 @@ namespace MagicOnion.Tests
                 .Should().Be("ConstructorInjectedFilterAttribute");
             Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult()).Status.Detail
                 .Should().Be("ConstructorInjectedFilterAttributeConstructorInjectedFilter2Attribute");
+            Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult()).Status.Detail
+                .Should().Be("ConstructorInjectedFilterAttributeConstructorInjectedFilter3Attributefoo987654");
         }
     }
 
@@ -78,13 +80,35 @@ namespace MagicOnion.Tests
         }
     }
 
+    public class ConstructorInjectedFilter3Attribute : MagicOnionFilterAttribute
+    {
+        readonly FilterConstructorInjectionValue injected;
+        readonly string arg1;
+        readonly int arg2;
+
+        public ConstructorInjectedFilter3Attribute(string arg1, int arg2, FilterConstructorInjectionValue injected)
+        {
+            this.arg1 = arg1;
+            this.arg2 = arg2;
+            this.injected = injected;
+        }
+
+        public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            var prevDetail = context.CallContext?.Status.Detail ?? string.Empty;
+            context.CallContext.Status = new Grpc.Core.Status(StatusCode.Unknown, prevDetail + (this.injected != null ? nameof(ConstructorInjectedFilter3Attribute) + this.arg1 + this.arg2 : ""));
+            return next(context);
+        }
+    }
+
     public interface IFilterConstructorInjectionTester : IService<IFilterConstructorInjectionTester>
     {
         UnaryResult<int> A();
         UnaryResult<int> B();
+        UnaryResult<int> C();
     }
 
-    [FromServiceFilter(typeof(ConstructorInjectedFilterAttribute))]
+    [FromTypeFilter(typeof(ConstructorInjectedFilterAttribute))]
     public class FilterConstructorInjectionTester : ServiceBase<IFilterConstructorInjectionTester>, IFilterConstructorInjectionTester
     {
         public UnaryResult<int> A()
@@ -92,8 +116,14 @@ namespace MagicOnion.Tests
             return UnaryResult(0);
         }
 
-        [FromServiceFilter(typeof(ConstructorInjectedFilter2Attribute))]
+        [FromTypeFilter(typeof(ConstructorInjectedFilter2Attribute))]
         public UnaryResult<int> B()
+        {
+            return UnaryResult(0);
+        }
+
+        [FromTypeFilter(typeof(ConstructorInjectedFilter3Attribute), Arguments = new object[] { "foo", 987654 })]
+        public UnaryResult<int> C()
         {
             return UnaryResult(0);
         }

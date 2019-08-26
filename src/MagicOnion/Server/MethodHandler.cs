@@ -25,7 +25,7 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly MagicOnionFilterDescriptor<MagicOnionFilterAttribute>[] filters;
+        readonly IMagicOnionFilterFactory<MagicOnionFilterAttribute>[] filters;
 
         // options
 
@@ -79,10 +79,11 @@ namespace MagicOnion.Server
                 .ToLookup(x => x.GetType());
 
             this.filters = options.GlobalFilters
-                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x, x.Order)))
-                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x.Type, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(x.Type, x.Order)))
+                .OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>()
+                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+                .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
                 .OrderBy(x => x.Order)
                 .ToArray();
 
@@ -286,9 +287,9 @@ namespace MagicOnion.Server
         {
             Func<ServiceContext, ValueTask> next = methodBody;
 
-            foreach (var filterDescriptor in this.filters.Reverse())
+            foreach (var filterFactory in this.filters.Reverse())
             {
-                var newFilter = filterDescriptor.GetOrCreateInstance(serviceLocator);
+                var newFilter = filterFactory.CreateInstance(serviceLocator);
                 var next_ = next; // capture reference
                 next = (ctx) => newFilter.Invoke(ctx, next_);
             }

@@ -19,7 +19,7 @@ namespace MagicOnion.Server.Hubs
 
         readonly IServiceLocator serviceLocator;
 
-        readonly MagicOnionFilterDescriptor<StreamingHubFilterAttribute>[] filters;
+        readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
         internal readonly IFormatterResolver resolver;
@@ -64,10 +64,11 @@ namespace MagicOnion.Server.Hubs
                 .ToLookup(x => x.GetType());
 
             this.filters = options.GlobalStreamingHubFilters
-                .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<StreamingHubFilterAttribute>(x, x.Order)))
-                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<StreamingHubFilterAttribute>(x.Type, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<StreamingHubFilterAttribute>(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true).Select(x => new MagicOnionFilterDescriptor<StreamingHubFilterAttribute>(x.Type, x.Order)))
+                .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
+                .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+                .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
                 .OrderBy(x => x.Order)
                 .ToArray();
 
@@ -154,9 +155,9 @@ namespace MagicOnion.Server.Hubs
         {
             Func<StreamingHubContext, ValueTask> next = methodBody;
 
-            foreach (var filterDescriptor in this.filters.Reverse())
+            foreach (var filterFactory in this.filters.Reverse())
             {
-                var newFilter = filterDescriptor.GetOrCreateInstance(serviceLocator);
+                var newFilter = filterFactory.CreateInstance(serviceLocator);
                 var next_ = next; // capture reference
                 next = (ctx) => newFilter.Invoke(ctx, next_);
             }

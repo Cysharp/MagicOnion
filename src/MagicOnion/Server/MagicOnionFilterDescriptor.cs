@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
-    public class MagicOnionFilterDescriptor<TAttribute>
+    public abstract class MagicOnionFilterDescriptor<TAttribute> : IMagicOnionFilterFactory<TAttribute>
         where TAttribute: class
     {
+        static readonly MethodInfo serviceLocatorGetServiceT = typeof(IServiceLocator).GetMethod("GetService");
+
         public Type Type { get; }
         public TAttribute Instance { get; }
         public int Order { get; }
@@ -27,6 +29,54 @@ namespace MagicOnion.Server
             Instance = instance;
             Order = order;
         }
+
+        public TAttribute CreateInstance(IServiceLocator serviceLocator)
+        {
+            return GetOrCreateInstance(serviceLocator);
+        }
+
+        protected TAttribute GetOrCreateInstance(IServiceLocator serviceLocator)
+        {
+            if (Instance != null) return Instance;
+
+            var filterType = Type;
+            var ctors = filterType.GetConstructors();
+            var ctor = ctors.Select(x => (Ctor: x, Parameters: x.GetParameters()))
+                .OrderByDescending(x => x.Parameters.Length)
+                .First();
+
+            var @params = ctor.Parameters
+                .Select(x => serviceLocatorGetServiceT.MakeGenericMethod(x.ParameterType).Invoke(serviceLocator, null))
+                .ToArray();
+
+            return (TAttribute)Activator.CreateInstance(filterType, @params);
+        }
+    }
+
+    public class MagicOnionServiceFilterDescriptor : MagicOnionFilterDescriptor<MagicOnionFilterAttribute>
+    {
+        public MagicOnionServiceFilterDescriptor(Type type, int order = 0)
+            : base(type, order)
+        {
+        }
+
+        public MagicOnionServiceFilterDescriptor(MagicOnionFilterAttribute instance, int order = 0)
+            : base(instance, order)
+        {
+        }
+    }
+
+    public class StreamingHubFilterDescriptor : MagicOnionFilterDescriptor<StreamingHubFilterAttribute>
+    {
+        public StreamingHubFilterDescriptor(Type type, int order = 0)
+            : base(type, order)
+        {
+        }
+
+        public StreamingHubFilterDescriptor(StreamingHubFilterAttribute instance, int order = 0)
+            : base(instance, order)
+        {
+        }
     }
 
     public static class MagicOnionFilterDescriptorExtensions
@@ -38,45 +88,19 @@ namespace MagicOnion.Server
         /// </summary>
         /// <param name="descriptors"></param>
         /// <param name="filterType"></param>
-        public static void Add<TAttribute>(this IList<MagicOnionFilterDescriptor<TAttribute>> descriptors, Type filterType)
-            where TAttribute: class
+        public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, Type filterType)
         {
-            if (!typeof(MagicOnionFilterAttribute).IsAssignableFrom(filterType))
-            {
-                throw new ArgumentException($"Type '{filterType.FullName}' doesn't inherit from MagicOnionFilterAttribute.", nameof(filterType));
-            }
-
-            descriptors.Add(new MagicOnionFilterDescriptor<TAttribute>(filterType));
+            descriptors.Add(new MagicOnionServiceFilterDescriptor(filterType));
         }
 
         /// <summary>
         /// Adds the MagicOnion filter as type.
         /// </summary>
         /// <param name="descriptors"></param>
-        public static void Add<TAttribute, T>(this IList<MagicOnionFilterDescriptor<TAttribute>> descriptors)
-            where TAttribute : class
-        {
-            descriptors.Add(new MagicOnionFilterDescriptor<TAttribute>(typeof(T)));
-        }
-
-        /// <summary>
-        /// Adds the MagicOnion filter as type.
-        /// </summary>
-        /// <param name="descriptors"></param>
-        public static void Add<T>(this IList<MagicOnionFilterDescriptor<MagicOnionFilterAttribute>> descriptors)
+        public static void Add<T>(this IList<MagicOnionServiceFilterDescriptor> descriptors)
             where T : MagicOnionFilterAttribute
         {
-            descriptors.Add(new MagicOnionFilterDescriptor<MagicOnionFilterAttribute>(typeof(T)));
-        }
-
-        /// <summary>
-        /// Adds the MagicOnion StreamingHub filter as type.
-        /// </summary>
-        /// <param name="descriptors"></param>
-        public static void Add<T>(this IList<MagicOnionFilterDescriptor<StreamingHubFilterAttribute>> descriptors)
-            where T : StreamingHubFilterAttribute
-        {
-            descriptors.Add(new MagicOnionFilterDescriptor<StreamingHubFilterAttribute>(typeof(T)));
+            descriptors.Add(new MagicOnionServiceFilterDescriptor(typeof(T)));
         }
 
         /// <summary>
@@ -84,12 +108,33 @@ namespace MagicOnion.Server
         /// </summary>
         /// <param name="descriptors"></param>
         /// <param name="filterInstance"></param>
-        public static void Add<TAttribute>(this IList<MagicOnionFilterDescriptor<TAttribute>> descriptors, TAttribute filterInstance)
-            where TAttribute: class
+        public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, MagicOnionFilterAttribute filterInstance)
         {
             if (filterInstance == null) throw new ArgumentNullException(nameof(filterInstance));
 
-            descriptors.Add(new MagicOnionFilterDescriptor<TAttribute>(filterInstance));
+            descriptors.Add(new MagicOnionServiceFilterDescriptor(filterInstance));
+        }
+
+        /// <summary>
+        /// Adds the MagicOnion StreamingHub filter as type.
+        /// </summary>
+        /// <param name="descriptors"></param>
+        public static void Add<T>(this IList<StreamingHubFilterDescriptor> descriptors)
+            where T : StreamingHubFilterAttribute
+        {
+            descriptors.Add(new StreamingHubFilterDescriptor(typeof(T)));
+        }
+
+        /// <summary>
+        /// Adds the MagicOnion StreamingHub filter instance as singleton.
+        /// </summary>
+        /// <param name="descriptors"></param>
+        /// <param name="filterInstance"></param>
+        public static void Add(this IList<StreamingHubFilterDescriptor> descriptors, StreamingHubFilterAttribute filterInstance)
+        {
+            if (filterInstance == null) throw new ArgumentNullException(nameof(filterInstance));
+
+            descriptors.Add(new StreamingHubFilterDescriptor(filterInstance));
         }
 
         internal static TAttribute GetOrCreateInstance<TAttribute>(this MagicOnionFilterDescriptor<TAttribute> descriptor, IServiceLocator serviceLocator)

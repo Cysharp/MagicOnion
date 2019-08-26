@@ -34,12 +34,12 @@ namespace MagicOnion.Server
         /// <summary>
         /// Global MagicOnion filters.
         /// </summary>
-        public List<MagicOnionFilterDescriptor<MagicOnionFilterAttribute>> GlobalFilters { get; private set; }
+        public List<MagicOnionServiceFilterDescriptor> GlobalFilters { get; private set; }
 
         /// <summary>
         /// Global StreamingHub filters.
         /// </summary>
-        public List<MagicOnionFilterDescriptor<StreamingHubFilterAttribute>> GlobalStreamingHubFilters { get; private set; }
+        public List<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; private set; }
 
         /// <summary>
         /// Default GroupRepository factory for StreamingHub.
@@ -60,8 +60,8 @@ namespace MagicOnion.Server
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
             this.FormatterResolver = MessagePackSerializer.DefaultResolver;
             this.MagicOnionLogger = new NullMagicOnionLogger();
-            this.GlobalFilters = new List<MagicOnionFilterDescriptor<MagicOnionFilterAttribute>>();
-            this.GlobalStreamingHubFilters = new List<MagicOnionFilterDescriptor<StreamingHubFilterAttribute>>();
+            this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
+            this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
             this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
             this.DisableEmbeddedService = false;
             this.EnableCurrentContext = false;
