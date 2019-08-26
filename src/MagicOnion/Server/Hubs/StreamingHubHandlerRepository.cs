@@ -49,7 +49,10 @@ namespace MagicOnion.Server.Hubs
 
         public static void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
         {
-            cacheGroup.Add(parent, repository);
+            lock (cacheGroup)
+            {
+                cacheGroup.Add(parent, repository);
+            }
         }
 
         public static IGroupRepository GetGroupRepository(MethodHandler parent)
