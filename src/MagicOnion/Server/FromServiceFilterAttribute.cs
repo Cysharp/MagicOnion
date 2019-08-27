@@ -18,8 +18,6 @@ namespace MagicOnion.Server
 
         public int Order { get; set; }
 
-        public object[] Arguments { get; set; } = Array.Empty<object>();
-
         public FromServiceFilterAttribute(Type type)
         {
             if (!typeof(MagicOnionFilterAttribute).IsAssignableFrom(type) &&
