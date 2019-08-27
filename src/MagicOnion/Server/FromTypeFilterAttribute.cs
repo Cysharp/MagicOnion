@@ -14,8 +14,6 @@ namespace MagicOnion.Server
         IMagicOnionFilterFactory<MagicOnionFilterAttribute>,
         IMagicOnionFilterFactory<StreamingHubFilterAttribute>
     {
-        static readonly MethodInfo serviceLocatorGetServiceT = typeof(IServiceLocator).GetMethod("GetService");
-
         public Type Type { get; }
 
         public int Order { get; set; }
@@ -54,7 +52,7 @@ namespace MagicOnion.Server
                 .First();
 
             var @params = ctor.Parameters
-                .Select((x, i) => (Arguments.Length > i) ? Arguments[i] : serviceLocatorGetServiceT.MakeGenericMethod(x.ParameterType).Invoke(serviceLocator, null))
+                .Select((x, i) => (Arguments.Length > i) ? Arguments[i] : serviceLocator.GetService(x.ParameterType))
                 .ToArray();
 
             return (T)Activator.CreateInstance(filterType, @params);

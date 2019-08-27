@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace MagicOnion.Server
 {
@@ -49,6 +50,13 @@ namespace MagicOnion.Server
 
     internal static class ServiceLocatorHelper
     {
+        static readonly MethodInfo serviceLocatorGetServiceT = typeof(IServiceLocator).GetMethod("GetService");
+
+        internal static object GetService(this IServiceLocator serviceLocator, Type t)
+        {
+            return serviceLocatorGetServiceT.MakeGenericMethod(t).Invoke(serviceLocator, null);
+        }
+
         internal static TServiceBase CreateService<TServiceBase, TServiceInterface>(ServiceContext context)
             where TServiceBase : ServiceBase<TServiceInterface>
         {

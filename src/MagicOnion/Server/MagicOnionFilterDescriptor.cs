@@ -10,20 +10,18 @@ namespace MagicOnion.Server
     public abstract class MagicOnionFilterDescriptor<TAttribute> : IMagicOnionFilterFactory<TAttribute>
         where TAttribute: class
     {
-        static readonly MethodInfo serviceLocatorGetServiceT = typeof(IServiceLocator).GetMethod("GetService");
-
         public Type Type { get; }
         public TAttribute Instance { get; }
         public int Order { get; }
 
-        public MagicOnionFilterDescriptor(Type type, int order = 0)
+        protected MagicOnionFilterDescriptor(Type type, int order = 0)
         {
             Type = type;
             Instance = null;
             Order = order;
         }
 
-        public MagicOnionFilterDescriptor(TAttribute instance, int order = 0)
+        protected MagicOnionFilterDescriptor(TAttribute instance, int order = 0)
         {
             Type = null;
             Instance = instance;
@@ -46,7 +44,7 @@ namespace MagicOnion.Server
                 .First();
 
             var @params = ctor.Parameters
-                .Select(x => serviceLocatorGetServiceT.MakeGenericMethod(x.ParameterType).Invoke(serviceLocator, null))
+                .Select(x => serviceLocator.GetService(x.ParameterType))
                 .ToArray();
 
             return (TAttribute)Activator.CreateInstance(filterType, @params);
@@ -81,8 +79,6 @@ namespace MagicOnion.Server
 
     public static class MagicOnionFilterDescriptorExtensions
     {
-        static readonly MethodInfo serviceLocatorGetServiceT = typeof(IServiceLocator).GetMethod("GetService");
-
         /// <summary>
         /// Adds the MagicOnion filter as type.
         /// </summary>
@@ -135,24 +131,6 @@ namespace MagicOnion.Server
             if (filterInstance == null) throw new ArgumentNullException(nameof(filterInstance));
 
             descriptors.Add(new StreamingHubFilterDescriptor(filterInstance));
-        }
-
-        internal static TAttribute GetOrCreateInstance<TAttribute>(this MagicOnionFilterDescriptor<TAttribute> descriptor, IServiceLocator serviceLocator)
-            where TAttribute: class
-        {
-            if (descriptor.Instance != null) return descriptor.Instance;
-
-            var filterType = descriptor.Type;
-            var ctors = filterType.GetConstructors();
-            var ctor = ctors.Select(x => (Ctor: x, Parameters: x.GetParameters()))
-                .OrderByDescending(x => x.Parameters.Length)
-                .First();
-
-            var @params = ctor.Parameters
-                .Select(x => serviceLocatorGetServiceT.MakeGenericMethod(x.ParameterType).Invoke(serviceLocator, null))
-                .ToArray();
-
-            return (TAttribute)Activator.CreateInstance(filterType, @params);
         }
     }
 }

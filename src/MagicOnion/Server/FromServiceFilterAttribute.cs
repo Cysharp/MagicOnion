@@ -43,7 +43,7 @@ namespace MagicOnion.Server
 
         protected T CreateInstance<T>(IServiceLocator serviceLocator)
         {
-            return serviceLocator.GetService<T>();
+            return (T)serviceLocator.GetService(Type);
         }
     }
 }

@@ -67,8 +67,10 @@ namespace MagicOnion.Server.Hubs
                 .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
                 .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true))
                 .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
                 .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true))
                 .OrderBy(x => x.Order)
                 .ToArray();
 

@@ -16,6 +16,7 @@ namespace MagicOnion.Tests
             protected override void PrepareServer()
             {
                 DefaultServiceLocator.Instance.Register(new FilterConstructorInjectionValue());
+                DefaultServiceLocator.Instance.Register(new ServiceFilterForMethodTestFilterAttribute());
                 base.PrepareServer();
             }
         }
@@ -32,14 +33,31 @@ namespace MagicOnion.Tests
         }
 
         [Fact]
-        public void Filter()
+        public void TypeFilterForClassTest()
         {
             Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult()).Status.Detail
                 .Should().Be("ConstructorInjectedFilterAttribute");
-            Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult()).Status.Detail
-                .Should().Be("ConstructorInjectedFilterAttributeConstructorInjectedFilter2Attribute");
+        }
+
+        [Fact]
+        public void TypeFilterForMethodTest()
+        {
+            Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult()).Status.Detail
+                .Should().Be("ConstructorInjectedFilterAttribute");
+        }
+
+        [Fact]
+        public void TypeFilterWithArgumentsForMethodTest()
+        {
             Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult()).Status.Detail
                 .Should().Be("ConstructorInjectedFilterAttributeConstructorInjectedFilter3Attributefoo987654");
+        }
+
+        [Fact]
+        public void ServiceFilterForMethodTest()
+        {
+            Assert.Throws<RpcException>(() => client.D().GetAwaiter().GetResult()).Status.Detail
+                .Should().Be("ConstructorInjectedFilterAttributeServiceFilterForMethodTestFilterAttribute");
         }
     }
 
@@ -101,11 +119,26 @@ namespace MagicOnion.Tests
         }
     }
 
+    public class ServiceFilterForMethodTestFilterAttribute : MagicOnionFilterAttribute
+    {
+        public ServiceFilterForMethodTestFilterAttribute()
+        {
+        }
+
+        public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            var prevDetail = context.CallContext?.Status.Detail ?? string.Empty;
+            context.CallContext.Status = new Grpc.Core.Status(StatusCode.Unknown, prevDetail + nameof(ServiceFilterForMethodTestFilterAttribute));
+            return next(context);
+        }
+    }
+
     public interface IFilterConstructorInjectionTester : IService<IFilterConstructorInjectionTester>
     {
         UnaryResult<int> A();
         UnaryResult<int> B();
         UnaryResult<int> C();
+        UnaryResult<int> D();
     }
 
     [FromTypeFilter(typeof(ConstructorInjectedFilterAttribute))]
@@ -124,6 +157,12 @@ namespace MagicOnion.Tests
 
         [FromTypeFilter(typeof(ConstructorInjectedFilter3Attribute), Arguments = new object[] { "foo", 987654 })]
         public UnaryResult<int> C()
+        {
+            return UnaryResult(0);
+        }
+
+        [FromServiceFilter(typeof(ServiceFilterForMethodTestFilterAttribute))]
+        public UnaryResult<int> D()
         {
             return UnaryResult(0);
         }
