@@ -278,18 +278,12 @@ MagicOnion filter is powerful feature to hook before-after invoke. It is useful 
 // for StreamingHub methods, implement StreamingHubFilterAttribute instead.
 public class SampleFilterAttribute : MagicOnionFilterAttribute
 {
-    // constructor convention rule. requires Func<ServiceContext, Task> next.
-    public SampleFilterAttribute(Func<ServiceContext, Task> next) : base(next) { }
-
-    // other constructor, use base(null)
-    public SampleFilterAttribute() : base(null) { }
-
-    public override async ValueTask Invoke(ServiceContext context)
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, Task> next)
     {
         try
         {
             /* on before */
-            await Next(context); // next
+            await next(context); // next
             /* on after */
         }
         catch
@@ -526,9 +520,9 @@ MagicOnionOption/Logging
 | --- | --- |
 | `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
 | `bool` DisableEmbeddedService | Disable embedded service(ex:heartbeat), default is false. |
-| `MagicOnionFilterAttribute[]` GlobalFilters | Global MagicOnion filters. |
+| `IList<MagicOnionFilterDescriptor>` GlobalFilters | Global MagicOnion filters. |
 | `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
-| `StreamingHubFilterAttribute[]` Global StreamingHub filters. | GlobalStreamingHubFilters |
+| `IList<StreamingHubFilterDescriptor>` Global StreamingHub filters. | GlobalStreamingHubFilters |
 | `IGroupRepositoryFactory` DefaultGroupRepositoryFactory | Default GroupRepository factory for StreamingHub, default is ``. |
 | `IServiceLocator` ServiceLocator | Add the extra typed option. |
 | `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
@@ -1329,14 +1323,16 @@ await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
         collection.AddSingleton<ITracer>(Tracing.Tracer);
         collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
     })
-    .UseMagicOnion(
-        new MagicOnionOptions()
+    .UseMagicOnion()
+    .ConfigureServices((hostContext, services) =>
+    {
+        services.Configure<MagicOnionHostingOptions>(options =>
         {
-            GlobalFilters = new[] { new OpenTelemetryCollectorFilter(null) },
-            GlobalStreamingHubFilters = new[] { new OpenTelemetryHubCollectorFilter(null) },
-            MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null))
-        },
-        new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+             options.Service.GlobalFilters.Add<OpenTelemetryCollectorFilter>();
+             options.Service.GlobalStreamingHubFilters.Add<OpenTelemetryHubCollectorFilter>();
+             options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null);
+        });
+    })
     .RunConsoleAsync();
 ```
 
