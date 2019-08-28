@@ -34,12 +34,12 @@ namespace MagicOnion.Server
         /// <summary>
         /// Global MagicOnion filters.
         /// </summary>
-        public List<MagicOnionServiceFilterDescriptor> GlobalFilters { get; private set; }
+        public IList<MagicOnionServiceFilterDescriptor> GlobalFilters { get; set; }
 
         /// <summary>
         /// Global StreamingHub filters.
         /// </summary>
-        public List<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; private set; }
+        public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; set; }
 
         /// <summary>
         /// Default GroupRepository factory for StreamingHub.
