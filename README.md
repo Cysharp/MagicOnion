@@ -4,6 +4,8 @@ MagicOnion
 
 Unified Realtime/API Engine for .NET Core and Unity.
 
+[Table of contents](#table-of-contents)
+
 What is it?
 ---
 MagicOnion is an Realtime Network Engine like [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR), [Socket.io](https://socket.io/) and RPC-Web API Framework like any web-framework.
@@ -102,6 +104,30 @@ Console.WriteLine("Client Received:" + result);
 MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules. 
 
 > for Server Hosting, We recommend to use `MagicOnion.Hosting`, it is easy to host and wait terminate signal, load from config, support DI, etc. see [MagicOnion#hosting](https://github.com/Cysharp/MagicOnion#hosting) section.
+
+Table of contents
+---
+- [What is it?](#what-is-it)
+- [Quick Start](#quick-start)
+- [StreamingHub](#streaminghub)
+- [Filter](#filter)
+- [ClientFilter](#clientfilter)
+- [ServiceContext and Lifecycle](#servicecontext-and-lifecycle)
+- [MagicOnionOption/Logging](#magiconionoptionlogging)
+- [ExceptionHandling and StatusCode](#exceptionhandling-and-statuscode)
+- [Group and GroupConfiguration](#group-and-groupconfiguration)
+- [Zero deserialization mapping](#zero-deserialization-mapping)
+- [Project Structure](#project-structure)
+- [Hosting](#hosting)
+- [DI](#di)
+- [Swagger](#swagger)
+- [Unity Supports](#unity-supports)
+- [Pack to Docker and deploy](#pack-to-docker-and-deploy)
+- [Raw gRPC APIs](#raw-grpc-apis)
+- [SSL/tls](#ssltls)
+- [Telemetry](#telemetry)
+- [Author Info](#author-info)
+- [License](#license)
 
 StreamingHub
 ---
