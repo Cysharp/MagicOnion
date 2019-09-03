@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  git-shallow-clone: guitarrapc/git-shallow-clone@0.2.0
 executors:
   dotnet:
     docker:
@@ -34,7 +36,7 @@ jobs:
   build-test:
     executor: dotnet
     steps:
-      - checkout
+      - git-shallow-clone/checkout_shallow
       - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
@@ -46,7 +48,7 @@ jobs:
   build-push:
     executor: dotnet
     steps:
-      - checkout
+      - git-shallow-clone/checkout_shallow
       # build .NET Core projects
       - run: dotnet build ./src/MagicOnion/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:Version=${CIRCLE_TAG}
