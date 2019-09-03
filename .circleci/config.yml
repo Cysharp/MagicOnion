@@ -23,7 +23,7 @@ jobs:
   build-unity:
     executor: unity
     steps:
-      - git-shallow-clone/checkout_shallow
+      - checkout
       # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
       - run: cat Unity_v2018.3.12f1.alf # file name same as image's version
