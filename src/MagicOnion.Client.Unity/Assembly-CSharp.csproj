@@ -188,21 +188,6 @@
     <Compile Include="Assets\Scripts\Tests\MetadataTest.cs" />
     <Compile Include="Assets\Scripts\Tests\SimpleTest.cs" />
     <Compile Include="Assets\Scripts\Tests\StandardTest.cs" />
-    <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
     </Reference>
@@ -413,8 +398,17 @@
     <Reference Include="Grpc.Core.Api">
       <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/Grpc.Core.Api/lib/net45/Grpc.Core.Api.dll</HintPath>
     </Reference>
-    <Reference Include="System.Interactive.Async">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Interactive.Async/lib/net45/System.Interactive.Async.dll</HintPath>
+    <Reference Include="System.Buffers">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Buffers/lib/net45/System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Memory/lib/net45/System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Runtime.CompilerServices.Unsafe/lib/net45/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Plugins/System.Threading.Tasks.Extensions/lib/net45/System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
@@ -424,12 +418,6 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Scripts/NetStandardLibraries/System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:/GitHubRepositories/MagicOnion/src/MagicOnion.Client.Unity/Assets/Scripts/NetStandardLibraries/System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.3f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

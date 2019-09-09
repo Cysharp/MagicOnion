@@ -121,3 +121,4 @@ nuget/*.unitypackage
 
 # Jetbrains Rider
 .idea/
+src/MagicOnion.Client.Unity/Packages/manifest.json

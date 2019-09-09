@@ -428,7 +428,7 @@ namespace MagicOnion.Server
             byte[] response = emptyBytes;
             try
             {
-                using (requestStream)
+                using (requestStream as IDisposable)
                 {
                     logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
                     if (enableCurrentContext)
@@ -521,7 +521,7 @@ namespace MagicOnion.Server
             try
             {
                 logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
-                using (requestStream)
+                using (requestStream as IDisposable)
                 {
                     if (enableCurrentContext)
                     {
