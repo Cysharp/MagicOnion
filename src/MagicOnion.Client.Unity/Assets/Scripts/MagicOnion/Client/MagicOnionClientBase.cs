@@ -18,7 +18,9 @@ namespace MagicOnion.Client
         {
             var self = context.Client;
             var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(MagicOnionMarshallers.UnsafeNilBytes));
-            return new ResponseContext<TResponse>(callResult, self.resolver);
+            var response = new ResponseContext<TResponse>(callResult, self.resolver);
+            response.SetResponseMutator(context.ResponseMutator);
+            return response;
         }
 
         static protected ResponseContext CreateResponseContext<TRequest, TResponse>(RequestContext context, Method<byte[], byte[]> method)
@@ -26,7 +28,9 @@ namespace MagicOnion.Client
             var self = context.Client;
             var message = LZ4MessagePackSerializer.Serialize<TRequest>(((RequestContext<TRequest>)context).Request, self.resolver);
             var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(message));
-            return new ResponseContext<TResponse>(callResult, self.resolver);
+            var response = new ResponseContext<TResponse>(callResult, self.resolver);
+            response.SetResponseMutator(context.ResponseMutator);
+            return response;
         }
     }
 

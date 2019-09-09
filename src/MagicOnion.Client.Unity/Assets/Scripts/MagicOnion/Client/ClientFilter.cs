@@ -21,6 +21,7 @@ namespace MagicOnion.Client
         public Type ResponseType { get; }
         public abstract Type RequestType { get; }
         public Func<byte[], byte[]> RequestMutator { get; private set; }
+        public Func<byte[], byte[]> ResponseMutator { get; private set; }
 
         Dictionary<string, object> items;
         public IDictionary<string, object> Items
@@ -49,11 +50,17 @@ namespace MagicOnion.Client
             this.Filters = filters;
             this.RequestMethod = requestMethod;
             this.RequestMutator = DefaultMutator;
+            this.ResponseMutator = DefaultMutator;
         }
 
         public void SetRequestMutator(Func<byte[], byte[]> mutator)
         {
             this.RequestMutator = mutator;
+        }
+
+        public void SetResponseMutator(Func<byte[], byte[]> mutator)
+        {
+            this.ResponseMutator = mutator;
         }
     }
 
@@ -100,7 +107,7 @@ namespace MagicOnion.Client
             this.ResponseMutator = DefaultMutator;
         }
 
-        public void SetRequestMutator(Func<byte[], byte[]> mutator)
+        public void SetResponseMutator(Func<byte[], byte[]> mutator)
         {
             this.ResponseMutator = mutator;
         }
