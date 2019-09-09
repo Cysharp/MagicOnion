@@ -17,7 +17,9 @@ namespace MagicOnion.Server.Hubs
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly StreamingHubFilterAttribute[] filters;
+        readonly IServiceLocator serviceLocator;
+
+        readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
         internal readonly IFormatterResolver resolver;
@@ -62,10 +64,18 @@ namespace MagicOnion.Server.Hubs
                 .ToLookup(x => x.GetType());
 
             this.filters = options.GlobalStreamingHubFilters
-                .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true))
-                .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true))
+                .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
+                .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+                .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true))
                 .OrderBy(x => x.Order)
                 .ToArray();
+
+            // options
+            this.serviceLocator = options.ServiceLocator;
 
             // validation filter
             if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)
@@ -145,21 +155,13 @@ namespace MagicOnion.Server.Hubs
 
         Func<StreamingHubContext, ValueTask> BuildMethodBodyWithFilter(Func<StreamingHubContext, ValueTask> methodBody)
         {
-            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
             Func<StreamingHubContext, ValueTask> next = methodBody;
 
-            foreach (var filter in this.filters.Reverse())
+            foreach (var filterFactory in this.filters.Reverse())
             {
-                var fields = filter.GetType().GetFields(flags);
-
-                var newFilter = (StreamingHubFilterAttribute)Activator.CreateInstance(filter.GetType(), new object[] { next });
-                // copy all data.
-                foreach (var item in fields)
-                {
-                    item.SetValue(newFilter, item.GetValue(filter));
-                }
-
-                next = newFilter.Invoke;
+                var newFilter = filterFactory.CreateInstance(serviceLocator);
+                var next_ = next; // capture reference
+                next = (ctx) => newFilter.Invoke(ctx, next_);
             }
 
             return next;

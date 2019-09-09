@@ -22,22 +22,13 @@ namespace MagicOnion.Tests
 
     public class SimpleFilter1 : MagicOnionFilterAttribute
     {
-        public SimpleFilter1() : this(null)
-        {
-
-        }
-
-        public SimpleFilter1(Func<ServiceContext, ValueTask> next) : base(next)
-        {
-        }
-
-        public async override ValueTask Invoke(ServiceContext context)
+        public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             try
             {
                 (context.Items["list"] as List<string>).Add(nameof(SimpleFilter1));
                 context.Items[nameof(SimpleFilter1)] = FilterCalledStatus.Begin;
-                await Next(context);
+                await next(context);
             }
             catch
             {
@@ -58,24 +49,19 @@ namespace MagicOnion.Tests
         public int Z { get; set; }
 
         public MultiFilter2(int x, int y)
-            : base(null)
         {
             this.X = x;
             this.Y = y;
         }
 
-        public MultiFilter2(Func<ServiceContext, ValueTask> next) : base(next)
-        {
-        }
-
-        public override async ValueTask Invoke(ServiceContext context)
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             try
             {
                 (context.Items["list"] as List<string>).Add(nameof(MultiFilter2));
                 context.Items[nameof(MultiFilter2)] = FilterCalledStatus.Begin;
                 context.Items[nameof(MultiFilter2) + "xyz"] = Tuple.Create(X, Y, Z);
-                await Next(context);
+                await next(context);
             }
             catch
             {
@@ -94,23 +80,18 @@ namespace MagicOnion.Tests
         readonly string msg;
 
         public MoreThanFilter3(string msg)
-            : base(null)
         {
             this.msg = msg;
         }
 
-        public MoreThanFilter3(Func<ServiceContext, ValueTask> next) : base(next)
-        {
-        }
-
-        public async override ValueTask Invoke(ServiceContext context)
+        public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             try
             {
                 (context.Items["list"] as List<string>).Add(nameof(MoreThanFilter3));
                 context.Items[nameof(MoreThanFilter3)] = FilterCalledStatus.Begin;
                 context.Items[nameof(MoreThanFilter3) + "msg"] = msg;
-                await Next(context);
+                await next(context);
             }
             catch
             {
@@ -126,22 +107,13 @@ namespace MagicOnion.Tests
 
     public class DumpFilter : MagicOnionFilterAttribute
     {
-        public DumpFilter() : base(null)
-        {
-
-        }
-
-        public DumpFilter(Func<ServiceContext, ValueTask> next) : base(next)
-        {
-        }
-
-        public override async ValueTask Invoke(ServiceContext context)
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             try
             {
                 context.Items["list"] = new List<string>();
                 (context.Items["list"] as List<string>).Add(nameof(DumpFilter));
-                await Next(context);
+                await next(context);
             }
             catch
             {

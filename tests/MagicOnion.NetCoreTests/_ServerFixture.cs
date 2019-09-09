@@ -42,6 +42,11 @@ namespace MagicOnion.Tests
 
         public ServerFixture()
         {
+            PrepareServer();
+        }
+
+        protected virtual void PrepareServer()
+        {
             var options = new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true };
             var service = MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ServerFixture).GetTypeInfo().Assembly }, options);
 
