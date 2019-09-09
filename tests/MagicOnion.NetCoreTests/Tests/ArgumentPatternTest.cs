@@ -233,6 +233,12 @@ namespace MagicOnion.Tests
             result.Y.Should().Be(9999);
         }
 
+        async Task<T> First<T>(IAsyncStreamReader<T> reader)
+        {
+            await reader.MoveNext(CancellationToken.None);
+            return reader.Current;
+        }
+
         [Fact]
         public async Task ServerStreaming()
         {
@@ -240,34 +246,34 @@ namespace MagicOnion.Tests
 
             {
                 var callResult = await client.ServerStreamingResult1(10, 100, "aaa");
-                var result = await callResult.ResponseStream.AsAsyncEnumerable().First();
+                var result = await First(callResult.ResponseStream);
                 result.Id.Should().Be(110);
                 result.Data.Should().Be("aaa");
             }
 
             {
                 var callResult = await client.ServerStreamingResult2(new MyRequest { Id = 999, Data = "zzz" });
-                var result = await callResult.ResponseStream.AsAsyncEnumerable().First();
+                var result = await First(callResult.ResponseStream);
                 result.Id.Should().Be(999);
                 result.Data.Should().Be("zzz");
             }
 
             {
                 var callResult = await client.ServerStreamingResult3();
-                var result = await callResult.ResponseStream.AsAsyncEnumerable().First();
+                var result = await First(callResult.ResponseStream);
                 result.Id.Should().Be(-1);
                 result.Data.Should().Be("empty");
             }
 
             {
                 var callResult = await client.ServerStreamingResult4();
-                var result = await callResult.ResponseStream.AsAsyncEnumerable().First();
+                var result = await First(callResult.ResponseStream);
                 result.Should().Be(Nil.Default);
             }
 
             {
                 var callResult = await client.ServerStreamingResult5(new MyStructRequest { X = 9, Y = 100 });
-                var result = await callResult.ResponseStream.AsAsyncEnumerable().First();
+                var result = await First(callResult.ResponseStream);
                 result.X.Should().Be(9);
                 result.Y.Should().Be(100);
             }

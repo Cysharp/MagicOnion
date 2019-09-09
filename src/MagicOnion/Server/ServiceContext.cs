@@ -129,7 +129,7 @@ namespace MagicOnion.Server
         }
     }
 
-    public class ClientStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>
+    public class ClientStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>, IDisposable
     {
         readonly ServiceContext context;
         readonly IAsyncStreamReader<byte[]> inner;
@@ -165,7 +165,7 @@ namespace MagicOnion.Server
 
         public void Dispose()
         {
-            inner.Dispose();
+            (inner as IDisposable)?.Dispose();
         }
 
         public async Task ForEachAsync(Action<TRequest> action)
@@ -245,7 +245,7 @@ namespace MagicOnion.Server
         }
     }
 
-    public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>
+    public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, IDisposable
     {
         readonly ServiceContext context;
         readonly IAsyncStreamReader<byte[]> innerReader;
@@ -286,7 +286,7 @@ namespace MagicOnion.Server
         /// <summary>IAsyncStreamReader Methods.</summary>
         public void Dispose()
         {
-            innerReader.Dispose();
+            (innerReader as IDisposable)?.Dispose();
         }
 
         /// <summary>
