@@ -14,10 +14,13 @@ namespace MagicOnion.Client
 
     public abstract class RequestContext
     {
+        static readonly Func<byte[], byte[]> DefaultMutator = xs => xs;
+
         public string MethodPath { get; }
         public CallOptions CallOptions { get; }
         public Type ResponseType { get; }
         public abstract Type RequestType { get; }
+        public Func<byte[], byte[]> RequestMutator { get; private set; }
 
         Dictionary<string, object> items;
         public IDictionary<string, object> Items
@@ -45,6 +48,12 @@ namespace MagicOnion.Client
             this.ResponseType = responseType;
             this.Filters = filters;
             this.RequestMethod = requestMethod;
+            this.RequestMutator = DefaultMutator;
+        }
+
+        public void SetRequestMutator(Func<byte[], byte[]> mutator)
+        {
+            this.RequestMutator = mutator;
         }
     }
 
@@ -62,11 +71,14 @@ namespace MagicOnion.Client
 
     public abstract class ResponseContext : IDisposable
     {
+        static readonly Func<byte[], byte[]> DefaultMutator = xs => xs;
+
         public abstract Task<Metadata> ResponseHeadersAsync { get; }
         public abstract Status GetStatus();
         public abstract Metadata GetTrailers();
         public abstract void Dispose();
         public abstract Type ResponseType { get; }
+        public Func<byte[], byte[]> ResponseMutator { get; private set; }
 
         public abstract Task<ResponseContext> WaitResponseAsync();
 
@@ -81,6 +93,16 @@ namespace MagicOnion.Client
             if (t == null) return Task.FromResult(default(T));
 
             return t.ResponseAsync;
+        }
+
+        public ResponseContext()
+        {
+            this.ResponseMutator = DefaultMutator;
+        }
+
+        public void SetRequestMutator(Func<byte[], byte[]> mutator)
+        {
+            this.ResponseMutator = mutator;
         }
     }
 
@@ -99,6 +121,7 @@ namespace MagicOnion.Client
         readonly Status status;
 
         public ResponseContext(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
+            : base()
         {
             this.isMock = false;
             this.inner = inner;
@@ -111,6 +134,7 @@ namespace MagicOnion.Client
         }
 
         public ResponseContext(T responseObject, Metadata trailers, Metadata responseHeaders, Status status)
+            : base()
         {
             this.isMock = true;
             this.responseObject = responseObject;
@@ -128,7 +152,7 @@ namespace MagicOnion.Client
             else
             {
                 var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-                responseObject = LZ4MessagePackSerializer.Deserialize<T>(bytes, resolver);
+                responseObject = LZ4MessagePackSerializer.Deserialize<T>(this.ResponseMutator(bytes), resolver);
                 deserialized = true;
                 return responseObject;
             }

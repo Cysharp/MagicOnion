@@ -187,7 +187,7 @@ workflows:
               only: /^\d\.\d\.\d.*/
             branches:
               ignore: /.*/
-      - build-unity-chatapp-android:
-          filters:
-            tags:
-              only: /.*/
+      # - build-unity-chatapp-android:
+      #     filters:
+      #       tags:
+      #         only: /.*/
