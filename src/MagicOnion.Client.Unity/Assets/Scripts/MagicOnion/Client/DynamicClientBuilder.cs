@@ -163,7 +163,10 @@ namespace MagicOnion.Client
 
                 // CreateResponseContext<TRequest, TResponse>(Context, Method);
                 var createMethod = typeof(MagicOnionClientBase)
-                    .GetMethod("CreateResponseContext", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    .Where(x => x.Name == "CreateResponseContext")
+                    .OrderByDescending(x => x.GetGenericArguments().Length)
+                    .First()
                     .MakeGenericMethod(definition.RequestType, definition.ResponseType);
 
                 il.Emit(OpCodes.Ldarg_0); // context
