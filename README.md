@@ -120,6 +120,7 @@ Table of contents
 - [Project Structure](#project-structure)
 - [Hosting](#hosting)
 - [DI](#di)
+- [Options](#options)
 - [Swagger](#swagger)
 - [Unity Supports](#unity-supports)
 - [Pack to Docker and deploy](#pack-to-docker-and-deploy)
@@ -331,9 +332,60 @@ Here is example of what kind of filter can be stacked.
 
 GlobalFilter can attach to MagicOnionOptions.
 
+MagicOnion filters supports [DI](#DI) by [MagicOnion.Hosting](#Hosting).
+
+```csharp
+public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
+{
+    private readonly ILogger _logger;
+
+    // the `logger` parameter will be injected at instantiating.
+    public MyStreamingHubFilterAttribute(ILogger<MyStreamingHubFilterAttribute> logger)
+    {
+        _logger = logger;
+    }
+
+    public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+    {
+        _logger.LogInformation($"MyStreamingHubFilter Begin: {context.Path}");
+        await next(context);
+        _logger.LogInformation($"MyStreamingHubFilter End: {context.Path}");
+    }
+}
+```
+
+Register filters using attributes with constructor injection(you can use `[FromTypeFilter]` and `[FromServiceFilter]`).
+
+```
+[FromTypeFilter(typeof(MyFilterAttribute))]
+public class MyService : ServiceBase<IMyService>, IMyService
+{
+    // The filter will instantiate from type.
+    [FromTypeFilter(typeof(MySecondFilterAttribute))]
+    public UnaryResult<int> Foo()
+    {
+        return UnaryResult(0);
+    }
+
+    // The filter will instantiate from type with some arguments. if the arguments are missing, it will be obtained from `IServiceLocator` 
+    [FromTypeFilter(typeof(MyThirdFilterAttribute), Arguments = new object[] { "foo", 987654 })]
+    public UnaryResult<int> Bar()
+    {
+        return UnaryResult(0);
+    }
+
+    // The filter instance will be provided via `IServiceLocator`.
+    [FromServiceFilter(typeof(MyFourthFilterAttribute))]
+    public UnaryResult<int> Baz()
+    {
+        return UnaryResult(0);
+    }
+}
+```
+
 ClientFilter
 ---
-MagicOnion client-filter is powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
+MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
 
 > Currently only suppots on Unary.
 
@@ -471,6 +523,17 @@ public class RetryFilter : IClientFilter
         }
 
         throw new Exception("Retry failed", lastException);
+    }
+}
+
+public class EncryptFilter : IClientFilter
+{
+    public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
+    {
+        context.SetRequestMutator(bytes => Encrypt(bytes));
+        context.SetResponseMutator(bytes => Decrypt(bytes));
+        
+        return await next(context);
     }
 }
 ```
@@ -763,6 +826,132 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     }
 
     // ...
+}
+```
+
+Options
+---
+Configure MagicOnion hosting using `Microsoft.Extensions.Options` that align to .NET Core way. In many real use cases, Using setting files (ex. appsettings.json), environment variables, etc ... to configure an application.
+
+For example, We have Production and Development configurations and have some differences about listening ports, certificates and others.
+
+This example makes hosting MagicOnion easier and configurations moved to external files, environment variables. appsettings.json looks like below.
+
+```csharp
+{
+  "MagicOnion": {
+    "Service": {
+      "IsReturnExceptionStackTraceInErrorDetail": false
+    },
+    "ChannelOptions": {
+      "grpc.primary_user_agent": "MagicOnion/1.0 (Development)",
+      "grpc.max_receive_message_length": 4194304
+    },
+    "ServerPorts": [
+      {
+        "Host": "localhost",
+        "Port": 12345,
+        "UseInsecureConnection": false,
+        "ServerCredentials": [
+          {
+            "CertificatePath": "./server.crt",
+            "KeyPath": "./server.key"
+          }
+        ]
+      }
+    ]
+  }}
+```
+
+An application setting files is not required by default. You can simply call UseMagicOnion() then it starts service on localhost:12345 (Insecure connection).
+
+```csharp
+class Program
+{
+   static async Task Main(string[] args)
+   {
+       await MagicOnionHost.CreateDefaultBuilder()
+           .UseMagicOnion()
+           .RunConsoleAsync();
+   }
+}
+```
+
+Of course, you can also flexibly configure hosting by code. During configuration, you can access `IHostingEnvironment` / `IConfiguration` instances and configure 
+`MagicOnionOptions`.
+
+```csharp
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        await MagicOnionHost.CreateDefaultBuilder()
+            .UseMagicOnion()
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.Configure<MagicOnionHostingOptions>(options =>
+                {
+                    if (hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        options.Service.GlobalFilters = new[] { new MyFilterAttribute(null) };
+                    }
+                    options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
+                });
+            })
+            .RunConsoleAsync();
+    }
+}
+```
+
+This configuration method supports multiple MagicOnion hosting scenarios.
+
+```json
+{
+  "MagicOnion": {
+    "ServerPorts": [
+      {
+        "Host": "localhost",
+        "Port": 12345,
+        "UseInsecureConnection": true
+      }
+    ]
+  },
+  "MagicOnion-Management": {
+    "ServerPorts": [
+      {
+        "Host": "localhost",
+        "Port": 23456,
+        "UseInsecureConnection": true
+      }
+    ]
+  }
+}
+```
+
+```csharp
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        await MagicOnionHost.CreateDefaultBuilder()
+            .UseMagicOnion(types: new[] { typeof(MyService) })
+            .UseMagicOnion(configurationName: "MagicOnion-Management", types: new[] { typeof(ManagementService) })
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.Configure<MagicOnionHostingOptions>(options =>
+                {
+                    options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
+                });
+                services.Configure<MagicOnionHostingOptions>("MagicOnion-Management", options =>
+                {
+                    if (hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        options.Service.GlobalFilters = new[] { new MyFilterAttribute(null) };
+                    }
+                });
+            })
+            .RunConsoleAsync();
+    }
 }
 ```
 

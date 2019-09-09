@@ -35,6 +35,9 @@ namespace Sandbox.Hosting
 
                             options.Service.GlobalFilters.Add<MyFilterAttribute>();
                             // options.Service.GlobalFilters.Add(new MyFilterAttribute(logger));
+
+                            // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = opti
+
                         }
                         options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
                         options.ChannelOptions.Add(new ChannelOption("grpc.keepalive_time_ms", 10000));
