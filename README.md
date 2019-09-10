@@ -305,7 +305,7 @@ MagicOnion filter is powerful feature to hook before-after invoke. It is useful 
 // for StreamingHub methods, implement StreamingHubFilterAttribute instead.
 public class SampleFilterAttribute : MagicOnionFilterAttribute
 {
-    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, Task> next)
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
         try
         {
