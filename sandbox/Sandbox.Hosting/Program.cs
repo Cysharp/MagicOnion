@@ -33,11 +33,11 @@ namespace Sandbox.Hosting
                             options.Service.GlobalStreamingHubFilters.Add<MyStreamingHubFilterAttribute>();
                             // options.Service.GlobalStreamingHubFilters.Add(new MyStreamingHubFilterAttribute(logger));
 
-                            options.Service.GlobalFilters.Add<MyFilterAttribute>();
-                            // options.Service.GlobalFilters.Add(new MyFilterAttribute(logger));
+                            options.Service.GlobalFilters.Add<MyFilterAttribute>(); // Register filter by type.
+                            options.Service.GlobalFilters.Add(new MyFilterUsingFactoryAttribute("Global")); // Register filter with IMagicOnionFilterFactory.
+                            // options.Service.GlobalFilters.Add(new MyFilterAttribute(null));
 
-                            // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = opti
-
+                            // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = 12345, Host = "0.0.0.0", UseInsecureConnection = true } };
                         }
                         options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
                         options.ChannelOptions.Add(new ChannelOption("grpc.keepalive_time_ms", 10000));
@@ -78,6 +78,7 @@ namespace Sandbox.Hosting
         }
     }
 
+
     public class MyFilterAttribute : MagicOnionFilterAttribute
     {
         private readonly ILogger _logger;
@@ -95,6 +96,42 @@ namespace Sandbox.Hosting
         }
     }
 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    public class MyFilterUsingFactoryAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public int Order { get; set; }
+        public string Label { get; set; }
+
+        public MyFilterUsingFactoryAttribute(string label)
+        {
+            Label = label;
+        }
+
+        MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new FilterImpl(serviceLocator.GetService<ILoggerFactory>().CreateLogger<MyFilterUsingFactoryAttribute>(), Label);
+        }
+
+        internal class FilterImpl : MagicOnionFilterAttribute
+        {
+            private readonly ILogger _logger;
+            private readonly string _label;
+
+            public FilterImpl(ILogger logger, string label)
+            {
+                this._logger = logger;
+                this._label = label;
+            }
+
+            public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            {
+                _logger.LogInformation($"MyFilterFactoryFilterImpl[{_label}] Begin: {context.CallContext.Method}");
+                await next(context);
+                _logger.LogInformation($"MyFilterFactoryFilterImpl[{_label}] End: {context.CallContext.Method}");
+            }
+        }
+    }
+
     public interface IMyService : IService<IMyService>
     {
         UnaryResult<string> HelloAsync();
@@ -105,6 +142,7 @@ namespace Sandbox.Hosting
         {
 
         }
+        [MyFilterUsingFactory("PerMethod")]
         public async UnaryResult<string> HelloAsync()
         {
             return "Konnichiwa";

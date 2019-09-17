@@ -59,6 +59,13 @@ namespace MagicOnion.Tests
             Assert.Throws<RpcException>(() => client.D().GetAwaiter().GetResult()).Status.Detail
                 .Should().Be("ConstructorInjectedFilterAttributeServiceFilterForMethodTestFilterAttribute");
         }
+
+        [Fact]
+        public void FilterFactoryTest()
+        {
+            Assert.Throws<RpcException>(() => client.E().GetAwaiter().GetResult()).Status.Detail
+                .Should().Be("ConstructorInjectedFilterAttributeFilterFactoryTestFilterAttributeHogemoge");
+        }
     }
 
 
@@ -139,6 +146,41 @@ namespace MagicOnion.Tests
         UnaryResult<int> B();
         UnaryResult<int> C();
         UnaryResult<int> D();
+        UnaryResult<int> E();
+    }
+
+    public class FilterFactoryTestFilterAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public int Order { get; set; }
+
+        public string Name { get; }
+
+        public FilterFactoryTestFilterAttribute(string name)
+        {
+            Name = name;
+        }
+
+        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new FilterImpl(Name) { Order = Order };
+        }
+
+        public class FilterImpl : MagicOnionFilterAttribute
+        {
+            private readonly string name;
+
+            public FilterImpl(string name)
+            {
+                this.name = name;
+            }
+
+            public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            {
+                var prevDetail = context.CallContext?.Status.Detail ?? string.Empty;
+                context.CallContext.Status = new Grpc.Core.Status(StatusCode.Unknown, prevDetail + nameof(FilterFactoryTestFilterAttribute) + name);
+                return next(context);
+            }
+        }
     }
 
     [FromTypeFilter(typeof(ConstructorInjectedFilterAttribute))]
@@ -163,6 +205,12 @@ namespace MagicOnion.Tests
 
         [FromServiceFilter(typeof(ServiceFilterForMethodTestFilterAttribute))]
         public UnaryResult<int> D()
+        {
+            return UnaryResult(0);
+        }
+
+        [FilterFactoryTestFilter("Hogemoge")]
+        public UnaryResult<int> E()
         {
             return UnaryResult(0);
         }
