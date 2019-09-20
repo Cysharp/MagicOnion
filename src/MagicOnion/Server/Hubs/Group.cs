@@ -164,7 +164,10 @@ namespace MagicOnion.Server.Hubs
         Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget);
         Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget);
         Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget);
-        Task WriteRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget);
+        Task WriteExceptRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget);
+        Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget);
+        Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget);
+        Task WriteToRawAsync(ArraySegment<byte> message, Guid[] connectionIds, bool fireAndForget);
     }
 
     public interface IInMemoryStorage

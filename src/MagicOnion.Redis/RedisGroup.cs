@@ -124,12 +124,25 @@ namespace MagicOnion.Redis
             int readSize;
             var len1 = MessagePackBinary.ReadArrayHeader(buffer, offset, out readSize);
             offset += readSize;
-            if (len1 == 2)
+            if (len1 == 3)
             {
-                var excludes = NativeGuidArrayFormatter.Deserialize(buffer, offset, out readSize);
+                var isExcept = MessagePackBinary.ReadBoolean(buffer, offset, out readSize);
                 offset += readSize;
 
-                return group.WriteRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: false);
+                if (isExcept)
+                {
+                    var excludes = NativeGuidArrayFormatter.Deserialize(buffer, offset, out readSize);
+                    offset += readSize;
+
+                    return group.WriteExceptRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: false);
+                }
+                else
+                {
+                    var includes = NativeGuidArrayFormatter.Deserialize(buffer, offset, out readSize);
+                    offset += readSize;
+
+                    return group.WriteToRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), includes, fireAndForget: false);
+                }
             }
 
             return Task.CompletedTask;
@@ -143,22 +156,34 @@ namespace MagicOnion.Redis
         public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
         {
             var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
-            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, null), flags);
+            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, null, true), flags);
         }
 
         public Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
         {
             var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
-            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, new[] { connectionId }), flags);
+            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, new[] { connectionId }, true), flags);
         }
 
         public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
         {
             var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
-            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, connectionIds), flags);
+            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, connectionIds, true), flags);
         }
 
-        byte[] BuildMessage<T>(int methodId, T value, Guid[] exceptIds)
+        public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+        {
+            var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
+            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, new[] { connectionId }, false), flags);
+        }
+
+        public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        {
+            var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
+            return subscriber.PublishAsync(channel, BuildMessage(methodId, value, connectionIds, false), flags);
+        }
+
+        byte[] BuildMessage<T>(int methodId, T value, Guid[] connectionIds, bool isExcept)
         {
             var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
             var buffer = rent;
@@ -166,9 +191,10 @@ namespace MagicOnion.Redis
             {
                 var offset = 0;
 
-                // redis-format: [[exceptIds], [raw-bloadcast-format]]
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-                offset += NativeGuidArrayFormatter.Serialize(ref buffer, offset, exceptIds);
+                // redis-format: [isExcept, [connectionIds], [raw-bloadcast-format]]
+                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
+                offset += MessagePackBinary.WriteBoolean(ref buffer, offset, isExcept);
+                offset += NativeGuidArrayFormatter.Serialize(ref buffer, offset, connectionIds);
 
                 offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
                 offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
@@ -183,7 +209,14 @@ namespace MagicOnion.Redis
             }
         }
 
-        public Task WriteRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget)
+
+        public Task WriteExceptRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget)
+        {
+            // only for the inmemory routing.
+            throw new NotSupportedException();
+        }
+
+        public Task WriteToRawAsync(ArraySegment<byte> message, Guid[] connectionIds, bool fireAndForget)
         {
             // only for the inmemory routing.
             throw new NotSupportedException();

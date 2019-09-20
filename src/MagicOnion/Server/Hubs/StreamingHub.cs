@@ -13,6 +13,8 @@ namespace MagicOnion.Server.Hubs
 
         public HubGroupRepository Group { get; private set; }
 
+        protected Guid ConnectionId { get { return Context.ContextId; } }
+
         // Broadcast Commands
 
         [Ignore]
@@ -40,6 +42,26 @@ namespace MagicOnion.Server.Hubs
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
             return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts });
+        }
+
+        [Ignore]
+        protected TReceiver BroadcastToSelf(IGroup group)
+        {
+            return BroadcastTo(group, Context.ContextId);
+        }
+
+        [Ignore]
+        protected TReceiver BroadcastTo(IGroup group, Guid toConnectionId)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId });
+        }
+
+        [Ignore]
+        protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToMany;
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionIds });
         }
 
         /// <summary>
