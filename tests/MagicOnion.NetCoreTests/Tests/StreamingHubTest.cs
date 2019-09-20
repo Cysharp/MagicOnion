@@ -74,7 +74,7 @@ namespace MagicOnion.Tests
 
         public async Task MoreArgument(int x, string y, double z)
         {
-            Broadcast(group).VoidMoreArgument(x, y, z);
+            BroadcastToSelf(group).VoidMoreArgument(x, y, z);
             //await Broadcast(group).MoreArgument(x, y, z);
         }
 

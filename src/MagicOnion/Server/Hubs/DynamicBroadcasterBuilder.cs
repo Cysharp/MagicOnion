@@ -90,13 +90,13 @@ namespace MagicOnion.Server.Hubs
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterToOne_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, to, ctor) = DefineConstructor2(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteToOneMethodInfo, to);
-                BroadcasterType_ExceptOne = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ToOne = typeBuilder.CreateTypeInfo().AsType();
             }
             {
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterToMany_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, to, ctor) = DefineConstructor3(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteToManyMethodInfo, to);
-                BroadcasterType_ExceptMany = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ToMany = typeBuilder.CreateTypeInfo().AsType();
             }
         }
 
