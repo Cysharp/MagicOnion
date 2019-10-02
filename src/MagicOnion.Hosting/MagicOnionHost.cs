@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -97,6 +97,12 @@ namespace MagicOnion.Hosting
         internal static void ConfigureHostConfigurationHosting2_2(IHostBuilder builder)
         {
             builder.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+            builder.ConfigureHostConfiguration(config =>
+            {
+                // NOTE: Treat prefix "DOTNET_" as the same as Microsoft.Extensions.Hosting 3.x.
+                config.AddEnvironmentVariables(prefix: "DOTNET_");
+            });
         }
 
         internal static void ConfigureAppConfigurationHosting2_2(IHostBuilder builder)
