@@ -97,11 +97,6 @@ namespace MagicOnion.Hosting
         internal static void ConfigureHostConfigurationHosting2_2(IHostBuilder builder)
         {
             builder.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            builder.ConfigureHostConfiguration(config =>
-            {
-                config.AddEnvironmentVariables(prefix: "NETCORE_");
-            });
         }
 
         internal static void ConfigureAppConfigurationHosting2_2(IHostBuilder builder)
@@ -132,6 +127,10 @@ namespace MagicOnion.Hosting
         {
             builder.ConfigureHostConfiguration(config =>
             {
+                // NOTE: This is backward compatibility for older versions.
+                // It's strongly recommended to use "DOTNET_" prefix expected by GenericHost. (e.g. DOTNET_ENVIRONMENT)
+                config.AddEnvironmentVariables(prefix: "NETCORE_");
+
                 config.AddInMemoryCollection(new[] { new KeyValuePair<string, string>(HostDefaults.ApplicationKey, Assembly.GetExecutingAssembly().GetName().Name) });
             });
 
