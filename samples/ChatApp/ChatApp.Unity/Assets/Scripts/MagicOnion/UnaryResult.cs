@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
+using MagicOnion.Client;
 using MagicOnion.CompilerServices; // require this using in AsyncMethodBuilder
-using MessagePack;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,16 +19,14 @@ namespace MagicOnion
         internal readonly TResponse rawValue; // internal
         internal readonly Task<TResponse> rawTaskValue; // internal
 
-        readonly AsyncUnaryCall<byte[]> inner;
-        readonly IFormatterResolver resolver;
+        readonly Task<ResponseContext<TResponse>> response;
 
         public UnaryResult(TResponse rawValue)
         {
             this.hasRawValue = true;
             this.rawValue = rawValue;
             this.rawTaskValue = null;
-            this.inner = null;
-            this.resolver = null;
+            this.response = null;
         }
 
         public UnaryResult(Task<TResponse> rawTaskValue)
@@ -35,23 +34,15 @@ namespace MagicOnion
             this.hasRawValue = true;
             this.rawValue = default(TResponse);
             this.rawTaskValue = rawTaskValue;
-            this.inner = null;
-            this.resolver = null;
+            this.response = null;
         }
 
-        public UnaryResult(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
+        public UnaryResult(Task<ResponseContext<TResponse>> response)
         {
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
             this.rawTaskValue = null;
-            this.inner = inner;
-            this.resolver = resolver;
-        }
-
-        async Task<TResponse> Deserialize()
-        {
-            var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-            return LZ4MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
+            this.response = response;
         }
 
         /// <summary>
@@ -63,7 +54,7 @@ namespace MagicOnion
             {
                 if (!hasRawValue)
                 {
-                    return Deserialize();
+                    return UnwrapResponse();
                 }
                 else if (rawTaskValue != null)
                 {
@@ -83,8 +74,42 @@ namespace MagicOnion
         {
             get
             {
-                return inner.ResponseHeadersAsync;
+                return UnwrapResponseHeaders();
             }
+        }
+
+        async Task<TResponse> UnwrapResponse()
+        {
+            var ctx = await response.ConfigureAwait(false);
+            return await ctx.ResponseAsync.ConfigureAwait(false);
+        }
+
+        async Task<Metadata> UnwrapResponseHeaders()
+        {
+            var ctx = await response.ConfigureAwait(false);
+            return await ctx.ResponseHeadersAsync.ConfigureAwait(false);
+        }
+
+        async void UnwrapDispose()
+        {
+            try
+            {
+                var ctx = await response.ConfigureAwait(false);
+                ctx.Dispose();
+            }
+            catch
+            {
+            }
+        }
+
+        ResponseContext<TResponse> TryUnwrap()
+        {
+            if (!response.IsCompleted)
+            {
+                throw new InvalidOperationException("UnaryResult request is not yet completed, please await before call this.");
+            }
+
+            return response.Result;
         }
 
         /// <summary>
@@ -101,7 +126,7 @@ namespace MagicOnion
         /// </summary>
         public Status GetStatus()
         {
-            return inner.GetStatus();
+            return TryUnwrap().GetStatus();
         }
 
         /// <summary>
@@ -110,7 +135,7 @@ namespace MagicOnion
         /// </summary>
         public Metadata GetTrailers()
         {
-            return inner.GetTrailers();
+            return TryUnwrap().GetTrailers();
         }
 
         /// <summary>
@@ -125,7 +150,14 @@ namespace MagicOnion
         /// </remarks>
         public void Dispose()
         {
-            inner.Dispose();
+            if (!response.IsCompleted)
+            {
+                UnwrapDispose();
+            }
+            else
+            {
+                response.Result.Dispose();
+            }
         }
     }
 }
