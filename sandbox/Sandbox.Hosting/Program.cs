@@ -49,7 +49,7 @@ namespace Sandbox.Hosting
                 .RunConsoleAsync();
 
 
-            var isDevelopment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") == "Development";
+            var isDevelopment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development";
             var creds = isDevelopment ? ChannelCredentials.Insecure : new SslCredentials(File.ReadAllText("./server.crt"));
 
             var clientMyService = MagicOnionClient.Create<IMyService>(new Channel("localhost", 12345, creds));
