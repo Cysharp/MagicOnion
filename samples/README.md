@@ -13,6 +13,11 @@ Sample Clientside Unity can ran with Unity 2019.1.10f1, then start on unity edit
 
 Now unity client automatically connect to MagicOnion, try chat app!
 
+*Notes  
+The Sample does not contain a library of gRPCs in the repository that are required for operation.  
+Before running the app, select the latest build ID from the link below, download the Unity support library for gRPC, and import it into Unity.  
+[gRPC Packages](https://packages.grpc.io/)
+
 ## Solution configuration
 Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
 

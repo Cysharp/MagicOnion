@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion
 {
-    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
     {
         readonly IAsyncStreamReader<byte[]> inner;
         readonly IFormatterResolver resolver;
@@ -37,7 +37,7 @@ namespace MagicOnion
 
         public void Dispose()
         {
-            inner.Dispose();
+            (inner as IDisposable)?.Dispose();
         }
     }
 

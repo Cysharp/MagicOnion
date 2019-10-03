@@ -179,7 +179,7 @@ namespace Assets.Scripts
             await this.streamingClient.GenerateException("client exception(streaminghub)!");
         }
 
-        public async void SampleMethod()
+        public void SampleMethod()
         {
             throw new System.NotImplementedException();
         }

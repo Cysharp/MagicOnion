@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Server.EmbeddedServices;
 using MessagePack;
+using System;
 using System.Threading.Tasks;
 
 #if !NON_UNITY
@@ -38,7 +39,7 @@ namespace MagicOnion.Client.EmbeddedServices
         }
 
         public HeartbeatClient(CallInvoker callInvoker)
-            : base(callInvoker, null)
+            : base(callInvoker, null, Array.Empty<IClientFilter>())
         {
         }
 

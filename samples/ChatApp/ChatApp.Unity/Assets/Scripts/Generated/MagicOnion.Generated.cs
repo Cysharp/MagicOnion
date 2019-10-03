@@ -22,7 +22,7 @@ namespace MagicOnion
             if(isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y) => new ChatApp.Shared.Services.IChatServiceClient(x, y));
+            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y, z) => new ChatApp.Shared.Services.IChatServiceClient(x, y, z));
 
             StreamingHubClientRegistry<ChatApp.Shared.Hubs.IChatHub, ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.IChatHubClient(a, b, c, d, e));
         }
@@ -119,7 +119,8 @@ namespace MagicOnion.Resolvers
 #pragma warning disable 168
 
 namespace ChatApp.Shared.Services {
-    using MagicOnion;
+    using System;
+	using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
@@ -127,20 +128,24 @@ namespace ChatApp.Shared.Services {
     public class IChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
         static readonly Method<byte[], byte[]> GenerateExceptionMethod;
+        static readonly Func<RequestContext, ResponseContext> GenerateExceptionDelegate;
         static readonly Method<byte[], byte[]> SendReportAsyncMethod;
+        static readonly Func<RequestContext, ResponseContext> SendReportAsyncDelegate;
 
         static IChatServiceClient()
         {
             GenerateExceptionMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "GenerateException", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            GenerateExceptionDelegate = _GenerateException;
             SendReportAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "SendReportAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            SendReportAsyncDelegate = _SendReportAsync;
         }
 
         IChatServiceClient()
         {
         }
 
-        public IChatServiceClient(CallInvoker callInvoker, IFormatterResolver resolver)
-            : base(callInvoker, resolver)
+        public IChatServiceClient(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+            : base(callInvoker, resolver, filters)
         {
         }
 
@@ -151,6 +156,7 @@ namespace ChatApp.Shared.Services {
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
             clone.resolver = this.resolver;
+            clone.filters = filters;
             return clone;
         }
 
@@ -179,17 +185,23 @@ namespace ChatApp.Shared.Services {
             return base.WithOptions(option);
         }
    
+        static ResponseContext _GenerateException(RequestContext __context)
+        {
+            return CreateResponseContext<string, global::MessagePack.Nil>(__context, GenerateExceptionMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GenerateException(string message)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(message, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(GenerateExceptionMethod, base.host, base.option, __request);
-            return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
+            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/GenerateException", message, GenerateExceptionDelegate);
         }
+        static ResponseContext _SendReportAsync(RequestContext __context)
+        {
+            return CreateResponseContext<string, global::MessagePack.Nil>(__context, SendReportAsyncMethod);
+        }
+
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> SendReportAsync(string message)
         {
-            var __request = LZ4MessagePackSerializer.Serialize(message, base.resolver);
-            var __callResult = callInvoker.AsyncUnaryCall(SendReportAsyncMethod, base.host, base.option, __request);
-            return new UnaryResult<global::MessagePack.Nil>(__callResult, base.resolver);
+            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/SendReportAsync", message, SendReportAsyncDelegate);
         }
     }
 }
@@ -197,8 +209,8 @@ namespace ChatApp.Shared.Services {
 #pragma warning restore 168
 #pragma warning restore 219
 #pragma warning restore 414
-#pragma warning restore 618
 #pragma warning restore 612
+#pragma warning restore 618
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -233,27 +245,27 @@ namespace ChatApp.Shared.Hubs {
             return __fireAndForgetClient;
         }
 
-        protected override Task OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
         {
             switch (methodId)
             {
                 case -1297457280: // OnJoin
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<string>(data, resolver);
-                    receiver.OnJoin(result); return Task.CompletedTask;
+                    receiver.OnJoin(result); break;
                 }
                 case 532410095: // OnLeave
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<string>(data, resolver);
-                    receiver.OnLeave(result); return Task.CompletedTask;
+                    receiver.OnLeave(result); break;
                 }
                 case -552695459: // OnSendMessage
                 {
                     var result = LZ4MessagePackSerializer.Deserialize<global::ChatApp.Shared.MessagePackObjects.MessageResponse>(data, resolver);
-                    receiver.OnSendMessage(result); return Task.CompletedTask;
+                    receiver.OnSendMessage(result); break;
                 }
                 default:
-                    return Task.CompletedTask;
+                    break;
             }
         }
 
