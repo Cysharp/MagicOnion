@@ -33,10 +33,17 @@ namespace MagicOnion.Server.Hubs
         static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
 
+        private static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
+        {
+            var mapping = targetType.GetInterfaceMap(interfaceType);
+            var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);
+            return mapping.InterfaceMethods[methodIndex];
+        }
+
         public StreamingHubHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
         {
             var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
-            var interfaceMethod = hubInterface.GetMethods().First(x => x.Name == methodInfo.Name);
+            var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
 
 
             this.HubType = classType;
