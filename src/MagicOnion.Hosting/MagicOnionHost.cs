@@ -90,6 +90,7 @@ namespace MagicOnion.Hosting
 
             ConfigureHostConfigurationHosting2_2(builder);
             ConfigureAppConfigurationHosting2_2(builder);
+            ConfigureLoggingHosting2_2(builder);
 
             return builder;
         }
@@ -125,6 +126,14 @@ namespace MagicOnion.Hosting
                 }
 
                 config.AddEnvironmentVariables();
+            });
+        }
+
+        internal static void ConfigureLoggingHosting2_2(IHostBuilder builder)
+        {
+            builder.ConfigureLogging((hostContext, logging) =>
+            {
+                logging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
             });
         }
         #endregion
