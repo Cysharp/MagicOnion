@@ -169,15 +169,20 @@ namespace MagicOnion.Hosting
                     }
 
                     logging.AddSimpleConsole();
-                    logging.AddFilter<SimpleConsoleLoggerProvider>((category, level) =>
+                    logging.AddFilter((providerName, category, level) =>
                     {
-                        // omit system message
-                        if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                        if (providerName == typeof(SimpleConsoleLogger).FullName)
                         {
-                            if (level <= LogLevel.Debug) return false;
+                            // omit system message
+                            if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                            {
+                                if (level <= LogLevel.Debug) return false;
+                            }
+
+                            return level >= minSimpleConsoleLoggerLogLevel;
                         }
 
-                        return level >= minSimpleConsoleLoggerLogLevel;
+                        return true;
                     });
                 });
             }
