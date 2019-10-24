@@ -1648,7 +1648,7 @@ In RPC, especially in real-time communication involving frequent transmission of
 
 Also, taking advantage of the fact that both the client and the server run on C# and data stored on internal memory are expected to share the same layout, I added an option to do mapping through memory copy without serialization/deserialization in case of a value-type variable.
 
-Especially in Unity, this is can combinate with `MessageaPack.UnityShims` package of NuGet.
+Especially in Unity, this is can combinate with `MessagePack.UnityShims` package of NuGet.
 
 ```csharp
 // It supports standard struct-type variables that are provided by Unity, such as Vector3, and arrays containing them, as well as custom struct-type variables and their arrays.
