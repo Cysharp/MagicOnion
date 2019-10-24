@@ -90,6 +90,7 @@ namespace MagicOnion.Hosting
 
             ConfigureHostConfigurationHosting2_2(builder);
             ConfigureAppConfigurationHosting2_2(builder);
+            ConfigureLoggingHosting2_2(builder);
 
             return builder;
         }
@@ -127,6 +128,14 @@ namespace MagicOnion.Hosting
                 config.AddEnvironmentVariables();
             });
         }
+
+        internal static void ConfigureLoggingHosting2_2(IHostBuilder builder)
+        {
+            builder.ConfigureLogging((hostContext, logging) =>
+            {
+                logging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
+            });
+        }
         #endregion
 
         internal static void ConfigureHostConfigurationDefault(IHostBuilder builder, string hostEnvironmentVariable)
@@ -160,15 +169,20 @@ namespace MagicOnion.Hosting
                     }
 
                     logging.AddSimpleConsole();
-                    logging.AddFilter<SimpleConsoleLoggerProvider>((category, level) =>
+                    logging.AddFilter((providerName, category, level) =>
                     {
-                        // omit system message
-                        if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                        if (providerName == typeof(SimpleConsoleLogger).FullName)
                         {
-                            if (level <= LogLevel.Debug) return false;
+                            // omit system message
+                            if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                            {
+                                if (level <= LogLevel.Debug) return false;
+                            }
+
+                            return level >= minSimpleConsoleLoggerLogLevel;
                         }
 
-                        return level >= minSimpleConsoleLoggerLogLevel;
+                        return true;
                     });
                 });
             }
