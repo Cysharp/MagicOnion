@@ -219,7 +219,9 @@ namespace MagicOnion.Server.Hubs
 
         void LogError(Exception ex, StreamingHubContext context)
         {
+#if !GRPC_DOTNET
             Logger.Error(ex, "StreamingHubHandler throws exception occured in " + context.Path);
+#endif
         }
 
         // Interface methods for Client

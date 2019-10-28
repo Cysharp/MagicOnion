@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>TRACE;NON_UNITY;GRPC_DOTNET</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MagicOnion\**\*.cs" Exclude="..\MagicOnion\obj\**\*.cs;..\MagicOnion\Client\**\*.cs" />
+    <Compile Include="..\MagicOnion\Client\ResponseContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.24.0" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.24.0" />
+    <PackageReference Include="MessagePack" Version="1.8.74" />
+  </ItemGroup>
+
+</Project>

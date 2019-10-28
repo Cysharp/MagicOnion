@@ -9,10 +9,12 @@ namespace MagicOnion.Server
     {
         public ServiceContext Context { get; set; }
 
+#if !GRPC_DOTNET
         /// <summary>
         /// Get Grpc Logger.
         /// </summary>
         protected Grpc.Core.Logging.ILogger Logger => GrpcEnvironment.Logger;
+#endif
 
         public ServiceBase()
         {

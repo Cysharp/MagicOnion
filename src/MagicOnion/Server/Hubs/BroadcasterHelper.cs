@@ -78,7 +78,9 @@ namespace MagicOnion.Server.Hubs
             }
             catch(Exception ex)
             {
+#if !GRPC_DOTNET
                 Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "exception occured in client broadcast.");
+#endif
             }
         }
 

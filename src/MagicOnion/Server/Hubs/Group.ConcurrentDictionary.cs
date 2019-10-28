@@ -536,7 +536,9 @@ namespace MagicOnion.Server.Hubs
                 }
                 catch (Exception ex)
                 {
+#if !GRPC_DOTNET
                     Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+#endif
                 }
             }
         }
@@ -551,7 +553,9 @@ namespace MagicOnion.Server.Hubs
                 }
                 catch (Exception ex)
                 {
+#if !GRPC_DOTNET
                     Grpc.Core.GrpcEnvironment.Logger?.Error(ex, "error occured on write to client, but keep to write other clients.");
+#endif
                 }
             }
         }

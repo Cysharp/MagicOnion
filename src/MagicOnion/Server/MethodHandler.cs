@@ -557,7 +557,9 @@ namespace MagicOnion.Server
 
         static void LogError(Exception ex, ServerCallContext context)
         {
+#if !GRPC_DOTNET
             GrpcEnvironment.Logger.Error(ex, "MagicOnionHandler throws exception occured in " + context.Method);
+#endif
         }
 
         public override string ToString()

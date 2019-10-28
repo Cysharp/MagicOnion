@@ -1,4 +1,5 @@
-﻿using System;
+#if !GRPC_DOTNET
+using System;
 using Grpc.Core.Logging;
 
 
@@ -186,3 +187,4 @@ namespace MagicOnion.Server
         #endregion
     }
 }
+#endif

@@ -46,6 +46,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.Hosting", "sandbox\Sandbox.Hosting\Sandbox.Hosting.csproj", "{A39D4B33-06FF-413C-8D92-325890B17954}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.AspNetCore3", "sandbox\Sandbox.AspNetCore3\Sandbox.AspNetCore3.csproj", "{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.AspNetCore", "src\MagicOnion.AspNetCore\MagicOnion.AspNetCore.csproj", "{AF526B48-541B-4565-81FB-358FD2DDE010}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +108,14 @@ Global
 		{A39D4B33-06FF-413C-8D92-325890B17954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A39D4B33-06FF-413C-8D92-325890B17954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A39D4B33-06FF-413C-8D92-325890B17954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF526B48-541B-4565-81FB-358FD2DDE010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF526B48-541B-4565-81FB-358FD2DDE010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF526B48-541B-4565-81FB-358FD2DDE010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF526B48-541B-4565-81FB-358FD2DDE010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +134,8 @@ Global
 		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE} = {5A3F5158-7B17-4586-9885-9E60C1393185}
 		{39136B3A-3CD6-42EC-ACFB-4067230D241E} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{A39D4B33-06FF-413C-8D92-325890B17954} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{9330FE8E-4300-4FD4-BC3C-997EA6FCE2E2} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{AF526B48-541B-4565-81FB-358FD2DDE010} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
