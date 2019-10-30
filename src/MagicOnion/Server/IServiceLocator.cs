@@ -8,13 +8,11 @@ namespace MagicOnion.Server
     public interface IServiceLocator
     {
         T GetService<T>();
-        void Register<T>(); // transient
-        void Register<T>(T singleton);
     }
 
     public class DefaultServiceLocator : IServiceLocator
     {
-        public static readonly IServiceLocator Instance = new DefaultServiceLocator();
+        public static DefaultServiceLocator Instance { get; } = new DefaultServiceLocator();
 
         DefaultServiceLocator()
         {
@@ -61,7 +59,7 @@ namespace MagicOnion.Server
             where TServiceBase : ServiceBase<TServiceInterface>
             where TServiceInterface : IServiceMarker
         {
-            var instance = context.ServiceLocator.GetService<TServiceBase>();
+            var instance = context.ServiceActivator.Create<TServiceBase>(context.ServiceLocator);
             instance.Context = context;
             return instance;
         }

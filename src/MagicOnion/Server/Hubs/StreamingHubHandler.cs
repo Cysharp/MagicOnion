@@ -1,5 +1,6 @@
 ﻿using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MagicOnion.Utils;
 using System.Linq.Expressions;
@@ -40,7 +41,7 @@ namespace MagicOnion.Server.Hubs
             return mapping.InterfaceMethods[methodIndex];
         }
 
-        public StreamingHubHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
+        public StreamingHubHandler(Type classType, MethodInfo methodInfo, IList<StreamingHubFilterDescriptor> globalStreamingHubFilters, IServiceLocator serviceLocator)
         {
             var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
             var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
@@ -57,7 +58,7 @@ namespace MagicOnion.Server.Hubs
             this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
 
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-            this.resolver = options.FormatterResolver;
+            this.resolver = serviceLocator.GetService<IFormatterResolver>();
 
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
@@ -70,7 +71,7 @@ namespace MagicOnion.Server.Hubs
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            this.filters = options.GlobalStreamingHubFilters
+            this.filters = globalStreamingHubFilters
                 .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
                 .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
@@ -82,7 +83,7 @@ namespace MagicOnion.Server.Hubs
                 .ToArray();
 
             // options
-            this.serviceLocator = options.ServiceLocator;
+            this.serviceLocator = serviceLocator;
 
             // validation filter
             if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)

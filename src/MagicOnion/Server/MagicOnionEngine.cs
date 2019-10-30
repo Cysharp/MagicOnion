@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace MagicOnion.Server
 {
@@ -52,8 +53,7 @@ namespace MagicOnion.Server
 
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
         {
-            option.RegisterOptionToServiceLocator();
-
+            var serviceLocator = new ServiceLocatorOptionAdapter(option);
             var builder = ServerServiceDefinition.CreateBuilder();
             var handlers = new HashSet<MethodHandler>();
             var streamingHubHandlers = new List<StreamingHubHandler>();
@@ -123,7 +123,7 @@ namespace MagicOnion.Server
                         // register for StreamingHub
                         if (isStreamingHub && methodName != "Connect")
                         {
-                            var streamingHandler = new StreamingHubHandler(option, classType, methodInfo);
+                            var streamingHandler = new StreamingHubHandler(classType, methodInfo, option.GlobalStreamingHubFilters, serviceLocator);
                             if (!tempStreamingHubHandlers.Add(streamingHandler))
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
@@ -133,7 +133,7 @@ namespace MagicOnion.Server
                         else
                         {
                             // create handler
-                            var handler = new MethodHandler(option, classType, methodInfo, methodName);
+                            var handler = new MethodHandler(classType, methodInfo, methodName, option.GlobalFilters, serviceLocator, option.IsReturnExceptionStackTraceInErrorDetail, option.EnableCurrentContext);
                             lock (builder)
                             {
                                 if (!handlers.Add(handler))
@@ -147,7 +147,7 @@ namespace MagicOnion.Server
 
                     if (isStreamingHub)
                     {
-                        var connectHandler = new MethodHandler(option, classType, classType.GetMethod("Connect"), "Connect");
+                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", option.GlobalFilters, serviceLocator, option.IsReturnExceptionStackTraceInErrorDetail, option.EnableCurrentContext);
                         lock (builder)
                         {
                             if (!handlers.Add(connectHandler))

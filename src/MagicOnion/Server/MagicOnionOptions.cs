@@ -52,6 +52,11 @@ namespace MagicOnion.Server
         public IServiceLocator ServiceLocator { get; set; }
 
         /// <summary>
+        /// Service instance activator.
+        /// </summary>
+        public IServiceActivator ServiceActivator { get; set; }
+
+        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
@@ -67,14 +72,35 @@ namespace MagicOnion.Server
             this.EnableCurrentContext = false;
 
             this.ServiceLocator = DefaultServiceLocator.Instance;
+            this.ServiceActivator = DefaultServiceActivator.Instance;
+        }
+    }
+
+    /// <summary>
+    /// Provides some services from MagicOnionOptions and ServiceLocator.
+    /// </summary>
+    internal class ServiceLocatorOptionAdapter : IServiceLocator
+    {
+        readonly MagicOnionOptions options;
+
+        public ServiceLocatorOptionAdapter(MagicOnionOptions options)
+        {
+            this.options = options;
         }
 
-        internal void RegisterOptionToServiceLocator()
+        public T GetService<T>()
         {
-            // call from engine initialization.
-            this.ServiceLocator.Register<IFormatterResolver>(FormatterResolver);
-            this.ServiceLocator.Register<IMagicOnionLogger>(MagicOnionLogger);
-            this.ServiceLocator.Register<IGroupRepositoryFactory>(DefaultGroupRepositoryFactory);
+            var t = typeof(T);
+            var value = default(T);
+
+            if (t == typeof(IFormatterResolver)) value = (T)options.FormatterResolver;
+            else if (t == typeof(IMagicOnionLogger)) value = (T)options.MagicOnionLogger;
+            else if (t == typeof(IGroupRepositoryFactory)) value = (T)options.DefaultGroupRepositoryFactory;
+            else if (t == typeof(IServiceActivator)) value = (T)options.ServiceActivator;
+
+            return value != null
+                ? value
+                : options.ServiceLocator.GetService<T>();
         }
     }
 }

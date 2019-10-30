@@ -1,39 +1,23 @@
 ﻿using MagicOnion.Server;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace MagicOnion.Hosting
 {
     public class ServiceLocatorBridge : IServiceLocator
     {
-        IServiceProvider provider;
-        readonly IServiceCollection serviceCollection;
+        readonly IServiceProvider serviceProvider;
 
-        public ServiceLocatorBridge(IServiceCollection serviceCollection)
+        public ServiceLocatorBridge(IServiceProvider serviceProvider)
         {
-            this.serviceCollection = serviceCollection;
+            this.serviceProvider = serviceProvider;
         }
 
         public T GetService<T>()
         {
-            if (provider == null)
-            {
-                provider = serviceCollection.BuildServiceProvider();
-            }
-
-            return provider.GetService<T>();
-        }
-
-        public void Register<T>()
-        {
-            serviceCollection.AddTransient(typeof(T));
-            provider = null;
-        }
-
-        public void Register<T>(T singleton)
-        {
-            serviceCollection.AddSingleton(typeof(T), singleton);
-            provider = null;
+            return serviceProvider.GetService<T>();
         }
     }
 }

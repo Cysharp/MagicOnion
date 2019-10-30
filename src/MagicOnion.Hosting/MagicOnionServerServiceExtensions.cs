@@ -161,15 +161,15 @@ namespace MagicOnion.Hosting
         {
             if (services.Any(x => (x.ImplementationInstance as MagicOnionHostedServiceDefinition)?.Name == configurationName))
             {
-                throw new InvalidOperationException($"MagicOnion ServiceDefinition for '{configurationName}' is already registerd.");
+                throw new InvalidOperationException($"MagicOnion ServiceDefinition for '{configurationName}' is already registered.");
             }
 
             services.AddSingleton<MagicOnionHostedServiceDefinition>(serviceProvider =>
             {
                 var hostingOptions = serviceProvider.GetService<IOptionsMonitor<MagicOnionHostingOptions>>().Get(configurationName);
                 var options = hostingOptions.Service;
-                var serviceLocator = new ServiceLocatorBridge(services);
-                options.ServiceLocator = serviceLocator;
+                options.ServiceLocator = new ServiceLocatorBridge(serviceProvider);
+                options.ServiceActivator = new GenericHostServiceActivator(serviceProvider, options);
 
                 // Build a MagicOnion ServiceDefinition from assemblies/types.
                 MagicOnionServiceDefinition serviceDefinition;
