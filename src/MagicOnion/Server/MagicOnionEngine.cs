@@ -70,7 +70,7 @@ namespace MagicOnion.Server
 
             try
             {
-                Parallel.ForEach(types, /* new ParallelOptions { MaxDegreeOfParallelism = 1 }, */ classType =>
+                foreach (var classType in types)
                 {
                     var className = classType.Name;
                     if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
@@ -174,7 +174,7 @@ namespace MagicOnion.Server
                             StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.ServiceLocator));
                         }
                     }
-                });
+                }
             }
             catch (AggregateException agex)
             {
