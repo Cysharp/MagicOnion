@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MagicOnion.CodeAnalysis
@@ -24,6 +25,13 @@ namespace MagicOnion.CodeAnalysis
         public bool IsServiceDefinition { get; set; }
         public bool IsIfDebug { get; set; }
         public MethodDefinition[] Methods { get; set; }
+
+        // NOTE: A client name is derived from original interface name without 'I' prefix.
+        // - ImportantService  --> ImportantServiceClient
+        // - IImportantService --> ImportantServiceClient
+        // - I0123Service      --> I0123ServiceClient
+        public string ClientName => (Regex.IsMatch(Name, "I[^a-z0-9]") ? Name.Substring(1) : Name) + "Client";
+        public string ClientFullName => (Namespace != null ? Namespace + "." : "") + ClientName;
 
         public override string ToString()
         {

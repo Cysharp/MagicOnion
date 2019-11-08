@@ -22,9 +22,9 @@ namespace MagicOnion
             if(isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y, z) => new ChatApp.Shared.Services.IChatServiceClient(x, y, z));
+            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y, z) => new ChatApp.Shared.Services.ChatServiceClient(x, y, z));
 
-            StreamingHubClientRegistry<ChatApp.Shared.Hubs.IChatHub, ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.IChatHubClient(a, b, c, d, e));
+            StreamingHubClientRegistry<ChatApp.Shared.Hubs.IChatHub, ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.ChatHubClient(a, b, c, d, e));
         }
     }
 }
@@ -125,14 +125,14 @@ namespace ChatApp.Shared.Services {
     using Grpc.Core;
     using MessagePack;
 
-    public class IChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
+    public class ChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
         static readonly Method<byte[], byte[]> GenerateExceptionMethod;
         static readonly Func<RequestContext, ResponseContext> GenerateExceptionDelegate;
         static readonly Method<byte[], byte[]> SendReportAsyncMethod;
         static readonly Func<RequestContext, ResponseContext> SendReportAsyncDelegate;
 
-        static IChatServiceClient()
+        static ChatServiceClient()
         {
             GenerateExceptionMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "GenerateException", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
             GenerateExceptionDelegate = _GenerateException;
@@ -140,18 +140,18 @@ namespace ChatApp.Shared.Services {
             SendReportAsyncDelegate = _SendReportAsync;
         }
 
-        IChatServiceClient()
+        ChatServiceClient()
         {
         }
 
-        public IChatServiceClient(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+        public ChatServiceClient(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
             : base(callInvoker, resolver, filters)
         {
         }
 
         protected override MagicOnionClientBase<IChatService> Clone()
         {
-            var clone = new IChatServiceClient();
+            var clone = new ChatServiceClient();
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
@@ -226,7 +226,7 @@ namespace ChatApp.Shared.Hubs {
     using System;
     using System.Threading.Tasks;
 
-    public class IChatHubClient : StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
+    public class ChatHubClient : StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
@@ -234,7 +234,7 @@ namespace ChatApp.Shared.Hubs {
 
         readonly global::ChatApp.Shared.Hubs.IChatHub __fireAndForgetClient;
 
-        public IChatHubClient(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+        public ChatHubClient(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
             : base(callInvoker, host, option, resolver, logger)
         {
             this.__fireAndForgetClient = new FireAndForgetClient(this);
@@ -336,9 +336,9 @@ namespace ChatApp.Shared.Hubs {
 
         class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
         {
-            readonly IChatHubClient __parent;
+            readonly ChatHubClient __parent;
 
-            public FireAndForgetClient(IChatHubClient parentClient)
+            public FireAndForgetClient(ChatHubClient parentClient)
             {
                 this.__parent = parentClient;
             }
