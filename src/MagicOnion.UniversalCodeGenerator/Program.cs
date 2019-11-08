@@ -99,7 +99,7 @@ namespace MagicOnion.CodeGenerator
             var registerTemplate = new RegisterTemplate
             {
                 Namespace = @namespace,
-                Interfaces = definitions.Where(x => x.IsServiceDifinition).ToArray(),
+                Interfaces = definitions.Where(x => x.IsServiceDefinition).ToArray(),
                 HubInterfaces = hubDefinitions,
                 UnuseUnityAttribute = unuseUnityAttr
             };

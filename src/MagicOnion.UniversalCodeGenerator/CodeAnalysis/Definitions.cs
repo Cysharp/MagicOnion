@@ -21,7 +21,7 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public string FullName { get; set; }
         public string Namespace { get; set; }
-        public bool IsServiceDifinition { get; set; }
+        public bool IsServiceDefinition { get; set; }
         public bool IsIfDebug { get; set; }
         public MethodDefinition[] Methods { get; set; }
 

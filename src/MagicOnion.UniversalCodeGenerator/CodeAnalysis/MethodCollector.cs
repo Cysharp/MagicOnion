@@ -96,7 +96,7 @@ namespace MagicOnion.CodeAnalysis
                     Name = x.ToDisplayString(shortTypeNameFormat),
                     FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                    IsServiceDifinition = true,
+                    IsServiceDefinition = true,
                     IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
