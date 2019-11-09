@@ -23,18 +23,19 @@ namespace MagicOnion.Server
             var fieldNext = typeof(InvokeHelper<TArg1, TDelegate>).GetField("Next");
             var methodInvoke = typeof(Func<TArg1, TDelegate, ValueTask>).GetMethod("Invoke");
 
-            if (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core") && Environment.Version > new Version(3, 0, 0))
+            if (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core 4")) /* .NET Core 2.x returns ".NET Core 4.x.y.z" */
             {
                 // HACK: If the app is running on .NET Core 2.2 or earlier, the runtime hides dynamic method in the stack trace.
                 var method = new DynamicMethod("InvokeNext", typeof(ValueTask), new[] { typeof(InvokeHelper<TArg1, TDelegate>), typeof(TArg1) }, restrictedSkipVisibility: true);
                 {
                     var il = method.GetILGenerator();
 
-                    // arg0.Invoke;
+                    // invoke = arg0.Invoke;
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, fieldInvoke);
 
-                    // return arg0.Invoke(arg1)
+                    // next = arg0.Next;
+                    // return invoke(arg1, next);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, fieldNext);
