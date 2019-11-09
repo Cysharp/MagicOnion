@@ -22,7 +22,7 @@ namespace Sandbox.Hosting
 
             var hostTask = MagicOnionHost.CreateDefaultBuilder()
                 //.UseMagicOnion()
-                .UseMagicOnion(types: new[] { typeof(MyService) })
+                .UseMagicOnion(types: new[] { typeof(MyService), typeof(MyHub) })
                 .UseMagicOnion(configurationName: "MagicOnion-Management", types: new[] { typeof(ManagementService) })
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -34,6 +34,8 @@ namespace Sandbox.Hosting
                             // options.Service.GlobalStreamingHubFilters.Add(new MyStreamingHubFilterAttribute(logger));
 
                             options.Service.GlobalFilters.Add<MyFilterAttribute>();
+                            options.Service.GlobalFilters.Add<MyFilter2Attribute>();
+                            options.Service.GlobalFilters.Add<MyFilter3Attribute>();
                             // options.Service.GlobalFilters.Add(new MyFilterAttribute(logger));
 
                             // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = opti
@@ -56,6 +58,9 @@ namespace Sandbox.Hosting
             var clientManagementService = MagicOnionClient.Create<IManagementService>(new Channel("localhost", 23456, creds));
             var result = await clientMyService.HelloAsync();
             var result2 = await clientManagementService.FooBarAsync();
+
+            var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
+            var result3 = await clientHub.HelloAsync();
 
             await hostTask;
         }
@@ -95,6 +100,17 @@ namespace Sandbox.Hosting
         }
     }
 
+    public class MyFilter2Attribute : MagicOnionFilterAttribute
+    {
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => await next(context);
+    }
+
+
+    public class MyFilter3Attribute : MagicOnionFilterAttribute
+    {
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => await next(context);
+    }
+
     public interface IMyService : IService<IMyService>
     {
         UnaryResult<string> HelloAsync();
@@ -120,6 +136,21 @@ namespace Sandbox.Hosting
         public async UnaryResult<int> FooBarAsync()
         {
             return 123456789;
+        }
+    }
+
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+    {
+        Task<string> HelloAsync();
+    }
+    public interface IMyHubReceiver
+    { }
+
+    public class MyHub : StreamingHubBase<IMyHub, IMyHubReceiver>, IMyHub
+    {
+        public Task<string> HelloAsync()
+        {
+            return Task.FromResult("Konnnichiwa!");
         }
     }
 }
