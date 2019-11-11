@@ -30,21 +30,21 @@ namespace <#= Namespace #>
             if(isRegistered) return;
             isRegistered = true;
 
-<# foreach(var interfaceDef in Interfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# foreach(var interfaceDef in Interfaces) { #>
 <# if(interfaceDef.IsIfDebug) { #>
 #if DEBUG
 <# } #>
-            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y, z) => new <#= clientName #>(x, y, z));
+            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y, z) => new <#= interfaceDef.ClientFullName #>(x, y, z));
 <# if(interfaceDef.IsIfDebug) { #>
 #endif
 <# } #>
 <# } // foreach #>
 
-<# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { var clientName = (interfaceDef.Namespace != null ? interfaceDef.Namespace + "." : "") + interfaceDef.Name + "Client"; #>
+<# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { #>
 <# if(interfaceDef.IsIfDebug) { #>
 #if DEBUG
 <# } #>
-            StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= clientName #>(a, b, c, d, e));
+            StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= interfaceDef.ClientFullName #>(a, b, c, d, e));
 <# if(interfaceDef.IsIfDebug) { #>
 #endif
 <# } #>
