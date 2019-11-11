@@ -167,8 +167,7 @@ namespace MagicOnion.Server.Hubs
             foreach (var filterFactory in this.filters.Reverse())
             {
                 var newFilter = filterFactory.CreateInstance(serviceLocator);
-                var next_ = next; // capture reference
-                next = (ctx) => newFilter.Invoke(ctx, next_);
+                next = new InvokeHelper<StreamingHubContext, Func<StreamingHubContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
             }
 
             return next;
