@@ -91,7 +91,7 @@ jobs:
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
 
-  build-push-nightly:
+  build-push-canary:
     executor: dotnet
     steps:
       - git-shallow-clone/checkout_shallow
@@ -123,11 +123,11 @@ jobs:
       # push to NuGet Server
       - run: echo "export NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED=true" >> $BASH_ENV
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
-      - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Nightly/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Nightly/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Nightly/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Nightly/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Nightly/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
 
   # upload to github by ghr
   upload-github:
@@ -258,7 +258,7 @@ workflows:
       #     filters:
       #       tags:
       #         only: /.*/
-      - build-push-nightly:
+      - build-push-canary:
           filters:
             branches:
               only: /.*/
