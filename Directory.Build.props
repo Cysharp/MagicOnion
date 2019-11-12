@@ -3,5 +3,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <VersionPrefix>2.6.4</VersionPrefix>
   </PropertyGroup>
 </Project>
