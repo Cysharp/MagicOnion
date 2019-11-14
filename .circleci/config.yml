@@ -261,4 +261,5 @@ workflows:
       - build-push-canary:
           filters:
             branches:
-              only: /.*/
+              only:
+                - master
