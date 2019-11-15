@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Client
@@ -112,6 +113,11 @@ namespace MagicOnion.Client
                      || methodName == "DisposeAsync"
                      || methodName == "WaitForDisconnect"
                      || methodName == "FireAndForget"
+                     || methodName == "WithOptions"
+                     || methodName == "WithHeaders"
+                     || methodName == "WithDeadline"
+                     || methodName == "WithCancellationToken"
+                     || methodName == "WithHost"
                      )
                     {
                         return false;
@@ -410,6 +416,55 @@ namespace MagicOnion.Client
                 }
             }
 
+            // IService<T>
+            {
+                // TSelf WithOption(CallOptions option)
+                {
+                    var method = typeBuilder.DefineMethod("WithOptions", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CallOptions) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithHeaders(Metadata headers);
+                {
+                    var method = typeBuilder.DefineMethod("WithHeaders", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(Metadata) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithDeadline(DateTime deadline);
+                {
+                    var method = typeBuilder.DefineMethod("WithDeadline", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(DateTime) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithCancellationToken(CancellationToken cancellationToken);
+                {
+                    var method = typeBuilder.DefineMethod("WithCancellationToken", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CancellationToken) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithHost(string host);
+                {
+                    var method = typeBuilder.DefineMethod("WithHost", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(string) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+            }
+
             // Proxy Methods
             for (int i = 0; i < definitions.Length; i++)
             {
@@ -497,6 +552,55 @@ namespace MagicOnion.Client
                         interfaceType, Type.EmptyTypes);
                     var il = method.GetILGenerator();
 
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+            }
+
+            // IService<T>
+            {
+                // TSelf WithOption(CallOptions option)
+                {
+                    var method = typeBuilder.DefineMethod("WithOptions", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CallOptions) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithHeaders(Metadata headers);
+                {
+                    var method = typeBuilder.DefineMethod("WithHeaders", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(Metadata) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithDeadline(DateTime deadline);
+                {
+                    var method = typeBuilder.DefineMethod("WithDeadline", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(DateTime) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithCancellationToken(CancellationToken cancellationToken);
+                {
+                    var method = typeBuilder.DefineMethod("WithCancellationToken", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(CancellationToken) });
+                    var il = method.GetILGenerator();
+                    il.Emit(OpCodes.Newobj, notSupportedException);
+                    il.Emit(OpCodes.Throw);
+                }
+                // TSelf WithHost(string host);
+                {
+                    var method = typeBuilder.DefineMethod("WithHost", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        interfaceType,
+                        new[] { typeof(string) });
+                    var il = method.GetILGenerator();
                     il.Emit(OpCodes.Newobj, notSupportedException);
                     il.Emit(OpCodes.Throw);
                 }

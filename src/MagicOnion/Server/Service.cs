@@ -6,6 +6,7 @@ using System.Threading;
 namespace MagicOnion.Server
 {
     public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterface>
+        where TServiceInterface : IService<TServiceInterface>
     {
         public ServiceContext Context { get; set; }
 

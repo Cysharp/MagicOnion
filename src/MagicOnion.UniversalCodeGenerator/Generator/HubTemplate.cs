@@ -113,7 +113,33 @@ namespace MagicOnion.Generator
             this.Write("#endif\r\n");
  } // end if(IsIfDebug) 
  } // end foreach(interfaceDef.Methods) 
-            this.Write("\r\n        class FireAndForgetClient : ");
+            this.Write("\r\n\r\n        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithOptions(CallOptions option)\r\n        {\r\n            throw new NotSupportedE" +
+                    "xception();\r\n        }\r\n        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithHeaders(Metadata headers)\r\n        {\r\n            throw new NotSupportedExc" +
+                    "eption();\r\n        }\r\n        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithDeadline(DateTime deadline)\r\n        {\r\n            throw new NotSupportedE" +
+                    "xception();\r\n        }\r\n        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithCancellationToken(global::System.Threading.CancellationToken cancellationTo" +
+                    "ken)\r\n        {\r\n            throw new NotSupportedException();\r\n        }\r\n    " +
+                    "    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithHost(string host)\r\n        {\r\n            throw new NotSupportedException()" +
+                    ";\r\n        }\r\n\r\n        class FireAndForgetClient : ");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
             this.Write("\r\n        {\r\n            readonly ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
@@ -137,7 +163,33 @@ namespace MagicOnion.Generator
                 throw new NotSupportedException();
             }
 
-");
+            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithOptions(CallOptions option)\r\n            {\r\n                throw new NotSu" +
+                    "pportedException();\r\n            }\r\n            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithHeaders(Metadata headers)\r\n            {\r\n                throw new NotSupp" +
+                    "ortedException();\r\n            }\r\n            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithDeadline(DateTime deadline)\r\n            {\r\n                throw new NotSu" +
+                    "pportedException();\r\n            }\r\n            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithCancellationToken(global::System.Threading.CancellationToken cancellationTo" +
+                    "ken)\r\n            {\r\n                throw new NotSupportedException();\r\n       " +
+                    "     }\r\n            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(" IService<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(">.WithHost(string host)\r\n            {\r\n                throw new NotSupportedExc" +
+                    "eption();\r\n            }\r\n\r\n");
  foreach(var item in interfaceDef.Methods) { 
  if(item.IsIfDebug) { 
             this.Write("#if DEBUG\r\n");
