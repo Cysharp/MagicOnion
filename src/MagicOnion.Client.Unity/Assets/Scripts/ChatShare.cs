@@ -86,7 +86,7 @@ namespace Sandbox.NetCoreServer.Hubs
         Task MoveAsync(Vector3 position, Quaternion rotation);
     }
 
-    public class GamingHubClient : IGamingHubReceiver
+    public class GamingHubClient2 : IGamingHubReceiver
     {
         Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
 
