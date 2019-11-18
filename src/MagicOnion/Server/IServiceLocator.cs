@@ -59,7 +59,7 @@ namespace MagicOnion.Server
 
         internal static TServiceBase CreateService<TServiceBase, TServiceInterface>(ServiceContext context)
             where TServiceBase : ServiceBase<TServiceInterface>
-            where TServiceInterface : IService<TServiceInterface>
+            where TServiceInterface : IServiceMarker
         {
             var instance = context.ServiceLocator.GetService<TServiceBase>();
             instance.Context = context;

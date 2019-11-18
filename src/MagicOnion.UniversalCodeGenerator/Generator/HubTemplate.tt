@@ -90,28 +90,6 @@
 <# } // end if(IsIfDebug) #>
 <# } // end foreach(interfaceDef.Methods) #>
 
-
-        <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithOptions(CallOptions option)
-        {
-            throw new NotSupportedException();
-        }
-        <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithHeaders(Metadata headers)
-        {
-            throw new NotSupportedException();
-        }
-        <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithDeadline(DateTime deadline)
-        {
-            throw new NotSupportedException();
-        }
-        <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException();
-        }
-        <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithHost(string host)
-        {
-            throw new NotSupportedException();
-        }
-
         class FireAndForgetClient : <#= interfaceDef.FullName #>
         {
             readonly <#= clientName #> __parent;
@@ -132,27 +110,6 @@
             }
 
             public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithOptions(CallOptions option)
-            {
-                throw new NotSupportedException();
-            }
-            <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithHeaders(Metadata headers)
-            {
-                throw new NotSupportedException();
-            }
-            <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithDeadline(DateTime deadline)
-            {
-                throw new NotSupportedException();
-            }
-            <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-            {
-                throw new NotSupportedException();
-            }
-            <#= interfaceDef.FullName #> IService<<#= interfaceDef.FullName #>>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }

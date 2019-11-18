@@ -608,28 +608,6 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
 
 
-
-        global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithOptions(CallOptions option)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithHeaders(Metadata headers)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithDeadline(DateTime deadline)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithHost(string host)
-        {
-            throw new NotSupportedException();
-        }
-
         class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.IGamingHub
         {
             readonly GamingHubClient __parent;
@@ -650,27 +628,6 @@ namespace Sandbox.NetCoreServer.Hubs {
             }
 
             public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithOptions(CallOptions option)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithHeaders(Metadata headers)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithDeadline(DateTime deadline)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IGamingHub IService<global::Sandbox.NetCoreServer.Hubs.IGamingHub>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }
@@ -758,28 +715,6 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
 
 
-
-        global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithOptions(CallOptions option)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithHeaders(Metadata headers)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithDeadline(DateTime deadline)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithHost(string host)
-        {
-            throw new NotSupportedException();
-        }
-
         class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub
         {
             readonly BugReproductionHubClient __parent;
@@ -800,27 +735,6 @@ namespace Sandbox.NetCoreServer.Hubs {
             }
 
             public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithOptions(CallOptions option)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithHeaders(Metadata headers)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithDeadline(DateTime deadline)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub IService<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }
@@ -919,28 +833,6 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
 
 
-
-        global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithOptions(CallOptions option)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithHeaders(Metadata headers)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithDeadline(DateTime deadline)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithHost(string host)
-        {
-            throw new NotSupportedException();
-        }
-
         class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.IChatHub
         {
             readonly ChatHubClient __parent;
@@ -961,27 +853,6 @@ namespace Sandbox.NetCoreServer.Hubs {
             }
 
             public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithOptions(CallOptions option)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithHeaders(Metadata headers)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithDeadline(DateTime deadline)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.IChatHub IService<global::Sandbox.NetCoreServer.Hubs.IChatHub>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }
@@ -1202,28 +1073,6 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
 
 
-
-        global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithOptions(CallOptions option)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithHeaders(Metadata headers)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithDeadline(DateTime deadline)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException();
-        }
-        global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithHost(string host)
-        {
-            throw new NotSupportedException();
-        }
-
         class FireAndForgetClient : global::Sandbox.NetCoreServer.Hubs.ITestHub
         {
             readonly TestHubClient __parent;
@@ -1244,27 +1093,6 @@ namespace Sandbox.NetCoreServer.Hubs {
             }
 
             public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithOptions(CallOptions option)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithHeaders(Metadata headers)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithDeadline(DateTime deadline)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
-            {
-                throw new NotSupportedException();
-            }
-            global::Sandbox.NetCoreServer.Hubs.ITestHub IService<global::Sandbox.NetCoreServer.Hubs.ITestHub>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }
