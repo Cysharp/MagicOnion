@@ -78,7 +78,7 @@ namespace MagicOnion.CodeAnalysis
                 .ToArray();
 
             serviceInterfaces = bothInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker))
+                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker) && x.AllInterfaces.All(y => y != typeReferences.IStreamingHubMarker))
                 .Distinct()
                 .ToArray();
 

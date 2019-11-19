@@ -335,6 +335,28 @@ namespace ChatApp.Shared.Hubs {
         }
 
 
+
+        global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithOptions(CallOptions option)
+        {
+            throw new NotSupportedException();
+        }
+        global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithHeaders(Metadata headers)
+        {
+            throw new NotSupportedException();
+        }
+        global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithDeadline(DateTime deadline)
+        {
+            throw new NotSupportedException();
+        }
+        global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+        global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithHost(string host)
+        {
+            throw new NotSupportedException();
+        }
+
         class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
         {
             readonly ChatHubClient __parent;
@@ -355,6 +377,27 @@ namespace ChatApp.Shared.Hubs {
             }
 
             public Task WaitForDisconnect()
+            {
+                throw new NotSupportedException();
+            }
+
+            global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithOptions(CallOptions option)
+            {
+                throw new NotSupportedException();
+            }
+            global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithHeaders(Metadata headers)
+            {
+                throw new NotSupportedException();
+            }
+            global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithDeadline(DateTime deadline)
+            {
+                throw new NotSupportedException();
+            }
+            global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithCancellationToken(global::System.Threading.CancellationToken cancellationToken)
+            {
+                throw new NotSupportedException();
+            }
+            global::ChatApp.Shared.Hubs.IChatHub IService<global::ChatApp.Shared.Hubs.IChatHub>.WithHost(string host)
             {
                 throw new NotSupportedException();
             }
