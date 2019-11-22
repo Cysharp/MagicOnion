@@ -22,6 +22,7 @@
 #if DEBUG
 <# } #>
 <# var clientName = interfaceDef.ClientName; #>
+    [Ignore]
     public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.FullName #>>, <#= interfaceDef.FullName #>
     {
 <# foreach(var item in interfaceDef.Methods) { #>

@@ -20,9 +20,14 @@ namespace Sandbox.Hosting
         {
             //GrpcEnvironment.SetLogger(new ConsoleLogger());
 
+            var isDevelopment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development";
+            var creds = isDevelopment ? ChannelCredentials.Insecure : new SslCredentials(File.ReadAllText("./server.crt"));
+
+            var clientMyService = MagicOnionClient.Create<IMyService>(new Channel("localhost", 12345, creds));
+
             var hostTask = MagicOnionHost.CreateDefaultBuilder()
                 //.UseMagicOnion()
-                .UseMagicOnion(types: new[] { typeof(MyService), typeof(MyHub) })
+                .UseMagicOnion(types: new [] { typeof(MyService), typeof(MyHub) })
                 .UseMagicOnion(configurationName: "MagicOnion-Management", types: new[] { typeof(ManagementService) })
                 .ConfigureServices((hostContext, services) =>
                 {
@@ -50,11 +55,7 @@ namespace Sandbox.Hosting
                 })
                 .RunConsoleAsync();
 
-
-            var isDevelopment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development";
-            var creds = isDevelopment ? ChannelCredentials.Insecure : new SslCredentials(File.ReadAllText("./server.crt"));
-
-            var clientMyService = MagicOnionClient.Create<IMyService>(new Channel("localhost", 12345, creds));
+            //var clientMyService = MagicOnionClient.Create<IMyService>(new Channel("localhost", 12345, creds));
             var clientManagementService = MagicOnionClient.Create<IManagementService>(new Channel("localhost", 23456, creds));
             var result = await clientMyService.HelloAsync();
             var result2 = await clientManagementService.FooBarAsync();

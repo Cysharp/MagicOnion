@@ -38,7 +38,7 @@ namespace MagicOnion.Generator
             this.Write("#if DEBUG\r\n");
  } 
  var clientName = interfaceDef.ClientName; 
-            this.Write("    public class ");
+            this.Write("    [Ignore]\r\n    public class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write(" : StreamingHubClientBase<");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
