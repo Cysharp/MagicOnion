@@ -66,6 +66,9 @@ namespace MagicOnion.Client
             var parentType = typeof(MagicOnionClientBase<>).MakeGenericType(t);
             var typeBuilder = asm.DefineType($"{DynamicClientAssemblyHolder.ModuleName}.{ti.FullName}Client", TypeAttributes.Public, parentType, new Type[] { t });
 
+            // Set `IgnoreAttribute` to the generated client type. Hides generated-types from building MagicOnion service definitions.
+            typeBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoreAttribute).GetConstructor(Array.Empty<Type>()), Array.Empty<object>()));
+
             DefineStaticFields(typeBuilder, methodDefinitions);
             DefineStaticConstructor(typeBuilder, t, methodDefinitions);
             var emptyCtor = DefineConstructors(typeBuilder, methodDefinitions);

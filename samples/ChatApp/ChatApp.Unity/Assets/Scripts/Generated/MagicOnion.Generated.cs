@@ -126,6 +126,7 @@ namespace ChatApp.Shared.Services {
     using Grpc.Core;
     using MessagePack;
 
+    [Ignore]
     public class ChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
         static readonly Method<byte[], byte[]> GenerateExceptionMethod;
@@ -227,6 +228,7 @@ namespace ChatApp.Shared.Hubs {
     using System;
     using System.Threading.Tasks;
 
+    [Ignore]
     public class ChatHubClient : StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
