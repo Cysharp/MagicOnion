@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -23,7 +24,7 @@ namespace MagicOnion.Server.Hubs
 
     public interface IGroupRepositoryFactory
     {
-        IGroupRepository CreateRepository(IServiceLocator serviceLocator);
+        IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator);
     }
 
     public interface IGroupRepository
