@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Hosting
 {
-    public class MicrosoftExtensionsServiceActivator : IServiceActivator
+    public class MicrosoftExtensionsMagicOnionServiceActivator : IMagicOnionServiceActivator
     {
         public T Create<T>(IServiceLocator serviceLocator)
         {

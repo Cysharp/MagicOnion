@@ -52,9 +52,9 @@ namespace MagicOnion.Server
         public IServiceLocator ServiceLocator { get; set; }
 
         /// <summary>
-        /// Service instance activator.
+        /// MagicOnion Service instance activator.
         /// </summary>
-        public IServiceActivator ServiceActivator { get; set; }
+        public IMagicOnionServiceActivator MagicOnionServiceActivator { get; set; }
 
         /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
@@ -72,7 +72,7 @@ namespace MagicOnion.Server
             this.EnableCurrentContext = false;
 
             this.ServiceLocator = DefaultServiceLocator.Instance;
-            this.ServiceActivator = DefaultServiceActivator.Instance;
+            this.MagicOnionServiceActivator = DefaultMagicOnionServiceActivator.Instance;
         }
     }
 }

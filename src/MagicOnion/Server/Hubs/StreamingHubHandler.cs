@@ -19,7 +19,7 @@ namespace MagicOnion.Server.Hubs
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
         readonly IServiceLocator serviceLocator;
-        readonly IServiceActivator serviceActivator;
+        readonly IMagicOnionServiceActivator serviceActivator;
 
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
@@ -205,7 +205,7 @@ namespace MagicOnion.Server.Hubs
 
         public IServiceLocator ServiceLocator { get; }
 
-        public IServiceActivator ServiceActivator { get; }
+        public IMagicOnionServiceActivator ServiceActivator { get; }
 
         public StreamingHubHandlerOptions(MagicOnionOptions options)
         {
@@ -213,7 +213,7 @@ namespace MagicOnion.Server.Hubs
             Logger = options.MagicOnionLogger;
             FormatterResolver = options.FormatterResolver;
             ServiceLocator = options.ServiceLocator;
-            ServiceActivator = options.ServiceActivator;
+            ServiceActivator = options.MagicOnionServiceActivator;
         }
     }
 }

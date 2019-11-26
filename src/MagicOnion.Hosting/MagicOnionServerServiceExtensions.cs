@@ -170,7 +170,7 @@ namespace MagicOnion.Hosting
                 var hostingOptions = serviceProvider.GetService<IOptionsMonitor<MagicOnionHostingOptions>>().Get(configurationName);
                 var options = hostingOptions.Service;
                 options.ServiceLocator = new MicrosoftExtensionsServiceLocator(serviceProvider, options);
-                options.ServiceActivator = new MicrosoftExtensionsServiceActivator();
+                options.MagicOnionServiceActivator = new MicrosoftExtensionsMagicOnionServiceActivator();
 
                 // Build a MagicOnion ServiceDefinition from assemblies/types.
                 MagicOnionServiceDefinition serviceDefinition;

@@ -33,7 +33,7 @@ namespace MagicOnion.Server
         internal readonly IMagicOnionLogger logger;
         readonly bool enableCurrentContext;
         readonly IServiceLocator serviceLocator;
-        readonly IServiceActivator serviceActivator;
+        readonly IMagicOnionServiceActivator serviceActivator;
 
         // use for request handling.
 
@@ -610,7 +610,7 @@ namespace MagicOnion.Server
 
         public IServiceLocator ServiceLocator { get; }
 
-        public IServiceActivator ServiceActivator { get; }
+        public IMagicOnionServiceActivator ServiceActivator { get; }
 
         public MethodHandlerOptions(MagicOnionOptions options)
         {
@@ -620,7 +620,7 @@ namespace MagicOnion.Server
             Logger = options.MagicOnionLogger;
             FormatterResolver = options.FormatterResolver;
             ServiceLocator = options.ServiceLocator;
-            ServiceActivator = options.ServiceActivator;
+            ServiceActivator = options.MagicOnionServiceActivator;
         }
     }
 

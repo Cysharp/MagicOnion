@@ -5,9 +5,14 @@ using System.Reflection;
 
 namespace MagicOnion.Server
 {
+    /// <summary>
+    /// An interface of service locator for non-MagicOnion types.
+    /// <see cref="IServiceLocator"/> doesn't provide MagicOnion related types (<see cref="IService{TSelf}"/>, <see cref="IStreamingHub{TSelf,TReceiver}"/>, formatter, etc...).
+    /// </summary>
     public interface IServiceLocator
     {
         T GetService<T>();
+
         IServiceLocatorScope CreateScope();
     }
 
@@ -16,7 +21,11 @@ namespace MagicOnion.Server
         IServiceLocator ServiceLocator { get; }
     }
 
-    public class DefaultServiceLocator : IServiceLocator, IServiceLocatorScope /* DefaultServiceLocator doesn't support scoped-service */
+    /// <summary>
+    /// Implements a simple ServiceLocator and provides registration mechanism.
+    /// <see cref="DefaultServiceLocator"/> doesn't support scoped-services. It always returns itself by <see cref="CreateScope"/>.
+    /// </summary>
+    public class DefaultServiceLocator : IServiceLocator, IServiceLocatorScope
     {
         public static DefaultServiceLocator Instance { get; } = new DefaultServiceLocator();
 
