@@ -13,7 +13,7 @@ using Xunit;
 namespace MagicOnion.NetCoreTests.Tests
 {
     [Collection(nameof(ServiceLocatorTestCollectionFixture))]
-    public class ServiceLocatorTest
+    public class ServiceLocatorTest : IDisposable
     {
         readonly Channel channel;
         readonly MagicOnionOptions options;
@@ -22,6 +22,13 @@ namespace MagicOnion.NetCoreTests.Tests
         {
             channel = serverFixture.DefaultChannel;
             options = serverFixture.Options;
+        }
+
+        public void Dispose()
+        {
+            var serviceLocator = ((ServiceLocatorTestServerFixture.DummyServiceLocator)options.ServiceLocator);
+            serviceLocator.StackedScopes.Clear();
+            serviceLocator.PoppedScopes.Clear();
         }
 
         [Fact]
