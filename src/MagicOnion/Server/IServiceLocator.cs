@@ -8,9 +8,15 @@ namespace MagicOnion.Server
     public interface IServiceLocator
     {
         T GetService<T>();
+        IServiceLocatorScope CreateScope();
     }
 
-    public class DefaultServiceLocator : IServiceLocator
+    public interface IServiceLocatorScope : IDisposable
+    {
+        IServiceLocator ServiceLocator { get; }
+    }
+
+    public class DefaultServiceLocator : IServiceLocator, IServiceLocatorScope /* DefaultServiceLocator doesn't support scoped-service */
     {
         public static DefaultServiceLocator Instance { get; } = new DefaultServiceLocator();
 
@@ -40,9 +46,17 @@ namespace MagicOnion.Server
             Cache<T>.cache = factory;
         }
 
+        public IServiceLocatorScope CreateScope() => this;
+
+        IServiceLocator IServiceLocatorScope.ServiceLocator => this;
+
         static class Cache<T>
         {
             public static Func<T> cache;
+        }
+
+        public void Dispose()
+        {
         }
     }
 

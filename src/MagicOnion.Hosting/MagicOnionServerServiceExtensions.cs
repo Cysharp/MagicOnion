@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MagicOnion.Hosting
 {
@@ -168,8 +169,8 @@ namespace MagicOnion.Hosting
             {
                 var hostingOptions = serviceProvider.GetService<IOptionsMonitor<MagicOnionHostingOptions>>().Get(configurationName);
                 var options = hostingOptions.Service;
-                options.ServiceLocator = new ServiceLocatorBridge(serviceProvider);
-                options.ServiceActivator = new GenericHostServiceActivator(serviceProvider, options);
+                options.ServiceLocator = new MicrosoftExtensionsServiceLocator(serviceProvider, options);
+                options.ServiceActivator = new MicrosoftExtensionsServiceActivator();
 
                 // Build a MagicOnion ServiceDefinition from assemblies/types.
                 MagicOnionServiceDefinition serviceDefinition;

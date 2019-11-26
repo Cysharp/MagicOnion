@@ -53,7 +53,7 @@ namespace MagicOnion.Server
 
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IEnumerable<Type> targetTypes, MagicOnionOptions option)
         {
-            var serviceLocator = new ServiceLocatorOptionAdapter(option);
+            var serviceLocator = option.ServiceLocator;
             var builder = ServerServiceDefinition.CreateBuilder();
             var handlers = new HashSet<MethodHandler>();
             var streamingHubHandlers = new List<StreamingHubHandler>();
@@ -133,7 +133,7 @@ namespace MagicOnion.Server
                         else
                         {
                             // create handler
-                            var handler = new MethodHandler(classType, methodInfo, methodName, option.GlobalFilters, serviceLocator, option.IsReturnExceptionStackTraceInErrorDetail, option.EnableCurrentContext);
+                            var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(option));
                             lock (builder)
                             {
                                 if (!handlers.Add(handler))
@@ -147,7 +147,7 @@ namespace MagicOnion.Server
 
                     if (isStreamingHub)
                     {
-                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", option.GlobalFilters, serviceLocator, option.IsReturnExceptionStackTraceInErrorDetail, option.EnableCurrentContext);
+                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", new MethodHandlerOptions(option));
                         lock (builder)
                         {
                             if (!handlers.Add(connectHandler))

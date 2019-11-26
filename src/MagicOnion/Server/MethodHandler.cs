@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace MagicOnion.Server
             .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
         static readonly MethodInfo createService = typeof(ServiceLocatorHelper).GetMethod(nameof(ServiceLocatorHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-        public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, IList<MagicOnionServiceFilterDescriptor> globalFilters, IServiceLocator serviceLocator, bool isReturnExceptionStackTraceInErrorDetail, bool enableCurrentContext)
+        public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions)
         {
             this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
 
@@ -64,7 +64,7 @@ namespace MagicOnion.Server
             MethodType mt;
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
             this.MethodType = mt;
-            this.resolver = serviceLocator.GetService<IFormatterResolver>();
+            this.resolver = handlerOptions.FormatterResolver;
 
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
@@ -77,7 +77,7 @@ namespace MagicOnion.Server
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            this.filters = globalFilters
+            this.filters = handlerOptions.GlobalFilters
                 .OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
                 .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
@@ -89,11 +89,11 @@ namespace MagicOnion.Server
                 .ToArray();
 
             // options
-            this.isReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
-            this.logger = serviceLocator.GetService<IMagicOnionLogger>();
-            this.enableCurrentContext = enableCurrentContext;
-            this.serviceLocator = serviceLocator;
-            this.serviceActivator = serviceLocator.GetService<IServiceActivator>();
+            this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
+            this.logger = handlerOptions.Logger;
+            this.enableCurrentContext = handlerOptions.EnableCurrentContext;
+            this.serviceLocator = handlerOptions.ServiceLocator;
+            this.serviceActivator = handlerOptions.ServiceActivator;
 
             // prepare lambda parameters
             var createServiceMethodInfo = createService.MakeGenericMethod(classType, serviceInterfaceType);
@@ -346,7 +346,8 @@ namespace MagicOnion.Server
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator, serviceActivator)
+            var serviceLocatorScope = serviceLocator.CreateScope();
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 Request = request
             };
@@ -406,6 +407,7 @@ namespace MagicOnion.Server
             finally
             {
                 logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                serviceLocatorScope.Dispose();
             }
 
             return response;
@@ -414,7 +416,8 @@ namespace MagicOnion.Server
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator, serviceActivator)
+            var serviceLocatorScope = serviceLocator.CreateScope();
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 RequestStream = requestStream
             };
@@ -455,6 +458,7 @@ namespace MagicOnion.Server
             finally
             {
                 logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                serviceLocatorScope.Dispose();
             }
             return response;
         }
@@ -462,7 +466,8 @@ namespace MagicOnion.Server
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator, serviceActivator)
+            var serviceLocatorScope = serviceLocator.CreateScope();
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 ResponseStream = responseStream,
                 Request = request
@@ -500,13 +505,15 @@ namespace MagicOnion.Server
             finally
             {
                 logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                serviceLocatorScope.Dispose();
             }
         }
 
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocator, serviceActivator)
+            var serviceLocatorScope = serviceLocator.CreateScope();
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 RequestStream = requestStream,
                 ResponseStream = responseStream
@@ -548,6 +555,7 @@ namespace MagicOnion.Server
             finally
             {
                 logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                serviceLocatorScope.Dispose();
             }
         }
 
@@ -582,6 +590,37 @@ namespace MagicOnion.Server
             {
                 return obj.methodHandlerId.GetHashCode();
             }
+        }
+    }
+
+    /// <summary>
+    /// Options for MethodHandler construction.
+    /// </summary>
+    public class MethodHandlerOptions
+    {
+        public IList<MagicOnionServiceFilterDescriptor> GlobalFilters { get; }
+
+        public bool IsReturnExceptionStackTraceInErrorDetail { get; }
+
+        public bool EnableCurrentContext { get; }
+
+        public IMagicOnionLogger Logger { get; }
+
+        public IFormatterResolver FormatterResolver { get; }
+
+        public IServiceLocator ServiceLocator { get; }
+
+        public IServiceActivator ServiceActivator { get; }
+
+        public MethodHandlerOptions(MagicOnionOptions options)
+        {
+            GlobalFilters = options.GlobalFilters;
+            IsReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
+            EnableCurrentContext = options.EnableCurrentContext;
+            Logger = options.MagicOnionLogger;
+            FormatterResolver = options.FormatterResolver;
+            ServiceLocator = options.ServiceLocator;
+            ServiceActivator = options.ServiceActivator;
         }
     }
 

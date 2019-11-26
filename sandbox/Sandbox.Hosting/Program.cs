@@ -10,6 +10,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sandbox.Hosting
@@ -31,6 +34,10 @@ namespace Sandbox.Hosting
                 .UseMagicOnion(configurationName: "MagicOnion-Management", types: new[] { typeof(ManagementService) })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton<MySingletonService>();
+                    services.AddScoped<MyScopedService>();
+                    services.AddTransient<MyTransientService>();
+
                     services.Configure<MagicOnionHostingOptions>(options =>
                     {
                         if (hostContext.HostingEnvironment.IsDevelopment())
@@ -52,19 +59,64 @@ namespace Sandbox.Hosting
                     services.Configure<MagicOnionHostingOptions>("MagicOnion-Management", options =>
                     {
                     });
+
+                    services.AddHostedService<MyHostedService>();
                 })
                 .RunConsoleAsync();
 
             //var clientMyService = MagicOnionClient.Create<IMyService>(new Channel("localhost", 12345, creds));
             var clientManagementService = MagicOnionClient.Create<IManagementService>(new Channel("localhost", 23456, creds));
             var result = await clientMyService.HelloAsync();
+            result = await clientMyService.HelloAsync();
+            result = await clientMyService.HelloAsync();
             var result2 = await clientManagementService.FooBarAsync();
 
             var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
             var result3 = await clientHub.HelloAsync();
 
+            var streamingHubClient = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
+            await streamingHubClient.HelloAsync();
+
+            var streamingHubClient2 = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
+            await streamingHubClient2.HelloAsync();
+
             await hostTask;
         }
+    }
+
+    public class MyHostedService : IHostedService
+    {
+        public MyHostedService(MySingletonService service)
+        {
+
+        }
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+    }
+
+    public class MySingletonService : IDisposable
+    {
+        public MySingletonService() => Console.WriteLine($"{this.GetType().Name}..ctor");
+        public void Dispose() => Console.WriteLine($"{this.GetType().Name}.Dispose");
+    }
+
+    public class MyTransientService : IDisposable
+    {
+        public MyTransientService() => Console.WriteLine($"{this.GetType().Name}..ctor");
+        public void Dispose() => Console.WriteLine($"{this.GetType().Name}.Dispose");
+    }
+
+    public class MyScopedService : IDisposable
+    {
+        public MyScopedService() => Console.WriteLine($"{this.GetType().Name}..ctor");
+        public void Dispose() => Console.WriteLine($"{this.GetType().Name}.Dispose");
     }
 
     public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
@@ -95,6 +147,16 @@ namespace Sandbox.Hosting
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
+            context.ServiceLocator.GetService<MyTransientService>();
+            context.ServiceLocator.GetService<MyTransientService>();
+            context.ServiceLocator.GetService<MyTransientService>();
+            context.ServiceLocator.GetService<MySingletonService>();
+            context.ServiceLocator.GetService<MySingletonService>();
+            context.ServiceLocator.GetService<MySingletonService>();
+            context.ServiceLocator.GetService<MyScopedService>();
+            context.ServiceLocator.GetService<MyScopedService>();
+            context.ServiceLocator.GetService<MyScopedService>();
+
             _logger.LogInformation($"MyFilter Begin: {context.CallContext.Method}");
             await next(context);
             _logger.LogInformation($"MyFilter End: {context.CallContext.Method}");
@@ -118,9 +180,8 @@ namespace Sandbox.Hosting
     }
     public class MyService : ServiceBase<IMyService>, IMyService
     {
-        public MyService()
+        public MyService(MySingletonService foo, MyScopedService bar)
         {
-
         }
         public async UnaryResult<string> HelloAsync()
         {
@@ -140,18 +201,17 @@ namespace Sandbox.Hosting
         }
     }
 
+    public interface IMyHubReceiver
+    {
+    }
+
     public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
     {
         Task<string> HelloAsync();
     }
-    public interface IMyHubReceiver
-    { }
 
     public class MyHub : StreamingHubBase<IMyHub, IMyHubReceiver>, IMyHub
     {
-        public Task<string> HelloAsync()
-        {
-            return Task.FromResult("Konnnichiwa!");
-        }
+        public Task<string> HelloAsync() => Task.FromResult("Konnichiwa!");
     }
 }

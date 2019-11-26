@@ -7,12 +7,12 @@ namespace MagicOnion.Server
     public class MagicOnionOptions
     {
         /// <summary>
-        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default).
+        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.Default).
         /// </summary>
         public IFormatterResolver FormatterResolver { get; set; }
 
         /// <summary>
-        /// If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false.
+        /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
         /// </summary>
         public bool IsReturnExceptionStackTraceInErrorDetail { get; set; }
 
@@ -73,34 +73,6 @@ namespace MagicOnion.Server
 
             this.ServiceLocator = DefaultServiceLocator.Instance;
             this.ServiceActivator = DefaultServiceActivator.Instance;
-        }
-    }
-
-    /// <summary>
-    /// Provides some services from MagicOnionOptions and ServiceLocator.
-    /// </summary>
-    internal class ServiceLocatorOptionAdapter : IServiceLocator
-    {
-        readonly MagicOnionOptions options;
-
-        public ServiceLocatorOptionAdapter(MagicOnionOptions options)
-        {
-            this.options = options;
-        }
-
-        public T GetService<T>()
-        {
-            var t = typeof(T);
-            var value = default(T);
-
-            if (t == typeof(IFormatterResolver)) value = (T)options.FormatterResolver;
-            else if (t == typeof(IMagicOnionLogger)) value = (T)options.MagicOnionLogger;
-            else if (t == typeof(IGroupRepositoryFactory)) value = (T)options.DefaultGroupRepositoryFactory;
-            else if (t == typeof(IServiceActivator)) value = (T)options.ServiceActivator;
-
-            return value != null
-                ? value
-                : options.ServiceLocator.GetService<T>();
         }
     }
 }
