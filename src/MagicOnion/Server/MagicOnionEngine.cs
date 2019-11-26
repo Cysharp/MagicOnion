@@ -123,7 +123,7 @@ namespace MagicOnion.Server
                         // register for StreamingHub
                         if (isStreamingHub && methodName != "Connect")
                         {
-                            var streamingHandler = new StreamingHubHandler(classType, methodInfo, option.GlobalStreamingHubFilters, serviceLocator);
+                            var streamingHandler = new StreamingHubHandler(classType, methodInfo, new StreamingHubHandlerOptions(option));
                             if (!tempStreamingHubHandlers.Add(streamingHandler))
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");

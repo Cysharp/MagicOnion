@@ -79,6 +79,9 @@ namespace Sandbox.Hosting
 
             var streamingHubClient2 = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
             await streamingHubClient2.HelloAsync();
+            await streamingHubClient2.HelloAsync();
+            await streamingHubClient2.HelloAsync();
+            await streamingHubClient2.DisposeAsync();
 
             await hostTask;
         }
@@ -212,6 +215,10 @@ namespace Sandbox.Hosting
 
     public class MyHub : StreamingHubBase<IMyHub, IMyHubReceiver>, IMyHub
     {
+        public MyHub(MyScopedService scopedService)
+        { }
+
+        public MyHub() => Console.WriteLine($"{this.GetType().Name}..ctor");
         public Task<string> HelloAsync() => Task.FromResult("Konnichiwa!");
     }
 }
