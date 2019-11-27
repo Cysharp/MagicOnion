@@ -116,26 +116,26 @@ namespace Sandbox.Hosting
 
         MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceLocator serviceLocator)
         {
-            return new FilterImpl(serviceLocator.GetService<ILoggerFactory>().CreateLogger<MyFilterUsingFactoryAttribute>(), Label);
+            return new MyFilterUsingFactory(serviceLocator.GetService<ILoggerFactory>().CreateLogger<MyFilterUsingFactoryAttribute>(), Label);
+        }
+    }
+
+    internal class MyFilterUsingFactory : MagicOnionFilterAttribute
+    {
+        private readonly ILogger _logger;
+        private readonly string _label;
+
+        public MyFilterUsingFactory(ILogger logger, string label)
+        {
+            this._logger = logger;
+            this._label = label;
         }
 
-        internal class FilterImpl : MagicOnionFilterAttribute
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
-            private readonly ILogger _logger;
-            private readonly string _label;
-
-            public FilterImpl(ILogger logger, string label)
-            {
-                this._logger = logger;
-                this._label = label;
-            }
-
-            public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
-            {
-                _logger.LogInformation($"MyFilterFactoryFilterImpl[{_label}] Begin: {context.CallContext.Method}");
-                await next(context);
-                _logger.LogInformation($"MyFilterFactoryFilterImpl[{_label}] End: {context.CallContext.Method}");
-            }
+            _logger.LogInformation($"MyFilterUsingFactory[{_label}] Begin: {context.CallContext.Method}");
+            await next(context);
+            _logger.LogInformation($"MyFilterUsingFactory[{_label}] End: {context.CallContext.Method}");
         }
     }
 
@@ -160,7 +160,7 @@ namespace Sandbox.Hosting
         {
 
         }
-        [MyFilterUsingFactory("PerMethod")]
+        [MyFilterUsingFactoryAttribute("PerMethod")]
         public async UnaryResult<string> HelloAsync()
         {
             return "Konnichiwa";

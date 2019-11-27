@@ -288,59 +288,58 @@ namespace MagicOnion.OpenTelemetry
 
         public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryCollectorFilterImpl(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
         }
+    }
 
-        internal class OpenTelemetryCollectorFilterImpl : MagicOnionFilterAttribute
+    internal class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
+    {
+        readonly ITracer tracer;
+        readonly ISampler sampler;
+
+        public OpenTelemetryCollectorFilter(ITracer tracer, ISampler sampler)
         {
-            readonly ITracer tracer;
-            readonly ISampler sampler;
-
-            public OpenTelemetryCollectorFilterImpl(ITracer tracer, ISampler sampler)
-            {
-                this.tracer = tracer;
-                this.sampler = sampler;
-            }
-
-            public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
-            {
-                // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
-
-                // span name must be `$package.$service/$method` but MagicOnion has no $package.
-                var spanBuilder = tracer.SpanBuilder(context.CallContext.Method).SetSpanKind(SpanKind.Server);
-
-                if (sampler != null)
-                {
-                    spanBuilder.SetSampler(sampler);
-                }
-
-                var span = spanBuilder.StartSpan();
-                try
-                {
-                    span.SetAttribute("component", "grpc");
-                    //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
-
-                    await next(context);
-
-                    //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
-                    span.SetAttribute("status_code", (long) context.CallContext.Status.StatusCode);
-                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
-                }
-                catch (Exception ex)
-                {
-                    span.SetAttribute("exception", ex.ToString());
-
-                    span.SetAttribute("status_code", (long) context.CallContext.Status.StatusCode);
-                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
-                    throw;
-                }
-                finally
-                {
-                    span.End();
-                }
-            }
+            this.tracer = tracer;
+            this.sampler = sampler;
         }
 
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
+
+            // span name must be `$package.$service/$method` but MagicOnion has no $package.
+            var spanBuilder = tracer.SpanBuilder(context.CallContext.Method).SetSpanKind(SpanKind.Server);
+
+            if (sampler != null)
+            {
+                spanBuilder.SetSampler(sampler);
+            }
+
+            var span = spanBuilder.StartSpan();
+            try
+            {
+                span.SetAttribute("component", "grpc");
+                //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
+
+                await next(context);
+
+                //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
+                span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+            }
+            catch (Exception ex)
+            {
+                span.SetAttribute("exception", ex.ToString());
+
+                span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+                throw;
+            }
+            finally
+            {
+                span.End();
+            }
+        }
     }
 
     /// <summary>
@@ -353,56 +352,56 @@ namespace MagicOnion.OpenTelemetry
 
         public StreamingHubFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryHubCollectorFilterImpl(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+        }
+    }
+
+    internal class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
+    {
+        readonly ITracer tracer;
+        readonly ISampler sampler;
+
+        public OpenTelemetryHubCollectorFilter(ITracer tracer, ISampler sampler)
+        {
+            this.tracer = tracer;
+            this.sampler = sampler;
         }
 
-        internal class OpenTelemetryHubCollectorFilterImpl : StreamingHubFilterAttribute
+        public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
-            readonly ITracer tracer;
-            readonly ISampler sampler;
+            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
 
-            public OpenTelemetryHubCollectorFilterImpl(ITracer tracer, ISampler sampler)
+            // span name must be `$package.$service/$method` but MagicOnion has no $package.
+            var spanBuilder = tracer.SpanBuilder(context.ServiceContext.CallContext.Method).SetSpanKind(SpanKind.Server);
+
+            if (sampler != null)
             {
-                this.tracer = tracer;
-                this.sampler = sampler;
+                spanBuilder.SetSampler(sampler);
             }
 
-            public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+            var span = spanBuilder.StartSpan();
+            try
             {
-                // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
+                span.SetAttribute("component", "grpc");
+                //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
 
-                // span name must be `$package.$service/$method` but MagicOnion has no $package.
-                var spanBuilder = tracer.SpanBuilder(context.ServiceContext.CallContext.Method).SetSpanKind(SpanKind.Server);
+                await next(context);
 
-                if (sampler != null)
-                {
-                    spanBuilder.SetSampler(sampler);
-                }
+                //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
+                span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
+                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+            }
+            catch (Exception ex)
+            {
+                span.SetAttribute("exception", ex.ToString());
 
-                var span = spanBuilder.StartSpan();
-                try
-                {
-                    span.SetAttribute("component", "grpc");
-                    //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
-
-                    await next(context);
-
-                    //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
-                    span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
-                }
-                catch (Exception ex)
-                {
-                    span.SetAttribute("exception", ex.ToString());
-
-                    span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
-                    throw;
-                }
-                finally
-                {
-                    span.End();
-                }
+                span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
+                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+                throw;
+            }
+            finally
+            {
+                span.End();
             }
         }
     }
