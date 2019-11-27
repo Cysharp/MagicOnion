@@ -89,6 +89,12 @@ namespace MagicOnion.Server
                     var inheritInterface = classType.GetInterfaces()
                         .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == (isStreamingHub ? typeof(IStreamingHub<,>) : typeof(IService<>)))
                         .GenericTypeArguments[0];
+
+                    if (!inheritInterface.IsAssignableFrom(classType))
+                    {
+                        throw new NotImplementedException($"Type '{classType.FullName}' has no implementation of interface '{inheritInterface.FullName}'.");
+                    }
+
                     var interfaceMap = classType.GetInterfaceMap(inheritInterface);
 
                     for (int i = 0; i < interfaceMap.TargetMethods.Length; ++i)

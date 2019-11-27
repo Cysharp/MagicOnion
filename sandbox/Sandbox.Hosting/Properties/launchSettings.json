@@ -1,15 +1,20 @@
 {
   "profiles": {
+    "Sandbox.Hosting": {
+      "commandName": "Project",
+      "environmentVariables": {
+      }
+    },
     "Sandbox.Hosting (Development)": {
       "commandName": "Project",
       "environmentVariables": {
-        "NETCORE_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     },
     "Sandbox.Hosting (Production)": {
       "commandName": "Project",
       "environmentVariables": {
-        "NETCORE_ENVIRONMENT": "Production"
+        "DOTNET_ENVIRONMENT": "Production"
       }
     }
   }

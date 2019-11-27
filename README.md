@@ -1,13 +1,11 @@
-MagicOnion
-===
+# MagicOnion
 [![CircleCI](https://circleci.com/gh/Cysharp/MagicOnion.svg?style=svg)](https://circleci.com/gh/Cysharp/MagicOnion) [![Releases](https://img.shields.io/github/release/Cysharp/MagicOnion.svg)](https://github.com/Cysharp/MagicOnion/releases)
 
 Unified Realtime/API Engine for .NET Core and Unity.
 
-[Table of contents](#table-of-contents)
+[📖 Table of contents](#-table-of-contents)
 
-What is it?
----
+## What is it?
 MagicOnion is an Realtime Network Engine like [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR), [Socket.io](https://socket.io/) and RPC-Web API Framework like any web-framework.
 
 MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(binary) network transport. It does not requires `.proto` and generate unlike plain gRPC. Protocol schema can share a C# interface and classes.
@@ -22,9 +20,8 @@ MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(bina
 
 MagicOnion is for Microservices(communicate between .NET Core Servers like Orleans, ServiceFabric, AMBROSIA), API Service(for WinForms/WPF like WCF, ASP.NET Core MVC), Native Client’s API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
 
-Quick Start
----
-for .NET 4.6, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity supports see [Unity Supports](https://github.com/cysharp/MagicOnion#unity-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](https://github.com/cysharp/MagicOnion#swagger) section.
+## Quick Start
+for .NET 4.6, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity supports see [Unity client Supports](#unity-client-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](#swagger) section.
 
 ```
 Install-Package MagicOnion
@@ -59,6 +56,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     }
 }
 ```
+
 
 and, launch the server.
 
@@ -101,37 +99,43 @@ var result = await client.SumAsync(100, 200);
 Console.WriteLine("Client Received:" + result);
 ```
 
-MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules. 
+MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules.
 
-> for Server Hosting, We recommend to use `MagicOnion.Hosting`, it is easy to host and wait terminate signal, load from config, support DI, etc. see [MagicOnion#hosting](https://github.com/Cysharp/MagicOnion#hosting) section.
+> for Server Hosting, We recommend to use `MagicOnion.Hosting`, it is easy to host and wait terminate signal, load from config, support DI, etc. see [Server host](#server-host) section.
 
-Table of contents
----
+
+## 📖 Table of contents
+
 - [What is it?](#what-is-it)
 - [Quick Start](#quick-start)
-- [StreamingHub](#streaminghub)
-- [Filter](#filter)
-- [ClientFilter](#clientfilter)
-- [ServiceContext and Lifecycle](#servicecontext-and-lifecycle)
-- [MagicOnionOption/Logging](#magiconionoptionlogging)
-- [ExceptionHandling and StatusCode](#exceptionhandling-and-statuscode)
-- [Group and GroupConfiguration](#group-and-groupconfiguration)
-- [Zero deserialization mapping](#zero-deserialization-mapping)
-- [Project Structure](#project-structure)
-- [Hosting](#hosting)
-- [DI](#di)
-- [Options](#options)
-- [Swagger](#swagger)
-- [Unity Supports](#unity-supports)
-- [Pack to Docker and deploy](#pack-to-docker-and-deploy)
-- [Raw gRPC APIs](#raw-grpc-apis)
-- [SSL/tls](#ssltls)
-- [Telemetry](#telemetry)
+- Fundamentals
+    - [StreamingHub](#streaminghub)
+    - [Filter](#filter)
+    - [ClientFilter](#clientfilter)
+    - [ServiceContext and Lifecycle](#servicecontext-and-lifecycle)
+    - [ExceptionHandling and StatusCode](#exceptionhandling-and-statuscode)
+    - [Group and GroupConfiguration](#group-and-groupconfiguration)
+    - [Project Structure](#project-structure)
+    - [Dependency Injection](#dependency-injection)
+- Client and Server
+    - [Unity client supports](#unity-client-supports)
+    - [Server Host](#server-host)
+        - [Server Host options](#server-host-options)
+- Deployment
+    - [Host in Docker](#host-in-docker)
+    - [SSL/TLS](#ssltls)
+- Integrations
+    - [Swagger](#swagger)
+    - [Telemetry](#telemetry)
+- Advanced
+    - [MagicOnionOption/Logging](#magiconionoptionlogging)
+    - [Raw gRPC APIs](#raw-grpc-apis)
+    - [Zero deserialization mapping](#zero-deserialization-mapping)
 - [Author Info](#author-info)
 - [License](#license)
 
-StreamingHub
----
+## Fundamentals
+### StreamingHub
 StreamingHub is a fully-typed realtime server<->client communication framework.
 
 This sample is for Unity(use Vector3, GameObject, etc) but StreamingHub supports .NET Core, too.
@@ -294,8 +298,7 @@ public class GamingHubClient : IGamingHubReceiver
 }
 ```
 
-Filter
----
+### Filter
 MagicOnion filter is powerful feature to hook before-after invoke. It is useful than gRPC server interceptor.
 
 ![image](https://user-images.githubusercontent.com/46207/50969421-cb465900-1521-11e9-8824-8a34cc52bbe4.png)
@@ -332,7 +335,7 @@ Here is example of what kind of filter can be stacked.
 
 GlobalFilter can attach to MagicOnionOptions.
 
-MagicOnion filters supports [DI](#DI) by [MagicOnion.Hosting](#Hosting).
+MagicOnion filters supports [DI](#dependency-injection) by [MagicOnion.Hosting](#server-host).
 
 ```csharp
 public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
@@ -383,8 +386,7 @@ public class MyService : ServiceBase<IMyService>, IMyService
 }
 ```
 
-ClientFilter
----
+### ClientFilter
 MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
 
 > Currently only suppots on Unary.
@@ -538,8 +540,7 @@ public class EncryptFilter : IClientFilter
 }
 ```
 
-ServiceContext and Lifecycle
----
+### ServiceContext and Lifecycle
 Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it is 
 
 | Property | Description |
@@ -601,28 +602,7 @@ gRPC In(
 
 StreamingHub instance is shared while connecting so StreamingHub's field can use cache area of connection.
 
-MagicOnionOption/Logging
----
-`MagicOnionOption` can pass to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
-
-| Property | Description |
-| --- | --- |
-| `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
-| `bool` DisableEmbeddedService | Disable embedded service(ex:heartbeat), default is false. |
-| `IList<MagicOnionFilterDescriptor>` GlobalFilters | Global MagicOnion filters. |
-| `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
-| `IList<StreamingHubFilterDescriptor>` Global StreamingHub filters. | GlobalStreamingHubFilters |
-| `IGroupRepositoryFactory` DefaultGroupRepositoryFactory | Default GroupRepository factory for StreamingHub, default is ``. |
-| `IServiceLocator` ServiceLocator | Add the extra typed option. |
-| `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
-| `IFormatterResolver` FormatterResolver | MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default). |
-
-`IMagicOnionLogger` is structured logger of MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
-
-If you want to add many loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
-
-ExceptionHandling and StatusCode
----
+### ExceptionHandling and StatusCode
 If you are return custom status code from server to client, you can use `throw new ReturnStatusException`.
 
 ```csharp
@@ -641,8 +621,7 @@ Client can receive exception as gRPC's `RpcException`. If performance centric to
 
 MagicOnion's engine catched exception(except ReturnStatusException), set `StatusCode.Unknown` and client received gRPC's `RpcException`. If `MagicOnionOption.IsReturnExceptionStackTraceInErrorDetail` is true, client can receive StackTrace of server exception, it is very useful for debugging but has critical issue about sercurity so should only to enable debug build.
 
-Group and GroupConfiguration
----
+### Group and GroupConfiguration
 StreamingHub's broadcast system is called Group. It can get from StreamingHub impl method, `this.Group`(this.Group type is `HubGroupRepository`, not `IGroup`).
 
 Current connection can add to group by `this.Group.AddAsync(string groupName)`, return value(`IGroup`) is joined group broadcaster so cache to field. It is enable per connection(if disconnected, automaticaly leaved from group). If you want to use some restriction, you can use `TryAddAsync(string groupName, int incluciveLimitCount, bool createIfEmpty)`.
@@ -707,46 +686,7 @@ var option = new MagicOnionOption();
 option.ServiceLocator.Register(new ConnectionMultiplexer(...));
 ```
 
-Zero deserialization mapping
----
-In RPC, especially in real-time communication involving frequent transmission of data, it is often the serialization process where data is converted before being sent that limits the performance. In MagicOnion, serialization is done by my MessagePack for C#, which is the fastest binary serializer for C#, so it cannot be a limiting factor. Also, in addition to performance, it also provides flexibility regarding data in that variables of any type can be sent as long as they can be serialized by MessagePack for C#.
-
-Also, taking advantage of the fact that both the client and the server run on C# and data stored on internal memory are expected to share the same layout, I added an option to do mapping through memory copy without serialization/deserialization in case of a value-type variable.
-
-Especially in Unity, this is can combinate with `MessageaPack.UnityShims` package of NuGet.
-
-```csharp
-// It supports standard struct-type variables that are provided by Unity, such as Vector3, and arrays containing them, as well as custom struct-type variables and their arrays.
-// I recommend doing this explicitly using [StructLayout(LayoutKind.Explicit)] to accurately match the size.
-public struct CustomStruct
-{
-    public long Id;
-    public int Hp;
-    public int Mp;
-    public byte Status;
-}
- 
-// ---- Register the following code when initializing.
- 
-// By registering it, T and T[] can be handled using zero deserialization mapping.
-UnsafeDirectBlitResolver.Register<CustomStruct>();
- 
-// The struct-type above as well as Unity-provided struct-types (Vector2, Rect, etc.), and their arrays are registered as standards.
-CompositeResolver.RegisterAndSetAsDefault(
-    UnsafeDirectBlitResolver.Instance,
-    MessagePack.Unity.Extension.UnityBlitResolver.Instance
-    );
- 
-// --- Now the communication will be in the format above when they are used for transmission.
-await client.SendAsync(new CustomStruct { Hp = 99 });
-```
-
-Nothing needs to be processed here, so it promises the best performance theoretically possible in terms of transmission speed. However, since these struct-type variables need to be copied, I recommend handling everything as ref as a rule when you need to define a large struct-type, or it might slow down the process.
-
-I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
-
-Project Structure
----
+### Project Structure
 If creates Server-Client project, I recommend make three projects. `Server`, `ServerDefinition`, `Client`.
 
 ![image](https://cloud.githubusercontent.com/assets/46207/21081857/e0f6dfce-c012-11e6-850d-358c5b928a82.png)
@@ -772,31 +712,8 @@ for Unity, you can't share by DLL(because can't share `IServer<>` because it is 
 
 see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
-Hosting
----
-I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2) to host .NET Core app. `MagicOnion.Hosting` package helps to build to use MagicOnion.
 
-* Install-Package MagicOnion.Hosting
-
-```csharp
-// using MagicOnion.Hosting
-static async Task Main(string[] args)
-{
-    // you can use new HostBuilder() instead of CreateDefaultBuilder
-    await MagicOnionHost.CreateDefaultBuilder()
-        .UseMagicOnion(
-            new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
-            new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-        .RunConsoleAsync();
-}
-```
-
-If you can want to load configuration, set logging, etc, see .NET Generic Host documantation.
-
-CreateDefaultBuilder's setup details is same as [MicroBatchFramework](https://github.com/Cysharp/MicroBatchFramework), it is similar as `WebHost.CreateDefaultBuilder` on ASP.NET Core. for the details, see [MicroBatchFramework#configure-configuration](https://github.com/Cysharp/MicroBatchFramework#configure-configuration)
-
-DI
----
+### Dependency Injection
 You can use DI(constructor injection) by GenericHost.
 
 ```csharp
@@ -829,8 +746,51 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 }
 ```
 
-Options
----
+## Server and Clients
+
+### Unity client Supports
+You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
+
+MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
+
+Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application.
+
+```
+moc arguments help:
+  -i, --input=VALUE          [required]Input path of analyze csproj
+  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
+  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
+  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
+  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
+  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
+```
+
+Please try it to run iOS/Android etc.
+
+Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
+
+### Server host
+I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2) to host .NET Core app. `MagicOnion.Hosting` package helps to build to use MagicOnion.
+
+* Install-Package MagicOnion.Hosting
+
+```csharp
+// using MagicOnion.Hosting
+static async Task Main(string[] args)
+{
+    // you can use new HostBuilder() instead of CreateDefaultBuilder
+    await new HostBuilder()
+        .UseMagicOnion()
+        .RunConsoleAsync();
+}
+```
+
+If you can want to load configuration, set logging, etc, see .NET Generic Host documantation.
+
+CreateDefaultBuilder's setup details is same as [MicroBatchFramework](https://github.com/Cysharp/MicroBatchFramework), it is similar as `WebHost.CreateDefaultBuilder` on ASP.NET Core. for the details, see [MicroBatchFramework#configure-configuration](https://github.com/Cysharp/MicroBatchFramework#configure-configuration)
+
+
+### Server host options
 Configure MagicOnion hosting using `Microsoft.Extensions.Options` that align to .NET Core way. In many real use cases, Using setting files (ex. appsettings.json), environment variables, etc ... to configure an application.
 
 For example, We have Production and Development configurations and have some differences about listening ports, certificates and others.
@@ -955,97 +915,9 @@ class Program
 }
 ```
 
-Swagger
----
-MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
+## Deployment
 
-* Install-Package MagicOnion.HttpGateway
-
-HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
-
-```csharp
-// using MagicOnion.Hosting;
-// using Microsoft.Extensions.DependencyInjection;
-// using Microsoft.Extensions.Hosting;
-
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        // setup MagicOnion hosting.
-        var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
-            .UseMagicOnion(
-                new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
-                new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-            .UseConsoleLifetime()
-            .Build();
-
-        // NuGet: Microsoft.AspNetCore.Server.Kestrel
-        var webHost = new WebHostBuilder()
-            .ConfigureServices(collection =>
-            {
-                // Add MagicOnionServiceDefinition for reference from Startup.
-                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
-            })
-            .UseKestrel()
-            .UseStartup<Startup>()
-            .UseUrls("http://localhost:5432")
-            .Build();
-
-        // Run and wait both.
-        await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
-    }
-}
-
-// WebAPI Startup configuration.
-public class Startup
-{
-    // Inject MagicOnionServiceDefinition from DIl
-    public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
-    {
-        // Optional:Add Summary to Swagger
-        // var xmlName = "Sandbox.NetCoreServer.xml";
-        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
-
-        // HttpGateway requires two middlewares.
-        // One is SwaggerView(MagicOnionSwaggerMiddleware)
-        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
-        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
-        {
-            // XmlDocumentPath = xmlPath
-        });
-        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
-    }
-}
-```
-
-Open `http://localhost:5432`, you can see swagger view.
-
-![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
-
-Unity Supports
----
-You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
-
-MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
-
-Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application.
-
-```
-moc arguments help:
-  -i, --input=VALUE          [required]Input path of analyze csproj
-  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
-  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
-  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
-  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
-```
-
-Please try it to run iOS/Android etc.
-
-Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
-
-## Pack to Docker and deploy
+### Host in Docker
 If you hosting the samples on a server, recommend to use container. Add Dockerfile like below.
 
 ```dockerfile
@@ -1112,8 +984,514 @@ workflows:
 
 Depending on the registration information of each environment and platform, fine tuning may be necessary, so please refer to the platform documentation and customize your own.
 
-Raw gRPC APIs
----
+### SSL/TLS
+As [official gRPC doc](https://grpc.io/docs/guides/auth/) notes gRPC supports SSL/TLS, and MagicOnion also support SSL/TLS. 
+
+> gRPC has SSL/TLS integration and promotes the use of SSL/TLS to authenticate the server, and to encrypt all the data exchanged between the client and the server. Optional mechanisms are available for clients to provide certificates for mutual authentication
+
+I will explain how to setup "SSL/TLS MagicOnion on localhost" with following 4 steps.
+
+* [generate certificate](#generate-certificate)
+* [simulate dummy domain on localhost](#simulate-dummy-domain-on-localhost)
+* [server configuration](#server-configuration)
+* [client configuration](#client-configuration)
+
+Let's use [samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server) for server project, and [samples/ChatApp/ChatApp.Unity](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity) for client project.
+
+#### generate certificate
+
+Certificates are required to establish SSL/TLS with Server/Client channel connection.
+Let's use [OpenSSL](https://github.com/openssl/openssl) to create required certificates.
+
+Following command will create 3 files `server.csr`, `server.key` and `server.crt`.
+gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt.
+
+```shell
+# move to your server project
+$ cd MagicOnion/samples/ChatApp/ChatApp.Server
+
+# generate certificates
+# NOTE: CN=xxxx should match domain name to magic onion server pointing domain name
+$ openssl genrsa 2048 > server.key
+$ openssl req -new -sha256 -key server.key -out server.csr -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com"
+$ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
+
+# server will use server.crt and server.key, leave generated certificates.
+
+# client will use server.crt, copy certificate to StreamingAssets folder.
+$ mkdir ../ChatApp.Unity/Assets/StreamingAssets
+$ cp server.crt ../ChatApp.Unity/Assets/StreamingAssets/server.crt
+```
+
+Please modify `/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com` as you need.
+Make sure `CN=xxxx` should match to domain that your MagicOnion Server will recieve request from your client.
+
+> ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
+
+#### simulate dummy domain on localhost
+
+Editting `hosts` file is the simple way to redirect dummy domain request to your localhost.
+
+Let's set your CN to you hosts, example is `dummy.example.com`. 
+Open hosts file and add your entry.
+
+```shell
+# NOTE: edit hosts to test on localhost
+# Windows: (use scoop to install sudo, or open elevated cmd or notepad.)
+PS> sudo notepad c:\windows\system32\drivers\etc\hosts
+# macos:
+$ sudo vim /private/etc/hosts
+# Linux:
+$ sudo vim /etc/hosts
+```
+
+Entry format would be similar to this, please follow to your platform hosts rule.
+
+```shell
+127.0.0.1	dummy.example.com
+```
+
+After modifying hosts, `ping` to your dummy domain and confirm localhost is responding.
+
+```shell
+$ ping dummy.example.com
+
+pinging to dummy.example.com [127.0.0.1] 32 bytes data:
+127.0.0.1 response: bytecount =32 time <1ms TTL=128
+```
+
+#### server configuration
+
+> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](#generate-certificate) section and copy them.
+
+Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
+
+```xml
+  <ItemGroup>
+    <Folder Include="LinkFromUnity\" />
+  </ItemGroup>
+
+  <!-- FOR SSL/TLS SUPPORT -->
+  <ItemGroup>
+    <None Update="server.crt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="server.key">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
+```
+
+Open `samples/ChatApp/ChatApp.Server/Program.cs`, there are default Insecure channel definition with `ServerCredentials.Insecure`.
+What you need is change this line to use `SslServerCredentials`.
+
+```csharp
+new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+```
+
+Add following lines before `await MagicOnionHost.CreateDefaultBuilder()`
+
+```csharp
+var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+var certificates = new System.Collections.Generic.List<KeyCertificatePair> { new KeyCertificatePair(System.IO.File.ReadAllText("server.crt"), System.IO.File.ReadAllText("server.key")) };
+var credential = new SslServerCredentials(certificates);
+```
+
+You may required following using namespaces.
+
+```csharp
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.IO;
+```
+
+Replace existing `new ServerPort("localhost", 12345, ServerCredentials.Insecure))` line with following.
+
+```csharp
+new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
+```
+
+> NOTE: Replace `localhost` to `127.0.0.1` enforce IPv4 connection.
+
+Debug run server on Visual Studio, any IDE or docker.
+
+```shell
+D0729 11:08:21.767387 Grpc.Core.Internal.NativeExtension gRPC native library loaded successfully.
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Production
+```
+
+#### client configuration
+
+> NOTE: Client will use **server.crt**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](#generate-certificate) section and copy it.
+
+Open `samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs`, channel creation is defined as `ChannelCredentials.Insecure` in `InitializeClient()`.
+What you need tois change this line to use `SslCredentials`.
+
+
+```csharp
+this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+```
+
+Replace this line to following.
+
+```csharp
+var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
+this.channel = new Channel("dummy.example.com", 12345, serverCred);
+```
+
+Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOnion Server.
+
+![image](https://user-images.githubusercontent.com/3856350/62017554-1be97f00-b1f2-11e9-9769-70464fe6d425.png)
+
+> NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show `disconnected server.` log.
+
+## Integrations
+### Swagger
+MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
+
+* Install-Package MagicOnion.HttpGateway
+
+HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
+
+```csharp
+// using MagicOnion.Hosting;
+// using Microsoft.Extensions.DependencyInjection;
+// using Microsoft.Extensions.Hosting;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // setup MagicOnion hosting.
+        var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
+            .UseMagicOnion(
+                new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
+                new ServerPort("localhost", 12345, ServerCredentials.Insecure))
+            .UseConsoleLifetime()
+            .Build();
+
+        // NuGet: Microsoft.AspNetCore.Server.Kestrel
+        var webHost = new WebHostBuilder()
+            .ConfigureServices(collection =>
+            {
+                // Add MagicOnionServiceDefinition for reference from Startup.
+                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
+            })
+            .UseKestrel()
+            .UseStartup<Startup>()
+            .UseUrls("http://localhost:5432")
+            .Build();
+
+        // Run and wait both.
+        await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
+    }
+}
+
+// WebAPI Startup configuration.
+public class Startup
+{
+    // Inject MagicOnionServiceDefinition from DIl
+    public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
+    {
+        // Optional:Add Summary to Swagger
+        // var xmlName = "Sandbox.NetCoreServer.xml";
+        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+
+        // HttpGateway requires two middlewares.
+        // One is SwaggerView(MagicOnionSwaggerMiddleware)
+        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
+        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
+        {
+            // XmlDocumentPath = xmlPath
+        });
+        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
+    }
+}
+```
+
+Open `http://localhost:5432`, you can see swagger view.
+
+![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
+
+### Telemetry
+
+You can configure Telemetry for MagicOnion with `MagicOnion.OpenTelemetry` package.
+Let's see overview and how to try on localhost.
+
+* overview
+* examples of implementation
+* try visualization on localhost
+* metrics customization
+* implement your own metrics
+
+#### overview
+
+MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Prometheus](https://prometheus.io/), [StackDriver](https://cloud.google.com/stackdriver/pricing), [Zipkin](https://zipkin.io/) and others.
+
+You can collect telemetry and use exporter on MagicOnion Serverside.
+
+#### examples of implementation
+
+What you need to do for Telemetry is followings.
+
+* configure exporter.
+* add reference to the MagicOnion.OpenTelemetry.
+* configure DI for OpenTelemetry-dotnet.
+* configure filters/logger for telemetry.
+
+Let's follow the steps. 
+
+**configure exporeter**
+
+Before implementing exporeters, I've recommend check samples offering on [opentelemetry\-dotnet/samples/Exporters at master · open\-telemetry/opentelemetry\-dotnet](https://github.com/open-telemetry/opentelemetry-dotnet/tree/master/samples/Exporters).
+
+Here's prometheus exporter sample implementation, paste this before `MagicOnionHost.CreateDefaultBuilder()`.
+This implementation allow prometheus to collect MagicOnion metrics from http://localhost:9184/metrics.
+
+```csharp
+# Program.cs
+var exporter = new PrometheusExporter(
+    new PrometheusExporterOptions()
+    {
+        Url = $"http://localhost:9184/metrics/",
+    },
+    Stats.ViewManager);
+exporter.Start();
+
+// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+```
+
+If you are running on any VM, Container or Kubernetes, you can configure exporter host & port by through ConfigurationBuilder.
+Following example allow you to change exporter host/port by environment variables `PROMETHEUS_EXPORTER_HOST` & `PROMETHEUS_EXPORTER_PORT`.
+
+```csharp
+# Program.cs
+var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+var exporterHost = config.GetValue<string>("PROMETHEUS_EXPORTER_HOST", "localhost");
+var exporterPort = config.GetValue<string>("PROMETHEUS_EXPORTER_PORT", "9182");
+var exporter = new PrometheusExporter(
+    new PrometheusExporterOptions()
+    {
+        Url = $"http://{exporterHost}:{exporterPort}/metrics/",
+    },
+    Stats.ViewManager);
+exporter.Start();
+
+// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+```
+
+**add reference to the MagicOnion.OpenTelemetry**
+
+Please add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
+
+```shell
+dotnet add package MagicOnion.OpenTelemetry
+```
+
+You are ready to configure MagicOnion Filter & Logger for OpenTelemetry.
+
+**configure DI for OpenTelemetry-dotnet**
+
+opentelemetry-dotnet requires DI for `ITracer` and `ISampler`.
+Make sure register them in DI with MagicOnion Builder.
+
+```csharp
+# Program.cs
+await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+    .ConfigureServices(collection =>
+    {
+        collection.AddSingleton<ITracer>(Tracing.Tracer);
+        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
+    })
+    .UseMagicOnion(....)
+```
+
+**configure filters/logger for telemetry**
+
+Use `MagicOnionOptions` to register filters and logger for telemetry.
+You can collect MagicOnion metrics with `MagicOnionFilter`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorFilter` and `OpenTelemetryHubCollectorFilter` for you.
+Also register MagicOnionLogger to collect metrics on each hook point prepared on `IMagicOnionLogger`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorLogger` for you.
+
+```csharp
+await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
+    .ConfigureServices(collection =>
+    {
+        collection.AddSingleton<ITracer>(Tracing.Tracer);
+        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
+    })
+    .UseMagicOnion()
+    .ConfigureServices((hostContext, services) =>
+    {
+        services.Configure<MagicOnionHostingOptions>(options =>
+        {
+             options.Service.GlobalFilters.Add<OpenTelemetryCollectorFilter>();
+             options.Service.GlobalStreamingHubFilters.Add<OpenTelemetryHubCollectorFilter>();
+             options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null);
+        });
+    })
+    .RunConsoleAsync();
+```
+
+All implementation is done! Let's Debug run Server and confirm you can see metrics on http://localhost:9182/metrics.
+
+![image](https://user-images.githubusercontent.com/3856350/62096698-83213500-b2bf-11e9-88ff-52ef673ac4f5.png)
+
+You may find `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition"}` are collected, and other metrics will shown as #HELP.
+They will export when Unary/StreamingHub request is comming.
+
+If you want insert your own tag to default metrics, please add `ITagContext` when register `OpenTelemetryCollectorLogger`.
+Following will add verion tag for each metrics.
+
+```csharp
+MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, new TagContext(new Dictionary<TagKey, TagValue>
+{
+    // add version to all default metrics
+    { TagKey.Create("version"), TagValue.Create("1.0.0") },
+}))
+```
+
+Now each metrics contains `version` tag like `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition",version="1.0.0"}`.
+
+#### try visualization on localhost
+
+You can try Prometheus collecter and visualize metrics on Grafana, all these operation can be done by docker-compose.
+Please follow the steps.
+
+* Apply above `examples of implementation` settings to the [MagicOnion/samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server).
+
+* Copy all items in [MagicOnion/docs/telemetry](https://github.com/Cysharp/MagicOnion/tree/master/docs/telemetry) directory to [MagicOnion/samples/ChatApp].
+
+```shell
+# Windows
+> xcopy MagicOnion\docs\telemetry MagicOnion\samples\ChatApp /H /E
+# Bash
+$ cp -rT MagicOnion/docs/telemetry MagicOnion/samples/ChatApp
+```
+
+* Build & Launch docker-compose, you are all systems are up and running on your localhost.
+
+```shell
+$ cd MagicOnion/samples/ChatApp
+$ docker-compose build
+$ docker-compose up
+
+Creating network "chatapp_default" with the default driver
+Creating alertmanager         ... done
+Creating prometheus           ... done
+Creating chatapp_magiconion_1 ... done
+Creating cAdvisor             ... done
+Creating grafana              ... done
+```
+
+When you launch docker-compose, followings set of service will launch for you.
+
+* **MagicOnion** stats export on http://localhost:9182/metrics/.
+* **cAdvisor** launch on http://localhost:8080.
+* **Prometheus** launch on http://localhost:9090.
+* **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
+* **Alertmanager** to notify alert to Slack.
+* optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
+
+To configure Grafana dashboard, follow the steps.
+
+* add DataSource: Data Souces> add > Prometheus (prometheus URL will be http://prometheus:9090)
+* add Dashboard:
+    * **Prometheus 2.0 Stats** dashboard: open Data Source > prometheus > dashboard tab > add Prometheus 2.0 Stats
+    * **Docker and Host Monitoring w/ Prometheus** dashboard (cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/179
+    * **MagicOnion Overview** dashboard (MagicOnion & cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/10584
+    * optional: **node_exporter 1.8** dashboard: open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/1860
+
+Now you can observe MagicOnion metrics through Grafana.
+
+![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
+
+To configure alert eather, modify `prometheus/config/alert.rules` and set slack incoming url on `alertmanager/config.yml`.
+
+#### implement your own metrics
+
+Implement `IMagicOnionLogger` to configure your metrics. You can collect metrics when following callbacks are invoked by filter.
+
+```csharp
+namespace MagicOnion.Server
+{
+    public interface IMagicOnionLogger
+    {
+        void BeginBuildServiceDefinition();
+        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
+        void EndBuildServiceDefinition(double elapsed);
+        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
+        void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
+        void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
+        void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
+        void WriteToStream(ServiceContext context, byte[] writeData, Type type);
+    }
+}
+```
+
+When implement your own metrics, define `IView` and register it `Stats.ViewManager.RegisterView(YOUR_VIEW);`, then send metrics.
+
+There are several way to send metrics.
+
+> Send each metrics each line.
+
+```csharp
+statsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record(TagContext);
+```
+
+> Put many metrics and send at once: 
+
+```csharp
+var map = statsRecorder.NewMeasureMap(); map.Put(YOUR_METRICS, 1);
+map.Put(YOUR_METRICS2, 2);
+map.Put(YOUR_METRICS3, 10);
+if (isErrorOrInterrupted)
+{
+    map.Put(YOUR_METRICS4, 3);
+}
+
+map.Record(TagContext);
+```
+
+> create tag scope and set number of metrics.
+
+```csharp
+var tagContextBuilder = Tagger.CurrentBuilder.Put(FrontendKey, TagValue.Create("mobile-ios9.3.5"));
+using (var scopedTags = tagContextBuilder.BuildScoped())
+{
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record();
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS2, 2).Record();
+    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS3, 10).Record();
+}
+```
+
+Make sure your View's column, and metrics TagKey is matched. Otherwise none of metrics will shown.
+
+## Advanced
+### MagicOnionOption/Logging
+
+
+`MagicOnionOption` can pass to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
+
+| Property | Description |
+| --- | --- |
+| `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
+| `bool` DisableEmbeddedService | Disable embedded service(ex:heartbeat), default is false. |
+| `IList<MagicOnionFilterDescriptor>` GlobalFilters | Global MagicOnion filters. |
+| `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
+| `IList<StreamingHubFilterDescriptor>` Global StreamingHub filters. | GlobalStreamingHubFilters |
+| `IGroupRepositoryFactory` DefaultGroupRepositoryFactory | Default GroupRepository factory for StreamingHub, default is ``. |
+| `IServiceLocator` ServiceLocator | Add the extra typed option. |
+| `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
+| `IFormatterResolver` FormatterResolver | MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default). |
+
+`IMagicOnionLogger` is structured logger of MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+
+If you want to add many loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
+### Raw gRPC APIs
 MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
 
 ```csharp
@@ -1265,435 +1643,48 @@ static async Task DuplexStreamRun(IMyFirstService client)
 }
 ```
 
-SSL/TLS
----
-As [official gRPC doc](https://grpc.io/docs/guides/auth/) notes gRPC supports SSL/TLS, and MagicOnion also support SSL/TLS. 
+### Zero deserialization mapping
+In RPC, especially in real-time communication involving frequent transmission of data, it is often the serialization process where data is converted before being sent that limits the performance. In MagicOnion, serialization is done by my MessagePack for C#, which is the fastest binary serializer for C#, so it cannot be a limiting factor. Also, in addition to performance, it also provides flexibility regarding data in that variables of any type can be sent as long as they can be serialized by MessagePack for C#.
 
-> gRPC has SSL/TLS integration and promotes the use of SSL/TLS to authenticate the server, and to encrypt all the data exchanged between the client and the server. Optional mechanisms are available for clients to provide certificates for mutual authentication
+Also, taking advantage of the fact that both the client and the server run on C# and data stored on internal memory are expected to share the same layout, I added an option to do mapping through memory copy without serialization/deserialization in case of a value-type variable.
 
-I will explain how to setup "SSL/TLS MagicOnion on localhost" with following 4 steps.
-
-* [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate)
-* [simulate dummy domain on localhost](https://github.com/Cysharp/MagicOnion#simulate-dummy-domain-on-localhost)
-* [server configuration](https://github.com/Cysharp/MagicOnion#server-configuration)
-* [client configuration](https://github.com/Cysharp/MagicOnion#client-configuration)
-
-Let's use [samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server) for server project, and [samples/ChatApp/ChatApp.Unity](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity) for client project.
-
-### generate certificate
-
-Certificates are required to establish SSL/TLS with Server/Client channel connection.
-Let's use [OpenSSL](https://github.com/openssl/openssl) to create required certificates.
-
-Following command will create 3 files `server.csr`, `server.key` and `server.crt`.
-gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt.
-
-```shell
-# move to your server project
-$ cd MagicOnion/samples/ChatApp/ChatApp.Server
-
-# generate certificates
-# NOTE: CN=xxxx should match domain name to magic onion server pointing domain name
-$ openssl genrsa 2048 > server.key
-$ openssl req -new -sha256 -key server.key -out server.csr -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com"
-$ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
-
-# server will use server.crt and server.key, leave generated certificates.
-
-# client will use server.crt, copy certificate to StreamingAssets folder.
-$ mkdir ../ChatApp.Unity/Assets/StreamingAssets
-$ cp server.crt ../ChatApp.Unity/Assets/StreamingAssets/server.crt
-```
-
-Please modify `/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com` as you need.
-Make sure `CN=xxxx` should match to domain that your MagicOnion Server will recieve request from your client.
-
-> ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
-
-### simulate dummy domain on localhost
-
-Editting `hosts` file is the simple way to redirect dummy domain request to your localhost.
-
-Let's set your CN to you hosts, example is `dummy.example.com`. 
-Open hosts file and add your entry.
-
-```shell
-# NOTE: edit hosts to test on localhost
-# Windows: (use scoop to install sudo, or open elevated cmd or notepad.)
-PS> sudo notepad c:\windows\system32\drivers\etc\hosts
-# macos:
-$ sudo vim /private/etc/hosts
-# Linux:
-$ sudo vim /etc/hosts
-```
-
-Entry format would be similar to this, please follow to your platform hosts rule.
-
-```shell
-127.0.0.1	dummy.example.com
-```
-
-After modifying hosts, `ping` to your dummy domain and confirm localhost is responding.
-
-```shell
-$ ping dummy.example.com
-
-pinging to dummy.example.com [127.0.0.1] 32 bytes data:
-127.0.0.1 response: bytecount =32 time <1ms TTL=128
-```
-
-### server configuration
-
-> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy them.
-
-Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
-
-```xml
-  <ItemGroup>
-    <Folder Include="LinkFromUnity\" />
-  </ItemGroup>
-
-  <!-- FOR SSL/TLS SUPPORT -->
-  <ItemGroup>
-    <None Update="server.crt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="server.key">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-</Project>
-```
-
-Open `samples/ChatApp/ChatApp.Server/Program.cs`, there are default Insecure channel definition with `ServerCredentials.Insecure`.
-What you need is change this line to use `SslServerCredentials`.
+Especially in Unity, this is can combinate with `MessagePack.UnityShims` package of NuGet.
 
 ```csharp
-new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-```
-
-Add following lines before `await MagicOnionHost.CreateDefaultBuilder()`
-
-```csharp
-var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
-var certificates = new System.Collections.Generic.List<KeyCertificatePair> { new KeyCertificatePair(System.IO.File.ReadAllText("server.crt"), System.IO.File.ReadAllText("server.key")) };
-var credential = new SslServerCredentials(certificates);
-```
-
-You may required following using namespaces.
-
-```csharp
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.IO;
-```
-
-Replace existing `new ServerPort("localhost", 12345, ServerCredentials.Insecure))` line with following.
-
-```csharp
-new ServerPort(config.GetValue<string>("MAGICONION_HOST", "127.0.0.1"), 12345, credential))
-```
-
-> NOTE: Replace `localhost` to `127.0.0.1` enforce IPv4 connection.
-
-Debug run server on Visual Studio, any IDE or docker.
-
-```shell
-D0729 11:08:21.767387 Grpc.Core.Internal.NativeExtension gRPC native library loaded successfully.
-Application started. Press Ctrl+C to shut down.
-Hosting environment: Production
-```
-
-### client configuration
-
-> NOTE: Client will use **server.crt**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](https://github.com/Cysharp/MagicOnion#generate-certificate) section and copy it.
-
-Open `samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs`, channel creation is defined as `ChannelCredentials.Insecure` in `InitializeClient()`.
-What you need tois change this line to use `SslCredentials`.
-
-
-```csharp
-this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
-```
-
-Replace this line to following.
-
-```csharp
-var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
-this.channel = new Channel("dummy.example.com", 12345, serverCred);
-```
-
-Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOnion Server.
-
-![image](https://user-images.githubusercontent.com/3856350/62017554-1be97f00-b1f2-11e9-9769-70464fe6d425.png)
-
-> NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show `disconnected server.` log.
-
-
-Telemetry
----
-
-You can configure Telemetry for MagicOnion with `MagicOnion.OpenTelemetry` package.
-Let's see overview and how to try on localhost.
-
-* overview
-* examples of implementation
-* try visualization on localhost
-* metrics customization
-* implement your own metrics
-
-### overview
-
-MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Prometheus](https://prometheus.io/), [StackDriver](https://cloud.google.com/stackdriver/pricing), [Zipkin](https://zipkin.io/) and others.
-
-You can collect telemetry and use exporter on MagicOnion Serverside.
-
-### examples of implementation
-
-What you need to do for Telemetry is followings.
-
-* configure exporter.
-* add reference to the MagicOnion.OpenTelemetry.
-* configure DI for OpenTelemetry-dotnet.
-* configure filters/logger for telemetry.
-
-Let's follow the steps. 
-
-**configure exporeter**
-
-Before implementing exporeters, I've recommend check samples offering on [opentelemetry\-dotnet/samples/Exporters at master · open\-telemetry/opentelemetry\-dotnet](https://github.com/open-telemetry/opentelemetry-dotnet/tree/master/samples/Exporters).
-
-Here's prometheus exporter sample implementation, paste this before `MagicOnionHost.CreateDefaultBuilder()`.
-This implementation allow prometheus to collect MagicOnion metrics from http://localhost:9184/metrics.
-
-```csharp
-# Program.cs
-var exporter = new PrometheusExporter(
-    new PrometheusExporterOptions()
-    {
-        Url = $"http://localhost:9184/metrics/",
-    },
-    Stats.ViewManager);
-exporter.Start();
-
-// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-```
-
-If you are running on any VM, Container or Kubernetes, you can configure exporter host & port by through ConfigurationBuilder.
-Following example allow you to change exporter host/port by environment variables `PROMETHEUS_EXPORTER_HOST` & `PROMETHEUS_EXPORTER_PORT`.
-
-```csharp
-# Program.cs
-var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
-var exporterHost = config.GetValue<string>("PROMETHEUS_EXPORTER_HOST", "localhost");
-var exporterPort = config.GetValue<string>("PROMETHEUS_EXPORTER_PORT", "9182");
-var exporter = new PrometheusExporter(
-    new PrometheusExporterOptions()
-    {
-        Url = $"http://{exporterHost}:{exporterPort}/metrics/",
-    },
-    Stats.ViewManager);
-exporter.Start();
-
-// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-```
-
-**add reference to the MagicOnion.OpenTelemetry**
-
-Please add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
-
-```shell
-dotnet add package MagicOnion.OpenTelemetry
-```
-
-You are ready to configure MagicOnion Filter & Logger for OpenTelemetry.
-
-**configure DI for OpenTelemetry-dotnet**
-
-opentelemetry-dotnet requires DI for `ITracer` and `ISampler`.
-Make sure register them in DI with MagicOnion Builder.
-
-```csharp
-# Program.cs
-await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-    .ConfigureServices(collection =>
-    {
-        collection.AddSingleton<ITracer>(Tracing.Tracer);
-        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
-    })
-    .UseMagicOnion(....)
-```
-
-**configure filters/logger for telemetry**
-
-Use `MagicOnionOptions` to register filters and logger for telemetry.
-You can collect MagicOnion metrics with `MagicOnionFilter`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorFilter` and `OpenTelemetryHubCollectorFilter` for you.
-Also register MagicOnionLogger to collect metrics on each hook point prepared on `IMagicOnionLogger`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorLogger` for you.
-
-```csharp
-await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-    .ConfigureServices(collection =>
-    {
-        collection.AddSingleton<ITracer>(Tracing.Tracer);
-        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
-    })
-    .UseMagicOnion()
-    .ConfigureServices((hostContext, services) =>
-    {
-        services.Configure<MagicOnionHostingOptions>(options =>
-        {
-             options.Service.GlobalFilters.Add<OpenTelemetryCollectorFilter>();
-             options.Service.GlobalStreamingHubFilters.Add<OpenTelemetryHubCollectorFilter>();
-             options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null);
-        });
-    })
-    .RunConsoleAsync();
-```
-
-All implementation is done! Let's Debug run Server and confirm you can see metrics on http://localhost:9182/metrics.
-
-![image](https://user-images.githubusercontent.com/3856350/62096698-83213500-b2bf-11e9-88ff-52ef673ac4f5.png)
-
-You may find `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition"}` are collected, and other metrics will shown as #HELP.
-They will export when Unary/StreamingHub request is comming.
-
-If you want insert your own tag to default metrics, please add `ITagContext` when register `OpenTelemetryCollectorLogger`.
-Following will add verion tag for each metrics.
-
-```csharp
-MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, new TagContext(new Dictionary<TagKey, TagValue>
+// It supports standard struct-type variables that are provided by Unity, such as Vector3, and arrays containing them, as well as custom struct-type variables and their arrays.
+// I recommend doing this explicitly using [StructLayout(LayoutKind.Explicit)] to accurately match the size.
+public struct CustomStruct
 {
-    // add version to all default metrics
-    { TagKey.Create("version"), TagValue.Create("1.0.0") },
-}))
-```
-
-Now each metrics contains `version` tag like `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition",version="1.0.0"}`.
-
-### try visualization on localhost
-
-You can try Prometheus collecter and visualize metrics on Grafana, all these operation can be done by docker-compose.
-Please follow the steps.
-
-* Apply above `examples of implementation` settings to the [MagicOnion/samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server).
-
-* Copy all items in [MagicOnion/docs/telemetry](https://github.com/Cysharp/MagicOnion/tree/master/docs/telemetry) directory to [MagicOnion/samples/ChatApp].
-
-```shell
-# Windows
-> xcopy MagicOnion\docs\telemetry MagicOnion\samples\ChatApp /H /E
-# Bash
-$ cp -rT MagicOnion/docs/telemetry MagicOnion/samples/ChatApp
-```
-
-* Build & Launch docker-compose, you are all systems are up and running on your localhost.
-
-```shell
-$ cd MagicOnion/samples/ChatApp
-$ docker-compose build
-$ docker-compose up
-
-Creating network "chatapp_default" with the default driver
-Creating alertmanager         ... done
-Creating prometheus           ... done
-Creating chatapp_magiconion_1 ... done
-Creating cAdvisor             ... done
-Creating grafana              ... done
-```
-
-When you launch docker-compose, followings set of service will launch for you.
-
-* **MagicOnion** stats export on http://localhost:9182/metrics/.
-* **cAdvisor** launch on http://localhost:8080.
-* **Prometheus** launch on http://localhost:9090.
-* **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
-* **Alertmanager** to notify alert to Slack.
-* optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
-
-To configure Grafana dashboard, follow the steps.
-
-* add DataSource: Data Souces> add > Prometheus (prometheus URL will be http://prometheus:9090)
-* add Dashboard:
-    * **Prometheus 2.0 Stats** dashboard: open Data Source > prometheus > dashboard tab > add Prometheus 2.0 Stats
-    * **Docker and Host Monitoring w/ Prometheus** dashboard (cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/179
-    * **MagicOnion Overview** dashboard (MagicOnion & cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/10584
-    * optional: **node_exporter 1.8** dashboard: open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/1860
-
-Now you can observe MagicOnion metrics through Grafana.
-
-![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
-
-To configure alert eather, modify `prometheus/config/alert.rules` and set slack incoming url on `alertmanager/config.yml`.
-
-### implement your own metrics
-
-Implement `IMagicOnionLogger` to configure your metrics. You can collect metrics when following callbacks are invoked by filter.
-
-```csharp
-namespace MagicOnion.Server
-{
-    public interface IMagicOnionLogger
-    {
-        void BeginBuildServiceDefinition();
-        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
-        void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
-        void EndBuildServiceDefinition(double elapsed);
-        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
-        void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
-        void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
-        void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
-        void WriteToStream(ServiceContext context, byte[] writeData, Type type);
-    }
+    public long Id;
+    public int Hp;
+    public int Mp;
+    public byte Status;
 }
+ 
+// ---- Register the following code when initializing.
+ 
+// By registering it, T and T[] can be handled using zero deserialization mapping.
+UnsafeDirectBlitResolver.Register<CustomStruct>();
+ 
+// The struct-type above as well as Unity-provided struct-types (Vector2, Rect, etc.), and their arrays are registered as standards.
+CompositeResolver.RegisterAndSetAsDefault(
+    UnsafeDirectBlitResolver.Instance,
+    MessagePack.Unity.Extension.UnityBlitResolver.Instance
+    );
+ 
+// --- Now the communication will be in the format above when they are used for transmission.
+await client.SendAsync(new CustomStruct { Hp = 99 });
 ```
 
-When implement your own metrics, define `IView` and register it `Stats.ViewManager.RegisterView(YOUR_VIEW);`, then send metrics.
+Nothing needs to be processed here, so it promises the best performance theoretically possible in terms of transmission speed. However, since these struct-type variables need to be copied, I recommend handling everything as ref as a rule when you need to define a large struct-type, or it might slow down the process.
 
-There are several way to send metrics.
+I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
 
-> Send each metrics each line.
-
-```csharp
-statsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record(TagContext);
-```
-
-> Put many metrics and send at once: 
-
-```csharp
-var map = statsRecorder.NewMeasureMap(); map.Put(YOUR_METRICS, 1);
-map.Put(YOUR_METRICS2, 2);
-map.Put(YOUR_METRICS3, 10);
-if (isErrorOrInterrupted)
-{
-    map.Put(YOUR_METRICS4, 3);
-}
-
-map.Record(TagContext);
-```
-
-> create tag scope and set number of metrics.
-
-```csharp
-var tagContextBuilder = Tagger.CurrentBuilder.Put(FrontendKey, TagValue.Create("mobile-ios9.3.5"));
-using (var scopedTags = tagContextBuilder.BuildScoped())
-{
-    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS, 1).Record();
-    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS2, 2).Record();
-    StatsRecorder.NewMeasureMap().Put(YOUR_METRICS3, 10).Record();
-}
-```
-
-Make sure your View's column, and metrics TagKey is matched. Otherwise none of metrics will shown.
-
-
-Author Info
----
+## Author Info
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
 He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
 He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.  
 He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
 
-License
----
+## License
 This library is under the MIT License.

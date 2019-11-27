@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MagicOnion.Hosting.Logging;
 using System.Reflection;
 
@@ -62,32 +63,50 @@ namespace MagicOnion.Hosting
         /// <returns>The initialized <see cref="IHostBuilder"/>.</returns>
         public static IHostBuilder CreateDefaultBuilder(bool useSimpleConsoleLogger, LogLevel minSimpleConsoleLoggerLogLevel, string hostEnvironmentVariable)
         {
-            var builder = new HostBuilder();
+            var builder = CreateDefaultBuilderHosting3_0_Or_Later() ??
+                          CreateDefaultBuilderHosting2_2();
 
             ConfigureHostConfigurationDefault(builder, hostEnvironmentVariable);
-            ConfigureAppConfigurationDefault(builder);
             ConfigureLoggingDefault(builder, useSimpleConsoleLogger, minSimpleConsoleLoggerLogLevel);
 
             return builder;
         }
 
-        internal static void ConfigureHostConfigurationDefault(IHostBuilder builder, string hostEnvironmentVariable)
+        private static IHostBuilder CreateDefaultBuilderHosting3_0_Or_Later()
+        {
+            // Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(string args[]);
+            var hostingHostType = Type.GetType("Microsoft.Extensions.Hosting.Host, Microsoft.Extensions.Hosting");
+            if (hostingHostType == null) return null;
+            var createDefaultBuilderMethod = hostingHostType.GetMethod("CreateDefaultBuilder", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string[]) }, null);
+
+            return (IHostBuilder)createDefaultBuilderMethod.Invoke(null, new [] { default(string) });
+        }
+
+        // TODO: When upgrading Microsoft.Extensions.Hosting to v3.x, We need to remove these workarounds and use `Host.CreateDefaultBuilder`.
+        #region Implementation for Microsoft.Extensions.Hosting 2.2
+        private static IHostBuilder CreateDefaultBuilderHosting2_2()
+        {
+            var builder = new HostBuilder();
+
+            ConfigureHostConfigurationHosting2_2(builder);
+            ConfigureAppConfigurationHosting2_2(builder);
+            ConfigureLoggingHosting2_2(builder);
+
+            return builder;
+        }
+
+        internal static void ConfigureHostConfigurationHosting2_2(IHostBuilder builder)
         {
             builder.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             builder.ConfigureHostConfiguration(config =>
             {
-                config.AddEnvironmentVariables(prefix: "NETCORE_");
-                config.AddInMemoryCollection(new[] { new KeyValuePair<string, string>(HostDefaults.ApplicationKey, Assembly.GetExecutingAssembly().GetName().Name) });
+                // NOTE: Treat prefix "DOTNET_" as the same as Microsoft.Extensions.Hosting 3.x.
+                config.AddEnvironmentVariables(prefix: "DOTNET_");
             });
-
-            if (!string.IsNullOrWhiteSpace(hostEnvironmentVariable))
-            {
-                builder.UseEnvironment(System.Environment.GetEnvironmentVariable(hostEnvironmentVariable) ?? "Production");
-            }
         }
 
-        internal static void ConfigureAppConfigurationDefault(IHostBuilder builder)
+        internal static void ConfigureAppConfigurationHosting2_2(IHostBuilder builder)
         {
             builder.ConfigureAppConfiguration((hostingContext, config) =>
             {
@@ -110,22 +129,60 @@ namespace MagicOnion.Hosting
             });
         }
 
+        internal static void ConfigureLoggingHosting2_2(IHostBuilder builder)
+        {
+            builder.ConfigureLogging((hostContext, logging) =>
+            {
+                logging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
+            });
+        }
+        #endregion
+
+        internal static void ConfigureHostConfigurationDefault(IHostBuilder builder, string hostEnvironmentVariable)
+        {
+            builder.ConfigureHostConfiguration(config =>
+            {
+                // NOTE: This is backward compatibility for older versions.
+                // It's strongly recommended to use "DOTNET_" prefix expected by GenericHost. (e.g. DOTNET_ENVIRONMENT)
+                config.AddEnvironmentVariables(prefix: "NETCORE_");
+
+                config.AddInMemoryCollection(new[] { new KeyValuePair<string, string>(HostDefaults.ApplicationKey, Assembly.GetExecutingAssembly().GetName().Name) });
+            });
+
+            if (!string.IsNullOrWhiteSpace(hostEnvironmentVariable))
+            {
+                builder.UseEnvironment(System.Environment.GetEnvironmentVariable(hostEnvironmentVariable) ?? "Production");
+            }
+        }
+
         internal static void ConfigureLoggingDefault(IHostBuilder builder, bool useSimpleConsoleLogger, LogLevel minSimpleConsoleLoggerLogLevel)
         {
             if (useSimpleConsoleLogger)
             {
                 builder.ConfigureLogging(logging =>
                 {
-                    logging.AddSimpleConsole();
-                    logging.AddFilter<SimpleConsoleLoggerProvider>((category, level) =>
+                    // Use SimpleConsoleLogger instead of the default ConsoleLogger.
+                    var consoleLogger = logging.Services.FirstOrDefault(x => x.ImplementationType?.FullName == "Microsoft.Extensions.Logging.Console.ConsoleLoggerProvider");
+                    if (consoleLogger != null)
                     {
-                        // omit system message
-                        if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                        logging.Services.Remove(consoleLogger);
+                    }
+
+                    logging.AddSimpleConsole();
+                    logging.AddFilter((providerName, category, level) =>
+                    {
+                        if (providerName == typeof(SimpleConsoleLogger).FullName)
                         {
-                            if (level <= LogLevel.Debug) return false;
+                            // omit system message
+                            if (category.StartsWith("Microsoft.Extensions.Hosting.Internal"))
+                            {
+                                if (level <= LogLevel.Debug) return false;
+                            }
+
+                            return level >= minSimpleConsoleLoggerLogLevel;
                         }
 
-                        return level >= minSimpleConsoleLoggerLogLevel;
+                        return true;
                     });
                 });
             }

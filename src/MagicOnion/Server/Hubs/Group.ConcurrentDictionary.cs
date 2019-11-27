@@ -249,7 +249,7 @@ namespace MagicOnion.Server.Hubs
                     }
                     WriteInAsyncLockVoid(item.Value, message);
                     writeCount++;
-                NEXT:
+                    NEXT:
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -282,7 +282,7 @@ namespace MagicOnion.Server.Hubs
                         buffer[index++] = WriteInAsyncLock(item.Value, message);
                         writeCount++;
 
-                    NEXT:
+                        NEXT:
                         continue;
                     }
 
@@ -297,7 +297,62 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        public Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+        public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+            if (fireAndForget)
+            {
+                var writeCount = 0;
+                foreach (var item in connectionIds)
+                {
+                    if (members.TryGetValue(item, out var context))
+                    {
+                        WriteInAsyncLockVoid(context, message);
+                        writeCount++;
+                    }
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                var rent = ArrayPool<ValueTask>.Shared.Rent(connectionIds.Length);
+                ValueTask promise;
+                var writeCount = 0;
+                try
+                {
+                    var buffer = rent;
+                    var index = 0;
+                    foreach (var item in connectionIds)
+                    {
+                        if (members.TryGetValue(item, out var context))
+                        {
+                            buffer[index++] = WriteInAsyncLock(context, message);
+                            writeCount++;
+                        }
+                        else
+                        {
+                            buffer[index++] = default(ValueTask);
+                        }
+                    }
+
+                    promise = ToPromise(buffer, index);
+                }
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return promise.AsTask();
+            }
+        }
+
+        public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
         {
             // oh, copy is bad but current gRPC interface only accepts byte[]...
             var message = new byte[msg.Count];
@@ -329,7 +384,7 @@ namespace MagicOnion.Server.Hubs
                         }
                         WriteInAsyncLockVoid(item.Value, message);
                         writeCount++;
-                    NEXT:
+                        NEXT:
                         continue;
                     }
                     logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -378,10 +433,69 @@ namespace MagicOnion.Server.Hubs
                             buffer[index++] = WriteInAsyncLock(item.Value, message);
                             writeCount++;
 
-                        NEXT:
+                            NEXT:
                             continue;
                         }
                     }
+                    promise = ToPromise(buffer, index);
+                }
+                finally
+                {
+                    ArrayPool<ValueTask>.Shared.Return(rent, true);
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return promise.AsTask();
+            }
+        }
+
+
+
+        public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
+        {
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+            if (fireAndForget)
+            {
+                if (connectionIds != null)
+                {
+                    var writeCount = 0;
+                    foreach (var item in connectionIds)
+                    {
+                        if (members.TryGetValue(item, out var context))
+                        {
+                            WriteInAsyncLockVoid(context, message);
+                            writeCount++;
+                        }
+                    }
+
+                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                }
+
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                var rent = ArrayPool<ValueTask>.Shared.Rent(connectionIds.Length);
+                ValueTask promise;
+                var writeCount = 0;
+                try
+                {
+                    var buffer = rent;
+                    var index = 0;
+                    foreach (var item in connectionIds)
+                    {
+                        if (members.TryGetValue(item, out var context))
+                        {
+                            buffer[index++] = WriteInAsyncLock(context, message);
+                            writeCount++;
+                        }
+                        else
+                        {
+                            buffer[index++] = default(ValueTask);
+                        }
+                    }
+
                     promise = ToPromise(buffer, index);
                 }
                 finally

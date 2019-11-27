@@ -78,7 +78,7 @@ namespace MagicOnion.CodeAnalysis
                 .ToArray();
 
             serviceInterfaces = bothInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker))
+                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker) && x.AllInterfaces.All(y => y != typeReferences.IStreamingHubMarker))
                 .Distinct()
                 .ToArray();
 
@@ -96,7 +96,7 @@ namespace MagicOnion.CodeAnalysis
                     Name = x.ToDisplayString(shortTypeNameFormat),
                     FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                    IsServiceDifinition = true,
+                    IsServiceDefinition = true,
                     IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()

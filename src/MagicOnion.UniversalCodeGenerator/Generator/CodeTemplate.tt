@@ -12,7 +12,7 @@
 
 <#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
     using System;
-	using MagicOnion;
+    using MagicOnion;
     using MagicOnion.Client;
     using Grpc.Core;
     using MessagePack;
@@ -21,7 +21,8 @@
 <# if(interfaceDef.IsIfDebug) { #>
 #if DEBUG
 <# } #>
-<# var clientName = interfaceDef.Name + "Client"; #>
+<# var clientName = interfaceDef.ClientName; #>
+    [Ignore]
     public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.FullName #>>, <#= interfaceDef.FullName #>
     {
 <# foreach(var item in interfaceDef.Methods) { #>

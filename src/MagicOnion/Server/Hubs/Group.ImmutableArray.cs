@@ -216,7 +216,7 @@ namespace MagicOnion.Server.Hubs
 
                     WriteInAsyncLockVoid(source[i], message);
                     writeCount++;
-                NEXT:
+                    NEXT:
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -239,7 +239,7 @@ namespace MagicOnion.Server.Hubs
 
                     promise.Add(WriteInAsyncLock(source[i], message));
                     writeCount++;
-                NEXT:
+                    NEXT:
                     continue;
                 }
 
@@ -248,7 +248,98 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        public Task WriteRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+        public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+
+            var source = members;
+
+            if (fireAndForget)
+            {
+                var writeCount = 0;
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (source[i].ContextId == connectionId)
+                    {
+                        WriteInAsyncLockVoid(source[i], message);
+                        writeCount++;
+                        break;
+                    }
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+                var writeCount = 0;
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (source[i].ContextId == connectionId)
+                    {
+                        promise.Add(WriteInAsyncLock(source[i], message));
+                        writeCount++;
+                        break;
+                    }
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        {
+            var message = BuildMessage(methodId, value);
+
+            var source = members;
+            if (fireAndForget)
+            {
+                var writeCount = 0;
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in connectionIds)
+                    {
+                        if (source[i].ContextId != item)
+                        {
+                            goto NEXT;
+                        }
+                    }
+
+                    WriteInAsyncLockVoid(source[i], message);
+                    writeCount++;
+                    NEXT:
+                    continue;
+                }
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+                var writeCount = 0;
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in connectionIds)
+                    {
+                        if (source[i].ContextId != item)
+                        {
+                            promise.Add(default(ValueTask));
+                            goto NEXT;
+                        }
+                    }
+
+                    promise.Add(WriteInAsyncLock(source[i], message));
+                    writeCount++;
+                    NEXT:
+                    continue;
+                }
+
+                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
         {
             // oh, copy is bad but current gRPC interface only accepts byte[]...
             var message = new byte[msg.Count];
@@ -279,7 +370,7 @@ namespace MagicOnion.Server.Hubs
                         }
                         WriteInAsyncLockVoid(source[i], message);
                         writeCount++;
-                    NEXT:
+                        NEXT:
                         continue;
                     }
                 }
@@ -313,12 +404,73 @@ namespace MagicOnion.Server.Hubs
 
                         promise.Add(WriteInAsyncLock(source[i], message));
                         writeCount++;
-                    NEXT:
+                        NEXT:
                         continue;
                     }
                 }
 
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                return promise.AsValueTask().AsTask();
+            }
+        }
+
+        public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
+        {
+            // oh, copy is bad but current gRPC interface only accepts byte[]...
+            var message = new byte[msg.Count];
+            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+
+            var source = members;
+            if (fireAndForget)
+            {
+                var writeCount = 0;
+                if (connectionIds != null)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        foreach (var item in connectionIds)
+                        {
+                            if (source[i].ContextId != item)
+                            {
+                                goto NEXT;
+                            }
+                        }
+                        WriteInAsyncLockVoid(source[i], message);
+                        writeCount++;
+                        NEXT:
+                        continue;
+                    }
+
+                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                }
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                var promise = new ReservedWhenAllPromise(source.Length);
+                var writeCount = 0;
+                if (connectionIds != null)
+                {
+                    for (int i = 0; i < source.Length; i++)
+                    {
+                        foreach (var item in connectionIds)
+                        {
+                            if (source[i].ContextId != item)
+                            {
+                                promise.Add(default(ValueTask));
+                                goto NEXT;
+                            }
+                        }
+
+                        promise.Add(WriteInAsyncLock(source[i], message));
+                        writeCount++;
+                        NEXT:
+                        continue;
+                    }
+
+                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                }
+
                 return promise.AsValueTask().AsTask();
             }
         }

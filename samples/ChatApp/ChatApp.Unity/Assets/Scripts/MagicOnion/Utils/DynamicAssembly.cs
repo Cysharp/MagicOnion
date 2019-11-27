@@ -6,7 +6,12 @@ using System.Reflection.Emit;
 
 namespace MagicOnion.Utils
 {
-    internal class DynamicAssembly
+#if ENABLE_SAVE_ASSEMBLY
+    public
+#else
+    internal
+#endif
+        class DynamicAssembly
     {
         readonly object gate = new object();
 

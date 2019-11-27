@@ -12,6 +12,9 @@ executors:
     docker:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       - image: gableroux/unity3d:2018.3.12f1-windows
+  go:
+    docker:
+      - image: circleci/golang    
   macos:
     macos:
       xcode: 10.2.0
@@ -35,9 +38,10 @@ jobs:
           name: Export unitypackage
           command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
           working_directory: src/MagicOnion.Client.Unity
-      - store_artifacts:
-          path: src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
-          destination: /MagicOnion.Client.Unity.unitypackage
+      - persist_to_workspace:
+          root: ./src/MagicOnion.Client.Unity/
+          paths:
+            - ./MagicOnion.Client.Unity.unitypackage
   # .NET Core debug/test, release/push
   build-test:
     executor: dotnet
@@ -76,15 +80,69 @@ jobs:
       - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r osx-x64 -o ./bin/moc/osx-x64
       - run: apt update && apt install zip -y
       - run: zip -r moc.zip ./src/MagicOnion.UniversalCodeGenerator/bin/moc
-      - store_artifacts:
-          path: moc.zip
-          destination: moc.zip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./moc.zip
       # push to NuGet Server
       - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
+
+  build-push-canary:
+    executor: dotnet
+    steps:
+      - git-shallow-clone/checkout_shallow
+      - run: echo "export MAGICONION_VERSION=`echo ci-\`date '+%Y%m%d-%H%M%S'\`+${CIRCLE_SHA1:0:6}`" >> $BASH_ENV
+      - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
+      # build .NET Core projects
+      - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      # tests
+      # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
+      # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
+      # pack nuget
+      - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.OpenTelemetry/MagicOnion.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      # publish moc
+      - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r win-x64 -o ./bin/moc/win-x64
+      - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r linux-x64 -o ./bin/moc/linux-x64
+      - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r osx-x64 -o ./bin/moc/osx-x64
+      - run: apt update && apt install zip -y
+      - run: zip -r moc.zip ./src/MagicOnion.UniversalCodeGenerator/bin/moc
+      - store_artifacts:
+          path: ./moc.zip
+      # push to NuGet Server
+      - run: echo "export NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED=true" >> $BASH_ENV
+      - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
+      - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+
+  # upload to github by ghr
+  upload-github:
+    executor: go
+    steps:
+      - attach_workspace:
+          at: .
+      - run: go get github.com/tcnksm/ghr
+      - run: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} ${CIRCLE_TAG} .
+      - store_artifacts:
+          path: MagicOnion.Client.Unity.unitypackage
+          destination: MagicOnion.Client.Unity.unitypackage
+      - store_artifacts:
+          path: moc.zip
+          destination: moc.zip
   # android build
   build-unity-chatapp-android:
     executor: macos
@@ -187,7 +245,21 @@ workflows:
               only: /^\d\.\d\.\d.*/
             branches:
               ignore: /.*/
+      - upload-github:
+          requires:
+            - build-unity
+            - build-push
+          filters:
+            tags:
+              only: /^\d\.\d\.\d.*/
+            branches:
+              ignore: /.*/
       # - build-unity-chatapp-android:
       #     filters:
       #       tags:
       #         only: /.*/
+      - build-push-canary:
+          filters:
+            branches:
+              only:
+                - master

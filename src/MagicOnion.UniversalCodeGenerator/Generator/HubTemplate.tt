@@ -23,7 +23,8 @@
 <# if(interfaceDef.IsIfDebug) { #>
 #if DEBUG
 <# } #>
-<# var clientName = interfaceDef.Name + "Client"; #>
+<# var clientName = interfaceDef.ClientName; #>
+    [Ignore]
     public class <#= clientName #> : StreamingHubClientBase<<#= interfaceDef.FullName #>, <#= receiverDef.FullName #>>, <#= interfaceDef.FullName #>
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "<#= interfaceDef.Name #>", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
