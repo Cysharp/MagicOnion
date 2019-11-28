@@ -60,10 +60,18 @@ namespace Sandbox.Hosting
             var result = await clientMyService.HelloAsync();
             var result2 = await clientManagementService.FooBarAsync();
 
-            var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
+            var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), new MyHubReceiver());
             var result3 = await clientHub.HelloAsync();
 
             await hostTask;
+        }
+
+        class MyHubReceiver : IMyHubReceiver
+        {
+            public void OnNantoka(string value)
+            {
+                Console.WriteLine(value);
+            }
         }
     }
 
@@ -144,14 +152,28 @@ namespace Sandbox.Hosting
     {
         Task<string> HelloAsync();
     }
+
     public interface IMyHubReceiver
-    { }
+    {
+        void OnNantoka(string value);
+    }
 
     public class MyHub : StreamingHubBase<IMyHub, IMyHubReceiver>, IMyHub
     {
-        public Task<string> HelloAsync()
+        public async Task<string> HelloAsync()
         {
-            return Task.FromResult("Konnnichiwa!");
+            var group = await this.Group.AddAsync("Nantoka");
+            group.CreateBroadcaster<IMyHubReceiver>().OnNantoka("BroadcastAll");
+            group.CreateBroadcasterTo<IMyHubReceiver>(Context.ContextId).OnNantoka("BroadcastTo(Self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(Guid.NewGuid()).OnNantoka("BroadcastTo(Non-self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(new[] { Guid.NewGuid(), Guid.NewGuid() }).OnNantoka("BroadcastTo(Non-self, Non-self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(new[] { Context.ContextId, Guid.NewGuid() }).OnNantoka("BroadcastTo(Self, Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(Context.ContextId).OnNantoka("BroadcastExcept(Self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(Guid.NewGuid()).OnNantoka("BroadcastExcept(Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(new[] { Guid.NewGuid(), Guid.NewGuid() }).OnNantoka("BroadcastExcept(Non-self, Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(new[] { Context.ContextId, Guid.NewGuid() }).OnNantoka("BroadcastExcept(Self, Non-self)");
+
+            return "Konnnichiwa!";
         }
     }
 }
