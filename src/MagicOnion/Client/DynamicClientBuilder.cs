@@ -431,6 +431,14 @@ namespace MagicOnion.Client
 
                             // create return result
                             il.Emit(OpCodes.Ldloc_1);
+
+                            // new MarshallingAsyncStreamReader<TRequest>()(inner.ResponseStream, resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Callvirt, typeof(AsyncServerStreamingCall<byte[]>).GetProperty("ResponseStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Newobj, typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.RequestType).GetConstructors().Single());
+
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, resolverField);
                             var resultType = typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType);
@@ -470,9 +478,22 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Stloc_0);
 
                         // create return result
+                        // new {Client,Duplex}StreamingResult<TRequest, TResponse>(
+                        //   inner,
                         il.Emit(OpCodes.Ldloc_0);
+
+                        //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, resolver),
+                        il.Emit(OpCodes.Ldloc_0);
+                        il.Emit(OpCodes.Callvirt, typeof(AsyncClientStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, resolverField);
+                        il.Emit(OpCodes.Newobj, typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single());
+
+                        //    resolver
+                        // );
+                        il.Emit(OpCodes.Ldarg_0);
+                        il.Emit(OpCodes.Ldfld, resolverField);
+
                         Type resultType2;
                         if (def.MethodType == MethodType.ClientStreaming)
                         {

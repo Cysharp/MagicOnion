@@ -11,12 +11,12 @@ namespace MagicOnion
     public struct ServerStreamingResult<TResponse> : IDisposable
     {
         readonly AsyncServerStreamingCall<byte[]> inner;
-        readonly MarshallingAsyncStreamReader<TResponse> responseStream;
+        readonly IAsyncStreamReader<TResponse> responseStream;
 
-        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IFormatterResolver resolver)
+        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IAsyncStreamReader<TResponse> responseStream, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
+            this.responseStream = responseStream;
         }
 
         /// <summary>

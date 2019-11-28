@@ -61,7 +61,12 @@ namespace MagicOnion.Client.EmbeddedServices
         public DuplexStreamingResult<Nil, Nil> Connect()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, base.host, base.option);
-            return new DuplexStreamingResult<Nil, Nil>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance);
+            return new DuplexStreamingResult<Nil, Nil>(
+                __callResult,
+                new MarshallingClientStreamWriter<Nil>(__callResult.RequestStream, MessagePack.Resolvers.BuiltinResolver.Instance),
+                new MarshallingAsyncStreamReader<Nil>(__callResult.ResponseStream, MessagePack.Resolvers.BuiltinResolver.Instance),
+                MessagePack.Resolvers.BuiltinResolver.Instance
+            );
         }
     }
 }

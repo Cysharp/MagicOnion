@@ -76,7 +76,7 @@ namespace MagicOnion.Client
         }
     }
 
-    public abstract class ResponseContext : IDisposable
+    public abstract class ResponseContext : IResponseContext
     {
         static readonly Func<byte[], byte[]> DefaultMutator = xs => xs;
 
@@ -113,7 +113,7 @@ namespace MagicOnion.Client
         }
     }
 
-    public sealed class ResponseContext<T> : ResponseContext
+    public sealed class ResponseContext<T> : ResponseContext, IResponseContext<T>
     {
         readonly AsyncUnaryCall<byte[]> inner;
         readonly IFormatterResolver resolver;

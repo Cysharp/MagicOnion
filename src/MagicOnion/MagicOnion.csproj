@@ -45,6 +45,9 @@
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
     </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    </ItemGroup>
 
     <!-- Exclude -->
 

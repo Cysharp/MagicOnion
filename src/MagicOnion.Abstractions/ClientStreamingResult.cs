@@ -17,7 +17,7 @@ namespace MagicOnion
         internal readonly TResponse rawValue;
         internal readonly bool hasRawValue;
         readonly AsyncClientStreamingCall<byte[], byte[]> inner;
-        readonly MarshallingClientStreamWriter<TRequest> requestStream;
+        readonly IClientStreamWriter<TRequest> requestStream;
         readonly IFormatterResolver resolver;
 
         public ClientStreamingResult(TResponse rawValue)
@@ -29,12 +29,12 @@ namespace MagicOnion
             this.resolver = null;
         }
 
-        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
+        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, IFormatterResolver resolver)
         {
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
             this.inner = inner;
-            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
+            this.requestStream = requestStream;
             this.resolver = resolver;
         }
 

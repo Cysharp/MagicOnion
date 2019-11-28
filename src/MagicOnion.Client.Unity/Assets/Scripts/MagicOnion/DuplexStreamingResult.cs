@@ -11,14 +11,14 @@ namespace MagicOnion
     public struct DuplexStreamingResult<TRequest, TResponse> : IDisposable
     {
         readonly AsyncDuplexStreamingCall<byte[], byte[]> inner;
-        readonly MarshallingClientStreamWriter<TRequest> requestStream;
-        readonly MarshallingAsyncStreamReader<TResponse> responseStream;
+        readonly IClientStreamWriter<TRequest> requestStream;
+        readonly IAsyncStreamReader<TResponse> responseStream;
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> writer, IAsyncStreamReader<TResponse> reader, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
+            this.requestStream = writer;
+            this.responseStream = reader;
         }
 
         public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;

@@ -180,6 +180,7 @@ namespace Sandbox.NetCoreServer.Hubs {
     using Grpc.Core;
     using MessagePack;
 
+    [Ignore]
     public class TestServiceClient : MagicOnionClientBase<global::Sandbox.NetCoreServer.Hubs.ITestService>, global::Sandbox.NetCoreServer.Hubs.ITestService
     {
         static readonly Method<byte[], byte[]> FooBarBazMethod;
@@ -266,6 +267,7 @@ namespace Sandbox.NetCoreServer.Services {
     using Grpc.Core;
     using MessagePack;
 
+    [Ignore]
     public class MyFirstServiceClient : MagicOnionClientBase<global::Sandbox.NetCoreServer.Services.IMyFirstService>, global::Sandbox.NetCoreServer.Services.IMyFirstService
     {
         static readonly Method<byte[], byte[]> ZeroAsyncMethod;
@@ -484,20 +486,20 @@ namespace Sandbox.NetCoreServer.Services {
         public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<int, string>> ClientStreamingSampleAsync()
         {
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreamingSampleAsyncMethod, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<int, string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<int, string>(__callResult, new MarshallingClientStreamWriter<int>(__callResult.RequestStream, resolver), base.resolver));
         }
 
         public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<string>> ServertSreamingSampleAsync(int x, int y, int z)
         {
             var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServertSreamingSampleAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<string>(__callResult, new MarshallingAsyncStreamReader<string>(__callResult.ResponseStream, base.resolver), base.resolver));
         }
 
         public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<int, string>> DuplexStreamingSampleAync()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingSampleAyncMethod, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<int, string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<int, string>(__callResult, new MarshallingClientStreamWriter<int>(__callResult.RequestStream, resolver), new MarshallingAsyncStreamReader<string>(__callResult.ResponseStream, base.resolver), base.resolver));
         }
     }
 }
@@ -522,6 +524,7 @@ namespace Sandbox.NetCoreServer.Hubs {
     using System;
     using System.Threading.Tasks;
 
+    [Ignore]
     public class GamingHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IGamingHub, global::Sandbox.NetCoreServer.Hubs.IGamingHubReceiver>, global::Sandbox.NetCoreServer.Hubs.IGamingHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IGamingHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -650,6 +653,7 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
     }
 
+    [Ignore]
     public class BugReproductionHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub, global::Sandbox.NetCoreServer.Hubs.IBugReproductionHubReceiver>, global::Sandbox.NetCoreServer.Hubs.IBugReproductionHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IBugReproductionHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -752,6 +756,7 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
     }
 
+    [Ignore]
     public class ChatHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.IChatHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver2>, global::Sandbox.NetCoreServer.Hubs.IChatHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -875,6 +880,7 @@ namespace Sandbox.NetCoreServer.Hubs {
         }
     }
 
+    [Ignore]
     public class TestHubClient : StreamingHubClientBase<global::Sandbox.NetCoreServer.Hubs.ITestHub, global::Sandbox.NetCoreServer.Hubs.IMessageReceiver>, global::Sandbox.NetCoreServer.Hubs.ITestHub
     {
         static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "ITestHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);

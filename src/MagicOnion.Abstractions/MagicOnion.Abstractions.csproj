@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
+    <DefineConstants>NON_UNITY</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.Core.Api" Version="2.25.0" />
+    <PackageReference Include="MessagePack" Version="1.7.3.7" />
+  </ItemGroup>
+
+   <!-- Copy files for unity MagicOnion -->
+   <PropertyGroup>
+     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\</DestinationRoot>
+   </PropertyGroup>
+   <ItemGroup>
+     <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;UnsafeDirectBlitResolver.cs;InternalsVisibleTo.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <TargetFiles Remove="InternalsVisibleTo.cs" />
+   </ItemGroup>
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+     <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+   </Target>
+
+</Project>

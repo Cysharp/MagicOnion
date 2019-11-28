@@ -49,7 +49,12 @@ namespace MagicOnion.Client
         public void __ConnectAndSubscribe(TReceiver receiver)
         {
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
-            var streamingResult = new DuplexStreamingResult<byte[], byte[]>(callResult, resolver);
+            var streamingResult = new DuplexStreamingResult<byte[], byte[]>(
+                callResult,
+                new MarshallingClientStreamWriter<byte[]>(callResult.RequestStream, resolver),
+                new MarshallingAsyncStreamReader<byte[]>(callResult.ResponseStream, resolver),
+                resolver
+            );
 
             this.connection = streamingResult;
             this.receiver = receiver;

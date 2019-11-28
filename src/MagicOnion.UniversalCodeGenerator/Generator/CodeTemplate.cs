@@ -186,7 +186,9 @@ namespace MagicOnion.Generator
             this.Write("Method, base.host, base.option, __request);\r\n            return System.Threading." +
                     "Tasks.Task.FromResult(new ServerStreamingResult<");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
-            this.Write(">(__callResult, base.resolver));\r\n");
+            this.Write(">(__callResult, new MarshallingAsyncStreamReader<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
+            this.Write(">(__callResult.ResponseStream, base.resolver), base.resolver));\r\n");
  } else if(item.MethodType ==MethodType.ClientStreaming) { 
             this.Write("            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[" +
                     "]>(");
@@ -196,7 +198,9 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
-            this.Write(">(__callResult, base.resolver));\r\n");
+            this.Write(">(__callResult, new MarshallingClientStreamWriter<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
+            this.Write(">(__callResult.RequestStream, resolver), base.resolver));\r\n");
  } else if(item.MethodType ==MethodType.DuplexStreaming) { 
             this.Write("            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[" +
                     "]>(");
@@ -206,7 +210,11 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
-            this.Write(">(__callResult, base.resolver));\r\n");
+            this.Write(">(__callResult, new MarshallingClientStreamWriter<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
+            this.Write(">(__callResult.RequestStream, resolver), new MarshallingAsyncStreamReader<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
+            this.Write(">(__callResult.ResponseStream, base.resolver), base.resolver));\r\n");
  } 
             this.Write("        }\r\n");
  if(item.IsIfDebug) { 
