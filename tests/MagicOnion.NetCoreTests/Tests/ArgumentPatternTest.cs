@@ -323,7 +323,7 @@ namespace MagicOnion.Tests
 
                 var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 
-                var response = new ResponseContext<MyResponse>(callResult, MessagePackSerializer.DefaultResolver);
+                IResponseContext<MyResponse> response = new ResponseContext<MyResponse>(callResult, MessagePackSerializer.DefaultResolver);
                 return new UnaryResult<MyResponse>(Task.FromResult(response));
             }
 
