@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MagicOnion
 {
-    public class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
     {
         readonly IAsyncStreamReader<byte[]> inner;
         readonly IFormatterResolver resolver;
@@ -41,7 +41,7 @@ namespace MagicOnion
         }
     }
 
-    public class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
+    internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<byte[]> inner;
         readonly IFormatterResolver resolver;
