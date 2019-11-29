@@ -54,7 +54,7 @@ namespace Sandbox.NetCoreServer.Services
     /// <summary>
     /// 計算処理をするサービス予定は未定。
     /// </summary>
-    public interface ICalcSerivce
+    public interface ICalcSerivce : IService<ICalcSerivce>
     {
         UnaryResult<string> DumpAsync(int x);
 
