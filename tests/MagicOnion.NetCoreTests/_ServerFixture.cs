@@ -39,16 +39,23 @@ namespace MagicOnion.Tests
         Grpc.Core.Server server;
         public ServerPort ServerPort { get; private set; }
         public Channel DefaultChannel { get; private set; }
+        public MagicOnionOptions Options { get; private set; }
 
         public ServerFixture()
         {
             PrepareServer();
         }
 
+        protected virtual MagicOnionOptions CreateMagicOnionOptions()
+            => new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true };
+
+        protected virtual MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ServerFixture).GetTypeInfo().Assembly }, options);
+
         protected virtual void PrepareServer()
         {
-            var options = new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true };
-            var service = MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ServerFixture).GetTypeInfo().Assembly }, options);
+            var options = CreateMagicOnionOptions();
+            var service = BuildServerServiceDefinition(options);
 
             var port = RandomProvider.ThreadRandom.Next(10000, 30000);
             var serverPort = new ServerPort("localhost", port, ServerCredentials.Insecure);
@@ -61,6 +68,7 @@ namespace MagicOnion.Tests
 
             server.Start();
 
+            Options = options;
             ServerPort = serverPort;
             DefaultChannel = new Channel(serverPort.Host, serverPort.Port, ChannelCredentials.Insecure);
         }
@@ -82,6 +90,27 @@ namespace MagicOnion.Tests
             DefaultChannel.ShutdownAsync().Wait();
             server.ShutdownAsync().Wait();
         }
+    }
+
+    public class ServerFixture<T> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T) }, options);
+    }
+    public class ServerFixture<T1, T2> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2) }, options);
+    }
+    public class ServerFixture<T1, T2, T3> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2), typeof(T3) }, options);
+    }
+    public class ServerFixture<T1, T2, T3, T4> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, options);
     }
 
     [CollectionDefinition(nameof(AllAssemblyGrpcServerFixture))]

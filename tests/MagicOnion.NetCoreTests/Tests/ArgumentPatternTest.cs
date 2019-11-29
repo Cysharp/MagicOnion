@@ -159,13 +159,12 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class ArgumentPatternTest
+    public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public ArgumentPatternTest(ITestOutputHelper logger, ServerFixture server)
+        public ArgumentPatternTest(ITestOutputHelper logger, ServerFixture<ArgumentPattern> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

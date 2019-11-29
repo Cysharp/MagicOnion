@@ -128,14 +128,13 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class BasicStreamingHubTest : IMessageReceiver, IDisposable
+    public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixture<ServerFixture<TestHub>>
     {
         ITestOutputHelper logger;
         Channel channel;
         ITestHub client;
 
-        public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture server)
+        public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture<TestHub> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;
@@ -415,14 +414,13 @@ namespace MagicOnion.Tests
     }
 
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class MoreCheckHubTest : IEmptyReceiver, IDisposable
+    public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
     {
         ITestOutputHelper logger;
         Channel channel;
         IMoreCheckHub client;
 
-        public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture server)
+        public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture<MoreCheckHub> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

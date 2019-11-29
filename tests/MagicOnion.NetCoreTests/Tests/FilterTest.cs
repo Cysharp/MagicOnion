@@ -159,12 +159,11 @@ namespace MagicOnion.Tests
     }
 
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class FilterTest
+    public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
     {
         IFilterTester client;
 
-        public FilterTest(ITestOutputHelper logger, ServerFixture server)
+        public FilterTest(ITestOutputHelper logger, ServerFixture<FilterTester> server)
         {
             this.client = server.CreateClient<IFilterTester>();
         }

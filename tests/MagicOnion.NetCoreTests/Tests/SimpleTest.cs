@@ -117,13 +117,12 @@ namespace MagicOnion.Tests
 
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class SimpleTest
+    public class SimpleTest : IClassFixture<ServerFixture<UnaryTestImpl>>
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public SimpleTest(ITestOutputHelper logger, ServerFixture server)
+        public SimpleTest(ITestOutputHelper logger, ServerFixture<UnaryTestImpl> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

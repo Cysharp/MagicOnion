@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Threading.Tasks;

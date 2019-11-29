@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Threading.Tasks;
@@ -14,11 +14,11 @@ namespace MagicOnion
         readonly IClientStreamWriter<TRequest> requestStream;
         readonly IAsyncStreamReader<TResponse> responseStream;
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> writer, IAsyncStreamReader<TResponse> reader, IFormatterResolver resolver)
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, IAsyncStreamReader<TResponse> responseStream, IFormatterResolver resolver)
         {
             this.inner = inner;
-            this.requestStream = writer;
-            this.responseStream = reader;
+            this.requestStream = requestStream;
+            this.responseStream = responseStream;
         }
 
         public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;

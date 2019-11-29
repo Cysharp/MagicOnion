@@ -165,13 +165,12 @@ namespace MagicOnion.NetCoreTests.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class ClientFilterTest
+    public class ClientFilterTest : IClassFixture<ServerFixture<ClientFilterTestService>>
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public ClientFilterTest(ITestOutputHelper logger, ServerFixture server)
+        public ClientFilterTest(ITestOutputHelper logger, ServerFixture<ClientFilterTestService> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

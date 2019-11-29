@@ -430,17 +430,23 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Stloc_1);
 
                             // create return result
+                            // new ServerStreamingResult<TResponse>(
+                            
+                            //     inner,
                             il.Emit(OpCodes.Ldloc_1);
-
-                            // new MarshallingAsyncStreamReader<TRequest>()(inner.ResponseStream, resolver),
-                            il.Emit(OpCodes.Ldloc_0);
-                            il.Emit(OpCodes.Callvirt, typeof(AsyncServerStreamingCall<byte[]>).GetProperty("ResponseStream").GetMethod);
+                            
+                            //     new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_1);
+                            il.Emit(OpCodes.Call, typeof(AsyncServerStreamingCall<byte[]>).GetProperty("ResponseStream").GetMethod);
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, resolverField);
-                            il.Emit(OpCodes.Newobj, typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.RequestType).GetConstructors().Single());
+                            il.Emit(OpCodes.Newobj, typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.ResponseType).GetConstructors().Single());
 
+                            //      this.resolver
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, resolverField);
+
+                            // );
                             var resultType = typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType.GetConstructors()[0]);
                             if (def.ResponseIsTask)
@@ -478,30 +484,53 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Stloc_0);
 
                         // create return result
-                        // new {Client,Duplex}StreamingResult<TRequest, TResponse>(
-                        //   inner,
-                        il.Emit(OpCodes.Ldloc_0);
-
-                        //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, resolver),
-                        il.Emit(OpCodes.Ldloc_0);
-                        il.Emit(OpCodes.Callvirt, typeof(AsyncClientStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
-                        il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldfld, resolverField);
-                        il.Emit(OpCodes.Newobj, typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single());
-
-                        //    resolver
-                        // );
-                        il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldfld, resolverField);
-
                         Type resultType2;
                         if (def.MethodType == MethodType.ClientStreaming)
                         {
+                            // new ClientStreamingResult<TRequest, TResponse>(
+                            //   inner,
+                            il.Emit(OpCodes.Ldloc_0);
+
+                            //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncClientStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single()));
+
+                            //    this.resolver
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+
+                            // );
                             resultType2 = typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType2.GetConstructors().OrderBy(x => x.GetParameters().Length).Last());
                         }
                         else
                         {
+                            // new DuplexStreamingResult<TRequest, TResponse>(
+                            //   inner,
+                            il.Emit(OpCodes.Ldloc_0);
+
+                            //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncDuplexStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single()));
+
+                            //   new MarshallingAsyncStreamReader<TResponse>()(inner.ResponseStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncDuplexStreamingCall<byte[], byte[]>).GetProperty("ResponseStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.ResponseType).GetConstructors().Single()));
+
+                            //    this.resolver
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, resolverField);
+                            
+                            // );
                             resultType2 = typeof(DuplexStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType2.GetConstructors()[0]);
                         }

@@ -78,13 +78,12 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
-    public class ReturnStatusTest
+    public class ReturnStatusTest : IClassFixture<ServerFixture<ReturnStatus>>
     {
         ITestOutputHelper logger;
         IReturnStatus client;
 
-        public ReturnStatusTest(ITestOutputHelper logger, ServerFixture server)
+        public ReturnStatusTest(ITestOutputHelper logger, ServerFixture<ReturnStatus> server)
         {
             this.logger = logger;
             this.client = server.CreateClient<IReturnStatus>();

@@ -51,8 +51,8 @@ namespace MagicOnion.Client
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
             var streamingResult = new DuplexStreamingResult<byte[], byte[]>(
                 callResult,
-                new MarshallingClientStreamWriter<byte[]>(callResult.RequestStream, resolver), 
-                new MarshallingAsyncStreamReader<byte[]>(callResult.ResponseStream, resolver), 
+                new MarshallingClientStreamWriter<byte[]>(callResult.RequestStream, resolver),
+                new MarshallingAsyncStreamReader<byte[]>(callResult.ResponseStream, resolver),
                 resolver
             );
 
