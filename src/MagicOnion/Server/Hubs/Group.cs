@@ -208,4 +208,71 @@ namespace MagicOnion.Server.Hubs
             storage.TryRemove(id, out _);
         }
     }
+
+    public static class GroupBroadcastExtensions
+    {
+        /// <summary>
+        /// Create a receiver proxy from the group. Can be use to broadcast messages to all clients.
+        /// </summary>
+        /// <typeparam name="TReceiver"></typeparam>
+        /// <param name="group"></param>
+        /// <returns></returns>
+        public static TReceiver CreateBroadcaster<TReceiver>(this IGroup group)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
+            return (TReceiver) Activator.CreateInstance(type, group);
+        }
+
+        /// <summary>
+        /// Create a receiver proxy from the group. Can be use to broadcast messages to all clients excepts one.
+        /// </summary>
+        /// <typeparam name="TReceiver"></typeparam>
+        /// <param name="group"></param>
+        /// <param name="except"></param>
+        /// <returns></returns>
+        public static TReceiver CreateBroadcasterExcept<TReceiver>(this IGroup group, Guid except)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
+            return (TReceiver) Activator.CreateInstance(type, new object[] {group, except});
+        }
+
+        /// <summary>
+        /// Create a receiver proxy from the group. Can be use to broadcast messages to all clients excepts some clients.
+        /// </summary>
+        /// <typeparam name="TReceiver"></typeparam>
+        /// <param name="group"></param>
+        /// <param name="excepts"></param>
+        /// <returns></returns>
+        public static TReceiver CreateBroadcasterExcept<TReceiver>(this IGroup group, Guid[] excepts)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
+            return (TReceiver) Activator.CreateInstance(type, new object[] {group, excepts});
+        }
+
+        /// <summary>
+        /// Create a receiver proxy from the group. Can be use to broadcast messages to one client.
+        /// </summary>
+        /// <typeparam name="TReceiver"></typeparam>
+        /// <param name="group"></param>
+        /// <param name="toConnectionId"></param>
+        /// <returns></returns>
+        public static TReceiver CreateBroadcasterTo<TReceiver>(this IGroup group, Guid toConnectionId)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
+            return (TReceiver) Activator.CreateInstance(type, new object[] { group, toConnectionId });
+        }
+
+        /// <summary>
+        /// Create a receiver proxy from the group. Can be use to broadcast messages to some clients.
+        /// </summary>
+        /// <typeparam name="TReceiver"></typeparam>
+        /// <param name="group"></param>
+        /// <param name="toConnectionIds"></param>
+        /// <returns></returns>
+        public static TReceiver CreateBroadcasterTo<TReceiver>(this IGroup group, Guid[] toConnectionIds)
+        {
+            var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToMany;
+            return (TReceiver) Activator.CreateInstance(type, new object[] { group, toConnectionIds });
+        }
+    }
 }

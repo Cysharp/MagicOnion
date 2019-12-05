@@ -80,11 +80,9 @@ namespace MagicOnion.Server
             this.filters = handlerOptions.GlobalFilters
                 .OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
-                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true))
+                .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
                 .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
-                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
                 .OrderBy(x => x.Order)
                 .ToArray();
 

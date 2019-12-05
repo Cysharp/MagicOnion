@@ -45,13 +45,14 @@ namespace Sandbox.Hosting
                             options.Service.GlobalStreamingHubFilters.Add<MyStreamingHubFilterAttribute>();
                             // options.Service.GlobalStreamingHubFilters.Add(new MyStreamingHubFilterAttribute(logger));
 
+                            options.Service.GlobalFilters.Add<MyFilterAttribute>(); // Register filter by type.
+                            options.Service.GlobalFilters.Add(new MyFilterUsingFactoryAttribute("Global")); // Register filter with IMagicOnionFilterFactory.
+                            // options.Service.GlobalFilters.Add(new MyFilterAttribute(null));
                             options.Service.GlobalFilters.Add<MyFilterAttribute>();
                             options.Service.GlobalFilters.Add<MyFilter2Attribute>();
                             options.Service.GlobalFilters.Add<MyFilter3Attribute>();
-                            // options.Service.GlobalFilters.Add(new MyFilterAttribute(logger));
 
-                            // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = opti
-
+                            // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = 12345, Host = "0.0.0.0", UseInsecureConnection = true } };
                         }
                         options.ChannelOptions.MaxReceiveMessageLength = 1024 * 1024 * 10;
                         options.ChannelOptions.Add(new ChannelOption("grpc.keepalive_time_ms", 10000));
@@ -71,7 +72,7 @@ namespace Sandbox.Hosting
             result = await clientMyService.HelloAsync();
             var result2 = await clientManagementService.FooBarAsync();
 
-            var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
+            var clientHub = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), new MyHubReceiver());
             var result3 = await clientHub.HelloAsync();
 
             var streamingHubClient = StreamingHubClient.Connect<IMyHub, IMyHubReceiver>(new Channel("localhost", 12345, creds), null);
@@ -84,6 +85,14 @@ namespace Sandbox.Hosting
             await streamingHubClient2.DisposeAsync();
 
             await hostTask;
+        }
+
+        class MyHubReceiver : IMyHubReceiver
+        {
+            public void OnNantoka(string value)
+            {
+                Console.WriteLine(value);
+            }
         }
     }
 
@@ -139,6 +148,7 @@ namespace Sandbox.Hosting
         }
     }
 
+
     public class MyFilterAttribute : MagicOnionFilterAttribute
     {
         private readonly ILogger _logger;
@@ -166,6 +176,42 @@ namespace Sandbox.Hosting
         }
     }
 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    public class MyFilterUsingFactoryAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public int Order { get; set; }
+        public string Label { get; set; }
+
+        public MyFilterUsingFactoryAttribute(string label)
+        {
+            Label = label;
+        }
+
+        MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new MyFilterUsingFactory(serviceLocator.GetService<ILoggerFactory>().CreateLogger<MyFilterUsingFactoryAttribute>(), Label);
+        }
+    }
+
+    internal class MyFilterUsingFactory : MagicOnionFilterAttribute
+    {
+        private readonly ILogger _logger;
+        private readonly string _label;
+
+        public MyFilterUsingFactory(ILogger logger, string label)
+        {
+            this._logger = logger;
+            this._label = label;
+        }
+
+        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            _logger.LogInformation($"MyFilterUsingFactory[{_label}] Begin: {context.CallContext.Method}");
+            await next(context);
+            _logger.LogInformation($"MyFilterUsingFactory[{_label}] End: {context.CallContext.Method}");
+        }
+    }
+
     public class MyFilter2Attribute : MagicOnionFilterAttribute
     {
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => await next(context);
@@ -186,6 +232,7 @@ namespace Sandbox.Hosting
         public MyService(MySingletonService foo, MyScopedService bar)
         {
         }
+        [MyFilterUsingFactoryAttribute("PerMethod")]
         public async UnaryResult<string> HelloAsync()
         {
             return "Konnichiwa";
@@ -206,6 +253,7 @@ namespace Sandbox.Hosting
 
     public interface IMyHubReceiver
     {
+        void OnNantoka(string value);
     }
 
     public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
@@ -219,6 +267,21 @@ namespace Sandbox.Hosting
         { }
 
         public MyHub() => Console.WriteLine($"{this.GetType().Name}..ctor");
-        public Task<string> HelloAsync() => Task.FromResult("Konnichiwa!");
+
+        public async Task<string> HelloAsync()
+        {
+            var group = await this.Group.AddAsync("Nantoka");
+            group.CreateBroadcaster<IMyHubReceiver>().OnNantoka("BroadcastAll");
+            group.CreateBroadcasterTo<IMyHubReceiver>(Context.ContextId).OnNantoka("BroadcastTo(Self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(Guid.NewGuid()).OnNantoka("BroadcastTo(Non-self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(new[] { Guid.NewGuid(), Guid.NewGuid() }).OnNantoka("BroadcastTo(Non-self, Non-self)");
+            group.CreateBroadcasterTo<IMyHubReceiver>(new[] { Context.ContextId, Guid.NewGuid() }).OnNantoka("BroadcastTo(Self, Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(Context.ContextId).OnNantoka("BroadcastExcept(Self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(Guid.NewGuid()).OnNantoka("BroadcastExcept(Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(new[] { Guid.NewGuid(), Guid.NewGuid() }).OnNantoka("BroadcastExcept(Non-self, Non-self)");
+            group.CreateBroadcasterExcept<IMyHubReceiver>(new[] { Context.ContextId, Guid.NewGuid() }).OnNantoka("BroadcastExcept(Self, Non-self)");
+
+            return "Konnnichiwa!";
+        }
     }
 }
