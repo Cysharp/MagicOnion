@@ -59,6 +59,7 @@ namespace MagicOnion.Server
         public IFormatterResolver FormatterResolver { get; private set; }
 
         public IServiceLocator ServiceLocator { get; private set; }
+        public IMagicOnionServiceActivator ServiceActivator { get; private set; }
 
         // internal, used from there methods.
         internal bool IsIgnoreSerialization { get; set; }
@@ -96,7 +97,7 @@ namespace MagicOnion.Server
             Result = response;
         }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator)
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator, IMagicOnionServiceActivator activator)
         {
             this.ContextId = Guid.NewGuid();
             this.ServiceType = serviceType;
@@ -109,6 +110,7 @@ namespace MagicOnion.Server
             this.MagicOnionLogger = logger;
             this.MethodHandler = methodHandler;
             this.ServiceLocator = serviceLocator;
+            this.ServiceActivator = activator;
         }
 
         /// <summary>

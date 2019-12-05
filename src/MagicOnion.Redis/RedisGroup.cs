@@ -10,17 +10,15 @@ namespace MagicOnion.Redis
 {
     public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            var resolver = serviceLocator.GetService<IFormatterResolver>();
-            var logger = serviceLocator.GetService<IMagicOnionLogger>();
             var connection = serviceLocator.GetService<ConnectionMultiplexer>();
             if (connection == null)
             {
-                throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefultServiceLocator.Register(new ConnectionMultiplexer)}");
+                throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
             }
 
-            return new RedisGroupRepository(resolver, connection, logger);
+            return new RedisGroupRepository(formatterResolver, connection, logger);
         }
     }
 

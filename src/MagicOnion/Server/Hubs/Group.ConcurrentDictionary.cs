@@ -10,9 +10,9 @@ namespace MagicOnion.Server.Hubs
 {
     public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            return new ConcurrentDictionaryGroupRepository(serviceLocator.GetService<IFormatterResolver>(), serviceLocator.GetService<IMagicOnionLogger>());
+            return new ConcurrentDictionaryGroupRepository(formatterResolver, logger);
         }
     }
 

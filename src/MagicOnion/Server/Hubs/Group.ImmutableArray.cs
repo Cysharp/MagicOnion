@@ -9,9 +9,9 @@ namespace MagicOnion.Server.Hubs
 {
     public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            return new ImmutableArrayGroupRepository(serviceLocator.GetService<IFormatterResolver>(), serviceLocator.GetService<IMagicOnionLogger>());
+            return new ImmutableArrayGroupRepository(formatterResolver, logger);
         }
     }
 

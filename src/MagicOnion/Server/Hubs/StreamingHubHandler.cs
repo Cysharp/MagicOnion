@@ -1,5 +1,6 @@
 ﻿using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MagicOnion.Utils;
 using System.Linq.Expressions;
@@ -18,6 +19,7 @@ namespace MagicOnion.Server.Hubs
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
         readonly IServiceLocator serviceLocator;
+        readonly IMagicOnionServiceActivator serviceActivator;
 
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
@@ -40,7 +42,7 @@ namespace MagicOnion.Server.Hubs
             return mapping.InterfaceMethods[methodIndex];
         }
 
-        public StreamingHubHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
+        public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions)
         {
             var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
             var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
@@ -57,7 +59,7 @@ namespace MagicOnion.Server.Hubs
             this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
 
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-            this.resolver = options.FormatterResolver;
+            this.resolver = handlerOptions.FormatterResolver;
 
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
@@ -70,7 +72,7 @@ namespace MagicOnion.Server.Hubs
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            this.filters = options.GlobalStreamingHubFilters
+            this.filters = handlerOptions.GlobalStreamingHubFilters
                 .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
                 .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>())
@@ -80,7 +82,8 @@ namespace MagicOnion.Server.Hubs
                 .ToArray();
 
             // options
-            this.serviceLocator = options.ServiceLocator;
+            this.serviceLocator = handlerOptions.ServiceLocator;
+            this.serviceActivator = handlerOptions.ServiceActivator;
 
             // validation filter
             if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)
@@ -184,6 +187,31 @@ namespace MagicOnion.Server.Hubs
         public bool Equals(StreamingHubHandler other)
         {
             return HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
+        }
+    }
+
+    /// <summary>
+    /// Options for StreamingHubHandler construction.
+    /// </summary>
+    public class StreamingHubHandlerOptions
+    {
+        public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
+
+        public IMagicOnionLogger Logger { get; }
+
+        public IFormatterResolver FormatterResolver { get; }
+
+        public IServiceLocator ServiceLocator { get; }
+
+        public IMagicOnionServiceActivator ServiceActivator { get; }
+
+        public StreamingHubHandlerOptions(MagicOnionOptions options)
+        {
+            GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
+            Logger = options.MagicOnionLogger;
+            FormatterResolver = options.FormatterResolver;
+            ServiceLocator = options.ServiceLocator;
+            ServiceActivator = options.MagicOnionServiceActivator;
         }
     }
 }
