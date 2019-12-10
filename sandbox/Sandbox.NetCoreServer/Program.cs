@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#pragma warning disable CS0219
+
+using Grpc.Core;
 using Grpc.Core.Logging;
 using MagicOnion;
 using MagicOnion.Client;

@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#pragma warning disable CS1998
+
+using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Hosting;
