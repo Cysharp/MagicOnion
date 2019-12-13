@@ -3,6 +3,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <VersionPrefix>2.7.1</VersionPrefix>
+    <VersionPrefix>2.7.2</VersionPrefix>
   </PropertyGroup>
 </Project>
