@@ -208,7 +208,20 @@ namespace MagicOnion.Server.Hubs
 
         public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
         {
-            throw new NotImplementedException();
+            var message = BuildMessage(methodId, value);
+            if (fireAndForget)
+            {
+                if (members.TryGetValue(connectionId, out var context))
+                {
+                    WriteInAsyncLockVoid(context, message);
+                    logger.InvokeHubBroadcast(GroupName, message.Length, 1);
+                }
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+            }
         }
 
         public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
