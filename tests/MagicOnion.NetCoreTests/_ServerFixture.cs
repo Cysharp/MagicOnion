@@ -87,8 +87,9 @@ namespace MagicOnion.Tests
 
         public void Dispose()
         {
-            DefaultChannel.ShutdownAsync().Wait();
-            server.ShutdownAsync().Wait();
+            try { DefaultChannel.ShutdownAsync().Wait(1000); } catch { }
+
+            try { server.ShutdownAsync().Wait(1000); } catch { }
         }
     }
 
