@@ -145,13 +145,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                for (int i = 0; i < source.Length; i++)
-                {
-                    promise.Add(WriteInAsyncLock(source[i], message));
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -176,23 +170,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    if (source[i].ContextId == connectionId)
-                    {
-                        promise.Add(default(ValueTask));
-                    }
-                    else
-                    {
-                        promise.Add(WriteInAsyncLock(source[i], message));
-                        writeCount++;
-                    }
-                }
-
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -224,27 +202,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    foreach (var item in connectionIds)
-                    {
-                        if (source[i].ContextId == item)
-                        {
-                            promise.Add(default(ValueTask));
-                            goto NEXT;
-                        }
-                    }
-
-                    promise.Add(WriteInAsyncLock(source[i], message));
-                    writeCount++;
-                    NEXT:
-                    continue;
-                }
-
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -271,19 +229,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    if (source[i].ContextId == connectionId)
-                    {
-                        promise.Add(WriteInAsyncLock(source[i], message));
-                        writeCount++;
-                        break;
-                    }
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -315,27 +261,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    foreach (var item in connectionIds)
-                    {
-                        if (source[i].ContextId != item)
-                        {
-                            promise.Add(default(ValueTask));
-                            goto NEXT;
-                        }
-                    }
-
-                    promise.Add(WriteInAsyncLock(source[i], message));
-                    writeCount++;
-                    NEXT:
-                    continue;
-                }
-
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -379,38 +305,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                if (exceptConnectionIds == null)
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        promise.Add(WriteInAsyncLock(source[i], message));
-                        writeCount++;
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        foreach (var item in exceptConnectionIds)
-                        {
-                            if (source[i].ContextId == item)
-                            {
-                                promise.Add(default(ValueTask));
-                                goto NEXT;
-                            }
-                        }
-
-                        promise.Add(WriteInAsyncLock(source[i], message));
-                        writeCount++;
-                        NEXT:
-                        continue;
-                    }
-                }
-
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -447,31 +342,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var promise = new ReservedWhenAllPromise(source.Length);
-                var writeCount = 0;
-                if (connectionIds != null)
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        foreach (var item in connectionIds)
-                        {
-                            if (source[i].ContextId != item)
-                            {
-                                promise.Add(default(ValueTask));
-                                goto NEXT;
-                            }
-                        }
-
-                        promise.Add(WriteInAsyncLock(source[i], message));
-                        writeCount++;
-                        NEXT:
-                        continue;
-                    }
-
-                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                }
-
-                return promise.AsValueTask().AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
