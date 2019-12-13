@@ -245,14 +245,14 @@ namespace MagicOnion.Server.Hubs
                 {
                     foreach (var item in connectionIds)
                     {
-                        if (source[i].ContextId != item)
+                        if (source[i].ContextId == item)
                         {
+                            WriteInAsyncLockVoid(source[i], message);
+                            writeCount++;
                             goto NEXT;
                         }
                     }
 
-                    WriteInAsyncLockVoid(source[i], message);
-                    writeCount++;
                     NEXT:
                     continue;
                 }
