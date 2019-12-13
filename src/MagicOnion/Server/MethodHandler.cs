@@ -40,7 +40,7 @@ namespace MagicOnion.Server
         public readonly Type RequestType;
         public readonly Type UnwrappedResponseType;
 
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions serializerOptions;
         readonly bool responseIsTask;
 
         readonly Func<ServiceContext, ValueTask> methodBody;
@@ -64,7 +64,7 @@ namespace MagicOnion.Server
             MethodType mt;
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
             this.MethodType = mt;
-            this.resolver = handlerOptions.FormatterResolver;
+            this.serializerOptions = handlerOptions.SerializerOptions;
 
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
@@ -222,12 +222,12 @@ namespace MagicOnion.Server
         // non-filtered.
         public byte[] BoxedSerialize(object requestValue)
         {
-            return LZ4MessagePackSerializer.NonGeneric.Serialize(RequestType, requestValue, resolver);
+            return MessagePackSerializer.Serialize(RequestType, requestValue, serializerOptions);
         }
 
         public object BoxedDeserialize(byte[] responseValue)
         {
-            return LZ4MessagePackSerializer.NonGeneric.Deserialize(UnwrappedResponseType, responseValue, resolver);
+            return MessagePackSerializer.Deserialize(UnwrappedResponseType, responseValue, serializerOptions);
         }
 
         static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
@@ -511,7 +511,7 @@ namespace MagicOnion.Server
         {
             var isErrorOrInterrupted = false;
             var serviceLocatorScope = serviceLocator.CreateScope();
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 RequestStream = requestStream,
                 ResponseStream = responseStream
@@ -604,7 +604,7 @@ namespace MagicOnion.Server
 
         public IMagicOnionLogger Logger { get; }
 
-        public IFormatterResolver FormatterResolver { get; }
+        public MessagePackSerializerOptions SerializerOptions { get; }
 
         public IServiceLocator ServiceLocator { get; }
 
@@ -616,7 +616,7 @@ namespace MagicOnion.Server
             IsReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
             EnableCurrentContext = options.EnableCurrentContext;
             Logger = options.MagicOnionLogger;
-            FormatterResolver = options.FormatterResolver;
+            SerializerOptions = options.SerializerOptions;
             ServiceLocator = options.ServiceLocator;
             ServiceActivator = options.MagicOnionServiceActivator;
         }

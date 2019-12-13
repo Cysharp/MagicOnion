@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using MagicOnion.Utils;
+using MessagePack;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace MagicOnion.Server.Hubs
         public DateTime Timestamp { get; internal set; }
 
         // helper for reflection
-        internal IFormatterResolver FormatterResolver { get; set; }
+        internal MessagePackSerializerOptions SerializerOptions { get; set; }
         public Guid ConnectionId => ServiceContext.ContextId;
 
         public AsyncLock AsyncWriterLock { get; internal set; }
@@ -51,25 +52,23 @@ namespace MagicOnion.Server.Hubs
 
             // MessageFormat:
             // response:  [messageId, methodId, response]
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            byte[] result;
-            try
+            byte[] BuildMessage()
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, MethodId);
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
 
-                await value.ConfigureAwait(false);
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, Nil.Default, FormatterResolver);
+                    writer.WriteArrayHeader(3);
+                    writer.Write(MessageId);
+                    writer.Write(MethodId);
+                    writer.WriteNil();
+                    return buffer.WrittenSpan.ToArray();
+                }
+            }
 
-                result = MessagePackBinary.FastCloneWithResize(buffer, offset);
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
-            }
+            // await value.ConfigureAwait(false);
+
+            var result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
                 await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
@@ -87,24 +86,20 @@ namespace MagicOnion.Server.Hubs
 
             // MessageFormat:
             // response:  [messageId, methodId, response]
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            byte[] result;
-            try
+            byte[] BuildMessage()
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, MethodId);
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+                    writer.WriteArrayHeader(3);
+                    writer.Write(MessageId);
+                    writer.Write(MethodId);
+                    writer.Flush();
+                    return buffer.WrittenSpan.ToArray();
+                }
+            }
 
-                var v2 = await value.ConfigureAwait(false);
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, v2, FormatterResolver);
-                result = MessagePackBinary.FastCloneWithResize(buffer, offset);
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
-            }
+            byte[] result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
                 await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
@@ -117,34 +112,34 @@ namespace MagicOnion.Server.Hubs
         {
             // MessageFormat:
             // error-response:  [messageId, statusCode, detail, StringMessage]
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            byte[] result;
-            try
+            byte[] BuildMessage()
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 4);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, MessageId);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, statusCode);
-                offset += MessagePackBinary.WriteString(ref buffer, offset, detail);
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+                    writer.WriteArrayHeader(4);
+                    writer.Write(MessageId);
+                    writer.Write(statusCode);
+                    writer.Write(detail);
 
-                var msg = (isReturnExceptionStackTraceInErrorDetail)
-                    ? ex.ToString()
-                    : null;
-                if (msg != null)
-                {
-                    offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, msg, FormatterResolver);
+                    var msg = (isReturnExceptionStackTraceInErrorDetail)
+                        ? ex.ToString()
+                        : null;
+
+                    if (msg != null)
+                    {
+                        MessagePackSerializer.Serialize(ref writer, msg, SerializerOptions);
+                    }
+                    else
+                    {
+                        writer.WriteNil();
+                    }
+                    writer.Flush();
+                    return buffer.WrittenSpan.ToArray();
                 }
-                else
-                {
-                    offset += MessagePackBinary.WriteNil(ref buffer, offset);
-                }
-                result = MessagePackBinary.FastCloneWithResize(buffer, offset);
             }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
-            }
+
+            var result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
                 await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);

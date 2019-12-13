@@ -7,9 +7,9 @@ namespace MagicOnion.Server
     public class MagicOnionOptions
     {
         /// <summary>
-        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.Default).
+        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).
         /// </summary>
-        public IFormatterResolver FormatterResolver { get; set; }
+        public MessagePackSerializerOptions SerializerOptions { get; set; }
 
         /// <summary>
         /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
@@ -63,7 +63,7 @@ namespace MagicOnion.Server
         public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
-            this.FormatterResolver = MessagePackSerializer.DefaultResolver;
+            this.SerializerOptions = MessagePackSerializer.DefaultOptions;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();

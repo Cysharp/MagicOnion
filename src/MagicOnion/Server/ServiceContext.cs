@@ -56,7 +56,7 @@ namespace MagicOnion.Server
         /// <summary>Raw gRPC Context.</summary>
         public ServerCallContext CallContext { get; private set; }
 
-        public IFormatterResolver FormatterResolver { get; private set; }
+        public MessagePackSerializerOptions SerializerOptions { get; private set; }
 
         public IServiceLocator ServiceLocator { get; private set; }
         public IMagicOnionServiceActivator ServiceActivator { get; private set; }
@@ -97,7 +97,7 @@ namespace MagicOnion.Server
             Result = response;
         }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, IFormatterResolver resolver, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator, IMagicOnionServiceActivator activator)
+        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator, IMagicOnionServiceActivator activator)
         {
             this.ContextId = Guid.NewGuid();
             this.ServiceType = serviceType;
@@ -106,7 +106,7 @@ namespace MagicOnion.Server
             this.MethodType = methodType;
             this.CallContext = context;
             this.Timestamp = DateTime.UtcNow;
-            this.FormatterResolver = resolver;
+            this.SerializerOptions = serializerOptions;
             this.MagicOnionLogger = logger;
             this.MethodHandler = methodHandler;
             this.ServiceLocator = serviceLocator;
@@ -114,15 +114,15 @@ namespace MagicOnion.Server
         }
 
         /// <summary>
-        /// modify request/response resolver in this context.
+        /// modify request/response options in this context.
         /// </summary>
-        public void ChangeFormatterResolver(IFormatterResolver resolver)
+        public void ChangeSerializerOptions(MessagePackSerializerOptions serializerOptions)
         {
-            this.FormatterResolver = resolver;
+            this.SerializerOptions = serializerOptions;
         }
 
         /// <summary>
-        /// Unsafe optimize option, ignore serialization process of LZ4MessagePackSerializer. This is useful for cache result.
+        /// Unsafe optimize option, ignore serialization process of MessagePackSerializer. This is useful for cache result.
         /// </summary>
         public void ForceSetRawUnaryResult(byte[] result)
         {
@@ -155,7 +155,7 @@ namespace MagicOnion.Server
             {
                 var data = inner.Current;
                 logger.ReadFromStream(context, data, typeof(TRequest), false);
-                this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.FormatterResolver);
+                this.Current = MessagePackSerializer.Deserialize<TRequest>(inner.Current, context.SerializerOptions);
                 return true;
             }
             else
@@ -229,7 +229,7 @@ namespace MagicOnion.Server
 
         public Task WriteAsync(TResponse message)
         {
-            var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
+            var bytes = MessagePackSerializer.Serialize(message, context.SerializerOptions);
             logger.WriteToStream(context, bytes, typeof(TResponse));
             return inner.WriteAsync(bytes);
         }
@@ -275,7 +275,7 @@ namespace MagicOnion.Server
             {
                 var data = innerReader.Current;
                 logger.ReadFromStream(context, data, typeof(TRequest), false);
-                this.Current = LZ4MessagePackSerializer.Deserialize<TRequest>(data, context.FormatterResolver);
+                this.Current = MessagePackSerializer.Deserialize<TRequest>(data, context.SerializerOptions);
                 return true;
             }
             else
@@ -312,7 +312,7 @@ namespace MagicOnion.Server
         /// </summary>
         public Task WriteAsync(TResponse message)
         {
-            var bytes = LZ4MessagePackSerializer.Serialize(message, context.FormatterResolver);
+            var bytes = MessagePackSerializer.Serialize(message, context.SerializerOptions);
             logger.WriteToStream(context, bytes, typeof(TResponse));
             return innerWriter.WriteAsync(bytes);
         }

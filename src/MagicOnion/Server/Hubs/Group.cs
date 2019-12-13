@@ -24,7 +24,7 @@ namespace MagicOnion.Server.Hubs
 
     public interface IGroupRepositoryFactory
     {
-        IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator);
+        IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator);
     }
 
     public interface IGroupRepository

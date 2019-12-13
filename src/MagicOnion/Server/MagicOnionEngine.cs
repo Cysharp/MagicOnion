@@ -171,7 +171,7 @@ namespace MagicOnion.Server
                             {
                                 factory = option.DefaultGroupRepositoryFactory;
                             }
-                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.FormatterResolver, option.MagicOnionLogger, option.ServiceLocator));
+                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.SerializerOptions, option.MagicOnionLogger, option.ServiceLocator));
                         }
                     }
                 }

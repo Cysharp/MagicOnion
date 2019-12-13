@@ -24,7 +24,7 @@ namespace MagicOnion.Server.Hubs
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
-        internal readonly IFormatterResolver resolver;
+        internal readonly MessagePackSerializerOptions serializerOptions;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
         readonly string toStringCache;
@@ -59,13 +59,14 @@ namespace MagicOnion.Server.Hubs
             this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
 
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-            this.resolver = handlerOptions.FormatterResolver;
 
+            var resolver = handlerOptions.SerializerOptions.Resolver;
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
             {
                 this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
             }
+            this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
@@ -199,7 +200,7 @@ namespace MagicOnion.Server.Hubs
 
         public IMagicOnionLogger Logger { get; }
 
-        public IFormatterResolver FormatterResolver { get; }
+        public MessagePackSerializerOptions SerializerOptions { get; }
 
         public IServiceLocator ServiceLocator { get; }
 
@@ -209,7 +210,7 @@ namespace MagicOnion.Server.Hubs
         {
             GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
             Logger = options.MagicOnionLogger;
-            FormatterResolver = options.FormatterResolver;
+            SerializerOptions = options.SerializerOptions;
             ServiceLocator = options.ServiceLocator;
             ServiceActivator = options.MagicOnionServiceActivator;
         }

@@ -9,6 +9,7 @@ using MagicOnion.Utils;
 using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.Server;
+using System.Buffers;
 
 namespace MagicOnion.Client
 {
@@ -20,7 +21,7 @@ namespace MagicOnion.Client
         readonly CallInvoker callInvoker;
         readonly ILogger logger;
 
-        protected readonly IFormatterResolver resolver;
+        protected readonly MessagePackSerializerOptions serializerOptions;
         readonly AsyncLock asyncLock = new AsyncLock();
 
         DuplexStreamingResult<byte[], byte[]> connection;
@@ -34,12 +35,12 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger)
+        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, ILogger logger)
         {
             this.callInvoker = callInvoker;
             this.host = host;
             this.option = option;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.logger = logger ?? GrpcEnvironment.Logger;
         }
 
@@ -49,7 +50,7 @@ namespace MagicOnion.Client
         public void __ConnectAndSubscribe(TReceiver receiver)
         {
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
-            var streamingResult = new DuplexStreamingResult<byte[], byte[]>(callResult, resolver);
+            var streamingResult = new DuplexStreamingResult<byte[], byte[]>(callResult, serializerOptions);
 
             this.connection = streamingResult;
             this.receiver = receiver;
@@ -69,70 +70,71 @@ namespace MagicOnion.Client
                 {
                     try
                     {
-                        var data = reader.Current;
                         // MessageFormat:
                         // broadcast: [methodId, [argument]]
                         // response:  [messageId, methodId, response]
                         // error-response: [messageId, statusCode, detail, StringMessage]
-                        var readSize = 0;
-                        var offset = 0;
-                        var arrayLength = MessagePackBinary.ReadArrayHeader(data, offset, out readSize);
-                        offset += readSize;
-                        if (arrayLength == 3)
+                        void ConsumeData(byte[] data)
                         {
-                            var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                            offset += readSize;
-                            object future;
-                            if (responseFutures.TryRemove(messageId, out future))
+                            var messagePackReader = new MessagePackReader(data);
+                            var arrayLength = messagePackReader.ReadArrayHeader();
+                            if (arrayLength == 3)
                             {
-                                var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                                offset += readSize;
-                                try
+                                var messageId = messagePackReader.ReadInt32();
+                                object future;
+                                if (responseFutures.TryRemove(messageId, out future))
                                 {
-                                    OnResponseEvent(methodId, future, new ArraySegment<byte>(data, offset, data.Length - offset));
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (!(future as ITaskCompletion).TrySetException(ex))
+                                    var methodId = messagePackReader.ReadInt32();
+                                    try
                                     {
-                                        throw;
+                                        var offset = (int)messagePackReader.Consumed;
+                                        var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
+                                        OnResponseEvent(methodId, future, rest);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (!(future as ITaskCompletion).TrySetException(ex))
+                                        {
+                                            throw;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else if (arrayLength == 4)
-                        {
-                            var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                            offset += readSize;
-                            object future;
-                            if (responseFutures.TryRemove(messageId, out future))
+                            else if (arrayLength == 4)
                             {
-                                var statusCode = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                                offset += readSize;
-                                var detail = MessagePackBinary.ReadString(data, offset, out readSize);
-                                offset += readSize;
-                                var error = LZ4MessagePackSerializer.Deserialize<string>(new ArraySegment<byte>(data, offset, data.Length - offset));
-                                (future as ITaskCompletion).TrySetException(new RpcException(new Status((StatusCode)statusCode, detail), error));
-                            }
-                        }
-                        else
-                        {
-                            var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                            offset += readSize;
-                            if (syncContext != null)
-                            {
-                                var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
-                                syncContext.Post(state =>
+                                var messageId = messagePackReader.ReadInt32();
+                                object future;
+                                if (responseFutures.TryRemove(messageId, out future))
                                 {
-                                    var t = (Tuple<int, byte[], int, int>)state;
-                                    OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
-                                }, tuple);
+                                    var statusCode = messagePackReader.ReadInt32();
+                                    var detail = messagePackReader.ReadString();
+                                    var offset = (int)messagePackReader.Consumed;
+                                    var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
+                                    var error = MessagePackSerializer.Deserialize<string>(rest, serializerOptions);
+                                    (future as ITaskCompletion).TrySetException(new RpcException(new Status((StatusCode)statusCode, detail), error));
+                                }
                             }
                             else
                             {
-                                OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                                var methodId = messagePackReader.ReadInt32();
+                                var offset = (int)messagePackReader.Consumed;
+                                if (syncContext != null)
+                                {
+                                    var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
+                                    syncContext.Post(state =>
+                                    {
+                                        var t = (Tuple<int, byte[], int, int>)state;
+                                        OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
+                                    }, tuple);
+                                }
+                                else
+                                {
+                                    OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                                }
                             }
                         }
+
+                        ConsumeData(reader.Current);
                     }
                     catch (Exception ex)
                     {
@@ -189,30 +191,20 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-#if NON_UNITY
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-#else
-            var rent = MessagePack.Internal.BufferPool.Default.Rent();
-#endif
-            var buffer = rent;
-            byte[] v;
-            try
+            byte[] BuildMessage()
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+                    writer.WriteArrayHeader(2);
+                    writer.Write(methodId);
+                    MessagePackSerializer.Serialize(ref writer, message, serializerOptions);
+                    writer.Flush();
+                    return buffer.WrittenSpan.ToArray();
+                }
+            }
 
-                v = MessagePackBinary.FastCloneWithResize(buffer, offset);
-            }
-            finally
-            {
-#if NON_UNITY
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
-#else
-                MessagePack.Internal.BufferPool.Default.Return(rent);
-#endif
-            }
+            var v = BuildMessage();
             using (await asyncLock.LockAsync())
             {
                 await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
@@ -233,30 +225,21 @@ namespace MagicOnion.Client
             var tcs = new TaskCompletionSourceEx<TResponse>(); // use Ex
             responseFutures[mid] = (object)tcs;
 
-#if NON_UNITY
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-#else
-            var rent = MessagePack.Internal.BufferPool.Default.Rent();
-#endif
-            var buffer = rent;
-            byte[] v;
-            try
+            byte[] BuildMessage()
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, mid);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, message, resolver);
-                v = MessagePackBinary.FastCloneWithResize(buffer, offset);
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+                    writer.WriteArrayHeader(3);
+                    writer.Write(mid);
+                    writer.Write(methodId);
+                    MessagePackSerializer.Serialize(ref writer, message, serializerOptions);
+                    writer.Flush();
+                    return buffer.WrittenSpan.ToArray();
+                }
             }
-            finally
-            {
-#if NON_UNITY
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
-#else
-                MessagePack.Internal.BufferPool.Default.Return(rent);
-#endif
-            }
+
+            var v = BuildMessage();
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
                 await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
