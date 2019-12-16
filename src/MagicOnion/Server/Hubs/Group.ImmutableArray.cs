@@ -9,23 +9,23 @@ namespace MagicOnion.Server.Hubs
 {
     public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            return new ImmutableArrayGroupRepository(formatterResolver, logger);
+            return new ImmutableArrayGroupRepository(serializerOptions, logger);
         }
     }
 
     public class ImmutableArrayGroupRepository : IGroupRepository
     {
-        IFormatterResolver resolver;
+        MessagePackSerializerOptions serializerOptions;
         IMagicOnionLogger logger;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public ImmutableArrayGroupRepository(IFormatterResolver resolver, IMagicOnionLogger logger)
+        public ImmutableArrayGroupRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
         {
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.factory = CreateGroup;
             this.logger = logger;
         }
@@ -37,7 +37,7 @@ namespace MagicOnion.Server.Hubs
 
         IGroup CreateGroup(string groupName)
         {
-            return new ImmutableArrayGroup(groupName, this, resolver, logger);
+            return new ImmutableArrayGroup(groupName, this, serializerOptions, logger);
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -55,7 +55,7 @@ namespace MagicOnion.Server.Hubs
     {
         readonly object gate = new object();
         readonly IGroupRepository parent;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions serializerOptions;
         readonly IMagicOnionLogger logger;
 
         ImmutableArray<ServiceContext> members;
@@ -63,11 +63,11 @@ namespace MagicOnion.Server.Hubs
 
         public string GroupName { get; }
 
-        public ImmutableArrayGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
+        public ImmutableArrayGroup(string groupName, IGroupRepository parent, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
         {
             this.GroupName = groupName;
             this.parent = parent;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.logger = logger;
             this.members = ImmutableArray<ServiceContext>.Empty;
         }
@@ -477,20 +477,13 @@ namespace MagicOnion.Server.Hubs
 
         byte[] BuildMessage<T>(int methodId, T value)
         {
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            try
+            using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-                offset += LZ4MessagePackSerializer.SerializeToBlock<T>(ref buffer, offset, value, resolver);
-                var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
-                return result;
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
+                var writer = new MessagePackWriter(buffer);
+                writer.WriteArrayHeader(2);
+                writer.WriteInt32(methodId);
+                MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
+                return buffer.WrittenSpan.ToArray();
             }
         }
 

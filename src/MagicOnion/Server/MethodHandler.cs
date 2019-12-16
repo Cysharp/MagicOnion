@@ -345,7 +345,7 @@ namespace MagicOnion.Server
         {
             var isErrorOrInterrupted = false;
             var serviceLocatorScope = serviceLocator.CreateScope();
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 Request = request
             };
@@ -415,7 +415,7 @@ namespace MagicOnion.Server
         {
             var isErrorOrInterrupted = false;
             var serviceLocatorScope = serviceLocator.CreateScope();
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 RequestStream = requestStream
             };
@@ -465,7 +465,7 @@ namespace MagicOnion.Server
         {
             var isErrorOrInterrupted = false;
             var serviceLocatorScope = serviceLocator.CreateScope();
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, resolver, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 ResponseStream = responseStream,
                 Request = request
@@ -644,7 +644,7 @@ namespace MagicOnion.Server
             {
                 var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
 
-                var bytes = LZ4MessagePackSerializer.Serialize<T>(value, context.FormatterResolver);
+                var bytes = MessagePackSerializer.Serialize<T>(value, context.SerializerOptions);
                 context.Result = bytes;
             }
         }
@@ -656,7 +656,7 @@ namespace MagicOnion.Server
             {
                 var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
 
-                var bytes = LZ4MessagePackSerializer.Serialize<T>(value, context.FormatterResolver);
+                var bytes = MessagePackSerializer.Serialize<T>(value, context.SerializerOptions);
                 context.Result = bytes;
             }
         }
@@ -665,7 +665,7 @@ namespace MagicOnion.Server
         {
             if (result.hasRawValue)
             {
-                var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
+                var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
                 context.Result = bytes;
             }
 
@@ -677,7 +677,7 @@ namespace MagicOnion.Server
             var result = await taskResult.ConfigureAwait(false);
             if (result.hasRawValue)
             {
-                var bytes = LZ4MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.FormatterResolver);
+                var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
                 context.Result = bytes;
             }
         }

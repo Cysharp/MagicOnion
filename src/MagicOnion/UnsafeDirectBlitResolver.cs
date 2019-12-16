@@ -20,7 +20,7 @@ namespace MagicOnion
         }
 
         public void Register<T>()
-            where T : struct
+            where T : unmanaged
         {
             if (isFreezed)
             {

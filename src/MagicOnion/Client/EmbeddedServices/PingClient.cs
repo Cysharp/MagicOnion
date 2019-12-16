@@ -21,10 +21,12 @@ namespace MagicOnion.Client.EmbeddedServices
     public class PingClient : MagicOnionClientBase<IMagicOnionEmbeddedPing>, IMagicOnionEmbeddedPing
     {
         static readonly Method<byte[], byte[]> Method;
+        static readonly MessagePackSerializerOptions BuiltinResolverOptions;
 
         static PingClient()
         {
             Method = new Method<byte[], byte[]>(MethodType.Unary, "IMagicOnionEmbeddedPing", "Ping", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            BuiltinResolverOptions = MessagePackSerializerOptions.Standard.WithResolver(MessagePack.Resolvers.BuiltinResolver.Instance);
         }
 
         PingClient()
@@ -48,7 +50,7 @@ namespace MagicOnion.Client.EmbeddedServices
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
-            clone.resolver = this.resolver;
+            clone.serializerOptions = this.serializerOptions;
             return clone;
         }
 
@@ -59,7 +61,7 @@ namespace MagicOnion.Client.EmbeddedServices
                 var __self = (PingClient)__ctx.Client;
                 var __request = MagicOnionMarshallers.UnsafeNilBytes;
                 var __callResult = __self.callInvoker.AsyncUnaryCall(PingClient.Method, __self.host, __ctx.CallOptions, __request);
-                return new ResponseContext<int>(__callResult, MessagePack.Resolvers.BuiltinResolver.Instance);
+                return new ResponseContext<int>(__callResult, BuiltinResolverOptions);
             });
         }
     }

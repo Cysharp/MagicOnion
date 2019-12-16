@@ -11,14 +11,14 @@ namespace MagicOnion.Client
         protected string host;
         protected CallOptions option;
         protected CallInvoker callInvoker;
-        protected IFormatterResolver resolver;
+        protected MessagePackSerializerOptions serializerOptions;
         protected IClientFilter[] filters;
 
         static protected ResponseContext CreateResponseContext<TResponse>(RequestContext context, Method<byte[], byte[]> method)
         {
             var self = context.Client;
             var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(MagicOnionMarshallers.UnsafeNilBytes));
-            var response = new ResponseContext<TResponse>(callResult, self.resolver);
+            var response = new ResponseContext<TResponse>(callResult, self.serializerOptions);
             response.SetResponseMutator(context.ResponseMutator);
             return response;
         }
@@ -26,9 +26,9 @@ namespace MagicOnion.Client
         static protected ResponseContext CreateResponseContext<TRequest, TResponse>(RequestContext context, Method<byte[], byte[]> method)
         {
             var self = context.Client;
-            var message = LZ4MessagePackSerializer.Serialize<TRequest>(((RequestContext<TRequest>)context).Request, self.resolver);
+            var message = MessagePackSerializer.Serialize<TRequest>(((RequestContext<TRequest>)context).Request, self.serializerOptions);
             var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(message));
-            var response = new ResponseContext<TResponse>(callResult, self.resolver);
+            var response = new ResponseContext<TResponse>(callResult, self.serializerOptions);
             response.SetResponseMutator(context.ResponseMutator);
             return response;
         }
@@ -41,10 +41,10 @@ namespace MagicOnion.Client
         {
         }
 
-        protected MagicOnionClientBase(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
+        protected MagicOnionClientBase(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] filters)
         {
             this.callInvoker = callInvoker;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.filters = filters;
         }
 
