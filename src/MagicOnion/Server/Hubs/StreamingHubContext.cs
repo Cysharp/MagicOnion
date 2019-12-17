@@ -27,7 +27,7 @@ namespace MagicOnion.Server.Hubs
         public ServiceContext ServiceContext { get; internal set; }
         public object HubInstance { get; internal set; }
 
-        public ArraySegment<byte> Request { get; internal set; }
+        public ReadOnlyMemory<byte> Request { get; internal set; }
         public string Path { get; internal set; }
         public DateTime Timestamp { get; internal set; }
 
