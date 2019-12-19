@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using MagicOnion.Server;
 
 namespace MagicOnion.Tests
 {
@@ -128,14 +129,26 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+        [CollectionDefinition(nameof(BasicStreamingHubTestCollectionServerFixture))]
+    public class BasicStreamingHubTestCollectionServerFixture : ICollectionFixture<BasicStreamingHubTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(TestHub) }, options);
+            }
+        }
+    }
+
+    [Collection(nameof(BasicStreamingHubTestCollectionServerFixture))]
     public class BasicStreamingHubTest : IMessageReceiver, IDisposable
     {
         ITestOutputHelper logger;
         Channel channel;
         ITestHub client;
 
-        public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture server)
+        public BasicStreamingHubTest(ITestOutputHelper logger, BasicStreamingHubTestCollectionServerFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;
@@ -413,16 +426,27 @@ namespace MagicOnion.Tests
             context.Items["HubFilter1_BF"] = "AfterOK";
         }
     }
+    
+    [CollectionDefinition(nameof(MoreCheckHubTestCollectionServerFixture))]
+    public class MoreCheckHubTestCollectionServerFixture : ICollectionFixture<MoreCheckHubTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(MoreCheckHub) }, options);
+            }
+        }
+    }
 
-
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [Collection(nameof(MoreCheckHubTestCollectionServerFixture))]
     public class MoreCheckHubTest : IEmptyReceiver, IDisposable
     {
         ITestOutputHelper logger;
         Channel channel;
         IMoreCheckHub client;
 
-        public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture server)
+        public MoreCheckHubTest(ITestOutputHelper logger, MoreCheckHubTestCollectionServerFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

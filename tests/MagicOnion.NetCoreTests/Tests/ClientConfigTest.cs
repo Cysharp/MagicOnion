@@ -55,13 +55,25 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [CollectionDefinition(nameof(ClientConfigTestCollectionServerFixture))]
+    public class ClientConfigTestCollectionServerFixture : ICollectionFixture<ClientConfigTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ConfigurationChange) }, options);
+            }
+        }
+    }
+
+    [Collection(nameof(ClientConfigTestCollectionServerFixture))]
     public class ClientConfigTest
     {
         ITestOutputHelper logger;
         IConfigurationChange client;
 
-        public ClientConfigTest(ITestOutputHelper logger, ServerFixture server)
+        public ClientConfigTest(ITestOutputHelper logger, ClientConfigTestCollectionServerFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.client = server.CreateClient<IConfigurationChange>();
