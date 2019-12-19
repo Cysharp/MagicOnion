@@ -116,7 +116,7 @@ namespace MagicOnion.Client
     public sealed class ResponseContext<T> : ResponseContext
     {
         readonly AsyncUnaryCall<byte[]> inner;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions serializerOptions;
         readonly bool isMock;
         bool deserialized;
 
@@ -127,12 +127,12 @@ namespace MagicOnion.Client
         readonly Metadata responseHeaders;
         readonly Status status;
 
-        public ResponseContext(AsyncUnaryCall<byte[]> inner, IFormatterResolver resolver)
+        public ResponseContext(AsyncUnaryCall<byte[]> inner, MessagePackSerializerOptions serializerOptions)
             : base()
         {
             this.isMock = false;
             this.inner = inner;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
         }
 
         public ResponseContext(T responseObject)
@@ -159,7 +159,7 @@ namespace MagicOnion.Client
             else
             {
                 var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-                responseObject = LZ4MessagePackSerializer.Deserialize<T>(this.ResponseMutator(bytes), resolver);
+                responseObject = MessagePackSerializer.Deserialize<T>(this.ResponseMutator(bytes), serializerOptions);
                 deserialized = true;
                 return responseObject;
             }
@@ -203,7 +203,7 @@ namespace MagicOnion.Client
             }
             else
             {
-                var newContext = new ResponseContext<T>(inner, resolver);
+                var newContext = new ResponseContext<T>(inner, serializerOptions);
                 newContext.deserialized = true;
                 newContext.responseObject = result;
                 return newContext;

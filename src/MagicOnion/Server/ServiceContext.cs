@@ -63,7 +63,8 @@ namespace MagicOnion.Server
 
         // internal, used from there methods.
         internal bool IsIgnoreSerialization { get; set; }
-        internal byte[] Request { get; set; }
+        byte[] request;
+        internal ReadOnlyMemory<byte> Request { get; }
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }
@@ -76,13 +77,13 @@ namespace MagicOnion.Server
         /// <summary>Get Raw Request.</summary>
         public byte[] GetRawRequest()
         {
-            return Request;
+            return request;
         }
 
         /// <summary>Set Raw Request, you can set before method body was called.</summary>
         public void SetRawRequest(byte[] request)
         {
-            Request = request;
+            this.request = request;
         }
 
         /// <summary>Can get after method body was finished.</summary>

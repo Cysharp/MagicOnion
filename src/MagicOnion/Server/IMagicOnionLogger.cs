@@ -15,7 +15,7 @@ namespace MagicOnion.Server
         void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
         void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
 
-        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type);
         void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
         void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
 
@@ -49,7 +49,7 @@ namespace MagicOnion.Server
         {
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
         }
 
@@ -120,9 +120,9 @@ namespace MagicOnion.Server
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length}");
 
         }
 
@@ -189,10 +189,10 @@ namespace MagicOnion.Server
             return "dump:" + MessagePackSerializer.ConvertToJson(bytes, serializerOptions);
         }
 
-        string ToJson(ArraySegment<byte> bytes, MessagePackSerializerOptions serializerOptions)
+        string ToJson(ReadOnlyMemory<byte> bytes, MessagePackSerializerOptions serializerOptions)
         {
-            if (bytes == null || bytes.Count == 0) return "";
-            if (bytes.Count >= 5000) return "log is too large.";
+            if (bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
 
             return "dump:" + MessagePackSerializer.ConvertToJson(bytes, serializerOptions);
         }
@@ -215,9 +215,9 @@ namespace MagicOnion.Server
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request, context.SerializerOptions)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, context.SerializerOptions)}");
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
@@ -294,10 +294,10 @@ namespace MagicOnion.Server
             return "dump:" + MessagePackSerializer.ConvertToJson(reSerialized);
         }
 
-        string ToJson(ArraySegment<byte> bytes, Type type, MessagePackSerializerOptions serializerOptions)
+        string ToJson(ReadOnlyMemory<byte> bytes, Type type, MessagePackSerializerOptions serializerOptions)
         {
-            if (bytes == null || bytes.Count == 0) return "";
-            if (bytes.Count >= 5000) return "log is too large.";
+            if (bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
 
             var reData = MessagePackSerializer.Deserialize(type, bytes, serializerOptions);
             var reSerialized = MessagePackSerializer.Serialize(type, reData, dumpResolverOptions);
@@ -322,9 +322,9 @@ namespace MagicOnion.Server
                     return ((int)type).ToString();
             }
         }
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request, type, context.SerializerOptions)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, type, context.SerializerOptions)}");
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)

@@ -32,19 +32,19 @@ namespace MagicOnion.Client
             return Create<T>(invoker, MessagePackSerializer.DefaultOptions, clientFilters);
         }
 
-        public static T Create<T>(Channel channel, MessagePackSerializerOptions resolver)
+        public static T Create<T>(Channel channel, MessagePackSerializerOptions serializerOptions)
             where T : IService<T>
         {
-            return Create<T>(new DefaultCallInvoker(channel), resolver, emptyFilters);
+            return Create<T>(new DefaultCallInvoker(channel), serializerOptions, emptyFilters);
         }
 
-        public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions resolver)
+        public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions serializerOptions)
             where T : IService<T>
         {
-            return Create<T>(invoker, resolver, emptyFilters);
+            return Create<T>(invoker, serializerOptions, emptyFilters);
         }
 
-        public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions resolver, IClientFilter[] clientFilters)
+        public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] clientFilters)
             where T : IService<T>
         {
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
@@ -56,12 +56,12 @@ namespace MagicOnion.Client
                 throw new InvalidOperationException("Does not registered client factory, dynamic code generation is not supported on IL2CPP. Please use code generator(moc).");
 #else
                 var t = DynamicClientBuilder<T>.ClientType;
-                return (T)Activator.CreateInstance(t, invoker, resolver, clientFilters);
+                return (T)Activator.CreateInstance(t, invoker, serializerOptions, clientFilters);
 #endif
             }
             else
             {
-                return ctor(invoker, resolver, clientFilters);
+                return ctor(invoker, serializerOptions, clientFilters);
             }
         }
     }

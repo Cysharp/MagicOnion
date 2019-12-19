@@ -56,8 +56,8 @@ namespace MagicOnion.Client
 
         static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes);
 
-        static readonly MethodInfo callMessagePackDesrialize = typeof(LZ4MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
+        static readonly MethodInfo callMessagePackDesrialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
 
         static readonly PropertyInfo completedTask = typeof(Task).GetProperty("CompletedTask", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
@@ -323,7 +323,7 @@ namespace MagicOnion.Client
 
                         il.Emit(OpCodes.Ldarg_2);
                         il.Emit(OpCodes.Castclass, tcsType);
-
+                        // TODO:fix emit
                         il.Emit(OpCodes.Ldarg_3);
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldfld, resolverField);
@@ -375,6 +375,7 @@ namespace MagicOnion.Client
                         }
                         else if (parameters.Length == 1)
                         {
+                            // TODO:fix emit
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             il.Emit(OpCodes.Ldarg_2);
@@ -386,6 +387,7 @@ namespace MagicOnion.Client
                         }
                         else
                         {
+                            // TODO:fix emit
                             var deserializeType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2]
                                 .MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                             var lc = il.DeclareLocal(deserializeType);

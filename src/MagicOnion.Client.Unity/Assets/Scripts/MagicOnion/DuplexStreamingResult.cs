@@ -14,11 +14,11 @@ namespace MagicOnion
         readonly MarshallingClientStreamWriter<TRequest> requestStream;
         readonly MarshallingAsyncStreamReader<TResponse> responseStream;
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, MessagePackSerializerOptions serializerOptions)
         {
             this.inner = inner;
-            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
+            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, serializerOptions);
+            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, serializerOptions);
         }
 
         public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;

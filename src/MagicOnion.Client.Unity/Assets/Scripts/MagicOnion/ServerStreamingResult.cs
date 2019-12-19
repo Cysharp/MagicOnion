@@ -13,10 +13,10 @@ namespace MagicOnion
         readonly AsyncServerStreamingCall<byte[]> inner;
         readonly MarshallingAsyncStreamReader<TResponse> responseStream;
 
-        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IFormatterResolver resolver)
+        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, MessagePackSerializerOptions serializerOptions)
         {
             this.inner = inner;
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
+            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, serializerOptions);
         }
 
         /// <summary>

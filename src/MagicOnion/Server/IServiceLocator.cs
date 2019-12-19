@@ -36,6 +36,12 @@ namespace MagicOnion.Server
 
         public T GetService<T>()
         {
+            var f = Cache<T>.cache;
+            if (f == null)
+            {
+                throw new InvalidOperationException("Singleton service cache is null. class:" + typeof(T).FullName);
+            }
+
             return Cache<T>.cache();
         }
 

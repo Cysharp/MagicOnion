@@ -47,8 +47,8 @@ namespace MagicOnion.Server
         public Func<object, byte> serialize;
 
         // reflection cache
-        static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(byte[]));
+        static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
         static readonly MethodInfo createService = typeof(ServiceLocatorHelper).GetMethod(nameof(ServiceLocatorHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions)
@@ -69,7 +69,9 @@ namespace MagicOnion.Server
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
             {
+                var resolver = this.serializerOptions.Resolver;
                 this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
+                this.serializerOptions = this.serializerOptions.WithResolver(resolver);
             }
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
@@ -104,7 +106,7 @@ namespace MagicOnion.Server
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
-                    //      var request = LZ4MessagePackSerializer.Deserialize<T>(context.Request, context.Resolver);
+                    //      var request = MessagePackSerializer.Deserialize<T>(context.Request, context.SerializerOptions, default);
                     //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     //      return MethodHandlerResultHelper.SerializeUnaryResult(result, context);
                     // };
@@ -112,13 +114,14 @@ namespace MagicOnion.Server
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
                         var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
+                        
                         var requestArg = Expression.Parameter(RequestType, "request");
-                        var getResolver = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("FormatterResolver", flags));
+                        var getSerializerOptions = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("SerializerOptions", flags));
+                        var defaultToken = Expression.Default(typeof(CancellationToken));
 
                         var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags));
 
-                        var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getResolver);
+                        var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getSerializerOptions, defaultToken);
                         var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                         Expression[] arguments = new Expression[parameters.Length];
@@ -345,10 +348,8 @@ namespace MagicOnion.Server
         {
             var isErrorOrInterrupted = false;
             var serviceLocatorScope = serviceLocator.CreateScope();
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
-            {
-                Request = request
-            };
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator);
+            serviceContext.SetRawRequest(request);
 
             byte[] response = emptyBytes;
             try
@@ -468,8 +469,8 @@ namespace MagicOnion.Server
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceLocator, serviceActivator)
             {
                 ResponseStream = responseStream,
-                Request = request
             };
+            serviceContext.SetRawRequest(request);
             try
             {
                 logger.BeginInvokeMethod(serviceContext, request, typeof(TRequest));
