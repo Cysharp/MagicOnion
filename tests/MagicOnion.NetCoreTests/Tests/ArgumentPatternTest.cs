@@ -159,13 +159,25 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [CollectionDefinition(nameof(ArgumentPatternTestCollectionServerFixture))]
+    public class ArgumentPatternTestCollectionServerFixture : ICollectionFixture<ArgumentPatternTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ArgumentPattern) }, options);
+            }
+        }
+    }
+
+    [Collection(nameof(ArgumentPatternTestCollectionServerFixture))]
     public class ArgumentPatternTest
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public ArgumentPatternTest(ITestOutputHelper logger, ServerFixture server)
+        public ArgumentPatternTest(ITestOutputHelper logger, ArgumentPatternTestCollectionServerFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

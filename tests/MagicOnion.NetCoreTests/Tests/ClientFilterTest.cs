@@ -165,13 +165,25 @@ namespace MagicOnion.NetCoreTests.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [CollectionDefinition(nameof(ClientFilterTestCollectionFixture))]
+    public class ClientFilterTestCollectionFixture : ICollectionFixture<ClientFilterTestCollectionFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ClientFilterTestService) }, options);
+            }
+        }
+    }
+
+    [Collection(nameof(ClientFilterTestCollectionFixture))]
     public class ClientFilterTest
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public ClientFilterTest(ITestOutputHelper logger, ServerFixture server)
+        public ClientFilterTest(ITestOutputHelper logger, ClientFilterTestCollectionFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;
