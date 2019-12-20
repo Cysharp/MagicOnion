@@ -78,13 +78,25 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [CollectionDefinition(nameof(ReturnStatusTestCollectionServerFixture))]
+    public class ReturnStatusTestCollectionServerFixture : ICollectionFixture<ReturnStatusTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ReturnStatus) }, options);
+            }
+        }
+    }
+
+    [Collection(nameof(ReturnStatusTestCollectionServerFixture))]
     public class ReturnStatusTest
     {
         ITestOutputHelper logger;
         IReturnStatus client;
 
-        public ReturnStatusTest(ITestOutputHelper logger, ServerFixture server)
+        public ReturnStatusTest(ITestOutputHelper logger, ReturnStatusTestCollectionServerFixture.CustomServerFixture server)
         {
             this.logger = logger;
             this.client = server.CreateClient<IReturnStatus>();

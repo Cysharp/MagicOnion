@@ -157,14 +157,25 @@ namespace MagicOnion.Tests
             throw new Exception("C-Exception");
         }
     }
+    
+    [CollectionDefinition(nameof(FilterTestCollectionServerFixture))]
+    public class FilterTestCollectionServerFixture : ICollectionFixture<FilterTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(FilterTester) }, options);
+            }
+        }
+    }
 
-
-    [Collection(nameof(AllAssemblyGrpcServerFixture))]
+    [Collection(nameof(FilterTestCollectionServerFixture))]
     public class FilterTest
     {
         IFilterTester client;
 
-        public FilterTest(ITestOutputHelper logger, ServerFixture server)
+        public FilterTest(ITestOutputHelper logger, FilterTestCollectionServerFixture.CustomServerFixture server)
         {
             this.client = server.CreateClient<IFilterTester>();
         }

@@ -6,6 +6,9 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Xunit;
+using System.Linq.Expressions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace MagicOnion.Tests
 {
@@ -34,12 +37,13 @@ namespace MagicOnion.Tests
         }
     }
 
-    public class ServerFixture : IDisposable
+    public abstract class ServerFixture : IDisposable
     {
         Grpc.Core.Server server;
         public ServerPort ServerPort { get; private set; }
         public Channel DefaultChannel { get; private set; }
         public MagicOnionOptions Options { get; private set; }
+        public NonCachedDefaultServiceLocator ServiceLocator { get; } = new NonCachedDefaultServiceLocator();
 
         public ServerFixture()
         {
@@ -47,10 +51,13 @@ namespace MagicOnion.Tests
         }
 
         protected virtual MagicOnionOptions CreateMagicOnionOptions()
-            => new MagicOnionOptions { IsReturnExceptionStackTraceInErrorDetail = true };
+            => new MagicOnionOptions
+            {
+                IsReturnExceptionStackTraceInErrorDetail = true,
+                ServiceLocator = ServiceLocator
+            };
 
-        protected virtual MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ServerFixture).GetTypeInfo().Assembly }, options);
+        protected abstract MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options);
 
         protected virtual void PrepareServer()
         {
@@ -87,14 +94,43 @@ namespace MagicOnion.Tests
 
         public void Dispose()
         {
-            DefaultChannel.ShutdownAsync().Wait();
-            server.ShutdownAsync().Wait();
+            try { DefaultChannel.ShutdownAsync().Wait(1000); } catch { }
+
+            try { server.ShutdownAsync().Wait(1000); } catch { }
         }
     }
 
-    [CollectionDefinition(nameof(AllAssemblyGrpcServerFixture))]
-    public class AllAssemblyGrpcServerFixture : ICollectionFixture<ServerFixture>
-    {
 
+    public class NonCachedDefaultServiceLocator : IServiceLocator, IServiceLocatorScope
+    {
+        Dictionary<Type, object> factories = new Dictionary<Type, object>();
+
+        public T GetService<T>()
+        {
+            return ((Func<T>)factories[typeof(T)])();
+        }
+
+        public void Register<T>(T singleton)
+        {
+            factories[typeof(T)] = (Func<T>)(() => singleton);
+        }
+
+        public void Register<T>()
+        {
+            if (!typeof(T).GetConstructors().Any(x => x.GetParameters().Length == 0))
+            {
+                throw new InvalidOperationException(string.Format("Type needs parameterless constructor, class:{0}", typeof(T).FullName));
+            }
+
+            factories[typeof(T)] = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+        }
+
+        public IServiceLocatorScope CreateScope() => this;
+
+        IServiceLocator IServiceLocatorScope.ServiceLocator => this;
+
+        public void Dispose()
+        {
+        }
     }
 }

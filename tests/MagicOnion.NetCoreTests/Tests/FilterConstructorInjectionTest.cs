@@ -15,9 +15,14 @@ namespace MagicOnion.Tests
         {
             protected override void PrepareServer()
             {
-                DefaultServiceLocator.Instance.Register(new FilterConstructorInjectionValue());
-                DefaultServiceLocator.Instance.Register(new ServiceFilterForMethodTestFilterAttribute());
+                ServiceLocator.Register(new FilterConstructorInjectionValue());
+                ServiceLocator.Register(new ServiceFilterForMethodTestFilterAttribute());
+
                 base.PrepareServer();
+            }
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(FilterConstructorInjectionTester) }, options);
             }
         }
     }
