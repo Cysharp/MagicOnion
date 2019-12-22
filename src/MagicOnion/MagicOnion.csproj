@@ -49,7 +49,7 @@
     <!-- Exclude -->
 
     <ItemGroup>
-        <None Remove="\**\*.meta" />
+        <None Remove="$(ProjectDir)..\**\*.meta" />
     </ItemGroup>
 
     <!-- T4 -->
@@ -74,7 +74,7 @@
         <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\</DestinationRoot>
     </PropertyGroup>
     <ItemGroup>
-        <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;UnsafeDirectBlitResolver.cs" />
+        <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;UnsafeDirectBlitResolver.cs" />
     </ItemGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Copy SourceFiles="$(ProjectDir)Server\Hubs\BroadcasterHelper.cs" DestinationFiles="$(DestinationRoot)Server\Hubs\BroadcasterHelper.cs" SkipUnchangedFiles="true" />
