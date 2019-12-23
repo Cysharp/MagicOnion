@@ -1,39 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
-      <OutputType>Library</OutputType>
-      <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-      <SignAssembly>true</SignAssembly>
-      <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
-      <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-      <GenerateDocumentationFile>true</GenerateDocumentationFile>
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-      <NoWarn>1701;1702;1705;1591</NoWarn>
-      <DefineConstants>NON_UNITY</DefineConstants>
-      <Company>Cysharp</Company>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>NON_UNITY</DefineConstants>
+        <Company>Cysharp</Company>
 
-      <!-- NuGet -->
-      <PackageId>MagicOnion.Redis</PackageId>
-      <PackageVersion>$(Version)</PackageVersion>
-      <Authors>Cysharp</Authors>
-      <Copyright>Cysharp</Copyright>
-      <Description>Redis backplane for MagicOnion.</Description>
-      <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-      <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-      <RepositoryType>git</RepositoryType>
-      <PackageTags>gRPC, HTTP2</PackageTags>
+        <!-- NuGet -->
+        <PackageId>MagicOnion.Redis</PackageId>
+        <PackageVersion>$(Version)</PackageVersion>
+        <Authors>Cysharp</Authors>
+        <Copyright>Cysharp</Copyright>
+        <Description>Redis backplane for MagicOnion.</Description>
+        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>gRPC, HTTP2</PackageTags>
 
-  </PropertyGroup>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.0.299-rc" />
-    <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
-    <PackageReference Include="System.Buffers" Version="4.5.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MessagePack" Version="2.0.323" />
+        <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+        <PackageReference Include="System.Buffers" Version="4.5.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
-  </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="../MagicOnion/Utils/ArrayPoolBufferWriter.cs" />
+    </ItemGroup>
 
 </Project>
