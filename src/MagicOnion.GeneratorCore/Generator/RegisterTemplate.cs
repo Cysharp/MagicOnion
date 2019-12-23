@@ -12,13 +12,14 @@ namespace MagicOnion.Generator
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using MagicOnion.CodeAnalysis;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class EnumTemplate : EnumTemplateBase
+    public partial class RegisterTemplate : RegisterTemplateBase
     {
         /// <summary>
         /// Create the template output
@@ -28,30 +29,57 @@ namespace MagicOnion.Generator
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
                     " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
-            this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n");
- foreach(var info in enumSerializationInfos) { 
-            this.Write("    public sealed class ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
-            this.Write("Formatter : global::MessagePack.Formatters.IMessagePackFormatter<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
-            this.Write(">\r\n    {\r\n        public int Serialize(ref byte[] bytes, int offset, ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
-            this.Write(" value, global::MessagePack.IFormatterResolver formatterResolver)\r\n        {\r\n   " +
-                    "         return MessagePackBinary.Write");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
-            this.Write("(ref bytes, offset, (");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
-            this.Write(")value);\r\n        }\r\n        \r\n        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
-            this.Write(" Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver for" +
-                    "matterResolver, out int readSize)\r\n        {\r\n            return (");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
-            this.Write(")MessagePackBinary.Read");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
-            this.Write("(bytes, offset, out readSize);\r\n        }\r\n    }\r\n\r\n");
+            this.Write(@"
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+
+    public static partial class MagicOnionInitializer
+    {
+        static bool isRegistered = false;
+
+");
+ if( !UnuseUnityAttribute) { 
+            this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
+                    "oadType.BeforeSceneLoad)]\r\n");
  } 
-            this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning " +
-                    "restore 414\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
+            this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
+                    "turn;\r\n            isRegistered = true;\r\n\r\n");
+ foreach(var interfaceDef in Interfaces) { 
+ if(interfaceDef.IsIfDebug) { 
+            this.Write("#if DEBUG\r\n");
+ } 
+            this.Write("            MagicOnionClientRegistry<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
+            this.Write(">.Register((x, y, z) => new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
+            this.Write("(x, y, z));\r\n");
+ if(interfaceDef.IsIfDebug) { 
+            this.Write("#endif\r\n");
+ } 
+ } // foreach 
+            this.Write("\r\n");
+ foreach(var (interfaceDef, receiverDef) in HubInterfaces) { 
+ if(interfaceDef.IsIfDebug) { 
+            this.Write("#if DEBUG\r\n");
+ } 
+            this.Write("            StreamingHubClientRegistry<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
+            this.Write(", ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(receiverDef.ToString()));
+            this.Write(">.Register((a, _, b, c, d, e) => new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
+            this.Write("(a, b, c, d, e));\r\n");
+ if(interfaceDef.IsIfDebug) { 
+            this.Write("#endif\r\n");
+ } 
+ } // foreach 
+            this.Write("        }\r\n    }\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n" +
+                    "#pragma warning restore 414\r\n#pragma warning restore 612\r\n#pragma warning restor" +
+                    "e 618");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -60,7 +88,7 @@ namespace MagicOnion.Generator
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class EnumTemplateBase
+    public class RegisterTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

@@ -58,8 +58,8 @@
         {
         }
 
-        public <#= clientName #>(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)
-            : base(callInvoker, resolver, filters)
+        public <#= clientName #>(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] filters)
+            : base(callInvoker, serializerOptions, filters)
         {
         }
 
@@ -69,7 +69,7 @@
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
-            clone.resolver = this.resolver;
+            clone.serializerOptions = this.serializerOptions;
             clone.filters = filters;
             return clone;
         }
@@ -125,13 +125,13 @@
 <# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
             var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, base.serializerOptions));
 <# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.serializerOptions));
 <# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.serializerOptions));
 <# } #>
         }
 <# if(item.IsIfDebug) { #>
