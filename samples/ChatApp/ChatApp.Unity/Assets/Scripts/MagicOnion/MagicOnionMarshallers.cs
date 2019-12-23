@@ -12,12 +12,12 @@ namespace MagicOnion
     internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
     {
         readonly IAsyncStreamReader<byte[]> inner;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions options;
 
-        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, IFormatterResolver resolver)
+        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, MessagePackSerializerOptions options)
         {
             this.inner = inner;
-            this.resolver = resolver;
+            this.options = options;
         }
 
         public T Current { get; private set; }
@@ -26,7 +26,7 @@ namespace MagicOnion
         {
             if (await inner.MoveNext(cancellationToken))
             {
-                this.Current = LZ4MessagePackSerializer.Deserialize<T>(inner.Current, resolver);
+                this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, options);
                 return true;
             }
             else
@@ -44,12 +44,12 @@ namespace MagicOnion
     internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<byte[]> inner;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions options;
 
-        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, IFormatterResolver resolver)
+        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, MessagePackSerializerOptions options)
         {
             this.inner = inner;
-            this.resolver = resolver;
+            this.options = options;
         }
 
         public WriteOptions WriteOptions
@@ -72,7 +72,7 @@ namespace MagicOnion
 
         public Task WriteAsync(T message)
         {
-            var bytes = LZ4MessagePackSerializer.Serialize(message, resolver);
+            var bytes = MessagePackSerializer.Serialize(message, options);
             return inner.WriteAsync(bytes);
         }
     }
@@ -167,7 +167,7 @@ namespace MagicOnion
             }
         }
 
-        public static object InsantiateDynamicArgumentTuple(Type[] typeParameters, object[] arguments)
+        public static object InstantiateDynamicArgumentTuple(Type[] typeParameters, object[] arguments)
         {
             // start from T2
             var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
@@ -196,7 +196,7 @@ namespace MagicOnion
             }
             else if (innerResolver == null)
             {
-                return MessagePackSerializer.DefaultResolver.GetFormatterWithVerify<T>();
+                return MessagePackSerializer.DefaultOptions.Resolver.GetFormatterWithVerify<T>();
             }
             else
             {

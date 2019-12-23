@@ -129,26 +129,13 @@ namespace MagicOnion.Tests
         }
     }
 
-        [CollectionDefinition(nameof(BasicStreamingHubTestCollectionServerFixture))]
-    public class BasicStreamingHubTestCollectionServerFixture : ICollectionFixture<BasicStreamingHubTestCollectionServerFixture.CustomServerFixture>
-    {
-        public class CustomServerFixture : ServerFixture
-        {
-            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-            {
-                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(TestHub) }, options);
-            }
-        }
-    }
-
-    [Collection(nameof(BasicStreamingHubTestCollectionServerFixture))]
-    public class BasicStreamingHubTest : IMessageReceiver, IDisposable
+    public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixture<ServerFixture<TestHub>>
     {
         ITestOutputHelper logger;
         Channel channel;
         ITestHub client;
 
-        public BasicStreamingHubTest(ITestOutputHelper logger, BasicStreamingHubTestCollectionServerFixture.CustomServerFixture server)
+        public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture<TestHub> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;
@@ -439,14 +426,13 @@ namespace MagicOnion.Tests
         }
     }
 
-    [Collection(nameof(MoreCheckHubTestCollectionServerFixture))]
-    public class MoreCheckHubTest : IEmptyReceiver, IDisposable
+    public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
     {
         ITestOutputHelper logger;
         Channel channel;
         IMoreCheckHub client;
 
-        public MoreCheckHubTest(ITestOutputHelper logger, MoreCheckHubTestCollectionServerFixture.CustomServerFixture server)
+        public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture<MoreCheckHub> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

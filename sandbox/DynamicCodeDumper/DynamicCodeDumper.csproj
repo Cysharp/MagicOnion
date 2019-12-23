@@ -59,6 +59,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj">
+      <Project>{2ad48c05-ed44-4e4f-b86b-a746e7f968a9}</Project>
+      <Name>MagicOnion.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\MagicOnion\MagicOnion.csproj">
       <Project>{c79ce0bf-ed4c-47be-822e-e82cf83fc68a}</Project>
       <Name>MagicOnion</Name>

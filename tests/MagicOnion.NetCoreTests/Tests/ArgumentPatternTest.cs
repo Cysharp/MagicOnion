@@ -159,25 +159,12 @@ namespace MagicOnion.Tests
         }
     }
 
-    [CollectionDefinition(nameof(ArgumentPatternTestCollectionServerFixture))]
-    public class ArgumentPatternTestCollectionServerFixture : ICollectionFixture<ArgumentPatternTestCollectionServerFixture.CustomServerFixture>
-    {
-        public class CustomServerFixture : ServerFixture
-        {
-            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-            {
-                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(ArgumentPattern) }, options);
-            }
-        }
-    }
-
-    [Collection(nameof(ArgumentPatternTestCollectionServerFixture))]
-    public class ArgumentPatternTest
+    public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public ArgumentPatternTest(ITestOutputHelper logger, ArgumentPatternTestCollectionServerFixture.CustomServerFixture server)
+        public ArgumentPatternTest(ITestOutputHelper logger, ServerFixture<ArgumentPattern> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;
@@ -336,7 +323,7 @@ namespace MagicOnion.Tests
                 var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
 
                 var response = new ResponseContext<MyResponse>(callResult, MessagePackSerializer.DefaultOptions);
-                return new UnaryResult<MyResponse>(Task.FromResult(response));
+                return new UnaryResult<MyResponse>(Task.FromResult<IResponseContext<MyResponse>>(response));
             }
 
             public UnaryResult<MyResponse> Unary2(MyRequest req)

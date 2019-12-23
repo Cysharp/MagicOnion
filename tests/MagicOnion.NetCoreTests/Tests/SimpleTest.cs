@@ -117,25 +117,12 @@ namespace MagicOnion.Tests
 
     }
 
-    [CollectionDefinition(nameof(SimpleTestCollectionServerFixture))]
-    public class SimpleTestCollectionServerFixture : ICollectionFixture<SimpleTestCollectionServerFixture.CustomServerFixture>
-    {
-        public class CustomServerFixture : ServerFixture
-        {
-            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-            {
-                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(UnaryTestImpl) }, options);
-            }
-        }
-    }
-
-    [Collection(nameof(SimpleTestCollectionServerFixture))]
-    public class SimpleTest
+    public class SimpleTest : IClassFixture<ServerFixture<UnaryTestImpl>>
     {
         ITestOutputHelper logger;
         Channel channel;
 
-        public SimpleTest(ITestOutputHelper logger, SimpleTestCollectionServerFixture.CustomServerFixture server)
+        public SimpleTest(ITestOutputHelper logger, ServerFixture<UnaryTestImpl> server)
         {
             this.logger = logger;
             this.channel = server.DefaultChannel;

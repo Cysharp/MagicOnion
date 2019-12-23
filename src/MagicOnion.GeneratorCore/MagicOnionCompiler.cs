@@ -70,15 +70,15 @@ namespace MagicOnion
                 .OrderBy(x => x.Key)
                 .Select(x => new EnumTemplate()
                 {
-                    Namespace = namespaceDot + ".Formatters",
+                    Namespace = namespaceDot + "Formatters",
                     enumSerializationInfos = x.ToArray()
                 })
                 .ToArray();
 
             var resolverTemplate = new ResolverTemplate()
             {
-                Namespace = namespaceDot + ".Resolvers",
-                FormatterNamespace = namespaceDot + ".Formatters",
+                Namespace = namespaceDot + "Resolvers",
+                FormatterNamespace = namespaceDot + "Formatters",
                 ResolverName = "MagicOnionResolver",
                 registerInfos = genericInfos.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enumInfos.OrderBy(x => x.FullName)).ToArray()
             };
@@ -105,7 +105,7 @@ namespace MagicOnion
 
             var registerTemplate = new RegisterTemplate
             {
-                Namespace = namespaceDot,
+                Namespace = @namespace,
                 Interfaces = definitions.Where(x => x.IsServiceDefinition).ToArray(),
                 HubInterfaces = hubDefinitions,
                 UnuseUnityAttribute = unuseUnityAttr

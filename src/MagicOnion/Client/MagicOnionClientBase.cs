@@ -54,7 +54,7 @@ namespace MagicOnion.Client
             return new UnaryResult<TResponse>(future);
         }
 
-        async Task<ResponseContext<TResponse>> InvokeAsyncCore<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
+        async Task<IResponseContext<TResponse>> InvokeAsyncCore<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
         {
             if (this.option.Headers == null && filters.Length != 0)
             {
@@ -64,7 +64,7 @@ namespace MagicOnion.Client
 
             var requestContext = new RequestContext<TRequest>(request, this, path, option, typeof(TResponse), filters, requestMethod);
             var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
-            var result = response as ResponseContext<TResponse>;
+            var result = response as IResponseContext<TResponse>;
             if (result != null)
             {
                 return result;
@@ -85,7 +85,7 @@ namespace MagicOnion.Client
 
             var requestContext = new RequestContext<TRequest>(request, this, path, option, typeof(TResponse), filters, requestMethod);
             var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
-            var result = response as ResponseContext<TResponse>;
+            var result = response as IResponseContext<TResponse>;
             if (result != null)
             {
                 return new UnaryResult<TResponse>(Task.FromResult(result));

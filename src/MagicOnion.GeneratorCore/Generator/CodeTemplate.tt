@@ -125,13 +125,13 @@
 <# } else if(item.MethodType ==MethodType.ServerStreaming) { #>
             var __request = <#= item.RequestObject() #>;
             var __callResult = callInvoker.AsyncServerStreamingCall(<#= item.Name #>Method, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, base.serializerOptions));
+            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<<#= item.ResponseType #>>(__callResult, new MarshallingAsyncStreamReader<<#= item.ResponseType #>>(__callResult.ResponseStream, base.serializerOptions), base.serializerOptions));
 <# } else if(item.MethodType ==MethodType.ClientStreaming) { #>
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.serializerOptions));
+            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, new MarshallingClientStreamWriter<<#= item.RequestType #>>(__callResult.RequestStream, serializerOptions), base.serializerOptions));
 <# } else if(item.MethodType ==MethodType.DuplexStreaming) { #>
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(<#= item.Name #>Method, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, base.serializerOptions));
+            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, new MarshallingClientStreamWriter<<#= item.RequestType #>>(__callResult.RequestStream, serializerOptions), new MarshallingAsyncStreamReader<<#= item.ResponseType #>>(__callResult.ResponseStream, base.serializerOptions), base.serializerOptions));
 <# } #>
         }
 <# if(item.IsIfDebug) { #>

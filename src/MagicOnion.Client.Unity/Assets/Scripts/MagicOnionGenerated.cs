@@ -757,20 +757,20 @@ namespace Sandbox.NetCoreServer.Services {
         public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<int, string>> ClientStreamingSampleAsync()
         {
             var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[]>(ClientStreamingSampleAsyncMethod, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<int, string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ClientStreamingResult<int, string>(__callResult, new MarshallingClientStreamWriter<int>(__callResult.RequestStream, resolver), base.resolver));
         }
 
         public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<string>> ServertSreamingSampleAsync(int x, int y, int z)
         {
             var __request = LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, int, int>(x, y, z), base.resolver);
             var __callResult = callInvoker.AsyncServerStreamingCall(ServertSreamingSampleAsyncMethod, base.host, base.option, __request);
-            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new ServerStreamingResult<string>(__callResult, new MarshallingAsyncStreamReader<string>(__callResult.ResponseStream, base.resolver), base.resolver));
         }
 
         public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<int, string>> DuplexStreamingSampleAync()
         {
             var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingSampleAyncMethod, base.host, base.option);
-            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<int, string>(__callResult, base.resolver));
+            return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<int, string>(__callResult, new MarshallingClientStreamWriter<int>(__callResult.RequestStream, resolver), new MarshallingAsyncStreamReader<string>(__callResult.ResponseStream, base.resolver), base.resolver));
         }
     }
 
