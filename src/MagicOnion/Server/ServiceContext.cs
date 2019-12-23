@@ -64,7 +64,7 @@ namespace MagicOnion.Server
         // internal, used from there methods.
         internal bool IsIgnoreSerialization { get; set; }
         byte[] request;
-        internal ReadOnlyMemory<byte> Request { get; }
+        internal ReadOnlyMemory<byte> Request => request;
         internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
         internal byte[] Result { get; set; }

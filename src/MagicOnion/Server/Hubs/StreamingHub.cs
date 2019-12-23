@@ -132,7 +132,7 @@ namespace MagicOnion.Server.Hubs
                         var msgId = messagePackReader.ReadInt32();
                         var metId = messagePackReader.ReadInt32();
                         var consumed = (int)messagePackReader.Consumed;
-                        return (msgId, metId, consumed);
+                        return (metId, msgId, consumed);
                     }
                     else
                     {

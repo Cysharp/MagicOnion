@@ -1,6 +1,8 @@
-﻿using MagicOnion;
+﻿using Grpc.Core;
+using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Server.Hubs;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +32,22 @@ namespace DynamicCodeDumper
         Task<int> RetrunZeroArgument();
         Task<string> RetrunOneArgument(int x);
         Task<double> RetrunMoreArgument(int x, string y, double z);
+    }
+
+    public interface ISimpleTestService : IService<ISimpleTestService>
+    {
+        UnaryResult<int> Unary1(int x, int y);
+        Task<UnaryResult<int>> Unary1Task(int x, int y);
+        UnaryResult<int> Unary2(int x, int y);
+
+        ClientStreamingResult<int, string> ClientStreaming1();
+        Task<ClientStreamingResult<int, string>> ClientStreaming1Task();
+
+        ServerStreamingResult<string> Serverstreaming1(int x, int y, int z);
+        Task<ServerStreamingResult<string>> ServerStreaming1Task(int x, int y, int z);
+
+        DuplexStreamingResult<int, string> DuplexStreaming1();
+        Task<DuplexStreamingResult<int, string>> DuplexStreaming1Task();
     }
 
     public interface ITestService : IService<ITestService>
@@ -69,12 +87,12 @@ namespace DynamicCodeDumper
         {
             //var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
             //var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
-            
-            //    var _ = DynamicClientBuilder<ITestService>.ClientType;
-            //var c = MagicOnion.Client.DynamicClientAssemblyHolder.Save();
-            //Verify(c);
 
-            //var _ = MagicOnionClient.Create<ITestHub>((Channel)null, null);
+            var _ = DynamicClientBuilder<ISimpleTestService>.ClientType;
+            var c = MagicOnion.Client.DynamicClientAssemblyHolder.Save();
+            Verify(c);
+            //Channel c = default;
+            //var _ = MagicOnionClient.Create<ITestService>(channel: c);
 
             //var __ = StreamingHubClientBuilder<ITestHub, IMessageReceiver>.ClientType;
             //var b = MagicOnion.Client.StreamingHubClientAssemblyHolder.Save();

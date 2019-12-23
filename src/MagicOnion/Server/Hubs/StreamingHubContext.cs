@@ -66,8 +66,7 @@ namespace MagicOnion.Server.Hubs
                 }
             }
 
-            // await value.ConfigureAwait(false);
-
+            await value.ConfigureAwait(false);
             var result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
@@ -86,7 +85,7 @@ namespace MagicOnion.Server.Hubs
 
             // MessageFormat:
             // response:  [messageId, methodId, response]
-            byte[] BuildMessage()
+            byte[] BuildMessage(T v)
             {
                 using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
                 {
@@ -94,12 +93,14 @@ namespace MagicOnion.Server.Hubs
                     writer.WriteArrayHeader(3);
                     writer.Write(MessageId);
                     writer.Write(MethodId);
+                    MessagePackSerializer.Serialize(ref writer, v, SerializerOptions);
                     writer.Flush();
                     return buffer.WrittenSpan.ToArray();
                 }
             }
-
-            byte[] result = BuildMessage();
+            
+            var vv = await value.ConfigureAwait(false);
+            byte[] result = BuildMessage(vv);
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
                 await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
