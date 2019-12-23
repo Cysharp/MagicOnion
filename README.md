@@ -1327,8 +1327,8 @@ await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
     {
         services.Configure<MagicOnionHostingOptions>(options =>
         {
-             options.Service.GlobalFilters.Add<OpenTelemetryCollectorFilter>();
-             options.Service.GlobalStreamingHubFilters.Add<OpenTelemetryHubCollectorFilter>();
+             options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
+             options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
              options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null);
         });
     })

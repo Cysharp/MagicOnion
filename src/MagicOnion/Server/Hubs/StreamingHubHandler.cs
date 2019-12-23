@@ -1,10 +1,12 @@
 ﻿using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MagicOnion.Utils;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -18,20 +20,21 @@ namespace MagicOnion.Server.Hubs
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
         readonly IServiceLocator serviceLocator;
+        readonly IMagicOnionServiceActivator serviceActivator;
 
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
-        internal readonly IFormatterResolver resolver;
+        internal readonly MessagePackSerializerOptions serializerOptions;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
         readonly string toStringCache;
         readonly int getHashCodeCache;
 
         // reflection cache
-        // Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
-        static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
+        // Deserialize<T>(ReadOnlyMemory<byte>, MessagePackSerializerOptions, CancellationToken)
+        static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
 
         private static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
         {
@@ -40,7 +43,7 @@ namespace MagicOnion.Server.Hubs
             return mapping.InterfaceMethods[methodIndex];
         }
 
-        public StreamingHubHandler(MagicOnionOptions options, Type classType, MethodInfo methodInfo)
+        public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions)
         {
             var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
             var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
@@ -57,32 +60,32 @@ namespace MagicOnion.Server.Hubs
             this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
 
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-            this.resolver = options.FormatterResolver;
 
+            var resolver = handlerOptions.SerializerOptions.Resolver;
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
             {
                 this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
             }
+            this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            this.filters = options.GlobalStreamingHubFilters
+            this.filters = handlerOptions.GlobalStreamingHubFilters
                 .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
                 .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .Concat(classType.GetCustomAttributes<FromTypeFilterAttribute>(true))
-                .Concat(classType.GetCustomAttributes<FromServiceFilterAttribute>(true))
+                .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>())
                 .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes<FromTypeFilterAttribute>(true))
-                .Concat(methodInfo.GetCustomAttributes<FromServiceFilterAttribute>(true))
+                .Concat(methodInfo.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>())
                 .OrderBy(x => x.Order)
                 .ToArray();
 
             // options
-            this.serviceLocator = options.ServiceLocator;
+            this.serviceLocator = handlerOptions.ServiceLocator;
+            this.serviceActivator = handlerOptions.ServiceActivator;
 
             // validation filter
             if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)
@@ -105,11 +108,12 @@ namespace MagicOnion.Server.Hubs
 
                 var contextArg = Expression.Parameter(typeof(StreamingHubContext), "context");
                 var requestArg = Expression.Parameter(RequestType, "request");
-                var getResolver = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("FormatterResolver", flags));
+                var getSerializerOptions = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("SerializerOptions", flags));
                 var contextRequest = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("Request", flags));
+                var noneCancellation = Expression.Default(typeof(CancellationToken));
                 var getInstanceCast = Expression.Convert(Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("HubInstance", flags)), HubType);
 
-                var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getResolver);
+                var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getSerializerOptions, noneCancellation);
                 var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                 Expression[] arguments = new Expression[parameters.Length];
@@ -186,6 +190,31 @@ namespace MagicOnion.Server.Hubs
         public bool Equals(StreamingHubHandler other)
         {
             return HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
+        }
+    }
+
+    /// <summary>
+    /// Options for StreamingHubHandler construction.
+    /// </summary>
+    public class StreamingHubHandlerOptions
+    {
+        public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
+
+        public IMagicOnionLogger Logger { get; }
+
+        public MessagePackSerializerOptions SerializerOptions { get; }
+
+        public IServiceLocator ServiceLocator { get; }
+
+        public IMagicOnionServiceActivator ServiceActivator { get; }
+
+        public StreamingHubHandlerOptions(MagicOnionOptions options)
+        {
+            GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
+            Logger = options.MagicOnionLogger;
+            SerializerOptions = options.SerializerOptions;
+            ServiceLocator = options.ServiceLocator;
+            ServiceActivator = options.MagicOnionServiceActivator;
         }
     }
 }

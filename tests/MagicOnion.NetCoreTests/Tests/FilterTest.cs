@@ -157,8 +157,7 @@ namespace MagicOnion.Tests
             throw new Exception("C-Exception");
         }
     }
-
-
+    
     public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
     {
         IFilterTester client;

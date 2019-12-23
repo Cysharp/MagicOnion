@@ -1,9 +1,11 @@
-﻿using MagicOnion.Utils;
+﻿using MagicOnion.GeneratorCore.Utils;
+using MagicOnion.Utils;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace MagicOnion.CodeAnalysis
 {
@@ -18,8 +20,8 @@ namespace MagicOnion.CodeAnalysis
         public readonly INamedTypeSymbol ClientStreamingResult;
         public readonly INamedTypeSymbol ServerStreamingResult;
         public readonly INamedTypeSymbol DuplexStreamingResult;
-        public readonly INamedTypeSymbol GenerateDefineIf;
         public readonly INamedTypeSymbol IServiceMarker;
+        public readonly INamedTypeSymbol IService;
         public readonly INamedTypeSymbol IStreamingHubMarker;
         public readonly INamedTypeSymbol IStreamingHub;
         public readonly INamedTypeSymbol MethodIdAttribute;
@@ -33,10 +35,10 @@ namespace MagicOnion.CodeAnalysis
             ClientStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ClientStreamingResult`2");
             DuplexStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.DuplexStreamingResult`2");
             ServerStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ServerStreamingResult`1");
-            GenerateDefineIf = compilation.GetTypeByMetadataName("MagicOnion.GenerateDefineIfAttribute");
             IStreamingHubMarker = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHubMarker");
             IServiceMarker = compilation.GetTypeByMetadataName("MagicOnion.IServiceMarker");
             IStreamingHub = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHub`2");
+            IService = compilation.GetTypeByMetadataName("MagicOnion.IService`1");
             MethodIdAttribute = compilation.GetTypeByMetadataName("MagicOnion.Server.Hubs.MethodIdAttribute");
 
             Global = this;
@@ -61,7 +63,7 @@ namespace MagicOnion.CodeAnalysis
         public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols)
         {
             this.csProjPath = csProjPath;
-            var compilation = RoslynExtensions.GetCompilationFromProject(csProjPath, conditinalSymbols.ToArray()).GetAwaiter().GetResult();
+            var compilation = BuildCompilation.CreateFromProjectAsync(new[] { csProjPath }, conditinalSymbols.ToArray(), CancellationToken.None).GetAwaiter().GetResult();
             this.typeReferences = new ReferenceSymbols(compilation);
 
             var bothInterfaces = compilation.GetNamedTypeSymbols()
@@ -79,11 +81,13 @@ namespace MagicOnion.CodeAnalysis
 
             serviceInterfaces = bothInterfaces
                 .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker) && x.AllInterfaces.All(y => y != typeReferences.IStreamingHubMarker))
+                .Where(x => x.ConstructedFrom != this.typeReferences.IService)
                 .Distinct()
                 .ToArray();
 
             hubInterfaces = bothInterfaces
                 .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IStreamingHubMarker))
+                .Where(x => x.ConstructedFrom != this.typeReferences.IStreamingHub)
                 .Distinct()
                 .ToArray();
         }
@@ -199,6 +203,10 @@ namespace MagicOnion.CodeAnalysis
         {
             var retType = method.ReturnType as INamedTypeSymbol;
             ITypeSymbol retType2 = null;
+            if (retType == null)
+            {
+                goto EMPTY;
+            }
 
             var constructedFrom = retType.ConstructedFrom;
             if (constructedFrom == typeReferences.TaskOfT)
@@ -214,6 +222,7 @@ namespace MagicOnion.CodeAnalysis
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 unwrappedOriginalResponseType = retType.TypeArguments[0];
+                return;
             }
             else if (constructedFrom == typeReferences.ServerStreamingResult)
             {
@@ -221,6 +230,7 @@ namespace MagicOnion.CodeAnalysis
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 unwrappedOriginalResponseType = retType.TypeArguments[0];
+                return;
             }
             else if (constructedFrom == typeReferences.ClientStreamingResult)
             {
@@ -228,6 +238,7 @@ namespace MagicOnion.CodeAnalysis
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 unwrappedOriginalResponseType = retType.TypeArguments[1];
+                return;
             }
             else if (constructedFrom == typeReferences.DuplexStreamingResult)
             {
@@ -235,15 +246,15 @@ namespace MagicOnion.CodeAnalysis
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 unwrappedOriginalResponseType = retType.TypeArguments[1];
+                return;
             }
-            else
-            {
-                // no validation
-                methodType = MethodType.Other;
-                requestType = null;
-                responseType = null;
-                unwrappedOriginalResponseType =  (retType == null) ? retType2 : (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : retType;
-            }
+
+            EMPTY:
+            // no validation
+            methodType = MethodType.Other;
+            requestType = null;
+            responseType = null;
+            unwrappedOriginalResponseType = (retType == null) ? retType2 : (retType.TypeArguments.Length != 0) ? retType.TypeArguments[0] : retType;
         }
 
         string GetDefaultValue(IParameterSymbol p)

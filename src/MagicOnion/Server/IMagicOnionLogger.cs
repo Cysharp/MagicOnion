@@ -15,7 +15,7 @@ namespace MagicOnion.Server
         void BeginInvokeMethod(ServiceContext context, byte[] request, Type type);
         void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
 
-        void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type);
+        void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type);
         void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
         void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
 
@@ -49,7 +49,7 @@ namespace MagicOnion.Server
         {
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
         }
 
@@ -120,9 +120,9 @@ namespace MagicOnion.Server
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length}");
 
         }
 
@@ -160,41 +160,41 @@ namespace MagicOnion.Server
 
         public void BeginInvokeMethod(ServiceContext context, byte[] request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method} size:{request.Length} {ToJson(request)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method} size:{request.Length} {ToJson(request, context.SerializerOptions)}");
         }
 
         public void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted)
         {
             var msg = isErrorOrInterrupted ? "error" : "";
-            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{response.Length} elapsed:{elapsed} {msg} {ToJson(response)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{response.Length} elapsed:{elapsed} {msg} {ToJson(response, context.SerializerOptions)}");
         }
 
         public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length} {ToJson(writeData)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length} {ToJson(writeData, context.SerializerOptions)}");
         }
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
             if (context.ServiceType == typeof(EmbeddedServices.MagicOnionEmbeddedHeartbeat)) return;
 
-            GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData, context.SerializerOptions)}");
         }
 
-        string ToJson(byte[] bytes)
+        string ToJson(byte[] bytes, MessagePackSerializerOptions serializerOptions)
         {
             if (bytes == null || bytes.Length == 0) return "";
             if (bytes.Length >= 5000) return "log is too large.";
 
-            return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
+            return "dump:" + MessagePackSerializer.ConvertToJson(bytes, serializerOptions);
         }
 
-        string ToJson(ArraySegment<byte> bytes)
+        string ToJson(ReadOnlyMemory<byte> bytes, MessagePackSerializerOptions serializerOptions)
         {
-            if (bytes == null || bytes.Count == 0) return "";
-            if (bytes.Count >= 5000) return "log is too large.";
+            if (bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
 
-            return "dump:" + LZ4MessagePackSerializer.ToJson(bytes);
+            return "dump:" + MessagePackSerializer.ConvertToJson(bytes, serializerOptions);
         }
 
         // enum.ToString is slow.
@@ -215,9 +215,9 @@ namespace MagicOnion.Server
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, context.SerializerOptions)}");
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
@@ -237,7 +237,7 @@ namespace MagicOnion.Server
     /// </summary>
     public class MagicOnionLogToGrpcLoggerWithNamedDataDump : IMagicOnionLogger
     {
-        readonly IFormatterResolver dumpResolver;
+        readonly MessagePackSerializerOptions dumpResolverOptions;
 
         public MagicOnionLogToGrpcLoggerWithNamedDataDump()
             : this(ContractlessFirstStandardResolver.Instance)
@@ -247,7 +247,7 @@ namespace MagicOnion.Server
 
         public MagicOnionLogToGrpcLoggerWithNamedDataDump(IFormatterResolver dumpResolver)
         {
-            this.dumpResolver = dumpResolver;
+            this.dumpResolverOptions = MessagePackSerializerOptions.Standard.WithResolver(dumpResolver);
         }
 
         public void BeginBuildServiceDefinition()
@@ -288,21 +288,21 @@ namespace MagicOnion.Server
             if (bytes == null || bytes.Length == 0) return "";
             if (bytes.Length >= 5000) return "log is too large.";
 
-            var reData = LZ4MessagePackSerializer.NonGeneric.Deserialize(type, bytes, context.FormatterResolver);
-            var reSerialized = MessagePackSerializer.NonGeneric.Serialize(type, reData, dumpResolver);
+            var reData = MessagePackSerializer.Deserialize(type, bytes, context.SerializerOptions);
+            var reSerialized = MessagePackSerializer.Serialize(type, reData, dumpResolverOptions);
 
-            return "dump:" + MessagePackSerializer.ToJson(reSerialized);
+            return "dump:" + MessagePackSerializer.ConvertToJson(reSerialized);
         }
 
-        string ToJson(ArraySegment<byte> bytes, Type type, IFormatterResolver resolver)
+        string ToJson(ReadOnlyMemory<byte> bytes, Type type, MessagePackSerializerOptions serializerOptions)
         {
-            if (bytes == null || bytes.Count == 0) return "";
-            if (bytes.Count >= 5000) return "log is too large.";
+            if (bytes.Length == 0) return "";
+            if (bytes.Length >= 5000) return "log is too large.";
 
-            var reData = LZ4MessagePackSerializer.NonGeneric.Deserialize(type, bytes, resolver);
-            var reSerialized = MessagePackSerializer.NonGeneric.Serialize(type, reData, dumpResolver);
+            var reData = MessagePackSerializer.Deserialize(type, bytes, serializerOptions);
+            var reSerialized = MessagePackSerializer.Serialize(type, reData, dumpResolverOptions);
 
-            return "dump:" + MessagePackSerializer.ToJson(reSerialized);
+            return "dump:" + MessagePackSerializer.ConvertToJson(reSerialized);
         }
 
         // enum.ToString is slow.
@@ -322,9 +322,9 @@ namespace MagicOnion.Server
                     return ((int)type).ToString();
             }
         }
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count} {ToJson(request, type, context.FormatterResolver)}");
+            GrpcEnvironment.Logger.Debug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, type, context.SerializerOptions)}");
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
@@ -343,7 +343,7 @@ namespace MagicOnion.Server
     {
         public static readonly IFormatterResolver Instance = new ContractlessFirstStandardResolver();
 
-        static readonly IFormatterResolver[] resolvers = new[]
+        static readonly IFormatterResolver[] resolvers = new IFormatterResolver[]
         {
             BuiltinResolver.Instance, // Try Builtin
             

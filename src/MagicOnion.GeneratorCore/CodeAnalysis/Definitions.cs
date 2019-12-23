@@ -156,13 +156,13 @@ namespace MagicOnion.CodeAnalysis
             }
             else if (Parameters.Length == 1)
             {
-                return $"LZ4MessagePackSerializer.Serialize({Parameters[0].ParameterName}, base.resolver)";
+                return $"MessagePackSerializer.Serialize({Parameters[0].ParameterName}, base.serializerOptions)";
             }
             else
             {
                 var typeArgs = string.Join(", ", Parameters.Select(x => x.TypeName));
                 var parameterNames = string.Join(", ", Parameters.Select(x => x.ParameterName));
-                return $"LZ4MessagePackSerializer.Serialize(new DynamicArgumentTuple<{typeArgs}>({parameterNames}), base.resolver)";
+                return $"MessagePackSerializer.Serialize(new DynamicArgumentTuple<{typeArgs}>({parameterNames}), base.serializerOptions)";
             }
         }
 
@@ -258,7 +258,7 @@ namespace MagicOnion.CodeAnalysis
 
             line2 = "receiver." + line2 + "; break;";
 
-            var line1 = $"var result = LZ4MessagePackSerializer.Deserialize<{parameterType}>(data, resolver);";
+            var line1 = $"var result = MessagePackSerializer.Deserialize<{parameterType}>(data, serializerOptions);";
             return (line1, line2);
         }
 
@@ -274,7 +274,7 @@ namespace MagicOnion.CodeAnalysis
                 type = UnwrappedOriginalResposneTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             }
 
-            var line1 = $"var result = LZ4MessagePackSerializer.Deserialize<{type}>(data, resolver);";
+            var line1 = $"var result = MessagePackSerializer.Deserialize<{type}>(data, serializerOptions);";
             var line2 = $"((TaskCompletionSource<{type}>)taskCompletionSource).TrySetResult(result);";
             return (line1, line2);
         }

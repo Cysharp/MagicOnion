@@ -7,12 +7,12 @@ namespace MagicOnion.Server
     public class MagicOnionOptions
     {
         /// <summary>
-        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default).
+        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).
         /// </summary>
-        public IFormatterResolver FormatterResolver { get; set; }
+        public MessagePackSerializerOptions SerializerOptions { get; set; }
 
         /// <summary>
-        /// If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false.
+        /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
         /// </summary>
         public bool IsReturnExceptionStackTraceInErrorDetail { get; set; }
 
@@ -52,13 +52,18 @@ namespace MagicOnion.Server
         public IServiceLocator ServiceLocator { get; set; }
 
         /// <summary>
+        /// MagicOnion Service instance activator.
+        /// </summary>
+        public IMagicOnionServiceActivator MagicOnionServiceActivator { get; set; }
+
+        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
         public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
-            this.FormatterResolver = MessagePackSerializer.DefaultResolver;
+            this.SerializerOptions = MessagePackSerializer.DefaultOptions;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
@@ -67,14 +72,7 @@ namespace MagicOnion.Server
             this.EnableCurrentContext = false;
 
             this.ServiceLocator = DefaultServiceLocator.Instance;
-        }
-
-        internal void RegisterOptionToServiceLocator()
-        {
-            // call from engine initialization.
-            this.ServiceLocator.Register<IFormatterResolver>(FormatterResolver);
-            this.ServiceLocator.Register<IMagicOnionLogger>(MagicOnionLogger);
-            this.ServiceLocator.Register<IGroupRepositoryFactory>(DefaultGroupRepositoryFactory);
+            this.MagicOnionServiceActivator = DefaultMagicOnionServiceActivator.Instance;
         }
     }
 }

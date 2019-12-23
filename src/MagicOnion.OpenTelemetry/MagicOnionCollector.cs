@@ -245,7 +245,7 @@ namespace MagicOnion.OpenTelemetry
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
             statsRecorder.NewMeasureMap().Put(StreamingHubRequestCount, 1).Record(CreateTag(context));
         }
@@ -281,7 +281,18 @@ namespace MagicOnion.OpenTelemetry
     /// <summary>
     /// Global filter. Handle Unary and most outside logging.
     /// </summary>
-    public class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    public class OpenTelemetryCollectorFilterAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public int Order { get; set; }
+
+        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+        }
+    }
+
+    internal class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
     {
         readonly ITracer tracer;
         readonly ISampler sampler;
@@ -334,7 +345,18 @@ namespace MagicOnion.OpenTelemetry
     /// <summary>
     /// StreamingHub Filter. Handle Streaming Hub logging.
     /// </summary>
-    public class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
+    public class OpenTelemetryHubCollectorFilterAttribute : Attribute, IMagicOnionFilterFactory<StreamingHubFilterAttribute>
+    {
+        public int Order { get; set; }
+
+        public StreamingHubFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+        }
+    }
+
+    internal class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
     {
         readonly ITracer tracer;
         readonly ISampler sampler;

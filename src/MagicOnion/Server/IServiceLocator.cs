@@ -5,16 +5,29 @@ using System.Reflection;
 
 namespace MagicOnion.Server
 {
+    /// <summary>
+    /// An interface of service locator for non-MagicOnion types.
+    /// <see cref="IServiceLocator"/> doesn't provide MagicOnion related types (<see cref="IService{TSelf}"/>, <see cref="IStreamingHub{TSelf,TReceiver}"/>, formatter, etc...).
+    /// </summary>
     public interface IServiceLocator
     {
         T GetService<T>();
-        void Register<T>(); // transient
-        void Register<T>(T singleton);
+
+        IServiceLocatorScope CreateScope();
     }
 
-    public class DefaultServiceLocator : IServiceLocator
+    public interface IServiceLocatorScope : IDisposable
     {
-        public static readonly IServiceLocator Instance = new DefaultServiceLocator();
+        IServiceLocator ServiceLocator { get; }
+    }
+
+    /// <summary>
+    /// Implements a simple ServiceLocator and provides registration mechanism.
+    /// <see cref="DefaultServiceLocator"/> doesn't support scoped-services. It always returns itself by <see cref="CreateScope"/>.
+    /// </summary>
+    public class DefaultServiceLocator : IServiceLocator, IServiceLocatorScope
+    {
+        public static DefaultServiceLocator Instance { get; } = new DefaultServiceLocator();
 
         DefaultServiceLocator()
         {
@@ -23,6 +36,12 @@ namespace MagicOnion.Server
 
         public T GetService<T>()
         {
+            var f = Cache<T>.cache;
+            if (f == null)
+            {
+                throw new InvalidOperationException("Singleton service cache is null. class:" + typeof(T).FullName);
+            }
+
             return Cache<T>.cache();
         }
 
@@ -42,9 +61,17 @@ namespace MagicOnion.Server
             Cache<T>.cache = factory;
         }
 
+        public IServiceLocatorScope CreateScope() => this;
+
+        IServiceLocator IServiceLocatorScope.ServiceLocator => this;
+
         static class Cache<T>
         {
             public static Func<T> cache;
+        }
+
+        public void Dispose()
+        {
         }
     }
 
@@ -61,7 +88,7 @@ namespace MagicOnion.Server
             where TServiceBase : ServiceBase<TServiceInterface>
             where TServiceInterface : IServiceMarker
         {
-            var instance = context.ServiceLocator.GetService<TServiceBase>();
+            var instance = context.ServiceActivator.Create<TServiceBase>(context.ServiceLocator);
             instance.Context = context;
             return instance;
         }

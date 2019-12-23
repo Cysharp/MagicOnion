@@ -92,9 +92,9 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write("()\r\n        {\r\n        }\r\n\r\n        public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            this.Write("(CallInvoker callInvoker, IFormatterResolver resolver, IClientFilter[] filters)\r\n" +
-                    "            : base(callInvoker, resolver, filters)\r\n        {\r\n        }\r\n\r\n    " +
-                    "    protected override MagicOnionClientBase<");
+            this.Write("(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClient" +
+                    "Filter[] filters)\r\n            : base(callInvoker, serializerOptions, filters)\r\n" +
+                    "        {\r\n        }\r\n\r\n        protected override MagicOnionClientBase<");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
             this.Write("> Clone()\r\n        {\r\n            var clone = new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
@@ -102,7 +102,7 @@ namespace MagicOnion.Generator
             clone.host = this.host;
             clone.option = this.option;
             clone.callInvoker = this.callInvoker;
-            clone.resolver = this.resolver;
+            clone.serializerOptions = this.serializerOptions;
             clone.filters = filters;
             return clone;
         }
@@ -188,7 +188,8 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             this.Write(">(__callResult, new MarshallingAsyncStreamReader<");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
-            this.Write(">(__callResult.ResponseStream, base.resolver), base.resolver));\r\n");
+            this.Write(">(__callResult.ResponseStream, base.serializerOptions), base.serializerOptions));" +
+                    "\r\n");
  } else if(item.MethodType ==MethodType.ClientStreaming) { 
             this.Write("            var __callResult = callInvoker.AsyncClientStreamingCall<byte[], byte[" +
                     "]>(");
@@ -200,7 +201,7 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             this.Write(">(__callResult, new MarshallingClientStreamWriter<");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
-            this.Write(">(__callResult.RequestStream, resolver), base.resolver));\r\n");
+            this.Write(">(__callResult.RequestStream, serializerOptions), base.serializerOptions));\r\n");
  } else if(item.MethodType ==MethodType.DuplexStreaming) { 
             this.Write("            var __callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[" +
                     "]>(");
@@ -212,9 +213,11 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
             this.Write(">(__callResult, new MarshallingClientStreamWriter<");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestType));
-            this.Write(">(__callResult.RequestStream, resolver), new MarshallingAsyncStreamReader<");
+            this.Write(">(__callResult.RequestStream, serializerOptions), new MarshallingAsyncStreamReade" +
+                    "r<");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ResponseType));
-            this.Write(">(__callResult.ResponseStream, base.resolver), base.resolver));\r\n");
+            this.Write(">(__callResult.ResponseStream, base.serializerOptions), base.serializerOptions));" +
+                    "\r\n");
  } 
             this.Write("        }\r\n");
  if(item.IsIfDebug) { 

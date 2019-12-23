@@ -10,44 +10,64 @@ namespace MagicOnion.Server
     public abstract class MagicOnionFilterDescriptor<TAttribute> : IMagicOnionFilterFactory<TAttribute>
         where TAttribute: class
     {
-        public Type Type { get; }
+        public IMagicOnionFilterFactory<TAttribute> Factory { get; }
         public TAttribute Instance { get; }
         public int Order { get; }
 
         protected MagicOnionFilterDescriptor(Type type, int order = 0)
         {
-            Type = type;
+            Factory = new MagicOnionFilterTypeFactory(type, order);
             Instance = null;
             Order = order;
         }
 
         protected MagicOnionFilterDescriptor(TAttribute instance, int order = 0)
         {
-            Type = null;
+            Factory = null;
             Instance = instance;
+            Order = order;
+        }
+
+        protected MagicOnionFilterDescriptor(IMagicOnionFilterFactory<TAttribute> factory, int order = 0)
+        {
+            Factory = factory;
+            Instance = null;
             Order = order;
         }
 
         public TAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return GetOrCreateInstance(serviceLocator);
-        }
-
-        protected TAttribute GetOrCreateInstance(IServiceLocator serviceLocator)
-        {
             if (Instance != null) return Instance;
 
-            var filterType = Type;
-            var ctors = filterType.GetConstructors();
-            var ctor = ctors.Select(x => (Ctor: x, Parameters: x.GetParameters()))
-                .OrderByDescending(x => x.Parameters.Length)
-                .First();
+            return Factory.CreateInstance(serviceLocator);
+        }
 
-            var @params = ctor.Parameters
-                .Select(x => serviceLocator.GetService(x.ParameterType))
-                .ToArray();
+        // Create a filter instance from specified type.
+        class MagicOnionFilterTypeFactory : IMagicOnionFilterFactory<TAttribute>
+        {
+            public Type Type { get; }
+            public int Order { get; }
 
-            return (TAttribute)Activator.CreateInstance(filterType, @params);
+            public MagicOnionFilterTypeFactory(Type type, int order)
+            {
+                Type = type;
+                Order = order;
+            }
+
+            public TAttribute CreateInstance(IServiceLocator serviceLocator)
+            {
+                var filterType = Type;
+                var ctors = filterType.GetConstructors();
+                var ctor = ctors.Select(x => (Ctor: x, Parameters: x.GetParameters()))
+                    .OrderByDescending(x => x.Parameters.Length)
+                    .First();
+
+                var @params = ctor.Parameters
+                    .Select(x => serviceLocator.GetService(x.ParameterType))
+                    .ToArray();
+
+                return (TAttribute)Activator.CreateInstance(filterType, @params);
+            }
         }
     }
 
@@ -60,6 +80,11 @@ namespace MagicOnion.Server
 
         public MagicOnionServiceFilterDescriptor(MagicOnionFilterAttribute instance, int order = 0)
             : base(instance, order)
+        {
+        }
+
+        public MagicOnionServiceFilterDescriptor(IMagicOnionFilterFactory<MagicOnionFilterAttribute> factory, int order = 0)
+            : base(factory, order)
         {
         }
     }
@@ -75,20 +100,15 @@ namespace MagicOnion.Server
             : base(instance, order)
         {
         }
+
+        public StreamingHubFilterDescriptor(IMagicOnionFilterFactory<StreamingHubFilterAttribute> factory, int order = 0)
+            : base(factory, order)
+        {
+        }
     }
 
     public static class MagicOnionFilterDescriptorExtensions
     {
-        /// <summary>
-        /// Adds the MagicOnion filter as type.
-        /// </summary>
-        /// <param name="descriptors"></param>
-        /// <param name="filterType"></param>
-        public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, Type filterType)
-        {
-            descriptors.Add(new MagicOnionServiceFilterDescriptor(filterType));
-        }
-
         /// <summary>
         /// Adds the MagicOnion filter as type.
         /// </summary>
@@ -112,6 +132,18 @@ namespace MagicOnion.Server
         }
 
         /// <summary>
+        /// Adds the MagicOnion filter as type.
+        /// </summary>
+        /// <param name="descriptors"></param>
+        /// <param name="factory"></param>
+        public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, IMagicOnionFilterFactory<MagicOnionFilterAttribute> factory)
+        {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+            descriptors.Add(new MagicOnionServiceFilterDescriptor(factory));
+        }
+
+        /// <summary>
         /// Adds the MagicOnion StreamingHub filter as type.
         /// </summary>
         /// <param name="descriptors"></param>
@@ -131,6 +163,18 @@ namespace MagicOnion.Server
             if (filterInstance == null) throw new ArgumentNullException(nameof(filterInstance));
 
             descriptors.Add(new StreamingHubFilterDescriptor(filterInstance));
+        }
+
+        /// <summary>
+        /// Adds the MagicOnion StreamingHub filter instance as singleton.
+        /// </summary>
+        /// <param name="descriptors"></param>
+        /// <param name="factory"></param>
+        public static void Add(this IList<StreamingHubFilterDescriptor> descriptors, IMagicOnionFilterFactory<StreamingHubFilterAttribute> factory)
+        {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+            descriptors.Add(new StreamingHubFilterDescriptor(factory));
         }
     }
 }

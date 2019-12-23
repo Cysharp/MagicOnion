@@ -109,7 +109,7 @@ namespace MagicOnion.HttpGateway
                     }
 
                     deserializedObject = typeArgs.Count == 1 ?
-                        args[0] : MagicOnionMarshallers.InsantiateDynamicArgumentTuple(typeArgs.ToArray(), args.ToArray());
+                        args[0] : MagicOnionMarshallers.InstantiateDynamicArgumentTuple(typeArgs.ToArray(), args.ToArray());
                 }
                 else
                 {

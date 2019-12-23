@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using MagicOnion.Server;
 
 namespace MagicOnion.Tests
 {
@@ -412,7 +413,18 @@ namespace MagicOnion.Tests
             context.Items["HubFilter1_BF"] = "AfterOK";
         }
     }
-
+    
+    [CollectionDefinition(nameof(MoreCheckHubTestCollectionServerFixture))]
+    public class MoreCheckHubTestCollectionServerFixture : ICollectionFixture<MoreCheckHubTestCollectionServerFixture.CustomServerFixture>
+    {
+        public class CustomServerFixture : ServerFixture
+        {
+            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            {
+                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(MoreCheckHub) }, options);
+            }
+        }
+    }
 
     public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
     {

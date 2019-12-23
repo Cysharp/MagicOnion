@@ -10,23 +10,23 @@ namespace MagicOnion.Server.Hubs
 {
     public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            return new ConcurrentDictionaryGroupRepository(serviceLocator.GetService<IFormatterResolver>(), serviceLocator.GetService<IMagicOnionLogger>());
+            return new ConcurrentDictionaryGroupRepository(serializerOptions, logger);
         }
     }
 
     public class ConcurrentDictionaryGroupRepository : IGroupRepository
     {
-        IFormatterResolver resolver;
+        MessagePackSerializerOptions serializerOptions;
         IMagicOnionLogger logger;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public ConcurrentDictionaryGroupRepository(IFormatterResolver resolver, IMagicOnionLogger logger)
+        public ConcurrentDictionaryGroupRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
         {
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.factory = CreateGroup;
             this.logger = logger;
         }
@@ -38,7 +38,7 @@ namespace MagicOnion.Server.Hubs
 
         IGroup CreateGroup(string groupName)
         {
-            return new ConcurrentDictionaryGroup(groupName, this, resolver, logger);
+            return new ConcurrentDictionaryGroup(groupName, this, serializerOptions, logger);
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -61,7 +61,7 @@ namespace MagicOnion.Server.Hubs
         readonly object gate = new object();
 
         readonly IGroupRepository parent;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions serializerOptions;
         readonly IMagicOnionLogger logger;
 
         ConcurrentDictionary<Guid, ServiceContext> members;
@@ -69,11 +69,11 @@ namespace MagicOnion.Server.Hubs
 
         public string GroupName { get; }
 
-        public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IFormatterResolver resolver, IMagicOnionLogger logger)
+        public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
         {
             this.GroupName = groupName;
             this.parent = parent;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.logger = logger;
             this.members = new ConcurrentDictionary<Guid, ServiceContext>();
         }
@@ -150,31 +150,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-                var writeCount = 0;
-                ValueTask promise;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    foreach (var item in members)
-                    {
-                        if (buffer.Length < index)
-                        {
-                            Array.Resize(ref buffer, buffer.Length * 2);
-                        }
-                        buffer[index++] = WriteInAsyncLock(item.Value, message);
-                        writeCount++;
-                    }
-
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -197,38 +173,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-                var writeCount = 0;
-                ValueTask promise;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    foreach (var item in members)
-                    {
-                        if (buffer.Length < index)
-                        {
-                            Array.Resize(ref buffer, buffer.Length * 2);
-                        }
-                        if (item.Value.ContextId == connectionId)
-                        {
-                            buffer[index++] = default(ValueTask);
-                        }
-                        else
-                        {
-                            buffer[index++] = WriteInAsyncLock(item.Value, message);
-                            writeCount++;
-                        }
-                    }
-
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -257,49 +202,26 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-                ValueTask promise;
-                var writeCount = 0;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    foreach (var item in members)
-                    {
-                        if (buffer.Length < index)
-                        {
-                            Array.Resize(ref buffer, buffer.Length * 2);
-                        }
-
-                        foreach (var item2 in connectionIds)
-                        {
-                            if (item.Value.ContextId == item2)
-                            {
-                                buffer[index++] = default(ValueTask);
-                                goto NEXT;
-                            }
-                        }
-                        buffer[index++] = WriteInAsyncLock(item.Value, message);
-                        writeCount++;
-
-                        NEXT:
-                        continue;
-                    }
-
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
         public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
         {
-            throw new NotImplementedException();
+            var message = BuildMessage(methodId, value);
+            if (fireAndForget)
+            {
+                if (members.TryGetValue(connectionId, out var context))
+                {
+                    WriteInAsyncLockVoid(context, message);
+                    logger.InvokeHubBroadcast(GroupName, message.Length, 1);
+                }
+                return TaskEx.CompletedTask;
+            }
+            else
+            {
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+            }
         }
 
         public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
@@ -321,34 +243,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(connectionIds.Length);
-                ValueTask promise;
-                var writeCount = 0;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    foreach (var item in connectionIds)
-                    {
-                        if (members.TryGetValue(item, out var context))
-                        {
-                            buffer[index++] = WriteInAsyncLock(context, message);
-                            writeCount++;
-                        }
-                        else
-                        {
-                            buffer[index++] = default(ValueTask);
-                        }
-                    }
-
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -393,58 +288,7 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(approximatelyLength);
-                var writeCount = 0;
-                ValueTask promise;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    if (exceptConnectionIds == null)
-                    {
-                        foreach (var item in members)
-                        {
-                            if (buffer.Length < index)
-                            {
-                                Array.Resize(ref buffer, buffer.Length * 2);
-                            }
-
-                            buffer[index++] = WriteInAsyncLock(item.Value, message);
-                            writeCount++;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var item in members)
-                        {
-                            if (buffer.Length < index)
-                            {
-                                Array.Resize(ref buffer, buffer.Length * 2);
-                            }
-
-                            foreach (var item2 in exceptConnectionIds)
-                            {
-                                if (item.Value.ContextId == item2)
-                                {
-                                    buffer[index++] = default(ValueTask);
-                                    goto NEXT;
-                                }
-                            }
-                            buffer[index++] = WriteInAsyncLock(item.Value, message);
-                            writeCount++;
-
-                            NEXT:
-                            continue;
-                        }
-                    }
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
@@ -476,53 +320,20 @@ namespace MagicOnion.Server.Hubs
             }
             else
             {
-                var rent = ArrayPool<ValueTask>.Shared.Rent(connectionIds.Length);
-                ValueTask promise;
-                var writeCount = 0;
-                try
-                {
-                    var buffer = rent;
-                    var index = 0;
-                    foreach (var item in connectionIds)
-                    {
-                        if (members.TryGetValue(item, out var context))
-                        {
-                            buffer[index++] = WriteInAsyncLock(context, message);
-                            writeCount++;
-                        }
-                        else
-                        {
-                            buffer[index++] = default(ValueTask);
-                        }
-                    }
-
-                    promise = ToPromise(buffer, index);
-                }
-                finally
-                {
-                    ArrayPool<ValueTask>.Shared.Return(rent, true);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return promise.AsTask();
+                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
             }
         }
 
         byte[] BuildMessage<T>(int methodId, T value)
         {
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            try
+            using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
             {
-                var offset = 0;
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-                offset += LZ4MessagePackSerializer.SerializeToBlock<T>(ref buffer, offset, value, resolver);
-                var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
-                return result;
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
+                var writer = new MessagePackWriter(buffer);
+                writer.WriteArrayHeader(2);
+                writer.WriteInt32(methodId);
+                MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
+                writer.Flush();
+                return buffer.WrittenSpan.ToArray();
             }
         }
 

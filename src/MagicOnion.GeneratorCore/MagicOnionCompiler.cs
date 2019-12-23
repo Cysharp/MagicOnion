@@ -1,47 +1,54 @@
-﻿using MagicOnion.CodeAnalysis;
-using MagicOnion.Generator;
-using MicroBatchFramework;
+﻿#pragma warning disable CS1998
+
+using MagicOnion.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis;
-using Mono.Options;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MagicOnion.Generator;
 
-namespace MagicOnion.CodeGenerator
+namespace MagicOnion
 {
-    public class Program : BatchBase
+    public class MagicOnionCompiler
     {
-        static async Task Main(string[] args)
+        private static readonly Encoding NoBomUtf8 = new UTF8Encoding(false);
+
+        private Action<string> logger;
+        private CancellationToken cancellationToken;
+
+        public MagicOnionCompiler(Action<string> logger, CancellationToken cancellationToken)
         {
-            await BatchHost.CreateDefaultBuilder().RunBatchEngineAsync<Program>(args);
+            this.logger = logger;
+            this.cancellationToken = cancellationToken;
         }
 
-        public void Run(
-            [Option("i", "Input path of analyze csproj.")]string input,
-            [Option("o", "Output path(file) or directory base(in separated mode).")]string output,
-            [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
-            [Option("n", "Conditional compiler symbol.")]string @namespace = "MagicOnion",
-            [Option("c", "Set namespace root name.")]string[] conditionalSymbol = null)
+        public async Task GenerateFileAsync(
+            string input,
+            string output,
+            bool unuseUnityAttr,
+            string @namespace,
+            string conditionalSymbol)
         {
             // Prepare args
-            conditionalSymbol = conditionalSymbol ?? new string[0];
+            var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
+            var conditionalSymbols = conditionalSymbol?.Split(',') ?? Array.Empty<string>();
 
             // Generator Start...
 
             var sw = Stopwatch.StartNew();
-            Console.WriteLine("Project Compilation Start:" + input);
+            logger("Project Compilation Start:" + input);
 
-            var collector = new MethodCollector(input, conditionalSymbol);
+            var collector = new MethodCollector(input, conditionalSymbols);
 
-            Console.WriteLine("Project Compilation Complete:" + sw.Elapsed.ToString());
-            Console.WriteLine();
+            logger("Project Compilation Complete:" + sw.Elapsed.ToString());
 
             sw.Restart();
-            Console.WriteLine("Method Collect Start");
+            logger("Method Collect Start");
 
             var definitions = collector.CollectServiceInterface();
             var hubDefinitions = collector.CollectHubInterface();
@@ -54,24 +61,24 @@ namespace MagicOnion.CodeGenerator
             enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().ToArray();
             genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().ToArray();
 
-            Console.WriteLine("Method Collect Complete:" + sw.Elapsed.ToString());
+            logger("Method Collect Complete:" + sw.Elapsed.ToString());
 
-            Console.WriteLine("Output Generation Start");
+            logger("Output Generation Start");
             sw.Restart();
 
             var enumTemplates = enumInfos.GroupBy(x => x.Namespace)
                 .OrderBy(x => x.Key)
                 .Select(x => new EnumTemplate()
                 {
-                    Namespace = @namespace + ".Formatters",
+                    Namespace = namespaceDot + ".Formatters",
                     enumSerializationInfos = x.ToArray()
                 })
                 .ToArray();
 
             var resolverTemplate = new ResolverTemplate()
             {
-                Namespace = @namespace + ".Resolvers",
-                FormatterNamespace = @namespace + ".Formatters",
+                Namespace = namespaceDot + ".Resolvers",
+                FormatterNamespace = namespaceDot + ".Formatters",
                 ResolverName = "MagicOnionResolver",
                 registerInfos = genericInfos.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enumInfos.OrderBy(x => x.FullName)).ToArray()
             };
@@ -98,7 +105,7 @@ namespace MagicOnion.CodeGenerator
 
             var registerTemplate = new RegisterTemplate
             {
-                Namespace = @namespace,
+                Namespace = namespaceDot,
                 Interfaces = definitions.Where(x => x.IsServiceDefinition).ToArray(),
                 HubInterfaces = hubDefinitions,
                 UnuseUnityAttribute = unuseUnityAttr
@@ -125,8 +132,7 @@ namespace MagicOnion.CodeGenerator
 
             Output(output, sb.ToString());
 
-            Console.WriteLine("String Generation Complete:" + sw.Elapsed.ToString());
-            Console.WriteLine();
+            logger("String Generation Complete:" + sw.Elapsed.ToString());
         }
 
         static void Output(string path, string text)
@@ -142,7 +148,7 @@ namespace MagicOnion.CodeGenerator
                 fi.Directory.Create();
             }
 
-            System.IO.File.WriteAllText(path, text, Encoding.UTF8);
+            System.IO.File.WriteAllText(path, text, NoBomUtf8);
         }
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
@@ -219,6 +225,8 @@ namespace MagicOnion.CodeGenerator
 
             foreach (var method in definitions.SelectMany(x => x.Methods))
             {
+                if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
+
                 var namedResponse = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
 
                 if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)

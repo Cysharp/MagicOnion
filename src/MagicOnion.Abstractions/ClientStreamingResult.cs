@@ -18,7 +18,7 @@ namespace MagicOnion
         internal readonly bool hasRawValue;
         readonly AsyncClientStreamingCall<byte[], byte[]> inner;
         readonly IClientStreamWriter<TRequest> requestStream;
-        readonly IFormatterResolver resolver;
+        readonly MessagePackSerializerOptions serializerOptions;
 
         public ClientStreamingResult(TResponse rawValue)
         {
@@ -26,22 +26,22 @@ namespace MagicOnion
             this.rawValue = rawValue;
             this.inner = null;
             this.requestStream = null;
-            this.resolver = null;
+            this.serializerOptions = null;
         }
 
-        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, IFormatterResolver resolver)
+        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, MessagePackSerializerOptions serializerOptions)
         {
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
             this.inner = inner;
             this.requestStream = requestStream;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
         }
 
         async Task<TResponse> Deserialize()
         {
             var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-            return LZ4MessagePackSerializer.Deserialize<TResponse>(bytes, resolver);
+            return MessagePackSerializer.Deserialize<TResponse>(bytes, serializerOptions);
         }
 
         /// <summary>

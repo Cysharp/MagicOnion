@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.0.1" />
+        <PackageReference Include="System.CodeDom" Version="4.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Update="Generator\CodeTemplate.tt">
+        <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+        <LastGenOutput>CodeTemplate.cs</LastGenOutput>
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+      </None>
+      <None Update="Generator\EnumTemplate.tt">
+        <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+        <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+      </None>
+      <None Update="Generator\HubTemplate.tt">
+        <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+        <LastGenOutput>HubTemplate.cs</LastGenOutput>
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+      </None>
+      <None Update="Generator\RegisterTemplate.tt">
+        <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+        <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+      </None>
+      <None Update="Generator\ResolverTemplate.tt">
+        <CustomToolNamespace>MagicOnion.Generator</CustomToolNamespace>
+        <LastGenOutput>ResolverTemplate.cs</LastGenOutput>
+        <Generator>TextTemplatingFilePreprocessor</Generator>
+      </None>
+    </ItemGroup>
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Generator\CodeTemplate.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CodeTemplate.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Generator\EnumTemplate.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>EnumTemplate.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Generator\HubTemplate.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>HubTemplate.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Generator\RegisterTemplate.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>RegisterTemplate.tt</DependentUpon>
+      </Compile>
+      <Compile Update="Generator\ResolverTemplate.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ResolverTemplate.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+</Project>

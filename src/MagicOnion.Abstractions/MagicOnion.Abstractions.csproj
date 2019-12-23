@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.25.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.7" />
+    <PackageReference Include="MessagePack" Version="2.0.323" />
   </ItemGroup>
 
    <!-- Copy files for unity MagicOnion -->
