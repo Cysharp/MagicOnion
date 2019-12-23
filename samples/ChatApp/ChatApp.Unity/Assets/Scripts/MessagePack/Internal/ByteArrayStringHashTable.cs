@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -10,10 +14,11 @@ namespace MessagePack.Internal
     // and specialized for internal use(nongenerics, TValue is int)
 
     // internal, but code generator requires this class
+    // or at least PerfBenchmarkDotNet
     public class ByteArrayStringHashTable : IEnumerable<KeyValuePair<string, int>>
     {
-        readonly Entry[][] buckets; // immutable array(faster than linkedlist)
-        readonly ulong indexFor;
+        private readonly Entry[][] buckets; // immutable array(faster than linkedlist)
+        private readonly ulong indexFor;
 
         public ByteArrayStringHashTable(int capacity)
             : this(capacity, 0.42f) // default: 0.75f -> 0.42f
@@ -24,12 +29,12 @@ namespace MessagePack.Internal
         {
             var tableSize = CalculateCapacity(capacity, loadFactor);
             this.buckets = new Entry[tableSize][];
-            this.indexFor = (ulong)buckets.Length - 1;
+            this.indexFor = (ulong)this.buckets.Length - 1;
         }
 
         public void Add(string key, int value)
         {
-            if (!TryAddInternal(Encoding.UTF8.GetBytes(key), value))
+            if (!this.TryAddInternal(Encoding.UTF8.GetBytes(key), value))
             {
                 throw new ArgumentException("Key was already exists. Key:" + key);
             }
@@ -37,29 +42,29 @@ namespace MessagePack.Internal
 
         public void Add(byte[] key, int value)
         {
-            if (!TryAddInternal(key, value))
+            if (!this.TryAddInternal(key, value))
             {
                 throw new ArgumentException("Key was already exists. Key:" + key);
             }
         }
 
-        bool TryAddInternal(byte[] key, int value)
+        private bool TryAddInternal(byte[] key, int value)
         {
-            var h = ByteArrayGetHashCode(key, 0, key.Length);
+            var h = ByteArrayGetHashCode(key);
             var entry = new Entry { Key = key, Value = value };
 
-            var array = buckets[h & (indexFor)];
+            Entry[] array = this.buckets[h & this.indexFor];
             if (array == null)
             {
-                buckets[h & (indexFor)] = new[] { entry };
+                this.buckets[h & this.indexFor] = new[] { entry };
             }
             else
             {
                 // check duplicate
                 for (int i = 0; i < array.Length; i++)
                 {
-                    var e = array[i].Key;
-                    if (ByteArrayComparer.Equals(key, 0, key.Length, e))
+                    byte[] e = array[i].Key;
+                    if (key.AsSpan().SequenceEqual(e))
                     {
                         return false;
                     }
@@ -69,95 +74,70 @@ namespace MessagePack.Internal
                 Array.Copy(array, newArray, array.Length);
                 array = newArray;
                 array[array.Length - 1] = entry;
-                buckets[h & (indexFor)] = array;
+                this.buckets[h & this.indexFor] = array;
             }
 
             return true;
         }
 
-        public bool TryGetValue(ArraySegment<byte> key, out int value)
+        public bool TryGetValue(in ReadOnlySequence<byte> key, out int value) => this.TryGetValue(CodeGenHelpers.GetSpanFromSequence(key), out value);
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public bool TryGetValue(ReadOnlySpan<byte> key, out int value)
         {
-            var table = buckets;
-            var hash = ByteArrayGetHashCode(key.Array, key.Offset, key.Count);
-            var entry = table[hash & indexFor];
+            Entry[][] table = this.buckets;
+            var hash = ByteArrayGetHashCode(key);
+            Entry[] entry = table[hash & this.indexFor];
 
-            if (entry == null) goto NOT_FOUND;
-
+            if (entry == null)
             {
-#if NETSTANDARD
-                ref var v = ref entry[0];
-#else
-                var v = entry[0];
-#endif
-                if (ByteArrayComparer.Equals(key.Array, key.Offset, key.Count, v.Key))
-                {
-                    value = v.Value;
-                    return true;
-                }
+                value = default(int);
+                return false;
             }
 
+            ref Entry v = ref entry[0];
+            if (key.SequenceEqual(v.Key))
+            {
+                value = v.Value;
+                return true;
+            }
+
+            return TryGetValueSlow(key, entry, out value);
+        }
+
+        private bool TryGetValueSlow(ReadOnlySpan<byte> key, Entry[] entry, out int value)
+        {
             for (int i = 1; i < entry.Length; i++)
             {
-#if NETSTANDARD
-                ref var v = ref entry[i];
-#else
-                var v = entry[i];
-#endif
-                if (ByteArrayComparer.Equals(key.Array, key.Offset, key.Count, v.Key))
+                ref Entry v = ref entry[i];
+                if (key.SequenceEqual(v.Key))
                 {
                     value = v.Value;
                     return true;
                 }
             }
 
-            NOT_FOUND:
             value = default(int);
             return false;
         }
 
-#if NETSTANDARD
-        static readonly bool Is32Bit = (IntPtr.Size == 4);
-#endif
+        private static readonly bool Is32Bit = IntPtr.Size == 4;
 
-#if NETSTANDARD
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
-        static ulong ByteArrayGetHashCode(byte[] x, int offset, int count)
+        private static ulong ByteArrayGetHashCode(ReadOnlySpan<byte> x)
         {
-#if NETSTANDARD
             // FarmHash https://github.com/google/farmhash
-            if (x == null) return 0;
-
             if (Is32Bit)
             {
-                return (ulong)FarmHash.Hash32(x, offset, count);
+                return (ulong)FarmHash.Hash32(x);
             }
             else
             {
-                return FarmHash.Hash64(x, offset, count);
+                return FarmHash.Hash64(x);
             }
-
-#else
-
-            // FNV1-1a 32bit https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-            uint hash = 0;
-            if (x != null)
-            {
-                var max = offset + count;
-
-                hash = 2166136261;
-                for (int i = offset; i < max; i++)
-                {
-                    hash = unchecked((x[i] ^ hash) * 16777619);
-                }
-            }
-
-            return (ulong)hash;
-
-#endif
         }
 
-        static int CalculateCapacity(int collectionSize, float loadFactor)
+        private static int CalculateCapacity(int collectionSize, float loadFactor)
         {
             var initialCapacity = (int)(((float)collectionSize) / loadFactor);
             var capacity = 1;
@@ -177,12 +157,16 @@ namespace MessagePack.Internal
         // only for Debug use
         public IEnumerator<KeyValuePair<string, int>> GetEnumerator()
         {
-            var b = this.buckets;
+            Entry[][] b = this.buckets;
 
-            foreach (var item in b)
+            foreach (Entry[] item in b)
             {
-                if (item == null) continue;
-                foreach (var item2 in item)
+                if (item == null)
+                {
+                    continue;
+                }
+
+                foreach (Entry item2 in item)
                 {
                     yield return new KeyValuePair<string, int>(Encoding.UTF8.GetString(item2.Key), item2.Value);
                 }
@@ -191,10 +175,10 @@ namespace MessagePack.Internal
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
 
-        struct Entry
+        private struct Entry
         {
             public byte[] Key;
             public int Value;
@@ -202,7 +186,7 @@ namespace MessagePack.Internal
             // for debugging
             public override string ToString()
             {
-                return "(" + Encoding.UTF8.GetString(Key) + ", " + Value + ")";
+                return "(" + Encoding.UTF8.GetString(this.Key) + ", " + this.Value + ")";
             }
         }
     }

@@ -19,7 +19,7 @@ namespace MagicOnion
         internal readonly TResponse rawValue; // internal
         internal readonly Task<TResponse> rawTaskValue; // internal
 
-        readonly Task<ResponseContext<TResponse>> response;
+        readonly Task<IResponseContext<TResponse>> response;
 
         public UnaryResult(TResponse rawValue)
         {
@@ -37,7 +37,7 @@ namespace MagicOnion
             this.response = null;
         }
 
-        public UnaryResult(Task<ResponseContext<TResponse>> response)
+        public UnaryResult(Task<IResponseContext<TResponse>> response)
         {
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
@@ -102,7 +102,7 @@ namespace MagicOnion
             }
         }
 
-        ResponseContext<TResponse> TryUnwrap()
+        IResponseContext<TResponse> TryUnwrap()
         {
             if (!response.IsCompleted)
             {
