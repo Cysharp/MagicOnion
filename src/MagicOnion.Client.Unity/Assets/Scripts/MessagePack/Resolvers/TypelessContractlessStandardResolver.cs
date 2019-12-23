@@ -1,17 +1,35 @@
-﻿#if NETSTANDARD
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if !UNITY_2018_3_OR_NEWER
+using System;
+using System.Collections.Generic;
 using MessagePack.Formatters;
+using MessagePack.Internal;
 
 namespace MessagePack.Resolvers
 {
     /// <summary>
-    /// Embed c# type names for `object` typed fields/collection items
-    /// Preserve c# DateTime timezone
+    /// Embeds the full name of .NET types for <see cref="object"/> typed fields/collection items
+    /// Preserves .NET <see cref="DateTime"/> timezone.
     /// </summary>
     public sealed class TypelessContractlessStandardResolver : IFormatterResolver
     {
-        public static readonly IFormatterResolver Instance = new TypelessContractlessStandardResolver();
+        /// <summary>
+        /// The singleton instance that can be used.
+        /// </summary>
+        public static readonly TypelessContractlessStandardResolver Instance;
 
-        static readonly IFormatterResolver[] resolvers = new[]
+        /// <summary>
+        /// A <see cref="MessagePackSerializerOptions"/> instance with this formatter pre-configured.
+        /// </summary>
+        public static readonly MessagePackSerializerOptions Options;
+
+        /// <summary>
+        /// A *private* list of resolvers. If we ever want to expose any of these (so the user can adjust settings, etc.)
+        /// then we must make this an instance collection instead of a static collection so that each consumer can have their own settings.
+        /// </summary>
+        private static readonly IReadOnlyList<IFormatterResolver> Resolvers = new IFormatterResolver[]
         {
             NativeDateTimeResolver.Instance, // Native c# DateTime format, preserving timezone
             BuiltinResolver.Instance, // Try Builtin
@@ -22,36 +40,44 @@ namespace MessagePack.Resolvers
             DynamicUnionResolver.Instance, // Try Union(Interface)
             DynamicObjectResolver.Instance, // Try Object
 #endif
-            DynamicContractlessObjectResolver.Instance, // Serializes keys as strings
-            TypelessObjectResolver.Instance
+            DynamicContractlessObjectResolverAllowPrivate.Instance, // Serializes keys as strings
+            TypelessObjectResolver.Instance,
         };
 
-        TypelessContractlessStandardResolver()
+        static TypelessContractlessStandardResolver()
         {
+            Instance = new TypelessContractlessStandardResolver();
+            Options = new MessagePackSerializerOptions(Instance);
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
-        {
-            return FormatterCache<T>.formatter;
-        }
+        private readonly ResolverCache resolverCache = new ResolverCache(Resolvers);
 
-        static class FormatterCache<T>
-        {
-            public static readonly IMessagePackFormatter<T> formatter;
+        public IMessagePackFormatter<T> GetFormatter<T>() => this.resolverCache.GetFormatter<T>();
 
-            static FormatterCache()
+        private class ResolverCache : CachingFormatterResolver
+        {
+            private readonly IReadOnlyList<IFormatterResolver> resolvers;
+
+            internal ResolverCache(IReadOnlyList<IFormatterResolver> resolvers)
             {
-                foreach (var item in resolvers)
+                this.resolvers = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
+            }
+
+            protected override IMessagePackFormatter<T> GetFormatterCore<T>()
+            {
+                foreach (IFormatterResolver item in this.resolvers)
                 {
-                    var f = item.GetFormatter<T>();
+                    IMessagePackFormatter<T> f = item.GetFormatter<T>();
                     if (f != null)
                     {
-                        formatter = f;
-                        return;
+                        return f;
                     }
                 }
+
+                return null;
             }
         }
     }
 }
+
 #endif

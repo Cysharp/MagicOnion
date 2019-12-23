@@ -1,4 +1,6 @@
-﻿using RuntimeUnitTestToolkit;
+﻿#if FALSE
+
+using RuntimeUnitTestToolkit;
 using UnityEngine;
 using System.Collections;
 using SharedLibrary;
@@ -79,3 +81,5 @@ namespace MagicOnion.Tests
         }
     }
 }
+
+#endif

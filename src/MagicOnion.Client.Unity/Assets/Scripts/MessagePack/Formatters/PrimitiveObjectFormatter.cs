@@ -1,6 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MessagePack.Formatters
 {
@@ -8,7 +12,7 @@ namespace MessagePack.Formatters
     {
         public static readonly IMessagePackFormatter<object> Instance = new PrimitiveObjectFormatter();
 
-        static readonly Dictionary<Type, int> typeToJumpCode = new Dictionary<Type, int>()
+        private static readonly Dictionary<Type, int> TypeToJumpCode = new Dictionary<Type, int>()
         {
             { typeof(Boolean), 0 },
             { typeof(Char), 1 },
@@ -19,227 +23,296 @@ namespace MessagePack.Formatters
             { typeof(Int32), 6 },
             { typeof(UInt32), 7 },
             { typeof(Int64), 8 },
-            { typeof(UInt64),9  },
+            { typeof(UInt64), 9 },
             { typeof(Single), 10 },
             { typeof(Double), 11 },
             { typeof(DateTime), 12 },
             { typeof(string), 13 },
-            { typeof(byte[]), 14 }
+            { typeof(byte[]), 14 },
         };
 
-        PrimitiveObjectFormatter()
+        private PrimitiveObjectFormatter()
         {
-
         }
 
-#if !UNITY_WSA
+#if !UNITY_2018_3_OR_NEWER
 
         public static bool IsSupportedType(Type type, TypeInfo typeInfo, object value)
         {
-            if (value == null) return true;
-            if (typeToJumpCode.ContainsKey(type)) return true;
-            if (typeInfo.IsEnum) return true;
+            if (value == null)
+            {
+                return true;
+            }
 
-            if (value is System.Collections.IDictionary) return true;
-            if (value is System.Collections.ICollection) return true;
+            if (TypeToJumpCode.ContainsKey(type))
+            {
+                return true;
+            }
+
+            if (typeInfo.IsEnum)
+            {
+                return true;
+            }
+
+            if (value is System.Collections.IDictionary)
+            {
+                return true;
+            }
+
+            if (value is System.Collections.ICollection)
+            {
+                return true;
+            }
 
             return false;
         }
 
 #endif
 
-        public int Serialize(ref byte[] bytes, int offset, object value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, object value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                writer.WriteNil();
+                return;
             }
 
-            var t = value.GetType();
+            Type t = value.GetType();
 
             int code;
-            if (typeToJumpCode.TryGetValue(t, out code))
+            if (TypeToJumpCode.TryGetValue(t, out code))
             {
                 switch (code)
                 {
                     case 0:
-                        return MessagePackBinary.WriteBoolean(ref bytes, offset, (bool)value);
+                        writer.Write((bool)value);
+                        return;
                     case 1:
-                        return MessagePackBinary.WriteChar(ref bytes, offset, (char)value);
+                        writer.Write((char)value);
+                        return;
                     case 2:
-                        return MessagePackBinary.WriteSByteForceSByteBlock(ref bytes, offset, (sbyte)value);
+                        writer.WriteInt8((sbyte)value);
+                        return;
                     case 3:
-                        return MessagePackBinary.WriteByteForceByteBlock(ref bytes, offset, (byte)value);
+                        writer.WriteUInt8((byte)value);
+                        return;
                     case 4:
-                        return MessagePackBinary.WriteInt16ForceInt16Block(ref bytes, offset, (Int16)value);
+                        writer.WriteInt16((Int16)value);
+                        return;
                     case 5:
-                        return MessagePackBinary.WriteUInt16ForceUInt16Block(ref bytes, offset, (UInt16)value);
+                        writer.WriteUInt16((UInt16)value);
+                        return;
                     case 6:
-                        return MessagePackBinary.WriteInt32ForceInt32Block(ref bytes, offset, (Int32)value);
+                        writer.WriteInt32((Int32)value);
+                        return;
                     case 7:
-                        return MessagePackBinary.WriteUInt32ForceUInt32Block(ref bytes, offset, (UInt32)value);
+                        writer.WriteUInt32((UInt32)value);
+                        return;
                     case 8:
-                        return MessagePackBinary.WriteInt64ForceInt64Block(ref bytes, offset, (Int64)value);
+                        writer.WriteInt64((Int64)value);
+                        return;
                     case 9:
-                        return MessagePackBinary.WriteUInt64ForceUInt64Block(ref bytes, offset, (UInt64)value);
+                        writer.WriteUInt64((UInt64)value);
+                        return;
                     case 10:
-                        return MessagePackBinary.WriteSingle(ref bytes, offset, (Single)value);
+                        writer.Write((Single)value);
+                        return;
                     case 11:
-                        return MessagePackBinary.WriteDouble(ref bytes, offset, (double)value);
+                        writer.Write((double)value);
+                        return;
                     case 12:
-                        return MessagePackBinary.WriteDateTime(ref bytes, offset, (DateTime)value);
+                        writer.Write((DateTime)value);
+                        return;
                     case 13:
-                        return MessagePackBinary.WriteString(ref bytes, offset, (string)value);
+                        writer.Write((string)value);
+                        return;
                     case 14:
-                        return MessagePackBinary.WriteBytes(ref bytes, offset, (byte[])value);
+                        writer.Write((byte[])value);
+                        return;
                     default:
-                        throw new InvalidOperationException("Not supported primitive object resolver. type:" + t.Name);
+                        throw new MessagePackSerializationException("Not supported primitive object resolver. type:" + t.Name);
                 }
             }
             else
             {
-#if UNITY_WSA && !NETFX_CORE
+#if UNITY_2018_3_OR_NEWER && !NETFX_CORE
                 if (t.IsEnum)
 #else
                 if (t.GetTypeInfo().IsEnum)
 #endif
                 {
-                    var underlyingType = Enum.GetUnderlyingType(t);
-                    var code2 = typeToJumpCode[underlyingType];
+                    Type underlyingType = Enum.GetUnderlyingType(t);
+                    var code2 = TypeToJumpCode[underlyingType];
                     switch (code2)
                     {
                         case 2:
-                            return MessagePackBinary.WriteSByteForceSByteBlock(ref bytes, offset, (sbyte)value);
+                            writer.WriteInt8((sbyte)value);
+                            return;
                         case 3:
-                            return MessagePackBinary.WriteByteForceByteBlock(ref bytes, offset, (byte)value);
+                            writer.WriteUInt8((byte)value);
+                            return;
                         case 4:
-                            return MessagePackBinary.WriteInt16ForceInt16Block(ref bytes, offset, (Int16)value);
+                            writer.WriteInt16((Int16)value);
+                            return;
                         case 5:
-                            return MessagePackBinary.WriteUInt16ForceUInt16Block(ref bytes, offset, (UInt16)value);
+                            writer.WriteUInt16((UInt16)value);
+                            return;
                         case 6:
-                            return MessagePackBinary.WriteInt32ForceInt32Block(ref bytes, offset, (Int32)value);
+                            writer.WriteInt32((Int32)value);
+                            return;
                         case 7:
-                            return MessagePackBinary.WriteUInt32ForceUInt32Block(ref bytes, offset, (UInt32)value);
+                            writer.WriteUInt32((UInt32)value);
+                            return;
                         case 8:
-                            return MessagePackBinary.WriteInt64ForceInt64Block(ref bytes, offset, (Int64)value);
+                            writer.WriteInt64((Int64)value);
+                            return;
                         case 9:
-                            return MessagePackBinary.WriteUInt64ForceUInt64Block(ref bytes, offset, (UInt64)value);
+                            writer.WriteUInt64((UInt64)value);
+                            return;
                         default:
                             break;
                     }
                 }
-                else if (value is System.Collections.IDictionary) // check IDictionary first
+                else if (value is System.Collections.IDictionary)
                 {
+                    // check IDictionary first
                     var d = value as System.Collections.IDictionary;
-                    var startOffset = offset;
-                    offset += MessagePackBinary.WriteMapHeader(ref bytes, offset, d.Count);
+                    writer.WriteMapHeader(d.Count);
                     foreach (System.Collections.DictionaryEntry item in d)
                     {
-                        offset += Serialize(ref bytes, offset, item.Key, formatterResolver);
-                        offset += Serialize(ref bytes, offset, item.Value, formatterResolver);
+                        this.Serialize(ref writer, item.Key, options);
+                        this.Serialize(ref writer, item.Value, options);
                     }
-                    return offset - startOffset;
+
+                    return;
                 }
                 else if (value is System.Collections.ICollection)
                 {
                     var c = value as System.Collections.ICollection;
-                    var startOffset = offset;
-                    offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, c.Count);
+                    writer.WriteArrayHeader(c.Count);
                     foreach (var item in c)
                     {
-                        offset += Serialize(ref bytes, offset, item, formatterResolver);
+                        this.Serialize(ref writer, item, options);
                     }
-                    return offset - startOffset;
+
+                    return;
                 }
             }
 
-            throw new InvalidOperationException("Not supported primitive object resolver. type:" + t.Name);
+            throw new MessagePackSerializationException("Not supported primitive object resolver. type:" + t.Name);
         }
 
-        public object Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public object Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            var type = MessagePackBinary.GetMessagePackType(bytes, offset);
+            MessagePackType type = reader.NextMessagePackType;
+            IFormatterResolver resolver = options.Resolver;
             switch (type)
             {
                 case MessagePackType.Integer:
-                    var code = bytes[offset];
-                    if (MessagePackCode.MinNegativeFixInt <= code && code <= MessagePackCode.MaxNegativeFixInt) return MessagePackBinary.ReadSByte(bytes, offset, out readSize);
-                    else if (MessagePackCode.MinFixInt <= code && code <= MessagePackCode.MaxFixInt) return MessagePackBinary.ReadByte(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.Int8) return MessagePackBinary.ReadSByte(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.Int16) return MessagePackBinary.ReadInt16(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.Int32) return MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.Int64) return MessagePackBinary.ReadInt64(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.UInt8) return MessagePackBinary.ReadByte(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.UInt16) return MessagePackBinary.ReadUInt16(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.UInt32) return MessagePackBinary.ReadUInt32(bytes, offset, out readSize);
-                    else if (code == MessagePackCode.UInt64) return MessagePackBinary.ReadUInt64(bytes, offset, out readSize);
-                    throw new InvalidOperationException("Invalid primitive bytes.");
-                case MessagePackType.Boolean:
-                    return MessagePackBinary.ReadBoolean(bytes, offset, out readSize);
-                case MessagePackType.Float:
-                    if (MessagePackCode.Float32 == bytes[offset])
+                    var code = reader.NextCode;
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
                     {
-                        return MessagePackBinary.ReadSingle(bytes, offset, out readSize);
+                        return reader.ReadSByte();
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return reader.ReadByte();
+                    }
+                    else if (code == MessagePackCode.Int8)
+                    {
+                        return reader.ReadSByte();
+                    }
+                    else if (code == MessagePackCode.Int16)
+                    {
+                        return reader.ReadInt16();
+                    }
+                    else if (code == MessagePackCode.Int32)
+                    {
+                        return reader.ReadInt32();
+                    }
+                    else if (code == MessagePackCode.Int64)
+                    {
+                        return reader.ReadInt64();
+                    }
+                    else if (code == MessagePackCode.UInt8)
+                    {
+                        return reader.ReadByte();
+                    }
+                    else if (code == MessagePackCode.UInt16)
+                    {
+                        return reader.ReadUInt16();
+                    }
+                    else if (code == MessagePackCode.UInt32)
+                    {
+                        return reader.ReadUInt32();
+                    }
+                    else if (code == MessagePackCode.UInt64)
+                    {
+                        return reader.ReadUInt64();
+                    }
+
+                    throw new MessagePackSerializationException("Invalid primitive bytes.");
+                case MessagePackType.Boolean:
+                    return reader.ReadBoolean();
+                case MessagePackType.Float:
+                    if (reader.NextCode == MessagePackCode.Float32)
+                    {
+                        return reader.ReadSingle();
                     }
                     else
                     {
-                        return MessagePackBinary.ReadDouble(bytes, offset, out readSize);
+                        return reader.ReadDouble();
                     }
+
                 case MessagePackType.String:
-                    return MessagePackBinary.ReadString(bytes, offset, out readSize);
+                    return reader.ReadString();
                 case MessagePackType.Binary:
-                    return MessagePackBinary.ReadBytes(bytes, offset, out readSize);
+                    return reader.ReadBytes();
                 case MessagePackType.Extension:
-                    var ext = MessagePackBinary.ReadExtensionFormatHeader(bytes, offset, out readSize);
+                    ExtensionHeader ext = reader.ReadExtensionFormatHeader();
                     if (ext.TypeCode == ReservedMessagePackExtensionTypeCode.DateTime)
                     {
-                        return MessagePackBinary.ReadDateTime(bytes, offset, out readSize);
+                        return reader.ReadDateTime(ext);
                     }
-                    throw new InvalidOperationException("Invalid primitive bytes.");
+
+                    throw new MessagePackSerializationException("Invalid primitive bytes.");
                 case MessagePackType.Array:
                     {
-                        var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                        var startOffset = offset;
-                        offset += readSize;
+                        var length = reader.ReadArrayHeader();
 
-                        var objectFormatter = formatterResolver.GetFormatter<object>();
+                        IMessagePackFormatter<object> objectFormatter = resolver.GetFormatter<object>();
                         var array = new object[length];
                         for (int i = 0; i < length; i++)
                         {
-                            array[i] = objectFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                            offset += readSize;
+                            array[i] = objectFormatter.Deserialize(ref reader, options);
                         }
 
-                        readSize = offset - startOffset;
                         return array;
                     }
+
                 case MessagePackType.Map:
                     {
-                        var length = MessagePackBinary.ReadMapHeader(bytes, offset, out readSize);
-                        var startOffset = offset;
-                        offset += readSize;
+                        var length = reader.ReadMapHeader();
 
-                        var objectFormatter = formatterResolver.GetFormatter<object>();
+                        IMessagePackFormatter<object> objectFormatter = resolver.GetFormatter<object>();
                         var hash = new Dictionary<object, object>(length);
                         for (int i = 0; i < length; i++)
                         {
-                            var key = objectFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                            offset += readSize;
+                            var key = objectFormatter.Deserialize(ref reader, options);
 
-                            var value = objectFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                            offset += readSize;
+                            var value = objectFormatter.Deserialize(ref reader, options);
 
                             hash.Add(key, value);
                         }
 
-                        readSize = offset - startOffset;
                         return hash;
                     }
+
                 case MessagePackType.Nil:
-                    readSize = 1;
+                    reader.ReadNil();
                     return null;
                 default:
-                    throw new InvalidOperationException("Invalid primitive bytes.");
+                    throw new MessagePackSerializationException("Invalid primitive bytes.");
             }
         }
     }
