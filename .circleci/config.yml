@@ -4,7 +4,7 @@ orbs:
 executors:
   dotnet:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
       NUGET_XMLDOC_MODE: skip
@@ -48,6 +48,7 @@ jobs:
     steps:
       - git-shallow-clone/checkout_shallow
       - run: dotnet build ./src/MagicOnion/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
       - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
@@ -61,6 +62,7 @@ jobs:
       - git-shallow-clone/checkout_shallow
       # build .NET Core projects
       - run: dotnet build ./src/MagicOnion/ -c Release -p:Version=${CIRCLE_TAG}
+      - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:Version=${CIRCLE_TAG}
@@ -70,6 +72,7 @@ jobs:
       # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
       # pack nuget
       - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
+      - run: dotnet pack ./src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
@@ -86,6 +89,7 @@ jobs:
       #       - ./moc.zip
       # push to NuGet Server
       - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
+      - run: dotnet nuget push ./src/MagicOnion.Abstractions/bin/Release/MagicOnion.Abstractions.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
@@ -99,6 +103,7 @@ jobs:
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build .NET Core projects
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
@@ -108,6 +113,7 @@ jobs:
       # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
       # pack nuget
       - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
@@ -124,6 +130,7 @@ jobs:
       - run: echo "export NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED=true" >> $BASH_ENV
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
       - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Abstractions/bin/Release/MagicOnion.Abstractions.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./src/MagicOnion.Hosting/bin/Release/MagicOnion.Hosting.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./src/MagicOnion.HttpGateway/bin/Release/MagicOnion.HttpGateway.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
