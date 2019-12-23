@@ -1,0 +1,9 @@
+﻿<Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <PropertyGroup>
+    <TaskFolder>netstandard2.0</TaskFolder>
+    <TaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(TaskFolder)\MagicOnion.MSBuild.Tasks.dll</TaskAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="MagicOnion.MSBuild.Tasks.MagicOnionGenerator" AssemblyFile="$(TaskAssembly)" />
+</Project>
