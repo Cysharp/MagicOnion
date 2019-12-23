@@ -354,6 +354,7 @@ namespace MagicOnion.Server.Hubs
                 writer.WriteArrayHeader(2);
                 writer.WriteInt32(methodId);
                 MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
+                writer.Flush();
                 return buffer.WrittenSpan.ToArray();
             }
         }

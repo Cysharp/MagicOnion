@@ -88,9 +88,9 @@ namespace DynamicCodeDumper
             //var _ = DynamicBroadcasterBuilder<IMessageReceiver>.BroadcasterType;
             //var a = MagicOnion.Server.Hubs.AssemblyHolder.Save();
 
-            var _ = DynamicClientBuilder<ISimpleTestService>.ClientType;
-            var c = MagicOnion.Client.DynamicClientAssemblyHolder.Save();
-            Verify(c);
+            //var _ = DynamicClientBuilder<ISimpleTestService>.ClientType;
+            //var c = MagicOnion.Client.DynamicClientAssemblyHolder.Save();
+            //Verify(c);
             //Channel c = default;
             //var _ = MagicOnionClient.Create<ITestService>(channel: c);
 

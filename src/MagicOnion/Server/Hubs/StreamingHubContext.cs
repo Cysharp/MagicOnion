@@ -62,6 +62,7 @@ namespace MagicOnion.Server.Hubs
                     writer.Write(MessageId);
                     writer.Write(MethodId);
                     writer.WriteNil();
+                    writer.Flush();
                     return buffer.WrittenSpan.ToArray();
                 }
             }
