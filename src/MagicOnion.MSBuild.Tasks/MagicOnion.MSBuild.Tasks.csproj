@@ -10,15 +10,8 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <!-- NuGet Info -->
         <PackageId>MagicOnion.MSBuild.Tasks</PackageId>
-        <IsPackable>true</IsPackable>
-        <Authors>Cysharp</Authors>
-        <Copyright>Cysharp</Copyright>
         <Title>MagicOnion CodeGenerator Tasks</Title>
         <Description>MSBuild Tasks of MagicOnion.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>gRPC, HTTP2</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

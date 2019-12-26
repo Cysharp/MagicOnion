@@ -5,6 +5,14 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>NON_UNITY</DefineConstants>
+
+    <PackageId>MagicOnion.Abstractions</PackageId>
+    <Description>MagicOnion interfaces and abstractions for server and client.
+Commonly used types:
+MagicOnion.IService&lt;TSelf&gt;
+MagicOnion.IStreamingHub&lt;TSelf, TReceiver&gt;
+MagicOnion.UnaryResult&lt;TResult&gt;
+MagicOnion.IgnoreAttribute</Description>
   </PropertyGroup>
 
   <ItemGroup>

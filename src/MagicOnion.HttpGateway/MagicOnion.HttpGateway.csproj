@@ -15,15 +15,7 @@
 
         <!-- NuGet -->
         <PackageId>MagicOnion.HttpGateway</PackageId>
-        <PackageVersion>$(Version)</PackageVersion>
-        <Authors>Cysharp</Authors>
-        <Copyright>Cysharp</Copyright>
         <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>gRPC, HTTP2</PackageTags>
-
     </PropertyGroup>
 
     <Choose>
