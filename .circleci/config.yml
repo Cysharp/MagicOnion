@@ -242,6 +242,9 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - store_artifacts:
+          path: MagicOnion.Client.Unity.unitypackage
+          destination: MagicOnion.Client.Unity.unitypackage
 
 workflows:
   version: 2
