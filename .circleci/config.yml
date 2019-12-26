@@ -82,9 +82,9 @@ jobs:
       - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       # publish moc
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
        - run: apt update && apt install zip -y
        - run: zip -r moc.zip ./src/MagicOnion.Generator/bin/moc
        - persist_to_workspace:
@@ -229,9 +229,9 @@ jobs:
       - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       # publish moc
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
-       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
        - run: apt update && apt install zip -y
        - run: zip -r moc.zip ./src/MagicOnion.Generator/bin/moc
        - store_artifacts:
