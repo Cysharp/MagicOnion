@@ -53,6 +53,7 @@ namespace Sandbox.Hosting
                             options.Service.GlobalFilters.Add<MyFilterAttribute>();
                             options.Service.GlobalFilters.Add<MyFilter2Attribute>();
                             options.Service.GlobalFilters.Add<MyFilter3Attribute>();
+                            options.Service.GlobalFilters.Add<MyFilter4Attribute>();
 
                             // options.ServerPorts = new[]{ new MagicOnionHostingServerPortOptions(){ Port = 12345, Host = "0.0.0.0", UseInsecureConnection = true } };
                         }
@@ -223,6 +224,24 @@ namespace Sandbox.Hosting
     public class MyFilter3Attribute : MagicOnionFilterAttribute
     {
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => await next(context);
+    }
+
+    public class MyFilter4Attribute : IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        {
+            return new FilterImpl();
+        }
+
+        public int Order { get; }
+
+        class FilterImpl : MagicOnionFilterAttribute
+        {
+            public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            {
+                return next(context);
+            }
+        }
     }
 
     public interface IMyService : IService<IMyService>

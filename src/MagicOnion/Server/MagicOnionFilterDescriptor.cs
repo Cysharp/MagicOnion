@@ -114,9 +114,24 @@ namespace MagicOnion.Server
         /// </summary>
         /// <param name="descriptors"></param>
         public static void Add<T>(this IList<MagicOnionServiceFilterDescriptor> descriptors)
-            where T : MagicOnionFilterAttribute
         {
-            descriptors.Add(new MagicOnionServiceFilterDescriptor(typeof(T)));
+            if (typeof(IMagicOnionFilterFactory<MagicOnionFilterAttribute>).IsAssignableFrom(typeof(T)))
+            {
+                var ctor = typeof(T).GetConstructors().SingleOrDefault(x => x.GetParameters().Length == 0);
+                if (ctor == null)
+                {
+                    throw new InvalidOperationException($"Type '{typeof(T).FullName}' has no parameter-less constructor. You can also use `Add(instance)` overload method.");
+                }
+                descriptors.Add(new MagicOnionServiceFilterDescriptor((IMagicOnionFilterFactory<MagicOnionFilterAttribute>)Activator.CreateInstance<T>()));
+            }
+            else if (typeof(MagicOnionFilterAttribute).IsAssignableFrom(typeof(T)))
+            {
+                descriptors.Add(new MagicOnionServiceFilterDescriptor(typeof(T)));
+            }
+            else
+            {
+                throw new InvalidOperationException($"Type '{typeof(T).FullName}' is not compatible with MagicOnionFilterAttribute or IMagicOnionFilterFactory<MagicOnionFilterAttribute>");
+            }
         }
 
         /// <summary>
@@ -148,9 +163,24 @@ namespace MagicOnion.Server
         /// </summary>
         /// <param name="descriptors"></param>
         public static void Add<T>(this IList<StreamingHubFilterDescriptor> descriptors)
-            where T : StreamingHubFilterAttribute
         {
-            descriptors.Add(new StreamingHubFilterDescriptor(typeof(T)));
+            if (typeof(IMagicOnionFilterFactory<StreamingHubFilterAttribute>).IsAssignableFrom(typeof(T)))
+            {
+                var ctor = typeof(T).GetConstructors().SingleOrDefault(x => x.GetParameters().Length == 0);
+                if (ctor == null)
+                {
+                    throw new InvalidOperationException($"Type '{typeof(T).FullName}' has no parameter-less constructor. You can also use `Add(instance)` overload method.");
+                }
+                descriptors.Add(new StreamingHubFilterDescriptor((IMagicOnionFilterFactory<StreamingHubFilterAttribute>)Activator.CreateInstance<T>()));
+            }
+            else if (typeof(StreamingHubFilterAttribute).IsAssignableFrom(typeof(T)))
+            {
+                descriptors.Add(new StreamingHubFilterDescriptor(typeof(T)));
+            }
+            else
+            {
+                throw new InvalidOperationException($"Type '{typeof(T).FullName}' is not compatible with StreamingHubFilterAttribute or IMagicOnionFilterFactory<StreamingHubFilterAttribute>");
+            }
         }
 
         /// <summary>
