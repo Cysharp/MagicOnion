@@ -749,11 +749,11 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 ## Server and Clients
 
 ### Unity client Supports
-You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` and `mpc.zip`(MessagePackCompiler) from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
+You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
 
-MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version. Allow unsafe Code and add `ENABLE_UNSAFE_MSGPACK`, you can use `UnsafeDirectBlitResolver` to extremely fast serialization.
+MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version.
 
-Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application.
+Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application but it requires [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download).
 
 ```
 moc arguments help:
@@ -765,7 +765,45 @@ moc arguments help:
   -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
 ```
 
-Please try it to run iOS/Android etc.
+You also need MessagePack-CSharp code generation, please see [MessagePack-CSharp AOT Code Generation (to support Unity/Xamarin)
+](https://github.com/neuecc/MessagePack-CSharp#aot-code-generation-to-support-unityxamarin) section.
+
+Other than download moc.zip, you can install `MagicOnion.Generator` as .NET Core Tools or use `MagicOnion.MSBuild.Tasks` to prebuild hook.
+
+[.NET Core Global Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) is easiest way to use moc directly.
+
+```
+dotnet tool install --global MagicOnion.Generator
+```
+
+```
+dotnet moc -h
+```
+
+`MagicOnion.MSBuild.Tasks` is easy way of generate code that target to shared project. We're mostly recommended to use this way. For example, PostCompile sample.
+
+```csharp
+// in Shared.csproj
+<Target Name="GenerateMessagePack" AfterTargets="Compile">
+    <MessagePackGenerator Input="$(ProjectPath)" Output="..\UnityClient\Assets\Scripts\Generated\MessagePack.Generated.cs" />
+</Target>
+<Target Name="GenerateMagicOnion" AfterTargets="Compile">
+    <MagicOnionGenerator Input="$(ProjectPath)" Output="..\UnityClient\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
+</Target>
+ ```
+
+Full options are below.
+
+```xml
+<MagicOnionGenerator
+    Input="string:required"
+    Output="string:required"
+    ConditionalSymbol="string:optional"
+    ResolverName="string:optional"
+    Namespace="string:optional"
+    UnuseUnityAttr="bool:optional"
+/>
+```
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
