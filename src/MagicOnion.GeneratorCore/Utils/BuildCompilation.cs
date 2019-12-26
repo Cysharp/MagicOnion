@@ -225,39 +225,107 @@ namespace MagicOnion.GeneratorCore.Utils
                 }
 
                 // resolve NuGet reference
-                foreach (var item in document.Descendants("PackageReference"))
+                var nugetPackagesPath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+                if (nugetPackagesPath == null)
                 {
-                    var nugetPackagesPath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
-                    if (nugetPackagesPath == null)
+                    // Try default
+                    // Windows: %userprofile%\.nuget\packages
+                    // Mac/Linux: ~/.nuget/packages
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        // Try default
-                        // Windows: %userprofile%\.nuget\packages
-                        // Mac/Linux: ~/.nuget/packages
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        nugetPackagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages");
+                    }
+                    else
+                    {
+                        nugetPackagesPath = "~/.nuget/packages";
+                    }
+                }
+
+                var solvedDllPaths = new HashSet<string>();
+                void CollectNugetPackages(string id, string packageVersion, string originalTargetFramework)
+                {
+                    foreach (var targetFramework in NetstandardFallBack(originalTargetFramework).Distinct())
+                    {
+                        var pathpath = Path.Combine(nugetPackagesPath, id, packageVersion, "lib", targetFramework);
+                        if (!Directory.Exists(pathpath))
                         {
-                            nugetPackagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".nuget\packages");
+                            pathpath = pathpath.ToLower(); // try all lower.
                         }
-                        else
+
+                        if (Directory.Exists(pathpath))
                         {
-                            nugetPackagesPath = "~/.nuget/packages";
+                            if (solvedDllPaths.Add(pathpath))
+                            {
+                                foreach (var dependency in SolveNuGetDependency(nugetPackagesPath, id, packageVersion, targetFramework))
+                                {
+                                    CollectNugetPackages(dependency.id, dependency.version, originalTargetFramework);
+                                }
+                            }
+                            break;
                         }
                     }
+                }
 
-                    var targetFramework = document.Descendants("TargetFramework").FirstOrDefault()?.Value ?? document.Descendants("TargetFrameworks").First().Value.Split(';').First();
+                foreach (var item in document.Descendants("PackageReference"))
+                {
+                    var originalTargetFramework = document.Descendants("TargetFramework").FirstOrDefault()?.Value ?? document.Descendants("TargetFrameworks").First().Value.Split(';').First();
                     var includePath = item.Attribute("Include").Value.Trim().ToLower(); // maybe lower
                     var packageVersion = item.Attribute("Version").Value.Trim();
 
-                    var pathpath = Path.Combine(nugetPackagesPath, includePath, packageVersion, "lib", targetFramework);
-                    if (!Directory.Exists(pathpath))
-                    {
-                        pathpath = pathpath.ToLower(); // try all lower.
-                    }
+                    CollectNugetPackages(includePath, packageVersion, originalTargetFramework);
+                }
 
-                    if (Directory.Exists(pathpath))
+                foreach (var item in solvedDllPaths)
+                {
+                    foreach (var dllPath in Directory.GetFiles(item, "*.dll"))
                     {
-                        foreach (var dllPath in Directory.GetFiles(pathpath, "*.dll"))
+                        metadataLocations.Add(Path.GetFullPath(dllPath));
+                    }
+                }
+            }
+        }
+
+        static IEnumerable<string> NetstandardFallBack(string originalTargetFramework)
+        {
+            yield return originalTargetFramework;
+            yield return "netstandard2.1";
+            yield return "netstandard2.0";
+            yield return "netstandard1.6";
+        }
+
+        static IEnumerable<(string id, string version)> SolveNuGetDependency(string nugetPackagesPath, string includePath, string packageVersion, string targetFramework)
+        {
+            var dirPath = Path.Combine(nugetPackagesPath, includePath, packageVersion);
+            if (!Directory.Exists(dirPath))
+            {
+                dirPath = dirPath.ToLower(); // try all lower.
+            }
+
+            var filePath = Path.Combine(dirPath, includePath.ToLower() + ".nuspec");
+            if (File.Exists(filePath))
+            {
+                XDocument document;
+                using (var sr = new StreamReader(filePath, true))
+                {
+                    var reader = new XmlTextReader(sr);
+                    reader.Namespaces = false;
+
+                    document = XDocument.Load(reader, LoadOptions.None);
+                }
+
+                foreach (var item in document.Descendants().Where(x => x.Name == "dependencies"))
+                {
+                    foreach (var tf in NetstandardFallBack(targetFramework))
+                    {
+                        foreach (var item2 in item.Elements().Where(x => x.Name == "group" && x.Attributes().Any(a => a.Name == "targetFramework" && (a.Value?.Trim('.')?.Equals(tf, StringComparison.OrdinalIgnoreCase) ?? false))))
                         {
-                            metadataLocations.Add(Path.GetFullPath(dllPath));
+                            foreach (var item3 in item2.Descendants().Where(x => x.Name == "dependency"))
+                            {
+                                yield return (item3.Attribute("id").Value, item3.Attribute("version").Value);
+                            }
+
+                            // found, stop search.
+                            yield break;
                         }
                     }
                 }

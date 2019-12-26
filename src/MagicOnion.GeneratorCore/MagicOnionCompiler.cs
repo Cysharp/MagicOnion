@@ -43,7 +43,7 @@ namespace MagicOnion
             var sw = Stopwatch.StartNew();
             logger("Project Compilation Start:" + input);
 
-            var collector = new MethodCollector(input, conditionalSymbols);
+            var collector = new MethodCollector(input, conditionalSymbols, logger);
 
             logger("Project Compilation Complete:" + sw.Elapsed.ToString());
 

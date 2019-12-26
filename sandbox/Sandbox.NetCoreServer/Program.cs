@@ -49,7 +49,7 @@ namespace Sandbox.NetCoreServer
                 //MagicOnionLogger = new MagicOnionLogToGrpcLogger(),
                 MagicOnionLogger = new MagicOnionLogToGrpcLoggerWithNamedDataDump(),
                 EnableCurrentContext = true,
-                DisableEmbeddedService = true,
+                // DisableEmbeddedService = true,
             };
 
 

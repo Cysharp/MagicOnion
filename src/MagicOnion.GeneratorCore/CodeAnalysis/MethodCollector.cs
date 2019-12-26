@@ -26,20 +26,45 @@ namespace MagicOnion.CodeAnalysis
         public readonly INamedTypeSymbol IStreamingHub;
         public readonly INamedTypeSymbol MethodIdAttribute;
 
-        public ReferenceSymbols(Compilation compilation)
+        public ReferenceSymbols(Compilation compilation, Action<string> logger)
         {
             Void = compilation.GetTypeByMetadataName("System.Void");
+            if (Void == null)
+            {
+                logger("failed to get metadata of System.Void.");
+            }
+
             TaskOfT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+            if (TaskOfT == null)
+            {
+                logger("failed to get metadata of System.Threading.Tasks.Task`1.");
+            }
+
             Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-            UnaryResult = compilation.GetTypeByMetadataName("MagicOnion.UnaryResult`1");
-            ClientStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ClientStreamingResult`2");
-            DuplexStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.DuplexStreamingResult`2");
-            ServerStreamingResult = compilation.GetTypeByMetadataName("MagicOnion.ServerStreamingResult`1");
-            IStreamingHubMarker = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHubMarker");
-            IServiceMarker = compilation.GetTypeByMetadataName("MagicOnion.IServiceMarker");
-            IStreamingHub = compilation.GetTypeByMetadataName("MagicOnion.IStreamingHub`2");
-            IService = compilation.GetTypeByMetadataName("MagicOnion.IService`1");
-            MethodIdAttribute = compilation.GetTypeByMetadataName("MagicOnion.Server.Hubs.MethodIdAttribute");
+            if (Task == null)
+            {
+                logger("failed to get metadata of System.Threading.Tasks.Task.");
+            }
+
+            INamedTypeSymbol GetTypeSymbolOrThrow(string name)
+            {
+                var symbol = compilation.GetTypeByMetadataName(name);
+                if (symbol == null)
+                {
+                    throw new InvalidOperationException("failed to get metadata of " + name);
+                }
+                return symbol;
+            }
+
+            UnaryResult = GetTypeSymbolOrThrow("MagicOnion.UnaryResult`1");
+            ClientStreamingResult = GetTypeSymbolOrThrow("MagicOnion.ClientStreamingResult`2");
+            DuplexStreamingResult = GetTypeSymbolOrThrow("MagicOnion.DuplexStreamingResult`2");
+            ServerStreamingResult = GetTypeSymbolOrThrow("MagicOnion.ServerStreamingResult`1");
+            IStreamingHubMarker = GetTypeSymbolOrThrow("MagicOnion.IStreamingHubMarker");
+            IServiceMarker = GetTypeSymbolOrThrow("MagicOnion.IServiceMarker");
+            IStreamingHub = GetTypeSymbolOrThrow("MagicOnion.IStreamingHub`2");
+            IService = GetTypeSymbolOrThrow("MagicOnion.IService`1");
+            MethodIdAttribute = GetTypeSymbolOrThrow("MagicOnion.Server.Hubs.MethodIdAttribute");
 
             Global = this;
         }
@@ -60,11 +85,11 @@ namespace MagicOnion.CodeAnalysis
         readonly INamedTypeSymbol[] hubInterfaces;
         readonly ReferenceSymbols typeReferences;
 
-        public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols)
+        public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols, Action<string> logger)
         {
             this.csProjPath = csProjPath;
             var compilation = BuildCompilation.CreateFromProjectAsync(new[] { csProjPath }, conditinalSymbols.ToArray(), CancellationToken.None).GetAwaiter().GetResult();
-            this.typeReferences = new ReferenceSymbols(compilation);
+            this.typeReferences = new ReferenceSymbols(compilation, logger);
 
             var bothInterfaces = compilation.GetNamedTypeSymbols()
                 .Where(x => x.TypeKind == TypeKind.Interface)
