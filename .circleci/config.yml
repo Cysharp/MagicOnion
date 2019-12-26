@@ -68,6 +68,7 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:Version=${CIRCLE_TAG}
+      - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:Version=${CIRCLE_TAG}
       # tests
       # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
       # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
@@ -78,17 +79,18 @@ jobs:
       - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.OpenTelemetry/MagicOnion.OpenTelemetry.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
-      - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.OpenTelemetry.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
+      - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
+      - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       # publish moc
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r win-x64 -o ./bin/moc/win-x64
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r linux-x64 -o ./bin/moc/linux-x64
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r osx-x64 -o ./bin/moc/osx-x64
-      # - run: apt update && apt install zip -y
-      # - run: zip -r moc.zip ./src/MagicOnion.UniversalCodeGenerator/bin/moc
-      # - persist_to_workspace:
-      #     root: .
-      #     paths:
-      #       - ./moc.zip
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
+       - run: apt update && apt install zip -y
+       - run: zip -r moc.zip ./src/MagicOnion.Generator/bin/moc
+       - persist_to_workspace:
+           root: .
+           paths:
+             - ./moc.zip
       # push to NuGet Server
       - run: dotnet nuget push ./src/MagicOnion/bin/Release/MagicOnion.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.Abstractions/bin/Release/MagicOnion.Abstractions.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
@@ -97,6 +99,7 @@ jobs:
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
       - run: dotnet nuget push ./src/MagicOnion.MSBuild.Tasks/bin/Release/MagicOnion.MSBuild.Tasks.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
+      - run: dotnet nuget push ./src/MagicOnion.Generator/bin/Release/MagicOnion.Generator.${CIRCLE_TAG}.nupkg -s https://www.nuget.org/api/v2/package -k ${NUGET_KEY}
 
   # upload to github by ghr
   upload-github:
@@ -212,6 +215,7 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       # tests
       # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
       # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
@@ -223,14 +227,15 @@ jobs:
       - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.OpenTelemetry/MagicOnion.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION}
       # publish moc
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r win-x64 -o ./bin/moc/win-x64
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r linux-x64 -o ./bin/moc/linux-x64
-      # - run: dotnet publish ./src/MagicOnion.UniversalCodeGenerator/ -c Release --self-contained -r osx-x64 -o ./bin/moc/osx-x64
-      # - run: apt update && apt install zip -y
-      # - run: zip -r moc.zip ./src/MagicOnion.UniversalCodeGenerator/bin/moc
-      # - store_artifacts:
-      #     path: ./moc.zip
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./bin/moc/win-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./bin/moc/linux-x64
+       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true,PublishTrimmed=true,IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./bin/moc/osx-x64
+       - run: apt update && apt install zip -y
+       - run: zip -r moc.zip ./src/MagicOnion.Generator/bin/moc
+       - store_artifacts:
+           path: ./moc.zip
 
       # push to NuGet Server
       - run: echo "export NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED=true" >> $BASH_ENV
@@ -242,6 +247,7 @@ jobs:
       - run: dotnet nuget push ./src/MagicOnion.Redis/bin/Release/MagicOnion.Redis.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./src/MagicOnion.OpenTelemetry/bin/Release/MagicOnion.OpenTelemetry.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./src/MagicOnion.MSBuild.Tasks/bin/Release/MagicOnion.MSBuild.Tasks.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./src/MagicOnion.Generator/bin/Release/MagicOnion.Generator.*.nupkg -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
 
   canary-push:
     executor: dotnet
