@@ -10,17 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" LinkBase="LinkFromUnity" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MagicOnion.Hosting" Version="3.0.0" />
-    <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="3.0.0" PrivateAssets="All" />
-    <PackageReference Include="MessagePack.MSBuild.Tasks" Version="2.0.323" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="LinkFromUnity\" />
+    <ProjectReference Include="..\ChatApp.Shared\ChatApp.Shared.csproj" />
   </ItemGroup>
 
   <!-- FOR SSL/TLS SUPPORT -->
@@ -32,11 +26,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Target Name="GenerateMessagePack" AfterTargets="Compile">
-    <MessagePackGenerator Input=".\ChatApp.Server.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MessagePack.Generated.cs" />
-  </Target>
-  <Target Name="GenerateMagicOnion" AfterTargets="Compile">
-    <MagicOnionGenerator Input="..\ChatApp.Unity\Assembly-CSharp.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
-  </Target>
 </Project>
