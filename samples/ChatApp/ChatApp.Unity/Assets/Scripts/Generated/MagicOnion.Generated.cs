@@ -189,21 +189,21 @@ namespace ChatApp.Shared.Services {
    
         static ResponseContext _GenerateException(RequestContext __context)
         {
-            return CreateResponseContext<string, global::MessagePack.Nil>(__context, GenerateExceptionMethod);
+            return CreateResponseContext<string, Nil>(__context, GenerateExceptionMethod);
         }
 
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GenerateException(string message)
+        public global::MagicOnion.UnaryResult<Nil> GenerateException(string message)
         {
-            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/GenerateException", message, GenerateExceptionDelegate);
+            return InvokeAsync<string, Nil>("IChatService/GenerateException", message, GenerateExceptionDelegate);
         }
         static ResponseContext _SendReportAsync(RequestContext __context)
         {
-            return CreateResponseContext<string, global::MessagePack.Nil>(__context, SendReportAsyncMethod);
+            return CreateResponseContext<string, Nil>(__context, SendReportAsyncMethod);
         }
 
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> SendReportAsync(string message)
+        public global::MagicOnion.UnaryResult<Nil> SendReportAsync(string message)
         {
-            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/SendReportAsync", message, SendReportAsyncDelegate);
+            return InvokeAsync<string, Nil>("IChatService/SendReportAsync", message, SendReportAsyncDelegate);
         }
     }
 }
