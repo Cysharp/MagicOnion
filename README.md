@@ -756,13 +756,12 @@ MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Uni
 Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application but it requires [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download).
 
 ```
-moc arguments help:
-  -i, --input=VALUE          [required]Input path of analyze csproj
-  -o, --output=VALUE         [required]Output path(file) or directory base(in separated mode)
-  -u, --unuseunityattr       [optional, default=false]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer
-  -c, --conditionalsymbol=VALUE [optional, default=empty]conditional compiler symbol
-  -n, --namespace=VALUE      [optional, default=MagicOnion]Set namespace root name
-  -a, asyncsuffix      [optional, default=false]Use methodName to async suffix
+argument list:
+-i, -input: Input path of analyze csproj or directory.
+-o, -output: Output path(file) or directory base(in separated mode).
+-u, -unuseUnityAttr: [default=False]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.
+-n, -namespace: [default=MagicOnion]Set namespace root name.
+-c, -conditionalSymbol: [default=null]Conditional compiler symbols, split with ','.
 ```
 
 You also need MessagePack-CSharp code generation, please see [MessagePack-CSharp AOT Code Generation (to support Unity/Xamarin)
