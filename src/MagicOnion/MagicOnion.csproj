@@ -17,14 +17,7 @@
 
         <!-- NuGet -->
         <PackageId>MagicOnion</PackageId>
-        <PackageVersion>$(Version)</PackageVersion>
-        <Authors>Cysharp</Authors>
-        <Copyright>Cysharp</Copyright>
         <Description>Unified Realtime/API Engine for .NET Core and Unity.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>gRPC, HTTP2</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net471'">

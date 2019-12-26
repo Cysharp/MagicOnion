@@ -10,14 +10,7 @@
 
         <!-- NuGet Info -->
         <PackageId>MagicOnion.Generator</PackageId>
-        <PackageVersion>$(Version)</PackageVersion>
-        <Authors>Cysharp</Authors>
-        <Copyright>Cysharp</Copyright>
         <Description>MagicOnion standalone code generator.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>gRPC, HTTP2</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

@@ -15,18 +15,11 @@
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>1701;1702;1705;1591</NoWarn>
         <DefineConstants>NON_UNITY</DefineConstants>
-        <Company>Cysharp</Company>
 
         <!-- NuGet -->
         <PackageId>MagicOnion.OpenTelemetry</PackageId>
-        <PackageVersion>$(Version)</PackageVersion>
-        <Authors>Cysharp</Authors>
-        <Copyright>Cysharp</Copyright>
         <Description>Telemetry Extensions of MagicOnion.</Description>
-        <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
-        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>gRPC, HTTP2, OpenTelemetry</PackageTags>
+        <PackageTags>$(PackageTags);OpenTelemetry</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

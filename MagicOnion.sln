@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-2
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.circleci\config.yml = .circleci\config.yml
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -46,11 +47,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.Hosting", "sandbox\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Abstractions", "src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj", "{2AD48C05-ED44-4E4F-B86B-A746E7F968A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Generator", "src\MagicOnion.Generator\MagicOnion.Generator.csproj", "{963FD601-3CE6-42DE-9FAC-C70D5494FA9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Generator", "src\MagicOnion.Generator\MagicOnion.Generator.csproj", "{963FD601-3CE6-42DE-9FAC-C70D5494FA9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.GeneratorCore", "src\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj", "{EE768243-100A-4075-8823-C49EA086680A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.GeneratorCore", "src\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj", "{EE768243-100A-4075-8823-C49EA086680A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.MSBuild.Tasks", "src\MagicOnion.MSBuild.Tasks\MagicOnion.MSBuild.Tasks.csproj", "{56C42B86-138C-413B-805A-30D07566660A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.MSBuild.Tasks", "src\MagicOnion.MSBuild.Tasks\MagicOnion.MSBuild.Tasks.csproj", "{56C42B86-138C-413B-805A-30D07566660A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{42EBB7E4-52D7-4E57-80AD-79FDD4900E13}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,5 +4,16 @@
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <VersionPrefix>3.0.0</VersionPrefix>
+
+    <!-- NuGet Packaging -->
+    <PackageVersion>$(Version)</PackageVersion>
+    <Company>Cysharp</Company>
+    <Authors>Cysharp</Authors>
+    <Copyright>© Cysharp, Inc.</Copyright>
+    <PackageTags>magiconion;grpc;http2</PackageTags>
+    <PackageProjectUrl>https://github.com/Cysharp/MagicOnion</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 </Project>
