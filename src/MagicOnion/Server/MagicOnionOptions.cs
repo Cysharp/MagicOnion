@@ -22,11 +22,6 @@ namespace MagicOnion.Server
         public IMagicOnionLogger MagicOnionLogger { get; set; }
 
         /// <summary>
-        /// Disable embedded service(ex:heartbeat), default is false.
-        /// </summary>
-        public bool DisableEmbeddedService { get; set; }
-
-        /// <summary>
         /// Enable ServiceContext.Current option by AsyncLocal.
         /// </summary>
         public bool EnableCurrentContext { get; set; }
@@ -68,7 +63,6 @@ namespace MagicOnion.Server
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
             this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
-            this.DisableEmbeddedService = false;
             this.EnableCurrentContext = false;
 
             this.ServiceLocator = DefaultServiceLocator.Instance;
