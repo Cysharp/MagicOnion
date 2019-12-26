@@ -283,7 +283,7 @@ workflows:
                 - v3
       - canary-push:
           requires:
-            - canary-build
+            - canary-build-and-push-nuget
             - build-unity
           filters:
             branches:
