@@ -1,34 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System.Buffers;
+
+#pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack.Formatters
 {
     public sealed class NullableFormatter<T> : IMessagePackFormatter<T?>
         where T : struct
     {
-        public int Serialize(ref byte[] bytes, int offset, T? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                writer.WriteNil();
             }
             else
             {
-                return formatterResolver.GetFormatterWithVerify<T>().Serialize(ref bytes, offset, value.Value, formatterResolver);
+                options.Resolver.GetFormatterWithVerify<T>().Serialize(ref writer, value.Value, options);
             }
         }
 
-        public T? Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (reader.IsNil)
             {
-                readSize = 1;
+                reader.ReadNil();
                 return null;
             }
             else
             {
-                return formatterResolver.GetFormatterWithVerify<T>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                return options.Resolver.GetFormatterWithVerify<T>().Deserialize(ref reader, options);
             }
         }
     }
@@ -36,35 +39,34 @@ namespace MessagePack.Formatters
     public sealed class StaticNullableFormatter<T> : IMessagePackFormatter<T?>
         where T : struct
     {
-        readonly IMessagePackFormatter<T> underlyingFormatter;
+        private readonly IMessagePackFormatter<T> underlyingFormatter;
 
         public StaticNullableFormatter(IMessagePackFormatter<T> underlyingFormatter)
         {
             this.underlyingFormatter = underlyingFormatter;
         }
 
-        public int Serialize(ref byte[] bytes, int offset, T? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                writer.WriteNil();
             }
             else
             {
-                return underlyingFormatter.Serialize(ref bytes, offset, value.Value, formatterResolver);
+                this.underlyingFormatter.Serialize(ref writer, value.Value, options);
             }
         }
 
-        public T? Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (reader.TryReadNil())
             {
-                readSize = 1;
                 return null;
             }
             else
             {
-                return underlyingFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                return this.underlyingFormatter.Deserialize(ref reader, options);
             }
         }
     }

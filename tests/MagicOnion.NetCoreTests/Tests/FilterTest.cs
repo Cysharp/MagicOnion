@@ -158,24 +158,11 @@ namespace MagicOnion.Tests
         }
     }
     
-    [CollectionDefinition(nameof(FilterTestCollectionServerFixture))]
-    public class FilterTestCollectionServerFixture : ICollectionFixture<FilterTestCollectionServerFixture.CustomServerFixture>
-    {
-        public class CustomServerFixture : ServerFixture
-        {
-            protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
-            {
-                return MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(FilterTester) }, options);
-            }
-        }
-    }
-
-    [Collection(nameof(FilterTestCollectionServerFixture))]
-    public class FilterTest
+    public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
     {
         IFilterTester client;
 
-        public FilterTest(ITestOutputHelper logger, FilterTestCollectionServerFixture.CustomServerFixture server)
+        public FilterTest(ITestOutputHelper logger, ServerFixture<FilterTester> server)
         {
             this.client = server.CreateClient<IFilterTester>();
         }

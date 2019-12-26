@@ -1,4 +1,5 @@
-﻿using MessagePack.Resolvers;
+﻿using MessagePack;
+using MessagePack.Resolvers;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -8,13 +9,15 @@ namespace Assets.Scripts
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void RegisterResolvers()
         {
-            CompositeResolver.RegisterAndSetAsDefault
-            (
-                MagicOnion.Resolvers.MagicOnionResolver.Instance,
-                MessagePack.Resolvers.GeneratedResolver.Instance,
-                BuiltinResolver.Instance,
-                PrimitiveObjectResolver.Instance
-            );
+            MessagePackSerializer.DefaultOptions = MessagePackSerializer.DefaultOptions
+                .WithResolver(
+                    CompositeResolver.Create(
+                        MagicOnion.Resolvers.MagicOnionResolver.Instance,
+                        MessagePack.Resolvers.GeneratedResolver.Instance,
+                        BuiltinResolver.Instance,
+                        PrimitiveObjectResolver.Instance
+                    )
+                );
         }
     }
 }

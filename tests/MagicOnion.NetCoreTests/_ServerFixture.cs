@@ -100,6 +100,30 @@ namespace MagicOnion.Tests
         }
     }
 
+    public class ServerFixture<T> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T) }, options);
+    }
+    public class ServerFixture<T1, T2> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2) }, options);
+    }
+    public class ServerFixture<T1, T2, T3> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2), typeof(T3) }, options);
+    }
+    public class ServerFixture<T1, T2, T3, T4> : ServerFixture
+    {
+        protected override MagicOnionServiceDefinition BuildServerServiceDefinition(MagicOnionOptions options)
+            => MagicOnionEngine.BuildServerServiceDefinition(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, options);
+    }
+
+    [CollectionDefinition(nameof(AllAssemblyGrpcServerFixture))]
+    public class AllAssemblyGrpcServerFixture : ICollectionFixture<ServerFixture>
+    { }
 
     public class NonCachedDefaultServiceLocator : IServiceLocator, IServiceLocatorScope
     {

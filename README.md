@@ -1479,7 +1479,6 @@ Make sure your View's column, and metrics TagKey is matched. Otherwise none of m
 | Property | Description |
 | --- | --- |
 | `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
-| `bool` DisableEmbeddedService | Disable embedded service(ex:heartbeat), default is false. |
 | `IList<MagicOnionFilterDescriptor>` GlobalFilters | Global MagicOnion filters. |
 | `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
 | `IList<StreamingHubFilterDescriptor>` Global StreamingHub filters. | GlobalStreamingHubFilters |

@@ -51,8 +51,9 @@ namespace MagicOnion.Client
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
         static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
         static readonly FieldInfo nilBytes = typeof(MagicOnionMarshallers).GetField("UnsafeNilBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        static readonly MethodInfo callMessagePackSerialize = typeof(LZ4MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            .First(x => x.Name == "Serialize" && x.GetParameters().Length == 2 && x.ReturnType == typeof(byte[]));
+        static readonly MethodInfo callMessagePackSerialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            .First(x => x.Name == "Serialize" && x.GetParameters().Length == 3 && x.ReturnType == typeof(byte[]));
+        static readonly MethodInfo callCancellationTokenNone = typeof(CancellationToken).GetProperty("None", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetGetMethod();
 
         static DynamicClientBuilder()
         {
@@ -205,16 +206,16 @@ namespace MagicOnion.Client
                 emptyCtor = ctor;
             }
 
-            // .ctor(CallInvoker, IFormatterResolver, IClientFilter[]):base(callInvoker, resolver, clientFilters)
+            // .ctor(CallInvoker, MessagePackSerializerOptions, IClientFilter[]):base(callInvoker, resolver, clientFilters)
             {
-                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker), typeof(IFormatterResolver), typeof(IClientFilter[]) });
+                var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(CallInvoker), typeof(MessagePackSerializerOptions), typeof(IClientFilter[]) });
                 var il = ctor.GetILGenerator();
 
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
-                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker), typeof(IFormatterResolver), typeof(IClientFilter[]) }, null));
+                il.Emit(OpCodes.Call, typeBuilder.BaseType.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(CallInvoker), typeof(MessagePackSerializerOptions), typeof(IClientFilter[]) }, null));
                 il.Emit(OpCodes.Ret);
             }
 
@@ -228,7 +229,7 @@ namespace MagicOnion.Client
             var hostField = filedHolderType.GetField("host", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var optionField = filedHolderType.GetField("option", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var invokerField = filedHolderType.GetField("callInvoker", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            var resolverField = filedHolderType.GetField("resolver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var serializerOptionsField = filedHolderType.GetField("serializerOptions", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var filtersField = filedHolderType.GetField("filters", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             // Clone
@@ -257,8 +258,8 @@ namespace MagicOnion.Client
 
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldfld, resolverField);
-                il.Emit(OpCodes.Stfld, resolverField);
+                il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                il.Emit(OpCodes.Stfld, serializerOptionsField);
 
                 il.Emit(OpCodes.Dup);
                 il.Emit(OpCodes.Ldarg_0);
@@ -404,7 +405,8 @@ namespace MagicOnion.Client
                             {
                                 // already loaded parameter.
                                 il.Emit(OpCodes.Ldarg_0);
-                                il.Emit(OpCodes.Ldfld, resolverField);
+                                il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                                il.Emit(OpCodes.Call, callCancellationTokenNone);
                                 il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                             }
                             else
@@ -412,7 +414,8 @@ namespace MagicOnion.Client
                                 // call new DynamicArgumentTuple<T>
                                 il.Emit(OpCodes.Newobj, def.RequestType.GetConstructors()[0]);
                                 il.Emit(OpCodes.Ldarg_0);
-                                il.Emit(OpCodes.Ldfld, resolverField);
+                                il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                                il.Emit(OpCodes.Call, callCancellationTokenNone);
                                 il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                             }
                             il.Emit(OpCodes.Stloc_0);
@@ -430,9 +433,24 @@ namespace MagicOnion.Client
                             il.Emit(OpCodes.Stloc_1);
 
                             // create return result
+                            // new ServerStreamingResult<TResponse>(
+                            
+                            //     inner,
                             il.Emit(OpCodes.Ldloc_1);
+                            
+                            //     new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_1);
+                            il.Emit(OpCodes.Call, typeof(AsyncServerStreamingCall<byte[]>).GetProperty("ResponseStream").GetMethod);
                             il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Newobj, typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.ResponseType).GetConstructors().Single());
+
+                            //      this.resolver
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+
+                            // );
+
                             var resultType = typeof(ServerStreamingResult<>).MakeGenericType(def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType.GetConstructors()[0]);
                             if (def.ResponseIsTask)
@@ -470,17 +488,53 @@ namespace MagicOnion.Client
                         il.Emit(OpCodes.Stloc_0);
 
                         // create return result
-                        il.Emit(OpCodes.Ldloc_0);
-                        il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldfld, resolverField);
                         Type resultType2;
                         if (def.MethodType == MethodType.ClientStreaming)
                         {
+                            // new ClientStreamingResult<TRequest, TResponse>(
+                            //   inner,
+                            il.Emit(OpCodes.Ldloc_0);
+
+                            //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncClientStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single()));
+
+                            //    this.resolver
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+
+                            // );
                             resultType2 = typeof(ClientStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType2.GetConstructors().OrderBy(x => x.GetParameters().Length).Last());
                         }
                         else
                         {
+                            // new DuplexStreamingResult<TRequest, TResponse>(
+                            //   inner,
+                            il.Emit(OpCodes.Ldloc_0);
+
+                            //   new MarshallingClientStreamWriter<TRequest>()(inner.RequestStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncDuplexStreamingCall<byte[], byte[]>).GetProperty("RequestStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingClientStreamWriter<>).MakeGenericType(def.RequestType).GetConstructors().Single()));
+
+                            //   new MarshallingAsyncStreamReader<TResponse>()(inner.ResponseStream, this.resolver),
+                            il.Emit(OpCodes.Ldloc_0);
+                            il.Emit(OpCodes.Call, typeof(AsyncDuplexStreamingCall<byte[], byte[]>).GetProperty("ResponseStream").GetMethod);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Newobj, (typeof(MarshallingAsyncStreamReader<>).MakeGenericType(def.ResponseType).GetConstructors().Single()));
+
+                            //    this.resolver
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            
+                            // );
                             resultType2 = typeof(DuplexStreamingResult<,>).MakeGenericType(def.RequestType, def.ResponseType);
                             il.Emit(OpCodes.Newobj, resultType2.GetConstructors()[0]);
                         }

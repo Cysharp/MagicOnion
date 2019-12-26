@@ -245,7 +245,7 @@ namespace MagicOnion.OpenTelemetry
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
             statsRecorder.NewMeasureMap().Put(StreamingHubRequestCount, 1).Record(CreateTag(context));
         }

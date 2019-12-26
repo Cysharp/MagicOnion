@@ -63,80 +63,13 @@ namespace MagicOnion.Hosting
         /// <returns>The initialized <see cref="IHostBuilder"/>.</returns>
         public static IHostBuilder CreateDefaultBuilder(bool useSimpleConsoleLogger, LogLevel minSimpleConsoleLoggerLogLevel, string hostEnvironmentVariable)
         {
-            var builder = CreateDefaultBuilderHosting3_0_Or_Later() ??
-                          CreateDefaultBuilderHosting2_2();
+            var builder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder();
 
             ConfigureHostConfigurationDefault(builder, hostEnvironmentVariable);
             ConfigureLoggingDefault(builder, useSimpleConsoleLogger, minSimpleConsoleLoggerLogLevel);
 
             return builder;
         }
-
-        private static IHostBuilder CreateDefaultBuilderHosting3_0_Or_Later()
-        {
-            // Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(string args[]);
-            var hostingHostType = Type.GetType("Microsoft.Extensions.Hosting.Host, Microsoft.Extensions.Hosting");
-            if (hostingHostType == null) return null;
-            var createDefaultBuilderMethod = hostingHostType.GetMethod("CreateDefaultBuilder", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string[]) }, null);
-
-            return (IHostBuilder)createDefaultBuilderMethod.Invoke(null, new [] { default(string) });
-        }
-
-        // TODO: When upgrading Microsoft.Extensions.Hosting to v3.x, We need to remove these workarounds and use `Host.CreateDefaultBuilder`.
-        #region Implementation for Microsoft.Extensions.Hosting 2.2
-        private static IHostBuilder CreateDefaultBuilderHosting2_2()
-        {
-            var builder = new HostBuilder();
-
-            ConfigureHostConfigurationHosting2_2(builder);
-            ConfigureAppConfigurationHosting2_2(builder);
-            ConfigureLoggingHosting2_2(builder);
-
-            return builder;
-        }
-
-        internal static void ConfigureHostConfigurationHosting2_2(IHostBuilder builder)
-        {
-            builder.UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-            builder.ConfigureHostConfiguration(config =>
-            {
-                // NOTE: Treat prefix "DOTNET_" as the same as Microsoft.Extensions.Hosting 3.x.
-                config.AddEnvironmentVariables(prefix: "DOTNET_");
-            });
-        }
-
-        internal static void ConfigureAppConfigurationHosting2_2(IHostBuilder builder)
-        {
-            builder.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                var env = hostingContext.HostingEnvironment;
-
-                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
-                if (env.IsDevelopment())
-                {
-                    var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
-                    if (appAssembly != null)
-                    {
-                        // use https://marketplace.visualstudio.com/items?itemName=guitarrapc.OpenUserSecrets to easily manage UserSecrets with GenericHost.
-                        config.AddUserSecrets(appAssembly, optional: true);
-                    }
-                }
-
-                config.AddEnvironmentVariables();
-            });
-        }
-
-        internal static void ConfigureLoggingHosting2_2(IHostBuilder builder)
-        {
-            builder.ConfigureLogging((hostContext, logging) =>
-            {
-                logging.AddConfiguration(hostContext.Configuration.GetSection("Logging"));
-            });
-        }
-        #endregion
 
         internal static void ConfigureHostConfigurationDefault(IHostBuilder builder, string hostEnvironmentVariable)
         {

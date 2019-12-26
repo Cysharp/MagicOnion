@@ -7,9 +7,9 @@ namespace MagicOnion.Server
     public class MagicOnionOptions
     {
         /// <summary>
-        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.Default).
+        /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).
         /// </summary>
-        public IFormatterResolver FormatterResolver { get; set; }
+        public MessagePackSerializerOptions SerializerOptions { get; set; }
 
         /// <summary>
         /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
@@ -20,11 +20,6 @@ namespace MagicOnion.Server
         /// Set the diagnostics info logger.
         /// </summary>
         public IMagicOnionLogger MagicOnionLogger { get; set; }
-
-        /// <summary>
-        /// Disable embedded service(ex:heartbeat), default is false.
-        /// </summary>
-        public bool DisableEmbeddedService { get; set; }
 
         /// <summary>
         /// Enable ServiceContext.Current option by AsyncLocal.
@@ -63,12 +58,11 @@ namespace MagicOnion.Server
         public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
         {
             this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
-            this.FormatterResolver = MessagePackSerializer.DefaultResolver;
+            this.SerializerOptions = MessagePackSerializer.DefaultOptions;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
             this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
-            this.DisableEmbeddedService = false;
             this.EnableCurrentContext = false;
 
             this.ServiceLocator = DefaultServiceLocator.Instance;

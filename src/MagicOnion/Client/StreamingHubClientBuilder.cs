@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Client
@@ -56,9 +57,9 @@ namespace MagicOnion.Client
 
         static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes);
 
-        static readonly MethodInfo callMessagePackDesrialize = typeof(LZ4MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
-
+        static readonly MethodInfo callMessagePackDesrialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
+        static readonly MethodInfo callCancellationTokenNone = typeof(CancellationToken).GetProperty("None", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetGetMethod();
         static readonly PropertyInfo completedTask = typeof(Task).GetProperty("CompletedTask", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static StreamingHubClientBuilder()
@@ -176,9 +177,9 @@ namespace MagicOnion.Client
 
         static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
-            // .ctor(CallInvoker callInvoker, string host, CallOptions option, IFormatterResolver resolver, ILogger logger) :base(...)
+            // .ctor(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions resolver, ILogger logger) :base(...)
             {
-                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IFormatterResolver), typeof(ILogger) };
+                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(MessagePackSerializerOptions), typeof(ILogger) };
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 
@@ -229,7 +230,7 @@ namespace MagicOnion.Client
         static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, FieldInfo methodField, FieldInfo clientField, MethodDefinition[] definitions)
         {
             var baseType = typeof(StreamingHubClientBase<,>).MakeGenericType(interfaceType, receiverType);
-            var resolverField = baseType.GetField("resolver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var serializerOptionsField = baseType.GetField("serializerOptions", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             var receiverField = baseType.GetField("receiver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             // protected abstract Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
@@ -323,10 +324,10 @@ namespace MagicOnion.Client
 
                         il.Emit(OpCodes.Ldarg_2);
                         il.Emit(OpCodes.Castclass, tcsType);
-
                         il.Emit(OpCodes.Ldarg_3);
                         il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldfld, resolverField);
+                        il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                        il.Emit(OpCodes.Call, callCancellationTokenNone);
                         il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(responseType));
 
                         il.Emit(OpCodes.Callvirt, tcsType.GetMethod("TrySetResult"));
@@ -375,23 +376,27 @@ namespace MagicOnion.Client
                         }
                         else if (parameters.Length == 1)
                         {
+                            // TODO:fix emit
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             il.Emit(OpCodes.Ldarg_2);
                             il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Call, callCancellationTokenNone);
                             il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(parameters[0].ParameterType));
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
                             il.Emit(OpCodes.Ret);
                         }
                         else
                         {
+                            // TODO:fix emit
                             var deserializeType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2]
                                 .MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                             var lc = il.DeclareLocal(deserializeType);
                             il.Emit(OpCodes.Ldarg_2);
                             il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, resolverField);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Call, callCancellationTokenNone);
                             il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(deserializeType));
                             il.Emit(OpCodes.Stloc, lc);
 

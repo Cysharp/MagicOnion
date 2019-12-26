@@ -64,9 +64,9 @@ namespace MagicOnion.Hosting
             }
         }
 
-        public void BeginInvokeHubMethod(StreamingHubContext context, ArraySegment<byte> request, Type type)
+        public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Count}");
+            logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length}");
 
         }
 

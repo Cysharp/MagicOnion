@@ -1,165 +1,168 @@
-﻿#if NETSTANDARD
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if !UNITY_2018_3_OR_NEWER
 
 using System;
 using System.Runtime.CompilerServices;
 
 namespace MessagePack.Internal
 {
-    // for string key property name write optimization.
+    /* for string key property name write optimization. */
 
     public static class UnsafeMemory
     {
-        public static readonly bool Is32Bit = (IntPtr.Size == 4);
+        public static readonly bool Is32Bit = IntPtr.Size == 4;
     }
 
     public static partial class UnsafeMemory32
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw1(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw1(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(byte*)pDst = *(byte*)pSrc;
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw2(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw2(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(short*)pDst = *(short*)pSrc;
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw3(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw3(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(byte*)pDst = *(byte*)pSrc;
                 *(short*)(pDst + 1) = *(short*)(pSrc + 1);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
     }
 
     public static partial class UnsafeMemory64
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw1(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw1(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(byte*)pDst = *(byte*)pSrc;
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw2(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw2(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(short*)pDst = *(short*)pSrc;
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw3(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw3(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(byte*)pDst = *(byte*)pSrc;
                 *(short*)(pDst + 1) = *(short*)(pSrc + 1);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw4(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw4(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(int*)(pDst + 0) = *(int*)(pSrc + 0);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw5(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw5(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(int*)(pDst + 0) = *(int*)(pSrc + 0);
                 *(int*)(pDst + 1) = *(int*)(pSrc + 1);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw6(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw6(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(int*)(pDst + 0) = *(int*)(pSrc + 0);
                 *(int*)(pDst + 2) = *(int*)(pSrc + 2);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe int WriteRaw7(ref byte[] dst, int dstOffset, byte[] src)
+        public static unsafe void WriteRaw7(ref MessagePackWriter writer, ReadOnlySpan<byte> src)
         {
-            MessagePackBinary.EnsureCapacity(ref dst, dstOffset, src.Length);
+            Span<byte> dst = writer.GetSpan(src.Length);
 
             fixed (byte* pSrc = &src[0])
-            fixed (byte* pDst = &dst[dstOffset])
+            fixed (byte* pDst = &dst[0])
             {
                 *(int*)(pDst + 0) = *(int*)(pSrc + 0);
                 *(int*)(pDst + 3) = *(int*)(pSrc + 3);
             }
 
-            return src.Length;
+            writer.Advance(src.Length);
         }
     }
 }

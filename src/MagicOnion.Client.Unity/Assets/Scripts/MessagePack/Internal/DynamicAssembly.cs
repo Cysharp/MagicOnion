@@ -1,4 +1,7 @@
-﻿#if !UNITY_WSA
+﻿// Copyright (c) All contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if !(UNITY_2018_3_OR_NEWER && NET_STANDARD_2_0)
 
 using System;
 using System.Reflection;
@@ -8,66 +11,61 @@ namespace MessagePack.Internal
 {
     internal class DynamicAssembly
     {
-#if NET_35
-        readonly string moduleName;
+#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes
+        private readonly string moduleName;
 #endif
-        readonly AssemblyBuilder assemblyBuilder;
-        readonly ModuleBuilder moduleBuilder;
+        private readonly AssemblyBuilder assemblyBuilder;
+        private readonly ModuleBuilder moduleBuilder;
 
         // don't expose ModuleBuilder
-        // public ModuleBuilder ModuleBuilder { get { return moduleBuilder; } }
+        //// public ModuleBuilder ModuleBuilder { get { return moduleBuilder; } }
 
-        readonly object gate = new object();
+        private readonly object gate = new object();
 
         public DynamicAssembly(string moduleName)
         {
-#if NET_35
+#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes
+            AssemblyBuilderAccess builderAccess = AssemblyBuilderAccess.RunAndSave;
             this.moduleName = moduleName;
-            this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
 #else
-#if NETSTANDARD
-            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
-#else
-            this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
+            AssemblyBuilderAccess builderAccess = AssemblyBuilderAccess.Run;
 #endif
-
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
-#endif
+            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), builderAccess);
+            this.moduleBuilder = this.assemblyBuilder.DefineDynamicModule(moduleName + ".dll");
         }
 
-        // requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161
+        /* requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161 */
 
         public TypeBuilder DefineType(string name, TypeAttributes attr)
         {
-            lock (gate)
+            lock (this.gate)
             {
-                return moduleBuilder.DefineType(name, attr);
+                return this.moduleBuilder.DefineType(name, attr);
             }
         }
 
         public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent)
         {
-            lock (gate)
+            lock (this.gate)
             {
-                return moduleBuilder.DefineType(name, attr, parent);
+                return this.moduleBuilder.DefineType(name, attr, parent);
             }
         }
 
         public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent, Type[] interfaces)
         {
-            lock (gate)
+            lock (this.gate)
             {
-                return moduleBuilder.DefineType(name, attr, parent, interfaces);
+                return this.moduleBuilder.DefineType(name, attr, parent, interfaces);
             }
         }
 
-#if NET_35
+#if NETFRAMEWORK
 
         public AssemblyBuilder Save()
         {
-            assemblyBuilder.Save(moduleName + ".dll");
-            return assemblyBuilder;
+            this.assemblyBuilder.Save(this.moduleName + ".dll");
+            return this.assemblyBuilder;
         }
 
 #endif

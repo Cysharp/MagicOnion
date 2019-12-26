@@ -51,26 +51,19 @@ namespace MagicOnion
 <# } #>
         }
 
-        public int Serialize(ref byte[] bytes, int offset, DynamicArgumentTuple<<#= typeArgs #>> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, DynamicArgumentTuple<<#= typeArgs #>> value, MessagePackSerializerOptions options)
         {
-            var startOffset = offset;
-<# if( i<= 15) { #>
-            offset += MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, <#= i #>);
-<# } else { #>
-            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, <#= i #>);
-<# } #>
+            writer.WriteArrayHeader(<#= i #>);
+            var resolver = options.Resolver;
 <# for(var j = 1; j <= i; j++) { #>
-            offset += formatterResolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref bytes, offset, value.Item<#= j #>, formatterResolver);
+            resolver.GetFormatterWithVerify<T<#= j #>>().Serialize(ref writer, value.Item<#= j #>, options);
 <# } #>
-            return offset - startOffset;
         }
 
-        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public DynamicArgumentTuple<<#= typeArgs #>> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            var startOffset = offset;
-            
-            var length = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-            offset += readSize;
+            var resolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
 
 <# for(var j = 1; j <= i; j++) { #>
             var item<#= j #> = default<#= j #>;
@@ -82,18 +75,15 @@ namespace MagicOnion
                 {
 <# for(var j = 1; j <= i; j++) { #>
                     case <#= j - 1 #>:
-                        item<#= j #> = formatterResolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                        item<#= j #> = resolver.GetFormatterWithVerify<T<#= j #>>().Deserialize(ref reader, options);
                         break;
 <# } #>
                     default:
-                        readSize = MessagePackBinary.ReadNextBlock(bytes, offset);
+                        reader.Skip();
                         break;
                 }
-
-                offset += readSize;
             }
 
-            readSize =  offset - startOffset;
             return new DynamicArgumentTuple<<#= typeArgs #>>(<#= itemArgs #>);
         }
     }

@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Threading.Tasks;
@@ -11,14 +11,14 @@ namespace MagicOnion
     public struct DuplexStreamingResult<TRequest, TResponse> : IDisposable
     {
         readonly AsyncDuplexStreamingCall<byte[], byte[]> inner;
-        readonly MarshallingClientStreamWriter<TRequest> requestStream;
-        readonly MarshallingAsyncStreamReader<TResponse> responseStream;
+        readonly IClientStreamWriter<TRequest> requestStream;
+        readonly IAsyncStreamReader<TResponse> responseStream;
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IFormatterResolver resolver)
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, IAsyncStreamReader<TResponse> responseStream, MessagePackSerializerOptions serializerOptions)
         {
             this.inner = inner;
-            this.requestStream = new MarshallingClientStreamWriter<TRequest>(inner.RequestStream, resolver);
-            this.responseStream = new MarshallingAsyncStreamReader<TResponse>(inner.ResponseStream, resolver);
+            this.requestStream = requestStream;
+            this.responseStream = responseStream;
         }
 
         public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;

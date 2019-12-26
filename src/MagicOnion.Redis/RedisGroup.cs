@@ -1,5 +1,6 @@
 ﻿using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Utils;
 using MessagePack;
 using StackExchange.Redis;
 using System;
@@ -10,7 +11,7 @@ namespace MagicOnion.Redis
 {
     public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(IFormatterResolver formatterResolver, IMagicOnionLogger logger, IServiceLocator serviceLocator)
+        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
             var connection = serviceLocator.GetService<ConnectionMultiplexer>();
             if (connection == null)
@@ -18,22 +19,22 @@ namespace MagicOnion.Redis
                 throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
             }
 
-            return new RedisGroupRepository(formatterResolver, connection, logger);
+            return new RedisGroupRepository(serializerOptions, connection, logger);
         }
     }
 
     public class RedisGroupRepository : IGroupRepository
     {
-        IFormatterResolver resolver;
+        MessagePackSerializerOptions serializerOptions;
         IMagicOnionLogger logger;
         ConnectionMultiplexer connection;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public RedisGroupRepository(IFormatterResolver resolver, ConnectionMultiplexer connection, IMagicOnionLogger logger)
+        public RedisGroupRepository(MessagePackSerializerOptions serializerOptions, ConnectionMultiplexer connection, IMagicOnionLogger logger)
         {
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.logger = logger;
             this.factory = CreateGroup;
             this.connection = connection;
@@ -46,7 +47,7 @@ namespace MagicOnion.Redis
 
         IGroup CreateGroup(string groupName)
         {
-            return new RedisGroup(groupName, resolver, new ConcurrentDictionaryGroup(groupName, this, resolver, logger), connection.GetSubscriber(), connection.GetDatabase());
+            return new RedisGroup(groupName, serializerOptions, new ConcurrentDictionaryGroup(groupName, this, serializerOptions, logger), connection.GetSubscriber(), connection.GetDatabase());
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -66,14 +67,14 @@ namespace MagicOnion.Redis
         IGroup inmemoryGroup;
         IDatabaseAsync database;
         RedisChannel channel;
-        IFormatterResolver resolver;
+        MessagePackSerializerOptions serializerOptions;
         ChannelMessageQueue mq;
         RedisKey counterKey;
 
-        public RedisGroup(string groupName, IFormatterResolver resolver, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
+        public RedisGroup(string groupName, MessagePackSerializerOptions serializerOptions, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
         {
             this.GroupName = groupName;
-            this.resolver = resolver;
+            this.serializerOptions = serializerOptions;
             this.channel = new RedisChannel("MagicOnion.Redis.RedisGroup?groupName=" + groupName, RedisChannel.PatternMode.Literal);
             this.counterKey = "MagicOnion.Redis.RedisGroup.MemberCount?groupName=" + groupName;
             this.inmemoryGroup = inmemoryGroup;
@@ -118,27 +119,22 @@ namespace MagicOnion.Redis
         static Task PublishFromRedisToMemoryGroup(RedisValue value, IGroup group)
         {
             byte[] buffer = value;
-            var offset = 0;
-            int readSize;
-            var len1 = MessagePackBinary.ReadArrayHeader(buffer, offset, out readSize);
-            offset += readSize;
+            var reader = new MessagePackReader(buffer);
+
+            var len1 = reader.ReadArrayHeader();
             if (len1 == 3)
             {
-                var isExcept = MessagePackBinary.ReadBoolean(buffer, offset, out readSize);
-                offset += readSize;
-
+                var isExcept = reader.ReadBoolean();
                 if (isExcept)
                 {
-                    var excludes = NativeGuidArrayFormatter.Deserialize(buffer, offset, out readSize);
-                    offset += readSize;
-
+                    var excludes = NativeGuidArrayFormatter.Deserialize(ref reader);
+                    var offset = (int)reader.Consumed;
                     return group.WriteExceptRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: false);
                 }
                 else
                 {
-                    var includes = NativeGuidArrayFormatter.Deserialize(buffer, offset, out readSize);
-                    offset += readSize;
-
+                    var includes = NativeGuidArrayFormatter.Deserialize(ref reader);
+                    var offset = (int)reader.Consumed;
                     return group.WriteToRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), includes, fireAndForget: false);
                 }
             }
@@ -183,27 +179,22 @@ namespace MagicOnion.Redis
 
         byte[] BuildMessage<T>(int methodId, T value, Guid[] connectionIds, bool isExcept)
         {
-            var rent = System.Buffers.ArrayPool<byte>.Shared.Rent(ushort.MaxValue);
-            var buffer = rent;
-            try
+            using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
             {
-                var offset = 0;
-
                 // redis-format: [isExcept, [connectionIds], [raw-bloadcast-format]]
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 3);
-                offset += MessagePackBinary.WriteBoolean(ref buffer, offset, isExcept);
-                offset += NativeGuidArrayFormatter.Serialize(ref buffer, offset, connectionIds);
+                var writer = new MessagePackWriter(buffer);
 
-                offset += MessagePackBinary.WriteArrayHeader(ref buffer, offset, 2);
-                offset += MessagePackBinary.WriteInt32(ref buffer, offset, methodId);
-                offset += LZ4MessagePackSerializer.SerializeToBlock(ref buffer, offset, value, resolver);
+                writer.WriteArrayHeader(3);
+                writer.Write(isExcept);
+                NativeGuidArrayFormatter.Serialize(ref writer, connectionIds);
 
-                var result = MessagePackBinary.FastCloneWithResize(buffer, offset);
+                writer.WriteArrayHeader(2);
+                writer.WriteInt32(methodId);
+                MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
+
+                writer.Flush();
+                var result = buffer.WrittenSpan.ToArray();
                 return result;
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(rent);
             }
         }
 

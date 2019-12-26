@@ -6,6 +6,7 @@ using MagicOnion.Utils;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -24,16 +25,16 @@ namespace MagicOnion.Server.Hubs
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
         readonly Type UnwrappedResponseType;
-        internal readonly IFormatterResolver resolver;
+        internal readonly MessagePackSerializerOptions serializerOptions;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
         readonly string toStringCache;
         readonly int getHashCodeCache;
 
         // reflection cache
-        // Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver)
-        static readonly MethodInfo messagePackDeserialize = typeof(LZ4MessagePackSerializer).GetMethods()
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 2 && x.GetParameters()[0].ParameterType == typeof(ArraySegment<byte>));
+        // Deserialize<T>(ReadOnlyMemory<byte>, MessagePackSerializerOptions, CancellationToken)
+        static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
+            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
 
         private static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
         {
@@ -59,13 +60,14 @@ namespace MagicOnion.Server.Hubs
             this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
 
             this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-            this.resolver = handlerOptions.FormatterResolver;
 
+            var resolver = handlerOptions.SerializerOptions.Resolver;
             var parameters = methodInfo.GetParameters();
             if (RequestType == null)
             {
                 this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
             }
+            this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
@@ -106,11 +108,12 @@ namespace MagicOnion.Server.Hubs
 
                 var contextArg = Expression.Parameter(typeof(StreamingHubContext), "context");
                 var requestArg = Expression.Parameter(RequestType, "request");
-                var getResolver = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("FormatterResolver", flags));
+                var getSerializerOptions = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("SerializerOptions", flags));
                 var contextRequest = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("Request", flags));
+                var noneCancellation = Expression.Default(typeof(CancellationToken));
                 var getInstanceCast = Expression.Convert(Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("HubInstance", flags)), HubType);
 
-                var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getResolver);
+                var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getSerializerOptions, noneCancellation);
                 var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                 Expression[] arguments = new Expression[parameters.Length];
@@ -199,7 +202,7 @@ namespace MagicOnion.Server.Hubs
 
         public IMagicOnionLogger Logger { get; }
 
-        public IFormatterResolver FormatterResolver { get; }
+        public MessagePackSerializerOptions SerializerOptions { get; }
 
         public IServiceLocator ServiceLocator { get; }
 
@@ -209,7 +212,7 @@ namespace MagicOnion.Server.Hubs
         {
             GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
             Logger = options.MagicOnionLogger;
-            FormatterResolver = options.FormatterResolver;
+            SerializerOptions = options.SerializerOptions;
             ServiceLocator = options.ServiceLocator;
             ServiceActivator = options.MagicOnionServiceActivator;
         }

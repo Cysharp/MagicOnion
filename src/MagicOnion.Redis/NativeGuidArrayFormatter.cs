@@ -7,44 +7,39 @@ namespace MagicOnion.Redis
 {
     internal static class NativeGuidArrayFormatter
     {
-        static readonly IMessagePackFormatter<Guid> formatter = BinaryGuidFormatter.Instance;
+        static readonly IMessagePackFormatter<Guid> formatter = NativeGuidFormatter.Instance;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Serialize(ref byte[] bytes, int offset, Guid[] value)
+        public static void Serialize(ref MessagePackWriter writer, Guid[] value)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                writer.WriteNil();
+                return;
             }
 
-            var start = offset;
-            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+            writer.WriteArrayHeader(value.Length);
             for (int i = 0; i < value.Length; i++)
             {
-                offset += formatter.Serialize(ref bytes, offset, value[i], null);
+                formatter.Serialize(ref writer, value[i], null);
             }
-            return offset - start;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Guid[] Deserialize(byte[] bytes, int offset, out int readSize)
+        public static Guid[] Deserialize(ref MessagePackReader reader)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (reader.TryReadNil())
             {
-                readSize = 1;
                 return null;
             }
 
-            var start = offset;
-            var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-            offset += readSize;
+            var len = reader.ReadArrayHeader();
             var result = new Guid[len];
             for (int i = 0; i < len; i++)
             {
-                result[i] = formatter.Deserialize(bytes, offset, null, out readSize);
-                offset += readSize;
+                result[i] = formatter.Deserialize(ref reader, null);
             }
-            readSize = offset - start;
+
             return result;
         }
     }

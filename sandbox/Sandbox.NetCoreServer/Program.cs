@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿#pragma warning disable CS0219
+
+using Grpc.Core;
 using Grpc.Core.Logging;
 using MagicOnion;
 using MagicOnion.Client;
@@ -101,29 +103,29 @@ namespace Sandbox.NetCoreServer
 
         static void CheckUnsfeResolver()
         {
-            UnsafeDirectBlitResolver.Register<Foo>();
-            CompositeResolver.RegisterAndSetAsDefault(
-                UnsafeDirectBlitResolver.Instance,
+            //UnsafeDirectBlitResolver.Register<Foo>();
+            //CompositeResolver.RegisterAndSetAsDefault(
+            //    UnsafeDirectBlitResolver.Instance,
 
-                BuiltinResolver.Instance
+            //    BuiltinResolver.Instance
 
-                );
+            //    );
 
-            var f = new Foo { A = 10, B = 9999, C = 9999999 };
-            var doudarou = MessagePackSerializer.Serialize(f, UnsafeDirectBlitResolver.Instance);
-            var two = MessagePackSerializer.Deserialize<Foo>(doudarou);
-
-
-            var f2 = new[]{
-                new Foo { A = 10, B = 9999, C = 9999999 },
-                new Foo { A = 101, B = 43, C = 234 },
-                new Foo { A = 20, B = 5666, C = 1111 },
-            };
-            var doudarou2 = MessagePackSerializer.Serialize(f2, UnsafeDirectBlitResolver.Instance);
-            var two2 = MessagePackSerializer.Deserialize<Foo[]>(doudarou2);
+            //var f = new Foo { A = 10, B = 9999, C = 9999999 };
+            //var doudarou = MessagePackSerializer.Serialize(f, UnsafeDirectBlitResolver.Instance);
+            //var two = MessagePackSerializer.Deserialize<Foo>(doudarou);
 
 
-            Console.WriteLine(string.Join(", ", doudarou2));
+            //var f2 = new[]{
+            //    new Foo { A = 10, B = 9999, C = 9999999 },
+            //    new Foo { A = 101, B = 43, C = 234 },
+            //    new Foo { A = 20, B = 5666, C = 1111 },
+            //};
+            //var doudarou2 = MessagePackSerializer.Serialize(f2, UnsafeDirectBlitResolver.Instance);
+            //var two2 = MessagePackSerializer.Deserialize<Foo[]>(doudarou2);
+
+
+            //Console.WriteLine(string.Join(", ", doudarou2));
         }
     }
 

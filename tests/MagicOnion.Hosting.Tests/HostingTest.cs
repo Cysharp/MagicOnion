@@ -1,3 +1,5 @@
+#pragma warning disable CS1998
+
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -117,7 +119,6 @@ namespace MagicOnion.Hosting.Tests
                 Assert.NotNull(options.ChannelOptions);
                 Assert.NotNull(options.ServerPorts);
 
-                Assert.False(options.Service.DisableEmbeddedService);
                 Assert.False(options.Service.IsReturnExceptionStackTraceInErrorDetail);
 
                 Assert.Null(options.ChannelOptions.Census);
@@ -161,7 +162,6 @@ namespace MagicOnion.Hosting.Tests
                 var optionsAccessor = host.Services.GetService<IOptionsMonitor<MagicOnionHostingOptions>>();
                 var options = optionsAccessor.CurrentValue;
 
-                Assert.True(options.Service.DisableEmbeddedService);
                 Assert.True(options.Service.IsReturnExceptionStackTraceInErrorDetail);
 
                 Assert.False(options.ChannelOptions.Census);
@@ -214,7 +214,6 @@ namespace MagicOnion.Hosting.Tests
                     var optionsAccessor = host.Services.GetService<IOptionsMonitor<MagicOnionHostingOptions>>();
                     var options = optionsAccessor.CurrentValue;
 
-                    Assert.True(options.Service.DisableEmbeddedService);
                     Assert.True(options.Service.IsReturnExceptionStackTraceInErrorDetail);
 
                     Assert.False(options.ChannelOptions.Census);
@@ -232,7 +231,6 @@ namespace MagicOnion.Hosting.Tests
                     var optionsAccessor = host.Services.GetService<IOptionsMonitor<MagicOnionHostingOptions>>();
                     var options = optionsAccessor.Get("MagicOnion-Secondary");
 
-                    Assert.False(options.Service.DisableEmbeddedService);
                     Assert.False(options.Service.IsReturnExceptionStackTraceInErrorDetail);
 
                     Assert.True(options.ChannelOptions.Census);

@@ -62,7 +62,6 @@ namespace MagicOnion.Server
               .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
               .Where(x => !x.GetTypeInfo().IsAbstract)
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
-              .Concat(SupplyEmbeddedServices(option))
               .ToArray();
 
             option.MagicOnionLogger.BeginBuildServiceDefinition();
@@ -171,7 +170,7 @@ namespace MagicOnion.Server
                             {
                                 factory = option.DefaultGroupRepositoryFactory;
                             }
-                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.FormatterResolver, option.MagicOnionLogger, option.ServiceLocator));
+                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.SerializerOptions, option.MagicOnionLogger, option.ServiceLocator));
                         }
                     }
                 }
@@ -187,14 +186,6 @@ namespace MagicOnion.Server
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
             return result;
-        }
-
-        static IEnumerable<Type> SupplyEmbeddedServices(MagicOnionOptions options)
-        {
-            if (options.DisableEmbeddedService) yield break;
-
-            yield return typeof(MagicOnion.Server.EmbeddedServices.MagicOnionEmbeddedHeartbeat);
-            yield return typeof(MagicOnion.Server.EmbeddedServices.MagicOnionEmbeddedPing);
         }
     }
 }

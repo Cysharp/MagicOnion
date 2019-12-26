@@ -111,25 +111,46 @@ namespace MagicOnion.Server.Hubs
 
             // Main loop of StreamingHub.
             // Be careful to allocation and performance.
-            while (await reader.MoveNext(ct))
+            while (await reader.MoveNext(ct)) // must keep SyncContext.
             {
-                var data = reader.Current;
-
-                var length = MessagePackBinary.ReadArrayHeader(data, 0, out var readSize);
-                var offset = readSize;
-
-                if (length == 2)
+                (int methodId, int messageId, int offset) FetchHeader(byte[] msgData)
                 {
-                    // void: [methodId, [argument]]
-                    var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                    offset += readSize;
+                    var messagePackReader = new MessagePackReader(msgData);
 
+                    var length = messagePackReader.ReadArrayHeader();
+                    if (length == 2)
+                    {
+                        // void: [methodId, [argument]]
+                        var mid = messagePackReader.ReadInt32();
+                        var consumed = (int)messagePackReader.Consumed;
+
+                        return (mid, -1, consumed);
+                    }
+                    else if (length == 3)
+                    {
+                        // T: [messageId, methodId, [argument]]
+                        var msgId = messagePackReader.ReadInt32();
+                        var metId = messagePackReader.ReadInt32();
+                        var consumed = (int)messagePackReader.Consumed;
+                        return (metId, msgId, consumed);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Invalid data format.");
+                    }
+                }
+
+                var data = reader.Current;
+                var (methodId, messageId, offset) = FetchHeader(data);
+
+                if (messageId == -1)
+                {
                     if (handlers.TryGetValue(methodId, out var handler))
                     {
                         var context = new StreamingHubContext() // create per invoke.
                         {
                             AsyncWriterLock = Context.AsyncWriterLock,
-                            FormatterResolver = handler.resolver,
+                            SerializerOptions = handler.serializerOptions,
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
@@ -160,21 +181,14 @@ namespace MagicOnion.Server.Hubs
                         throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
                     }
                 }
-                else if (length == 3)
+                else
                 {
-                    // T: [messageId, methodId, [argument]]
-                    var messageId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                    offset += readSize;
-
-                    var methodId = MessagePackBinary.ReadInt32(data, offset, out readSize);
-                    offset += readSize;
-
                     if (handlers.TryGetValue(methodId, out var handler))
                     {
                         var context = new StreamingHubContext() // create per invoke.
                         {
                             AsyncWriterLock = Context.AsyncWriterLock,
-                            FormatterResolver = handler.resolver,
+                            SerializerOptions = handler.serializerOptions,
                             HubInstance = this,
                             ServiceContext = Context,
                             Request = new ArraySegment<byte>(data, offset, data.Length - offset),
@@ -209,10 +223,6 @@ namespace MagicOnion.Server.Hubs
                     {
                         throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
                     }
-                }
-                else
-                {
-                    throw new InvalidOperationException("Invalid data format.");
                 }
             }
         }
