@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <RestoreAdditionalProjectSources>
       https://www.myget.org/F/opentelemetry/api/v3/index.json;
@@ -37,6 +37,6 @@
     <MessagePackGenerator Input=".\ChatApp.Server.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MessagePack.Generated.cs" />
   </Target>
   <Target Name="GenerateMagicOnion" AfterTargets="Compile">
-    <MagicOnionGenerator Input=".\ChatApp.Server.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
+    <MagicOnionGenerator Input="..\ChatApp.Unity\Assembly-CSharp.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
   </Target>
 </Project>
