@@ -19,53 +19,43 @@ Before running the app, select the latest build ID from the link below, download
 [gRPC Packages](https://packages.grpc.io/)
 
 ## Solution configuration
+![image](https://user-images.githubusercontent.com/38392460/71502123-96a5eb80-28b1-11ea-886e-bc240ddebd11.PNG)
 Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
 
-And from the Server side, do Code link of the folder for Shared of Unity project.  
-Add the following specification to `ChatApp.Server.csproj`.  
+Create a Shared project for common code reference and reference the source code that exists on the Unity side with a code link.  
+The Server project simply references the Shared project directly.  
+  
+※1 Code link  
+Add the following specification to `ChatApp.Shared.csproj`.
 ```xml
 <ItemGroup>
-  <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" LinkBase="LinkFromUnity" />
+  <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" />
 </ItemGroup>
 ```
-![image](https://user-images.githubusercontent.com/38392460/55617417-fd88ef00-57ce-11e9-96c8-d1796ce614db.PNG)
 
-Other than that, You can also copy files by creating a CopyTask.
-```xml
-  <ItemGroup>
-    <SourceFiles Include="$(ProjectDir)..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Copy SourceFiles="@(SourceFiles)" DestinationFiles="$(ProjectDir)\LinkFromUnity\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-  </Target>
-```
 
 ## Code generate
 In order to use MagicOnion, a dedicated Formatter for each MessagePackObject implemented is required.  
 I will explain how each is generated.  
+  
+The package reference and build tasks for automatic code generation are shown in  
+Add to the Shared project and automatically generate code.  
+  
+Add the following specification to `ChatApp.Shared.csproj`.
+```xml
+<ItemGroup>
+  <PackageReference Include="MagicOnion.Abstractions" Version="3.0.0" />
+  <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="3.0.0" PrivateAssets="All" />
+  <PackageReference Include="MessagePack.MSBuild.Tasks" Version="2.0.323" PrivateAssets="All" />
+</ItemGroup>
 
-`MagicOnionCodeGenerator` https://github.com/cysharp/MagicOnion/releases  
-`MessagePackUniversalCodeGenerator` https://github.com/neuecc/MessagePack-CSharp/releases  
-See above for the auto generation tool.  
-
-In the sample, source code is automatically generated from EditorMenu as an example.  
-Please check the source code in the sample directly for details.  
-The following excerpt is only part.  
-```csharp
-var psi = new ProcessStartInfo()
-{
-    CreateNoWindow = true,
-    WindowStyle = ProcessWindowStyle.Hidden,
-    RedirectStandardOutput = true,
-    RedirectStandardError = true,
-    UseShellExecute = false,
-    FileName = filePath + exeFileName,
-    Arguments = $@"-i ""{rootPath}/ChatApp.Server/ChatApp.Server.csproj"" -o ""{Application.dataPath}/Scripts/Generated/MagicOnion.Generated.cs""",
-};
-
-var p = Process.Start(psi);
+<Target Name="GenerateMessagePack" AfterTargets="Compile">
+  <MessagePackGenerator Input=".\ChatApp.Shared.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MessagePack.Generated.cs" />
+</Target>
+<Target Name="GenerateMagicOnion" AfterTargets="Compile">
+  <MagicOnionGenerator Input=".\ChatApp.Shared.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
+</Target>
 ```
-![image](https://user-images.githubusercontent.com/38392460/55618800-5908ac00-57d2-11e9-9238-10dc13a1dbfe.png)
 
 
 ## Registration of Resolver
