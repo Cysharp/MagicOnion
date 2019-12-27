@@ -126,5 +126,20 @@ namespace MagicOnion
             return symbol.GetMembers()
                 .Concat(symbol.AllInterfaces.SelectMany(x => x.GetMembers()));
         }
+
+        public static bool ApproximatelyEqual(this ITypeSymbol left, ITypeSymbol right)
+        {
+            if (left == null && right == null) return true;
+            if (left == null || right == null) return false;
+
+            if (left is IErrorTypeSymbol || right is IErrorTypeSymbol)
+            {
+                return left.ToDisplayString() == right.ToDisplayString();
+            }
+            else
+            {
+                return SymbolEqualityComparer.Default.Equals(left, right);
+            }
+        }
     }
 }

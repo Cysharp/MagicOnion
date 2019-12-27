@@ -1,8 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,37 +9,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace MagicOnion.GeneratorCore.Utils
 {
-    internal static class BuildCompilation
+    internal static class PseudoCompilation
     {
-        static Type[] standardMetadata = new[]
-        {
-            typeof(object),
-            typeof(Enumerable),
-            typeof(Task<>),
-            typeof(IgnoreDataMemberAttribute),
-            typeof(System.Collections.Hashtable),
-            typeof(System.Collections.Generic.List<>),
-            typeof(System.Collections.Generic.HashSet<>),
-            typeof(System.Collections.Immutable.IImmutableList<>),
-            typeof(System.Linq.ILookup<,>),
-            typeof(System.Tuple<>),
-            typeof(System.ValueTuple<>),
-            typeof(System.Collections.Concurrent.ConcurrentDictionary<,>),
-            typeof(System.Collections.ObjectModel.ObservableCollection<>),
-        };
-
         public static Task<CSharpCompilation> CreateFromProjectAsync(string[] csprojs, string[] preprocessorSymbols, CancellationToken cancellationToken)
         {
-            var parseOption = new CSharpParseOptions(LanguageVersion.Latest, DocumentationMode.Parse, SourceCodeKind.Regular, preprocessorSymbols);
+            var parseOption = new CSharpParseOptions(LanguageVersion.Latest, DocumentationMode.Parse, SourceCodeKind.Regular, CleanPreprocessorSymbols(preprocessorSymbols));
             var syntaxTrees = new List<SyntaxTree>();
-            var metadata = standardMetadata
-               .Select(x => x.Assembly.Location)
-               .Distinct()
-               .Select(x => MetadataReference.CreateFromFile(x))
-               .ToList();
+            var metadata = GetStandardReferences();
 
             var sources = new HashSet<string>();
             var locations = new List<string>();
@@ -71,14 +49,17 @@ namespace MagicOnion.GeneratorCore.Utils
                 "CodeGenTemp",
                 syntaxTrees,
                 metadata,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    allowUnsafe: true,
+                    metadataImportOptions: MetadataImportOptions.All));
 
             return Task.FromResult(compilation);
         }
 
         public static async Task<CSharpCompilation> CreateFromDirectoryAsync(string directoryRoot, string[] preprocessorSymbols, string dummyAnnotation, CancellationToken cancellationToken)
         {
-            var parseOption = new CSharpParseOptions(LanguageVersion.Latest, DocumentationMode.Parse, SourceCodeKind.Regular, preprocessorSymbols);
+            var parseOption = new CSharpParseOptions(LanguageVersion.Latest, DocumentationMode.Parse, SourceCodeKind.Regular, CleanPreprocessorSymbols(preprocessorSymbols));
 
             var syntaxTrees = new List<SyntaxTree>();
             foreach (var file in IterateCsFileWithoutBinObj(directoryRoot))
@@ -92,15 +73,9 @@ namespace MagicOnion.GeneratorCore.Utils
                 }
             }
 
-            {
-                syntaxTrees.Add(CSharpSyntaxTree.ParseText(dummyAnnotation, parseOption));
-            }
+            syntaxTrees.Add(CSharpSyntaxTree.ParseText(dummyAnnotation, parseOption));
 
-            var metadata = standardMetadata
-                .Select(x => x.Assembly.Location)
-                .Distinct()
-                .Select(x => MetadataReference.CreateFromFile(x))
-                .ToList();
+            var metadata = GetStandardReferences();
 
             var compilation = CSharpCompilation.Create(
                 "CodeGenTemp",
@@ -109,6 +84,62 @@ namespace MagicOnion.GeneratorCore.Utils
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
 
             return compilation;
+        }
+
+        private static List<PortableExecutableReference> GetStandardReferences()
+        {
+            var standardMetadataType = new[]
+            {
+                typeof(object),
+                typeof(Attribute),
+                typeof(Enumerable),
+                typeof(Task<>),
+                typeof(IgnoreDataMemberAttribute),
+                typeof(System.Collections.Hashtable),
+                typeof(System.Collections.Generic.List<>),
+                typeof(System.Collections.Generic.HashSet<>),
+                typeof(System.Collections.Immutable.IImmutableList<>),
+                typeof(System.Linq.ILookup<,>),
+                typeof(System.Tuple<>),
+                typeof(System.ValueTuple<>),
+                typeof(System.Collections.Concurrent.ConcurrentDictionary<,>),
+                typeof(System.Collections.ObjectModel.ObservableCollection<>),
+            };
+
+            var metadata = standardMetadataType
+               .Select(x => x.Assembly.Location)
+               .Distinct()
+               .Select(x => MetadataReference.CreateFromFile(x))
+               .ToList();
+
+            var dir = new FileInfo(typeof(object).Assembly.Location).Directory;
+            {
+                var path = Path.Combine(dir.FullName, "netstandard.dll");
+                if (File.Exists(path))
+                {
+                    metadata.Add(MetadataReference.CreateFromFile(path));
+                }
+            }
+
+            {
+                var path = Path.Combine(dir.FullName, "System.Runtime.dll");
+                if (File.Exists(path))
+                {
+                    metadata.Add(MetadataReference.CreateFromFile(path));
+                }
+            }
+
+            return metadata;
+        }
+
+        private static IEnumerable<string> CleanPreprocessorSymbols(string[] preprocessorSymbols)
+        {
+            if (preprocessorSymbols == null)
+            {
+                return null;
+            }
+
+            return preprocessorSymbols.Where(x => !string.IsNullOrWhiteSpace(x));
         }
 
         private static void CollectDocument(string csproj, HashSet<string> source, List<string> metadataLocations)
@@ -241,7 +272,7 @@ namespace MagicOnion.GeneratorCore.Utils
                     }
                 }
 
-                var solvedDllPaths = new HashSet<string>();
+                var resolvedDllPaths = new HashSet<string>();
                 void CollectNugetPackages(string id, string packageVersion, string originalTargetFramework)
                 {
                     foreach (var targetFramework in NetstandardFallBack(originalTargetFramework).Distinct())
@@ -254,13 +285,14 @@ namespace MagicOnion.GeneratorCore.Utils
 
                         if (Directory.Exists(pathpath))
                         {
-                            if (solvedDllPaths.Add(pathpath))
+                            if (resolvedDllPaths.Add(pathpath))
                             {
-                                foreach (var dependency in SolveNuGetDependency(nugetPackagesPath, id, packageVersion, targetFramework))
+                                foreach (var dependency in ResolveNuGetDependency(nugetPackagesPath, id, packageVersion, targetFramework))
                                 {
                                     CollectNugetPackages(dependency.id, dependency.version, originalTargetFramework);
                                 }
                             }
+
                             break;
                         }
                     }
@@ -275,7 +307,7 @@ namespace MagicOnion.GeneratorCore.Utils
                     CollectNugetPackages(includePath, packageVersion, originalTargetFramework);
                 }
 
-                foreach (var item in solvedDllPaths)
+                foreach (var item in resolvedDllPaths)
                 {
                     foreach (var dllPath in Directory.GetFiles(item, "*.dll"))
                     {
@@ -285,15 +317,23 @@ namespace MagicOnion.GeneratorCore.Utils
             }
         }
 
-        static IEnumerable<string> NetstandardFallBack(string originalTargetFramework)
+        private static IEnumerable<string> NetstandardFallBack(string originalTargetFramework)
         {
             yield return originalTargetFramework;
+            if (originalTargetFramework.Contains("netcoreapp"))
+            {
+                yield return "netcoreapp3.1";
+                yield return "netcoreapp3.0";
+                yield return "netcoreapp2.1";
+                yield return "netcoreapp2.0";
+            }
+
             yield return "netstandard2.1";
             yield return "netstandard2.0";
             yield return "netstandard1.6";
         }
 
-        static IEnumerable<(string id, string version)> SolveNuGetDependency(string nugetPackagesPath, string includePath, string packageVersion, string targetFramework)
+        private static IEnumerable<(string id, string version)> ResolveNuGetDependency(string nugetPackagesPath, string includePath, string packageVersion, string targetFramework)
         {
             var dirPath = Path.Combine(nugetPackagesPath, includePath, packageVersion);
             if (!Directory.Exists(dirPath))
@@ -361,6 +401,9 @@ namespace MagicOnion.GeneratorCore.Utils
 
         private static IEnumerable<string> GetCompileFullPaths(XElement compile, string includeOrRemovePattern, string csProjRoot)
         {
+            // solve macro
+            includeOrRemovePattern = includeOrRemovePattern.Replace("$(ProjectDir)", csProjRoot);
+
             var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
             matcher.AddIncludePatterns(includeOrRemovePattern.Split(';'));
             var exclude = compile?.Attribute("Exclude")?.Value;

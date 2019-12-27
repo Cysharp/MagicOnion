@@ -782,7 +782,15 @@ dotnet moc -h
 `MagicOnion.MSBuild.Tasks` is easy way of generate code that target to shared project. We're mostly recommended to use this way. For example, PostCompile sample.
 
 ```csharp
-// in Shared.csproj
+<!-- in Shared.csproj -->
+
+<ItemGroup>
+    <!-- Install MSBuild Task(with PrivateAssets="All", it means to use dependency only in build time). -->
+    <PackageReference Include="MessagePack.MSBuild.Tasks" Version="*" PrivateAssets="All" />
+    <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="*" PrivateAssets="All" />
+</ItemGroup>
+
+<!-- Call code generator after compile successfully. -->
 <Target Name="GenerateMessagePack" AfterTargets="Compile">
     <MessagePackGenerator Input="$(ProjectPath)" Output="..\UnityClient\Assets\Scripts\Generated\MessagePack.Generated.cs" />
 </Target>

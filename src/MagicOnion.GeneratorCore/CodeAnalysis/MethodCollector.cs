@@ -88,7 +88,7 @@ namespace MagicOnion.CodeAnalysis
         public MethodCollector(string csProjPath, IEnumerable<string> conditinalSymbols, Action<string> logger)
         {
             this.csProjPath = csProjPath;
-            var compilation = BuildCompilation.CreateFromProjectAsync(new[] { csProjPath }, conditinalSymbols.ToArray(), CancellationToken.None).GetAwaiter().GetResult();
+            var compilation = PseudoCompilation.CreateFromProjectAsync(new[] { csProjPath }, conditinalSymbols.ToArray(), CancellationToken.None).GetAwaiter().GetResult();
             this.typeReferences = new ReferenceSymbols(compilation, logger);
 
             var bothInterfaces = compilation.GetNamedTypeSymbols()
@@ -96,7 +96,7 @@ namespace MagicOnion.CodeAnalysis
                 .Where(x =>
                 {
                     var all = x.AllInterfaces;
-                    if (all.Any(y => y == typeReferences.IServiceMarker) || all.Any(y => y == typeReferences.IStreamingHubMarker))
+                    if (all.Any(y => y.ApproximatelyEqual(typeReferences.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(typeReferences.IStreamingHubMarker)))
                     {
                         return true;
                     }
@@ -105,14 +105,14 @@ namespace MagicOnion.CodeAnalysis
                 .ToArray();
 
             serviceInterfaces = bothInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IServiceMarker) && x.AllInterfaces.All(y => y != typeReferences.IStreamingHubMarker))
-                .Where(x => x.ConstructedFrom != this.typeReferences.IService)
+                .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(typeReferences.IServiceMarker)) && x.AllInterfaces.All(y => !y.ApproximatelyEqual(typeReferences.IStreamingHubMarker)))
+                .Where(x => !x.ConstructedFrom.ApproximatelyEqual(this.typeReferences.IService))
                 .Distinct()
                 .ToArray();
 
             hubInterfaces = bothInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y == typeReferences.IStreamingHubMarker))
-                .Where(x => x.ConstructedFrom != this.typeReferences.IStreamingHub)
+                .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(typeReferences.IStreamingHubMarker)))
+                .Where(x => !x.ConstructedFrom.ApproximatelyEqual(this.typeReferences.IStreamingHub))
                 .Distinct()
                 .ToArray();
         }
@@ -152,7 +152,7 @@ namespace MagicOnion.CodeAnalysis
                             .ToArray()
                     };
 
-                    var receiver = x.AllInterfaces.First(y => y.ConstructedFrom == this.typeReferences.IStreamingHub).TypeArguments[1];
+                    var receiver = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(this.typeReferences.IStreamingHub)).TypeArguments[1];
 
                     var receiverDefinition = new InterfaceDefinition()
                     {
@@ -234,14 +234,14 @@ namespace MagicOnion.CodeAnalysis
             }
 
             var constructedFrom = retType.ConstructedFrom;
-            if (constructedFrom == typeReferences.TaskOfT)
+            if (constructedFrom.ApproximatelyEqual(typeReferences.TaskOfT))
             {
                 retType2 = retType.TypeArguments[0];
                 retType = retType2 as INamedTypeSymbol;
                 constructedFrom = retType?.ConstructedFrom;
             }
 
-            if (constructedFrom == typeReferences.UnaryResult)
+            if (constructedFrom.ApproximatelyEqual(typeReferences.UnaryResult))
             {
                 methodType = MethodType.Unary;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
@@ -249,7 +249,7 @@ namespace MagicOnion.CodeAnalysis
                 unwrappedOriginalResponseType = retType.TypeArguments[0];
                 return;
             }
-            else if (constructedFrom == typeReferences.ServerStreamingResult)
+            else if (constructedFrom.ApproximatelyEqual(typeReferences.ServerStreamingResult))
             {
                 methodType = MethodType.ServerStreaming;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
@@ -257,7 +257,7 @@ namespace MagicOnion.CodeAnalysis
                 unwrappedOriginalResponseType = retType.TypeArguments[0];
                 return;
             }
-            else if (constructedFrom == typeReferences.ClientStreamingResult)
+            else if (constructedFrom.ApproximatelyEqual(typeReferences.ClientStreamingResult))
             {
                 methodType = MethodType.ClientStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -265,7 +265,7 @@ namespace MagicOnion.CodeAnalysis
                 unwrappedOriginalResponseType = retType.TypeArguments[1];
                 return;
             }
-            else if (constructedFrom == typeReferences.DuplexStreamingResult)
+            else if (constructedFrom.ApproximatelyEqual(typeReferences.DuplexStreamingResult))
             {
                 methodType = MethodType.DuplexStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
