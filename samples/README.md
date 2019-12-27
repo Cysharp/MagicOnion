@@ -19,7 +19,7 @@ Before running the app, select the latest build ID from the link below, download
 [gRPC Packages](https://packages.grpc.io/)
 
 ## Solution configuration
-![image](https://user-images.githubusercontent.com/38392460/71502123-96a5eb80-28b1-11ea-886e-bc240ddebd11.PNG)
+![image](https://user-images.githubusercontent.com/38392460/71507978-a3ced480-28c9-11ea-9090-8f4ef4ffc306.png)
 Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
 
 Create a Shared project for common code reference and reference the source code that exists on the Unity side with a code link.  
