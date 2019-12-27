@@ -58,8 +58,8 @@ namespace MagicOnion
             ExtractResolverInfo(definitions, out genericInfos, out enumInfos);
             ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2);
             ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3);
-            enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().ToArray();
-            genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().ToArray();
+            enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
+            genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
 
             logger("Method Collect Complete:" + sw.Elapsed.ToString());
 
