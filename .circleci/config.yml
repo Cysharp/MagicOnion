@@ -54,7 +54,7 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
       # - run: dotnet build ./src/MagicOnion.UniversalCodeGenerator/ -c Debug
       - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
-      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
+      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug -- xunit.parallelizeTestCollections=false
       - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
   build-push:
     executor: dotnet
