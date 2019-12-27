@@ -132,6 +132,7 @@ namespace MagicOnion.CodeAnalysis
                         .Select(CreateMethodDefinition)
                         .ToArray()
                 })
+                .OrderBy(x => x.FullName)
                 .ToArray();
         }
 
@@ -168,6 +169,8 @@ namespace MagicOnion.CodeAnalysis
 
                     return (hubDefinition, receiverDefinition);
                 })
+                .OrderBy(x => x.hubDefinition.FullName)
+                .ThenBy(x => x.receiverDefinition.FullName)
                 .ToArray();
         }
 
