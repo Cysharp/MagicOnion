@@ -1,9 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/runtime:2.2-stretch-slim AS base
-#FROM mcr.microsoft.com/dotnet/core/runtime:2.2 AS base
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS base
 EXPOSE 12345
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["ChatApp.Server/ChatApp.Server.csproj", "ChatApp.Server/"]
 RUN dotnet restore "ChatApp.Server/ChatApp.Server.csproj"

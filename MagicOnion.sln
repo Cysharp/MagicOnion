@@ -58,6 +58,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{42EBB7E4
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Shared", "samples\ChatApp\ChatApp.Shared\ChatApp.Shared.csproj", "{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{56C42B86-138C-413B-805A-30D07566660A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56C42B86-138C-413B-805A-30D07566660A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56C42B86-138C-413B-805A-30D07566660A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -149,6 +155,7 @@ Global
 		{963FD601-3CE6-42DE-9FAC-C70D5494FA9B} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{EE768243-100A-4075-8823-C49EA086680A} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{56C42B86-138C-413B-805A-30D07566660A} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15} = {5A3F5158-7B17-4586-9885-9E60C1393185}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
