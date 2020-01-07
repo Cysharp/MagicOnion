@@ -17,7 +17,7 @@ namespace MagicOnion.MSBuild.Tasks
 
         public string Namespace { get; set; }
 
-        public bool? UnuseUnityAttr { get; set; }
+        public bool UnuseUnityAttr { get; set; } = false;
 
         public override bool Execute()
         {
@@ -27,7 +27,7 @@ namespace MagicOnion.MSBuild.Tasks
                     .GenerateFileAsync(
                         Input,
                         Output,
-                        UnuseUnityAttr ?? false,
+                        UnuseUnityAttr,
                         Namespace ?? "MagicOnion",
                         ConditionalSymbol
                     )
