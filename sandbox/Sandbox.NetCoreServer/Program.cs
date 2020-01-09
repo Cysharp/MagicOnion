@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0219
+#pragma warning disable CS0219
 
 using Grpc.Core;
 using Grpc.Core.Logging;
@@ -6,7 +6,6 @@ using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.HttpGateway.Swagger;
 using MagicOnion.Server;
-using MagicOnion.Server.EmbeddedServices;
 using MagicOnion.Utils;
 using MessagePack;
 using MagicOnion.Hosting;
@@ -61,15 +60,18 @@ namespace Sandbox.NetCoreServer
             // test webhost
 
             // NuGet: Microsoft.AspNetCore.Server.Kestrel
-            var webHost = new WebHostBuilder()
+            var webHost = Host.CreateDefaultBuilder()
                 .ConfigureServices(collection =>
                 {
                     // Add MagicOnionServiceDefinition for reference from Startup.
                     collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
                 })
-                .UseKestrel()
-                .UseStartup<Startup>()
-                .UseUrls("http://localhost:5432")
+                .ConfigureWebHost(web =>
+                {
+                    web.UseKestrel()
+                    .UseStartup<Startup>()
+                    .UseUrls("http://localhost:5432");
+                })
                 .Build();
 
             await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
