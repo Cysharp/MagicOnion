@@ -10,7 +10,13 @@ namespace MagicOnion.Generator
     {
         static async Task Main(string[] args)
         {
-            await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args).ConfigureAwait(false);
+            await Host.CreateDefaultBuilder()
+                .ConfigureLogging(logging =>
+                {
+                    logging.ReplaceToSimpleConsole();
+                })
+                .RunConsoleAppFrameworkAsync<Program>(args)
+                .ConfigureAwait(false);
         }
 
         public async Task RunAsync(
