@@ -1,15 +1,16 @@
-﻿using MagicOnion.GeneratorCore;
-using MicroBatchFramework;
+using MagicOnion.GeneratorCore;
 using System;
 using System.Threading.Tasks;
+using ConsoleAppFramework;
+using Microsoft.Extensions.Hosting;
 
 namespace MagicOnion.Generator
 {
-    public class Program : BatchBase
+    public class Program : ConsoleAppBase
     {
         static async Task Main(string[] args)
         {
-            await BatchHost.CreateDefaultBuilder().RunBatchEngineAsync<Program>(args).ConfigureAwait(false);
+            await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args).ConfigureAwait(false);
         }
 
         public async Task RunAsync(

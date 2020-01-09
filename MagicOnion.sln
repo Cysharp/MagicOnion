@@ -37,6 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.OpenTelemetry", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-201F-4255-9ADA-622B52D2A6ED}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		.circleci\config.yml = .circleci\config.yml
 		LICENSE = LICENSE

@@ -1,0 +1,14 @@
+[*.cs]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.csproj]
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[Dockerfile]
+charset = utf-8
+indent_style = space
+indent_size = 4
