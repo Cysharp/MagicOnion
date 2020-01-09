@@ -1,4 +1,4 @@
-﻿using MagicOnion.Server;
+using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
 using MessagePack;
@@ -129,13 +129,13 @@ namespace MagicOnion.Redis
                 {
                     var excludes = NativeGuidArrayFormatter.Deserialize(ref reader);
                     var offset = (int)reader.Consumed;
-                    return group.WriteExceptRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: false);
+                    return group.WriteExceptRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: true);
                 }
                 else
                 {
                     var includes = NativeGuidArrayFormatter.Deserialize(ref reader);
                     var offset = (int)reader.Consumed;
-                    return group.WriteToRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), includes, fireAndForget: false);
+                    return group.WriteToRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), includes, fireAndForget: true);
                 }
             }
 
