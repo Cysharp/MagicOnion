@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -10,25 +10,35 @@ public static class PackageExporter
     public static void Export()
     {
         // configure
-        var root = "Scripts/MagicOnion";
         var exportPath = "./MagicOnion.Client.Unity.unitypackage";
+        var roots = new[]
+        {
+            "Scripts/MagicOnion",
+            "Scripts/MagicOnion.Abstractions"
+        };
 
-        var path = Path.Combine(Application.dataPath, root);
-        var assets = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-            .Where(x => Path.GetExtension(x) == ".cs" || Path.GetExtension(x) == ".asmdef" || Path.GetExtension(x) == ".json" || Path.GetExtension(x) == ".meta")
-            .Select(x => "Assets" + x.Replace(Application.dataPath, "").Replace(@"\", "/"))
+        var packageTargetAssets = roots
+            .SelectMany(root =>
+            {
+                var path = Path.Combine(Application.dataPath, root);
+                var assets = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                    .Where(x => Path.GetExtension(x) == ".cs" || Path.GetExtension(x) == ".asmdef" || Path.GetExtension(x) == ".json" || Path.GetExtension(x) == ".meta")
+                    .Select(x => "Assets" + x.Replace(Application.dataPath, "").Replace(@"\", "/"))
+                    .ToArray();
+                return assets;
+            })
             .ToArray();
 
         var netStandardsAsset = Directory.EnumerateFiles(Path.Combine(Application.dataPath, "Plugins"), "System.*", SearchOption.AllDirectories)
             .Select(x => "Assets" + x.Replace(Application.dataPath, "").Replace(@"\", "/"))
             .ToArray();
 
-        assets = assets.Concat(netStandardsAsset).ToArray();
+        packageTargetAssets = packageTargetAssets.Concat(netStandardsAsset).ToArray();
 
-        UnityEngine.Debug.Log("Export below files" + Environment.NewLine + string.Join(Environment.NewLine, assets));
+        UnityEngine.Debug.Log("Export below files" + Environment.NewLine + string.Join(Environment.NewLine, packageTargetAssets));
 
         AssetDatabase.ExportPackage(
-            assets,
+            packageTargetAssets,
             exportPath,
             ExportPackageOptions.Default);
 
