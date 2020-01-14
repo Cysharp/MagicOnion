@@ -54,8 +54,8 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
       # - run: dotnet build ./src/MagicOnion.UniversalCodeGenerator/ -c Debug
       - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
-      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug --logger:"console;verbosity=detailed"
-      - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug --logger:"console;verbosity=detailed"
+      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug < /dev/null
+      - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug < /dev/null
   build-push:
     executor: dotnet
     steps:
@@ -70,8 +70,8 @@ jobs:
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:Version=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:Version=${CIRCLE_TAG}
       # tests
-      # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
-      # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
+      # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release < /dev/null
+      # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release < /dev/null
       # pack nuget
       - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
       - run: dotnet pack ./src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj -c Release --no-build -p:Version=${CIRCLE_TAG}
