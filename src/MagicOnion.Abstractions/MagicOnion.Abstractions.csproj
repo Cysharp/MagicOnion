@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -22,10 +22,10 @@ MagicOnion.IgnoreAttribute</Description>
 
    <!-- Copy files for unity MagicOnion -->
    <PropertyGroup>
-     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\</DestinationRoot>
+     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Abstractions\</DestinationRoot>
    </PropertyGroup>
    <ItemGroup>
-     <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*;UnsafeDirectBlitResolver.cs;InternalsVisibleTo.cs" />
+     <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;InternalsVisibleTo.cs" />
    </ItemGroup>
    <ItemGroup>
      <TargetFiles Remove="InternalsVisibleTo.cs" />

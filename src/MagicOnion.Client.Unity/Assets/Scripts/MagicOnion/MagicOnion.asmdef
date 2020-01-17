@@ -1,0 +1,15 @@
+{
+    "name": "MagicOnion",
+    "references": [
+        "MessagePack",
+        "MagicOnion.Abstractions"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
