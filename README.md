@@ -1807,6 +1807,8 @@ await MagicOnionHost.CreateDefaultBuilder()
     .RunConsoleAsync();
 ```
 
+Now you can detect client network disconnection on serverside by override `OnDisconnected`.
+
 ## Author Info
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
 He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
