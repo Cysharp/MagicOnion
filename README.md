@@ -997,7 +997,7 @@ var options = new[]
 Pass this options to Channel on Client, or to `IHostBuilder.UseMagicOnion` on Server will configure Keepalive.
 
 ```csharp
-// Unity Client
+// Client
 this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure, options);
 ```
 
