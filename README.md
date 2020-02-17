@@ -121,6 +121,7 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [Unity client supports](#unity-client-supports)
     - [Server Host](#server-host)
         - [Server Host options](#server-host-options)
+    - [gRPC Keepalive](#grpc-keepalive)
 - Deployment
     - [Host in Docker](#host-in-docker)
     - [SSL/TLS](#ssltls)
@@ -131,7 +132,6 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [MagicOnionOption/Logging](#magiconionoptionlogging)
     - [Raw gRPC APIs](#raw-grpc-apis)
     - [Zero deserialization mapping](#zero-deserialization-mapping)
-    - [gRPC Keepalive](#grpc-keepalive)
 - [Author Info](#author-info)
 - [License](#license)
 
@@ -961,6 +961,91 @@ class Program
 }
 ```
 
+### gRPC Keepalive
+
+When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
+It's nothing special, just follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
+
+MagicOnion offers two ways to configure gRPC Core Keepalive, `ChannelOption` and `MagicOnionOption`.
+
+**ChannelOption**
+
+ChannelOptions is primitive way to configure options.
+Below uses `ChannelOption` and offer keepalive for every 10 second even RPC is not called.
+
+```csharp
+// If you want configure KEEP_ALIVE interval, then....
+// * set same value for `grpc.keepalive_time_ms` and `grpc.http2.min_time_between_pings_ms`
+// * keep `grpc.http2.min_ping_interval_without_data_ms < grpc.http2.min_time_between_pings_ms`
+var options = new[]
+{
+    // send keepalive ping every 10 second, default is 2 hours
+    new ChannelOption("grpc.keepalive_time_ms", 10000),
+    // keepalive ping time out after 5 seconds, default is 20 seoncds
+    new ChannelOption("grpc.keepalive_timeout_ms", 5000),
+    // allow grpc pings from client every 10 seconds
+    new ChannelOption("grpc.http2.min_time_between_pings_ms", 10000),
+    // allow unlimited amount of keepalive pings without data
+    new ChannelOption("grpc.http2.max_pings_without_data", 0),
+    // allow keepalive pings when there's no gRPC calls
+    new ChannelOption("grpc.keepalive_permit_without_calls", 1),
+    // allow grpc pings from client without data every 5 seconds
+    new ChannelOption("grpc.http2.min_ping_interval_without_data_ms", 5000),
+};
+```
+
+Pass this options to Channel on Client, or to `IHostBuilder.UseMagicOnion` on Server will configure Keepalive.
+
+```csharp
+// Unity Client
+this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure, options);
+```
+
+```csharp
+// Server (Program.cs)
+await MagicOnionHost.CreateDefaultBuilder()
+    .UseMagicOnion(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true), new ServerPort("0.0.0.0", 12345, ServerCredentials.Insecure), grpcOptions)
+    .RunConsoleAsync();
+```
+
+**MagicOnionOption**
+
+Here's another option `MagicOnionOption`. With MagicOnionOption, you can use appsettings.json to configure grpc parameters for Serverside MagicOnion!
+Let's translate same grpc options in json.
+
+```json
+{
+    "MagicOnion": {
+        "ServerPorts": [
+            {
+                "Host": "0.0.0.0",
+                "Port": 12345,
+                "UseInsecureConnection": true
+            }
+        ],
+        "ChannelOptions": {
+            "grpc.keepalive_time_ms": "10000",
+            "grpc.keepalive_timeout_ms": "5000",
+            "grpc.http2.min_time_between_pings_ms": "10000",
+            "grpc.http2.max_pings_without_data": "0",
+            "grpc.keepalive_permit_without_calls": "1",
+            "grpc.http2.min_ping_interval_without_data_ms": "5000"
+        }
+    }
+}
+```
+
+All you need to do on Program.cs is just call `.UseMagicOnion`.
+
+```csharp
+await MagicOnionHost.CreateDefaultBuilder()
+    .UseMagicOnion()
+    .RunConsoleAsync();
+```
+
+Now you can detect client network disconnection on serverside, let's override `OnDisconnected` and set debugger, disconnect Client network and wait for interval sec!
+
+
 ## Deployment
 
 ### Host in Docker
@@ -1724,90 +1809,6 @@ await client.SendAsync(new CustomStruct { Hp = 99 });
 Nothing needs to be processed here, so it promises the best performance theoretically possible in terms of transmission speed. However, since these struct-type variables need to be copied, I recommend handling everything as ref as a rule when you need to define a large struct-type, or it might slow down the process.
 
 I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
-
-### gRPC Keepalive
-
-When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
-It's nothing special, just follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
-
-MagicOnion offers 2way to configure gRPC Core Keepalive, `ChannelOption` and `MagicOnionOption`.
-
-**ChannelOption**
-
-ChannelOptions is primitive way to configure options.
-Below uses `ChannelOption` and offer keepalive for every 10 second even RPC is not called.
-
-```csharp
-// If you want configure KEEP_ALIVE interval, then....
-// * set same value for `grpc.keepalive_time_ms` and `grpc.http2.min_time_between_pings_ms`
-// * keep `grpc.http2.min_ping_interval_without_data_ms < grpc.http2.min_time_between_pings_ms`
-var options = new[]
-{
-    // send keepalive ping every 10 second, default is 2 hours
-    new ChannelOption("grpc.keepalive_time_ms", 10000),
-    // keepalive ping time out after 5 seconds, default is 20 seoncds
-    new ChannelOption("grpc.keepalive_timeout_ms", 5000),
-    // allow grpc pings from client every 10 seconds
-    new ChannelOption("grpc.http2.min_time_between_pings_ms", 10000),
-    // allow unlimited amount of keepalive pings without data
-    new ChannelOption("grpc.http2.max_pings_without_data", 0),
-    // allow keepalive pings when there's no gRPC calls
-    new ChannelOption("grpc.keepalive_permit_without_calls", 1),
-    // allow grpc pings from client without data every 5 seconds
-    new ChannelOption("grpc.http2.min_ping_interval_without_data_ms", 5000),
-};
-```
-
-Pass this options to Channel on Client, or to `IHostBuilder.UseMagicOnion` on Server will configure Keepalive.
-
-```csharp
-// Unity Client
-this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure, options);
-```
-
-```csharp
-// Server (Program.cs)
-await MagicOnionHost.CreateDefaultBuilder()
-    .UseMagicOnion(new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true), new ServerPort("0.0.0.0", 12345, ServerCredentials.Insecure), grpcOptions)
-    .RunConsoleAsync();
-```
-
-**MagicOnionOption**
-
-Here's another option `MagicOnionOption`. With MagicOnionOption, you can use appsettings.json to configure grpc parameters for Serverside MagicOnion!
-Let's translate same grpc options in json.
-
-```json
-{
-    "MagicOnion": {
-        "ServerPorts": [
-            {
-                "Host": "0.0.0.0",
-                "Port": 12345,
-                "UseInsecureConnection": true
-            }
-        ],
-        "ChannelOptions": {
-            "grpc.keepalive_time_ms": "10000",
-            "grpc.keepalive_timeout_ms": "5000",
-            "grpc.http2.min_time_between_pings_ms": "10000",
-            "grpc.http2.max_pings_without_data": "0",
-            "grpc.keepalive_permit_without_calls": "1",
-            "grpc.http2.min_ping_interval_without_data_ms": "5000"
-        }
-    }
-}
-```
-
-All you need to do on Program.cs is just call `.UseMagicOnion`.
-
-```csharp
-await MagicOnionHost.CreateDefaultBuilder()
-    .UseMagicOnion()
-    .RunConsoleAsync();
-```
-
-Now you can detect client network disconnection on serverside, let's override `OnDisconnected` and set debugger, disconnect Client network and wait for interval sec!
 
 ## Author Info
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
