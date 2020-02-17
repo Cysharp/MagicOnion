@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -29,6 +29,9 @@
         <ProjectReference Include="..\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj" PrivateAssets="All" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
     <!--
         The include needs to happen after output has been copied to build output folder
         but before NuGet generates a nuspec. See https://github.com/NuGet/Home/issues/4704.

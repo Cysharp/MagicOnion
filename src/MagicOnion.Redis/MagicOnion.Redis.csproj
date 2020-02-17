@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.0.323" />
+        <PackageReference Include="MessagePack" Version="2.1.80" />
         <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
         <PackageReference Include="System.Buffers" Version="4.5.0" />
     </ItemGroup>
@@ -31,6 +31,6 @@
 
     <ItemGroup>
         <Compile Include="../MagicOnion/Utils/ArrayPoolBufferWriter.cs" />
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
     </ItemGroup>
-
 </Project>

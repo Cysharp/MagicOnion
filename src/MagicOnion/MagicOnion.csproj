@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) but currently removed(for CI) -->
@@ -24,6 +24,10 @@
         <DefineConstants>NON_UNITY;ENABLE_SAVE_ASSEMBLY</DefineConstants>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
     <!-- NuGet -->
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -32,7 +36,7 @@
 
     <ItemGroup>
         <PackageReference Include="Grpc" Version="2.23.0" />
-        <PackageReference Include="MessagePack" Version="2.0.323" />
+        <PackageReference Include="MessagePack" Version="2.1.80" />
         <PackageReference Include="System.Buffers" Version="4.5.0" />
         <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />

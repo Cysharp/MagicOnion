@@ -3,7 +3,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <VersionPrefix>3.0.9</VersionPrefix>
+    <VersionPrefix>3.0.10</VersionPrefix>
 
     <!-- NuGet Packaging -->
     <PackageVersion>$(Version)</PackageVersion>
@@ -15,5 +15,6 @@
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Icon.png</PackageIcon>
   </PropertyGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
@@ -33,7 +33,7 @@
 
     <ItemGroup>
         <PackageReference Include="Grpc" Version="2.23.0" />
-        <PackageReference Include="MessagePack" Version="2.0.323" />
+        <PackageReference Include="MessagePack" Version="2.1.80" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     </ItemGroup>
 
@@ -48,4 +48,7 @@
         <EmbeddedResource Include="Swagger\SwaggerUI\*" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
 </Project>
