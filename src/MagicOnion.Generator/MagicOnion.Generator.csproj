@@ -14,6 +14,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="ConsoleAppFramework" Version="2.0.0" />
     </ItemGroup>
 

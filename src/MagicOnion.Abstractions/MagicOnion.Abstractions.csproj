@@ -20,7 +20,11 @@ MagicOnion.IgnoreAttribute</Description>
     <PackageReference Include="MessagePack" Version="2.0.323" />
   </ItemGroup>
 
-   <!-- Copy files for unity MagicOnion -->
+  <ItemGroup>
+    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Copy files for unity MagicOnion -->
    <PropertyGroup>
      <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Abstractions\</DestinationRoot>
    </PropertyGroup>
