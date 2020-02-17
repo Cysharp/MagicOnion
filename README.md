@@ -1758,7 +1758,7 @@ var options = new[]
 };
 ```
 
-Pass this options to Channel on Unity with `new Channel` or on Server with `IHostBuilder.UseMagicOnion`
+Pass this options to Channel on Client, or to `IHostBuilder.UseMagicOnion` on Server will configure Keepalive.
 
 ```csharp
 // Unity Client
@@ -1807,7 +1807,7 @@ await MagicOnionHost.CreateDefaultBuilder()
     .RunConsoleAsync();
 ```
 
-Now you can detect client network disconnection on serverside by override `OnDisconnected`.
+Now you can detect client network disconnection on serverside, let's override `OnDisconnected` and set debugger, disconnect Client network and wait for interval sec!
 
 ## Author Info
 This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
