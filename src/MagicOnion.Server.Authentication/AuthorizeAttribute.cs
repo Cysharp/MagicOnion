@@ -56,6 +56,6 @@ namespace MagicOnion.Server.Authentication
 
         public int Order { get; set; }
 
-        public string[] Roles { get; set; }
+        public string[] Roles { get; set; } = Array.Empty<string>();
     }
 }

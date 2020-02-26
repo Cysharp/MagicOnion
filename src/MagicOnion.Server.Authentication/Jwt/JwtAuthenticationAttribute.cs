@@ -49,6 +49,10 @@ namespace MagicOnion.Server.Authentication.Jwt
                 {
                     throw new ReturnStatusException(StatusCode.Unauthenticated, $"The authentication token is invalid. (Reason: {result})");
                 }
+                if (principal == null)
+                {
+                    throw new ReturnStatusException(StatusCode.Unauthenticated, $"The authentication token is invalid. (Reason: Principal is not provided)");
+                }
 
                 var validationCtx = new JwtAuthenticationValidationContext(principal);
                 _jwtAuthProvider.ValidatePrincipal(ref validationCtx);

@@ -5,7 +5,7 @@ namespace MagicOnion.Server.Authentication.Jwt
 {
     public interface IJwtAuthenticationProvider
     {
-        DecodeResult TryCreatePrincipalFromToken(byte[] bytes, out IPrincipal principal);
+        DecodeResult TryCreatePrincipalFromToken(byte[] bytes, out IPrincipal? principal);
 
         byte[] CreateTokenFromPayload(object payload);
 

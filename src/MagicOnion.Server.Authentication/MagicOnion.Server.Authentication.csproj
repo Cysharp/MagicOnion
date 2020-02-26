@@ -9,6 +9,8 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1701;1702;1705;1591</NoWarn>
         <DefineConstants>NON_UNITY</DefineConstants>
+        <nullable>enable</nullable>
+        <LangVersion>latest</LangVersion>
 
         <!-- NuGet -->
         <PackageId>MagicOnion.Server.Authentication</PackageId>
