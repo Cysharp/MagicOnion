@@ -1,0 +1,46 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using JwtAuthApp.Server.Authentication;
+using JwtAuthApp.Shared;
+using MagicOnion.Server;
+using MagicOnion.Server.Authentication;
+using MagicOnion.Server.Hubs;
+
+namespace JwtAuthApp.Server.Hubs
+{
+    [Authorize]
+    public class TimerHub : StreamingHubBase<ITimerHub, ITimerHubReceiver>, ITimerHub
+    {
+        private Task _timerLoopTask;
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private TimeSpan _interval = TimeSpan.FromSeconds(1);
+        private IGroup _group;
+
+        public async Task SetAsync(TimeSpan interval)
+        {
+            if (_timerLoopTask != null) throw new InvalidOperationException("The timer has been already started.");
+
+            _group = await this.Group.AddAsync(ConnectionId.ToString());
+            _interval = interval;
+            _timerLoopTask = Task.Run(async () =>
+            {
+                while (!_cancellationTokenSource.IsCancellationRequested)
+                {
+                    await Task.Delay(_interval, _cancellationTokenSource.Token);
+
+                    var identity = Context.GetPrincipal().Identity as CustomJwtAuthUserIdentity;
+                    BroadcastToSelf(_group).OnTick($"UserId={identity.UserId}; Name={identity.Name}");
+                }
+            });
+        }
+
+        protected override ValueTask OnDisconnected()
+        {
+            _cancellationTokenSource.Cancel();
+            return base.OnDisconnected();
+        }
+    }
+}
