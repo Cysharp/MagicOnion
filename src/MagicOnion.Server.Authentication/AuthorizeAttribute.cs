@@ -7,6 +7,9 @@ using Grpc.Core;
 
 namespace MagicOnion.Server.Authentication
 {
+    /// <summary>
+    /// Specifies that the class or method that this attribute is applied to require authorization.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
     {

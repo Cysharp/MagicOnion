@@ -37,7 +37,7 @@ namespace JwtAuthApp.Server.Authentication
 
             return _jwtAuthOptions.Encoder.EncodeAsUtf8Bytes(
                 payload,
-                DateTimeOffset.Now.Add(_jwtAuthOptions.Expiry),
+                DateTimeOffset.Now.Add(_jwtAuthOptions.Expire),
                 (o, writer) => writer.Write(JsonSerializer.SerializeToUtf8Bytes(o)));
         }
 

@@ -11,6 +11,13 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MagicOnionAuthenticationJwtServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds JWT authentication and provider for MagicOnion to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <typeparam name="TProvider"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
         public static IServiceCollection AddMagicOnionJwtAuthentication<TProvider>(this IServiceCollection services, Action<JwtAuthenticationOptions> configureOptions)
             where TProvider: class, IJwtAuthenticationProvider
         {

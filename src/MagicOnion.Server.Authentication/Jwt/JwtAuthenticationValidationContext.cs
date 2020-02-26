@@ -13,6 +13,9 @@ namespace MagicOnion.Server.Authentication.Jwt
             Principal = principal;
         }
 
+        /// <summary>
+        /// Rejects the current principal.
+        /// </summary>
         public void Reject()
         {
             Rejected = true;

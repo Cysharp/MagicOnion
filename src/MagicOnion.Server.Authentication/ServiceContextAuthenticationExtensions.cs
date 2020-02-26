@@ -16,6 +16,11 @@ namespace MagicOnion.Server
             context.Items[MagicOnionPrincipal.ServiceContextItemKeyPrincipal] = principal;
         }
 
+        /// <summary>
+        /// Gets the principal associated with this service context.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static IPrincipal GetPrincipal(this ServiceContext context)
         {
             return context.Items[MagicOnionPrincipal.ServiceContextItemKeyPrincipal] as IPrincipal ?? MagicOnionPrincipal.AnonymousPrincipal;
