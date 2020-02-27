@@ -31,14 +31,14 @@ namespace JwtAuthApp.Server.Authentication
             return DecodeResult.Success;
         }
 
-        public byte[] CreateTokenFromPayload(object payload)
+        public JwtAuthenticationTokenResult CreateTokenFromPayload(object payload)
         {
             if (payload == null) throw new ArgumentNullException(nameof(payload));
 
-            return _jwtAuthOptions.Encoder.EncodeAsUtf8Bytes(
-                payload,
-                DateTimeOffset.Now.Add(_jwtAuthOptions.Expire),
-                (o, writer) => writer.Write(JsonSerializer.SerializeToUtf8Bytes(o)));
+            var expire = DateTimeOffset.Now.Add(_jwtAuthOptions.Expire);
+            var encoded = _jwtAuthOptions.Encoder.EncodeAsUtf8Bytes(payload, expire, (o, writer) => writer.Write(JsonSerializer.SerializeToUtf8Bytes(o)));
+
+            return new JwtAuthenticationTokenResult(encoded, expire);
         }
 
         public void ValidatePrincipal(ref JwtAuthenticationValidationContext ctx)

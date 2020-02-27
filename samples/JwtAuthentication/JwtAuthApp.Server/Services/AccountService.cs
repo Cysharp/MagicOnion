@@ -35,10 +35,13 @@ namespace JwtAuthApp.Server.Services
 
             if (DummyUsers.TryGetValue(signInId, out var userInfo) && userInfo.Password == password)
             {
+                var encodedPayload = _jwtAuthProvider.CreateTokenFromPayload(new CustomJwtAuthenticationPayload() {UserId = userInfo.UserId, DisplayName = userInfo.DisplayName});
+
                 return new SignInResponse(
                     userInfo.UserId,
                     userInfo.DisplayName,
-                    _jwtAuthProvider.CreateTokenFromPayload(new CustomJwtAuthenticationPayload() { UserId = userInfo.UserId, DisplayName = userInfo.DisplayName })
+                    encodedPayload.Token,
+                    encodedPayload.Expiration
                 );
             }
 

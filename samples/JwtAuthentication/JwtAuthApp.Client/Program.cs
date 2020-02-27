@@ -18,69 +18,67 @@ namespace JwtAuthApp.Client
             var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
 
             // 1. Call an API without an authentication token.
-            var accountClient = MagicOnionClient.Create<IAccountService>(channel);
-            var user = await accountClient.GetCurrentUserNameAsync();
-            Console.WriteLine($@"[IAccountService.GetCurrentUserNameAsync] Current User: UserId={user.UserId}; IsAuthenticated={user.IsAuthenticated}; Name={user.Name}");
-            try
             {
-                var greeterClientAnon = MagicOnionClient.Create<IGreeterService>(channel);
-                Console.WriteLine($"[IGreeterService.HelloAsync] {await greeterClientAnon.HelloAsync()}");
-            }
-            catch (RpcException e)
-            {
-                Console.WriteLine($"[IGreeterService.HelloAsync] Exception: {e.Message}");
+                var accountClient = MagicOnionClient.Create<IAccountService>(channel);
+                var user = await accountClient.GetCurrentUserNameAsync();
+                Console.WriteLine($@"[IAccountService.GetCurrentUserNameAsync] Current User: UserId={user.UserId}; IsAuthenticated={user.IsAuthenticated}; Name={user.Name}");
+                try
+                {
+                    var greeterClientAnon = MagicOnionClient.Create<IGreeterService>(channel);
+                    Console.WriteLine($"[IGreeterService.HelloAsync] {await greeterClientAnon.HelloAsync()}");
+                }
+                catch (RpcException e)
+                {
+                    Console.WriteLine($"[IGreeterService.HelloAsync] Exception: {e.Message}");
+                }
             }
 
-            // 2. Sign-in with ID and password and receive an authentication token.
+            // 3. Sign-in with ID and password and receive an authentication token. (WithAuthenticationFilter will acquire an authentication token automatically.)
             var signInId = "kyaru@example.com";
             var password = "P@ssword2";
-            Console.WriteLine($@"[IAccountService.SignInAsync] Try signing in as '{signInId}'...");
-            var authResult = await accountClient.SignInAsync(signInId, password);
-            if (authResult.Success)
-            {
-                Console.WriteLine($@"[IAccountService.SignInAsync] User authenticated as {authResult.Name} (UserId:{authResult.UserId})");
-            }
-            else
-            {
-                throw new Exception("[IAccountService.SignInAsync] Authentication failed.");
-            }
 
-            // 3. Get the user information using the authentication token.
-            accountClient = MagicOnionClient.Create<IAccountService>(channel)
-                .WithHeaders(new Metadata
-                {
-                    { "auth-token-bin", authResult.Token }
-                });
-            user = await accountClient.GetCurrentUserNameAsync();
-            Console.WriteLine($@"[IAccountService.GetCurrentUserNameAsync] Current User: UserId={user.UserId}; IsAuthenticated={user.IsAuthenticated}; Name={user.Name}");
+            // 4. Get the user information using the authentication token.
+            {
+                var accountClient = MagicOnionClient.Create<IAccountService>(channel, new[] { new WithAuthenticationFilter(signInId, password, channel), });
+                var user = await accountClient.GetCurrentUserNameAsync();
+                Console.WriteLine($@"[IAccountService.GetCurrentUserNameAsync] Current User: UserId={user.UserId}; IsAuthenticated={user.IsAuthenticated}; Name={user.Name}");
 
-            // 4. Call an API with the authentication token.
-            var greeterClient = MagicOnionClient.Create<IGreeterService>(channel)
-                .WithHeaders(new Metadata
-                {
-                    { "auth-token-bin", authResult.Token }
-                });
-            Console.WriteLine($"[IGreeterService.HelloAsync] {await greeterClient.HelloAsync()}");
+                // 5. Call an API with the authentication token.
+                var greeterClient = MagicOnionClient.Create<IGreeterService>(channel, new[] { new WithAuthenticationFilter(signInId, password, channel), });
+                Console.WriteLine($"[IGreeterService.HelloAsync] {await greeterClient.HelloAsync()}");
+            }
 
             // 5. Call StreamingHub with authentication
-            var timerHubClient = StreamingHubClient.Connect<ITimerHub, ITimerHubReceiver>(
-                channel,
-                this,
-                option: new CallOptions().WithHeaders(new Metadata()
-                {
-                    { "auth-token-bin", authResult.Token }
-                }));
-            await timerHubClient.SetAsync(TimeSpan.FromSeconds(5));
-            await Task.Yield(); // NOTE: Release the gRPC's worker thread here.
+            {
+                var timerHubClient = StreamingHubClient.Connect<ITimerHub, ITimerHubReceiver>(
+                    channel,
+                    this,
+                    option: new CallOptions().WithHeaders(new Metadata()
+                    {
+                        { "auth-token-bin", AuthenticationTokenStorage.Current.Token }
+                    }));
+                await timerHubClient.SetAsync(TimeSpan.FromSeconds(5));
+                await Task.Yield(); // NOTE: Release the gRPC's worker thread here.
+            }
 
             // 6. Insufficient privilege (The current user is not in administrators role).
-            try
             {
-                await accountClient.DangerousOperationAsync();
+                var accountClient = MagicOnionClient.Create<IAccountService>(channel, new[] { new WithAuthenticationFilter(signInId, password, channel), });
+                try
+                {
+                    await accountClient.DangerousOperationAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[IAccountService.DangerousOperationAsync] Exception: {e.Message}");
+                }
             }
-            catch (Exception e)
+
+            // 7. Refresh the token before calling an API.
             {
-                Console.WriteLine($"[IAccountService.DangerousOperationAsync] Exception: {e.Message}");
+                await Task.Delay(1000 * 6); // The server is configured a token expiration set to 5 seconds.
+                var greeterClient = MagicOnionClient.Create<IGreeterService>(channel, new[] { new WithAuthenticationFilter(signInId, password, channel), });
+                Console.WriteLine($"[IGreeterService.HelloAsync] {await greeterClient.HelloAsync()}");
             }
 
             Console.ReadLine();
@@ -89,6 +87,71 @@ namespace JwtAuthApp.Client
         void ITimerHubReceiver.OnTick(string message)
         {
             Console.WriteLine($"[ITimerHubReceiver.OnTick] {message}");
+        }
+    }
+
+    // NOTE: This implementation is for demonstration purpose only. DO NOT USE THIS IN PRODUCTION.
+    class WithAuthenticationFilter : IClientFilter
+    {
+        private readonly string _signInId;
+        private readonly string _password;
+        private readonly Channel _channel;
+
+        public WithAuthenticationFilter(string signInId, string password, Channel channel)
+        {
+            _signInId = signInId ?? throw new ArgumentNullException(nameof(signInId));
+            _password = password ?? throw new ArgumentNullException(nameof(password));
+            _channel = channel ?? throw new ArgumentNullException(nameof(channel));
+        }
+
+        public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
+        {
+            if (AuthenticationTokenStorage.Current.IsExpired)
+            {
+                Console.WriteLine($@"[WithAuthenticationFilter/IAccountService.SignInAsync] Try signing in as '{_signInId}'... ({(AuthenticationTokenStorage.Current.Token == null ? "FirstTime" : "RefreshToken")})");
+
+                var client = MagicOnionClient.Create<IAccountService>(_channel);
+                var authResult = await client.SignInAsync(_signInId, _password);
+                if (!authResult.Success)
+                {
+                    throw new Exception("Failed to sign-in on the server.");
+                }
+                Console.WriteLine($@"[WithAuthenticationFilter/IAccountService.SignInAsync] User authenticated as {authResult.Name} (UserId:{authResult.UserId})");
+
+                AuthenticationTokenStorage.Current.Update(authResult.Token, authResult.Expiration); // NOTE: You can also read the token expiration date from JWT.
+
+                context.CallOptions.Headers.Remove(new Metadata.Entry("auth-token-bin", Array.Empty<byte>()));
+            }
+
+            if (!context.CallOptions.Headers.Contains(new Metadata.Entry("auth-token-bin", Array.Empty<byte>())))
+            {
+                context.CallOptions.Headers.Add("auth-token-bin", AuthenticationTokenStorage.Current.Token);
+            }
+
+            return await next(context);
+        }
+    }
+
+    // When the authentication filter acquires an authentication token, the token is stored in somewhere. (e.g. In-memory, JSON, PlayerPrefs, etc ...)
+    // The token may be used repeatedly by multiple clients (MagicOnionClient or StreamingHubClient).
+    class AuthenticationTokenStorage
+    {
+        public static AuthenticationTokenStorage Current { get; } = new AuthenticationTokenStorage();
+
+        private readonly object _syncObject = new object();
+
+        public byte[] Token { get; private set; }
+        public DateTimeOffset Expiration { get; private set; }
+
+        public bool IsExpired => Token == null || Expiration < DateTimeOffset.Now;
+
+        public void Update(byte[] token, DateTimeOffset expiration)
+        {
+            lock (_syncObject)
+            {
+                Token = token ?? throw new ArgumentNullException(nameof(token));
+                Expiration = expiration;
+            }
         }
     }
 }

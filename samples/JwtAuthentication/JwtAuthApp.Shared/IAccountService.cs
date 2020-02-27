@@ -19,18 +19,20 @@ namespace JwtAuthApp.Shared
         public long UserId { get; set; }
         public string Name { get; set; }
         public byte[] Token { get; set; }
+        public DateTimeOffset Expiration { get; set; }
         public bool Success { get; set; }
 
         public static SignInResponse Failed { get; } = new SignInResponse() { Success = false };
 
         public SignInResponse() { }
 
-        public SignInResponse(long userId, string name, byte[] token)
+        public SignInResponse(long userId, string name, byte[] token, DateTimeOffset expiration)
         {
+            Success = true;
             UserId = userId;
             Name = name;
             Token = token;
-            Success = true;
+            Expiration = expiration;
         }
     }
 

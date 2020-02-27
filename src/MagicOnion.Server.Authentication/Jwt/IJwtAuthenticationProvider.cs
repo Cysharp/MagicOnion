@@ -21,7 +21,7 @@ namespace MagicOnion.Server.Authentication.Jwt
         /// </summary>
         /// <param name="payload"></param>
         /// <returns></returns>
-        byte[] CreateTokenFromPayload(object payload);
+        JwtAuthenticationTokenResult CreateTokenFromPayload(object payload);
 
         /// <summary>
         /// Validates a principal. The methods will be called on executing the authentication process.
