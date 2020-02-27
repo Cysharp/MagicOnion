@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Grpc.Core;
 using LitJWT;
+using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.Authentication.Jwt
 {
@@ -15,17 +16,18 @@ namespace MagicOnion.Server.Authentication.Jwt
         {
             private readonly IJwtAuthenticationProvider _jwtAuthProvider;
             private readonly bool _isAuthTokenRequired;
-            private const string RequestHeaderKeyAuthTokenBin = "auth-token-bin";
+            private readonly string _requestHeaderKey;
 
-            public JwtAuthenticationFilter(IJwtAuthenticationProvider jwtAuthProvider, bool isAuthTokenRequired = false)
+            public JwtAuthenticationFilter(IJwtAuthenticationProvider jwtAuthProvider, string requestHeaderKey, bool isAuthTokenRequired)
             {
                 _jwtAuthProvider = jwtAuthProvider ?? throw new ArgumentNullException(nameof(jwtAuthProvider));
+                _requestHeaderKey = requestHeaderKey ?? throw new ArgumentNullException(nameof(requestHeaderKey));
                 _isAuthTokenRequired = isAuthTokenRequired;
             }
 
             public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
             {
-                var metadataAuthToken = context.CallContext.RequestHeaders.Get(RequestHeaderKeyAuthTokenBin);
+                var metadataAuthToken = context.CallContext.RequestHeaders.Get(_requestHeaderKey);
                 if (metadataAuthToken == null)
                 {
                     if (_isAuthTokenRequired)
@@ -69,7 +71,9 @@ namespace MagicOnion.Server.Authentication.Jwt
 
         public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new JwtAuthenticationFilter(serviceLocator.GetService<IJwtAuthenticationProvider>());
+            var options = serviceLocator.GetService<IOptions<JwtAuthenticationOptions>>().Value;
+            var provider = serviceLocator.GetService<IJwtAuthenticationProvider>();
+            return new JwtAuthenticationFilter(provider, options.RequestHeaderKey, options.IsAuthTokenRequired);
         }
 
         public int Order { get; set; }
