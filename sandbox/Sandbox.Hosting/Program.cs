@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1998
+#pragma warning disable CS1998
 
 using Grpc.Core;
 using MagicOnion;

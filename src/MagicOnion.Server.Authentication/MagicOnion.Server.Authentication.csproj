@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>NON_UNITY</DefineConstants>
+        <nullable>enable</nullable>
+        <LangVersion>latest</LangVersion>
+
+        <!-- NuGet -->
+        <PackageId>MagicOnion.Server.Authentication</PackageId>
+        <Description>Provides simple authentication an authorization mechanism for MagicOnion.</Description>
+        <VersionSuffix>preview</VersionSuffix>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="LitJWT" Version="1.1.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\MagicOnion.Hosting\MagicOnion.Hosting.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
+</Project>
