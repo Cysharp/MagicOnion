@@ -17,7 +17,7 @@ MagicOnion.IgnoreAttribute</Description>
 
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.25.0" />
-    <PackageReference Include="MessagePack" Version="2.1.80" />
+    <PackageReference Include="MessagePack" Version="2.1.90" />
   </ItemGroup>
 
   <ItemGroup>
