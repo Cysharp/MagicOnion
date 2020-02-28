@@ -13,7 +13,7 @@
     <ItemGroup>
         <PackageReference Include="Grpc" Version="2.23.0" />
         <PackageReference Include="MessagePack" Version="2.1.80" />
-        <PackageReference Include="MessagePack.UnityShims" Version="1.9.3" />
+        <PackageReference Include="MessagePack.UnityShims" Version="1.9.11" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
