@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.1.80" />
+        <PackageReference Include="MessagePack" Version="2.1.90" />
         <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
         <PackageReference Include="System.Buffers" Version="4.5.0" />
     </ItemGroup>
