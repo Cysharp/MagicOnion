@@ -26,6 +26,7 @@ jobs:
   build-unity:
     executor: unity
     steps:
+      - run: apt update && apt install git -y
       - checkout
       # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
