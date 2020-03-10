@@ -164,7 +164,7 @@ namespace MagicOnion
             byte[] rentMemory = ArrayPool<byte>.Shared.Rent(size);
             try
             {
-                var span = rentMemory.AsSpan().Slice(size);
+                var span = rentMemory.AsSpan().Slice(0, size);
                 Unsafe.WriteUnaligned(ref span[0], value);
                 writer.Write(span);
             }
