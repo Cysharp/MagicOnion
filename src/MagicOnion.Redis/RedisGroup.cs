@@ -9,17 +9,35 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Redis
 {
+    public class RedisGroupOptions
+    {
+        public ConnectionMultiplexer ConnectionMultiplexer { get; }
+        public int Db { get; }
+
+        public RedisGroupOptions(ConnectionMultiplexer connectionMultiplexer, int db = -1)
+        {
+            ConnectionMultiplexer = connectionMultiplexer;
+            Db = db;
+        }
+    }
+
     public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
     {
         public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator)
         {
-            var connection = serviceLocator.GetService<ConnectionMultiplexer>();
-            if (connection == null)
+            var options = serviceLocator.GetService<RedisGroupOptions>();
+            if (options == null)
             {
-                throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
+                var connection = serviceLocator.GetService<ConnectionMultiplexer>();
+                if (connection == null)
+                {
+                    throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
+                }
+
+                options = new RedisGroupOptions(connection);
             }
 
-            return new RedisGroupRepository(serializerOptions, connection, logger);
+            return new RedisGroupRepository(serializerOptions, options, logger);
         }
     }
 
@@ -28,16 +46,18 @@ namespace MagicOnion.Redis
         MessagePackSerializerOptions serializerOptions;
         IMagicOnionLogger logger;
         ConnectionMultiplexer connection;
+        int db;
 
         readonly Func<string, IGroup> factory;
         ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-        public RedisGroupRepository(MessagePackSerializerOptions serializerOptions, ConnectionMultiplexer connection, IMagicOnionLogger logger)
+        public RedisGroupRepository(MessagePackSerializerOptions serializerOptions, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
         {
             this.serializerOptions = serializerOptions;
             this.logger = logger;
             this.factory = CreateGroup;
-            this.connection = connection;
+            this.connection = redisGroupOptions.ConnectionMultiplexer;
+            this.db = redisGroupOptions.Db;
         }
 
         public IGroup GetOrAdd(string groupName)
@@ -47,7 +67,7 @@ namespace MagicOnion.Redis
 
         IGroup CreateGroup(string groupName)
         {
-            return new RedisGroup(groupName, serializerOptions, new ConcurrentDictionaryGroup(groupName, this, serializerOptions, logger), connection.GetSubscriber(), connection.GetDatabase());
+            return new RedisGroup(groupName, serializerOptions, new ConcurrentDictionaryGroup(groupName, this, serializerOptions, logger), connection.GetSubscriber(), connection.GetDatabase(db));
         }
 
         public bool TryGet(string groupName, out IGroup group)
@@ -142,9 +162,9 @@ namespace MagicOnion.Redis
             return Task.CompletedTask;
         }
 
-        public ValueTask<int> GetMemberCountAsync()
+        public async ValueTask<int> GetMemberCountAsync()
         {
-            throw new NotImplementedException();
+            return (int)await database.StringGetAsync(counterKey);
         }
 
         public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
