@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  git-shallow-clone: guitarrapc/git-shallow-clone@0.2.0
+  git-shallow-clone: guitarrapc/git-shallow-clone@1.1.0
 executors:
   dotnet:
     docker:
@@ -47,7 +47,7 @@ jobs:
   build-test:
     executor: dotnet
     steps:
-      - checkout
+      - git-shallow-clone/checkout_shallow
       - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
       - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
@@ -61,7 +61,7 @@ jobs:
   build-push:
     executor: dotnet
     steps:
-      - checkout
+      - git-shallow-clone/checkout_shallow
       # build .NET Core projects
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionPrefix=${CIRCLE_TAG}
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionPrefix=${CIRCLE_TAG}
@@ -193,7 +193,7 @@ jobs:
             - /Users/distiller/Downloads/Unity_Packages/2018.4.5f1/UnitySetup-Android-Support-for-Editor-2018.4.5f1.pkg
           when: on_success
       # checkout and run unity build
-      - checkout
+      - git-shallow-clone/checkout_shallow
       - run:
           command: source $BASH_ENV && /Applications/Unity_2018.4.5f1/Unity.app/Contents/MacOS/Unity -quit -batchmode -nographics -silent-crashes -logFile -noUpm -executeMethod BatchBuild.Build -platform android -locationpath ./build/chatapp.apk -serial ${UNITY_SERIAL} -username ${UNITY_USERNAME} -password ${UNITY_PASSWORD}
           working_directory: ./samples/ChatApp/ChatApp.Unity
@@ -209,7 +209,7 @@ jobs:
   canary-build-and-push-nuget:
     executor: dotnet
     steps:
-      - checkout
+      - git-shallow-clone/checkout_shallow
       - run: echo "export MAGICONION_VERSION=`echo ci-\`date '+%Y%m%d-%H%M%S'\`+${CIRCLE_SHA1:0:6}`" >> $BASH_ENV
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build .NET Core projects
