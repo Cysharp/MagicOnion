@@ -26,7 +26,7 @@ for .NET 4.6, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity sup
 ```
 Install-Package MagicOnion
 ```
-MagicOnion has two sides, `Service` for like web-api and `StreamingHub` for relatime communication. At first, see define `Service`.
+MagicOnion has two sides, `Service` for like web-api and `StreamingHub` for realtime communication. At first, see define `Service`.
 
 ```csharp
 using Grpc.Core;
