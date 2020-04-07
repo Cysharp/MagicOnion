@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1998
+#pragma warning disable CS1998
 
 using MagicOnion.CodeAnalysis;
 using System.Linq;
@@ -194,6 +194,13 @@ namespace MagicOnion
             return sb.ToString();
         }
 
+        static string NormalizeNewLines(string content)
+        {
+            // The T4 generated code may be text with mixed line ending types. (CR + CRLF)
+            // We need to normalize the line ending type in each Operating Systems. (e.g. Windows=CRLF, Linux/macOS=LF)
+            return content.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+        }
+
         static void Output(string path, string text)
         {
             path = path.Replace("global::", "");
@@ -207,7 +214,7 @@ namespace MagicOnion
                 fi.Directory.Create();
             }
 
-            System.IO.File.WriteAllText(path, text, NoBomUtf8);
+            System.IO.File.WriteAllText(path, NormalizeNewLines(text), NoBomUtf8);
         }
 
         static readonly SymbolDisplayFormat binaryWriteFormat = new SymbolDisplayFormat(
