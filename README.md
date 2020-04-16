@@ -750,6 +750,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 ## Server and Clients
 
 ### Unity client Supports
+
 You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
 
 MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version.
@@ -814,6 +815,36 @@ Full options are below.
 ```
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
+
+### stripping debug symbols from Grpc.Core/runtime/ios/libgrpc.a
+
+When you download grpc daily build and extract Native Libararies for Unity, you will find Plugins/Grpc.Core/runtime/ios/libgrpc.a size is over 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
+The reason "Why libgrpc.a size is up to 250MB?" is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
+
+We prepare `strip_grpc_ios_binaries.sh` to strip debug symbols for each architectures and generate `libgrpc_stripped.a`.
+Script may be useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
+
+**How to use**
+
+Download gRPC lib from [gRPC daily builds](https://packages.grpc.io/) and download `grpc_unity_package.*.*.*-dev.zip`, extract it will generate Plugins folder.
+
+Copy `/THIS_REPO>/tool/strip_grpc_ios_binaries.sh` to `Plugins/Grpc.Core/runtime/ios/`, execute script will generate `libgrpc_stripped.a`.
+
+```shell
+$ cp ./tools/strip_grpc_ios_binaries.sh ./Plugins/Groc.Core/runtime/ios/.
+$ cd ./Plugins/Groc.Core/runtime/ios
+$ chmod +x ./strip_grpc_ios_binaries.sh && strip_grpc_ios_binaries.sh
+```
+
+Once stripped native lib had generated, replace it with libgrpc.a in Unity Plugin directory.
+
+```shell
+$ cp ./libgrpc_stripped.a ${UNITY_PATH}/Assets/Plugin/Grpc.Core/runtime/ios/libgrpc_stripped.a
+$ cd ${UNITY_PATH}/Assets/Plugin/Grpc.Core/runtime/ios/
+$ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
+```
+
+Make sure you can build app with iOS and works fine.
 
 ### Server host
 I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2) to host .NET Core app. `MagicOnion.Hosting` package helps to build to use MagicOnion.
