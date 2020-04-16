@@ -54,18 +54,3 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
-
-# gRPC Plugins
-# https://packages.grpc.io/
-[Aa]ssets/Plugins/Google.Protobuf/
-[Aa]ssets/Plugins/Google.Protobuf.meta
-[Aa]ssets/Plugins/Grpc.Core/
-[Aa]ssets/Plugins/Grpc.Core.meta
-[Aa]ssets/Plugins/Grpc.Core.Api/
-[Aa]ssets/Plugins/Grpc.Core.Api.meta
-[Aa]ssets/Plugins/System.Buffers/
-[Aa]ssets/Plugins/System.Buffers.meta
-[Aa]ssets/Plugins/System.Memory/
-[Aa]ssets/Plugins/System.Memory.meta
-[Aa]ssets/Plugins/System.Runtime.CompilerServices.Unsafe/
-[Aa]ssets/Plugins/System.Runtime.CompilerServices.Unsafe.meta
