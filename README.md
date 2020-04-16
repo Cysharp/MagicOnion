@@ -831,8 +831,8 @@ Download gRPC lib from [gRPC daily builds](https://packages.grpc.io/) and downlo
 Copy `/THIS_REPO>/tool/strip_grpc_ios_binaries.sh` to `Plugins/Grpc.Core/runtime/ios/`, execute script will generate `libgrpc_stripped.a`.
 
 ```shell
-$ cp ./tools/strip_grpc_ios_binaries.sh ./Plugins/Groc.Core/runtime/ios/.
-$ cd ./Plugins/Groc.Core/runtime/ios
+$ cp ./tools/strip_grpc_ios_binaries.sh ./Plugins/Grpc.Core/runtime/ios/.
+$ cd ./Plugins/Grpc.Core/runtime/ios
 $ chmod +x ./strip_grpc_ios_binaries.sh && strip_grpc_ios_binaries.sh
 ```
 
