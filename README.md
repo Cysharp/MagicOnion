@@ -119,6 +119,7 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [Dependency Injection](#dependency-injection)
 - Client and Server
     - [Unity client supports](#unity-client-supports)
+        - [Stripping debug symbols from Grpc.Core/runtime/ios/libgrpc.a](#stripping-debug-symbols-from-Grpc.Core/runtime/ios/libgrpc.a)
     - [Server Host](#server-host)
         - [Server Host options](#server-host-options)
     - [gRPC Keepalive](#grpc-keepalive)
@@ -816,11 +817,11 @@ Full options are below.
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
-### stripping debug symbols from Grpc.Core/runtime/ios/libgrpc.a
-When you download grpc daily build and extract Native Libararies for Unity, you will find Plugins/Grpc.Core/runtime/ios/libgrpc.a size is over 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
+### Stripping debug symbols from Grpc.Core/runtime/ios/libgrpc.a
+When you download grpc daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
 The reason "Why libgrpc.a size is up to 250MB?" is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
 
-We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`.
+We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`, it's abount 17MB.
 This may useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
 
 **How to strip**
