@@ -54,8 +54,8 @@ namespace ChatApp.Server
 
         protected override ValueTask OnConnecting()
         {
-            Console.WriteLine($"client connected {this.Context.ContextId}");
             // handle connection if needed.
+            Console.WriteLine($"client connected {this.Context.ContextId}");
         }
 
         protected override ValueTask OnDisconnected()

@@ -119,6 +119,7 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [Dependency Injection](#dependency-injection)
 - Client and Server
     - [Unity client supports](#unity-client-supports)
+        - [iOS build with grpc](#ios-build-with-grpc)
         - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
     - [Server Host](#server-host)
         - [Server Host options](#server-host-options)
@@ -816,6 +817,49 @@ Full options are below.
 ```
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
+
+### iOS build with grpc
+Grpc iOS build require two additional operation on build.
+
+1. Disable Bitcode
+1. Add libz.tbd
+
+We introduce OnPostProcessingBuild sample [BuildIos.cs](https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/BuildeIos.cs) for ChatApp.Unity to automate these steps.
+
+```csharp
+#if UNITY_IPHONE
+using System.IO;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
+
+public class BuildIos
+{
+    /// <summary>
+    /// Handle libgrpc project settings.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="path"></param>
+    [PostProcessBuild(1)]
+    public static void OnPostProcessBuild(BuildTarget target, string path)
+    {
+        var projectPath = PBXProject.GetPBXProjectPath(path);
+        var project = new PBXProject();
+        project.ReadFromString(File.ReadAllText(projectPath));
+        var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+        // libz.tbd for grpc ios build
+        project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
+
+        // libgrpc_csharp_ext missing bitcode. as BITCODE exand binary size to 250MB.
+        project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
+        
+        File.WriteAllText(projectPath, project.WriteToString());
+    }
+}
+#endif
+```
 
 ### Stripping debug symbols from ios/libgrpc.a
 When you download grpc daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
