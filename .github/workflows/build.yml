@@ -6,9 +6,8 @@ jobs:
   build-test:
     strategy:
       matrix:
-        os: [ubuntu-latest]
         dotnet: ['3.1.201'] # support latest only
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -37,9 +36,8 @@ jobs:
   build-unity:
     strategy:
       matrix:
-        os: [ubuntu-latest]
         unity: ['2018.3.12f1']
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     container:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-windows
