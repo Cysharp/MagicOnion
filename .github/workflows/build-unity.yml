@@ -6,7 +6,9 @@ jobs:
   build:
     strategy:
       matrix:
+        os: [ubuntu-latest]
         unity: ['2018.3.12f1']
+    runs-on: ${{ matrix.os }}
     container:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-windows
