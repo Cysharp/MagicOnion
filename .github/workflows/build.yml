@@ -76,10 +76,3 @@ jobs:
         env:
           GHR_PATH: MagicOnion.Client.Unity.unitypackage
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v1
-        with:
-          name: MagicOnion.Client.Unity.unitypackage
-          path: ./MagicOnion.Client.Unity.unitypackage
-    #   - store_artifacts:
-    #       path: moc.zip
-    #       destination: moc.zip
