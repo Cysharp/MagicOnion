@@ -1,0 +1,64 @@
+name: build
+
+on: [push]
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        dotnet: ['3.1.201'] # support latest only
+    runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core ${{ matrix.dotnet }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ matrix.dotnet }}
+    # build
+    - run: dotnet build ./src/MagicOnion/ -c Debug
+    - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
+    - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
+    - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
+    - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
+    - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
+    - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Debug
+    - run: dotnet build ./src/MagicOnion.Generator/ -c Debug
+    - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Debug
+    - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
+    # test
+    - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
+    - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
+
+  build-unity:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        unity: ['2018.3.12f1']
+    runs-on: ${{ matrix.os }}
+    container:
+      # https://hub.docker.com/r/gableroux/unity3d/tags
+      image: gableroux/unity3d:${{ matrix.unity }}-windows
+    steps:
+    - run: apt update && apt install git -y
+    - uses: actions/checkout@v1
+    # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
+    - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
+    - run: cat Unity_v${{ matrix.unity }}.alf # file name same as image's version
+    # get from UNITY_LICENSE envvar(base64 encoded(cat foo.ulf | base64 )), this file is generated from above manual activation
+    - run: echo ${UNITY_LICENSE} | base64 -di  >> .circleci/Unity.ulf
+      env:
+        UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+    - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .circleci/Unity.ulf || exit 0
+    # Execute scripts(in Linux, currently does not supported IL2CPP so it run on mono)
+    - name: Export unitypackage
+      run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
+      working-directory: src/MagicOnion.Client.Unity
+    - uses: actions/upload-artifact@v1
+      with:
+        name: MagicOnion.Client.Unity.unitypackage
+        path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
