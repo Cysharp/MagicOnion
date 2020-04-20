@@ -60,3 +60,25 @@ jobs:
       with:
         name: MagicOnion.Client.Unity.unitypackage
         path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+
+  upload-github:
+    runs-on: ubuntu-latest
+    needs: build-unity
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: MagicOnion.Client.Unity.unitypackage
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.14'
+      - uses: fnkr/github-action-ghr@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GHR_PATH: MagicOnion.Client.Unity.unitypackage
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - store_artifacts:
+          path: MagicOnion.Client.Unity.unitypackage
+          destination: MagicOnion.Client.Unity.unitypackage
+    #   - store_artifacts:
+    #       path: moc.zip
+    #       destination: moc.zip
