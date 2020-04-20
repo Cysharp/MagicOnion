@@ -827,11 +827,11 @@ This may useful for whom want commit `libgrpc.a` to GitHub, and understanding st
 
 Download gRPC lib `grpc_unity_package.*.*.*-dev.zip` from [gRPC daily builds](https://packages.grpc.io/) and extract it, copy Plugins folder to Unity's Assets path.
 
-Open terminal on `Plugins/Grpc.Core/runtime/ios/` and execute following will generate `libgrpc_stripped.a` and replace original libgrpc.a with stripped version.
+Open terminal on `Plugins/Grpc.Core/runtimes/ios/` and execute following will generate `libgrpc_stripped.a` and replace original libgrpc.a with stripped version.
 
 ```shell
-$ cd ${UNITY_PATH}/Plugins/Groc.Core/runtime/ios
-$ strip -S -x libgprc.a -o libgrpc_stripped.a
+$ cd ${UNITY_PATH}/Plugins/Grpc.Core/runtimes/ios
+$ strip -S -x libgrpc.a -o libgrpc_stripped.a
 $ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
 ```
 
