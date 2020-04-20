@@ -119,7 +119,7 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [Dependency Injection](#dependency-injection)
 - Client and Server
     - [Unity client supports](#unity-client-supports)
-        - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ios/libgrpc.a)
+        - [Stripping debug symbols from ios libgrpc.a](#stripping-debug-symbols-from-ios-libgrpc.a)
     - [Server Host](#server-host)
         - [Server Host options](#server-host-options)
     - [gRPC Keepalive](#grpc-keepalive)
@@ -817,7 +817,7 @@ Full options are below.
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
-### Stripping debug symbols from ios/libgrpc.a
+### Stripping debug symbols from ios libgrpc.a
 When you download grpc daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
 The reason of libgrpc.a file size is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
 
