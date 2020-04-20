@@ -54,3 +54,8 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+# gRPC Plugins
+# https://packages.grpc.io/
+[Aa]ssets/Plugins/Google.Protobuf/
+[Aa]ssets/Plugins/Google.Protobuf.meta
