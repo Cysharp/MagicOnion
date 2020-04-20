@@ -31,6 +31,6 @@ jobs:
     - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Debug
     - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
     # test
-    - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug < /dev/null
-    - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug < /dev/null
+    - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
+    - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
 
