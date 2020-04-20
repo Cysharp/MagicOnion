@@ -817,30 +817,21 @@ Full options are below.
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
 ### stripping debug symbols from Grpc.Core/runtime/ios/libgrpc.a
-
 When you download grpc daily build and extract Native Libararies for Unity, you will find Plugins/Grpc.Core/runtime/ios/libgrpc.a size is over 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
 The reason "Why libgrpc.a size is up to 250MB?" is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
 
-We prepare `strip_grpc_ios_binaries.sh` to strip debug symbols for each architectures and generate `libgrpc_stripped.a`.
-Script may be useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
+We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`.
+This may useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
 
-**How to use**
+**How to strip**
 
-Download gRPC lib from [gRPC daily builds](https://packages.grpc.io/) and download `grpc_unity_package.*.*.*-dev.zip`, extract it will generate Plugins folder.
+Download gRPC lib `grpc_unity_package.*.*.*-dev.zip` from [gRPC daily builds](https://packages.grpc.io/) and extract it, copy Plugins folder to Unity's Assets path.
 
-Copy `/THIS_REPO>/tool/strip_grpc_ios_binaries.sh` to `Plugins/Grpc.Core/runtime/ios/`, execute script will generate `libgrpc_stripped.a`.
-
-```shell
-$ cp ./tools/strip_grpc_ios_binaries.sh ./Plugins/Groc.Core/runtime/ios/.
-$ cd ./Plugins/Groc.Core/runtime/ios
-$ chmod +x ./strip_grpc_ios_binaries.sh && strip_grpc_ios_binaries.sh
-```
-
-Once stripped native lib had generated, replace it with libgrpc.a in Unity Plugin directory.
+Open terminal on `Plugins/Grpc.Core/runtime/ios/` and execute following will generate `libgrpc_stripped.a` and replace original libgrpc.a with stripped version.
 
 ```shell
-$ cp ./libgrpc_stripped.a ${UNITY_PATH}/Assets/Plugin/Grpc.Core/runtime/ios/libgrpc_stripped.a
-$ cd ${UNITY_PATH}/Assets/Plugin/Grpc.Core/runtime/ios/
+$ cd ${UNITY_PATH}/Plugins/Groc.Core/runtime/ios
+$ strip -S -x libgprc.a -o libgrpc_stripped.a
 $ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
 ```
 
