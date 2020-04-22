@@ -2,8 +2,14 @@ name: build-debug
 
 on:
   push:
+    branches:
+      - "**"
     tags:
       - "!*" # not a tag push
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
 jobs:
   build-test:
