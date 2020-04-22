@@ -111,15 +111,15 @@ jobs:
           prerelease: false
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
-      - run: dotnet nuget push ./MagicOnion.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.Abstractions.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.Hosting.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.HttpGateway.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.Redis.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.OpenTelemetry.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.MSBuild.Tasks.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.Generator.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./MagicOnion.Server.Authentication.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.Hosting.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.HttpGateway.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.Redis.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.OpenTelemetry.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.MSBuild.Tasks.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.Generator.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push ./nuget/MagicOnion.Server.Authentication.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
       # Upload to Releases(unitypackage)
       - uses: actions/upload-release-asset@v1
         env:

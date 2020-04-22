@@ -77,12 +77,12 @@ jobs:
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
-      - run: dotnet nuget push ./MagicOnion.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.Abstractions.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.Hosting.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.HttpGateway.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.Redis.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.OpenTelemetry.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.MSBuild.Tasks.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.Generator.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./MagicOnion.Server.Authentication.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.Hosting.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.HttpGateway.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.Redis.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.OpenTelemetry.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.MSBuild.Tasks.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.Generator.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/MagicOnion.Server.Authentication.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
