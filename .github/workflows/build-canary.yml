@@ -5,7 +5,6 @@ on:
     branches:
       - "master"
       - "v3"
-      - "feat/github_actions"
     tags:
       - "!*" # not a tag push
 
@@ -82,5 +81,4 @@ jobs:
         env:
           FEED_ENDPOINTS: ${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
-      # specify each nupkg as *.nupkg seems broken. https://github.com/NuGet/Home/issues/8100
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
