@@ -9,14 +9,17 @@ public static class PackageExporter
     [MenuItem("Tools/Export Unitypackage")]
     public static void Export()
     {
+        var version = Environment.GetEnvironmentVariable("UNITY_PACKAGE_VERSION");
+
         // configure
-        var exportPath = "./MagicOnion.Client.Unity.unitypackage";
         var roots = new[]
         {
             "Scripts/MagicOnion",
             "Scripts/MagicOnion.Abstractions",
             "Scripts/MagicOnion.Unity",
         };
+        var fileName = string.IsNullOrEmpty(version) ? "MagicOnion.Client.Unity.unitypackage" : $"MagicOnion.Client.Unity.{version}.unitypackage";
+        var exportPath = "./" + fileName;
 
         var packageTargetAssets = roots
             .SelectMany(root =>
