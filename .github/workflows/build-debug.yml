@@ -49,7 +49,7 @@ jobs:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-windows
     steps:
-      - run: apt update && apt install git -y
+      - run: apt-get update && apt-get install git -y
       - uses: actions/checkout@v2
       # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
