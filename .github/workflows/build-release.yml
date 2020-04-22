@@ -63,12 +63,10 @@ jobs:
   build-unity:
     strategy:
       matrix:
-        unity: ["2019.3.9f1", "2020.1.0b5"]
+        unity: ["2019.3.9f1"]
         include:
           - unity: 2019.3.9f1
             license: UNITY_2019_3
-          - unity: 2020.1.0b5
-            license: UNITY_2020_1
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
@@ -90,24 +88,20 @@ jobs:
       - name: Activate Unity, always returns a success. But if a subsequent run fails, the activation may have failed(if succeeded, shows `Next license update check is after` and not shows other message(like GUID != GUID). If fails not). In that case, upload the artifact's .alf file to https://license.unity3d.com/manual to get the .ulf file and set it to secrets.
         run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
 
-      # todo: prepare runtime unit test
-      # Execute scripts: RuntimeUnitTestToolkit
-      # - name: Build UnitTest(Linux64, mono)
-      #   run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend mono /BuildTarget StandaloneLinux64
-      #   working-directory: src/ZLogger.Unity
-      # - name: Execute UnitTest
-      #   run: ./src/ZLogger.Unity/bin/UnitTest/StandaloneLinux64_Mono2x/test
+      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
 
       # execute scripts/Export Package
       - name: Export unitypackage
         run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
         working-directory: src/MagicOnion.Client.Unity
+        env:
+          UNITY_PACKAGE_VERSION: ${{ env.GIT_TAG }}
 
       # Store artifacts.
       - uses: actions/upload-artifact@v1
         with:
-          name: MagicOnion.Client.Unity.${{ matrix.unity }}.unitypackage
-          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+          name: MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
+          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
 
   create-release:
     needs: [build-dotnet, build-unity]
@@ -148,6 +142,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MagicOnion.Client.Unity.unitypackage
+          asset_path: ./MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
           asset_name: MagicOnion.Client.Unity.unitypackage
           asset_content_type: application/octet-stream
