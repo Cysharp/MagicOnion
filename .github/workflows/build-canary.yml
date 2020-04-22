@@ -5,6 +5,7 @@ on:
     branches:
       - "master"
       - "v3"
+      - "feat/github_actions"
     tags:
       - "!*" # not a tag push
 
@@ -79,12 +80,4 @@ jobs:
         env:
           FEED_ENDPOINTS: ${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
-      - run: dotnet nuget push ./nuget/MagicOnion.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.Hosting.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.HttpGateway.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.Redis.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.OpenTelemetry.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.MSBuild.Tasks.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.Generator.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
-      - run: dotnet nuget push ./nuget/MagicOnion.Server.Authentication.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push ./nuget/*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
