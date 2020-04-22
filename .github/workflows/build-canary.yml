@@ -76,7 +76,7 @@ jobs:
           dotnet-version: 3.1.101
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
-      - run: echo "::set-env name=VSS_NUGET_EXTERNAL_FEED_ENDPOINTS::${{ secret.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}}"
+      - run: echo "::set-env name=VSS_NUGET_EXTERNAL_FEED_ENDPOINTS::${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}}"
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
       - run: dotnet nuget push ./nuget/MagicOnion.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
       - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.*.nupkg --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
