@@ -11,6 +11,7 @@ jobs:
       matrix:
         dotnet: ["3.1.201"] # support latest only
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -69,6 +70,7 @@ jobs:
           - unity: 2020.1.0b5
             license: UNITY_2020_1
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     container:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
@@ -130,16 +132,16 @@ jobs:
           draft: true
           prerelease: false
       - uses: actions/download-artifact@v2-preview
-      # Upload to NuGet
-      - run: dotnet nuget push ./nuget/MagicOnion.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.Hosting.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.HttpGateway.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.Redis.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.OpenTelemetry.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.MSBuild.Tasks.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.Generator.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
-      - run: dotnet nuget push ./nuget/MagicOnion.Server.Authentication.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # # specify each nupkg as *.nupkg seems broken. https://github.com/NuGet/Home/issues/8100
+      # - run: dotnet nuget push ./nuget/MagicOnion.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.Abstractions.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.Hosting.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.HttpGateway.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.Redis.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.OpenTelemetry.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.MSBuild.Tasks.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.Generator.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # - run: dotnet nuget push ./nuget/MagicOnion.Server.Authentication.${{ env.GIT_TAG }}.nupkg --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
       # Upload to Releases(unitypackage)
       - uses: actions/upload-release-asset@v1
         env:

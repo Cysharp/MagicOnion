@@ -50,6 +50,7 @@ jobs:
           - unity: 2020.1.0b5
             license: UNITY_2020_1
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     container:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
