@@ -1,0 +1,85 @@
+name: build-canary
+
+on:
+  push:
+    branches:
+      - "master"
+      - "v3"
+    tags:
+      - "!*" # not a tag push
+
+jobs:
+  build-dotnet:
+    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
+    strategy:
+      matrix:
+        dotnet: ["3.1.201"] # support latest only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+      - run: echo "::set-env name=MAGICONION_VERSION::ci-`date '+%Y%m%d-%H%M%S'`+${GITHUB_SHA:0:6}"
+      - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
+      # build
+      - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      # test
+      # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
+      # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
+      - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.OpenTelemetry/MagicOnion.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server.Authentication/MagicOnion.Server.Authentication.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nuget
+          path: ./publish/
+      # publish moc
+      - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./src/MagicOnion.Generator/bin/moc/win-x64
+      - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./src/MagicOnion.Generator/bin/moc/linux-x64
+      - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./src/MagicOnion.Generator/bin/moc/osx-x64
+      - run: zip -r moc.${{ env.MAGICONION_VERSION }}.zip ./src/MagicOnion.Generator/bin/moc
+      - uses: actions/upload-artifact@v1
+        with:
+          name: moc.${{ env.MAGICONION_VERSION }}.zip
+          path: ./moc.${{ env.MAGICONION_VERSION }}.zip
+
+  canary-push:
+    needs: [build-dotnet]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+      NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: true
+    steps:
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.101
+      - uses: actions/download-artifact@v2-preview
+      # Upload to NuGet
+      - run: echo "::set-env name=VSS_NUGET_EXTERNAL_FEED_ENDPOINTS::${FEED_ENDPOINTS}"
+        env:
+          FEED_ENDPOINTS: ${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}
+      - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
+      - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps

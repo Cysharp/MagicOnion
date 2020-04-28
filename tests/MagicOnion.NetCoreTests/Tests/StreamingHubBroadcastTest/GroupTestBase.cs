@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -105,7 +105,7 @@ namespace MagicOnion.NetCoreTests.Tests.StreamingHubBroadcastTest
 
             await hub.CallBroadcastExceptSelfAsync();
 
-            await Task.Delay(10); // NOTE: The receivers may not receive broadcast yet at this point.
+            await Task.Delay(TimeSpan.FromMilliseconds(100)); // NOTE: The receivers may not receive broadcast yet at this point.
 
             // Target: Other
             Assert.False(mockReceiver.HasCalled);
