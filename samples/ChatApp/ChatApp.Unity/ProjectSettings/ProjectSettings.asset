@@ -155,6 +155,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.cysharp.magiconion.samples.chatapp
     Standalone: com.cysharp.magiconion.samples.chatapp
+    iOS: com.cysharp.magiconion.samples.chatapp
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 26
@@ -235,7 +236,7 @@ PlayerSettings:
   tvOSManualSigningProvisioningProfileID: 
   iOSManualSigningProvisioningProfileType: 0
   tvOSManualSigningProvisioningProfileType: 0
-  appleEnableAutomaticSigning: 0
+  appleEnableAutomaticSigning: 1
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
   appleEnableProMotion: 0

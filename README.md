@@ -119,6 +119,8 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
     - [Dependency Injection](#dependency-injection)
 - Client and Server
     - [Unity client supports](#unity-client-supports)
+        - [iOS build with grpc](#ios-build-with-grpc)
+        - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
     - [Server Host](#server-host)
         - [Server Host options](#server-host-options)
     - [gRPC Keepalive](#grpc-keepalive)
@@ -750,6 +752,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 ## Server and Clients
 
 ### Unity client Supports
+
 You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
 
 MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version.
@@ -814,6 +817,70 @@ Full options are below.
 ```
 
 Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
+
+### iOS build with grpc
+Grpc iOS build require two additional operation on build.
+
+1. Disable Bitcode
+1. Add libz.tbd
+
+We introduce OnPostProcessingBuild sample [BuildIos.cs](https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/BuildeIos.cs) for ChatApp.Unity to automate these steps.
+
+```csharp
+#if UNITY_IPHONE
+using System.IO;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
+
+public class BuildIos
+{
+    /// <summary>
+    /// Handle libgrpc project settings.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="path"></param>
+    [PostProcessBuild(1)]
+    public static void OnPostProcessBuild(BuildTarget target, string path)
+    {
+        var projectPath = PBXProject.GetPBXProjectPath(path);
+        var project = new PBXProject();
+        project.ReadFromString(File.ReadAllText(projectPath));
+        var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+        // libz.tbd for grpc ios build
+        project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
+
+        // libgrpc_csharp_ext missing bitcode. as BITCODE exand binary size to 250MB.
+        project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
+        
+        File.WriteAllText(projectPath, project.WriteToString());
+    }
+}
+#endif
+```
+
+### Stripping debug symbols from ios/libgrpc.a
+When you download grpc daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
+The reason of libgrpc.a file size is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
+
+We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`, it's about 17MB.
+This may useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
+
+**How to strip**
+
+Download gRPC lib `grpc_unity_package.*.*.*-dev.zip` from [gRPC daily builds](https://packages.grpc.io/) and extract it, copy Plugins folder to Unity's Assets path.
+
+Open terminal on `Plugins/Grpc.Core/runtimes/ios/` and execute following will generate `libgrpc_stripped.a` and replace original libgrpc.a with stripped version.
+
+```shell
+$ cd ${UNITY_PATH}/Plugins/Grpc.Core/runtimes/ios
+$ strip -S -x libgrpc.a -o libgrpc_stripped.a
+$ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
+```
+
+Make sure you can build app with iOS and works fine.
 
 ### Server host
 I've recommend to use [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2) to host .NET Core app. `MagicOnion.Hosting` package helps to build to use MagicOnion.

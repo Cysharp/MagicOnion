@@ -1,4 +1,4 @@
-﻿using ChatApp.Shared.Hubs;
+using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using MagicOnion.Server.Hubs;
 using System;
@@ -50,6 +50,13 @@ namespace ChatApp.Server
         public Task SampleMethod(List<int> sampleList, Dictionary<int, string> sampleDictionary)
         {
             throw new System.NotImplementedException();
+        }
+
+        protected override ValueTask OnConnecting()
+        {
+            // handle connection if needed.
+            Console.WriteLine($"client connected {this.Context.ContextId}");
+            return CompletedTask;
         }
 
         protected override ValueTask OnDisconnected()
