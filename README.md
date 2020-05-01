@@ -1672,7 +1672,7 @@ Make sure your View's column, and metrics TagKey is matched. Otherwise none of m
 ### MagicOnionOption/Logging
 
 
-`MagicOnionOption` can pass to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
+`MagicOnionOption` can be passed to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
 
 | Property | Description |
 | --- | --- |
@@ -1685,9 +1685,10 @@ Make sure your View's column, and metrics TagKey is matched. Otherwise none of m
 | `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
 | `IFormatterResolver` FormatterResolver | MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default). |
 
-`IMagicOnionLogger` is structured logger of MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+`IMagicOnionLogger` is structured logger for MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
 
-If you want to add many loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
+If you want to add multiple loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
+
 ### Raw gRPC APIs
 MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there isn't a particular reason, we recommend using StreamingHub instead.
 
@@ -1878,10 +1879,8 @@ Nothing needs to be processed here, so it promises the best performance theoreti
 I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
 
 ## Author Info
-This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
-He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
-He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.  
-He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
+This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc), who is the CEO/CTO of Cysharp, which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
+He was awarded Microsoft MVP for Developer Technologies(C#) from 2011. He is also the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
 
 ## License
 This library is under the MIT License.
