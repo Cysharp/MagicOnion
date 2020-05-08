@@ -1,0 +1,900 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>ServiceContext Class
+   | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="ServiceContext Class
+   | MagicOnion ">
+    <meta name="generator" content="docfx 2.51.0.0">
+    
+    <link rel="shortcut icon" href="../Icon.png">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../index.html">
+                  <img id="logo" src="../Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.ServiceContext">
+  
+  <h1 id="MagicOnion_Server_ServiceContext" data-uid="MagicOnion.Server.ServiceContext" class="text-break">ServiceContext Class
+  </h1>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class ServiceContext : object</code></pre>
+  </div>
+
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">ServiceContext</span>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MessagePackSerializerOptions_MagicOnion_Server_IMagicOnionLogger_MagicOnion_Server_MethodHandler_MagicOnion_Server_IServiceLocator_MagicOnion_Server_IMagicOnionServiceActivator_">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, MessagePackSerializerOptions, IMagicOnionLogger, MethodHandler, IServiceLocator, IMagicOnionServiceActivator)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Properties
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_AttributeLookup">AttributeLookup</a>
+        </td>
+        <td class="markdown level1 summary"><p>Cached Attributes both service and method.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_CallContext">CallContext</a>
+        </td>
+        <td class="markdown level1 summary"><p>Raw gRPC Context.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ContextId">ContextId</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_Current">Current</a>
+        </td>
+        <td class="markdown level1 summary"><p>Get Current ServiceContext. This property requires to MagicOnionOptions.Enable</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_Items">Items</a>
+        </td>
+        <td class="markdown level1 summary"><p>Object storage per invoke.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_MethodInfo">MethodInfo</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_MethodType">MethodType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SerializerOptions">SerializerOptions</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ServiceActivator">ServiceActivator</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ServiceLocator">ServiceLocator</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ServiceType">ServiceType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_Timestamp">Timestamp</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ChangeSerializerOptions_MessagePackSerializerOptions_">ChangeSerializerOptions(MessagePackSerializerOptions)</a>
+        </td>
+        <td class="markdown level1 summary"><p>modify request/response options in this context.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_ForceSetRawUnaryResult_System_Byte___">ForceSetRawUnaryResult(Byte[])</a>
+        </td>
+        <td class="markdown level1 summary"><p>Unsafe optimize option, ignore serialization process of MessagePackSerializer. This is useful for cache result.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_GetRawRequest">GetRawRequest()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Get Raw Request.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_GetRawResponse">GetRawResponse()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Can get after method body was finished.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawRequest_System_Byte___">SetRawRequest(Byte[])</a>
+        </td>
+        <td class="markdown level1 summary"><p>Set Raw Request, you can set before method body was called.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawResponse_System_Byte___">SetRawResponse(Byte[])</a>
+        </td>
+        <td class="markdown level1 summary"><p>Can set after method body was finished.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext__ctor_" data-uid="MagicOnion.Server.ServiceContext.#ctor*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MessagePackSerializerOptions_MagicOnion_Server_IMagicOnionLogger_MagicOnion_Server_MethodHandler_MagicOnion_Server_IServiceLocator_MagicOnion_Server_IMagicOnionServiceActivator_" data-uid="MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MessagePackSerializerOptions,MagicOnion.Server.IMagicOnionLogger,MagicOnion.Server.MethodHandler,MagicOnion.Server.IServiceLocator,MagicOnion.Server.IMagicOnionServiceActivator)">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, MessagePackSerializerOptions, IMagicOnionLogger, MethodHandler, IServiceLocator, IMagicOnionServiceActivator)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup&lt;Type, Attribute&gt; attributeLookup, MethodType methodType, ServerCallContext context, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceLocator serviceLocator, IMagicOnionServiceActivator activator)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>serviceType</code></span> <span class="xref">Type</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">MethodInfo</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>attributeLookup</code></span> <span class="xref">ILookup</span>&lt;<span class="xref">Type</span>, <span class="xref">Attribute</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>methodType</code></span> <span class="xref">MethodType</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>context</code></span> <span class="xref">ServerCallContext</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>methodHandler</code></span> <a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serviceLocator</code></span> <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>activator</code></span> <a class="xref" href="MagicOnion.Server.IMagicOnionServiceActivator.html">IMagicOnionServiceActivator</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="properties">Properties
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_AttributeLookup_" data-uid="MagicOnion.Server.ServiceContext.AttributeLookup*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_AttributeLookup" data-uid="MagicOnion.Server.ServiceContext.AttributeLookup">AttributeLookup</h4>
+  <div class="markdown level1 summary"><p>Cached Attributes both service and method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ILookup&lt;Type, Attribute&gt; AttributeLookup { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ILookup</span>&lt;<span class="xref">Type</span>, <span class="xref">Attribute</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_CallContext_" data-uid="MagicOnion.Server.ServiceContext.CallContext*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_CallContext" data-uid="MagicOnion.Server.ServiceContext.CallContext">CallContext</h4>
+  <div class="markdown level1 summary"><p>Raw gRPC Context.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerCallContext CallContext { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ServerCallContext</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ContextId_" data-uid="MagicOnion.Server.ServiceContext.ContextId*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ContextId" data-uid="MagicOnion.Server.ServiceContext.ContextId">ContextId</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Guid ContextId { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Guid</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_Current_" data-uid="MagicOnion.Server.ServiceContext.Current*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_Current" data-uid="MagicOnion.Server.ServiceContext.Current">Current</h4>
+  <div class="markdown level1 summary"><p>Get Current ServiceContext. This property requires to MagicOnionOptions.Enable</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ServiceContext Current { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Server.ServiceContext.html">ServiceContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_Items_" data-uid="MagicOnion.Server.ServiceContext.Items*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_Items" data-uid="MagicOnion.Server.ServiceContext.Items">Items</h4>
+  <div class="markdown level1 summary"><p>Object storage per invoke.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConcurrentDictionary&lt;string, object&gt; Items { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ConcurrentDictionary</span>&lt;<span class="xref">System.String</span>, <span class="xref">System.Object</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_MethodInfo_" data-uid="MagicOnion.Server.ServiceContext.MethodInfo*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_MethodInfo" data-uid="MagicOnion.Server.ServiceContext.MethodInfo">MethodInfo</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MethodInfo MethodInfo { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">MethodInfo</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_MethodType_" data-uid="MagicOnion.Server.ServiceContext.MethodType*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_MethodType" data-uid="MagicOnion.Server.ServiceContext.MethodType">MethodType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MethodType MethodType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">MethodType</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_SerializerOptions_" data-uid="MagicOnion.Server.ServiceContext.SerializerOptions*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_SerializerOptions" data-uid="MagicOnion.Server.ServiceContext.SerializerOptions">SerializerOptions</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MessagePackSerializerOptions SerializerOptions { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ServiceActivator_" data-uid="MagicOnion.Server.ServiceContext.ServiceActivator*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ServiceActivator" data-uid="MagicOnion.Server.ServiceContext.ServiceActivator">ServiceActivator</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IMagicOnionServiceActivator ServiceActivator { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Server.IMagicOnionServiceActivator.html">IMagicOnionServiceActivator</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ServiceLocator_" data-uid="MagicOnion.Server.ServiceContext.ServiceLocator*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ServiceLocator" data-uid="MagicOnion.Server.ServiceContext.ServiceLocator">ServiceLocator</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IServiceLocator ServiceLocator { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ServiceType_" data-uid="MagicOnion.Server.ServiceContext.ServiceType*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ServiceType" data-uid="MagicOnion.Server.ServiceContext.ServiceType">ServiceType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Type ServiceType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Type</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_Timestamp_" data-uid="MagicOnion.Server.ServiceContext.Timestamp*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_Timestamp" data-uid="MagicOnion.Server.ServiceContext.Timestamp">Timestamp</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DateTime Timestamp { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">DateTime</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ChangeSerializerOptions_" data-uid="MagicOnion.Server.ServiceContext.ChangeSerializerOptions*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ChangeSerializerOptions_MessagePackSerializerOptions_" data-uid="MagicOnion.Server.ServiceContext.ChangeSerializerOptions(MessagePackSerializerOptions)">ChangeSerializerOptions(MessagePackSerializerOptions)</h4>
+  <div class="markdown level1 summary"><p>modify request/response options in this context.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ChangeSerializerOptions(MessagePackSerializerOptions serializerOptions)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_ForceSetRawUnaryResult_" data-uid="MagicOnion.Server.ServiceContext.ForceSetRawUnaryResult*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_ForceSetRawUnaryResult_System_Byte___" data-uid="MagicOnion.Server.ServiceContext.ForceSetRawUnaryResult(System.Byte[])">ForceSetRawUnaryResult(Byte[])</h4>
+  <div class="markdown level1 summary"><p>Unsafe optimize option, ignore serialization process of MessagePackSerializer. This is useful for cache result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ForceSetRawUnaryResult(byte[] result)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>result</code></span> <span class="xref">System.Byte</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_GetRawRequest_" data-uid="MagicOnion.Server.ServiceContext.GetRawRequest*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_GetRawRequest" data-uid="MagicOnion.Server.ServiceContext.GetRawRequest">GetRawRequest()</h4>
+  <div class="markdown level1 summary"><p>Get Raw Request.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public byte[] GetRawRequest()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Byte</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_GetRawResponse_" data-uid="MagicOnion.Server.ServiceContext.GetRawResponse*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_GetRawResponse" data-uid="MagicOnion.Server.ServiceContext.GetRawResponse">GetRawResponse()</h4>
+  <div class="markdown level1 summary"><p>Can get after method body was finished.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public byte[] GetRawResponse()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Byte</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_SetRawRequest_" data-uid="MagicOnion.Server.ServiceContext.SetRawRequest*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_SetRawRequest_System_Byte___" data-uid="MagicOnion.Server.ServiceContext.SetRawRequest(System.Byte[])">SetRawRequest(Byte[])</h4>
+  <div class="markdown level1 summary"><p>Set Raw Request, you can set before method body was called.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetRawRequest(byte[] request)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>request</code></span> <span class="xref">System.Byte</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContext_SetRawResponse_" data-uid="MagicOnion.Server.ServiceContext.SetRawResponse*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_SetRawResponse_System_Byte___" data-uid="MagicOnion.Server.ServiceContext.SetRawResponse(System.Byte[])">SetRawResponse(Byte[])</h4>
+  <div class="markdown level1 summary"><p>Can set after method body was finished.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetRawResponse(byte[] response)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>response</code></span> <span class="xref">System.Byte</span>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  
+  
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
