@@ -2,7 +2,7 @@ name: build-docs
 
 on:
   push:
-    branch:
+    branches:
       - feature/docfx
 
 jobs:
@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: Cysharp/DocfxTemplate
+          path: docs/_DocfxTemplate
       - uses: Kirbyrawr/docfx-action@master
         name: Docfx metadata
         with:
