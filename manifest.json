@@ -9,7 +9,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.AsyncLock.LockReleaser.html",
-          "hash": "31AKj2Nlf5QTttGznw7I9Q=="
+          "hash": "dA3sC2kt2pl5JV7NNG8wzg=="
         }
       },
       "is_incremental": false,
@@ -21,7 +21,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.AsyncLock.html",
-          "hash": "mMa/08X18GDu4kq+L2Wh5g=="
+          "hash": "kXY2PX7yW5zabkIYl17Yww=="
         }
       },
       "is_incremental": false,
@@ -33,7 +33,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.AsyncStreamReaderExtensions.html",
-          "hash": "UP7uMJt+kTSxkIWl4h4GDw=="
+          "hash": "j0meprKzkBdY9dbqnOC6Bw=="
         }
       },
       "is_incremental": false,
@@ -45,7 +45,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.IClientFilter.html",
-          "hash": "8VLPW3cIrkmDcdJoFDPPag=="
+          "hash": "ralz7nyJx9cAy7k3vDdo8A=="
         }
       },
       "is_incremental": false,
@@ -57,7 +57,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.IResponseContext-1.html",
-          "hash": "TdzqJmEVGzCn/+24ujIeOg=="
+          "hash": "yuUs33X9d1phTxb4xbg4VQ=="
         }
       },
       "is_incremental": false,
@@ -69,7 +69,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.IResponseContext.html",
-          "hash": "vOTNB2UEx5y6jxI1Z0QdYA=="
+          "hash": "7BsXdboplNojmaOQj0EdMA=="
         }
       },
       "is_incremental": false,
@@ -81,7 +81,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClient.html",
-          "hash": "qNhXJSckYqfL2jDP+eMtKw=="
+          "hash": "9sDNBtjsamJKbIqmt3Z98w=="
         }
       },
       "is_incremental": false,
@@ -93,7 +93,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClientBase-1.html",
-          "hash": "LK1c/vndndfD2Yg//tLwNQ=="
+          "hash": "vvhJUEjAnErc/Q6PK3ne4Q=="
         }
       },
       "is_incremental": false,
@@ -105,7 +105,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClientBase.html",
-          "hash": "WZ7FlZXntk7Q+3VwU9/WQA=="
+          "hash": "qybiDoJdj2sIM/dgnTsjRQ=="
         }
       },
       "is_incremental": false,
@@ -117,7 +117,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClientRegistry-1.html",
-          "hash": "6HvGsYIQnEMJw+xGncS0OQ=="
+          "hash": "MAbLN0SZXvjrIEM8WOlXHg=="
         }
       },
       "is_incremental": false,
@@ -129,7 +129,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.RequestContext-1.html",
-          "hash": "a4gH7af3HPsTPEmaczKEzw=="
+          "hash": "SKzkhP8ZhzL0vU427dp1JA=="
         }
       },
       "is_incremental": false,
@@ -141,7 +141,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.RequestContext.html",
-          "hash": "Qg/TVfHwHD0MU9Eh2fK3/Q=="
+          "hash": "4K2bmHoZn5IPkVkuk/Y/Mw=="
         }
       },
       "is_incremental": false,
@@ -153,7 +153,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.ResponseContext-1.html",
-          "hash": "WR1bKHbib7DM2vdLvOCAVg=="
+          "hash": "RrmepcSsRiY7+r1YTTTNIA=="
         }
       },
       "is_incremental": false,
@@ -165,7 +165,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.ResponseContext.html",
-          "hash": "WOZx5Ff6BK3EXI5VEfH6+Q=="
+          "hash": "k9kjUacWzULxbGxfrbjdMQ=="
         }
       },
       "is_incremental": false,
@@ -177,7 +177,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClient.html",
-          "hash": "6VvtmV2KTxfdyvKc1JmrlQ=="
+          "hash": "7Cpmth0uAFo2iEZGNlipdQ=="
         }
       },
       "is_incremental": false,
@@ -189,7 +189,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.html",
-          "hash": "Gwy1YApVArS8ydU+a795Ag=="
+          "hash": "Ck3Nvpfz4bR/l8mTh6pjZA=="
         }
       },
       "is_incremental": false,
@@ -201,7 +201,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientRegistry-2.html",
-          "hash": "K03muXM1b+tIFAu6HOGAKg=="
+          "hash": "oCL1t3V3BCEi2Sf71k4mUw=="
         }
       },
       "is_incremental": false,
@@ -213,7 +213,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.html",
-          "hash": "hvuI4ww/oPFko/O5iKsD5g=="
+          "hash": "dwzyQehxx0N3OFNcS7mIBw=="
         }
       },
       "is_incremental": false,
@@ -225,7 +225,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.ClientStreamingResult-2.html",
-          "hash": "9ZygrXJiFGB37qJBx2gHNw=="
+          "hash": "Dpz/dzZ2krYVrrWkf2NSdw=="
         }
       },
       "is_incremental": false,
@@ -237,7 +237,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html",
-          "hash": "dtvBqaQ2FU8TPavfzwUG/g=="
+          "hash": "P6CHQEq2MQ55x6ZYM0/mYQ=="
         }
       },
       "is_incremental": false,
@@ -249,7 +249,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html",
-          "hash": "qo0Kg21mugE0yL57RDYITg=="
+          "hash": "b+NigT9t6hkvntzunsvr2w=="
         }
       },
       "is_incremental": false,
@@ -261,7 +261,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html",
-          "hash": "XjBSIZJQgsDq36qh+to8bQ=="
+          "hash": "To7qwKQ4IhPgbz0tH1oX3g=="
         }
       },
       "is_incremental": false,
@@ -273,7 +273,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.InterfaceDefinition.html",
-          "hash": "7r3k/zKM7iNhfdPT7MMIvg=="
+          "hash": "pbS8EuWpKvRQfPKsTKk8lQ=="
         }
       },
       "is_incremental": false,
@@ -285,7 +285,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.MethodCollector.html",
-          "hash": "zkiWuLf1bCmkIkZpNS1QcA=="
+          "hash": "o2IGZyyPUkTmfz0IB6znTA=="
         }
       },
       "is_incremental": false,
@@ -297,7 +297,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.MethodDefinition.html",
-          "hash": "JyLOKpsX+eVBS1EuYd1dow=="
+          "hash": "76gHd2mcXfcWjQbVGYeafg=="
         }
       },
       "is_incremental": false,
@@ -309,7 +309,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.MethodType.html",
-          "hash": "8XBVyy67OMkOnzUlwjfrIg=="
+          "hash": "zcFok6EUlu/NcXdkozaMig=="
         }
       },
       "is_incremental": false,
@@ -321,7 +321,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.ParameterDefinition.html",
-          "hash": "lczUsccSag8LvUv+XB6LnQ=="
+          "hash": "v1eT3MTpCKn4ohDlzhKNSg=="
         }
       },
       "is_incremental": false,
@@ -333,7 +333,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.ReferenceSymbols.html",
-          "hash": "5xUCaGC2LtHC/7jrmgE+lw=="
+          "hash": "aWXp88PmjPZyc+1fKmEG7w=="
         }
       },
       "is_incremental": false,
@@ -345,7 +345,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.html",
-          "hash": "E2JLroAz3aVYkRS5ohoEMA=="
+          "hash": "HO6/h0fMrwcQ5GodEw+DGQ=="
         }
       },
       "is_incremental": false,
@@ -357,7 +357,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder-1.html",
-          "hash": "nWKZG8CBHt8U7fhk4Q8EXQ=="
+          "hash": "sNq5Ri9ftAmvvG/yTLXLkA=="
         }
       },
       "is_incremental": false,
@@ -369,7 +369,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CompilerServices.html",
-          "hash": "DW86BOZV560NCaBh4rL6yw=="
+          "hash": "feC8R6xS9NChm9DGCVLwwQ=="
         }
       },
       "is_incremental": false,
@@ -381,7 +381,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DuplexStreamingResult-2.html",
-          "hash": "SkBwtqAop36gB+zqOs0UsA=="
+          "hash": "SnTpLTFcewdGnE8CaNouXA=="
         }
       },
       "is_incremental": false,
@@ -393,7 +393,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-10.html",
-          "hash": "xsWr1bEOMNa6mY5xHVovcA=="
+          "hash": "0GPpr9aMAJyUqZlMszUvPQ=="
         }
       },
       "is_incremental": false,
@@ -405,7 +405,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-11.html",
-          "hash": "NMnNf+ItG7J3NwIWS4DfDg=="
+          "hash": "rAgNSJu4lX5d0fcuI9l0Ig=="
         }
       },
       "is_incremental": false,
@@ -417,7 +417,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-12.html",
-          "hash": "kVQJLJnN2VFAa89wYI6bqQ=="
+          "hash": "483RxyuY4y0V6n010xT3PA=="
         }
       },
       "is_incremental": false,
@@ -429,7 +429,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-13.html",
-          "hash": "iv6CqecqcxmILA1V0h2ekA=="
+          "hash": "dvHwIPjaD8PavuT3cXGeSA=="
         }
       },
       "is_incremental": false,
@@ -441,7 +441,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-14.html",
-          "hash": "TzG6llU/Pb3fw9Etw+5APg=="
+          "hash": "fkKPY9eCSJpLEbvm7YjgIg=="
         }
       },
       "is_incremental": false,
@@ -453,7 +453,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-15.html",
-          "hash": "cjh9rGyGdBu8gtdpruvTBQ=="
+          "hash": "EgxSDQ3a4X+PbOnJMIS9DQ=="
         }
       },
       "is_incremental": false,
@@ -465,7 +465,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-16.html",
-          "hash": "BKDpziyijPIUbZ0Y8RADqQ=="
+          "hash": "WdUD3I5OcAd9bXeFBR//LA=="
         }
       },
       "is_incremental": false,
@@ -477,7 +477,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-17.html",
-          "hash": "maNr7BDqmE0y9ukn0jeLvQ=="
+          "hash": "zDstCsQ8iKNe7dldBT2TCA=="
         }
       },
       "is_incremental": false,
@@ -489,7 +489,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-18.html",
-          "hash": "GoYBd4os2bCCrxKYvzuNFw=="
+          "hash": "CpQH69IV8uRYyhmAb1X8AA=="
         }
       },
       "is_incremental": false,
@@ -501,7 +501,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-19.html",
-          "hash": "+Ev4IyvXnsjrfT0+V/Ckbg=="
+          "hash": "F/Aaqz/dsSKQAPdYlj2/rg=="
         }
       },
       "is_incremental": false,
@@ -513,7 +513,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-2.html",
-          "hash": "VWz/vx1ZOCD1O8l72vtvPQ=="
+          "hash": "PgLVLWsn4eTz6qtfeEggiw=="
         }
       },
       "is_incremental": false,
@@ -525,7 +525,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-20.html",
-          "hash": "QGwONbSu3t/F9KFMzbswew=="
+          "hash": "ZCZS6AJhdaNInxBcZxgXjQ=="
         }
       },
       "is_incremental": false,
@@ -537,7 +537,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-3.html",
-          "hash": "l0dtbhitcq+eU75G2PR4BQ=="
+          "hash": "Y9ClcOBcUQkEZ4gaPGYiVw=="
         }
       },
       "is_incremental": false,
@@ -549,7 +549,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-4.html",
-          "hash": "inHVDjD/32CR99q/O8FApA=="
+          "hash": "cpQyRHI7kX89EBtedmknSA=="
         }
       },
       "is_incremental": false,
@@ -561,7 +561,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-5.html",
-          "hash": "VGxz4CU+Vt4MowfWbepZjw=="
+          "hash": "4MpFzgkwUkigqehzvWS0pg=="
         }
       },
       "is_incremental": false,
@@ -573,7 +573,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-6.html",
-          "hash": "xzJPnTPPbvSFXFj+AyVk3g=="
+          "hash": "nIsnPrO0qMUpB5Q8FTCmMg=="
         }
       },
       "is_incremental": false,
@@ -585,7 +585,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-7.html",
-          "hash": "qXwPx54sy++vfd9I8dekYg=="
+          "hash": "6jm02t+u/v+PplVmZtttdA=="
         }
       },
       "is_incremental": false,
@@ -597,7 +597,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-8.html",
-          "hash": "NEO+jMRmeinjTpcXWQkyHw=="
+          "hash": "d1/0ndDvILnqshZZ6LAqLw=="
         }
       },
       "is_incremental": false,
@@ -609,7 +609,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-9.html",
-          "hash": "hV5sAoXZy3UaNw8o9GGHTQ=="
+          "hash": "y38zNLufhKeDqupQOgbyCg=="
         }
       },
       "is_incremental": false,
@@ -621,7 +621,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-10.html",
-          "hash": "yLI33nW9nFFHqvMqSuZppw=="
+          "hash": "z1Req0sQiJu4MBydu/545g=="
         }
       },
       "is_incremental": false,
@@ -633,7 +633,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-11.html",
-          "hash": "Za8SBVwx1dNDoh4+fUdMKw=="
+          "hash": "xOhdkmBse6pBfxeCoI8QHw=="
         }
       },
       "is_incremental": false,
@@ -645,7 +645,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-12.html",
-          "hash": "//e4pcxZcPGR6Ut42aNP5Q=="
+          "hash": "LC/yH0W4+u3vK8ahIUtbZQ=="
         }
       },
       "is_incremental": false,
@@ -657,7 +657,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-13.html",
-          "hash": "qOKvSuUI/CdscHG6Gcw+lA=="
+          "hash": "PTcN0oj0fvSN3tmI1fiQJg=="
         }
       },
       "is_incremental": false,
@@ -669,7 +669,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-14.html",
-          "hash": "ytXM0LgWCwAofx7jZKa4lQ=="
+          "hash": "GM+Ltdop9hE90QSwRqRjUQ=="
         }
       },
       "is_incremental": false,
@@ -681,7 +681,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-15.html",
-          "hash": "znP1NHQclsnH7lAwkBc33A=="
+          "hash": "MEJdUri9kOYP33JISUvyng=="
         }
       },
       "is_incremental": false,
@@ -693,7 +693,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-16.html",
-          "hash": "lQrtFQjFJ58+6wEDRsoSDg=="
+          "hash": "orYFg5deujZuJTNk5xbtIg=="
         }
       },
       "is_incremental": false,
@@ -705,7 +705,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-17.html",
-          "hash": "U/agJCIePXD0LsSaS8gVcA=="
+          "hash": "cpFQTsOxjfZPW2VH405/HQ=="
         }
       },
       "is_incremental": false,
@@ -717,7 +717,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-18.html",
-          "hash": "1AK0jWAbkRcxcySqVGgseQ=="
+          "hash": "dGPZZvE2Fvs1O2QMbd5TsQ=="
         }
       },
       "is_incremental": false,
@@ -729,7 +729,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-19.html",
-          "hash": "MTBD9gUVWNu5aiesjMX+yQ=="
+          "hash": "rfDnDSPCTbWqVT8UVJq2aQ=="
         }
       },
       "is_incremental": false,
@@ -741,7 +741,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-2.html",
-          "hash": "jLtJLE8PTJVu2GbvxbLTng=="
+          "hash": "qL4HZ0qJDaA3iN220spZCQ=="
         }
       },
       "is_incremental": false,
@@ -753,7 +753,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-20.html",
-          "hash": "wahfJH5wOAd2ZixLXzGLuA=="
+          "hash": "Oe83WHd0MNPxRgtBoW7MnA=="
         }
       },
       "is_incremental": false,
@@ -765,7 +765,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-3.html",
-          "hash": "MPWlAQ2GsS6fbwYutSvBrQ=="
+          "hash": "3GymBEIBc+QrtGQdz4N5rA=="
         }
       },
       "is_incremental": false,
@@ -777,7 +777,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-4.html",
-          "hash": "g05osJmLuH1E7iBMThaiDA=="
+          "hash": "eSrwCvdie0wOztDkB2KfGQ=="
         }
       },
       "is_incremental": false,
@@ -789,7 +789,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-5.html",
-          "hash": "RNAOrjViwv7V7ullfGzWvQ=="
+          "hash": "uazUqYKvQyJ7tSXoimSdEw=="
         }
       },
       "is_incremental": false,
@@ -801,7 +801,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-6.html",
-          "hash": "7oC37xxR2oS3B2pymHTBKA=="
+          "hash": "wOx4/uKH0FXhGEQNpoeSHQ=="
         }
       },
       "is_incremental": false,
@@ -813,7 +813,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-7.html",
-          "hash": "8Qq47ODa4KawuShh8xEK8g=="
+          "hash": "EJhOCgOSCDF7LJRSW0cF1w=="
         }
       },
       "is_incremental": false,
@@ -825,7 +825,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-8.html",
-          "hash": "dAg3/IwpTs8q8rcMTddhdA=="
+          "hash": "NgQ/Snak/diPWvSBz4kqmA=="
         }
       },
       "is_incremental": false,
@@ -837,7 +837,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-9.html",
-          "hash": "7VWjbmhl3RKQMBDVtZ1+IQ=="
+          "hash": "ZSjIzfx/tZKQORJDCD02ig=="
         }
       },
       "is_incremental": false,
@@ -849,7 +849,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.html",
-          "hash": "Q2YWuyL4Jx3pXVTiC5D/3A=="
+          "hash": "N3s775Qf3W8s83LjCFC32Q=="
         }
       },
       "is_incremental": false,
@@ -861,7 +861,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeTemplate.html",
-          "hash": "qvb4axMLlzlppwuALXwf9g=="
+          "hash": "2dxeKwAPhYYou46TRs1IxA=="
         }
       },
       "is_incremental": false,
@@ -873,7 +873,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeTemplateBase.ToStringInstanceHelper.html",
-          "hash": "ZgFHTLxjClFu6BghdZcGKg=="
+          "hash": "3Yi4lv2F6LuzGCOn4rCxFA=="
         }
       },
       "is_incremental": false,
@@ -885,7 +885,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeTemplateBase.html",
-          "hash": "LNXHrXX7NIkLPcFI932FmA=="
+          "hash": "McBBgK3fJdGJabZvg2LRJQ=="
         }
       },
       "is_incremental": false,
@@ -897,7 +897,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.EnumTemplate.html",
-          "hash": "/RqTtyc6ZMV+Z1Gs2tQtjQ=="
+          "hash": "2/mwtfCpVVstLzAcLdVyEQ=="
         }
       },
       "is_incremental": false,
@@ -909,7 +909,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.EnumTemplateBase.ToStringInstanceHelper.html",
-          "hash": "BN1a4+3KioZ2Elh552mFUw=="
+          "hash": "NXP3vecwytFV2o2XE3MOBA=="
         }
       },
       "is_incremental": false,
@@ -921,7 +921,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.EnumTemplateBase.html",
-          "hash": "HKcdid3QVf/jxIPfe8abwQ=="
+          "hash": "gKJyGhVt4MZcX//Wr4WJsw=="
         }
       },
       "is_incremental": false,
@@ -933,7 +933,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.HubTemplate.html",
-          "hash": "tw/ItXCD2YuUFtKU7Ah5FA=="
+          "hash": "pEGU4JMTZhUm3M/t3S4ihQ=="
         }
       },
       "is_incremental": false,
@@ -945,7 +945,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.HubTemplateBase.ToStringInstanceHelper.html",
-          "hash": "A8viWgoYc0J0pRRl+jhQ6Q=="
+          "hash": "p1sNUJWq/qRfO18vXfOz5g=="
         }
       },
       "is_incremental": false,
@@ -957,7 +957,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.HubTemplateBase.html",
-          "hash": "wl40B2hMlyta4qVBARSVjQ=="
+          "hash": "BAhfLYeEtUxqjqLhUlkxKg=="
         }
       },
       "is_incremental": false,
@@ -969,7 +969,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.Program.html",
-          "hash": "SlBGlp4RyCfAW6OLeLpczA=="
+          "hash": "Ueh36n400+Tbhas5EZ7CLA=="
         }
       },
       "is_incremental": false,
@@ -981,7 +981,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.RegisterTemplate.html",
-          "hash": "la7oC2KcFrmgivD9n6j+2w=="
+          "hash": "2n3VDNsAj9dBPXkgfE4b5Q=="
         }
       },
       "is_incremental": false,
@@ -993,7 +993,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.ToStringInstanceHelper.html",
-          "hash": "NoxjvWvfgVHfmX7W10aUuw=="
+          "hash": "IFyUBRPyr0XFC66JodDHww=="
         }
       },
       "is_incremental": false,
@@ -1005,7 +1005,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.html",
-          "hash": "lQEHGBzpCh1hu1pTvd7gog=="
+          "hash": "Yh6kDrx2DucVGQiPEfyxpw=="
         }
       },
       "is_incremental": false,
@@ -1017,7 +1017,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.ResolverTemplate.html",
-          "hash": "zHAR54mAXyQw1qTt3ubrcA=="
+          "hash": "Rhiip8CK1KQJEvJU2vAufw=="
         }
       },
       "is_incremental": false,
@@ -1029,7 +1029,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.ToStringInstanceHelper.html",
-          "hash": "v5M+GRQu+IEdgMSaBBhmJA=="
+          "hash": "cKz1D+5ws7M7LVxlw/gtig=="
         }
       },
       "is_incremental": false,
@@ -1041,7 +1041,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.html",
-          "hash": "6MLaKzp9msfCauXGuLpRKg=="
+          "hash": "DwQzmdNfJ6UErAaFerJ3FA=="
         }
       },
       "is_incremental": false,
@@ -1053,7 +1053,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.html",
-          "hash": "VIeohHa4CEOsNM1HOZmAmg=="
+          "hash": "1NzIa8vSwf85j4mURNzpHw=="
         }
       },
       "is_incremental": false,
@@ -1065,7 +1065,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.Logging.SimpleConsoleLogger.html",
-          "hash": "MaUC4RjenZbQVcMsQLP1YQ=="
+          "hash": "+VmkucUGLMd8UeO6jV/EXA=="
         }
       },
       "is_incremental": false,
@@ -1077,7 +1077,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.Logging.SimpleConsoleLoggerExtensions.html",
-          "hash": "p3hmZBkc5/N1Me+s9ZTXrA=="
+          "hash": "7nepA7NiIIVOUFl3m0zXEg=="
         }
       },
       "is_incremental": false,
@@ -1089,7 +1089,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.Logging.SimpleConsoleLoggerProvider.html",
-          "hash": "PQ3xCfiQwmtuslMAkGvEfA=="
+          "hash": "Q9hngX9EQ/xT6s8E1jeSHg=="
         }
       },
       "is_incremental": false,
@@ -1101,7 +1101,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.Logging.html",
-          "hash": "dck549AodudSi5l+YSdN9A=="
+          "hash": "BzBxjLhJau0YmtUwsKbXhw=="
         }
       },
       "is_incremental": false,
@@ -1113,7 +1113,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHost.html",
-          "hash": "lRvntz1uv2NzVBQKkSzoEQ=="
+          "hash": "nBgzRwTdtLuw1KZjzFCVCA=="
         }
       },
       "is_incremental": false,
@@ -1125,7 +1125,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHostedServiceDefinition.html",
-          "hash": "5GtHsgA+BF7T/wb61wPbSA=="
+          "hash": "U5gvZUElzZYimjnuB0pS+A=="
         }
       },
       "is_incremental": false,
@@ -1137,7 +1137,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHostingOptions.html",
-          "hash": "xiGVL4Gb52nNtO5zhy63/g=="
+          "hash": "R7095qwCWZaLvHUV6VD39A=="
         }
       },
       "is_incremental": false,
@@ -1149,7 +1149,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHostingServerChannelOptionsOptions.html",
-          "hash": "pTtF2x6qIxHovSOEE9nE8g=="
+          "hash": "DsUggqW8RRioeEGQGCCpZA=="
         }
       },
       "is_incremental": false,
@@ -1161,7 +1161,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHostingServerKeyCertificatePairOptions.html",
-          "hash": "VDWoHdoclGrY29QrtVQYKw=="
+          "hash": "VYfnewtyoOupHK4DchLHGQ=="
         }
       },
       "is_incremental": false,
@@ -1173,7 +1173,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionHostingServerPortOptions.html",
-          "hash": "20igVQpYCaMrrOW4Wi4h1w=="
+          "hash": "ICRHr5AiLLwWIOx0FSpuzA=="
         }
       },
       "is_incremental": false,
@@ -1185,7 +1185,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionLogger.html",
-          "hash": "rk8SLlLPGI/MJst48dLC7Q=="
+          "hash": "nftWjAv6s7YY8u2cUYkAAQ=="
         }
       },
       "is_incremental": false,
@@ -1197,7 +1197,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MagicOnionServerServiceExtensions.html",
-          "hash": "YKmb7V+2pGBeOXHNGO5z3g=="
+          "hash": "I98YPvTR22+EnmsxI4IW/A=="
         }
       },
       "is_incremental": false,
@@ -1209,7 +1209,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MicrosoftExtensionsMagicOnionServiceActivator.html",
-          "hash": "CWLII6tyWVLq7B5LaBRriw=="
+          "hash": "BNjF7Vc79ztusCOC9cGeHw=="
         }
       },
       "is_incremental": false,
@@ -1221,7 +1221,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.MicrosoftExtensionsServiceLocator.html",
-          "hash": "h3QY9DlQHthDfJuVumqnww=="
+          "hash": "8/zgd0CXLp7a5ZxQRb3+MA=="
         }
       },
       "is_incremental": false,
@@ -1233,7 +1233,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Hosting.html",
-          "hash": "Wmmwhw/drAkG5HuZ4UQQwQ=="
+          "hash": "XB0CW9vHA4YGgTfwfcMJ8w=="
         }
       },
       "is_incremental": false,
@@ -1245,7 +1245,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.MagicOnionHttpGatewayMiddleware.html",
-          "hash": "6Et6H1AC4cWNUUPujWB0uQ=="
+          "hash": "4Ct3flB5NS9Y9/NpQj2MFw=="
         }
       },
       "is_incremental": false,
@@ -1257,7 +1257,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.MagicOnionSwaggerMiddleware.html",
-          "hash": "uDhV3RNEZ+qBFKmJAkFmZQ=="
+          "hash": "bj3ck22mFy60O1EsaW9t6w=="
         }
       },
       "is_incremental": false,
@@ -1269,7 +1269,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.IgnoreEmptyEnumerablesResolver.html",
-          "hash": "EfgMSTp8zjq6DikPFG8wGg=="
+          "hash": "KgJwBymJdZCMsQDEk+theg=="
         }
       },
       "is_incremental": false,
@@ -1281,7 +1281,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Contact.html",
-          "hash": "cGSoNqzNDakM3x7I6/Wf1g=="
+          "hash": "VwX+99mTX6Wtvj7TEzqEuQ=="
         }
       },
       "is_incremental": false,
@@ -1293,7 +1293,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.ExternalDocs.html",
-          "hash": "FBbX7Q6UdzGOn2ggcFNqcQ=="
+          "hash": "xmfQLTeiyB5wSj+XIN3LhQ=="
         }
       },
       "is_incremental": false,
@@ -1305,7 +1305,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Header.html",
-          "hash": "E4CI1/8kuTTJYwYikk8HwQ=="
+          "hash": "mJGFnZbjjICwPG85LI3jJQ=="
         }
       },
       "is_incremental": false,
@@ -1317,7 +1317,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Info.html",
-          "hash": "t3dYMlYMgChgDR6ZgMfA5w=="
+          "hash": "ew10NgI84RSKChZl49X0MQ=="
         }
       },
       "is_incremental": false,
@@ -1329,7 +1329,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.License.html",
-          "hash": "ufMRB2ia+iJWFjQcYk9e6A=="
+          "hash": "oRRRZNN95vl4Zh5oVEgKfA=="
         }
       },
       "is_incremental": false,
@@ -1341,7 +1341,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Operation.html",
-          "hash": "QsnJVzjvqIojFmh0Heyluw=="
+          "hash": "EL8j14RGcVOxoaqlLox6sg=="
         }
       },
       "is_incremental": false,
@@ -1353,7 +1353,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Parameter.html",
-          "hash": "5Dd74n/pC7NrEzajbEpPQQ=="
+          "hash": "K36YxPMX3zENdA/MQBMQ0w=="
         }
       },
       "is_incremental": false,
@@ -1365,7 +1365,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.PartialSchema.html",
-          "hash": "z8YTmYG8rLaOH8/JLZ+EVA=="
+          "hash": "/XwT+FnzT5bOcZKDD+CgPg=="
         }
       },
       "is_incremental": false,
@@ -1377,7 +1377,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.PathItem.html",
-          "hash": "dOlWcRJ6XN4MVWUK8wJflA=="
+          "hash": "IVsCx1lcLZNwqe4fTRv/vg=="
         }
       },
       "is_incremental": false,
@@ -1389,7 +1389,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Response.html",
-          "hash": "WVzoShsCzl3umB/wCbs/qQ=="
+          "hash": "3FNOX1LpqKWbjZfsdXfiag=="
         }
       },
       "is_incremental": false,
@@ -1401,7 +1401,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Schema.html",
-          "hash": "Zn2a0P+q2i9mwK10iHjZ4g=="
+          "hash": "4yx3JCfR9zJ1FqO0SQXnyw=="
         }
       },
       "is_incremental": false,
@@ -1413,7 +1413,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.SecurityScheme.html",
-          "hash": "d7G263p/DjCfPKGMoKpgmQ=="
+          "hash": "ud5jDkAHmcIYhvCLlBuL+A=="
         }
       },
       "is_incremental": false,
@@ -1425,7 +1425,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.SwaggerDocument.html",
-          "hash": "gTXJDyRZMTuVhvaVW4QSnw=="
+          "hash": "WB2xWrmnCGVV45SucAWQTw=="
         }
       },
       "is_incremental": false,
@@ -1437,7 +1437,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Tag.html",
-          "hash": "zVUs43k68/tDz17mF9vLGQ=="
+          "hash": "1J7x9jEdas2qQjXT5k+RjA=="
         }
       },
       "is_incremental": false,
@@ -1449,7 +1449,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.Xml.html",
-          "hash": "r07xv1np3Ip+lF1hvuto0w=="
+          "hash": "q1sgos2K1fDMDDl/E7Yzhg=="
         }
       },
       "is_incremental": false,
@@ -1461,7 +1461,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.Schemas.html",
-          "hash": "0VaNcBME7J/f6Guv7Bbcdw=="
+          "hash": "aUraqMXiN3cfNZ0F+sV6tg=="
         }
       },
       "is_incremental": false,
@@ -1473,7 +1473,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.SwaggerDefinitionBuilder.html",
-          "hash": "O3woHm0BE0znkUEoGi+DAA=="
+          "hash": "tpJMQRwxJWwQOWH8tJbflw=="
         }
       },
       "is_incremental": false,
@@ -1485,7 +1485,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.SwaggerOptions.html",
-          "hash": "fSc3Q+wIYyf7QfJWskfEqA=="
+          "hash": "AphRsGVPzDpLgyw0Vj32hg=="
         }
       },
       "is_incremental": false,
@@ -1497,7 +1497,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.Swagger.html",
-          "hash": "Y9BUkiKq+qEagZS0TyK/Bg=="
+          "hash": "GZK7p/ga7a6fcJObv+gWDQ=="
         }
       },
       "is_incremental": false,
@@ -1509,7 +1509,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.HttpGateway.html",
-          "hash": "qFaZDfW5hNhaLfSp8ScmIA=="
+          "hash": "7iP0ZC0WSfGVCd30b/C/cQ=="
         }
       },
       "is_incremental": false,
@@ -1521,7 +1521,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.IService-1.html",
-          "hash": "wWRNsYqWvqRDWrv794jjlg=="
+          "hash": "8G9elgN9Hos1CL7YAqBE5Q=="
         }
       },
       "is_incremental": false,
@@ -1533,7 +1533,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.IServiceMarker.html",
-          "hash": "rHtfwzKLeJtIR/qNs8TKGQ=="
+          "hash": "8woGJgxbuYgb0sk1Ljnbww=="
         }
       },
       "is_incremental": false,
@@ -1545,7 +1545,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.IStreamingHub-2.html",
-          "hash": "S3jc8cej+QRwSvSsmigK6A=="
+          "hash": "3jFwlLNvzmTXPlbU2SrhuA=="
         }
       },
       "is_incremental": false,
@@ -1557,7 +1557,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.IStreamingHubMarker.html",
-          "hash": "shpuHzjgNbqoWkgJ33K1lQ=="
+          "hash": "VdiOofA/aIj85UacOrHj/w=="
         }
       },
       "is_incremental": false,
@@ -1569,7 +1569,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.IgnoreAttribute.html",
-          "hash": "Zhihd5d3j4i8SDXd4iRybA=="
+          "hash": "f+8yafR8+k6vYMVm6Rpprg=="
         }
       },
       "is_incremental": false,
@@ -1581,7 +1581,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html",
-          "hash": "Qxk5Kg3tvATZYvJOeR1eJQ=="
+          "hash": "GDDv52vNsAufupdZpmZ72g=="
         }
       },
       "is_incremental": false,
@@ -1593,7 +1593,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MSBuild.Tasks.html",
-          "hash": "XTmmZC3HV3Uh6ilyIKRKvw=="
+          "hash": "mm/CBdkL0N6AeIbi51psLQ=="
         }
       },
       "is_incremental": false,
@@ -1605,7 +1605,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MagicOnionCompiler.html",
-          "hash": "GnK6mmQAhjLhnMYy/5WdOw=="
+          "hash": "v8FQ2cRkyAL0AIUKiPkzYg=="
         }
       },
       "is_incremental": false,
@@ -1617,7 +1617,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MagicOnionMarshallers.html",
-          "hash": "1/+Zt9/ofaf1fjWqo4vF8g=="
+          "hash": "Vytqg6GgJuTQsLOZwZS6tg=="
         }
       },
       "is_incremental": false,
@@ -1629,7 +1629,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MagicOnionMiddlewareExtensions.html",
-          "hash": "dwXApDtDrFzEG+6fBKTU6g=="
+          "hash": "cSNi581jQYC1LvnfdltJHQ=="
         }
       },
       "is_incremental": false,
@@ -1641,7 +1641,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MetadataExtensions.html",
-          "hash": "c674TpPGPXRyc9Y8MgG7Xg=="
+          "hash": "gc+m1Gdkzt32Zs64oCOiyg=="
         }
       },
       "is_incremental": false,
@@ -1653,7 +1653,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html",
-          "hash": "IQ3UwDin1I1b0dRdYqsfbA=="
+          "hash": "qVFMgRuHnu09EseVXTq4TA=="
         }
       },
       "is_incremental": false,
@@ -1665,7 +1665,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html",
-          "hash": "5lKF05OqmcT+FyZiz1bn3g=="
+          "hash": "DjTVudBXvoUxNILl6vqPFA=="
         }
       },
       "is_incremental": false,
@@ -1677,7 +1677,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html",
-          "hash": "ThMUd8DfrEiST2Wez1UVyQ=="
+          "hash": "K/np9ognQvx1CHPTb7dQTA=="
         }
       },
       "is_incremental": false,
@@ -1689,7 +1689,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetrygRpcStatusHelper.html",
-          "hash": "fkVnc4vXhkeDHrKPAGohhg=="
+          "hash": "dI9fPhhLrQRjrktUb5XUxA=="
         }
       },
       "is_incremental": false,
@@ -1701,7 +1701,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.html",
-          "hash": "vKWywaCdi8mdJr7fA4eMSw=="
+          "hash": "tCPUAS1yKTaBLsu+mgkJrg=="
         }
       },
       "is_incremental": false,
@@ -1713,7 +1713,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Redis.RedisGroup.html",
-          "hash": "kktt15saMuFHzUTfv5zOgw=="
+          "hash": "66kLEMjpZBaJSVr0AB9vqQ=="
         }
       },
       "is_incremental": false,
@@ -1725,7 +1725,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Redis.RedisGroupOptions.html",
-          "hash": "XopMOjDhHcCntFJQVwf8WA=="
+          "hash": "Sihb/B4f8NOfWJnN0B3ebw=="
         }
       },
       "is_incremental": false,
@@ -1737,7 +1737,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Redis.RedisGroupRepository.html",
-          "hash": "9wwha+8JaItp2QgmYUhgRw=="
+          "hash": "vcVG3fFYwtaDANTjtDi1VA=="
         }
       },
       "is_incremental": false,
@@ -1749,7 +1749,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Redis.RedisGroupRepositoryFactory.html",
-          "hash": "3I5zMBPs7Gk23vinz0+zow=="
+          "hash": "KjtjrwHwOdgwz8pIvDGMTQ=="
         }
       },
       "is_incremental": false,
@@ -1761,7 +1761,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Redis.html",
-          "hash": "qbrAkGX8NNV4VoElaNHH/Q=="
+          "hash": "hd5+gHjEZkKIeIqVScVlIQ=="
         }
       },
       "is_incremental": false,
@@ -1773,7 +1773,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.ReturnStatusException.html",
-          "hash": "VfiL10+sLSDLFMhd1aUlbQ=="
+          "hash": "WHHrcE4QMgmckoY+pjRVew=="
         }
       },
       "is_incremental": false,
@@ -1785,7 +1785,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.AllowAnonymousAttribute.html",
-          "hash": "mVxwfXVCfFHJza6aT+k0zg=="
+          "hash": "FX5bEnFdbgJTPRPkhSXWDA=="
         }
       },
       "is_incremental": false,
@@ -1797,7 +1797,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.AuthorizeAttribute.html",
-          "hash": "TNq/hW5iH8B/oVeETBRCiw=="
+          "hash": "AWozTsMZN+c3bgc++00Y4Q=="
         }
       },
       "is_incremental": false,
@@ -1809,7 +1809,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.IJwtAuthenticationProvider.html",
-          "hash": "VHsfrhDGugx148CWuwOvUw=="
+          "hash": "EWhNG4IzJbUWbvXluNyN5Q=="
         }
       },
       "is_incremental": false,
@@ -1821,7 +1821,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.JwtAuthenticationAttribute.html",
-          "hash": "Zg9FnynTLES0hsek9KMWOg=="
+          "hash": "J3drOB3PVb71IhAD9hrWnw=="
         }
       },
       "is_incremental": false,
@@ -1833,7 +1833,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.JwtAuthenticationOptions.html",
-          "hash": "2dxh7rW4XRFIFuGjUnc4NA=="
+          "hash": "0kqdoyjeZ4DbDIjbMj22vg=="
         }
       },
       "is_incremental": false,
@@ -1845,7 +1845,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.JwtAuthenticationTokenResult.html",
-          "hash": "DZ2wzGEOE6wpMcyE3nIpEA=="
+          "hash": "YfEB+47eAGAfjGwyCBCxyw=="
         }
       },
       "is_incremental": false,
@@ -1857,7 +1857,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.JwtAuthenticationValidationContext.html",
-          "hash": "7Ly20i3lXvZE3EgXySUNNw=="
+          "hash": "gub+WTrY4BH8hfOCOCUwnA=="
         }
       },
       "is_incremental": false,
@@ -1869,7 +1869,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.Jwt.html",
-          "hash": "SXOdplp7nFbN7BPtDEuTFg=="
+          "hash": "u0nU+pAi6qDoLFwczNzJ9w=="
         }
       },
       "is_incremental": false,
@@ -1881,7 +1881,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.MagicOnionPrincipal.html",
-          "hash": "J2PLys3fcbonofvlgN0CNw=="
+          "hash": "nwIKMUqPzWElX0HcK5waRQ=="
         }
       },
       "is_incremental": false,
@@ -1893,7 +1893,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Authentication.html",
-          "hash": "um/V/v4NMdbGRbOqrJw+kw=="
+          "hash": "EGxACs63P8eZ0VitbubrOA=="
         }
       },
       "is_incremental": false,
@@ -1905,7 +1905,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ClientStreamingContext-2.html",
-          "hash": "IRRtp5ZcoGrY9IpC1EwP4A=="
+          "hash": "SciJgGG1hHYWm2DdKy5e4w=="
         }
       },
       "is_incremental": false,
@@ -1917,7 +1917,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.CompositeLogger.html",
-          "hash": "bK+mHhA1tq/4mXhp5791RA=="
+          "hash": "NtforQME6sPPR2d8v0Dl5w=="
         }
       },
       "is_incremental": false,
@@ -1929,7 +1929,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.CompositeMagicOnionLogger.html",
-          "hash": "ltdF8UAKXhlRYc9HlJFtaw=="
+          "hash": "AHImwKfqSPMICDleuKaNrw=="
         }
       },
       "is_incremental": false,
@@ -1941,7 +1941,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.DefaultMagicOnionServiceActivator.html",
-          "hash": "+/b3fJh5dH8mXktqch7fZg=="
+          "hash": "n3Bxf/MxxXqxuNaIs63iTA=="
         }
       },
       "is_incremental": false,
@@ -1953,7 +1953,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.DefaultServiceLocator.html",
-          "hash": "b+i3TweS0eXnUBMyuUUXQw=="
+          "hash": "o2CLI34bDXlBRYGcYrCoYA=="
         }
       },
       "is_incremental": false,
@@ -1965,7 +1965,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.DuplexStreamingContext-2.html",
-          "hash": "LMW1NjRve0tIRCtaV5DbdQ=="
+          "hash": "qZuhIFufdqnaqCMxYLaQww=="
         }
       },
       "is_incremental": false,
@@ -1977,7 +1977,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.FromServiceFilterAttribute.html",
-          "hash": "C0/Ya6mPINnVdo+Ahbg/WA=="
+          "hash": "O9/a3jPx4URMp7kOoTRz3Q=="
         }
       },
       "is_incremental": false,
@@ -1989,7 +1989,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.FromTypeFilterAttribute.html",
-          "hash": "TtYowTtsvdbDP2kmosc8iA=="
+          "hash": "fPMQ2Oz0nZLE28s7dvMzXw=="
         }
       },
       "is_incremental": false,
@@ -2001,7 +2001,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.BroadcasterHelper.html",
-          "hash": "trgSYr9Q2dPerm26jiJqOQ=="
+          "hash": "1BqKkZfjxHALCtm6ayF1fQ=="
         }
       },
       "is_incremental": false,
@@ -2013,7 +2013,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html",
-          "hash": "XIIiiK9BQfJ0aQ8ibFBBaw=="
+          "hash": "MEKGrxBnV1nL/bpcJwVuTQ=="
         }
       },
       "is_incremental": false,
@@ -2025,7 +2025,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.html",
-          "hash": "9iHz2PSZFVUU6rQciulalg=="
+          "hash": "9Fa/UCKIoDwBV3i6w8Hsyw=="
         }
       },
       "is_incremental": false,
@@ -2037,7 +2037,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html",
-          "hash": "GmXgoSKVTwwrD4eQFyRjYw=="
+          "hash": "Zla7Y0sfHUUiOtpnQdfCxw=="
         }
       },
       "is_incremental": false,
@@ -2049,7 +2049,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.DefaultInMemoryStorage-1.html",
-          "hash": "OuF+Z1ZVpa4AC8R7ySDftw=="
+          "hash": "7+RJK/MvjqQm1ruu09RAKg=="
         }
       },
       "is_incremental": false,
@@ -2061,7 +2061,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.GroupBroadcastExtensions.html",
-          "hash": "fjA4t4GhCa/NoDqzQ+uVoA=="
+          "hash": "RUpdlRuUkq9shtWSg7OYXg=="
         }
       },
       "is_incremental": false,
@@ -2073,7 +2073,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html",
-          "hash": "N/vQaum0J2bQkmpjagvTqg=="
+          "hash": "xHt/mVlIfBkWWtvoxAcHBQ=="
         }
       },
       "is_incremental": false,
@@ -2085,7 +2085,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.HubGroupRepository.html",
-          "hash": "213QquayhmswSrx9ewFU+A=="
+          "hash": "Edx/4rMixW+s7s+jBsgxhg=="
         }
       },
       "is_incremental": false,
@@ -2097,7 +2097,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.IGroup.html",
-          "hash": "YvYcSFV5A9ts2RfAIz72lA=="
+          "hash": "KNk9uu65W7BSY9yfkcCTCA=="
         }
       },
       "is_incremental": false,
@@ -2109,7 +2109,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.IGroupRepository.html",
-          "hash": "KcPQG3eM8ufd1zQkMq0BsQ=="
+          "hash": "e7aomD4UruToA31tXVePpw=="
         }
       },
       "is_incremental": false,
@@ -2121,7 +2121,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.html",
-          "hash": "S+O7pKtzVfGCfo1o3mxGEQ=="
+          "hash": "1JIM9vptiJuUUVMcanSlgg=="
         }
       },
       "is_incremental": false,
@@ -2133,7 +2133,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage-1.html",
-          "hash": "T+0QUf+QJbA5mt2hz5UX3w=="
+          "hash": "o3bx1eUz9UWXjTL5MsypOQ=="
         }
       },
       "is_incremental": false,
@@ -2145,7 +2145,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage.html",
-          "hash": "uFI4YExZe7s6wdCl2sBYbQ=="
+          "hash": "IJ22walzx7Q50yhs3FVVZQ=="
         }
       },
       "is_incremental": false,
@@ -2157,7 +2157,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroup.html",
-          "hash": "VPIMQzhLkT3m+EW46pOMHg=="
+          "hash": "gG7NAStUNWzyi89jx9vF0g=="
         }
       },
       "is_incremental": false,
@@ -2169,7 +2169,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html",
-          "hash": "MTW3mQGgWd04QqiqY7Hotg=="
+          "hash": "RHdCfgnpXQ9Ri2s+wzp+lg=="
         }
       },
       "is_incremental": false,
@@ -2181,7 +2181,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html",
-          "hash": "Z4fno9USsqSkgTilcqKfGQ=="
+          "hash": "5tDh0p+0t5ib27DWqAK/Fg=="
         }
       },
       "is_incremental": false,
@@ -2193,7 +2193,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.MethodIdAttribute.html",
-          "hash": "i9MNGVIdwIqTmhopo0Cing=="
+          "hash": "i4B+DhKFC8jBNMzvoIR10Q=="
         }
       },
       "is_incremental": false,
@@ -2205,7 +2205,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubBase-2.html",
-          "hash": "pPUd3DgxV8Jw3w/vr8iFSA=="
+          "hash": "d7wZu1zohFE0vNGYFVKykQ=="
         }
       },
       "is_incremental": false,
@@ -2217,7 +2217,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubContext.html",
-          "hash": "0i1TAct2rOxKOhLwWM8xWw=="
+          "hash": "2VXydqsVm9V0BYi3VE2DNw=="
         }
       },
       "is_incremental": false,
@@ -2229,7 +2229,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubFilterAttribute.html",
-          "hash": "gpRTPgfqGBH8i9xSyXKu1w=="
+          "hash": "0t28YgYYvMLVmzMcwMUKEw=="
         }
       },
       "is_incremental": false,
@@ -2241,7 +2241,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandler.html",
-          "hash": "t+6R7TBS2xegagJ8DakEKA=="
+          "hash": "MnPzph0e3IAyOAYVFgTFwA=="
         }
       },
       "is_incremental": false,
@@ -2253,7 +2253,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandlerOptions.html",
-          "hash": "8L+y1S/vElVYNEKbfQ3+Sg=="
+          "hash": "1OSq460E0fiJXvyfy1SkbQ=="
         }
       },
       "is_incremental": false,
@@ -2265,7 +2265,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.html",
-          "hash": "iGNZXtOM01120uxddjyPTg=="
+          "hash": "dpJvYo4StR16ATuB9KBpyA=="
         }
       },
       "is_incremental": false,
@@ -2277,7 +2277,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IMagicOnionFilterFactory-1.html",
-          "hash": "vie2Dr/Nnvui4L0piInlCA=="
+          "hash": "ubzWFaivpPv7PaqRHnpabw=="
         }
       },
       "is_incremental": false,
@@ -2289,7 +2289,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IMagicOnionLogger.html",
-          "hash": "K64eii7YywaxvHzqZM4f7w=="
+          "hash": "yd5n5H3c5bDxGyz/zra8Eg=="
         }
       },
       "is_incremental": false,
@@ -2301,7 +2301,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IMagicOnionServiceActivator.html",
-          "hash": "nu8Ndrgryy3ULnLMCSr2Wg=="
+          "hash": "HEcU8l9RoKX3ZAacsLBTrQ=="
         }
       },
       "is_incremental": false,
@@ -2313,7 +2313,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IServiceLocator.html",
-          "hash": "u07aVU3+iDWmUYKatrU6sQ=="
+          "hash": "emAPysUyLc24P/BCSmzeYw=="
         }
       },
       "is_incremental": false,
@@ -2325,7 +2325,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IServiceLocatorScope.html",
-          "hash": "6Vcxg5YAN7HrHWwxqo/jJg=="
+          "hash": "ChF+tpmLaHcKf3Z0Snmgmw=="
         }
       },
       "is_incremental": false,
@@ -2337,7 +2337,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionEngine.html",
-          "hash": "nggfBg+vIZKGcah8B6GaLw=="
+          "hash": "kRuvTnqzhxfmZdwYVhcYCQ=="
         }
       },
       "is_incremental": false,
@@ -2349,7 +2349,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionFilterAttribute.html",
-          "hash": "3asgHNtEVovj2BX4/Ddh7w=="
+          "hash": "bHq7/rfUD+9cWgySb7RbXw=="
         }
       },
       "is_incremental": false,
@@ -2361,7 +2361,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptor-1.html",
-          "hash": "iMDHUKEqMyZRvDuI1aHHMA=="
+          "hash": "YIPKMUfyAJEKjzcsLgbP4Q=="
         }
       },
       "is_incremental": false,
@@ -2373,7 +2373,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptorExtensions.html",
-          "hash": "zzX8bZdSpf3M0J/BP5Qlvw=="
+          "hash": "I4CrAcr0LRKg8EX13wtJLg=="
         }
       },
       "is_incremental": false,
@@ -2385,7 +2385,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionLogToGrpcLogger.html",
-          "hash": "S7CKmfODU4zuyhpN0rFtDg=="
+          "hash": "uEq2Vo1oj5yDXLcBPJ5MeA=="
         }
       },
       "is_incremental": false,
@@ -2397,7 +2397,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionLogToGrpcLoggerWithDataDump.html",
-          "hash": "FLuJkxkzKcMhPT34dvi+0w=="
+          "hash": "2lfcgwe+1bswZ0o8g/u9UA=="
         }
       },
       "is_incremental": false,
@@ -2409,7 +2409,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionLogToGrpcLoggerWithNamedDataDump.html",
-          "hash": "xPymlorKTPI/h7CPdaGsWQ=="
+          "hash": "MoyLKcExdIEFS3yd0sHg9w=="
         }
       },
       "is_incremental": false,
@@ -2421,7 +2421,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionOptions.html",
-          "hash": "Hnw/zwwISpLASp/V3drXLw=="
+          "hash": "ULhGXJifTx5eWg7Yq1TqPw=="
         }
       },
       "is_incremental": false,
@@ -2433,7 +2433,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionServiceDefinition.html",
-          "hash": "yey07piT3sxseBCrwG39rw=="
+          "hash": "jtBvsIXHjGZov5jOQ3HEgQ=="
         }
       },
       "is_incremental": false,
@@ -2445,7 +2445,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MagicOnionServiceFilterDescriptor.html",
-          "hash": "+ytAr6glF5OC+TNUYowXrg=="
+          "hash": "pqtyXgc7Bks4V/T6fkh+qQ=="
         }
       },
       "is_incremental": false,
@@ -2457,7 +2457,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html",
-          "hash": "d1Roc1Qw9KtCB4ooi1ii0Q=="
+          "hash": "Rm1F3v8HDlEat5fJIsRkrQ=="
         }
       },
       "is_incremental": false,
@@ -2469,7 +2469,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MethodHandler.html",
-          "hash": "nwTC7nNmOWUsf4P5cfj5yQ=="
+          "hash": "93k7fw2OZXrqEM1br93NPg=="
         }
       },
       "is_incremental": false,
@@ -2481,7 +2481,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.MethodHandlerOptions.html",
-          "hash": "viCCpiqRQ2TFva1ArBZnFg=="
+          "hash": "mhXxlnkZ6W6fHwOZKoe39A=="
         }
       },
       "is_incremental": false,
@@ -2493,7 +2493,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.NullMagicOnionLogger.html",
-          "hash": "GGnLs30zH+N3ZxDhAR8W8g=="
+          "hash": "UE1XaJmiA5TjIcfJhDv+wA=="
         }
       },
       "is_incremental": false,
@@ -2505,7 +2505,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServerStreamingContext-1.html",
-          "hash": "Epcg7Xp8BzGwZQoxZ3kdtQ=="
+          "hash": "36VRWRpqG8Jdg7LflRwRvw=="
         }
       },
       "is_incremental": false,
@@ -2517,7 +2517,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServiceBase-1.html",
-          "hash": "ctTolZBBPEJLlJo5HY9vWA=="
+          "hash": "C1OKSyESYHzua7bJMMo7Pw=="
         }
       },
       "is_incremental": false,
@@ -2529,7 +2529,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServiceContext.html",
-          "hash": "SPrLflesau0AVw5R+/u8XQ=="
+          "hash": "fBzpOE8/xac1GQmlX336pQ=="
         }
       },
       "is_incremental": false,
@@ -2541,7 +2541,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServiceContextAuthenticationExtensions.html",
-          "hash": "xvXIn8WAHmgE3WS3cfdyWQ=="
+          "hash": "PgEDuaUYaihp/YHcoVRCHA=="
         }
       },
       "is_incremental": false,
@@ -2553,7 +2553,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.StreamingHubFilterDescriptor.html",
-          "hash": "c6WFH9wsHIkP3QnkdBP6wA=="
+          "hash": "NiJAE8fAoVdQpKDzBW4GqQ=="
         }
       },
       "is_incremental": false,
@@ -2565,7 +2565,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.html",
-          "hash": "bwNYe9SowfrgrV08TykqFA=="
+          "hash": "2DHOQ4cqiPOq3L+exI8/5w=="
         }
       },
       "is_incremental": false,
@@ -2577,7 +2577,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.ServerStreamingResult-1.html",
-          "hash": "D4pY9k4UbyFpNAHiL+JKsA=="
+          "hash": "8XCP4OZ7RWBv75v7ZZ5wHA=="
         }
       },
       "is_incremental": false,
@@ -2589,7 +2589,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnaryResult-1.html",
-          "hash": "X1HNHjUe1HKaWHlFeYY6zQ=="
+          "hash": "wK2FJ7wHKW0Zxo10YmeuLg=="
         }
       },
       "is_incremental": false,
@@ -2601,7 +2601,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnsafeDirectBlitArrayFormatter-1.html",
-          "hash": "6QT8UkG9OIcsToIUO+PSdA=="
+          "hash": "urtWb3/mE71eZGnmf3S0xg=="
         }
       },
       "is_incremental": false,
@@ -2613,7 +2613,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnsafeDirectBlitFormatter-1.html",
-          "hash": "6uTYr6bP1VRehC9YsggoDg=="
+          "hash": "Aog38vQrO6E7mI5v3H9aTA=="
         }
       },
       "is_incremental": false,
@@ -2625,7 +2625,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnsafeDirectBlitResolver.html",
-          "hash": "Th0dJA3i0j75eABpocIEGg=="
+          "hash": "8n0NT8lzzwfVaXZI9CmH3Q=="
         }
       },
       "is_incremental": false,
@@ -2637,7 +2637,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.DuplicateKeyException.html",
-          "hash": "LhKg8tOAwTpXKyrSZ1bN2Q=="
+          "hash": "13KV871Wv4czwtU2gt8PSA=="
         }
       },
       "is_incremental": false,
@@ -2649,7 +2649,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.FNV1A32.html",
-          "hash": "Gq9d7R+ZIPVdWRxKS5vU5A=="
+          "hash": "pw1ZS7+NVO1R0D0JNx+LIA=="
         }
       },
       "is_incremental": false,
@@ -2661,7 +2661,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.ReservedWhenAllPromise.html",
-          "hash": "hulkdIT+TTrQkcsPpGbklA=="
+          "hash": "akrLcxQ65ba++EE4FAT3VA=="
         }
       },
       "is_incremental": false,
@@ -2673,7 +2673,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.UniqueHashDictionary-1.html",
-          "hash": "P7Izu8aMgLZXkuD2vpiNqA=="
+          "hash": "gKb75Usi9vJXtpPYrRO/zw=="
         }
       },
       "is_incremental": false,
@@ -2685,7 +2685,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.html",
-          "hash": "wLVtmD01Bm/rWYa3YDA90A=="
+          "hash": "XRpTW7Ffl8j1tsT36fH6VA=="
         }
       },
       "is_incremental": false,
@@ -2697,7 +2697,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.html",
-          "hash": "0FJhnJLl7PE4x+7JsZf3ew=="
+          "hash": "onxe4wXZkgav9RIaFYSJWA=="
         }
       },
       "is_incremental": false,
@@ -2709,7 +2709,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.html",
-          "hash": "wXzfEl2z+ohFvGKXRcNDLg=="
+          "hash": "nPAXIZKKQZQAii9PC3ZVtg=="
         }
       },
       "is_incremental": false,
@@ -2721,7 +2721,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Microsoft.Extensions.DependencyInjection.html",
-          "hash": "KuosbY5zav4VzLVrwbNgVA=="
+          "hash": "TVACofhsJ3csbbD5yxOCig=="
         }
       },
       "is_incremental": false,
@@ -2745,7 +2745,7 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "S2bJDyxjjWX9F66LBLFYLQ=="
+          "hash": "w4C19y4ooPTI0GQHbTODkg=="
         }
       },
       "is_incremental": false,
@@ -2760,7 +2760,7 @@
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "zBo+X52iv6/hc4aajpy/lw=="
+          "hash": "pnWDFQ5nxBcaO7VQbaVvkQ=="
         }
       },
       "is_incremental": false,
