@@ -42,11 +42,11 @@ namespace ChatApp.Server
             metricsServer.Start();
             Console.WriteLine($"Started Metrics Server on {exporterUrl}");
 
-            // TracerServer for Zipkin push model
-            var traceServer = TestHttpServer.RunServer(ProcessServerRequest, tracerHost, tracerPort);
+            // TracerServer for Zipkin push model (in case you won't run on docker)
+            // $ docker run --rm -p 9411:9411 openzipkin/zipkin
             Console.WriteLine($"Started Tracer Server on http://{tracerHost}:{tracerPort}");
 
-            // Metrics
+            // Metrics (factory is cacheable)
             var processor = new UngroupedBatcher();
             var spanContext = default(SpanContext);
             var meterFactory = MeterFactory.Create(mb =>
@@ -61,43 +61,37 @@ namespace ChatApp.Server
             var labels1 = new List<KeyValuePair<string, string>>();
             labels1.Add(new KeyValuePair<string, string>("dim1", "value1"));
 
+            // Tracer (factory is cacheable)
+            var traceRandom = new Random();
+            var frontTracerFactory = TracerFactory.Create(builder => builder.UseZipkin(o =>
+            {
+                o.ServiceName = "front-zipkin";
+                o.Endpoint = new Uri($"http://{tracerHost}:{tracerPort}/api/v2/spans");
+            }));
+            var grpcTracerFactory = TracerFactory.Create(builder => builder.UseZipkin(o =>
+            {
+                o.ServiceName = "grpc-zipkin";
+                o.Endpoint = new Uri($"http://{tracerHost}:{tracerPort}/api/v2/spans");
+            }));
 
+            // Execute
             var sw = Stopwatch.StartNew();
             while (sw.Elapsed.TotalMinutes < 10)
             {
-                // execute metrics
+                // metrics
                 counter.Add(spanContext, 100, meter.GetLabelSet(labels1));
 
-                // Tracer           
-                var requestId = Guid.NewGuid();
-                using (var tracerFactory = TracerFactory.Create(builder => builder.UseZipkin(o =>
-                {
-                    o.ServiceName = "test-zipkin";
-                    o.Endpoint = new Uri($"http://{tracerHost}:{tracerPort}/api/v2/spans?requestId={requestId}");
-                })))
-                {
+                // tracer
+                await ExecuteTrace(frontTracerFactory, grpcTracerFactory, traceRandom);
 
-                    var tracer = tracerFactory.GetTracer("zipkin-test");
-                    
-                    // execute tracer
-                    using (tracer.StartActiveSpan($"parent", out var parent))
-                    {
-                        tracer.CurrentSpan.SetAttribute("key", 123);
-                        tracer.CurrentSpan.AddEvent("test-event");
-
-                        using (tracer.StartActiveSpan("child", out var child))
-                        {
-                            child.SetAttribute("key", "value");
-                        }
-                    }
-
-                    await Task.Delay(1000);
-                    var remaining = (10 * 60) - sw.Elapsed.TotalSeconds;
-                    Console.WriteLine("Running and emitting metrics. Remaining time:" + (int)remaining + " seconds");
-                }
+                await Task.Delay(1000);
+                var remaining = (10 * 60) - sw.Elapsed.TotalSeconds;
+                Console.WriteLine("Running and emitting metrics. Remaining time:" + (int)remaining + " seconds");
             }
 
-            traceServer.Dispose();
+            frontTracerFactory?.Dispose();
+            grpcTracerFactory?.Dispose();
+
             metricsServer.Stop();
 
             //await MagicOnionHost.CreateDefaultBuilder()
@@ -119,115 +113,51 @@ namespace ChatApp.Server
             //    .RunConsoleAsync();
         }
 
-        private static readonly ConcurrentDictionary<Guid, string> Responses = new ConcurrentDictionary<Guid, string>();
-
-        static void ProcessServerRequest(HttpListenerContext context)
+        private static async Task ExecuteTrace(TracerFactory frontTracerFactory, TracerFactory grpcTracerFactory, Random traceRandom)
         {
-            context.Response.StatusCode = 200;
+            var taskList = new List<Task>();
 
-            if (context.Request.QueryString.Count == 0)
+            // service A
+            var tracer = frontTracerFactory.GetTracer("web");
+            using (tracer.StartActiveSpan($"web", out var parent))
             {
-                foreach (var response in Responses)
+                tracer.CurrentSpan.SetAttribute("key", 123);
+                tracer.CurrentSpan.AddEvent("test-event");
+
+                await Task.Delay(TimeSpan.FromMilliseconds(traceRandom.Next(20, 100)));
+
+                // service B
+                var tracerGrpc = grpcTracerFactory.GetTracer("grpc");
+                var tracerGrpcRedis = grpcTracerFactory.GetTracer("redis");
+                var tracerGrpcDb = grpcTracerFactory.GetTracer("db");
+                using (tracerGrpc.StartActiveSpan("grpc", out var grpc))
                 {
-                    var body = Encoding.UTF8.GetBytes($"{response.Key}: {response.Value}");
-                    context.Response.ContentType = "application/json";
-                    context.Response.OutputStream.Write(body, 0, body.Length);
-                }
-                context.Response.OutputStream.Close();
-                return;
-            }
+                    grpc.SetAttribute("path", "/api/user/status");
 
-            using (var readStream = new StreamReader(context.Request.InputStream))
-            {
-                string requestContent = readStream.ReadToEnd();
-                Responses.TryAdd(
-                    Guid.Parse(context.Request.QueryString["requestId"]),
-                    requestContent);
-
-                context.Response.OutputStream.Close();
-            }
-        }
-
-        internal class TestHttpServer
-        {
-            private class RunningServer : IDisposable
-            {
-                private readonly Task httpListenerTask;
-                private readonly HttpListener listener;
-                private readonly AutoResetEvent initialized = new AutoResetEvent(false);
-
-                public RunningServer(Action<HttpListenerContext> action, string host, int port)
-                {
-                    this.listener = new HttpListener();
-
-                    this.listener.Prefixes.Add($"http://{host}:{port}/");
-                    this.listener.Start();
-
-                    this.httpListenerTask = new Task(async () =>
+                    using (tracerGrpcRedis.StartActiveSpan("redis", out var redis))
                     {
-                        while (true)
+                        redis.SetAttribute("key", "uid-123");
+                        redis.SetAttribute("status", "up");
+                        var t1 = Task.Delay(TimeSpan.FromMilliseconds(traceRandom.Next(1, 20)));
+                        taskList.Add(t1);
+
+                        using (tracerGrpcDb.StartActiveSpan("db", out var db))
                         {
-                            try
-                            {
-                                var ctxTask = this.listener.GetContextAsync();
-
-                                this.initialized.Set();
-
-                                action(await ctxTask.ConfigureAwait(false));
-                            }
-                            catch (Exception ex)
-                            {
-                                if (ex is ObjectDisposedException // Listener was closed before we got into GetContextAsync.
-                                    || (ex is HttpListenerException httpEx && httpEx.ErrorCode == 995)) // Listener was closed while we were in GetContextAsync.
-                                {
-                                    break;
-                                }
-                                throw;
-                            }
+                            db.SetAttribute("database", "user");
+                            db.SetAttribute("table", "status");
+                            db.SetAttribute("uid", "123");
+                            var t2 = Task.Delay(TimeSpan.FromMilliseconds(traceRandom.Next(2, 50)));
+                            taskList.Add(t2);
                         }
-                    });
+                    }
+
+                    await Task.WhenAll(taskList);
                 }
 
-                public void Start()
-                {
-                    this.httpListenerTask.Start();
-                    this.initialized.WaitOne();
-                }
-
-                public void Dispose()
-                {
-                    try
-                    {
-                        this.listener?.Stop();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        // swallow this exception just in case
-                    }
-                }
-            }
-
-            public static IDisposable RunServer(Action<HttpListenerContext> action, string host, int port)
-            {
-                RunningServer server = null;
-
-                var retryCount = 5;
-                while (retryCount > 0)
-                {
-                    try
-                    {
-                        server = new RunningServer(action, host, port);
-                        server.Start();
-                        break;
-                    }
-                    catch (HttpListenerException)
-                    {
-                        retryCount--;
-                    }
-                }
-
-                return server;
+                await Task.Delay(TimeSpan.FromMilliseconds(traceRandom.Next(10, 50)));
             }
         }
+
+        private static readonly ConcurrentDictionary<Guid, string> Responses = new ConcurrentDictionary<Guid, string>();
     }
 }
