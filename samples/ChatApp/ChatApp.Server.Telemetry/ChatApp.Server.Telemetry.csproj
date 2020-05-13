@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="MagicOnion.Hosting" Version="3.0.11" />
+    <PackageReference Include="MagicOnion.OpenTelemetry" Version="3.0.11" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.40" />
   </ItemGroup>
 
   <ItemGroup>
