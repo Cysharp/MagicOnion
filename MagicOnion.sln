@@ -67,11 +67,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ChatApp", "ChatApp", "{FEE2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JwtAuthentication", "JwtAuthentication", "{EBF51D3A-A093-4177-865A-D17F816EDEF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuthApp.Shared", "samples\JwtAuthentication\JwtAuthApp.Shared\JwtAuthApp.Shared.csproj", "{93BC9FC7-D157-4541-A05E-C56D31B2F2BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthApp.Shared", "samples\JwtAuthentication\JwtAuthApp.Shared\JwtAuthApp.Shared.csproj", "{93BC9FC7-D157-4541-A05E-C56D31B2F2BC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthApp.Server", "samples\JwtAuthentication\JwtAuthApp.Server\JwtAuthApp.Server.csproj", "{38B41013-6FD3-4E99-A7A9-0DBAC0CAF6F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuthApp.Client", "samples\JwtAuthentication\JwtAuthApp.Client\JwtAuthApp.Client.csproj", "{5948D82F-EA56-4266-8718-7508C26BFFD4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthApp.Client", "samples\JwtAuthentication\JwtAuthApp.Client\JwtAuthApp.Client.csproj", "{5948D82F-EA56-4266-8718-7508C26BFFD4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server.TelemetryNew", "samples\ChatApp\ChatApp.Server.TelemetryNew\ChatApp.Server.TelemetryNew.csproj", "{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server.Telemetry", "samples\ChatApp\ChatApp.Server.Telemetry\ChatApp.Server.Telemetry.csproj", "{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,6 +167,14 @@ Global
 		{5948D82F-EA56-4266-8718-7508C26BFFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5948D82F-EA56-4266-8718-7508C26BFFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5948D82F-EA56-4266-8718-7508C26BFFD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,6 +203,8 @@ Global
 		{93BC9FC7-D157-4541-A05E-C56D31B2F2BC} = {EBF51D3A-A093-4177-865A-D17F816EDEF5}
 		{38B41013-6FD3-4E99-A7A9-0DBAC0CAF6F5} = {EBF51D3A-A093-4177-865A-D17F816EDEF5}
 		{5948D82F-EA56-4266-8718-7508C26BFFD4} = {EBF51D3A-A093-4177-865A-D17F816EDEF5}
+		{328AAC97-B2A8-4EEC-8C3C-61E72ABD9F4E} = {FEE2B9AB-A1D0-41BA-A172-FC95935542DF}
+		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B} = {FEE2B9AB-A1D0-41BA-A172-FC95935542DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
