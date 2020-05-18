@@ -55,11 +55,14 @@ namespace ChatApp.Server
                 mb.SetMetricExporter(exporter);
                 mb.SetMetricPushInterval(TimeSpan.FromSeconds(10));
             });
-            var meter = meterFactory.GetMeter("MyMeter");
-            var counter = meter.CreateInt64Counter("MyCounter");
+            var meter = meterFactory.GetMeter("MagicOnion");
+            var counter = meter.CreateInt64Counter("MagicOnion/measure/BuildServiceDefinition");
 
             var labels1 = new List<KeyValuePair<string, string>>();
             labels1.Add(new KeyValuePair<string, string>("dim1", "value1"));
+
+            var labels2 = new List<KeyValuePair<string, string>>();
+            labels2.Add(new KeyValuePair<string, string>("dim2", "value2"));
 
             // Tracer (factory is cacheable)
             var traceRandom = new Random();
