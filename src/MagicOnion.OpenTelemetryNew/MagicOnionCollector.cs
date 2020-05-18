@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using MagicOnion.Server;
@@ -10,6 +11,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Metrics.Configuration;
 using OpenTelemetry.Metrics.Export;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Trace.Configuration;
 
 namespace MagicOnion.OpenTelemetry
 {
@@ -62,36 +64,6 @@ namespace MagicOnion.OpenTelemetry
             connectCounter = meter.CreateInt64Counter("MagicOnion/measure/Connect"); // sum
             // StreamingHub disconnect count. num
             disconnectCounter = meter.CreateInt64Counter("MagicOnion/measure/Disconnect"); // sum
-        }
-
-        /// <summary>
-        /// Create tags with context and put to metrics
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        ITagContext CreateTag(ServiceContext context)
-        {
-            return tagger.ToBuilder(defaultTags).Put(MethodKey, TagValue.Create(context.CallContext.Method)).Build();
-        }
-
-        /// <summary>
-        /// Create tags with context and put to metrics
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        ITagContext CreateTag(StreamingHubContext context)
-        {
-            return tagger.ToBuilder(defaultTags).Put(MethodKey, TagValue.Create(context.Path)).Build();
-        }
-
-        /// <summary>
-        /// Create tags with value and put to metrics
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        ITagContext CreateTag(string value)
-        {
-            return tagger.ToBuilder(defaultTags).Put(MethodKey, TagValue.Create(value)).Build();
         }
 
         IEnumerable<KeyValuePair<string, string>> CreateLabel(ServiceContext context)
@@ -190,6 +162,24 @@ namespace MagicOnion.OpenTelemetry
         }
     }
 
+    public class MagicOnionOpenTelemetryOption
+    {
+        /// <summary>
+        /// Service Name for the app. default is Assembly name.
+        /// </summary>
+        public string ServiceName { get; }
+
+        public MagicOnionOpenTelemetryOption()
+        {
+            ServiceName = Assembly.GetExecutingAssembly().GetName().Name;
+        }
+
+        public MagicOnionOpenTelemetryOption(string serviceName)
+        {
+            ServiceName = serviceName;
+        }
+    }
+
     /// <summary>
     /// Global filter. Handle Unary and most outside logging.
     /// </summary>
@@ -200,56 +190,61 @@ namespace MagicOnion.OpenTelemetry
 
         public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOption>());
         }
     }
 
     internal class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
     {
-        readonly ITracer tracer;
-        readonly ISampler sampler;
+        readonly TracerFactory tracerFactcory;
+        readonly string serviceName;
 
-        public OpenTelemetryCollectorFilter(ITracer tracer, ISampler sampler)
+        public OpenTelemetryCollectorFilter(TracerFactory tracerFactory, MagicOnionOpenTelemetryOption telemetryOption)
         {
-            this.tracer = tracer;
-            this.sampler = sampler;
+            this.tracerFactcory = tracerFactory;
+            this.serviceName = telemetryOption.ServiceName;
         }
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
-            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
+            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
+
+            var spanContext = default(SpanContext);
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
-            var spanBuilder = tracer.SpanBuilder(context.CallContext.Method).SetSpanKind(SpanKind.Server);
+            var tracer = tracerFactcory.GetTracer(context.CallContext.Method);
+            tracer.CurrentSpan.SetAttribute("rpc.service", serviceName);
 
-            if (sampler != null)
-            {
-                spanBuilder.SetSampler(sampler);
-            }
-
-            var span = spanBuilder.StartSpan();
+            TelemetrySpan sendSpan = null;
+            IDisposable sendSpanDisposable = null;
             try
             {
-                span.SetAttribute("component", "grpc");
-                //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
+                // incoming kind: SERVER
+                using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", spanContext, SpanKind.Server, out var recieveSpan))
+                {
+                    recieveSpan.SetAttribute("net.peer.ip", context.CallContext.Peer);
+                    recieveSpan.SetAttribute("message.type", "RECIEVED");
+                    recieveSpan.SetAttribute("message.id", context.ContextId);
+                    recieveSpan.SetAttribute("message.uncompressed_size", context.GetRawRequest().LongLength);
 
-                await next(context);
+                    await next(context);
+                }
 
-                //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
-                span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
-                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+                // outgoing kind: CLINET
+                sendSpanDisposable = tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", spanContext, SpanKind.Client, out sendSpan);
+                sendSpan.SetAttribute("net.peer.ip", context.CallContext.Host);
+                sendSpan.SetAttribute("message.type", "SENT");
+                sendSpan.SetAttribute("message.id", context.ContextId);
+                sendSpan.SetAttribute("message.uncompressed_size", context.GetRawResponse().LongLength);
+                sendSpan.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
             }
             catch (Exception ex)
             {
-                span.SetAttribute("exception", ex.ToString());
-
-                span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
-                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
-                throw;
+                sendSpan.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
             }
             finally
             {
-                span.End();
+                sendSpanDisposable?.Dispose();
             }
         }
     }
@@ -264,56 +259,61 @@ namespace MagicOnion.OpenTelemetry
 
         public StreamingHubFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<ITracer>(), serviceLocator.GetService<ISampler>());
+            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOption>());
         }
     }
 
     internal class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
     {
-        readonly ITracer tracer;
-        readonly ISampler sampler;
+        readonly TracerFactory tracerFactcory;
+        readonly string serviceName;
 
-        public OpenTelemetryHubCollectorFilter(ITracer tracer, ISampler sampler)
+        public OpenTelemetryHubCollectorFilter(TracerFactory tracerFactory, MagicOnionOpenTelemetryOption telemetryOption)
         {
-            this.tracer = tracer;
-            this.sampler = sampler;
+            this.tracerFactcory = tracerFactory;
+            this.serviceName = telemetryOption.ServiceName;
         }
 
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
-            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/semantic-conventions.md#grpc
+            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
+
+            var spanContext = default(SpanContext);
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
-            var spanBuilder = tracer.SpanBuilder(context.ServiceContext.CallContext.Method).SetSpanKind(SpanKind.Server);
+            var tracer = tracerFactcory.GetTracer(context.ServiceContext.CallContext.Method);
+            tracer.CurrentSpan.SetAttribute("rpc.service", serviceName);
 
-            if (sampler != null)
-            {
-                spanBuilder.SetSampler(sampler);
-            }
-
-            var span = spanBuilder.StartSpan();
+            TelemetrySpan sendSpan = null;
+            IDisposable sendSpanDisposable = null;
             try
             {
-                span.SetAttribute("component", "grpc");
-                //span.SetAttribute("request.size", context.GetRawRequest().LongLength);
+                // incoming kind: SERVER
+                using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.ServiceContext.CallContext.Method}", spanContext, SpanKind.Server, out var recieveSpan))
+                {
+                    recieveSpan.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Peer);
+                    recieveSpan.SetAttribute("message.type", "RECIEVED");
+                    recieveSpan.SetAttribute("message.id", context.ServiceContext.ContextId);
+                    recieveSpan.SetAttribute("message.uncompressed_size", context.ServiceContext.GetRawRequest().LongLength);
 
-                await next(context);
+                    await next(context);
+                }
 
-                //span.SetAttribute("response.size", context.GetRawResponse().LongLength);
-                span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+                // outgoing kind: CLINET
+                sendSpanDisposable = tracer.StartActiveSpan($"grpc.{serviceName}/{context.ServiceContext.CallContext.Method}", spanContext, SpanKind.Client, out sendSpan);
+                sendSpan.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Host);
+                sendSpan.SetAttribute("message.type", "SENT");
+                sendSpan.SetAttribute("message.id", context.ServiceContext.ContextId);
+                sendSpan.SetAttribute("message.uncompressed_size", context.ServiceContext.GetRawResponse().LongLength);
+                sendSpan.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
             }
             catch (Exception ex)
             {
-                span.SetAttribute("exception", ex.ToString());
-
-                span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
-                throw;
+                sendSpan.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
             }
             finally
             {
-                span.End();
+                sendSpanDisposable?.Dispose();
             }
         }
     }
