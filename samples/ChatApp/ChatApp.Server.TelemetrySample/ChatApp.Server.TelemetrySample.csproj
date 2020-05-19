@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,13 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.287" />
-    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.287" />
+    <PackageReference Include="MagicOnion.Hosting" Version="3.0.11" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.286" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.286" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\MagicOnion.Hosting\MagicOnion.Hosting.csproj" />
-    <ProjectReference Include="..\..\..\src\MagicOnion.OpenTelemetryNew\MagicOnion.OpenTelemetryNew.csproj" />
     <ProjectReference Include="..\ChatApp.Shared\ChatApp.Shared.csproj" />
   </ItemGroup>
 
