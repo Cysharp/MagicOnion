@@ -16,7 +16,7 @@ namespace MagicOnion.OpenTelemetry
 
         public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOption>());
+            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
         }
     }
 
@@ -25,7 +25,7 @@ namespace MagicOnion.OpenTelemetry
         readonly TracerFactory tracerFactcory;
         readonly string serviceName;
 
-        public OpenTelemetryCollectorFilter(TracerFactory tracerFactory, MagicOnionOpenTelemetryOption telemetryOption)
+        public OpenTelemetryCollectorFilter(TracerFactory tracerFactory, MagicOnionOpenTelemetryOptions telemetryOption)
         {
             this.tracerFactcory = tracerFactory;
             this.serviceName = telemetryOption.ServiceName;
@@ -37,27 +37,33 @@ namespace MagicOnion.OpenTelemetry
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             var tracer = tracerFactcory.GetTracer(context.CallContext.Method);
-            tracer.CurrentSpan.SetAttribute("rpc.service", serviceName);
 
             // incoming kind: SERVER
-            using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", SpanKind.Server, out var span))
+            using (tracer.StartActiveSpan($"{context.CallContext.Method}", SpanKind.Server, out var span))
             {
                 try
                 {
+                    span.SetAttribute("rpc.service", serviceName);
                     span.SetAttribute("net.peer.ip", context.CallContext.Peer);
+                    span.SetAttribute("net.host.name", context.CallContext.Host);
                     span.SetAttribute("message.type", "RECIEVED");
-                    span.SetAttribute("message.id", context.ContextId);
-                    span.SetAttribute("message.uncompressed_size", context.GetRawRequest().LongLength);
+                    span.SetAttribute("message.id", context.ContextId.ToString());
+                    span.SetAttribute("message.uncompressed_size", context.GetRawRequest()?.LongLength ?? 0);
+
+                    span.SetAttribute("magiconion.method.type", context.MethodType.ToString());
+                    span.SetAttribute("magiconion.service.type", context.ServiceType.Name);
+                    span.SetAttribute("magiconion.auth.enabled", !string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName));
+                    span.SetAttribute("magiconion.auth.peer.authenticated", context.CallContext.AuthContext.IsPeerAuthenticated);
 
                     await next(context);
 
-                    span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                    span.SetAttribute("grpc.status_code", (long)context.CallContext.Status.StatusCode);
                     span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
                 }
                 catch (Exception ex)
                 {
                     span.SetAttribute("exception", ex.ToString());
-                    span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                    span.SetAttribute("grpc.status_code", (long)context.CallContext.Status.StatusCode);
                     span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
                 }
             }

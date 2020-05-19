@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Grpc.Core;
@@ -30,6 +30,8 @@ namespace MagicOnion.OpenTelemetry
 
         public OpenTelemetryCollectorLogger(MeterFactory meterFactory, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
         {
+            if (meterFactory == null) throw new ArgumentNullException(nameof(meterFactory));
+
             // configure defaultTags included as default tag
             this.defaultLabels = defaultLabels ?? Array.Empty<KeyValuePair<string, string>>();
 
