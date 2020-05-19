@@ -209,42 +209,31 @@ namespace MagicOnion.OpenTelemetry
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
-            var spanContext = default(SpanContext);
-
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             var tracer = tracerFactcory.GetTracer(context.CallContext.Method);
             tracer.CurrentSpan.SetAttribute("rpc.service", serviceName);
 
-            TelemetrySpan sendSpan = null;
-            IDisposable sendSpanDisposable = null;
-            try
+            // incoming kind: SERVER
+            using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", SpanKind.Server, out var span))
             {
-                // incoming kind: SERVER
-                using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", spanContext, SpanKind.Server, out var recieveSpan))
+                try
                 {
-                    recieveSpan.SetAttribute("net.peer.ip", context.CallContext.Peer);
-                    recieveSpan.SetAttribute("message.type", "RECIEVED");
-                    recieveSpan.SetAttribute("message.id", context.ContextId);
-                    recieveSpan.SetAttribute("message.uncompressed_size", context.GetRawRequest().LongLength);
+                    span.SetAttribute("net.peer.ip", context.CallContext.Peer);
+                    span.SetAttribute("message.type", "RECIEVED");
+                    span.SetAttribute("message.id", context.ContextId);
+                    span.SetAttribute("message.uncompressed_size", context.GetRawRequest().LongLength);
 
                     await next(context);
-                }
 
-                // outgoing kind: CLINET
-                sendSpanDisposable = tracer.StartActiveSpan($"grpc.{serviceName}/{context.CallContext.Method}", spanContext, SpanKind.Client, out sendSpan);
-                sendSpan.SetAttribute("net.peer.ip", context.CallContext.Host);
-                sendSpan.SetAttribute("message.type", "SENT");
-                sendSpan.SetAttribute("message.id", context.ContextId);
-                sendSpan.SetAttribute("message.uncompressed_size", context.GetRawResponse().LongLength);
-                sendSpan.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                sendSpan.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
-            }
-            finally
-            {
-                sendSpanDisposable?.Dispose();
+                    span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+                }
+                catch (Exception ex)
+                {
+                    span.SetAttribute("exception", ex.ToString());
+                    span.SetAttribute("status_code", (long)context.CallContext.Status.StatusCode);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+                }
             }
         }
     }
@@ -278,42 +267,31 @@ namespace MagicOnion.OpenTelemetry
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
-            var spanContext = default(SpanContext);
-
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             var tracer = tracerFactcory.GetTracer(context.ServiceContext.CallContext.Method);
             tracer.CurrentSpan.SetAttribute("rpc.service", serviceName);
 
-            TelemetrySpan sendSpan = null;
-            IDisposable sendSpanDisposable = null;
-            try
+            // incoming kind: SERVER
+            using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.ServiceContext.CallContext.Method}", SpanKind.Server, out var span))
             {
-                // incoming kind: SERVER
-                using (tracer.StartActiveSpan($"grpc.{serviceName}/{context.ServiceContext.CallContext.Method}", spanContext, SpanKind.Server, out var recieveSpan))
+                try
                 {
-                    recieveSpan.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Peer);
-                    recieveSpan.SetAttribute("message.type", "RECIEVED");
-                    recieveSpan.SetAttribute("message.id", context.ServiceContext.ContextId);
-                    recieveSpan.SetAttribute("message.uncompressed_size", context.ServiceContext.GetRawRequest().LongLength);
+                    span.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Peer);
+                    span.SetAttribute("message.type", "RECIEVED");
+                    span.SetAttribute("message.id", context.ServiceContext.ContextId);
+                    span.SetAttribute("message.uncompressed_size", context.ServiceContext.GetRawRequest().LongLength);
 
                     await next(context);
-                }
 
-                // outgoing kind: CLINET
-                sendSpanDisposable = tracer.StartActiveSpan($"grpc.{serviceName}/{context.ServiceContext.CallContext.Method}", spanContext, SpanKind.Client, out sendSpan);
-                sendSpan.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Host);
-                sendSpan.SetAttribute("message.type", "SENT");
-                sendSpan.SetAttribute("message.id", context.ServiceContext.ContextId);
-                sendSpan.SetAttribute("message.uncompressed_size", context.ServiceContext.GetRawResponse().LongLength);
-                sendSpan.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                sendSpan.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-            }
-            finally
-            {
-                sendSpanDisposable?.Dispose();
+                    span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+                }
+                catch (Exception ex)
+                {
+                    span.SetAttribute("exception", ex.ToString());
+                    span.SetAttribute("status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+                }
             }
         }
     }
