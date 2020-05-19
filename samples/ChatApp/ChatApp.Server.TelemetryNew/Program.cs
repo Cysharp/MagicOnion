@@ -34,6 +34,7 @@ namespace ChatApp.Server
                     },
                     tracerBuilder =>
                     {
+                        // open-telemetry with Zipkin exporter
                         tracerBuilder.UseZipkin(o =>
                         {
                             o.ServiceName = options.ServiceName;

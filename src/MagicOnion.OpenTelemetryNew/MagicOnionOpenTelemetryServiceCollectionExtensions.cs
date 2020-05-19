@@ -16,17 +16,23 @@ namespace MagicOnion.OpenTelemetry
             return AddMagicOnionOptnTelemetry(services, new MagicOnionOpenTelemetryOptions());
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, MagicOnionOpenTelemetryOptions options)
+        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+            MagicOnionOpenTelemetryOptions options)
         {
             return AddMagicOnionOptnTelemetry(services, options, null, null);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, Action<TracerBuilder> configureTracerFactory)
+        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+            Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
+            Action<TracerBuilder> configureTracerFactory)
         {
             return AddMagicOnionOptnTelemetry(services, new MagicOnionOpenTelemetryOptions(), configureMeterFactory, configureTracerFactory);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, MagicOnionOpenTelemetryOptions options, Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, Action<TracerBuilder> configureTracerFactory)
+        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+            MagicOnionOpenTelemetryOptions options, 
+            Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
+            Action<TracerBuilder> configureTracerFactory)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             if (string.IsNullOrEmpty(options.ServiceName)) throw new ArgumentNullException($"{nameof(options)}.{nameof(options.ServiceName)}");
