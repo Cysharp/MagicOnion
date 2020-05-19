@@ -23,11 +23,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.286" />
+        <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.287" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.287" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
+        <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
     </ItemGroup>
 
     <ItemGroup>
