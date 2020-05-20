@@ -28,7 +28,7 @@ namespace MagicOnion.OpenTelemetry
         readonly CounterMetric<long> connectCounter;
         readonly CounterMetric<long> disconnectCounter;
 
-        public OpenTelemetryCollectorLogger(MeterFactory meterFactory, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
+        public OpenTelemetryCollectorLogger(MeterFactory meterFactory, string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
         {
             if (meterFactory == null) throw new ArgumentNullException(nameof(meterFactory));
 
@@ -36,7 +36,7 @@ namespace MagicOnion.OpenTelemetry
             this.defaultLabels = defaultLabels ?? Array.Empty<KeyValuePair<string, string>>();
 
             // todo: how to description?
-            var meter = meterFactory.GetMeter("MagicOnion");
+            var meter = meterFactory.GetMeter("MagicOnion", version);
 
             // Service build time. ms
             buildServiceDefinitionMeasure = meter.CreateDoubleMeasure("MagicOnion/measure/BuildServiceDefinition"); // sum
