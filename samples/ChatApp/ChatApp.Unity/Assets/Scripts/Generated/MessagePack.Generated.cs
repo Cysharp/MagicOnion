@@ -14,8 +14,6 @@
 namespace MessagePack.Resolvers
 {
     using System;
-    using System.Buffers;
-    using MessagePack;
 
     public class GeneratedResolver : global::MessagePack.IFormatterResolver
     {
@@ -129,6 +127,7 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
 
+            options.Security.DepthStep(ref reader);
             IFormatterResolver formatterResolver = options.Resolver;
             var length = reader.ReadArrayHeader();
             var __RoomName__ = default(string);
@@ -155,6 +154,7 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
             var ____result = new global::ChatApp.Shared.MessagePackObjects.JoinRequest();
             ____result.RoomName = __RoomName__;
             ____result.UserName = __UserName__;
+            reader.Depth--;
             return ____result;
         }
     }
@@ -178,6 +178,7 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
 
+            options.Security.DepthStep(ref reader);
             IFormatterResolver formatterResolver = options.Resolver;
             var length = reader.ReadArrayHeader();
             var __UserName__ = default(string);
@@ -204,6 +205,7 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
             var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
             ____result.UserName = __UserName__;
             ____result.Message = __Message__;
+            reader.Depth--;
             return ____result;
         }
     }
