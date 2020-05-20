@@ -7,7 +7,7 @@ using OpenTelemetry.Trace.Configuration;
 namespace MagicOnion.OpenTelemetry
 {
     /// <summary>
-    /// Global filter. Handle Unary and most outside logging.
+    /// Collect OpenTelemetry Tracing for Global filter. Handle Unary and most outside logging.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
     public class OpenTelemetryCollectorFilterAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>

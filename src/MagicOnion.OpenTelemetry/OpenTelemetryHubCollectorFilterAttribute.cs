@@ -8,7 +8,7 @@ using OpenTelemetry.Trace.Configuration;
 namespace MagicOnion.OpenTelemetry
 {
     /// <summary>
-    /// StreamingHub Filter. Handle Streaming Hub logging.
+    /// Collect OpenTelemetry Tracing for StreamingHub Filter. Handle Streaming Hub logging.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
     public class OpenTelemetryHubCollectorFilterAttribute : Attribute, IMagicOnionFilterFactory<StreamingHubFilterAttribute>

@@ -50,7 +50,7 @@ namespace ChatApp.Server
                     {
                         options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
                         options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
-                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory, null);
+                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory);
                     });
                 })
                 .RunConsoleAsync();
