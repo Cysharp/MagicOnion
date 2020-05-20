@@ -14,6 +14,7 @@ namespace MessagePack.Formatters
 
         private static readonly Dictionary<Type, int> TypeToJumpCode = new Dictionary<Type, int>()
         {
+            // When adding types whose size exceeds 32-bits, add support in MessagePackSecurity.GetHashCollisionResistantEqualityComparer<T>()
             { typeof(Boolean), 0 },
             { typeof(Char), 1 },
             { typeof(SByte), 2 },
@@ -267,7 +268,8 @@ namespace MessagePack.Formatters
                 case MessagePackType.String:
                     return reader.ReadString();
                 case MessagePackType.Binary:
-                    return reader.ReadBytes();
+                    // We must copy the sequence returned by ReadBytes since the reader's sequence is only valid during deserialization.
+                    return reader.ReadBytes()?.ToArray();
                 case MessagePackType.Extension:
                     ExtensionHeader ext = reader.ReadExtensionFormatHeader();
                     if (ext.TypeCode == ReservedMessagePackExtensionTypeCode.DateTime)
@@ -282,9 +284,17 @@ namespace MessagePack.Formatters
 
                         IMessagePackFormatter<object> objectFormatter = resolver.GetFormatter<object>();
                         var array = new object[length];
-                        for (int i = 0; i < length; i++)
+                        options.Security.DepthStep(ref reader);
+                        try
                         {
-                            array[i] = objectFormatter.Deserialize(ref reader, options);
+                            for (int i = 0; i < length; i++)
+                            {
+                                array[i] = objectFormatter.Deserialize(ref reader, options);
+                            }
+                        }
+                        finally
+                        {
+                            reader.Depth--;
                         }
 
                         return array;
@@ -295,14 +305,22 @@ namespace MessagePack.Formatters
                         var length = reader.ReadMapHeader();
 
                         IMessagePackFormatter<object> objectFormatter = resolver.GetFormatter<object>();
-                        var hash = new Dictionary<object, object>(length);
-                        for (int i = 0; i < length; i++)
+                        var hash = new Dictionary<object, object>(length, options.Security.GetEqualityComparer<object>());
+                        options.Security.DepthStep(ref reader);
+                        try
                         {
-                            var key = objectFormatter.Deserialize(ref reader, options);
+                            for (int i = 0; i < length; i++)
+                            {
+                                var key = objectFormatter.Deserialize(ref reader, options);
 
-                            var value = objectFormatter.Deserialize(ref reader, options);
+                                var value = objectFormatter.Deserialize(ref reader, options);
 
-                            hash.Add(key, value);
+                                hash.Add(key, value);
+                            }
+                        }
+                        finally
+                        {
+                            reader.Depth--;
                         }
 
                         return hash;
