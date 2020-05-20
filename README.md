@@ -1435,55 +1435,43 @@ You can collect telemetry and use exporter on MagicOnion Serverside.
 
 What you need to do for Telemetry is followings.
 
-* configure exporter.
 * add reference to the MagicOnion.OpenTelemetry.
+* configuration for OpenTelemery.
 * configure DI for OpenTelemetry-dotnet.
+* (optional) add PrometheusExporterMetricsService for prometheus exporter.
 * configure filters/logger for telemetry.
+* try your telemetry.
 
 Let's follow the steps. 
 
-**configure exporeter**
-
-Before implementing exporeters, I've recommend check samples offering on [opentelemetry\-dotnet/samples/Exporters at master · open\-telemetry/opentelemetry\-dotnet](https://github.com/open-telemetry/opentelemetry-dotnet/tree/master/samples/Exporters).
-
-Here's prometheus exporter sample implementation, paste this before `MagicOnionHost.CreateDefaultBuilder()`.
-This implementation allow prometheus to collect MagicOnion metrics from http://localhost:9184/metrics.
-
-```csharp
-# Program.cs
-var exporter = new PrometheusExporter(
-    new PrometheusExporterOptions()
-    {
-        Url = $"http://localhost:9184/metrics/",
-    },
-    Stats.ViewManager);
-exporter.Start();
-
-// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-```
-
-If you are running on any VM, Container or Kubernetes, you can configure exporter host & port by through ConfigurationBuilder.
-Following example allow you to change exporter host/port by environment variables `PROMETHEUS_EXPORTER_HOST` & `PROMETHEUS_EXPORTER_PORT`.
-
-```csharp
-# Program.cs
-var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
-var exporterHost = config.GetValue<string>("PROMETHEUS_EXPORTER_HOST", "localhost");
-var exporterPort = config.GetValue<string>("PROMETHEUS_EXPORTER_PORT", "9182");
-var exporter = new PrometheusExporter(
-    new PrometheusExporterOptions()
-    {
-        Url = $"http://{exporterHost}:{exporterPort}/metrics/",
-    },
-    Stats.ViewManager);
-exporter.Start();
-
-// await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-```
-
 **add reference to the MagicOnion.OpenTelemetry**
 
-Please add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
+Add nuget.config to reference opentelemetry-dotnet MyGet v3 endpoint.
+
+```shell
+dotnet new nugetconfig
+```
+
+add package sources reference.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageRestore>
+    <add key="enabled" value="true" />
+    <add key="automatic" value="true" />
+  </packageRestore>
+  <packageSources>
+    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
+    <clear />
+    <add key="nuget" value="https://api.nuget.org/v3/index.json" />
+    <add key="myget.org opentelemetry" value="https://www.myget.org/F/opentelemetry/api/v3/index.json" />
+  </packageSources>
+</configuration>
+
+```
+
+Add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
 
 ```shell
 dotnet add package MagicOnion.OpenTelemetry
@@ -1491,67 +1479,170 @@ dotnet add package MagicOnion.OpenTelemetry
 
 You are ready to configure MagicOnion Filter & Logger for OpenTelemetry.
 
+**configuration for OpenTelemetry**
+
+```csharp
+var options = new MagicOnionOpenTelemetryOptions();
+hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
+```
+
+* `ServiceName`: Configure Tracer ServiceName
+* `MetricsExporterEndpoint`: Configure your metrics exporter's push endpoint. (e.g. Prometheus)
+* `TracerExporterEndpoint`: Configure your tracer exporter's push endpoint. (e.g. Zipkin)
+
+```json
+{
+  "MagicOnion": {
+    "OpenTelemetry": {
+      "ServiceName": "ChatApp.Server.Telemery",
+      "MetricsExporterEndpoint": "http://127.0.0.1:9184/metrics/",
+      "TracerExporterEndpoint": "http://127.0.0.1:9411/api/v2/spans"
+    }
+  }
+}
+```
+
 **configure DI for OpenTelemetry-dotnet**
 
-opentelemetry-dotnet requires DI for `ITracer` and `ISampler`.
-Make sure register them in DI with MagicOnion Builder.
+MagicOnion.OpenTelemetry offers extensions for IServiceCollection, `AddMagicOnionOptnTelemetry`.
+Register `MagicOnionOpenTelemetryOptions`, `Action<MagicOnionOpenTelemetryMeterFactoryOption>` and `Action<TracerBuilder>` to configure MeterFactory & TracerFactory.
+
+```csharp
+await MagicOnionHost.CreateDefaultBuilder()
+    .UseMagicOnion()
+    .ConfigureServices((hostContext, services) =>
+    {
+        var options = new MagicOnionOpenTelemetryOptions();
+        hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
+        services.AddMagicOnionOptnTelemetry(options, meterOptions =>
+        {
+            // open-telemetry with Prometheus exporter
+            meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
+        },
+        tracerBuilder =>
+        {
+            // open-telemetry with Zipkin exporter
+            tracerBuilder.UseZipkin(o =>
+            {
+                o.ServiceName = options.ServiceName;
+                o.Endpoint = new Uri(options.TracerExporterEndpoint);
+            });
+        });
+    })
+```
+
+`AddMagicOnionOptnTelemetry` register MagicOnionOpenTelemetryOptions, MeterFactory and TracerFactory as Singleton for you.
+
+**(optional) add PrometheusExporterMetricsService for prometheus exporter.**
+
+If you use Prometheus Exporter and require Prometheus Server to recieve pull request from Prometheus Collector Server, see sample IHostedService implementation.
+
+> [PrometheusExporterMetricsService](https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Server.Telemery/PrometheusExporterMetricsService.cs)
+> [PrometheusExporterMetricsHttpServerCustom](https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Server.Telemery/PrometheusExporterMetricsHttpServerCustom.cs)
 
 ```csharp
 # Program.cs
-await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-    .ConfigureServices(collection =>
+.ConfigureServices((hostContext, services) =>
+{
+    services.AddMagicOnionOptnTelemetry(options, meterOptions =>
     {
-        collection.AddSingleton<ITracer>(Tracing.Tracer);
-        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
-    })
-    .UseMagicOnion(....)
+        // your exporter implementation.
+    });
+
+    // host your prometheus metrics server
+    services.AddHostedService<PrometheusExporterMetricsService>();
+})
 ```
 
 **configure filters/logger for telemetry**
 
-Use `MagicOnionOptions` to register filters and logger for telemetry.
-You can collect MagicOnion metrics with `MagicOnionFilter`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorFilter` and `OpenTelemetryHubCollectorFilter` for you.
-Also register MagicOnionLogger to collect metrics on each hook point prepared on `IMagicOnionLogger`, MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorLogger` for you.
+You can collect MagicOnion metrics with `MagicOnionFilter`. MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorFilter` and `OpenTelemetryHubCollectorFilter` for you.
+You can trace Unary and StreamingHub API by register MagicOnionLogger on each hook point prepared via `IMagicOnionLogger`. MagicOnion.OpenTelemetry offers `OpenTelemetryCollectorLogger` for you.
 
 ```csharp
-await MagicOnionHost.CreateDefaultBuilder(useSimpleConsoleLogger: true)
-    .ConfigureServices(collection =>
-    {
-        collection.AddSingleton<ITracer>(Tracing.Tracer);
-        collection.AddSingleton<ISampler>(Samplers.AlwaysSample);
-    })
+await MagicOnionHost.CreateDefaultBuilder()
     .UseMagicOnion()
     .ConfigureServices((hostContext, services) =>
     {
+        services.AddMagicOnionOptnTelemetry(options, meterOptions =>
+        {
+            // your exporter implementation.
+        });
+    })
+    .ConfigureServices((hostContext, services) =>
+    {
+        var meterFactory = services.BuildServiceProvider().GetService<MeterFactory>();
         services.Configure<MagicOnionHostingOptions>(options =>
         {
-             options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
-             options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
-             options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, null);
+            options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
+            options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
+            options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory, null);
         });
     })
     .RunConsoleAsync();
 ```
 
-All implementation is done! Let's Debug run Server and confirm you can see metrics on http://localhost:9182/metrics.
+**try your telemetry**
 
-![image](https://user-images.githubusercontent.com/3856350/62096698-83213500-b2bf-11e9-88ff-52ef673ac4f5.png)
+All implementation is done, let's Debug run MagicOnion and confirm you can see metrics and tracer.
 
-You may find `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition"}` are collected, and other metrics will shown as #HELP.
-They will export when Unary/StreamingHub request is comming.
+SampleApp `ChatApp.Server.Telemery` offers sample for Prometheus Metrics exporter and Zipkin Tracer exporter.
 
-If you want insert your own tag to default metrics, please add `ITagContext` when register `OpenTelemetryCollectorLogger`.
-Following will add verion tag for each metrics.
+Run Zipkin on Docker to recieve tracer from ChatApp.Server.Telemery.
 
-```csharp
-MagicOnionLogger = new OpenTelemetryCollectorLogger(Stats.StatsRecorder, Tags.Tagger, new TagContext(new Dictionary<TagKey, TagValue>
-{
-    // add version to all default metrics
-    { TagKey.Create("version"), TagValue.Create("1.0.0") },
-}))
+```shell
+docker run --rm -p 9411:9411 openzipkin/zipkin
 ```
 
-Now each metrics contains `version` tag like `MagicOnion_measure_BuildServiceDefinition{MagicOnion_keys_Method="BuildServiceDefinition",version="1.0.0"}`.
+* Prometheus metrics wlll show on http://localhost:9184/metrics.
+* Zipkin tracer will show on http://localhost:9411/zipkin/
+
+```
+MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 9 1589966049901
+MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/GenerateException"} 0 1589966049901
+MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/SendMessageAsync"} 9 1589966049901
+MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/JoinAsync"} 0 1589966049901
+# HELP MagicOnion_measure_StreamingHubDisconnectMagicOnionMagicOnion/measure/StreamingHubDisconnect
+# TYPE MagicOnion_measure_StreamingHubDisconnect counter
+MagicOnion_measure_StreamingHubDisconnect{MagicOnion_keys_Method="/IChatHub/Connect"} 1 1589966049901
+# HELP MagicOnion_measure_UnaryRequestMagicOnionMagicOnion/measure/UnaryRequest
+# TYPE MagicOnion_measure_UnaryRequest counter
+MagicOnion_measure_UnaryRequest{MagicOnion_keys_Method="/IChatService/GenerateException"} 1 1589966049901
+# HELP MagicOnion_measure_StreamingHubConnectMagicOnionMagicOnion/measure/StreamingHubConnect
+# TYPE MagicOnion_measure_StreamingHubConnect counter
+MagicOnion_measure_StreamingHubConnect{MagicOnion_keys_Method="/IChatHub/Connect"} 0 1589966049901
+# HELP MagicOnion_measure_UnaryResponseSizeMagicOnionMagicOnion/measure/UnaryResponseSize
+# TYPE MagicOnion_measure_UnaryResponseSize summary
+MagicOnion/measure/UnaryResponseSize_sum{MagicOnion_keys_Method="/IChatService/GenerateException"} 0 1589966049901
+MagicOnion/measure/UnaryResponseSize_count{MagicOnion_keys_Method="/IChatService/GenerateException"} 1 1589966049901
+MagicOnion/measure/UnaryResponseSize{MagicOnion_keys_Method="/IChatService/GenerateException",quantile="0"} 0 1589966049901
+MagicOnion/measure/UnaryResponseSize{MagicOnion_keys_Method="/IChatService/GenerateException",quantile="1"} 0 1589966049901
+# HELP MagicOnion_measure_StreamingHubElapsedMagicOnionMagicOnion/measure/StreamingHubElapsed
+# TYPE MagicOnion_measure_StreamingHubElapsed summary
+MagicOnion/measure/StreamingHubElapsed_sum{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 4.108 1589966049901
+MagicOnion/measure/StreamingHubElapsed_count{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 1 1589966049901
+MagicOnion/measure/StreamingHubElapsed{MagicOnion_keys_Method="/IChatHub/LeaveAsync",quantile="0"} 4.108 1589966049901
+MagicOnion/measure/StreamingHubElapsed{MagicOnion_keys_Method="/IChatHub/LeaveAsync",quantile="1"} 4.108 1589966049901
+```
+
+You may find `MagicOnion/measure/BuildServiceDefinition{MagicOnion_keys_Method="EndBuildServiceDefinition",quantile="0"}` are collected, and other metrics will shown as #HELP.
+They will export when Unary/StreamingHub request is comming.
+
+**tips**
+
+* Want insert your own tag to default metrics.
+
+Add defaultTags when register `OpenTelemetryCollectorLogger`.
+
+* Want contain `version` tag to your metrics.
+
+Add version when register `OpenTelemetryCollectorLogger`
+
+This should output like follows, however current opentelemetry-dotnet Prometheus exporter not respect version tag.
+
+```
+MagicOnion/measure/BuildServiceDefinition_count{MagicOnion_keys_Method="EndBuildServiceDefinition",version="1.0.0"}
+```
 
 #### try visualization on localhost
 
