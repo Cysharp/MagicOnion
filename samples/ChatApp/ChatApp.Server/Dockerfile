@@ -5,6 +5,7 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY ["ChatApp.Server/ChatApp.Server.csproj", "ChatApp.Server/"]
+COPY ["ChatApp.Shared/ChatApp.Shared.csproj", "ChatApp.Shared/"]
 RUN dotnet restore "ChatApp.Server/ChatApp.Server.csproj"
 COPY . .
 WORKDIR "/src/ChatApp.Server"

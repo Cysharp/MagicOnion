@@ -1,0 +1,6 @@
+.git/
+.vs/
+bin/
+obj/
+ChatApp.Unity/Temp/
+ChatApp.Unity/Library/

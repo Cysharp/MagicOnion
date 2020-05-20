@@ -1,9 +1,7 @@
-using Microsoft.Extensions.Hosting;
 using System;
 using OpenTelemetry.Metrics.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Trace.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace MagicOnion.OpenTelemetry
 {

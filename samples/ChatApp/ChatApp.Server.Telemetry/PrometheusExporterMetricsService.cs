@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.OpenTelemetry;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter.Prometheus;
@@ -10,17 +11,18 @@ namespace ChatApp.Server
 {
     sealed class PrometheusExporterMetricsService : IHostedService
     {
-        private readonly PrometheusExporterMetricsHttpServer server;
+        private readonly PrometheusExporterMetricsHttpServerCustom server;
         private readonly ILogger<PrometheusExporterMetricsService> logger;
         private readonly MagicOnionOpenTelemetryOptions options;
 
-        public PrometheusExporterMetricsService(MetricExporter exporter, MagicOnionOpenTelemetryOptions options, ILogger<PrometheusExporterMetricsService> logger)
+        public PrometheusExporterMetricsService(MetricExporter exporter, MagicOnionOpenTelemetryOptions options, IConfiguration configuration, ILogger<PrometheusExporterMetricsService> logger)
         {
             this.logger = logger;
             this.options = options;
             if (exporter is PrometheusExporter prometheusExporter)
             {
-                server = new PrometheusExporterMetricsHttpServer(prometheusExporter);
+                var hostingEndpoint = configuration.GetSection("MagicOnion:OpenTelemetry").GetValue("PrometheusMetricsHostingEndpoint", options.MetricsExporterEndpoint);
+                server = new PrometheusExporterMetricsHttpServerCustom(prometheusExporter, hostingEndpoint);
             }
         }
         public Task StartAsync(CancellationToken cancellationToken)
