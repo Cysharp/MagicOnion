@@ -10,6 +10,9 @@ using OpenTelemetry.Trace;
 
 namespace MagicOnion.OpenTelemetry
 {
+    /// <summary>
+    /// Collect OpemTelemetry Meter Metrics.
+    /// </summary>
     public class OpenTelemetryCollectorLogger : IMagicOnionLogger
     {
         static readonly string MethodKey = "MagicOnion/keys/Method";
@@ -25,8 +28,8 @@ namespace MagicOnion.OpenTelemetry
         readonly MeasureMetric<double> streamingHubElapsedMeasure;
         readonly CounterMetric<long> streamingHubRequestCounter;
         readonly MeasureMetric<long> streamingHubResponseSizeMeasure;
-        readonly CounterMetric<long> connectCounter;
-        readonly CounterMetric<long> disconnectCounter;
+        readonly CounterMetric<long> streamingHubConnectCounter;
+        readonly CounterMetric<long> streamingHubDisconnectCounter;
 
         public OpenTelemetryCollectorLogger(MeterFactory meterFactory, string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
         {
@@ -53,35 +56,39 @@ namespace MagicOnion.OpenTelemetry
             // StreamingHub API elapsed time. ms
             streamingHubElapsedMeasure = meter.CreateDoubleMeasure("MagicOnion/measure/StreamingHubElapsed"); // sum
             // StreamingHub request count. num
-            streamingHubRequestCounter = meter.CreateInt64Counter("MagicOnion/measure/StreamingRequest"); // sum
+            streamingHubRequestCounter = meter.CreateInt64Counter("MagicOnion/measure/StreamingHubRequest"); // sum
             // StreamingHub API response size. bytes
             streamingHubResponseSizeMeasure = meter.CreateInt64Measure("MagicOnion/measure/StreamingHubResponseSize"); // sum
             // ConnectCount - DisconnectCount = current connect count. (successfully disconnected)
             // StreamingHub connect count. num
-            connectCounter = meter.CreateInt64Counter("MagicOnion/measure/Connect"); // sum
+            streamingHubConnectCounter = meter.CreateInt64Counter("MagicOnion/measure/StreamingHubConnect"); // sum
             // StreamingHub disconnect count. num
-            disconnectCounter = meter.CreateInt64Counter("MagicOnion/measure/Disconnect"); // sum
+            streamingHubDisconnectCounter = meter.CreateInt64Counter("MagicOnion/measure/StreamingHubDisconnect"); // sum
         }
 
         IEnumerable<KeyValuePair<string, string>> CreateLabel(ServiceContext context)
         {
-            var label = labelCache.GetOrAdd(nameof(EndBuildServiceDefinition), new HashSet<KeyValuePair<string, string>>(defaultLabels)
+            // Unary start from /{UnaryInterface}/{Method}
+            var value = context.CallContext.Method;
+            var label = labelCache.GetOrAdd(value, new HashSet<KeyValuePair<string, string>>(defaultLabels)
             {
-                new KeyValuePair<string, string>( MethodKey, nameof(context.CallContext.Method)),
+                new KeyValuePair<string, string>( MethodKey, value),
             });
             return label;
         }
         IEnumerable<KeyValuePair<string, string>> CreateLabel(StreamingHubContext context)
         {
-            var label = labelCache.GetOrAdd(nameof(EndBuildServiceDefinition), new HashSet<KeyValuePair<string, string>>(defaultLabels)
+            // StreamingHub start from {HubInterface}/{Method}
+            var value = "/" + context.Path;
+            var label = labelCache.GetOrAdd(value, new HashSet<KeyValuePair<string, string>>(defaultLabels)
             {
-                new KeyValuePair<string, string>( MethodKey, nameof(context.Path)),
+                new KeyValuePair<string, string>( MethodKey, value),
             });
             return label;
         }
         IEnumerable<KeyValuePair<string, string>> CreateLabel(string value)
         {
-            var label = labelCache.GetOrAdd(nameof(EndBuildServiceDefinition), new HashSet<KeyValuePair<string, string>>(defaultLabels)
+            var label = labelCache.GetOrAdd(value, new HashSet<KeyValuePair<string, string>>(defaultLabels)
             {
                 new KeyValuePair<string, string>( MethodKey, value),
             });
@@ -101,7 +108,7 @@ namespace MagicOnion.OpenTelemetry
         {
             if (context.MethodType == MethodType.DuplexStreaming && context.CallContext.Method.EndsWith("/Connect"))
             {
-                connectCounter.Add(default(SpanContext), 1, CreateLabel(context));
+                streamingHubConnectCounter.Add(default(SpanContext), 1, CreateLabel(context));
             }
             else if (context.MethodType == MethodType.Unary)
             {
@@ -113,7 +120,7 @@ namespace MagicOnion.OpenTelemetry
         {
             if (context.MethodType == MethodType.DuplexStreaming && context.CallContext.Method.EndsWith("/Connect"))
             {
-                disconnectCounter.Add(default(SpanContext), 1, CreateLabel(context));
+                streamingHubDisconnectCounter.Add(default(SpanContext), 1, CreateLabel(context));
             }
             else if (context.MethodType == MethodType.Unary)
             {
