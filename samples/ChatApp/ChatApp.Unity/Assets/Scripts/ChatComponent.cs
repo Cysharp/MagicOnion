@@ -121,7 +121,7 @@ namespace Assets.Scripts
             await this.streamingClient.DisposeAsync();
         }
 
-        public async void ReconectInitializedServer()
+        public async void ReconnectInitializedServer()
         {
             if (this.channel != null)
             {
