@@ -8,4 +8,4 @@ services:
     ports:
       - 12345:12345
     environment:
-      - DOTNET_ENVIRONMENT=Development"
+      - DOTNET_ENVIRONMENT=Development
