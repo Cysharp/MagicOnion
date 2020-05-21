@@ -1481,10 +1481,8 @@ You are ready to configure MagicOnion Filter & Logger for OpenTelemetry.
 
 **configuration for OpenTelemetry**
 
-```csharp
-var options = new MagicOnionOpenTelemetryOptions();
-hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
-```
+MagicOnion.OpenTelemetry offers configuration binder.
+Default configuration key is `MagicOnion:OpenTelemery`.
 
 * `ServiceName`: Configure Tracer ServiceName
 * `MetricsExporterEndpoint`: Configure your metrics exporter's push endpoint. (e.g. Prometheus)
@@ -1494,7 +1492,7 @@ hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
 {
   "MagicOnion": {
     "OpenTelemetry": {
-      "ServiceName": "ChatApp.Server.Telemery",
+      "ServiceName": "ChatApp.Server",
       "MetricsExporterEndpoint": "http://127.0.0.1:9184/metrics/",
       "TracerExporterEndpoint": "http://127.0.0.1:9411/api/v2/spans"
     }
@@ -1512,14 +1510,12 @@ await MagicOnionHost.CreateDefaultBuilder()
     .UseMagicOnion()
     .ConfigureServices((hostContext, services) =>
     {
-        var options = new MagicOnionOpenTelemetryOptions();
-        hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
-        services.AddMagicOnionOpenTelemetry(options, meterOptions =>
+        services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
         {
             // open-telemetry with Prometheus exporter
             meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
         },
-        tracerBuilder =>
+        (options, tracerBuilder) =>
         {
             // open-telemetry with Zipkin exporter
             tracerBuilder.UseZipkin(o =>
@@ -1544,11 +1540,14 @@ If you use Prometheus Exporter and require Prometheus Server to recieve pull req
 # Program.cs
 .ConfigureServices((hostContext, services) =>
 {
-    services.AddMagicOnionOpenTelemetry(options, meterOptions =>
+    services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
     {
-        // your exporter implementation.
+        // your metrics exporter implementation.
+    },
+    (options, tracerBuilder) =>
+    {
+        // your tracer exporter implementation.
     });
-
     // host your prometheus metrics server
     services.AddHostedService<PrometheusExporterMetricsService>();
 })
@@ -1564,9 +1563,13 @@ await MagicOnionHost.CreateDefaultBuilder()
     .UseMagicOnion()
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddMagicOnionOpenTelemetry(options, meterOptions =>
+        services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
         {
-            // your exporter implementation.
+            // your metrics exporter implementation.
+        },
+        (options, tracerBuilder) =>
+        {
+            // your tracer exporter implementation.
         });
     })
     .ConfigureServices((hostContext, services) =>
@@ -1597,7 +1600,13 @@ docker run --rm -p 9411:9411 openzipkin/zipkin
 * Prometheus metrics wlll show on http://localhost:9184/metrics.
 * Zipkin tracer will show on http://localhost:9411/zipkin/
 
-```
+Zipkin tracer will be shown as below.
+
+![image](https://user-images.githubusercontent.com/3856350/82529117-3b80d800-9b75-11ea-9e70-4bf15411becc.png)
+
+Prometheus Metrics will be shown as like follows.
+
+```txt
 MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 9 1589966049901
 MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/GenerateException"} 0 1589966049901
 MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/SendMessageAsync"} 9 1589966049901
