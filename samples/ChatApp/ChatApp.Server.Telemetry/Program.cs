@@ -25,14 +25,12 @@ namespace ChatApp.Server
                 .UseMagicOnion()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var options = new MagicOnionOpenTelemetryOptions();
-                    hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
-                    services.AddMagicOnionOpenTelemetry(options, meterOptions =>
+                    services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
                     {
                         // open-telemetry with Prometheus exporter
                         meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
                     },
-                    tracerBuilder =>
+                    (options, tracerBuilder) =>
                     {
                         // open-telemetry with Zipkin exporter
                         tracerBuilder.UseZipkin(o =>
