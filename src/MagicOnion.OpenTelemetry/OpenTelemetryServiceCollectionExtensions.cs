@@ -6,28 +6,28 @@ using OpenTelemetry.Trace.Configuration;
 namespace MagicOnion.OpenTelemetry
 {
     /// <summary>MagicOnion extensions for Microsoft.Extensions.Hosting classes</summary>
-    public static class MagicOnionOpenTelemetryServiceCollectionExtensions
+    public static class OpenTelemetryServiceCollectionExtensions
     {
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services)
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services)
         {
-            return AddMagicOnionOptnTelemetry(services, new MagicOnionOpenTelemetryOptions());
+            return AddMagicOnionOpenTelemetry(services, new MagicOnionOpenTelemetryOptions());
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
             MagicOnionOpenTelemetryOptions options)
         {
-            return AddMagicOnionOptnTelemetry(services, options, null, null);
+            return AddMagicOnionOpenTelemetry(services, options, null, null);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
             Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
             Action<TracerBuilder> configureTracerFactory)
         {
-            return AddMagicOnionOptnTelemetry(services, new MagicOnionOpenTelemetryOptions(), configureMeterFactory, configureTracerFactory);
+            return AddMagicOnionOpenTelemetry(services, new MagicOnionOpenTelemetryOptions(), configureMeterFactory, configureTracerFactory);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOptnTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
             MagicOnionOpenTelemetryOptions options, 
             Action<MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
             Action<TracerBuilder> configureTracerFactory)

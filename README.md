@@ -1504,7 +1504,7 @@ hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
 
 **configure DI for OpenTelemetry-dotnet**
 
-MagicOnion.OpenTelemetry offers extensions for IServiceCollection, `AddMagicOnionOptnTelemetry`.
+MagicOnion.OpenTelemetry offers extensions for IServiceCollection, `AddMagicOnionOpenTelemetry`.
 Register `MagicOnionOpenTelemetryOptions`, `Action<MagicOnionOpenTelemetryMeterFactoryOption>` and `Action<TracerBuilder>` to configure MeterFactory & TracerFactory.
 
 ```csharp
@@ -1514,7 +1514,7 @@ await MagicOnionHost.CreateDefaultBuilder()
     {
         var options = new MagicOnionOpenTelemetryOptions();
         hostContext.Configuration.GetSection("MagicOnion:OpenTelemetry").Bind(options);
-        services.AddMagicOnionOptnTelemetry(options, meterOptions =>
+        services.AddMagicOnionOpenTelemetry(options, meterOptions =>
         {
             // open-telemetry with Prometheus exporter
             meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
@@ -1531,7 +1531,7 @@ await MagicOnionHost.CreateDefaultBuilder()
     })
 ```
 
-`AddMagicOnionOptnTelemetry` register MagicOnionOpenTelemetryOptions, MeterFactory and TracerFactory as Singleton for you.
+`AddMagicOnionOpenTelemetry` register MagicOnionOpenTelemetryOptions, MeterFactory and TracerFactory as Singleton for you.
 
 **(optional) add PrometheusExporterMetricsService for prometheus exporter.**
 
@@ -1544,7 +1544,7 @@ If you use Prometheus Exporter and require Prometheus Server to recieve pull req
 # Program.cs
 .ConfigureServices((hostContext, services) =>
 {
-    services.AddMagicOnionOptnTelemetry(options, meterOptions =>
+    services.AddMagicOnionOpenTelemetry(options, meterOptions =>
     {
         // your exporter implementation.
     });
@@ -1564,7 +1564,7 @@ await MagicOnionHost.CreateDefaultBuilder()
     .UseMagicOnion()
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddMagicOnionOptnTelemetry(options, meterOptions =>
+        services.AddMagicOnionOpenTelemetry(options, meterOptions =>
         {
             // your exporter implementation.
         });
