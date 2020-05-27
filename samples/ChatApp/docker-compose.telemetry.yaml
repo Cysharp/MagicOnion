@@ -1,7 +1,7 @@
 version: "3"
 
-# won''t run until MagicOnion.Telemery nuget package is published.
 services:
+  # won't run until MagicOnion.Telemery nuget package is published.
   chatapp:
     build:
       context: .
@@ -14,6 +14,55 @@ services:
       - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
       - MagicOnion__OpenTelemetry__TracerExporterEndpoint=http://zipkin:9411/api/v2/spans
       - MagicOnion__OpenTelemetry__PrometheusMetricsHostingEndpoint=http://+:9184/metrics/
+
+  prometheus:
+    image: prom/prometheus:v2.11.1
+    volumes:
+      # persistent prometheus database
+      - ./ChatApp.Server.Telemetry/docker/prometheus/data/:/prometheus
+      - ./ChatApp.Server.Telemetry/docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./ChatApp.Server.Telemetry/docker/prometheus/config/alert.rules:/etc/prometheus/alert.rules
+    ports:
+      - "9090:9090"
+
+  # # if you want monitor linux host machine, install node-exporter or use it through container.
+  # # settings detail: https://qiita.com/kanga/items/21acb042237f8a27f437
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   ports:
+  #     - 9100:9100
+  #   volumes:
+  #     - /:/host:ro
+  #   net: host
+  #   pid: host
+  #   command: quay.io/prometheus/node-exporter --path.rootfs /host
+
+  cAdvisor:
+    image: google/cadvisor:latest
+    volumes:
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    volumes:
+      # persistent grafana database
+      - ./ChatApp.Server.Telemetry/docker/grafana/:/var/lib/grafana
+    ports:
+      - 3000:3000
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - ./ChatApp.Server.Telemetry/docker/alertmanager/config.yml:/etc/alertmanager/config.yml
+    command: "--config.file=/etc/alertmanager/config.yml"
+    ports:
+      - 9093:9093
 
   zipkin:
     image: openzipkin/zipkin

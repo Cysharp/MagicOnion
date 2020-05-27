@@ -38,10 +38,10 @@ scrape_configs:
       - targets:
           - "cAdvisor:8080"
 
-  - job_name: "magiconion"
+  - job_name: "chatapp"
     scrape_interval: 10s
     static_configs:
       - targets:
-          - "magiconion:9184"
+          - "chatapp:9184"
         labels:
-          group: "magiconion"
+          group: "chatapp"
