@@ -1425,6 +1425,26 @@ Let's see overview and how to try on localhost.
 * metrics customization
 * implement your own metrics
 
+#### try sample app
+
+ChatApp.Server.Telemery offers OpenTelemery implementations for Prometheus and Zipkin.
+You can try it with docker or Kubernetes.
+
+**run on docker**
+
+exec docker-compose to run chatapp server, prometheus and zipkin.
+
+```shell
+cd samples/ChatApp
+docker-compose -f docker-compose.telemetry.yaml up --build
+```
+
+**run on kubernetes**
+
+```shell
+
+```
+
 #### overview
 
 MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Prometheus](https://prometheus.io/), [StackDriver](https://cloud.google.com/stackdriver/pricing), [Zipkin](https://zipkin.io/) and others.
