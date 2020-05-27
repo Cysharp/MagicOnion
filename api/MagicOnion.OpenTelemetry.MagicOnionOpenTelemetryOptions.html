@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>OpenTelemetryCollectorFilterAttribute Class
+    <title>MagicOnionOpenTelemetryOptions Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="OpenTelemetryCollectorFilterAttribute Class
+    <meta name="title" content="MagicOnionOpenTelemetryOptions Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.51.0.0">
     
@@ -71,31 +71,26 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions">
   
-  <h1 id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute" class="text-break">OpenTelemetryCollectorFilterAttribute Class
+  <h1 id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions" class="text-break">MagicOnionOpenTelemetryOptions Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.OpenTelemetry.html">MagicOnion.OpenTelemetry</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.OpenTelemetry.dll</h6>
   
-  <div class="markdown level0 summary"><p>Collect OpenTelemetry Tracing for Global filter. Handle Unary and most outside logging.</p>
-</div>
+  <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class OpenTelemetryCollectorFilterAttribute : Attribute, IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionOpenTelemetryOptions : object</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">OpenTelemetryCollectorFilterAttribute</span>
+    <span class="xref">MagicOnionOpenTelemetryOptions</span>
   </div>
   
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="MagicOnion.Server.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory</a>&lt;<a class="xref" href="MagicOnion.Server.MagicOnionFilterAttribute.html">MagicOnionFilterAttribute</a>&gt;</div>
-  </div>
   
   
   
@@ -115,27 +110,24 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_Order">Order</a>
+          <a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MetricsExporterEndpoint">MetricsExporterEndpoint</a>
         </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Metrics Exporter Endpoint. Default Prometheus endpoint.</p>
+</td>
       </tr>
-    </tbody>
-  </table>
-  <h4>Methods
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_CreateInstance_MagicOnion_Server_IServiceLocator_">CreateInstance(IServiceLocator)</a>
+          <a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName">ServiceName</a>
         </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Service Name for the app. default is Assembly name.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerExporterEndpoint">TracerExporterEndpoint</a>
+        </td>
+        <td class="markdown level1 summary"><p>Tracer Exporter Endpoint. Default Zipkin endpoint.</p>
+</td>
       </tr>
     </tbody>
   </table>
@@ -143,13 +135,14 @@
   <h3 id="properties">Properties
   </h3>
   <section>
-  <a id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_Order_" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order*"></a>
-  <h4 id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_Order" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order">Order</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MetricsExporterEndpoint_" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint*"></a>
+  <h4 id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MetricsExporterEndpoint" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint">MetricsExporterEndpoint</h4>
+  <div class="markdown level1 summary"><p>Metrics Exporter Endpoint. Default Prometheus endpoint.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Order { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string MetricsExporterEndpoint { get; set; }</code></pre>
   </div>
 
   
@@ -159,7 +152,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Int32</span></dt>
+    <dt><span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -172,50 +165,69 @@
   
   
   </section>
-  <h3 id="methods">Methods
-  </h3>
   <section>
-  <a id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_CreateInstance_" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance*"></a>
-  <h4 id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_CreateInstance_MagicOnion_Server_IServiceLocator_" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)">CreateInstance(IServiceLocator)</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName_" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName*"></a>
+  <h4 id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName">ServiceName</h4>
+  <div class="markdown level1 summary"><p>Service Name for the app. default is Assembly name.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)</code></pre>
+    <pre><code class="lang-csharp hljs">public string ServiceName { get; set; }</code></pre>
   </div>
 
+  
+  
+  
+  
   <section>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serviceLocator</code></span> <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dt><span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>
   
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.MagicOnionFilterAttribute.html">MagicOnionFilterAttribute</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
+  <a id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerExporterEndpoint_" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint*"></a>
+  <h4 id="MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerExporterEndpoint" data-uid="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint">TracerExporterEndpoint</h4>
+  <div class="markdown level1 summary"><p>Tracer Exporter Endpoint. Default Zipkin endpoint.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  
-  <h3 id="implements">Implements</h3>
-  <div>
-      <a class="xref" href="MagicOnion.Server.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory&lt;T&gt;</a>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string TracerExporterEndpoint { get; set; }</code></pre>
   </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
   
   
 </article>

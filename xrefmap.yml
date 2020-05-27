@@ -9922,6 +9922,96 @@ references:
   commentId: N:MagicOnion.OpenTelemetry
   fullName: MagicOnion.OpenTelemetry
   nameWithType: MagicOnion.OpenTelemetry
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption
+  name: MagicOnionOpenTelemetryMeterFactoryOption
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html
+  commentId: T:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+  name: MetricExporter
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricExporter
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter*
+  name: MetricExporter
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricExporter_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricExporter
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+  name: MetricProcessor
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricProcessor
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor*
+  name: MetricProcessor
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricProcessor_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricProcessor
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+  name: MetricPushInterval
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricPushInterval
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval*
+  name: MetricPushInterval
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption_MetricPushInterval_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+  nameWithType: MagicOnionOpenTelemetryMeterFactoryOption.MetricPushInterval
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions
+  name: MagicOnionOpenTelemetryOptions
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html
+  commentId: T:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions
+  nameWithType: MagicOnionOpenTelemetryOptions
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+  name: MetricsExporterEndpoint
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MetricsExporterEndpoint
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+  nameWithType: MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint*
+  name: MetricsExporterEndpoint
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MetricsExporterEndpoint_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+  nameWithType: MagicOnionOpenTelemetryOptions.MetricsExporterEndpoint
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName
+  name: ServiceName
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName
+  nameWithType: MagicOnionOpenTelemetryOptions.ServiceName
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName*
+  name: ServiceName
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName
+  nameWithType: MagicOnionOpenTelemetryOptions.ServiceName
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+  name: TracerExporterEndpoint
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerExporterEndpoint
+  commentId: P:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+  nameWithType: MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+- uid: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint*
+  name: TracerExporterEndpoint
+  href: api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerExporterEndpoint_
+  commentId: Overload:MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
+  nameWithType: MagicOnionOpenTelemetryOptions.TracerExporterEndpoint
 - uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute
   name: OpenTelemetryCollectorFilterAttribute
   href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html
@@ -9960,12 +10050,15 @@ references:
   commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger
   fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger
   nameWithType: OpenTelemetryCollectorLogger
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(IStatsRecorder,ITagger,ITagContext)
-  name: OpenTelemetryCollectorLogger(IStatsRecorder, ITagger, ITagContext)
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_IStatsRecorder_ITagger_ITagContext_
-  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(IStatsRecorder,ITagger,ITagContext)
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(IStatsRecorder, ITagger, ITagContext)
-  nameWithType: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(IStatsRecorder, ITagger, ITagContext)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
+  name: OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable<KeyValuePair<String, String>>)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_IEnumerable_KeyValuePair_System_String_System_String___
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
+  name.vb: OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable(Of KeyValuePair(Of String, String)))
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, IEnumerable<KeyValuePair<System.String, System.String>>)
+  fullName.vb: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, IEnumerable(Of KeyValuePair(Of System.String, System.String)))
+  nameWithType: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable<KeyValuePair<String, String>>)
+  nameWithType.vb: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable(Of KeyValuePair(Of String, String)))
 - uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor*
   name: OpenTelemetryCollectorLogger
   href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_
@@ -10156,6 +10249,49 @@ references:
   isSpec: "True"
   fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
   nameWithType: OpenTelemetryHubCollectorFilterAttribute.Order
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions
+  name: OpenTelemetryServiceCollectionExtensions
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html
+  commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions
+  nameWithType: OpenTelemetryServiceCollectionExtensions
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption},Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,TracerBuilder},System.String)
+  name: AddMagicOnionOpenTelemetry(IServiceCollection, Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnionOpenTelemetryOptions, TracerBuilder>, String)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html#MagicOnion_OpenTelemetry_OpenTelemetryServiceCollectionExtensions_AddMagicOnionOpenTelemetry_IServiceCollection_Action_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption__Action_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerBuilder__System_String_
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption},Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,TracerBuilder},System.String)
+  name.vb: AddMagicOnionOpenTelemetry(IServiceCollection, Action(Of MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnionOpenTelemetryOptions, TracerBuilder), String)
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, Action<MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, TracerBuilder>, System.String)
+  fullName.vb: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, Action(Of MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, TracerBuilder), System.String)
+  nameWithType: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnionOpenTelemetryOptions, TracerBuilder>, String)
+  nameWithType.vb: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, Action(Of MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnionOpenTelemetryOptions, TracerBuilder), String)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions)
+  name: AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html#MagicOnion_OpenTelemetry_OpenTelemetryServiceCollectionExtensions_AddMagicOnionOpenTelemetry_IServiceCollection_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions)
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions)
+  nameWithType: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption},Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,TracerBuilder})
+  name: AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions, Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnionOpenTelemetryOptions, TracerBuilder>)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html#MagicOnion_OpenTelemetry_OpenTelemetryServiceCollectionExtensions_AddMagicOnionOpenTelemetry_IServiceCollection_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_Action_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryMeterFactoryOption__Action_MagicOnion_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracerBuilder__
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption},Action{MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions,TracerBuilder})
+  name.vb: AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions, Action(Of MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnionOpenTelemetryOptions, TracerBuilder))
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, Action<MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, TracerBuilder>)
+  fullName.vb: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, Action(Of MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions, TracerBuilder))
+  nameWithType: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions, Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption>, Action<MagicOnionOpenTelemetryOptions, TracerBuilder>)
+  nameWithType.vb: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, MagicOnionOpenTelemetryOptions, Action(Of MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption), Action(Of MagicOnionOpenTelemetryOptions, TracerBuilder))
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,System.String)
+  name: AddMagicOnionOpenTelemetry(IServiceCollection, String)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html#MagicOnion_OpenTelemetry_OpenTelemetryServiceCollectionExtensions_AddMagicOnionOpenTelemetry_IServiceCollection_System_String_
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection,System.String)
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, System.String)
+  nameWithType: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry(IServiceCollection, String)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry*
+  name: AddMagicOnionOpenTelemetry
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html#MagicOnion_OpenTelemetry_OpenTelemetryServiceCollectionExtensions_AddMagicOnionOpenTelemetry_
+  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry
+  isSpec: "True"
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry
+  nameWithType: OpenTelemetryServiceCollectionExtensions.AddMagicOnionOpenTelemetry
 - uid: MagicOnion.Redis
   name: MagicOnion.Redis
   href: api/MagicOnion.Redis.html
