@@ -10,7 +10,7 @@ services:
       - 12345:12345
       - 9184:9184
     environment:
-      - DOTNET_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Production
       - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
       - MagicOnion__OpenTelemetry__TracerExporterEndpoint=http://zipkin:9411/api/v2/spans
       - MagicOnion__OpenTelemetry__PrometheusMetricsHostingEndpoint=http://+:9184/metrics/

@@ -14,6 +14,7 @@ namespace ChatApp.Server
         private readonly PrometheusExporterMetricsHttpServerCustom server;
         private readonly ILogger<PrometheusExporterMetricsService> logger;
         private readonly MagicOnionOpenTelemetryOptions options;
+        private readonly string metricsExporterHostingEndpoint;
 
         public PrometheusExporterMetricsService(MetricExporter exporter, MagicOnionOpenTelemetryOptions options, IConfiguration configuration, ILogger<PrometheusExporterMetricsService> logger)
         {
@@ -21,15 +22,15 @@ namespace ChatApp.Server
             this.options = options;
             if (exporter is PrometheusExporter prometheusExporter)
             {
-                var hostingEndpoint = configuration.GetSection("MagicOnion:OpenTelemetry").GetValue("PrometheusMetricsHostingEndpoint", options.MetricsExporterEndpoint);
-                server = new PrometheusExporterMetricsHttpServerCustom(prometheusExporter, hostingEndpoint);
+                metricsExporterHostingEndpoint = configuration.GetSection("MagicOnion:OpenTelemetry").GetValue("PrometheusMetricsHostingEndpoint", options.MetricsExporterEndpoint);
+                server = new PrometheusExporterMetricsHttpServerCustom(prometheusExporter, metricsExporterHostingEndpoint);
             }
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
             if (server != null)
             {
-                logger.LogInformation($"PrometheusExporter MetricsServer is listening on: {options.MetricsExporterEndpoint}");
+                logger.LogInformation($"PrometheusExporter MetricsServer is listening on: {metricsExporterHostingEndpoint}, sending to {options.MetricsExporterEndpoint}");
                 server.Start();
             }
             return Task.CompletedTask;
