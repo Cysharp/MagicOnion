@@ -41,6 +41,46 @@ namespace System.Buffers
             return true;
         }
 
+#if UNITY_ANDROID
+
+        /// <summary>
+        /// In Android 32bit device(armv7) + IL2CPP does not work correctly on Unsafe.ReadUnaligned.
+        /// Perhaps it is about memory alignment bug of Unity's IL2CPP VM.
+        /// For a workaround, read memory manually.
+        /// https://github.com/neuecc/MessagePack-CSharp/issues/748
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static unsafe bool TryRead(ref this SequenceReader<byte> reader, out long value)
+        {
+            ReadOnlySpan<byte> span = reader.UnreadSpan;
+            if (span.Length < sizeof(long))
+            {
+                return TryReadMultisegment(ref reader, out value);
+            }
+
+            value = BitConverterToInt64(span);
+            reader.Advance(sizeof(long));
+            return true;
+        }
+
+        private static unsafe long BitConverterToInt64(ReadOnlySpan<byte> value)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                int i1 = value[0] | (value[1] << 8) | (value[2] << 16) | (value[3] << 24);
+                int i2 = value[4] | (value[5] << 8) | (value[6] << 16) | (value[7] << 24);
+                return (uint)i1 | ((long)i2 << 32);
+            }
+            else
+            {
+                int i1 = (value[0] << 24) | (value[1] << 16) | (value[2] << 8) | value[3];
+                int i2 = (value[4] << 24) | (value[5] << 16) | (value[6] << 8) | value[7];
+                return (uint)i2 | ((long)i1 << 32);
+            }
+        }
+
+#endif
+
         private static unsafe bool TryReadMultisegment<T>(ref SequenceReader<byte> reader, out T value)
             where T : unmanaged
         {
@@ -60,6 +100,29 @@ namespace System.Buffers
             reader.Advance(sizeof(T));
             return true;
         }
+
+#if UNITY_ANDROID
+
+        private static unsafe bool TryReadMultisegment(ref SequenceReader<byte> reader, out long value)
+        {
+            Debug.Assert(reader.UnreadSpan.Length < sizeof(long), "reader.UnreadSpan.Length < sizeof(long)");
+
+            // Not enough data in the current segment, try to peek for the data we need.
+            long buffer = default;
+            Span<byte> tempSpan = new Span<byte>(&buffer, sizeof(long));
+
+            if (!reader.TryCopyTo(tempSpan))
+            {
+                value = default;
+                return false;
+            }
+
+            value = BitConverterToInt64(tempSpan);
+            reader.Advance(sizeof(long));
+            return true;
+        }
+
+#endif
 
         /// <summary>
         /// Reads an <see cref="sbyte"/> from the next position in the sequence.

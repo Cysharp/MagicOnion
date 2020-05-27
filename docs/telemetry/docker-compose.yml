@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   magiconion:
     image: magiconion_chatsample:dev
@@ -7,12 +7,12 @@ services:
       dockerfile: ChatApp.Server/Dockerfile
     ports:
       - 12345:12345
-      - 9182:9182
+      - 9184:9184
     environment:
-      - PROMETHEUS_EXPORTER_HOST=+
-      - PROMETHEUS_EXPORTER_PORT=9182
-      - MAGICONION_HOST=0.0.0.0
-    restart: always
+      - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
+      - MagicOnion__OpenTelemetry__TracerExporterEndpoint=http://zipkin:9411/api/v2/spans
+      - MagicOnion__OpenTelemetry__PrometheusMetricsHostingEndpoint=http://+:9184/metrics/
+
   prometheus:
     image: prom/prometheus:v2.11.1
     container_name: prometheus
@@ -23,7 +23,7 @@ services:
       - ./prometheus/config/alert.rules:/etc/prometheus/alert.rules
     ports:
       - "9090:9090"
-    restart: always
+
   # # if you want monitor linux host machine, install node-exporter or use it through container.
   # # settings detail: https://qiita.com/kanga/items/21acb042237f8a27f437
   # node-exporter:
@@ -36,7 +36,7 @@ services:
   #   net: host
   #   pid: host
   #   command: quay.io/prometheus/node-exporter --path.rootfs /host
-  #   restart: always
+
   cAdvisor:
     image: google/cadvisor:latest
     container_name: cAdvisor
@@ -46,7 +46,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     ports:
       - 8080:8080
-    restart: always
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -57,7 +57,7 @@ services:
       - ./grafana/:/var/lib/grafana
     ports:
       - 3000:3000
-    restart: always
+
   alertmanager:
     image: prom/alertmanager
     container_name: alertmanager
@@ -66,4 +66,8 @@ services:
     command: "--config.file=/etc/alertmanager/config.yml"
     ports:
       - 9093:9093
-    restart: always
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411

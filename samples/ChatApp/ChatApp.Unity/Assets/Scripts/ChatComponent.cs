@@ -1,9 +1,10 @@
-﻿using ChatApp.Shared.Hubs;
+using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using ChatApp.Shared.Services;
 using Grpc.Core;
 using MagicOnion.Client;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -118,6 +119,34 @@ namespace Assets.Scripts
                 this.JoinOrLeave();
 
             await this.streamingClient.DisposeAsync();
+        }
+
+        public async void ReconnectInitializedServer()
+        {
+            if (this.channel != null)
+            {
+                var chan = this.channel;
+                if (chan == Interlocked.CompareExchange(ref this.channel, null, chan))
+                {
+                    await chan.ShutdownAsync();
+                    this.channel = null;
+                }
+            }
+            if (this.streamingClient != null)
+            {
+                var streamClient = this.streamingClient;
+                if (streamClient == Interlocked.CompareExchange(ref this.streamingClient, null, streamClient))
+                {
+                    await streamClient.DisposeAsync();
+                    this.streamingClient = null;
+                }
+            }
+
+            if (this.channel == null && this.streamingClient == null)
+            {
+                this.InitializeClient();
+                this.InitializeUi();
+            }
         }
 
 

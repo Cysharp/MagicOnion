@@ -14,8 +14,6 @@
 namespace MessagePack.Resolvers
 {
     using System;
-    using System.Buffers;
-    using MessagePack;
 
     public class GeneratedResolver : global::MessagePack.IFormatterResolver
     {
@@ -53,8 +51,8 @@ namespace MessagePack.Resolvers
         {
             lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
             {
-                { typeof(global::ChatApp.Shared.MessagePackObjects.MessageResponse), 0 },
-                { typeof(global::ChatApp.Shared.MessagePackObjects.JoinRequest), 1 },
+                { typeof(global::ChatApp.Shared.MessagePackObjects.JoinRequest), 0 },
+                { typeof(global::ChatApp.Shared.MessagePackObjects.MessageResponse), 1 },
             };
         }
 
@@ -68,8 +66,8 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.MessageResponseFormatter();
-                case 1: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.JoinRequestFormatter();
+                case 0: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.JoinRequestFormatter();
+                case 1: return new MessagePack.Formatters.ChatApp.Shared.MessagePackObjects.MessageResponseFormatter();
                 default: return null;
             }
         }
@@ -110,55 +108,6 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
     using System.Buffers;
     using MessagePack;
 
-    public sealed class MessageResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.MessageResponse>
-    {
-
-
-        public void Serialize(ref MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.MessageResponse value, global::MessagePack.MessagePackSerializerOptions options)
-        {
-            IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(2);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.UserName, options);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Message, options);
-        }
-
-        public global::ChatApp.Shared.MessagePackObjects.MessageResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
-        {
-            if (reader.TryReadNil())
-            {
-                throw new InvalidOperationException("typecode is null, struct not supported");
-            }
-
-            IFormatterResolver formatterResolver = options.Resolver;
-            var length = reader.ReadArrayHeader();
-            var __UserName__ = default(string);
-            var __Message__ = default(string);
-
-            for (int i = 0; i < length; i++)
-            {
-                var key = i;
-
-                switch (key)
-                {
-                    case 0:
-                        __UserName__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
-                        break;
-                    case 1:
-                        __Message__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
-                        break;
-                    default:
-                        reader.Skip();
-                        break;
-                }
-            }
-
-            var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
-            ____result.UserName = __UserName__;
-            ____result.Message = __Message__;
-            return ____result;
-        }
-    }
-
     public sealed class JoinRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.JoinRequest>
     {
 
@@ -178,6 +127,7 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
 
+            options.Security.DepthStep(ref reader);
             IFormatterResolver formatterResolver = options.Resolver;
             var length = reader.ReadArrayHeader();
             var __RoomName__ = default(string);
@@ -204,6 +154,58 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
             var ____result = new global::ChatApp.Shared.MessagePackObjects.JoinRequest();
             ____result.RoomName = __RoomName__;
             ____result.UserName = __UserName__;
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class MessageResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.MessageResponse>
+    {
+
+
+        public void Serialize(ref MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.MessageResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(2);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.UserName, options);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Message, options);
+        }
+
+        public global::ChatApp.Shared.MessagePackObjects.MessageResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                throw new InvalidOperationException("typecode is null, struct not supported");
+            }
+
+            options.Security.DepthStep(ref reader);
+            IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var __UserName__ = default(string);
+            var __Message__ = default(string);
+
+            for (int i = 0; i < length; i++)
+            {
+                var key = i;
+
+                switch (key)
+                {
+                    case 0:
+                        __UserName__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        __Message__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
+            ____result.UserName = __UserName__;
+            ____result.Message = __Message__;
+            reader.Depth--;
             return ____result;
         }
     }

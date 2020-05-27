@@ -1,4 +1,5 @@
 # MagicOnionSample
+
 Provides a sample of a simple chat app using MagicOnion.  
 
 Please see here about MagicOnion itself.  
@@ -125,7 +126,16 @@ The Sample implementation is as follows:.
 https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs
 
 ## How to run the app
+
 1. Launch `ChatApp.Server` from VisualStudio.  
 2. Run `ChatScene` from UnityEditor.  
 
 If you want to connect simultaneously and chat, build Unity and launch it from the exe file.
+
+### Docker
+
+use docker-compose to build and run ChatApp.Server.
+
+```shell
+docker-compose up
+```

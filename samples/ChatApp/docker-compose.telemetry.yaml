@@ -1,0 +1,21 @@
+version: "3"
+
+# won''t run until MagicOnion.Telemery nuget package is published.
+services:
+  chatapp:
+    build:
+      context: .
+      dockerfile: ./ChatApp.Server.Telemetry/Dockerfile
+    ports:
+      - 12345:12345
+      - 9184:9184
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
+      - MagicOnion__OpenTelemetry__TracerExporterEndpoint=http://zipkin:9411/api/v2/spans
+      - MagicOnion__OpenTelemetry__PrometheusMetricsHostingEndpoint=http://+:9184/metrics/
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411
