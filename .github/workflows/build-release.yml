@@ -77,10 +77,10 @@ jobs:
       - uses: actions/checkout@v2
       # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
       - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
-      - uses: actions/upload-artifact@v1
-        with:
-          name: Unity_v${{ matrix.unity }}.alf
-          path: ./Unity_v${{ matrix.unity }}.alf
+      # - uses: actions/upload-artifact@v1
+      #   with:
+      #     name: Unity_v${{ matrix.unity }}.alf
+      #     path: ./Unity_v${{ matrix.unity }}.alf
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
         env:
@@ -125,7 +125,7 @@ jobs:
           release_name: Ver.${{ github.ref }}
           draft: true
           prerelease: false
-      - uses: actions/download-artifact@v2-preview
+      - uses: actions/download-artifact@v2
       # Upload to NuGet
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
       # Upload to Releases(unitypackage)
@@ -136,4 +136,12 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
           asset_name: MagicOnion.Client.Unity.unitypackage
+          asset_content_type: application/octet-stream
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./moc.${{ env.GIT_TAG }}.zip/moc.${{ env.GIT_TAG }}.zip
+          asset_name: moc.zip
           asset_content_type: application/octet-stream
