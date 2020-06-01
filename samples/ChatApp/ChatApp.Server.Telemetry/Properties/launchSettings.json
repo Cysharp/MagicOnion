@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ChatApp.Server.Telemetry": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
