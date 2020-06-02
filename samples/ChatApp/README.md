@@ -154,7 +154,38 @@ You can confirm MagicOnion on container usage.
 
 ### Docker with already built image.
 
-You can confirm MagicOnion on container usage with already build docker image.
+You can confirm MagicOnion on container running with already build docker image.
+Use docker-compose to build with docker.
+
+> TIPS: make sure you are locate at ./samples/ChatApp/
+
+```shell
+docker-compose up
+```
+
+If you want try ChatApp.Server.Telemery, use followings.
+
+```shell
+docker-compose -f docker-compose.telemetry.yaml up
+```
+
+### Docker with self build image
+
+You can confirm MagicOnion on container running with actual csproj.
+
+```shell
+docker-compose -f docker-compose.self.yaml up
+```
+
+If you want try ChatApp.Server.Telemery, use followings.
+
+```shell
+docker-compose -f docker-compose.telemetry.self.yaml up
+```
+
+### docker push
+
+cysharp/magiconion_sample_chatapp
 
 ```shell
 docker-compose -f docker-compose.self.yaml build
@@ -164,32 +195,11 @@ docker push cysharp/magiconion_sample_chatapp:latest
 docker push cysharp/magiconion_sample_chatapp:3.0.13
 ```
 
-```shell
-# make sure you are locate at ./samples/ChatApp/
-docker-compose up
-```
-
-If you want try ChatApp.Server.Telemery, use followings.
-
+cysharp/magiconion_sample_chatapp_telemetry
 ```shell
 docker-compose -f docker-compose.self.telemetry.yaml build magiconion
 docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:latest
 docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:3.0.13
 docker push cysharp/magiconion_sample_chatapp_telemetry:latest
 docker push cysharp/magiconion_sample_chatapp_telemetry:3.0.13
-```
-
-```shell
-# make sure you are locate at ./samples/ChatApp/
-docker-compose -f docker-compose.telemetry.yaml up
-```
-
-
-### Docker with self build image
-
-use docker-compose to build and run ChatApp.Server.
-
-```shell
-# make sure you are locate at ./samples/ChatApp/
-docker-compose -f docker-compose.self.yaml up
 ```
