@@ -10050,15 +10050,15 @@ references:
   commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger
   fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger
   nameWithType: OpenTelemetryCollectorLogger
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
-  name: OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable<KeyValuePair<String, String>>)
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_IEnumerable_KeyValuePair_System_String_System_String___
-  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
-  name.vb: OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable(Of KeyValuePair(Of String, String)))
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, IEnumerable<KeyValuePair<System.String, System.String>>)
-  fullName.vb: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, IEnumerable(Of KeyValuePair(Of System.String, System.String)))
-  nameWithType: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable<KeyValuePair<String, String>>)
-  nameWithType.vb: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable(Of KeyValuePair(Of String, String)))
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
+  name: OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable<KeyValuePair<String, String>>)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_System_String_IEnumerable_KeyValuePair_System_String_System_String___
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,System.String,IEnumerable{KeyValuePair{System.String,System.String}})
+  name.vb: OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable(Of KeyValuePair(Of String, String)))
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, System.String, IEnumerable<KeyValuePair<System.String, System.String>>)
+  fullName.vb: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, System.String, System.String, IEnumerable(Of KeyValuePair(Of System.String, System.String)))
+  nameWithType: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable<KeyValuePair<String, String>>)
+  nameWithType.vb: OpenTelemetryCollectorLogger.OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable(Of KeyValuePair(Of String, String)))
 - uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor*
   name: OpenTelemetryCollectorLogger
   href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_

@@ -115,7 +115,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_IEnumerable_KeyValuePair_System_String_System_String___">OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable&lt;KeyValuePair&lt;String, String&gt;&gt;)</a>
+          <a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_System_String_IEnumerable_KeyValuePair_System_String_System_String___">OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable&lt;KeyValuePair&lt;String, String&gt;&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -192,18 +192,20 @@
   </h3>
   <section>
   <a id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor*"></a>
-  <h4 id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_IEnumerable_KeyValuePair_System_String_System_String___" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,IEnumerable{KeyValuePair{System.String,System.String}})">OpenTelemetryCollectorLogger(MeterFactory, String, IEnumerable&lt;KeyValuePair&lt;String, String&gt;&gt;)</h4>
+  <h4 id="MagicOnion_OpenTelemetry_OpenTelemetryCollectorLogger__ctor_MeterFactory_System_String_System_String_IEnumerable_KeyValuePair_System_String_System_String___" data-uid="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.#ctor(MeterFactory,System.String,System.String,IEnumerable{KeyValuePair{System.String,System.String}})">OpenTelemetryCollectorLogger(MeterFactory, String, String, IEnumerable&lt;KeyValuePair&lt;String, String&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public OpenTelemetryCollectorLogger(MeterFactory meterFactory, string version = null, IEnumerable&lt;KeyValuePair&lt;string, string&gt;&gt; defaultLabels = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public OpenTelemetryCollectorLogger(MeterFactory meterFactory, string metricsPrefix = &quot;magiconion&quot;, string version = null, IEnumerable&lt;KeyValuePair&lt;string, string&gt;&gt; defaultLabels = null)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>meterFactory</code></span> <span class="xref">MeterFactory</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>metricsPrefix</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>version</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
