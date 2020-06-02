@@ -7,19 +7,41 @@ https://github.com/Cysharp/MagicOnion
 
 ## Getting started
 
-Sample Serverside MagicOnion can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
-If you want run MagiconOnion with telemetry containers please follow to the [README](https://github.com/Cysharp/MagicOnion#try-visualization-on-localhost)
+To run simple ChatApp.Server, 
 
-Sample Clientside Unity can ran with Unity 2019.1.10f1, then start on unity editor.
+1. Launch `ChatApp.Server` from VisualStudio.  
+2. Run `ChatScene` from UnityEditor.  
 
-Now unity client automatically connect to MagicOnion, try chat app!
+To run ChatApp.Server with OpenTelemetry,
 
-*Notes  
-The Sample does not contain a library of gRPCs in the repository that are required for operation.  
-Before running the app, select the latest build ID from the link below, download the Unity support library for gRPC, and import it into Unity.  
-[gRPC Packages](https://packages.grpc.io/)
+1. Launch `ChatApp.Server.Telemetry` from VisualStudio.  
+2. Run `ChatScene` from UnityEditor.  
+
+### ChatApp.Server
+
+This is Sample Serverside MagicOnion.
+You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
+
+### ChatApp.Server.Telemetry
+
+This is Sample Serverside MagicOnion with OpenTelemetry implementation.
+You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server.Telemetry` project as start up and Start Debug.
+
+> Addtional note: If you want run MagiconOnion with telemetry containers please follow to the [README](https://github.com/Cysharp/MagicOnion#try-visualization-on-localhost)
+
+### ChatApp.Unity
+
+Sample Clientside Unity.
+You can ran with Unity from 2018.4.5f1 and higher then start on unity editor.
+
+> TIPS: confirmed run on 2019.1.10f1
+
+Now unity client automatically connect to MagicOnion Server, try chat app!
+
+> TIPS: ChatApp.Unity contains a gRPCs library in the repository that are required for MagicOnion operation. If you want other version of gRPC lib, go [gRPC Packages](https://packages.grpc.io/), select the latest build ID from the link below, download the Unity support library for gRPC, and import it into Unity will replace existing.
 
 ## Solution configuration
+
 ![image](https://user-images.githubusercontent.com/38392460/71507978-a3ced480-28c9-11ea-9090-8f4ef4ffc306.png)
 Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
 
@@ -125,17 +147,49 @@ This ensures that the Server and Unity project files co-exist.
 The Sample implementation is as follows:.
 https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs
 
-## How to run the app
+## Container support
 
-1. Launch `ChatApp.Server` from VisualStudio.  
-2. Run `ChatScene` from UnityEditor.  
+There are docker and kubernetes samples for you.
+You can confirm MagicOnion on container usage.
 
-If you want to connect simultaneously and chat, build Unity and launch it from the exe file.
+### Docker with already built image.
 
-### Docker
+You can confirm MagicOnion on container usage with already build docker image.
+
+```shell
+docker-compose -f docker-compose.self.yaml build
+docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp:latest
+docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp:3.0.13
+docker push cysharp/magiconion_sample_chatapp:latest
+docker push cysharp/magiconion_sample_chatapp:3.0.13
+```
+
+```shell
+# make sure you are locate at ./samples/ChatApp/
+docker-compose up
+```
+
+If you want try ChatApp.Server.Telemery, use followings.
+
+```shell
+docker-compose -f docker-compose.self.telemetry.yaml build magiconion
+docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:latest
+docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:3.0.13
+docker push cysharp/magiconion_sample_chatapp_telemetry:latest
+docker push cysharp/magiconion_sample_chatapp_telemetry:3.0.13
+```
+
+```shell
+# make sure you are locate at ./samples/ChatApp/
+docker-compose -f docker-compose.telemetry.yaml up
+```
+
+
+### Docker with self build image
 
 use docker-compose to build and run ChatApp.Server.
 
 ```shell
-docker-compose up
+# make sure you are locate at ./samples/ChatApp/
+docker-compose -f docker-compose.self.yaml up
 ```

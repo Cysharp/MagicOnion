@@ -2,7 +2,9 @@ version: "3"
 
 services:
   magiconion:
-    image: cysharp/magiconion_sample_chatapp_telemetry:3.0.13
+    build:
+      context: .
+      dockerfile: ./ChatApp.Server.Telemetry/Dockerfile
     ports:
       - 12345:12345
       - 9184:9184

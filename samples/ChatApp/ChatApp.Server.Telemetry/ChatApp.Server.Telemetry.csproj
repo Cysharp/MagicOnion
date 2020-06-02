@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MagicOnion.Hosting" Version="3.0.12" />
-    <PackageReference Include="MagicOnion.OpenTelemetry" Version="3.0.12" />
+    <PackageReference Include="MagicOnion.Hosting" Version="3.0.13" />
+    <PackageReference Include="MagicOnion.OpenTelemetry" Version="3.0.13" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.2.0-alpha.296" />
     <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.2.0-alpha.296" />
   </ItemGroup>

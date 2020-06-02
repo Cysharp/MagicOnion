@@ -38,10 +38,11 @@ scrape_configs:
       - targets:
           - "cAdvisor:8080"
 
-  - job_name: "chatapp"
+  - job_name: "magiconion"
     scrape_interval: 10s
     static_configs:
       - targets:
-          - "chatapp:9184"
+          - "magiconion:9184"
+          # - "host.docker.internal:9184"
         labels:
-          group: "chatapp"
+          group: "magiconion"
