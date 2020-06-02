@@ -1,0 +1,11 @@
+server:
+  ingress:
+    enabled: true
+    hosts:
+      - prometheus.chatapp.magiconion.local
+  retention: "12h"
+alertmanager:
+  ingress:
+    enabled: false
+pushgateway:
+  enabled: false

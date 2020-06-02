@@ -1,0 +1,8 @@
+resources:
+  - deployment.yaml
+
+# mark Deployment to be collected via Prometheus
+commonAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: /metrics
+  prometheus.io/port: "9184"
