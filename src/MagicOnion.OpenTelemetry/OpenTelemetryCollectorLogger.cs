@@ -171,7 +171,7 @@ namespace MagicOnion.OpenTelemetry
             var spanContext = default(SpanContext);
             var label = CreateLabel(context);
             streamingHubElapsedMeasure.Record(spanContext, elapsed, label);
-            streamingHubRequestCounter.Add(spanContext, responseSize, label);
+            streamingHubResponseSizeMeasure.Record(spanContext, responseSize, label);
             if (isErrorOrInterrupted)
             {
                 streamingHubErrorCounter.Add(spanContext, 1, label);
