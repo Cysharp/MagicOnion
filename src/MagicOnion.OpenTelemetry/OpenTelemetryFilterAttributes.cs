@@ -66,6 +66,7 @@ namespace MagicOnion.OpenTelemetry
                     span.SetAttribute("exception", ex.ToString());
                     span.SetAttribute("grpc.status_code", (long)context.CallContext.Status.StatusCode);
                     span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode).WithDescription(context.CallContext.Status.Detail);
+                    throw;
                 }
             }
         }
@@ -130,6 +131,7 @@ namespace MagicOnion.OpenTelemetry
                     span.SetAttribute("exception", ex.ToString());
                     span.SetAttribute("grpc.status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
                     span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode).WithDescription(context.ServiceContext.CallContext.Status.Detail);
+                    throw;
                 }
             }
         }
