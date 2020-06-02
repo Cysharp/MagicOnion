@@ -1505,6 +1505,8 @@ Default configuration key is `MagicOnion:OpenTelemery`.
 MagicOnion.OpenTelemetry offers extensions for IServiceCollection, `AddMagicOnionOpenTelemetry`.
 Register `MagicOnionOpenTelemetryOptions`, `Action<MagicOnionOpenTelemetryMeterFactoryOption>` and `Action<TracerBuilder>` to configure MeterFactory & TracerFactory.
 
+> TIPS: `AddMagicOnionOpenTelemetry` register MagicOnionOpenTelemetryOptions, MeterFactory and TracerFactory as Singleton for you.
+
 ```csharp
 await MagicOnionHost.CreateDefaultBuilder()
     .UseMagicOnion()
@@ -1527,7 +1529,6 @@ await MagicOnionHost.CreateDefaultBuilder()
     })
 ```
 
-`AddMagicOnionOpenTelemetry` register MagicOnionOpenTelemetryOptions, MeterFactory and TracerFactory as Singleton for you.
 
 **(optional) add PrometheusExporterMetricsService for prometheus exporter.**
 
@@ -1579,7 +1580,7 @@ await MagicOnionHost.CreateDefaultBuilder()
         {
             options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
             options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
-            options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory, null);
+            options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory);
         });
     })
     .RunConsoleAsync();
@@ -1607,31 +1608,34 @@ Zipkin tracer will be shown as below.
 Prometheus Metrics will be shown as like follows.
 
 ```txt
-MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 9 1589966049901
-MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/GenerateException"} 0 1589966049901
-MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/SendMessageAsync"} 9 1589966049901
-MagicOnion_measure_StreamingHubRequest{MagicOnion_keys_Method="/IChatHub/JoinAsync"} 0 1589966049901
-# HELP MagicOnion_measure_StreamingHubDisconnectMagicOnionMagicOnion/measure/StreamingHubDisconnect
-# TYPE MagicOnion_measure_StreamingHubDisconnect counter
-MagicOnion_measure_StreamingHubDisconnect{MagicOnion_keys_Method="/IChatHub/Connect"} 1 1589966049901
-# HELP MagicOnion_measure_UnaryRequestMagicOnionMagicOnion/measure/UnaryRequest
-# TYPE MagicOnion_measure_UnaryRequest counter
-MagicOnion_measure_UnaryRequest{MagicOnion_keys_Method="/IChatService/GenerateException"} 1 1589966049901
-# HELP MagicOnion_measure_StreamingHubConnectMagicOnionMagicOnion/measure/StreamingHubConnect
-# TYPE MagicOnion_measure_StreamingHubConnect counter
-MagicOnion_measure_StreamingHubConnect{MagicOnion_keys_Method="/IChatHub/Connect"} 0 1589966049901
-# HELP MagicOnion_measure_UnaryResponseSizeMagicOnionMagicOnion/measure/UnaryResponseSize
-# TYPE MagicOnion_measure_UnaryResponseSize summary
-MagicOnion/measure/UnaryResponseSize_sum{MagicOnion_keys_Method="/IChatService/GenerateException"} 0 1589966049901
-MagicOnion/measure/UnaryResponseSize_count{MagicOnion_keys_Method="/IChatService/GenerateException"} 1 1589966049901
-MagicOnion/measure/UnaryResponseSize{MagicOnion_keys_Method="/IChatService/GenerateException",quantile="0"} 0 1589966049901
-MagicOnion/measure/UnaryResponseSize{MagicOnion_keys_Method="/IChatService/GenerateException",quantile="1"} 0 1589966049901
-# HELP MagicOnion_measure_StreamingHubElapsedMagicOnionMagicOnion/measure/StreamingHubElapsed
-# TYPE MagicOnion_measure_StreamingHubElapsed summary
-MagicOnion/measure/StreamingHubElapsed_sum{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 4.108 1589966049901
-MagicOnion/measure/StreamingHubElapsed_count{MagicOnion_keys_Method="/IChatHub/LeaveAsync"} 1 1589966049901
-MagicOnion/measure/StreamingHubElapsed{MagicOnion_keys_Method="/IChatHub/LeaveAsync",quantile="0"} 4.108 1589966049901
-MagicOnion/measure/StreamingHubElapsed{MagicOnion_keys_Method="/IChatHub/LeaveAsync",quantile="1"} 4.108 1589966049901
+# HELP magiconion_buildservicedefinition_duration_millisecondsMagicOnionmagiconion_buildservicedefinition_duration_milliseconds
+# TYPE magiconion_buildservicedefinition_duration_milliseconds summary
+magiconion_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition"} 0 1591066746669
+magiconion_buildservicedefinition_duration_milliseconds_count{method="EndBuildServiceDefinition"} 0 1591066746669
+magiconion_buildservicedefinition_duration_milliseconds{method="EndBuildServiceDefinition",quantile="0"} 1.7976931348623157E+308 1591066746669
+magiconion_buildservicedefinition_duration_milliseconds{method="EndBuildServiceDefinition",quantile="1"} -1.7976931348623157E+308 1591066746669
+# HELP magiconion_broadcast_request_sizeMagicOnionmagiconion_broadcast_request_size
+# TYPE magiconion_broadcast_request_size summary
+magiconion_broadcast_request_size_sum{GroupName="SampleRoom"} 0 1591066746669
+magiconion_broadcast_request_size_count{GroupName="SampleRoom"} 0 1591066746669
+magiconion_broadcast_request_size{GroupName="SampleRoom",quantile="0"} 9.223372036854776E+18 1591066746669
+magiconion_broadcast_request_size{GroupName="SampleRoom",quantile="1"} -9.223372036854776E+18 1591066746669
+# HELP magiconion_streaminghub_elapsed_millisecondsMagicOnionmagiconion_streaminghub_elapsed_milliseconds
+# TYPE magiconion_streaminghub_elapsed_milliseconds summary
+magiconion_streaminghub_elapsed_milliseconds_sum{methodType="DuplexStreaming"} 0 1591066746669
+magiconion_streaminghub_elapsed_milliseconds_count{methodType="DuplexStreaming"} 0 1591066746669
+magiconion_streaminghub_elapsed_milliseconds{methodType="DuplexStreaming",quantile="0"} 1.7976931348623157E+308 1591066746669
+magiconion_streaminghub_elapsed_milliseconds{methodType="DuplexStreaming",quantile="1"} -1.7976931348623157E+308 1591066746670
+# HELP magiconion_unary_response_sizeMagicOnionmagiconion_unary_response_size
+# TYPE magiconion_unary_response_size summary
+magiconion_unary_response_size_sum{method="/IChatService/GenerateException"} 0 1591066746669
+magiconion_unary_response_size_count{method="/IChatService/GenerateException"} 0 1591066746669
+magiconion_unary_response_size{method="/IChatService/GenerateException",quantile="0"} 9.223372036854776E+18 1591066746669
+magiconion_unary_response_size{method="/IChatService/GenerateException",quantile="1"} -9.223372036854776E+18 1591066746669
+magiconion_unary_response_size_sum{methodType="Unary"} 0 1591066746669
+magiconion_unary_response_size_count{methodType="Unary"} 0 1591066746669
+magiconion_unary_response_size{methodType="Unary",quantile="0"} 9.223372036854776E+18 1591066746669
+magiconion_unary_response_size{methodType="Unary",quantile="1"} -9.223372036854776E+18 1591066746669
 ```
 
 You may find `MagicOnion/measure/BuildServiceDefinition{MagicOnion_keys_Method="EndBuildServiceDefinition",quantile="0"}` are collected, and other metrics will shown as #HELP.
@@ -1643,14 +1647,23 @@ They will export when Unary/StreamingHub request is comming.
 
 Add defaultTags when register `OpenTelemetryCollectorLogger`.
 
+* Want replace magiconion metrics prefix to my magiconion metrics.
+
+Set metricsPrefix when register `OpenTelemetryCollectorLogger`.
+If you pass `yourprefix`, then metrics prefix will change to followings.
+
+```
+yourprefix_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition"} 66.7148 1591066185908
+```
+
 * Want contain `version` tag to your metrics.
 
-Add version when register `OpenTelemetryCollectorLogger`
+Add version when register `OpenTelemetryCollectorLogger`.
 
 This should output like follows, however current opentelemetry-dotnet Prometheus exporter not respect version tag.
 
 ```
-MagicOnion/measure/BuildServiceDefinition_count{MagicOnion_keys_Method="EndBuildServiceDefinition",version="1.0.0"}
+magiconion_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition",version="1.0.0"} 66.7148 1591066185908
 ```
 
 #### try visualization on localhost
