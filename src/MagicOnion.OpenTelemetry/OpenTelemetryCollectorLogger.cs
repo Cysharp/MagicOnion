@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
@@ -16,13 +17,14 @@ namespace MagicOnion.OpenTelemetry
     public class OpenTelemetryCollectorLogger : IMagicOnionLogger
     {
         static readonly string MethodKey = "method";
-        static readonly string MethodTypeKey = "methodType";
+
         readonly IEnumerable<KeyValuePair<string, string>> defaultLabels;
         readonly ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>> labelCache = new ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>>();
         readonly ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>> broadcastLabelCache = new ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>>();
 
         readonly MeasureMetric<double> buildServiceDefinitionMeasure;
         readonly CounterMetric<long> unaryRequestCounter;
+        readonly MeasureMetric<long> unaryRequestSizeMeasure;
         readonly MeasureMetric<long> unaryResponseSizeMeasure;
         readonly CounterMetric<long> unaryErrorCounter;
         readonly MeasureMetric<double> unaryElapsedMeasure;
@@ -30,6 +32,7 @@ namespace MagicOnion.OpenTelemetry
         readonly CounterMetric<long> streamingHubErrorCounter;
         readonly MeasureMetric<double> streamingHubElapsedMeasure;
         readonly CounterMetric<long> streamingHubRequestCounter;
+        readonly MeasureMetric<long> streamingHubRequestSizeMeasure;
         readonly MeasureMetric<long> streamingHubResponseSizeMeasure;
         readonly CounterMetric<long> streamingHubConnectCounter;
         readonly CounterMetric<long> streamingHubDisconnectCounter;
@@ -53,6 +56,8 @@ namespace MagicOnion.OpenTelemetry
 
             // Unary request count. num
             unaryRequestCounter = meter.CreateInt64Counter($"{metricsPrefix}_unary_requests_count"); // sum
+            // Unary API request size. bytes
+            unaryRequestSizeMeasure = meter.CreateInt64Measure($"{metricsPrefix}_unary_request_size"); // sum
             // Unary API response size. bytes
             unaryResponseSizeMeasure = meter.CreateInt64Measure($"{metricsPrefix}_unary_response_size"); // sum
             // Unary API error Count. num
@@ -60,13 +65,15 @@ namespace MagicOnion.OpenTelemetry
             // Unary API elapsed time. ms
             unaryElapsedMeasure = meter.CreateDoubleMeasure($"{metricsPrefix}_unary_elapsed_milliseconds"); // sum
 
-            // StreamingHub API error Count. num
+            // StreamingHub error Count. num
             streamingHubErrorCounter = meter.CreateInt64Counter($"{metricsPrefix}_streaminghub_error_count"); // sum
-            // StreamingHub API elapsed time. ms
+            // StreamingHub elapsed time. ms
             streamingHubElapsedMeasure = meter.CreateDoubleMeasure($"{metricsPrefix}_streaminghub_elapsed_milliseconds"); // sum
             // StreamingHub request count. num
             streamingHubRequestCounter = meter.CreateInt64Counter($"{metricsPrefix}_streaminghub_requests_count"); // sum
-            // StreamingHub API response size. bytes
+            // StreamingHub request size. bytes
+            streamingHubRequestSizeMeasure = meter.CreateInt64Measure($"{metricsPrefix}_streaminghub_request_size"); // sum
+            // StreamingHub response size. bytes
             streamingHubResponseSizeMeasure = meter.CreateInt64Measure($"{metricsPrefix}_streaminghub_response_size"); // sum
             // ConnectCount - DisconnectCount = current connect count. (successfully disconnected)
             // StreamingHub connect count. num
@@ -90,7 +97,6 @@ namespace MagicOnion.OpenTelemetry
             {
                 new KeyValuePair<string, string>( MethodKey, context.CallContext.Method),
             });
-            label.Add(new KeyValuePair<string, string>(MethodTypeKey, MethodTypeToString(context.MethodType)));
             return label;
         }
         IEnumerable<KeyValuePair<string, string>> CreateLabel(StreamingHubContext context)
@@ -101,7 +107,6 @@ namespace MagicOnion.OpenTelemetry
             {
                 new KeyValuePair<string, string>( MethodKey, value),
             });
-            label.Add(new KeyValuePair<string, string>(MethodTypeKey, MethodTypeToString(context.ServiceContext.MethodType)));
             return label;
         }
         IEnumerable<KeyValuePair<string, string>> CreateLabel(string value)
@@ -132,26 +137,29 @@ namespace MagicOnion.OpenTelemetry
 
         public void BeginInvokeMethod(ServiceContext context, byte[] request, Type type)
         {
+            var spanContext = default(SpanContext);
+            var label = CreateLabel(context);
             if (context.MethodType == MethodType.DuplexStreaming && context.CallContext.Method.EndsWith("/Connect"))
             {
-                streamingHubConnectCounter.Add(default(SpanContext), 1, CreateLabel(context));
+                streamingHubConnectCounter.Add(spanContext, 1, label);
             }
             else if (context.MethodType == MethodType.Unary)
             {
-                unaryRequestCounter.Add(default(SpanContext), 1, CreateLabel(context));
+                unaryRequestCounter.Add(spanContext, 1, label);
+                unaryRequestSizeMeasure.Record(spanContext, request.Length, label);
             }
         }
 
         public void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted)
         {
+            var spanContext = default(SpanContext);
+            var label = CreateLabel(context);
             if (context.MethodType == MethodType.DuplexStreaming && context.CallContext.Method.EndsWith("/Connect"))
             {
-                streamingHubDisconnectCounter.Add(default(SpanContext), 1, CreateLabel(context));
+                streamingHubDisconnectCounter.Add(spanContext, 1, label);
             }
             else if (context.MethodType == MethodType.Unary)
             {
-                var spanContext = default(SpanContext);
-                var label = CreateLabel(context);
                 unaryElapsedMeasure.Record(spanContext, elapsed, label);
                 unaryResponseSizeMeasure.Record(spanContext, response.LongLength, label);
                 if (isErrorOrInterrupted)
@@ -163,7 +171,10 @@ namespace MagicOnion.OpenTelemetry
 
         public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            streamingHubRequestCounter.Add(default(SpanContext), 1, CreateLabel(context));
+            var spanContext = default(SpanContext);
+            var label = CreateLabel(context);
+            streamingHubRequestCounter.Add(spanContext, 1, label);
+            streamingHubRequestSizeMeasure.Record(spanContext, request.Length, label);
         }
 
         public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
@@ -192,23 +203,6 @@ namespace MagicOnion.OpenTelemetry
 
         public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
         {
-        }
-
-        string MethodTypeToString(MethodType type)
-        {
-            switch (type)
-            {
-                case MethodType.Unary:
-                    return "Unary";
-                case MethodType.ClientStreaming:
-                    return "ClientStreaming";
-                case MethodType.ServerStreaming:
-                    return "ServerStreaming";
-                case MethodType.DuplexStreaming:
-                    return "DuplexStreaming";
-                default:
-                    return ((int)type).ToString();
-            }
         }
     }
 }
