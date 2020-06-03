@@ -1673,61 +1673,6 @@ This should output like follows, however current opentelemetry-dotnet Prometheus
 magiconion_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition",version="1.0.0"} 66.7148 1591066185908
 ```
 
-#### try visualization on localhost
-
-You can try Prometheus collecter and visualize metrics on Grafana, all these operation can be done by docker-compose.
-Please follow the steps.
-
-* Apply above `examples of implementation` settings to the [MagicOnion/samples/ChatApp/ChatApp.Server](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server).
-
-* Copy all items in [MagicOnion/docs/telemetry](https://github.com/Cysharp/MagicOnion/tree/master/docs/telemetry) directory to [MagicOnion/samples/ChatApp].
-
-```shell
-# Windows
-> xcopy MagicOnion\docs\telemetry MagicOnion\samples\ChatApp /H /E
-# Bash
-$ cp -rT MagicOnion/docs/telemetry MagicOnion/samples/ChatApp
-```
-
-* Build & Launch docker-compose, you are all systems are up and running on your localhost.
-
-```shell
-$ cd MagicOnion/samples/ChatApp
-$ docker-compose build
-$ docker-compose up
-
-Creating network "chatapp_default" with the default driver
-Creating alertmanager         ... done
-Creating prometheus           ... done
-Creating chatapp_magiconion_1 ... done
-Creating cAdvisor             ... done
-Creating grafana              ... done
-```
-
-When you launch docker-compose, followings set of service will launch for you.
-
-* **MagicOnion** stats export on http://localhost:9182/metrics/.
-* **cAdvisor** launch on http://localhost:8080.
-* **Prometheus** launch on http://localhost:9090.
-* **Grafana** launch on http://localhost:3000. (default username: `admin`, password: `admin`)
-* **Alertmanager** to notify alert to Slack.
-* optional: if you want **node_exporter**, uncomment in `docker-compose.yml` and it launch on http://localhost:9100. make sure host volume is mounted to container.
-
-To configure Grafana dashboard, follow the steps.
-
-* add DataSource: Data Souces> add > Prometheus (prometheus URL will be http://prometheus:9090)
-* add Dashboard:
-    * **Prometheus 2.0 Stats** dashboard: open Data Source > prometheus > dashboard tab > add Prometheus 2.0 Stats
-    * **Docker and Host Monitoring w/ Prometheus** dashboard (cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/179
-    * **MagicOnion Overview** dashboard (MagicOnion & cAdvisor): open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/10584
-    * optional: **node_exporter 1.8** dashboard: open Dashboard > Manage > Import > https://grafana.com/grafana/dashboards/1860
-
-Now you can observe MagicOnion metrics through Grafana.
-
-![image](https://user-images.githubusercontent.com/3856350/61683238-c58ec300-ad4f-11e9-9057-1cfb9c30cd67.png)
-
-To configure alert eather, modify `prometheus/config/alert.rules` and set slack incoming url on `alertmanager/config.yml`.
-
 #### implement your own metrics
 
 Implement `IMagicOnionLogger` to configure your metrics. You can collect metrics when following callbacks are invoked by filter.
