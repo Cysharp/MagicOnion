@@ -270,7 +270,7 @@ kubectl kustomize ./k8s/common | kubectl delete -f -
 ### Docker with already built image.
 
 You can confirm MagicOnion on container running with already build docker image.
-Use docker-compose to build with docker.
+Use docker-compose to build with docker, grafana user/password will be `admin/admin` by default.
 
 > TIPS: make sure you are locate at ./samples/ChatApp/
 

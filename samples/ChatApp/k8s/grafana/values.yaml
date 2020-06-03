@@ -35,5 +35,5 @@ dashboards:
       datasource: Prometheus
     magiconion-overview:
       gnetId: 10584
-      revision: 7
+      revision: 9
       datasource: Prometheus
