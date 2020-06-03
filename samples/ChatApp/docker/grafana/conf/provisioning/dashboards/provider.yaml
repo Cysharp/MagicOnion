@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - disableDeletion: false
+    editable: true
+    folder: ""
+    name: default
+    options:
+      path: /var/tmp/grafana/dashboards
+    orgId: 1
+    type: file

@@ -53,6 +53,7 @@ services:
     volumes:
       # persistent grafana database
       - ./docker/grafana/:/var/lib/grafana
+      - ./docker/grafana/conf/provisioning/:/etc/grafana/provisioning/
     ports:
       - 3000:3000
 

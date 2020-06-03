@@ -293,9 +293,10 @@ docker-compose -f docker-compose.self.yaml up
 ```
 
 If you want try ChatApp.Server.Telemery, use followings.
+This will provision grafana datasource and dashboard for you.
 
 ```shell
-docker-compose -f docker-compose.telemetry.self.yaml up
+docker-compose -f docker-compose.telemetry.self.yaml up --build
 ```
 
 ## docker push
