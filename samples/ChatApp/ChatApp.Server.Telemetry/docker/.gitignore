@@ -1,3 +1,0 @@
-grafana/grafana.db
-prometheus/data/**/*
-!prometheus/data/.gitkeep

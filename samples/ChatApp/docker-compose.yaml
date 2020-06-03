@@ -7,3 +7,4 @@ services:
       - 12345:12345
     environment:
       - DOTNET_ENVIRONMENT=Development
+      - MagicOnion__ServerPorts__0__Host=0.0.0.0

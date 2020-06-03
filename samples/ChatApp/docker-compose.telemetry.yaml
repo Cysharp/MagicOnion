@@ -17,9 +17,9 @@ services:
     image: prom/prometheus:v2.11.1
     volumes:
       # persistent prometheus database
-      - ./ChatApp.Server.Telemetry/docker/prometheus/data/:/prometheus
-      - ./ChatApp.Server.Telemetry/docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./ChatApp.Server.Telemetry/docker/prometheus/config/alert.rules:/etc/prometheus/alert.rules
+      - ./docker/prometheus/data/:/prometheus
+      - ./docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/prometheus/config/alert.rules:/etc/prometheus/alert.rules
     ports:
       - "9090:9090"
 
@@ -50,14 +50,14 @@ services:
       - prometheus
     volumes:
       # persistent grafana database
-      - ./ChatApp.Server.Telemetry/docker/grafana/:/var/lib/grafana
+      - ./docker/grafana/:/var/lib/grafana
     ports:
       - 3000:3000
 
   alertmanager:
     image: prom/alertmanager
     volumes:
-      - ./ChatApp.Server.Telemetry/docker/alertmanager/config.yml:/etc/alertmanager/config.yml
+      - ./docker/alertmanager/config.yml:/etc/alertmanager/config.yml
     command: "--config.file=/etc/alertmanager/config.yml"
     ports:
       - 9093:9093
