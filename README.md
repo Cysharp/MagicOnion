@@ -1416,34 +1416,15 @@ Open `http://localhost:5432`, you can see swagger view.
 
 ### Telemetry
 
-You can configure Telemetry for MagicOnion with `MagicOnion.OpenTelemetry` package.
+MagicOnion offer OpenTelemetry support with `MagicOnion.OpenTelemetry` package.
 Let's see overview and how to try on localhost.
 
 * overview
-* examples of implementation
+* try sample app for OpenTelemetry
+* hands on
 * try visualization on localhost
 * metrics customization
 * implement your own metrics
-
-#### try sample app
-
-ChatApp.Server.Telemery offers OpenTelemery implementations for Prometheus and Zipkin.
-You can try it with docker or Kubernetes.
-
-**run on docker**
-
-exec docker-compose to run chatapp server, prometheus and zipkin.
-
-```shell
-cd samples/ChatApp
-docker-compose -f docker-compose.telemetry.yaml up --build
-```
-
-**run on kubernetes**
-
-```shell
-
-```
 
 #### overview
 
@@ -1451,7 +1432,13 @@ MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-do
 
 You can collect telemetry and use exporter on MagicOnion Serverside.
 
-#### examples of implementation
+#### try sample app for OpenTelemetry
+
+You can try OpenTelemetry with ChatApp sample app.
+
+goto [samples/ChatApp](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp) and see README.
+
+#### hands on
 
 What you need to do for Telemetry is followings.
 

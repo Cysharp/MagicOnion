@@ -17,6 +17,8 @@ To run ChatApp.Server with OpenTelemetry,
 1. Launch `ChatApp.Server.Telemetry` from VisualStudio.  
 2. Run `ChatScene` from UnityEditor.  
 
+If you want launch on Container, see [Container support](#container-support) section.
+
 ### ChatApp.Server
 
 This is Sample Serverside MagicOnion.
@@ -24,7 +26,7 @@ You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `C
 
 ### ChatApp.Server.Telemetry
 
-This is Sample Serverside MagicOnion with OpenTelemetry implementation.
+This is Sample Serverside MagicOnion with OpenTelemetry implementation for Prometheus and Zipkin exporters.
 You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server.Telemetry` project as start up and Start Debug.
 
 > Addtional note: If you want run MagiconOnion with telemetry containers please follow to the [README](https://github.com/Cysharp/MagicOnion#try-visualization-on-localhost)
@@ -149,34 +151,24 @@ https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/
 
 ## Container support
 
-There are docker and kubernetes samples for you.
-You can confirm MagicOnion on container usage.
+We prepare container sample with kubernetes and docker.
+You may find MagicOnion on works fine on container environment.
+
+Let's see how it work on Kubernetes, then docker.
 
 ### Kubernetes
 
-**Preprequisites**
+This instruction in written under following environment.
 
-Make sure you are installed follows.
-
-* kubectl 1.14 and higher
+* kubectl 1.16.8
 * kubectx
 * wsl
 
-This sample can be run on local k8s.
-If you are using Windows, you can try with WSL with Docker for Windows.
+> ProTips: If you are using Windows, you can try k8s on WSL with Docker for Windows installed.
 
 **Getting started**
 
-Let's try with local kubernetes cluster running on Docker for Windows.
-
-Put `Hosts` entry to access prometheus and grafana via ingress.
-
-> TIPS: Windows user better set these hosts on Windows side, not WSL.
-
-```txt
-127.0.0.1 grafana.chatapp.magiconion.local
-127.0.0.1 prometheus.chatapp.magiconion.local
-```
+Let's try run ChatApp on kubernetes cluster.
 
 Deploy your manifests to the cluster.
 
@@ -198,47 +190,29 @@ kubectl rollout status deploy prometheus-server -n chatapp
 kubectl rollout status deploy grafana -n chatapp
 ```
 
-Everything is done, your kubernetes resources will be follows.
+Everything is done, check kubernetes resources is up and running.
 
-```
-$ kubectl get deploy,svc,daemonset,ingress
-
-NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/chatapp                         1/1     1            1           28m
-deployment.apps/grafana                         1/1     1            1           12m
-deployment.apps/nginx-ingress-controller        1/1     1            1           64m
-deployment.apps/nginx-ingress-default-backend   1/1     1            1           64m
-deployment.apps/prometheus-alertmanager         1/1     1            1           59m
-deployment.apps/prometheus-kube-state-metrics   1/1     1            1           59m
-deployment.apps/prometheus-server               1/1     1            1           59m
-
-NAME                                    TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
-service/chatapp-prometheus-svc          ClusterIP      10.101.87.162    <none>        9184/TCP                     42m
-service/chatapp-svc                     LoadBalancer   10.98.216.37     localhost     12345:30809/TCP              50m
-service/grafana                         ClusterIP      10.110.57.106    <none>        80/TCP                       12m
-service/nginx-ingress-controller        LoadBalancer   10.111.154.227   localhost     80:31687/TCP,443:32279/TCP   64m
-service/nginx-ingress-default-backend   ClusterIP      10.103.10.115    <none>        80/TCP                       64m
-service/prometheus-alertmanager         ClusterIP      10.96.190.143    <none>        80/TCP                       59m
-service/prometheus-kube-state-metrics   ClusterIP      10.98.178.7      <none>        8080/TCP                     59m
-service/prometheus-node-exporter        ClusterIP      None             <none>        9100/TCP                     59m
-service/prometheus-server               ClusterIP      10.107.13.135    <none>        80/TCP                       59m
-
-NAME                                      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-daemonset.apps/prometheus-node-exporter   1         1         1       1            1           <none>          59m
-
-NAME                                   HOSTS                                 ADDRESS        PORTS   AGE
-ingress.extensions/grafana             grafana.chatapp.magiconion.local      192.168.65.3   80      12m
-ingress.extensions/prometheus-server   prometheus.chatapp.magiconion.local   192.168.65.3   80      59m
+```shell
+kubectl get deploy,svc,daemonset,ingress
 ```
 
-Now your pods are ready.
+Now you are ready to accept ChatApp.Unity requests.
 
 **Access to ChatApp.Server on Kubernetes**
 
 ChatApp.Unity can access to ChatApp.Unity on k8s with `localhost:12345`.
 Just launch ChatApp.Unity and enjoy chat.
 
-**Access to the Dashboard**
+**hosts file for ingress access**
+
+Before accesing Grafana dashboard, put `Hosts` entry to your OS, this enable your to access prometheus and grafana via ingress.
+
+```txt
+127.0.0.1 grafana.chatapp.magiconion.local
+127.0.0.1 prometheus.chatapp.magiconion.local
+```
+
+**Access to the Grafana dashboard**
 
 Let's access to your dashboard.
 
@@ -253,71 +227,54 @@ Main dashboard is Grafana, let's login with user `admin`, password will be show 
 kubectl get secret --namespace chatapp grafana -o jsonpath="{.data.admin-password}" | base64 --decode && echo
 ```
 
-![image](https://user-images.githubusercontent.com/3856350/83566667-57b04c00-a55b-11ea-986e-eeaa4af35c21.png)
+Grafana dashboard [MagicOnion Overview](https://grafana.com/grafana/dashboards/10584) will be automatically loaded into grafana, you may see your magiconion metrics.
+
+![image](https://user-images.githubusercontent.com/3856350/83670579-5d1a9e80-a60e-11ea-9289-89a412dd5877.png)
 
 **Clean up**
 
-after all, you can clean up your resources.
+after all, clean up your k8s resources.
 
 ```shell
+kubectx docker-desktop
 helm uninstall nginx-ingress -n chatapp
 helm uninstall prometheus -n chatapp
 helm uninstall grafana -n chatapp
 kubectl kustomize ./k8s/common | kubectl delete -f -
 ```
 
+### Docker
 
-### Docker with already built image.
-
-You can confirm MagicOnion on container running with already build docker image.
-Use docker-compose to build with docker, grafana user/password will be `admin/admin` by default.
-
-> TIPS: make sure you are locate at ./samples/ChatApp/
+You can confirm MagicOnion running on container.
 
 ```shell
 docker-compose up
 ```
 
-If you want try ChatApp.Server.Telemery, use followings.
-
-```shell
-docker-compose -f docker-compose.telemetry.yaml up
-```
-
-### Docker with self build image
-
-You can confirm MagicOnion on container running with actual csproj.
+If you want build current ChatApp.Server with current csproj, use follows.
 
 ```shell
 docker-compose -f docker-compose.self.yaml up
 ```
 
-If you want try ChatApp.Server.Telemery, use followings.
-This will provision grafana datasource and dashboard for you.
+### Docker (self build)
+
+use following to try ChatApp.Server.Telemery.
+
+```shell
+docker-compose -f docker-compose.telemetry.yaml up --build
+```
+
+You can access to dashboard with following urls.
+
+* [prometheus](http://localhost:9090/)
+* [zipkin](http://localhost:9411/)
+* [grafana](http://localhost:3000/)
+
+Grafana user/password will be `admin/admin` by default.
+
+If you want build current ChatApp.Server.Telemetry with current csproj, use follows.
 
 ```shell
 docker-compose -f docker-compose.telemetry.self.yaml up --build
 ```
-
-## docker push
-
-cysharp/magiconion_sample_chatapp
-
-```shell
-docker-compose -f docker-compose.self.yaml build
-docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp:latest
-docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp:3.0.13
-docker push cysharp/magiconion_sample_chatapp:latest
-docker push cysharp/magiconion_sample_chatapp:3.0.13
-```
-
-cysharp/magiconion_sample_chatapp_telemetry
-
-```shell
-docker-compose -f docker-compose.self.telemetry.yaml build magiconion
-docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:latest
-docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:3.0.13
-docker push cysharp/magiconion_sample_chatapp_telemetry:latest
-docker push cysharp/magiconion_sample_chatapp_telemetry:3.0.13
-```
-
