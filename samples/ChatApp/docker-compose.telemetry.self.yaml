@@ -47,12 +47,14 @@ services:
       - 8080:8080
 
   grafana:
-    image: grafana/grafana:latest
+    build:
+      context: .
+      dockerfile: ./docker/grafana/Dockerfile
     depends_on:
       - prometheus
     volumes:
       # persistent grafana database
-      - ./docker/grafana/:/var/lib/grafana
+      - ./docker/grafana/data/:/var/lib/grafana
       - ./docker/grafana/conf/provisioning/:/etc/grafana/provisioning/
     ports:
       - 3000:3000

@@ -8,3 +8,5 @@ providers:
       path: /var/tmp/grafana/dashboards
     orgId: 1
     type: file
+    editable: true
+    allowUiUpdates: true
