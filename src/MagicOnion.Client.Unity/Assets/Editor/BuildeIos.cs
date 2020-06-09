@@ -17,7 +17,7 @@ public class BuildIos
     {
         // only execute if Environment variables is exists.
         var flag = System.Environment.GetEnvironmentVariable("ENABLE_MAGICONION_LIB_BUILD");
-        if (flag != "true")
+        if (flag.Equals("true", System.StringComparison.OrdinalIgnoreCase))
             return;
 
         var projectPath = PBXProject.GetPBXProjectPath(path);
