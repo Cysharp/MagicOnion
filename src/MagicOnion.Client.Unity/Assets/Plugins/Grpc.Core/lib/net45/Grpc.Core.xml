@@ -88,7 +88,7 @@
             Invokes a simple remote call in a blocking fashion.
             </summary>
             <returns>The response.</returns>
-            <param name="call">The call defintion.</param>
+            <param name="call">The call definition.</param>
             <param name="req">Request message.</param>
             <typeparam name="TRequest">Type of request message.</typeparam>
             <typeparam name="TResponse">The of response message.</typeparam>
@@ -98,7 +98,7 @@
             Invokes a simple remote call asynchronously.
             </summary>
             <returns>An awaitable call object providing access to the response.</returns>
-            <param name="call">The call defintion.</param>
+            <param name="call">The call definition.</param>
             <param name="req">Request message.</param>
             <typeparam name="TRequest">Type of request message.</typeparam>
             <typeparam name="TResponse">The of response message.</typeparam>
@@ -109,7 +109,7 @@
             In server streaming scenario, client sends on request and server responds with a stream of responses.
             </summary>
             <returns>A call object providing access to the asynchronous response stream.</returns>
-            <param name="call">The call defintion.</param>
+            <param name="call">The call definition.</param>
             <param name="req">Request message.</param>
             <typeparam name="TRequest">Type of request message.</typeparam>
             <typeparam name="TResponse">The of response messages.</typeparam>
@@ -119,7 +119,7 @@
             Invokes a client streaming call asynchronously.
             In client streaming scenario, client sends a stream of requests and server responds with a single response.
             </summary>
-            <param name="call">The call defintion.</param>
+            <param name="call">The call definition.</param>
             <returns>An awaitable call object providing access to the response.</returns>
             <typeparam name="TRequest">Type of request messages.</typeparam>
             <typeparam name="TResponse">The of response message.</typeparam>
@@ -133,7 +133,7 @@
             <returns>A call object providing access to the asynchronous request and response streams.</returns>
             <param name="call">The call definition.</param>
             <typeparam name="TRequest">Type of request messages.</typeparam>
-            <typeparam name="TResponse">Type of reponse messages.</typeparam>
+            <typeparam name="TResponse">Type of responsemessages.</typeparam>
         </member>
         <member name="T:Grpc.Core.Channel">
             <summary>
@@ -213,18 +213,8 @@
             </summary>
             <param name="deadline">The deadline. <c>null</c> indicates no deadline.</param>
         </member>
-        <member name="M:Grpc.Core.Channel.ShutdownAsync">
-            <summary>
-            Shuts down the channel cleanly. It is strongly recommended to shutdown
-            all previously created channels before exiting from the process.
-            </summary>
-            <remarks>
-            This method doesn't wait for all calls on this channel to finish (nor does
-            it explicitly cancel all outstanding calls). It is user's responsibility to make sure
-            all the calls on this channel have finished (successfully or with an error)
-            before shutting down the channel to ensure channel shutdown won't impact
-            the outcome of those remote calls.
-            </remarks>
+        <member name="M:Grpc.Core.Channel.ShutdownAsyncCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
         <member name="M:Grpc.Core.Channel.CreateCallInvoker">
             <summary>
@@ -586,61 +576,6 @@
             <summary>
             Handler for AppDomain.DomainUnload, AppDomain.ProcessExit and AssemblyLoadContext.Unloading hooks.
             </summary>
-        </member>
-        <member name="T:Grpc.Core.Interceptors.ChannelExtensions">
-            <summary>
-            Provides extension methods to make it easy to register interceptors on Channel objects.
-            </summary>
-        </member>
-        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.Channel,Grpc.Core.Interceptors.Interceptor)">
-            <summary>
-            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
-            the channel with the given interceptor.
-            </summary>
-            <param name="channel">The channel to intercept.</param>
-            <param name="interceptor">The interceptor to intercept the channel with.</param>
-            <remarks>
-            Multiple interceptors can be added on top of each other by calling
-            "channel.Intercept(a, b, c)".  The order of invocation will be "a", "b", and then "c".
-            Interceptors can be later added to an existing intercepted channel, effectively
-            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
-            in this case, the last interceptor added will be the first to take control.
-            </remarks>
-        </member>
-        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.Channel,Grpc.Core.Interceptors.Interceptor[])">
-            <summary>
-            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
-            the channel with the given interceptors.
-            </summary>
-            <param name="channel">The channel to intercept.</param>
-            <param name="interceptors">
-            An array of interceptors to intercept the channel with.
-            Control is passed to the interceptors in the order specified.
-            </param>
-            <remarks>
-            Multiple interceptors can be added on top of each other by calling
-            "channel.Intercept(a, b, c)".  The order of invocation will be "a", "b", and then "c".
-            Interceptors can be later added to an existing intercepted channel, effectively
-            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
-            in this case, the last interceptor added will be the first to take control.
-            </remarks>
-        </member>
-        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.Channel,System.Func{Grpc.Core.Metadata,Grpc.Core.Metadata})">
-            <summary>
-            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
-            the invoker with the given interceptor.
-            </summary>
-            <param name="channel">The channel to intercept.</param>
-            <param name="interceptor">
-            An interceptor delegate that takes the request metadata to be sent with an outgoing call
-            and returns a <see cref="T:Grpc.Core.Metadata" /> instance that will replace the existing
-            invocation metadata.
-            </param>
-            <remarks>
-            Multiple interceptors can be added on top of each other by
-            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
-            in this case, the last interceptor added will be the first to take control.
-            </remarks>
         </member>
         <member name="T:Grpc.Core.Interceptors.ServerServiceDefinitionExtensions">
             <summary>
@@ -1575,7 +1510,7 @@
         </member>
         <member name="T:Grpc.Core.Internal.UnmanagedLibrary.Mono">
             <summary>
-            On Linux systems, using using dlopen and dlsym results in
+            On Linux systems, using dlopen and dlsym results in
             DllNotFoundException("libdl.so not found") if libc6-dev
             is not installed. As a workaround, we load symbols for
             dlopen and dlsym from the current process as on Linux

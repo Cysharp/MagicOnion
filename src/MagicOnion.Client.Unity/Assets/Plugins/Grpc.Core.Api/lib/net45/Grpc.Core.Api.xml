@@ -32,6 +32,12 @@
             The method name of the RPC being called.
             </summary>
         </member>
+        <member name="T:Grpc.Core.AsyncCallState">
+            <summary>
+            Provides an abstraction over the callback providers
+            used by AsyncUnaryCall, AsyncDuplexStreamingCall, etc
+            </summary>
+        </member>
         <member name="T:Grpc.Core.AsyncClientStreamingCall`2">
             <summary>
             Return type for client streaming calls.
@@ -49,6 +55,18 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},System.Threading.Tasks.Task{`1},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncClientStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncClientStreamingCall`2.ResponseAsync">
             <summary>
@@ -113,6 +131,18 @@
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
         </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},Grpc.Core.IAsyncStreamReader{`1},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
+        </member>
         <member name="P:Grpc.Core.AsyncDuplexStreamingCall`2.ResponseStream">
             <summary>
             Async stream to read streaming responses.
@@ -167,6 +197,17 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.#ctor(Grpc.Core.IAsyncStreamReader{`0},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncServerStreamingCall`1.ResponseStream">
             <summary>
@@ -233,6 +274,17 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.#ctor(System.Threading.Tasks.Task{`0},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncUnaryCall object with the specified properties.
+            </summary>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncUnaryCall`1.ResponseAsync">
             <summary>
@@ -388,7 +440,7 @@
         </member>
         <member name="M:Grpc.Core.CallCredentials.Compose(Grpc.Core.CallCredentials[])">
             <summary>
-            Composes multiple multiple <c>CallCredentials</c> objects into
+            Composes multiple <c>CallCredentials</c> objects into
             a single <c>CallCredentials</c> object.
             </summary>
             <param name="credentials">credentials to compose</param>
@@ -537,7 +589,7 @@
         </member>
         <member name="P:Grpc.Core.CallOptions.IsWaitForReady">
             <summary>
-            If <c>true</c> and and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
+            If <c>true</c> and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
             instead of failing immediately (which is the default "FailFast" semantics).
             Note: experimental API that can change or be removed without any prior notice.
             </summary>
@@ -622,6 +674,23 @@
             Create a new <see cref="T:Grpc.Core.CallInvoker"/> for the channel.
             </summary>
             <returns>A new <see cref="T:Grpc.Core.CallInvoker"/>.</returns>
+        </member>
+        <member name="M:Grpc.Core.ChannelBase.ShutdownAsync">
+            <summary>
+            Shuts down the channel cleanly. It is strongly recommended to shutdown
+            the channel once you stopped using it.
+            </summary>
+            <remarks>
+            Guidance for implementors:
+            This method doesn't wait for all calls on this channel to finish (nor does
+            it have to explicitly cancel all outstanding calls). It is user's responsibility to make sure
+            all the calls on this channel have finished (successfully or with an error)
+            before shutting down the channel to ensure channel shutdown won't impact
+            the outcome of those remote calls.
+            </remarks>
+        </member>
+        <member name="M:Grpc.Core.ChannelBase.ShutdownAsyncCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
         <member name="T:Grpc.Core.ChannelCredentials">
             <summary>
@@ -994,6 +1063,61 @@
             <summary>
             Creates a new instance of MetadataInterceptor given the specified interceptor function.
             </summary>
+        </member>
+        <member name="T:Grpc.Core.Interceptors.ChannelExtensions">
+            <summary>
+            Provides extension methods to make it easy to register interceptors on Channel objects.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.ChannelBase,Grpc.Core.Interceptors.Interceptor)">
+            <summary>
+            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
+            the channel with the given interceptor.
+            </summary>
+            <param name="channel">The channel to intercept.</param>
+            <param name="interceptor">The interceptor to intercept the channel with.</param>
+            <remarks>
+            Multiple interceptors can be added on top of each other by calling
+            "channel.Intercept(a, b, c)".  The order of invocation will be "a", "b", and then "c".
+            Interceptors can be later added to an existing intercepted channel, effectively
+            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
+            in this case, the last interceptor added will be the first to take control.
+            </remarks>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.ChannelBase,Grpc.Core.Interceptors.Interceptor[])">
+            <summary>
+            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
+            the channel with the given interceptors.
+            </summary>
+            <param name="channel">The channel to intercept.</param>
+            <param name="interceptors">
+            An array of interceptors to intercept the channel with.
+            Control is passed to the interceptors in the order specified.
+            </param>
+            <remarks>
+            Multiple interceptors can be added on top of each other by calling
+            "channel.Intercept(a, b, c)".  The order of invocation will be "a", "b", and then "c".
+            Interceptors can be later added to an existing intercepted channel, effectively
+            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
+            in this case, the last interceptor added will be the first to take control.
+            </remarks>
+        </member>
+        <member name="M:Grpc.Core.Interceptors.ChannelExtensions.Intercept(Grpc.Core.ChannelBase,System.Func{Grpc.Core.Metadata,Grpc.Core.Metadata})">
+            <summary>
+            Returns a <see cref="T:Grpc.Core.CallInvoker" /> instance that intercepts
+            the invoker with the given interceptor.
+            </summary>
+            <param name="channel">The channel to intercept.</param>
+            <param name="interceptor">
+            An interceptor delegate that takes the request metadata to be sent with an outgoing call
+            and returns a <see cref="T:Grpc.Core.Metadata" /> instance that will replace the existing
+            invocation metadata.
+            </param>
+            <remarks>
+            Multiple interceptors can be added on top of each other by
+            building a chain like "channel.Intercept(c).Intercept(b).Intercept(a)".  Note that
+            in this case, the last interceptor added will be the first to take control.
+            </remarks>
         </member>
         <member name="T:Grpc.Core.Interceptors.ClientInterceptorContext`2">
             <summary>
@@ -1759,6 +1883,8 @@
         <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status,System.String)">
             <summary>
             Creates a new <c>RpcException</c> associated with given status and message.
+            NOTE: the exception message is not sent to the remote peer. Use <c>status.Details</c> to pass error
+            details to the peer.
             </summary>
             <param name="status">Resulting status of a call.</param>
             <param name="message">The exception message.</param> 
@@ -1773,6 +1899,8 @@
         <member name="M:Grpc.Core.RpcException.#ctor(Grpc.Core.Status,Grpc.Core.Metadata,System.String)">
             <summary>
             Creates a new <c>RpcException</c> associated with given status, message and trailing response metadata.
+            NOTE: the exception message is not sent to the remote peer. Use <c>status.Details</c> to pass error
+            details to the peer.
             </summary>
             <param name="status">Resulting status of a call.</param>
             <param name="trailers">Response trailing metadata.</param>
@@ -1814,6 +1942,16 @@
             <c>Complete()</c> needs to be called.
             </summary>
         </member>
+        <member name="M:Grpc.Core.SerializationContext.SetPayloadLength(System.Int32)">
+            <summary>
+            Sets the payload length when writing serialized data into a buffer writer. If the serializer knows the full payload
+            length in advance, providing that information before obtaining the buffer writer using <c>GetBufferWriter()</c> can improve
+            serialization efficiency by avoiding copies. The provided payload length must be the same as the data written to the writer.
+            Calling this method is optional. If the payload length is not set then the length is calculated using the data written to
+            the buffer writer when <c>Complete()</c> is called.
+            </summary>
+            <param name="payloadLength">The total length of the payload in bytes.</param>
+        </member>
         <member name="M:Grpc.Core.SerializationContext.Complete">
             <summary>
             Complete the payload written to the buffer writer. <c>Complete()</c> can only be called once.
@@ -1853,13 +1991,13 @@
             <summary>Address of the remote endpoint in URI format.</summary>
         </member>
         <member name="P:Grpc.Core.ServerCallContext.Deadline">
-            <summary>Deadline for this RPC.</summary>
+            <summary>Deadline for this RPC. The call will be automatically cancelled once the deadline is exceeded.</summary>
         </member>
         <member name="P:Grpc.Core.ServerCallContext.RequestHeaders">
             <summary>Initial metadata sent by client.</summary>
         </member>
         <member name="P:Grpc.Core.ServerCallContext.CancellationToken">
-            <summary>Cancellation token signals when call is cancelled.</summary>
+            <summary>Cancellation token signals when call is cancelled. It is also triggered when the deadline is exceeeded or there was some other error (e.g. network problem).</summary>
         </member>
         <member name="P:Grpc.Core.ServerCallContext.ResponseTrailers">
             <summary>Trailers to send back to client after RPC finishes.</summary>
