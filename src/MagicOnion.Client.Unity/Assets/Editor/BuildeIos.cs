@@ -15,6 +15,11 @@ public class BuildIos
     [PostProcessBuild(1)]
     public static void OnPostProcessBuild(BuildTarget target, string path)
     {
+        // only execute if Environment variables is exists.
+        var flag = System.Environment.GetEnvironmentVariable("ENABLE_MAGICONION_LIB_BUILD");
+        if (flag != "true")
+            return;
+
         var projectPath = PBXProject.GetPBXProjectPath(path);
         var project = new PBXProject();
         project.ReadFromString(File.ReadAllText(projectPath));
