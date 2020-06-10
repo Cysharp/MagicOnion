@@ -1,26 +1,24 @@
-﻿#if UNITY_IPHONE
 using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
 
-public class BuildIos
+public static class UnityCloudBuildConfiguration
 {
+#if UNITY_IPHONE
     /// <summary>
     /// Handle libgrpc project settings.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="path"></param>
-    [PostProcessBuild(1)]
-    public static void OnPostProcessBuild(BuildTarget target, string path)
+    public static void PostBuild(string exportPath)
     {
-        // only execute if Environment variables is exists.
-        var flag = System.Environment.GetEnvironmentVariable("ENABLE_MAGICONION_LIB_BUILD");
-        if (flag == null || !flag.Equals("true", System.StringComparison.OrdinalIgnoreCase))
-            return;
+        // package export
+        PackageExporter.Export();
 
-        var projectPath = PBXProject.GetPBXProjectPath(path);
+        // fix pbx
+        var projectPath = PBXProject.GetPBXProjectPath(exportPath);
         var project = new PBXProject();
         project.ReadFromString(File.ReadAllText(projectPath));
 #if UNITY_2019_3_OR_NEWER
@@ -28,14 +26,10 @@ public class BuildIos
 #else
         var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
 #endif
-
-        // libz.tbd for grpc ios build
         project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
-
-        // libgrpc_csharp_ext missing bitcode. as BITCODE exand binary size to 250MB.
         project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
         
         File.WriteAllText(projectPath, project.WriteToString());
     }
-}
 #endif
+}
