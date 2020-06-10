@@ -6,18 +6,26 @@ using UnityEditor.iOS.Xcode;
 
 public static class UnityCloudBuildConfiguration
 {
-#if UNITY_IPHONE
     /// <summary>
-    /// Handle libgrpc project settings.
+    /// UnityCloudbuild Post-Export method
     /// </summary>
-    /// <param name="target"></param>
-    /// <param name="path"></param>
+    /// <param name="exportPath"></param>
     public static void PostBuild(string exportPath)
     {
         // package export
         PackageExporter.Export();
 
-        // fix pbx
+        // gRPC iOS settings
+        ApplyGrpcIosSettings(exportPath);
+    }
+
+    /// <summary>
+    /// Handle gRPC's libgrpc native lib.
+    /// </summary>
+    /// <param name="exportPath"></param>
+    private static void ApplyGrpcIosSettings(string exportPath)
+    {
+#if UNITY_IPHONE
         var projectPath = PBXProject.GetPBXProjectPath(exportPath);
         var project = new PBXProject();
         project.ReadFromString(File.ReadAllText(projectPath));
@@ -26,10 +34,14 @@ public static class UnityCloudBuildConfiguration
 #else
         var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
 #endif
+
+        // libz.tbd for grpc ios build
         project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
+
+        // // libgrpc_csharp_ext missing bitcode. as BITCODE expand binary size to 250MB.
         project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
         
         File.WriteAllText(projectPath, project.WriteToString());
-    }
 #endif
+    }
 }
