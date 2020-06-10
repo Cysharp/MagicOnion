@@ -18,7 +18,11 @@ public class BuildIos
         var projectPath = PBXProject.GetPBXProjectPath(path);
         var project = new PBXProject();
         project.ReadFromString(File.ReadAllText(projectPath));
+#if UNITY_2019_3_OR_NEWER
+        var targetGuid = project.GetUnityFrameworkTargetGuid();
+#else
         var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
+#endif
 
         // libz.tbd for grpc ios build
         project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
