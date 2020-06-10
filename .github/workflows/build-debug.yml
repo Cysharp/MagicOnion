@@ -13,7 +13,6 @@ on:
 
 jobs:
   build-dotnet:
-    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
     strategy:
       matrix:
         dotnet: ["3.1.202"] # support latest only
@@ -42,7 +41,7 @@ jobs:
       - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
 
   build-unity:
-    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
+    if: "(github.event == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:')"
     strategy:
       matrix:
         unity: ["2019.3.9f1", "2020.1.0b5"]
