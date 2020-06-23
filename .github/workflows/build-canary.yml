@@ -9,7 +9,7 @@ on:
       - "!*" # not a tag push
 
 jobs:
-  build-dotnet:
+  canary-build:
     if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
     strategy:
       matrix:
@@ -64,7 +64,7 @@ jobs:
           path: ./moc.${{ env.MAGICONION_VERSION }}.zip
 
   canary-push:
-    needs: [build-dotnet]
+    needs: [canary-build]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
