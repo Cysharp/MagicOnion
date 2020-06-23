@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MagicOnion.Abstractions" Version="3.0.11" />
-    <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="3.0.11" PrivateAssets="All" />
+    <PackageReference Include="MagicOnion.Abstractions" Version="3.0.13" />
+    <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="3.0.13" PrivateAssets="All" />
     <PackageReference Include="MessagePack.MSBuild.Tasks" Version="2.1.115" PrivateAssets="All" />
   </ItemGroup>
 

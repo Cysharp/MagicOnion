@@ -1,11 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using MagicOnion.OpenTelemetry;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
 
-namespace MagicOnion.OpenTelemetry
+namespace ChatApp.Server
 {
     /// <summary>
     /// Collect OpenTelemetry Tracing for Global filter. Handle Unary and most outside logging.

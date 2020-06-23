@@ -1,2 +1,2 @@
-grafana/grafana.db
+grafana/data/**/*
 prometheus/data/**/*

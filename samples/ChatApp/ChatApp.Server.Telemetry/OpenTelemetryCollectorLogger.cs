@@ -9,7 +9,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Metrics.Configuration;
 using OpenTelemetry.Trace;
 
-namespace MagicOnion.OpenTelemetry
+namespace ChatApp.Server
 {
     /// <summary>
     /// Collect OpemTelemetry Meter Metrics.
