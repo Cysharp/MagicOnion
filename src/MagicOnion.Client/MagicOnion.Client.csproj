@@ -1,29 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
     <LangVersion>latest</LangVersion>
     <nullable>enable</nullable>
+
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.30.0" />
-    <PackageReference Include="Grpc.Core.Api" Version="2.30.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.30.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="DynamicArgumentTuple.tt">
-      <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
   </ItemGroup>
 
 </Project>

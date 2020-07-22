@@ -1,4 +1,4 @@
-﻿using MagicOnion.Utils;
+using MagicOnion.Utils;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -56,7 +57,7 @@ namespace MagicOnion.Server.Hubs
         static readonly MethodInfo groupWriteToOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteToAsync) && !x.GetParameters()[2].ParameterType.IsArray);
         static readonly MethodInfo groupWriteToManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteToAsync) && x.GetParameters()[2].ParameterType.IsArray);
 
-        static readonly MethodInfo fireAndForget = typeof(BroadcasterHelper).GetMethod(nameof(BroadcasterHelper.FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly MethodInfo fireAndForget = typeof(DynamicBroadcasterBuilder<T>).GetMethod(nameof(FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static DynamicBroadcasterBuilder()
         {
@@ -234,6 +235,18 @@ namespace MagicOnion.Server.Hubs
                 }
 
                 il.Emit(OpCodes.Ret);
+            }
+        }
+
+        static async void FireAndForget(Task task)
+        {
+            try
+            {
+                await task.ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                MagicOnionServerInternalLogger.Current.LogError(ex, "exception occured in client broadcast.");
             }
         }
     }

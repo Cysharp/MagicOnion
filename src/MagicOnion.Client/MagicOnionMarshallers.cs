@@ -1,4 +1,4 @@
-using Grpc.Core;
+﻿using Grpc.Core;
 using MessagePack;
 using MessagePack.Formatters;
 using System;
@@ -9,6 +9,74 @@ using System.Threading.Tasks;
 
 namespace MagicOnion
 {
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
+    {
+        readonly IAsyncStreamReader<byte[]> inner;
+        readonly MessagePackSerializerOptions options;
+
+        public MarshallingAsyncStreamReader(IAsyncStreamReader<byte[]> inner, MessagePackSerializerOptions options)
+        {
+            this.inner = inner;
+            this.options = options;
+        }
+
+        public T Current { get; private set; }
+
+        public async Task<bool> MoveNext(CancellationToken cancellationToken)
+        {
+            if (await inner.MoveNext(cancellationToken))
+            {
+                this.Current = MessagePackSerializer.Deserialize<T>(inner.Current, options);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Dispose()
+        {
+            (inner as IDisposable)?.Dispose();
+        }
+    }
+
+    internal class MarshallingClientStreamWriter<T> : IClientStreamWriter<T>
+    {
+        readonly IClientStreamWriter<byte[]> inner;
+        readonly MessagePackSerializerOptions options;
+
+        public MarshallingClientStreamWriter(IClientStreamWriter<byte[]> inner, MessagePackSerializerOptions options)
+        {
+            this.inner = inner;
+            this.options = options;
+        }
+
+        public WriteOptions WriteOptions
+        {
+            get
+            {
+                return inner.WriteOptions;
+            }
+
+            set
+            {
+                inner.WriteOptions = value;
+            }
+        }
+
+        public Task CompleteAsync()
+        {
+            return inner.CompleteAsync();
+        }
+
+        public Task WriteAsync(T message)
+        {
+            var bytes = MessagePackSerializer.Serialize(message, options);
+            return inner.WriteAsync(bytes);
+        }
+    }
+
     // invoke from dynamic methods so must be public
     public static class MagicOnionMarshallers
     {
@@ -97,6 +165,13 @@ namespace MagicOnion
                 resolver = new PriorityResolver(t, formatter, resolver);
                 return t;
             }
+        }
+
+        public static object InstantiateDynamicArgumentTuple(Type[] typeParameters, object[] arguments)
+        {
+            // start from T2
+            var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
+            return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments);
         }
     }
 

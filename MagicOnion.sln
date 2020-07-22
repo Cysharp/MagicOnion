@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
@@ -78,6 +78,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server", "src\MagicOnion.Server\MagicOnion.Server.csproj", "{72D2C01C-765C-4FE1-89CA-28244DEC7C37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.AspNetCore", "sandbox\Sandbox.AspNetCore\Sandbox.AspNetCore.csproj", "{E70D0B00-0524-4EBE-B290-64DDB6B323F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client", "src\MagicOnion.Client\MagicOnion.Client.csproj", "{4DE802A2-426D-4074-B9F3-710980B3EDA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Shared", "src\MagicOnion.Shared\MagicOnion.Shared.csproj", "{45A800CF-C0D0-40A8-B070-9AC2C3E4312F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -181,6 +185,14 @@ Global
 		{E70D0B00-0524-4EBE-B290-64DDB6B323F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E70D0B00-0524-4EBE-B290-64DDB6B323F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E70D0B00-0524-4EBE-B290-64DDB6B323F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DE802A2-426D-4074-B9F3-710980B3EDA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DE802A2-426D-4074-B9F3-710980B3EDA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DE802A2-426D-4074-B9F3-710980B3EDA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DE802A2-426D-4074-B9F3-710980B3EDA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -212,6 +224,8 @@ Global
 		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B} = {FEE2B9AB-A1D0-41BA-A172-FC95935542DF}
 		{72D2C01C-765C-4FE1-89CA-28244DEC7C37} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{E70D0B00-0524-4EBE-B290-64DDB6B323F9} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
+		{4DE802A2-426D-4074-B9F3-710980B3EDA8} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
