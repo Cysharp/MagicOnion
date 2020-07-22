@@ -295,7 +295,7 @@ namespace MagicOnion.Server
             return next;
         }
 
-        internal void RegisterHandler(ServerServiceDefinition.Builder builder)
+        internal void BindHandler(ServiceBinderBase binder)
         {
             var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
@@ -308,7 +308,7 @@ namespace MagicOnion.Server
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
 
                         var handler = (UnaryServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this);
-                        builder.AddMethod(method, handler);
+                        binder.AddMethod(method, handler);
                     }
                     break;
                 case MethodType.ClientStreaming:
@@ -317,7 +317,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ClientStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this);
-                        builder.AddMethod(method, handler);
+                        binder.AddMethod(method, handler);
                     }
                     break;
                 case MethodType.ServerStreaming:
@@ -326,7 +326,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ServerStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this);
-                        builder.AddMethod(method, handler);
+                        binder.AddMethod(method, handler);
                     }
                     break;
                 case MethodType.DuplexStreaming:
@@ -335,7 +335,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (DuplexStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this);
-                        builder.AddMethod(method, handler);
+                        binder.AddMethod(method, handler);
                     }
                     break;
                 default:

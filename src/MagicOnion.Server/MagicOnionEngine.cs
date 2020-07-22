@@ -138,7 +138,6 @@ namespace MagicOnion.Server
                                 {
                                     throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                                 }
-                                handler.RegisterHandler(builder);
                             }
                         }
                     }
@@ -152,7 +151,6 @@ namespace MagicOnion.Server
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
                             }
-                            connectHandler.RegisterHandler(builder);
                         }
 
                         lock (streamingHubHandlers)
@@ -179,7 +177,7 @@ namespace MagicOnion.Server
                 ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
             }
 
-            var result = new MagicOnionServiceDefinition(builder.Build(), handlers.ToArray(), streamingHubHandlers.ToArray());
+            var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 
             sw.Stop();
             option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
