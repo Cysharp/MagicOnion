@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using MessagePack;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server
 {
@@ -16,6 +17,7 @@ namespace MagicOnion.Server
         /// <summary>
         /// Search MagicOnion service from all assemblies.
         /// </summary>
+        /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
         /// <param name="isReturnExceptionStackTraceInErrorDetail">If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</param>
         /// <returns></returns>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, bool isReturnExceptionStackTraceInErrorDetail = false)
@@ -26,6 +28,8 @@ namespace MagicOnion.Server
         /// <summary>
         /// Search MagicOnion service from all assemblies.
         /// </summary>
+        /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
+        /// <param name="options">The options for MagicOnion server</param>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options)
         {
             return BuildServerServiceDefinition(serviceProvider, AppDomain.CurrentDomain.GetAssemblies(), options);
@@ -34,7 +38,10 @@ namespace MagicOnion.Server
         /// <summary>
         /// Search MagicOnion service from target assemblies. ex: new[]{ typeof(Startup).GetTypeInfo().Assembly }
         /// </summary>
-        public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions option)
+        /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
+        /// <param name="searchAssemblies">The assemblies to be search for services</param>
+        /// <param name="options">The options for MagicOnion server</param>
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions options)
         {
             var types = searchAssemblies
               .SelectMany(x =>
@@ -48,12 +55,17 @@ namespace MagicOnion.Server
                       return ex.Types.Where(t => t != null);
                   }
               });
-            return BuildServerServiceDefinition(serviceProvider, types, option);
+            return BuildServerServiceDefinition(serviceProvider, types, options);
         }
 
-        public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable<Type> targetTypes, MagicOnionOptions option)
+        /// <summary>
+        /// Search MagicOnion service from target types.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
+        /// <param name="targetTypes">The types to be search for services</param>
+        /// <param name="options">The options for MagicOnion server</param>
+        public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable<Type> targetTypes, MagicOnionOptions options)
         {
-            var builder = ServerServiceDefinition.CreateBuilder();
             var handlers = new HashSet<MethodHandler>();
             var streamingHubHandlers = new List<StreamingHubHandler>();
 
@@ -63,7 +75,7 @@ namespace MagicOnion.Server
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .ToArray();
 
-            option.MagicOnionLogger.BeginBuildServiceDefinition();
+            options.MagicOnionLogger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
             try
@@ -121,7 +133,7 @@ namespace MagicOnion.Server
                         // register for StreamingHub
                         if (isStreamingHub && methodName != "Connect")
                         {
-                            var streamingHandler = new StreamingHubHandler(classType, methodInfo, new StreamingHubHandlerOptions(option), serviceProvider);
+                            var streamingHandler = new StreamingHubHandler(classType, methodInfo, new StreamingHubHandlerOptions(options), serviceProvider);
                             if (!tempStreamingHubHandlers.Add(streamingHandler))
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
@@ -131,44 +143,35 @@ namespace MagicOnion.Server
                         else
                         {
                             // create handler
-                            var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(option), serviceProvider);
-                            lock (builder)
+                            var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(options), serviceProvider);
+                            if (!handlers.Add(handler))
                             {
-                                if (!handlers.Add(handler))
-                                {
-                                    throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
-                                }
+                                throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                             }
                         }
                     }
 
                     if (isStreamingHub)
                     {
-                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", new MethodHandlerOptions(option), serviceProvider);
-                        lock (builder)
+                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", new MethodHandlerOptions(options), serviceProvider);
+                        if (!handlers.Add(connectHandler))
                         {
-                            if (!handlers.Add(connectHandler))
-                            {
-                                throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
-                            }
+                            throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
                         }
 
-                        lock (streamingHubHandlers)
+                        streamingHubHandlers.AddRange(tempStreamingHubHandlers);
+                        StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers.ToArray());
+                        IGroupRepositoryFactory factory;
+                        var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
+                        if (attr != null)
                         {
-                            streamingHubHandlers.AddRange(tempStreamingHubHandlers);
-                            StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers.ToArray());
-                            IGroupRepositoryFactory factory;
-                            var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
-                            if (attr != null)
-                            {
-                                factory = attr.Create();
-                            }
-                            else
-                            {
-                                factory = option.DefaultGroupRepositoryFactory;
-                            }
-                            StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(option.SerializerOptions, option.MagicOnionLogger));
+                            factory = attr.Create();
                         }
+                        else
+                        {
+                            factory = options.DefaultGroupRepositoryFactory;
+                        }
+                        StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.SerializerOptions, options.MagicOnionLogger));
                     }
                 }
             }
@@ -180,7 +183,7 @@ namespace MagicOnion.Server
             var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 
             sw.Stop();
-            option.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
+            options.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
             return result;
         }
