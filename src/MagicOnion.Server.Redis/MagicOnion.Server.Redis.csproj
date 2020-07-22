@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <SignAssembly>true</SignAssembly>
@@ -14,7 +14,7 @@
         <Company>Cysharp</Company>
 
         <!-- NuGet -->
-        <PackageId>MagicOnion.Redis</PackageId>
+        <PackageId>MagicOnion.Server.Redis</PackageId>
         <Description>Redis backplane for MagicOnion.</Description>
     </PropertyGroup>
 
@@ -26,11 +26,10 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\MagicOnion\MagicOnion.csproj" />
+        <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="../MagicOnion/Utils/ArrayPoolBufferWriter.cs" />
         <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
     </ItemGroup>
 </Project>

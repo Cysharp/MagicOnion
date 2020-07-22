@@ -1,9 +1,9 @@
-﻿using MessagePack;
+using MessagePack;
 using MessagePack.Formatters;
 using System;
 using System.Runtime.CompilerServices;
 
-namespace MagicOnion.Redis
+namespace MagicOnion.Server.Redis
 {
     internal static class NativeGuidArrayFormatter
     {

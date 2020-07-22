@@ -7,7 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Redis
+namespace MagicOnion.Server.Redis
 {
     public class RedisGroupOptions
     {
@@ -23,21 +23,18 @@ namespace MagicOnion.Redis
 
     public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
     {
-        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, IServiceLocator serviceLocator)
+        private readonly RedisGroupOptions _options;
+        private readonly ConnectionMultiplexer _connection;
+
+        public RedisGroupRepositoryFactory(RedisGroupOptions options, ConnectionMultiplexer connection)
         {
-            var options = serviceLocator.GetService<RedisGroupOptions>();
-            if (options == null)
-            {
-                var connection = serviceLocator.GetService<ConnectionMultiplexer>();
-                if (connection == null)
-                {
-                    throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
-                }
+            _options = options ?? new RedisGroupOptions(connection);
+            _connection = connection ?? throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
+        }
 
-                options = new RedisGroupOptions(connection);
-            }
-
-            return new RedisGroupRepository(serializerOptions, options, logger);
+        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+        {
+            return new RedisGroupRepository(serializerOptions, _options, logger);
         }
     }
 
