@@ -4,29 +4,31 @@ using System.Reflection;
 using System.Text;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server.Glue;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.Extensions
 {
     public static class MagicOnionServicesExtensions
     {
-        public static void AddMagicOnion(this IServiceCollection services)
+        public static void AddMagicOnion(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
         {
+            var configName = "MagicOnion";
             var glueServiceType = MagicOnionGlueService.CreateType();
-            var methodCreateServiceMethodProviderServiceDescriptor = typeof(MagicOnionServicesExtensions).GetMethod(nameof(CreateServiceMethodProviderServiceDescriptor), BindingFlags.Static | BindingFlags.NonPublic)!.MakeGenericMethod(glueServiceType);
-            var serviceMethodProviderDescriptor = (ServiceDescriptor)methodCreateServiceMethodProviderServiceDescriptor.Invoke(null, Array.Empty<object>())!;
 
-            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp));
+            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
             services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
-            services.TryAddEnumerable(serviceMethodProviderDescriptor);
+            services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
             services.TryAddSingleton<IMagicOnionLogger>(new NullMagicOnionLogger());
-        }
 
-        private static ServiceDescriptor CreateServiceMethodProviderServiceDescriptor<T>()
-            where T : class
-        {
-            return ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<T>), typeof(MagicOnionGlueServiceMethodProvider<T>));
+            services.AddOptions<MagicOnionOptions>(configName)
+                .Configure<IConfiguration>((o, configuration) =>
+                {
+                    configuration.GetSection(configName).Bind(o);
+                    configureOptions?.Invoke(o);
+                });
         }
     }
 }

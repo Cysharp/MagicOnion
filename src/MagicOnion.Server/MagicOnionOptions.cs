@@ -44,10 +44,9 @@ namespace MagicOnion.Server
         /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
-        /// <param name="isReturnExceptionStackTraceInErrorDetail">true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</param>
-        public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)
+        public MagicOnionOptions()
         {
-            this.IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail;
+            this.IsReturnExceptionStackTraceInErrorDetail = false;
             this.SerializerOptions = MessagePackSerializer.DefaultOptions;
             this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();

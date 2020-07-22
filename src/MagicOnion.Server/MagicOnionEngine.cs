@@ -20,7 +20,7 @@ namespace MagicOnion.Server
         /// <returns></returns>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, bool isReturnExceptionStackTraceInErrorDetail = false)
         {
-            return BuildServerServiceDefinition(serviceProvider, new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail));
+            return BuildServerServiceDefinition(serviceProvider, new MagicOnionOptions() { IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail });
         }
 
         /// <summary>
