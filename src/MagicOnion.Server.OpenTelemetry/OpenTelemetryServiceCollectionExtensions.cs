@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Trace.Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace MagicOnion.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>MagicOnion extensions for Microsoft.Extensions.Hosting classes</summary>
     public static class OpenTelemetryServiceCollectionExtensions

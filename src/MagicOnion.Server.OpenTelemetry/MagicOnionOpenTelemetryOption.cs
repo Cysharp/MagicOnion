@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using OpenTelemetry.Metrics.Export;
 
-namespace MagicOnion.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry
 {
     public class MagicOnionOpenTelemetryOptions
     {

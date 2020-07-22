@@ -9,7 +9,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Metrics.Configuration;
 using OpenTelemetry.Trace;
 
-namespace MagicOnion.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>
     /// Collect OpemTelemetry Meter Metrics.
@@ -202,6 +202,14 @@ namespace MagicOnion.OpenTelemetry
         }
 
         public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
+        {
+        }
+
+        public void Error(Exception ex, ServerCallContext context)
+        {
+        }
+
+        public void Error(Exception ex, StreamingHubContext context)
         {
         }
     }

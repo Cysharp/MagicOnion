@@ -1,6 +1,6 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 
-namespace MagicOnion.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry
 {
     public static class OpenTelemetrygRpcStatusHelper
     {

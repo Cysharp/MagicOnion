@@ -2,10 +2,11 @@ using System;
 using System.Threading.Tasks;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Trace.Configuration;
 
-namespace MagicOnion.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>
     /// Collect OpenTelemetry Tracing for Global filter. Handle Unary and most outside logging.
@@ -15,9 +16,9 @@ namespace MagicOnion.OpenTelemetry
     {
         public int Order { get; set; }
 
-        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceProvider)
         {
-            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
+            return new OpenTelemetryCollectorFilter(serviceProvider.GetService<TracerFactory>(), serviceProvider.GetService<MagicOnionOpenTelemetryOptions>());
         }
     }
 
@@ -80,9 +81,9 @@ namespace MagicOnion.OpenTelemetry
     {
         public int Order { get; set; }
 
-        public StreamingHubFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceProvider)
         {
-            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<TracerFactory>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
+            return new OpenTelemetryHubCollectorFilter(serviceProvider.GetService<TracerFactory>(), serviceProvider.GetService<MagicOnionOpenTelemetryOptions>());
         }
     }
 
