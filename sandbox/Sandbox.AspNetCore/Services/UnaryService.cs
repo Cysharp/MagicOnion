@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 using MagicOnion;
 using MagicOnion.Server;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sandbox.NetCoreServer.Services
+namespace Sandbox.AspNetCore.Services
 {
     public interface IMyFirstService : IService<IMyFirstService>
     {

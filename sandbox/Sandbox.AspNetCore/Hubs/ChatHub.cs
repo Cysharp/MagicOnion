@@ -1,4 +1,4 @@
-﻿using MagicOnion;
+using MagicOnion;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MessagePack;
@@ -7,8 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Sandbox.AspNetCore.Models;
 
-namespace Sandbox.NetCoreServer.Hubs
+namespace Sandbox.AspNetCore.Hubs
 {
     public interface IMessageReceiver2
     {

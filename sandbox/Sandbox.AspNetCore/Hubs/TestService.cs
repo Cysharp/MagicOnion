@@ -1,9 +1,9 @@
-﻿using MagicOnion;
+using MagicOnion;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sandbox.NetCoreServer.Hubs
+namespace Sandbox.AspNetCore.Hubs
 {
     public interface ITestService : IService<ITestService>
     {

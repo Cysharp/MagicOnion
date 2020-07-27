@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1998
+#pragma warning disable CS1998
 
 using MagicOnion;
 using MagicOnion.Server.Hubs;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sandbox.NetCoreServer.Hubs
+namespace Sandbox.AspNetCore.Hubs
 {
     public interface IGamingHubReceiver
     {

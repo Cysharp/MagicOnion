@@ -1,8 +1,8 @@
-﻿using MagicOnion;
+using MagicOnion;
 using MagicOnion.Server.Hubs;
 using System.Threading.Tasks;
 
-namespace Sandbox.NetCoreServer.Hubs
+namespace Sandbox.AspNetCore.Hubs
 {
     public interface IBugReproductionHubReceiver
     {
