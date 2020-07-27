@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using LitJWT;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Authentication.Jwt
 {
@@ -69,10 +70,10 @@ namespace MagicOnion.Server.Authentication.Jwt
             }
         }
 
-        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceProvider)
         {
-            var options = serviceLocator.GetService<IOptions<JwtAuthenticationOptions>>().Value;
-            var provider = serviceLocator.GetService<IJwtAuthenticationProvider>();
+            var options = serviceProvider.GetService<IOptions<JwtAuthenticationOptions>>().Value;
+            var provider = serviceProvider.GetService<IJwtAuthenticationProvider>();
             return new JwtAuthenticationFilter(provider, options.RequestHeaderKey, options.IsAuthTokenRequired);
         }
 

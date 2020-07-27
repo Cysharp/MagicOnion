@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using MagicOnion.Hosting;
 using MagicOnion.Server;
 using MagicOnion.Server.Authentication.Jwt;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +23,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJwtAuthenticationProvider, TProvider>();
 
             services.Configure<JwtAuthenticationOptions>(configureOptions);
-            services.Configure<MagicOnionHostingOptions>(options =>
+            services.Configure<MagicOnionOptions>(options =>
             {
-                options.Service.GlobalFilters.Add<JwtAuthenticationAttribute>();
+                options.GlobalFilters.Add<JwtAuthenticationAttribute>();
             });
 
             return services;

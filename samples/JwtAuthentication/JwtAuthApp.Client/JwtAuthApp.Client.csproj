@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\MagicOnion\MagicOnion.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\JwtAuthApp.Shared\JwtAuthApp.Shared.csproj" />
   </ItemGroup>
 

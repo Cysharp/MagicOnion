@@ -21,7 +21,7 @@
       <PackageReference Include="LitJWT" Version="1.1.0" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\MagicOnion.Hosting\MagicOnion.Hosting.csproj" />
+      <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />

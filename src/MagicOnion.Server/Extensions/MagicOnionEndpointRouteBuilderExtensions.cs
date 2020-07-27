@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicOnion.Server.Extensions
+namespace Microsoft.AspNetCore.Routing
 {
     public static class MagicOnionEndpointRouteBuilderExtensions
     {
