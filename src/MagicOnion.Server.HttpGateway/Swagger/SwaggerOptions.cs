@@ -1,8 +1,8 @@
-﻿using MagicOnion.HttpGateway.Swagger.Schemas;
+using MagicOnion.Server.HttpGateway.Swagger.Schemas;
 using Microsoft.AspNetCore.Http;
 using System;
 
-namespace MagicOnion.HttpGateway.Swagger
+namespace MagicOnion.Server.HttpGateway.Swagger
 {
     public class SwaggerOptions
     {

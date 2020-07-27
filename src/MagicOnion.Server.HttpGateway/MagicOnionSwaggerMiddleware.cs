@@ -1,4 +1,4 @@
-using MagicOnion.HttpGateway.Swagger;
+using MagicOnion.Server.HttpGateway.Swagger;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
@@ -6,8 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
 
-namespace MagicOnion.HttpGateway
+namespace MagicOnion.Server.HttpGateway
 {
     public class MagicOnionSwaggerMiddleware
     {
@@ -27,9 +28,15 @@ namespace MagicOnion.HttpGateway
         public async Task Invoke(HttpContext httpContext)
         {
             // reference embedded resouces
-            const string prefix = "MagicOnion.HttpGateway.Swagger.SwaggerUI.";
+            const string prefix = "MagicOnion.Server.HttpGateway.Swagger.SwaggerUI.";
 
-            var path = httpContext.Request.Path.Value.Trim('/');
+            var path = (httpContext.Request.RouteValues.GetValueOrDefault("path") as string)?.Trim('/') ?? string.Empty;
+            if (path == "" && !httpContext.Request.Path.Value.EndsWith("/"))
+            {
+                httpContext.Response.Redirect(httpContext.Request.GetEncodedUrl() + "/");
+                return;
+            }
+
             if (path == "") path = "index.html";
             var filePath = prefix + path.Replace("/", ".");
             var mediaType = GetMediaType(filePath);
@@ -53,7 +60,6 @@ namespace MagicOnion.HttpGateway
                     if (stream == null)
                     {
                         // not found, standard request.
-                        await next(httpContext);
                         return;
                     }
 
@@ -81,7 +87,6 @@ namespace MagicOnion.HttpGateway
                     if (bytes == null)
                     {
                         // not found, standard request.
-                        await next(httpContext);
                         return;
                     }
 

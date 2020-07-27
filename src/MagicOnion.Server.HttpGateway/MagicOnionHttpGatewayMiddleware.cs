@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using System.Reflection;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
@@ -9,20 +9,21 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Grpc.Net.Client;
 using Newtonsoft.Json;
 
-namespace MagicOnion.HttpGateway
+namespace MagicOnion.Server.HttpGateway
 {
     public class MagicOnionHttpGatewayMiddleware
     {
         readonly RequestDelegate next;
         readonly IDictionary<string, MethodHandler> handlers;
-        readonly Channel channel;
+        readonly GrpcChannel channel;
 
-        public MagicOnionHttpGatewayMiddleware(RequestDelegate next, IReadOnlyList<MethodHandler> handlers, Channel channel)
+        public MagicOnionHttpGatewayMiddleware(RequestDelegate next, IReadOnlyList<MethodHandler> handlers, GrpcChannel channel)
         {
             this.next = next;
-            this.handlers = handlers.ToDictionary(x => "/" + x.ToString());
+            this.handlers = handlers.ToDictionary(x => x.ToString());
             this.channel = channel;
         }
 
@@ -30,12 +31,14 @@ namespace MagicOnion.HttpGateway
         {
             try
             {
-                var path = httpContext.Request.Path.Value;
+                var path = $"{httpContext.Request.RouteValues["service"]}/{httpContext.Request.RouteValues["method"]}";
 
                 MethodHandler handler;
                 if (!handlers.TryGetValue(path, out handler))
                 {
-                    await next(httpContext);
+                    httpContext.Response.StatusCode = 404;
+                    httpContext.Response.ContentType = "text/plain";
+                    await httpContext.Response.WriteAsync("Not Found");
                     return;
                 }
 
@@ -116,7 +119,7 @@ namespace MagicOnion.HttpGateway
                     string body;
                     using (var sr = new StreamReader(httpContext.Request.Body, Encoding.UTF8))
                     {
-                        body = sr.ReadToEnd();
+                        body = await sr.ReadToEndAsync();
                     }
 
                     if (handler.RequestType == typeof(byte[]) && string.IsNullOrWhiteSpace(body))
@@ -133,12 +136,12 @@ namespace MagicOnion.HttpGateway
 
                 // create header
                 var metadata = new Metadata();
-                foreach (var header in httpContext.Request.Headers)
+                foreach (var header in httpContext.Request.Headers.Where(x => !x.Key.StartsWith(":")))
                 {
                     metadata.Add(header.Key, header.Value);
                 }
 
-                var invoker = new DefaultCallInvoker(channel);
+                var invoker = channel.CreateCallInvoker();
                 var rawResponse = await invoker.AsyncUnaryCall(method, null, default(CallOptions).WithHeaders(metadata), requestObject);
 
                 // MessagePack -> Object -> Json

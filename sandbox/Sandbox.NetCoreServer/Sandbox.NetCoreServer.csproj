@@ -23,7 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\MagicOnion.Hosting\MagicOnion.Hosting.csproj" />
-        <ProjectReference Include="..\..\src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj" />
         <ProjectReference Include="..\..\src\MagicOnion\MagicOnion.csproj" />
     </ItemGroup>
 

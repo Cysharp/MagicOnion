@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sandbox", "sandbox", "{7682
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion", "src\MagicOnion\MagicOnion.csproj", "{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.HttpGateway", "src\MagicOnion.HttpGateway\MagicOnion.HttpGateway.csproj", "{FCE03661-803E-4629-944F-45DB6B444320}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox.NetCoreServer", "sandbox\Sandbox.NetCoreServer\Sandbox.NetCoreServer.csproj", "{8174DFB5-0C46-440C-A225-C3A9851C2700}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicCodeDumper", "sandbox\DynamicCodeDumper\DynamicCodeDumper.csproj", "{A2156D81-1A67-4EAC-8A74-3E459385E4A0}"
@@ -83,6 +81,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.Redis", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.OpenTelemetry", "src\MagicOnion.Server.OpenTelemetry\MagicOnion.Server.OpenTelemetry.csproj", "{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.HttpGateway", "src\MagicOnion.Server.HttpGateway\MagicOnion.Server.HttpGateway.csproj", "{34C724ED-7459-4F62-855D-90C276A6F5EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,10 +93,6 @@ Global
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FCE03661-803E-4629-944F-45DB6B444320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FCE03661-803E-4629-944F-45DB6B444320}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FCE03661-803E-4629-944F-45DB6B444320}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FCE03661-803E-4629-944F-45DB6B444320}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8174DFB5-0C46-440C-A225-C3A9851C2700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8174DFB5-0C46-440C-A225-C3A9851C2700}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8174DFB5-0C46-440C-A225-C3A9851C2700}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -193,13 +189,16 @@ Global
 		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34C724ED-7459-4F62-855D-90C276A6F5EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34C724ED-7459-4F62-855D-90C276A6F5EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34C724ED-7459-4F62-855D-90C276A6F5EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34C724ED-7459-4F62-855D-90C276A6F5EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A} = {1987061F-8970-4018-8D58-6932961C9EB4}
-		{FCE03661-803E-4629-944F-45DB6B444320} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{8174DFB5-0C46-440C-A225-C3A9851C2700} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A2156D81-1A67-4EAC-8A74-3E459385E4A0} = {7682EFFC-681C-4DCC-B5E7-D8449E42DAC9}
 		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3} = {5C86A5C9-ECE1-4FB9-B48C-A9DCF9C3FECC}
@@ -226,6 +225,7 @@ Global
 		{45A800CF-C0D0-40A8-B070-9AC2C3E4312F} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{80127E7E-FB71-4F68-B52B-2905AD39029B} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{34C724ED-7459-4F62-855D-90C276A6F5EA} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

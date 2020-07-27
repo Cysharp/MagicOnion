@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Server.HttpGateway\MagicOnion.Server.HttpGateway.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
   </ItemGroup>
 

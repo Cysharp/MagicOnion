@@ -1,9 +1,9 @@
-﻿// This definition is borrowed from Swashbuckle.
+// This definition is borrowed from Swashbuckle.
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MagicOnion.HttpGateway.Swagger.Schemas
+namespace MagicOnion.Server.HttpGateway.Swagger.Schemas
 {
     public class SwaggerDocument
     {

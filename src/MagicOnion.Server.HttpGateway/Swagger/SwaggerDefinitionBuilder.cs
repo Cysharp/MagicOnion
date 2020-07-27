@@ -1,4 +1,4 @@
-﻿using MagicOnion.HttpGateway.Swagger.Schemas;
+using MagicOnion.Server.HttpGateway.Swagger.Schemas;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace MagicOnion.HttpGateway.Swagger
+namespace MagicOnion.Server.HttpGateway.Swagger
 {
     public class SwaggerDefinitionBuilder
     {

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Reflection;
 
-namespace MagicOnion.HttpGateway.Swagger
+namespace MagicOnion.Server.HttpGateway.Swagger
 {
     internal static class Utils
     {
