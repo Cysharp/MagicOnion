@@ -9,7 +9,7 @@
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
