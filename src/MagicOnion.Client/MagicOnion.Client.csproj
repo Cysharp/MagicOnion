@@ -22,4 +22,14 @@
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
   </ItemGroup>
 
+  <!-- Sync codes: MagicOnion.Client for Unity -->
+  <PropertyGroup>
+    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Client\</DestinationRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

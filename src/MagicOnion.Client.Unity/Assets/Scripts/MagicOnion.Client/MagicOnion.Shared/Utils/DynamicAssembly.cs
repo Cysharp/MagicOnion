@@ -1,4 +1,4 @@
-#if NON_UNITY || !NET_STANDARD_2_0
+﻿#if NON_UNITY || !NET_STANDARD_2_0
 
 using System;
 using System.Reflection;
@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Utils
 {
-#if ENABLE_SAVE_ASSEMBLY || !NON_UNITY
+#if ENABLE_SAVE_ASSEMBLY
     public
 #else
     internal
