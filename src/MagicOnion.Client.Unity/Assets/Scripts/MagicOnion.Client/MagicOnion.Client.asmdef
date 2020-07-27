@@ -1,8 +1,8 @@
 {
-    "name": "MagicOnion.Unity",
+    "name": "MagicOnion.Client",
     "references": [
         "MagicOnion.Abstractions",
-        "MagicOnion.Client"
+        "MessagePack"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
