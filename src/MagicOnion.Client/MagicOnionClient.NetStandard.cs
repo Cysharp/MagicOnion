@@ -1,4 +1,4 @@
-#if NON_UNITY
+#if NON_UNITY && !NET461
 using System;
 using System.Collections.Generic;
 using System.Text;

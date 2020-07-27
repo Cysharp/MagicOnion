@@ -1,4 +1,4 @@
-#if !NON_UNITY || USE_GRPC_CCORE
+#if !NON_UNITY || NET461
 using System;
 using System.Collections.Generic;
 using System.Text;
