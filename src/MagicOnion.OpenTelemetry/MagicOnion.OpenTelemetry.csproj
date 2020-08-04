@@ -2,9 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <RestoreAdditionalProjectSources>
-            https://www.myget.org/F/opentelemetry/api/v3/index.json;
-        </RestoreAdditionalProjectSources>
 
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -26,7 +23,8 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
-      <PackageReference Include="OpenTelemetry" Version="0.2.0-alpha.296" />
+      <PackageReference Include="OpenTelemetry" Version="0.4.0-beta.2" />
+      <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0-preview.8.20365.13" />
     </ItemGroup>
 
     <ItemGroup>
