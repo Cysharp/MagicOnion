@@ -18,55 +18,57 @@ namespace MagicOnion.OpenTelemetry
 
         public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<ActivitySource>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
+            return new OpenTelemetryCollectorFilter(serviceLocator.GetService<TracerProvider>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
         }
     }
 
     internal class OpenTelemetryCollectorFilter : MagicOnionFilterAttribute
     {
-        readonly ActivitySource activitySource;
-        readonly string serviceName;
+        readonly TracerProvider tracerProvider;
+        readonly MagicOnionOpenTelemetryOptions telemetryOption;
 
-        public OpenTelemetryCollectorFilter(ActivitySource activitySource, MagicOnionOpenTelemetryOptions telemetryOption)
+        public OpenTelemetryCollectorFilter(TracerProvider tracerProvider, MagicOnionOpenTelemetryOptions telemetryOption)
         {
-            this.activitySource = activitySource;
-            this.serviceName = telemetryOption.ServiceName;
+            this.tracerProvider = tracerProvider;
+            this.telemetryOption = telemetryOption;
         }
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
-            // incoming kind: SERVER
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
-            using (var activity = activitySource.StartActivity($"{context.CallContext.Method}", ActivityKind.Server))
+            var tracer = tracerProvider.GetTracer(context.CallContext.Method, telemetryOption.TracerVersion);
+
+            // incoming kind: SERVER
+            using (var span = tracer.StartSpan($"{context.CallContext.Method}", SpanKind.Server))
             {
                 try
                 {
-                    //todo: method 確認
-                    activity.SetTag("grpc.method", context.CallContext.Method);
-                    activity.SetTag("rpc.service", serviceName);
-                    activity.SetTag("net.peer.ip", context.CallContext.Peer);
-                    activity.SetTag("net.host.name", context.CallContext.Host);
-                    activity.SetTag("message.type", "RECIEVED");
-                    activity.SetTag("message.id", context.ContextId.ToString());
-                    activity.SetTag("message.uncompressed_size", context.GetRawRequest()?.LongLength ?? 0);
+                    span.SetAttribute("grpc.method", context.CallContext.Method);
+                    span.SetAttribute("rpc.service", telemetryOption.ServiceName);
+                    span.SetAttribute("net.peer.ip", context.CallContext.Peer);
+                    span.SetAttribute("net.host.name", context.CallContext.Host);
+                    span.SetAttribute("message.type", "RECIEVED");
+                    span.SetAttribute("message.id", context.ContextId.ToString());
+                    span.SetAttribute("message.uncompressed_size", context.GetRawRequest()?.LongLength.ToString() ?? "0");
 
-                    activity.SetTag("magiconion.method.type", context.MethodType.ToString());
-                    activity.SetTag("magiconion.service.type", context.ServiceType.Name);
-                    activity.SetTag("magiconion.auth.enabled", !string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName));
-                    activity.SetTag("magiconion.auth.peer.authenticated", context.CallContext.AuthContext.IsPeerAuthenticated);
+                    span.SetAttribute("magiconion.method.type", context.MethodType.ToString());
+                    span.SetAttribute("magiconion.service.type", context.ServiceType.Name);
+                    span.SetAttribute("magiconion.auth.enabled", (!string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName)).ToString());
+                    span.SetAttribute("magiconion.auth.peer.authenticated", context.CallContext.AuthContext.IsPeerAuthenticated.ToString());
 
                     await next(context);
 
-                    activity.SetTag("grpc.status_code", (long)context.CallContext.Status.StatusCode);
-                    activity.SetStatus(OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode));
+                    span.SetAttribute("grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode);
                 }
                 catch (Exception ex)
                 {
-                    activity.SetTag("exception", ex.ToString());
-                    activity.SetTag("grpc.status_code", (long)context.CallContext.Status.StatusCode);
-                    activity.SetStatus(OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode));
+                    span.SetAttribute("exception", ex.ToString());
+                    span.SetAttribute("grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
+                    span.SetAttribute("grpc.status_detail", context.CallContext.Status.Detail);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.CallContext.Status.StatusCode);
                     throw;
                 }
             }
@@ -83,55 +85,57 @@ namespace MagicOnion.OpenTelemetry
 
         public StreamingHubFilterAttribute CreateInstance(IServiceLocator serviceLocator)
         {
-            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<ActivitySource>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
+            return new OpenTelemetryHubCollectorFilter(serviceLocator.GetService<TracerProvider>(), serviceLocator.GetService<MagicOnionOpenTelemetryOptions>());
         }
     }
 
     internal class OpenTelemetryHubCollectorFilter : StreamingHubFilterAttribute
     {
-        readonly ActivitySource activitySource;
-        readonly string serviceName;
+        readonly TracerProvider tracerProvider;
+        readonly MagicOnionOpenTelemetryOptions telemetryOption;
 
-        public OpenTelemetryHubCollectorFilter(ActivitySource activitySource, MagicOnionOpenTelemetryOptions telemetryOption)
+        public OpenTelemetryHubCollectorFilter(TracerProvider tracerProvider, MagicOnionOpenTelemetryOptions telemetryOption)
         {
-            this.activitySource = activitySource;
-            this.serviceName = telemetryOption.ServiceName;
+            this.tracerProvider = tracerProvider;
+            this.telemetryOption = telemetryOption;
         }
 
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
-            // incoming kind: SERVER
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
-            using (var activity = activitySource.StartActivity($"/{context.Path}", ActivityKind.Server))
+            var tracer = tracerProvider.GetTracer($"/{context.Path}", telemetryOption.TracerVersion);
+
+            // incoming kind: SERVER
+            using (var span = tracer.StartSpan($"/{context.Path}", SpanKind.Server))
             {
                 try
                 {
-                    //todo: method 確認
-                    activity.SetTag("grpc.method", context.ServiceContext.CallContext.Method);
-                    activity.SetTag("rpc.service", serviceName);
-                    activity.SetTag("net.peer.ip", context.ServiceContext.CallContext.Peer);
-                    activity.SetTag("net.host.name", context.ServiceContext.CallContext.Host);
-                    activity.SetTag("message.type", "RECIEVED");
-                    activity.SetTag("message.id", context.ServiceContext.ContextId.ToString());
-                    activity.SetTag("message.uncompressed_size", context.Request.Length);
+                    span.SetAttribute("grpc.method", context.ServiceContext.CallContext.Method);
+                    span.SetAttribute("rpc.service", telemetryOption.ServiceName);
+                    span.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Peer);
+                    span.SetAttribute("net.host.name", context.ServiceContext.CallContext.Host);
+                    span.SetAttribute("message.type", "RECIEVED");
+                    span.SetAttribute("message.id", context.ServiceContext.ContextId.ToString());
+                    span.SetAttribute("message.uncompressed_size", context.Request.Length.ToString());
 
-                    activity.SetTag("magiconion.method.type", context.ServiceContext.MethodType.ToString());
-                    activity.SetTag("magiconion.service.type", context.ServiceContext.ServiceType.Name);
-                    activity.SetTag("magiconion.auth.enabled", !string.IsNullOrEmpty(context.ServiceContext.CallContext.AuthContext.PeerIdentityPropertyName));
-                    activity.SetTag("magiconion.auth.peer.authenticated", context.ServiceContext.CallContext.AuthContext.IsPeerAuthenticated);
+                    span.SetAttribute("magiconion.method.type", context.ServiceContext.MethodType.ToString());
+                    span.SetAttribute("magiconion.service.type", context.ServiceContext.ServiceType.Name);
+                    span.SetAttribute("magiconion.auth.enabled", (!string.IsNullOrEmpty(context.ServiceContext.CallContext.AuthContext.PeerIdentityPropertyName)).ToString());
+                    span.SetAttribute("magiconion.auth.peer.authenticated", context.ServiceContext.CallContext.AuthContext.IsPeerAuthenticated.ToString());
 
                     await next(context);
 
-                    activity.SetTag("grpc.status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                    activity.SetStatus(OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode));
+                    span.SetAttribute("grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode);
                 }
                 catch (Exception ex)
                 {
-                    activity.SetTag("exception", ex.ToString());
-                    activity.SetTag("grpc.status_code", (long)context.ServiceContext.CallContext.Status.StatusCode);
-                    activity.SetStatus(OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode));
+                    span.SetAttribute("exception", ex.ToString());
+                    span.SetAttribute("grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
+                    span.SetAttribute("grpc.status_detail", context.ServiceContext.CallContext.Status.Detail);
+                    span.Status = OpenTelemetrygRpcStatusHelper.ConvertStatus(context.ServiceContext.CallContext.Status.StatusCode);
                     throw;
                 }
             }
