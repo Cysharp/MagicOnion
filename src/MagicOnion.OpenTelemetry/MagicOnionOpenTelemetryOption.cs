@@ -18,6 +18,13 @@ namespace MagicOnion.OpenTelemetry
         /// Tracer Exporter Endpoint. Default Zipkin endpoint.
         /// </summary>
         public string TracerExporterEndpoint { get; set; } = "http://127.0.0.1:9411/api/v2/spans";
+        /// <summary>
+        /// ActivitySource Name Tracer using
+        /// </summary>
+        public string ActivitySourceName { get; set; } = Assembly.GetExecutingAssembly().GetName().Name.ToLower();
+        /// <summary>
+        /// Tracer Version to record
+        /// </summary>
         public string TracerVersion { get; set; }
     }
 

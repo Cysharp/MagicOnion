@@ -63,7 +63,13 @@ namespace MagicOnion.OpenTelemetry
             // configure TracerFactory
             if (configureTracerFactory != null)
             {
-                var tracerFactory = services.AddOpenTelemetry((provider, builder) => configureTracerFactory(options, provider, builder));
+                var tracerFactory = services.AddOpenTelemetry((provider, builder) => {
+                    if (!string.IsNullOrEmpty(options.ActivitySourceName))
+                    {
+                        builder.AddActivitySource(options.ActivitySourceName);
+                    }
+                    configureTracerFactory(options, provider, builder);
+                });
                 services.AddSingleton(tracerFactory);
             }
 
