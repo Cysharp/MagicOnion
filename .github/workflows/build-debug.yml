@@ -59,12 +59,6 @@ jobs:
     steps:
       - run: apt-get update && apt-get install git -y
       - uses: actions/checkout@v2
-      # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
-      - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
-      - uses: actions/upload-artifact@v1
-        with:
-          name: Unity_v${{ matrix.unity }}.alf
-          path: ./Unity_v${{ matrix.unity }}.alf
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
         env:
