@@ -6,11 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter.Prometheus;
-using OpenTelemetry.Metrics.Configuration;
-using OpenTelemetry.Trace.Configuration;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace ChatApp.Server
@@ -30,25 +28,27 @@ namespace ChatApp.Server
                         // open-telemetry with Prometheus exporter
                         meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
                     },
-                    (options, tracerBuilder) =>
+                    (options, provider, tracerBuilder) =>
                     {
                         // open-telemetry with Zipkin exporter
-                        tracerBuilder.UseZipkin(o =>
+                        tracerBuilder.UseZipkinExporter(o =>
                         {
                             o.ServiceName = options.ServiceName;
                             o.Endpoint = new Uri(options.TracerExporterEndpoint);
                         });
+                        // ConsoleExporter will show current tracer activity
+                        tracerBuilder.UseConsoleExporter();
                     });
                     services.AddHostedService<PrometheusExporterMetricsService>();
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var meterFactory = services.BuildServiceProvider().GetService<MeterFactory>();
+                    var meterProvider = services.BuildServiceProvider().GetService<MeterProvider>();
                     services.Configure<MagicOnionHostingOptions>(options =>
                     {
                         options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
                         options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
-                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory);
+                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider);
                     });
                 })
                 .RunConsoleAsync();
