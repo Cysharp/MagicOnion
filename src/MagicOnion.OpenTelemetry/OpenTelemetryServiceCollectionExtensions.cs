@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Resources;
 
 namespace MagicOnion.OpenTelemetry
 {
@@ -11,21 +12,21 @@ namespace MagicOnion.OpenTelemetry
     public static class OpenTelemetryServiceCollectionExtensions
     {
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
             string configurationName = "")
         {
             var options = BindMagicOnionOpenTelemetryOptions(services, configurationName);
             return AddMagicOnionOpenTelemetry(services, options);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
             MagicOnionOpenTelemetryOptions options)
         {
             return AddMagicOnionOpenTelemetry(services, options, null, null);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
+            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory,
             Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerFactory,
             string configurationName = "")
         {
@@ -33,13 +34,12 @@ namespace MagicOnion.OpenTelemetry
             return AddMagicOnionOpenTelemetry(services, options, configureMeterFactory, configureTracerFactory);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
-            MagicOnionOpenTelemetryOptions options, 
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterProvider, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
+            MagicOnionOpenTelemetryOptions options,
+            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterProvider,
             Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerFactory)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            if (string.IsNullOrEmpty(options.ServiceName)) throw new ArgumentNullException($"{nameof(options)}.{nameof(options.ServiceName)}");
 
             services.AddSingleton(options);
 
@@ -63,11 +63,15 @@ namespace MagicOnion.OpenTelemetry
             // configure TracerFactory
             if (configureTracerFactory != null)
             {
-                var tracerFactory = services.AddOpenTelemetry((provider, builder) => {
-                    if (!string.IsNullOrEmpty(options.ActivitySourceName))
-                    {
-                        builder.AddActivitySource(options.ActivitySourceName);
-                    }
+                if (string.IsNullOrEmpty(options.ActivitySourceName))
+                {
+                    throw new NullReferenceException(nameof(options.ActivitySourceName));
+                }
+
+                var tracerFactory = services.AddOpenTelemetry((provider, builder) =>
+                {
+                    // ActivitySourceName must match to TracerName.
+                    builder.AddActivitySource(options.ActivitySourceName);
                     configureTracerFactory(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);

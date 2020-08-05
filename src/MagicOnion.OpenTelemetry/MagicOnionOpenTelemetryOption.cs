@@ -9,7 +9,7 @@ namespace MagicOnion.OpenTelemetry
         /// <summary>
         /// Service Name for the app. default is Assembly name.
         /// </summary>
-        public string ServiceName { get; set; } = Assembly.GetExecutingAssembly().GetName().Name;
+        public string ServiceName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
         /// <summary>
         /// Metrics Exporter Endpoint. Default Prometheus endpoint.
         /// </summary>
@@ -21,7 +21,7 @@ namespace MagicOnion.OpenTelemetry
         /// <summary>
         /// ActivitySource Name Tracer using
         /// </summary>
-        public string ActivitySourceName { get; set; } = Assembly.GetExecutingAssembly().GetName().Name.ToLower();
+        public string ActivitySourceName { get; set; } = Assembly.GetEntryAssembly().GetName().Name.ToLower();
         /// <summary>
         /// Tracer Version to record
         /// </summary>
