@@ -33,7 +33,7 @@ namespace ChatApp.Server
                         // open-telemetry with Zipkin exporter
                         tracerBuilder.UseZipkinExporter(o =>
                         {
-                            o.ServiceName = options.ServiceName;
+                            o.ServiceName = "ChatApp.Server";
                             o.Endpoint = new Uri(options.TracerExporterEndpoint);
                         });
                         // ConsoleExporter will show current tracer activity

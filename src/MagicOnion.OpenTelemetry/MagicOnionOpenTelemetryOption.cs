@@ -7,10 +7,6 @@ namespace MagicOnion.OpenTelemetry
     public class MagicOnionOpenTelemetryOptions
     {
         /// <summary>
-        /// Service Name for the app. default is Assembly name.
-        /// </summary>
-        public string ServiceName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
-        /// <summary>
         /// Metrics Exporter Endpoint. Default Prometheus endpoint.
         /// </summary>
         public string MetricsExporterEndpoint { get; set; } = "http://127.0.0.1:9181/metrics/";
