@@ -1,10 +1,10 @@
 global:
-  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/IncomingWebhookEndpoint'
+  slack_api_url: "https://hooks.slack.com/services/YOUR/SLACK/IncomingWebhookEndpoint"
 
 route:
-  receiver: 'slack'
+  receiver: "slack"
 
 receivers:
-  - name: 'slack'
+  - name: "slack"
     slack_configs:
-    - channel: '#alerts'
+      - channel: "#alerts"

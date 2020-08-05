@@ -2,7 +2,9 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
+#if UNITY_IPHONE
 using UnityEditor.iOS.Xcode;
+#endif
 
 public static class UnityCloudBuildConfiguration
 {
