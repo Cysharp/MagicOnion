@@ -17,6 +17,7 @@
     <PackageId>MagicOnion.OpenTelemetry</PackageId>
     <Description>Telemetry Extensions of MagicOnion.</Description>
     <PackageTags>$(PackageTags);OpenTelemetry</PackageTags>
+    <VersionSuffix>beta</VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
