@@ -36,7 +36,7 @@ namespace MagicOnion.OpenTelemetry
         public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
             MagicOnionOpenTelemetryOptions options,
             Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterProvider,
-            Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerFactory)
+            Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerProvider)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
@@ -60,7 +60,7 @@ namespace MagicOnion.OpenTelemetry
             }
 
             // configure TracerFactory
-            if (configureTracerFactory != null)
+            if (configureTracerProvider != null)
             {
                 if (string.IsNullOrEmpty(options.ActivitySourceName))
                 {
@@ -71,7 +71,7 @@ namespace MagicOnion.OpenTelemetry
                 {
                     // ActivitySourceName must match to TracerName.
                     builder.AddActivitySource(options.ActivitySourceName);
-                    configureTracerFactory(options, provider, builder);
+                    configureTracerProvider(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);
             }
