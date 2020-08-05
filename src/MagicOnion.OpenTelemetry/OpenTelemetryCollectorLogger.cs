@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;

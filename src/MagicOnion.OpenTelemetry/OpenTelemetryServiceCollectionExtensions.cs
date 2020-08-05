@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Resources;
 
 namespace MagicOnion.OpenTelemetry
 {

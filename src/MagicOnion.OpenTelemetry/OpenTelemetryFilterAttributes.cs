@@ -1,9 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Trace;
 
 namespace MagicOnion.OpenTelemetry
