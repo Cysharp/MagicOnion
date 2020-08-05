@@ -17,7 +17,7 @@
     <PackageId>MagicOnion.OpenTelemetry</PackageId>
     <Description>Telemetry Extensions of MagicOnion.</Description>
     <PackageTags>$(PackageTags);OpenTelemetry</PackageTags>
-    <VersionSuffix>beta.0402</VersionSuffix>
+    <VersionSuffix>beta.402.0</VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
