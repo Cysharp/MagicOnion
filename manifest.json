@@ -1665,7 +1665,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html",
-          "hash": "LM65W+sZp9cIHpjchUau5Q=="
+          "hash": "PYGIWuI6YVYvnIGnMJDDYA=="
         }
       },
       "is_incremental": false,
@@ -1689,7 +1689,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html",
-          "hash": "mTXXqGUby95YDLOOUyvRvA=="
+          "hash": "Ihxg2S2raL4P4HP4EEbqiA=="
         }
       },
       "is_incremental": false,
@@ -1713,7 +1713,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html",
-          "hash": "ZL2VNxRF+1N+30lLn7IB2A=="
+          "hash": "tj9YDHuf/bnwd0AXbynIgA=="
         }
       },
       "is_incremental": false,
