@@ -45,7 +45,7 @@ namespace MagicOnion.OpenTelemetry
             {
                 try
                 {
-                    span.SetAttribute("grpc.method", "Unary");
+                    span.SetAttribute("grpc.method", context.MethodType.ToString());
                     span.SetAttribute("rpc.service", telemetryOption.ServiceName);
                     span.SetAttribute("rpc.method", context.CallContext.Method);
                     span.SetAttribute("net.peer.ip", context.CallContext.Peer);
@@ -113,7 +113,7 @@ namespace MagicOnion.OpenTelemetry
             {
                 try
                 {
-                    span.SetAttribute("grpc.method", "Duplex");
+                    span.SetAttribute("grpc.method", context.ServiceContext.MethodType.ToString());
                     span.SetAttribute("rpc.service", telemetryOption.ServiceName);
                     span.SetAttribute("rpc.method", $"/{context.Path}");
                     span.SetAttribute("net.peer.ip", context.ServiceContext.CallContext.Peer);
