@@ -122,6 +122,15 @@ jobs:
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      # Upload to Releases(generator)
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./moc.${{ env.GIT_TAG }}.zip/moc.${{ env.GIT_TAG }}.zip
+          asset_name: moc.${{ env.GIT_TAG }}.zip
+          asset_content_type: application/octet-stream
       # Upload to Releases(unitypackage)
       - uses: actions/upload-release-asset@v1
         env:
