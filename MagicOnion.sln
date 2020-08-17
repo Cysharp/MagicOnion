@@ -75,6 +75,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthApp.Client", "sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server.Telemetry", "samples\ChatApp\ChatApp.Server.Telemetry\ChatApp.Server.Telemetry.csproj", "{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Generator.Tests", "tests\MagicOnion.Generator.Tests\MagicOnion.Generator.Tests.csproj", "{E5415D78-63D2-4573-BA53-E923506A9C30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,6 +171,10 @@ Global
 		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5415D78-63D2-4573-BA53-E923506A9C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5415D78-63D2-4573-BA53-E923506A9C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5415D78-63D2-4573-BA53-E923506A9C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5415D78-63D2-4573-BA53-E923506A9C30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -198,6 +204,7 @@ Global
 		{38B41013-6FD3-4E99-A7A9-0DBAC0CAF6F5} = {EBF51D3A-A093-4177-865A-D17F816EDEF5}
 		{5948D82F-EA56-4266-8718-7508C26BFFD4} = {EBF51D3A-A093-4177-865A-D17F816EDEF5}
 		{59C571F4-DC3E-4BD4-BA0F-4B353C545A4B} = {FEE2B9AB-A1D0-41BA-A172-FC95935542DF}
+		{E5415D78-63D2-4573-BA53-E923506A9C30} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
