@@ -43,7 +43,14 @@ namespace TempProject
             ");
 
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(tempWorkspace.CsProjectPath, tempWorkspace.OutputDirectory, true, "TempProject.Generated", "");
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
 
             var compilation = tempWorkspace.GetOutputCompilation();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
@@ -75,7 +82,14 @@ namespace TempProject
             ");
 
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(tempWorkspace.CsProjectPath, tempWorkspace.OutputDirectory, true, "TempProject.Generated", "");
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
 
             var compilation = tempWorkspace.GetOutputCompilation();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
@@ -106,7 +120,14 @@ namespace TempProject
             ");
 
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(tempWorkspace.CsProjectPath, tempWorkspace.OutputDirectory, true, "TempProject.Generated", "");
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
 
             var compilation = tempWorkspace.GetOutputCompilation();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
@@ -137,7 +158,14 @@ namespace TempProject
             ");
 
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(tempWorkspace.CsProjectPath, tempWorkspace.OutputDirectory, true, "TempProject.Generated", "");
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
 
             var compilation = tempWorkspace.GetOutputCompilation();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
