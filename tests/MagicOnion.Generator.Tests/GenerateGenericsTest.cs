@@ -406,5 +406,165 @@ namespace TempProject
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>",
             });
         }
+
+        [Fact]
+        public async Task ListFormatter_KnownType()
+        {
+            using var tempWorkspace = TemporaryProjectWorkarea.Create();
+            tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<List<string>> GetStringValuesAsync();
+        UnaryResult<List<int>> GetIntValuesAsync();
+    }
+}
+            ");
+
+            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
+
+            var compilation = tempWorkspace.GetOutputCompilation();
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+            {
+                "global::MessagePack.Formatters.ListFormatter<string>",
+                "global::MessagePack.Formatters.ListFormatter<int>"
+            });
+        }
+
+        [Fact]
+        public async Task ListFormatter_UserType()
+        {
+            using var tempWorkspace = TemporaryProjectWorkarea.Create();
+            tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<List<MyResponse>> GetValuesAsync();
+    }
+    public class MyResponse
+    {
+    }
+}
+            ");
+
+            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
+
+            var compilation = tempWorkspace.GetOutputCompilation();
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+            {
+                "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
+            });
+        }
+
+        [Fact]
+        public async Task ArrayFormatter_KnownType()
+        {
+            using var tempWorkspace = TemporaryProjectWorkarea.Create();
+            tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<string[]> GetStringValuesAsync();
+        UnaryResult<int[]> GetIntValuesAsync();
+        UnaryResult<Int32[]> GetInt32ValuesAsync();
+        UnaryResult<float[]> GetSingleValuesAsync();
+        UnaryResult<bool[]> GetBooleanValuesAsync();
+    }
+}
+            ");
+
+            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
+
+            var compilation = tempWorkspace.GetOutputCompilation();
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+            compilation.GetResolverKnownFormatterTypes().Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ArrayFormatter_UserType()
+        {
+            using var tempWorkspace = TemporaryProjectWorkarea.Create();
+            tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<MyResponse[]> GetValuesAsync();
+    }
+
+    public class MyResponse
+    {
+    }
+}
+            ");
+
+            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
+
+            var compilation = tempWorkspace.GetOutputCompilation();
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+            {
+                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyResponse>"
+            });
+        }
     }
 }
