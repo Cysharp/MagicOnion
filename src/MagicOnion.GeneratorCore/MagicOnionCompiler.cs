@@ -297,7 +297,7 @@ namespace MagicOnion
                 TraverseTypes(method.UnwrappedOriginalResposneTypeSymbol, genericInfos, enumInfos, messagePackGeneratedNamespace);
 
                 // paramter type
-                foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type).OfType<INamedTypeSymbol>())
+                foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type))
                 {
                     TraverseTypes(p, genericInfos, enumInfos, messagePackGeneratedNamespace);
                 }
@@ -388,7 +388,7 @@ namespace MagicOnion
                     genericInfos.Add(genericInfo);
 
                     // Recursively scan generic-types
-                    foreach (var typeArg in namedTypeSymbol.TypeArguments.OfType<ITypeSymbol>())
+                    foreach (var typeArg in namedTypeSymbol.TypeArguments)
                     {
                         TraverseTypes(typeArg, genericInfos, enumInfos, messagePackGeneratedNamespace);
                     }
