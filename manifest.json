@@ -969,7 +969,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.Program.html",
-          "hash": "ugJpBI/BBY/igePXNEHlGA=="
+          "hash": "RoNkzXWYR6Prr/klvv1+dA=="
         }
       },
       "is_incremental": false,
@@ -1581,7 +1581,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html",
-          "hash": "D2+tt1JyMymQkobemCZIsA=="
+          "hash": "Sva+Jf0/LzOn49dluuPEjw=="
         }
       },
       "is_incremental": false,
@@ -1605,7 +1605,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MagicOnionCompiler.html",
-          "hash": "jli3zAhYucH80cZXhFTEZg=="
+          "hash": "cE2SnmPHKZp2cb9x9Je6pQ=="
         }
       },
       "is_incremental": false,

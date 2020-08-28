@@ -6828,12 +6828,12 @@ references:
   commentId: T:MagicOnion.Generator.Program
   fullName: MagicOnion.Generator.Program
   nameWithType: Program
-- uid: MagicOnion.Generator.Program.RunAsync(System.String,System.String,System.Boolean,System.String,System.String)
-  name: RunAsync(String, String, Boolean, String, String)
-  href: api/MagicOnion.Generator.Program.html#MagicOnion_Generator_Program_RunAsync_System_String_System_String_System_Boolean_System_String_System_String_
-  commentId: M:MagicOnion.Generator.Program.RunAsync(System.String,System.String,System.Boolean,System.String,System.String)
-  fullName: MagicOnion.Generator.Program.RunAsync(System.String, System.String, System.Boolean, System.String, System.String)
-  nameWithType: Program.RunAsync(String, String, Boolean, String, String)
+- uid: MagicOnion.Generator.Program.RunAsync(System.String,System.String,System.Boolean,System.String,System.String,System.String)
+  name: RunAsync(String, String, Boolean, String, String, String)
+  href: api/MagicOnion.Generator.Program.html#MagicOnion_Generator_Program_RunAsync_System_String_System_String_System_Boolean_System_String_System_String_System_String_
+  commentId: M:MagicOnion.Generator.Program.RunAsync(System.String,System.String,System.Boolean,System.String,System.String,System.String)
+  fullName: MagicOnion.Generator.Program.RunAsync(System.String, System.String, System.Boolean, System.String, System.String, System.String)
+  nameWithType: Program.RunAsync(String, String, Boolean, String, String, String)
 - uid: MagicOnion.Generator.Program.RunAsync*
   name: RunAsync
   href: api/MagicOnion.Generator.Program.html#MagicOnion_Generator_Program_RunAsync_
@@ -9687,12 +9687,12 @@ references:
   isSpec: "True"
   fullName: MagicOnion.MagicOnionCompiler.MagicOnionCompiler
   nameWithType: MagicOnionCompiler.MagicOnionCompiler
-- uid: MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String,System.String,System.Boolean,System.String,System.String)
-  name: GenerateFileAsync(String, String, Boolean, String, String)
-  href: api/MagicOnion.MagicOnionCompiler.html#MagicOnion_MagicOnionCompiler_GenerateFileAsync_System_String_System_String_System_Boolean_System_String_System_String_
-  commentId: M:MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String,System.String,System.Boolean,System.String,System.String)
-  fullName: MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String, System.String, System.Boolean, System.String, System.String)
-  nameWithType: MagicOnionCompiler.GenerateFileAsync(String, String, Boolean, String, String)
+- uid: MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String,System.String,System.Boolean,System.String,System.String,System.String)
+  name: GenerateFileAsync(String, String, Boolean, String, String, String)
+  href: api/MagicOnion.MagicOnionCompiler.html#MagicOnion_MagicOnionCompiler_GenerateFileAsync_System_String_System_String_System_Boolean_System_String_System_String_System_String_
+  commentId: M:MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String,System.String,System.Boolean,System.String,System.String,System.String)
+  fullName: MagicOnion.MagicOnionCompiler.GenerateFileAsync(System.String, System.String, System.Boolean, System.String, System.String, System.String)
+  nameWithType: MagicOnionCompiler.GenerateFileAsync(String, String, Boolean, String, String, String)
 - uid: MagicOnion.MagicOnionCompiler.GenerateFileAsync*
   name: GenerateFileAsync
   href: api/MagicOnion.MagicOnionCompiler.html#MagicOnion_MagicOnionCompiler_GenerateFileAsync_
@@ -9877,6 +9877,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.Input
   nameWithType: MagicOnionGenerator.Input
+- uid: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace
+  name: MessagePackGeneratedNamespace
+  href: api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html#MagicOnion_MSBuild_Tasks_MagicOnionGenerator_MessagePackGeneratedNamespace
+  commentId: P:MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace
+  fullName: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace
+  nameWithType: MagicOnionGenerator.MessagePackGeneratedNamespace
+- uid: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace*
+  name: MessagePackGeneratedNamespace
+  href: api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html#MagicOnion_MSBuild_Tasks_MagicOnionGenerator_MessagePackGeneratedNamespace_
+  commentId: Overload:MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace
+  isSpec: "True"
+  fullName: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.MessagePackGeneratedNamespace
+  nameWithType: MagicOnionGenerator.MessagePackGeneratedNamespace
 - uid: MagicOnion.MSBuild.Tasks.MagicOnionGenerator.Namespace
   name: Namespace
   href: api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html#MagicOnion_MSBuild_Tasks_MagicOnionGenerator_Namespace
