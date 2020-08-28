@@ -383,7 +383,7 @@ namespace MagicOnion
                     var genericInfo = new GenericSerializationInfo
                     {
                         FormatterName = $"{formatterFullName}()",
-                        FullName = formatterFullName,
+                        FullName = namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     };
                     genericInfos.Add(genericInfo);
 
