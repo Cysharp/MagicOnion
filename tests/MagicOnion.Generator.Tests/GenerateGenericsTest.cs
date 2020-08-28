@@ -408,6 +408,52 @@ namespace TempProject
         }
 
         [Fact]
+        public async Task Return_Nested_Array()
+        {
+            using var tempWorkspace = TemporaryProjectWorkarea.Create();
+            tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<MyGenericObject<MyNestedGenericObject[]>> GetValuesAsync();
+    }
+
+    public class MyGenericObject<T>
+    {
+    }
+
+    public class MyNestedGenericObject
+    {
+    }
+}
+            ");
+
+            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                tempWorkspace.OutputDirectory,
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters"
+            );
+
+            var compilation = tempWorkspace.GetOutputCompilation();
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+            {
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyNestedGenericObject[]>",
+                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyNestedGenericObject>"
+            });
+        }
+
+        [Fact]
         public async Task ListFormatter_KnownType()
         {
             using var tempWorkspace = TemporaryProjectWorkarea.Create();

@@ -388,7 +388,7 @@ namespace MagicOnion
                     genericInfos.Add(genericInfo);
 
                     // Recursively scan generic-types
-                    foreach (var typeArg in namedTypeSymbol.TypeArguments.OfType<INamedTypeSymbol>())
+                    foreach (var typeArg in namedTypeSymbol.TypeArguments.OfType<ITypeSymbol>())
                     {
                         TraverseTypes(typeArg, genericInfos, enumInfos, messagePackGeneratedNamespace);
                     }
