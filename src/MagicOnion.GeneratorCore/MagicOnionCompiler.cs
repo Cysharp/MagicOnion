@@ -294,8 +294,7 @@ namespace MagicOnion
             {
                 if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
 
-                var namedResponse = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
-                TraverseTypes(namedResponse, genericInfos, enumInfos, messagePackGeneratedNamespace);
+                TraverseTypes(method.UnwrappedOriginalResposneTypeSymbol, genericInfos, enumInfos, messagePackGeneratedNamespace);
 
                 // paramter type
                 foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type).OfType<INamedTypeSymbol>())
@@ -325,11 +324,13 @@ namespace MagicOnion
             enumInfoResults = enumInfos.Distinct().ToArray();
         }
 
-        static void TraverseTypes(INamedTypeSymbol namedTypeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace)
+        static void TraverseTypes(ITypeSymbol typeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace)
         {
-            if (namedTypeSymbol.TypeKind == TypeKind.Array)
+            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+
+            if (typeSymbol.TypeKind == TypeKind.Array)
             {
-                var array = namedTypeSymbol as IArrayTypeSymbol;
+                var array = (IArrayTypeSymbol)typeSymbol;
                 if (embeddedTypes.Contains(array.ToString())) return;
                 MakeArray(array, genericInfos);
                 if (array.ElementType.TypeKind == TypeKind.Enum)
@@ -337,11 +338,11 @@ namespace MagicOnion
                     MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
                 }
             }
-            else if (namedTypeSymbol.TypeKind == TypeKind.Enum)
+            else if (typeSymbol.TypeKind == TypeKind.Enum)
             {
                 MakeEnum(namedTypeSymbol, enumInfos);
             }
-            else if (namedTypeSymbol.IsGenericType)
+            else if (namedTypeSymbol != null && namedTypeSymbol.IsGenericType)
             {
                 var genericType = namedTypeSymbol.ConstructUnboundGenericType();
                 var genericTypeString = genericType.ToDisplayString();
