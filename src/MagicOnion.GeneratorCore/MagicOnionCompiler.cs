@@ -32,7 +32,8 @@ namespace MagicOnion
             string output,
             bool unuseUnityAttr,
             string @namespace,
-            string conditionalSymbol)
+            string conditionalSymbol,
+            string messagePackGeneratedNamespace)
         {
             // Prepare args
             var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
@@ -55,9 +56,9 @@ namespace MagicOnion
 
             GenericSerializationInfo[] genericInfos;
             EnumSerializationInfo[] enumInfos;
-            ExtractResolverInfo(definitions, out genericInfos, out enumInfos);
-            ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2);
-            ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3);
+            ExtractResolverInfo(definitions, out genericInfos, out enumInfos, messagePackGeneratedNamespace);
+            ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2, messagePackGeneratedNamespace);
+            ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3, messagePackGeneratedNamespace);
             enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
             genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
 
@@ -284,7 +285,7 @@ namespace MagicOnion
             {"System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter<TREPLACE>()"},
         };
 
-        static void ExtractResolverInfo(InterfaceDefinition[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults)
+        static void ExtractResolverInfo(InterfaceDefinition[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults, string messagePackGeneratedNamespace)
         {
             var genericInfos = new List<GenericSerializationInfo>();
             var enumInfos = new List<EnumSerializationInfo>();
@@ -294,91 +295,12 @@ namespace MagicOnion
                 if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
 
                 var namedResponse = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
-
-                if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
-                {
-                    var array = method.UnwrappedOriginalResposneTypeSymbol as IArrayTypeSymbol;
-                    if (!embeddedTypes.Contains(array.ToString()))
-                    {
-                        MakeArray(array, genericInfos);
-                        if (array.ElementType.TypeKind == TypeKind.Enum)
-                        {
-                            MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
-                        }
-                    }
-                }
-                else if (method.UnwrappedOriginalResposneTypeSymbol.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
-                {
-                    var enumType = method.UnwrappedOriginalResposneTypeSymbol as INamedTypeSymbol;
-                    MakeEnum(enumType, enumInfos);
-                }
-                else if (namedResponse != null && namedResponse.IsGenericType)
-                {
-                    // generic type handling
-                    var genericType = namedResponse.ConstructUnboundGenericType();
-                    var genericTypeString = genericType.ToDisplayString();
-                    var fullName = namedResponse.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    string formatterString;
-
-                    if (genericTypeString == "T?")
-                    {
-                        var more = namedResponse.TypeArguments[0];
-                        if (more.TypeKind == TypeKind.Enum)
-                        {
-                            MakeEnum(more as INamedTypeSymbol, enumInfos);
-                        }
-
-                        MakeNullable(namedResponse, genericInfos);
-                    }
-                    else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out formatterString))
-                    {
-                        MakeGeneric(namedResponse, formatterString, genericInfos);
-                    }
-                }
+                TraverseTypes(namedResponse, genericInfos, enumInfos, messagePackGeneratedNamespace);
 
                 // paramter type
-                foreach (var p in method.Parameters)
+                foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type).OfType<INamedTypeSymbol>())
                 {
-                    namedResponse = p.OriginalSymbol.Type as INamedTypeSymbol;
-
-                    if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Array)
-                    {
-                        var array = p.OriginalSymbol.Type as IArrayTypeSymbol;
-                        if (embeddedTypes.Contains(array.ToString())) continue;
-                        MakeArray(array, genericInfos);
-                        if (array.ElementType.TypeKind == TypeKind.Enum)
-                        {
-                            MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
-                        }
-                    }
-                    else if (p.OriginalSymbol.Type.TypeKind == Microsoft.CodeAnalysis.TypeKind.Enum)
-                    {
-                        var enumType = p.OriginalSymbol.Type as INamedTypeSymbol;
-                        MakeEnum(enumType, enumInfos);
-                    }
-                    else if (namedResponse != null && namedResponse.IsGenericType)
-                    {
-                        // generic type handling
-                        var genericType = namedResponse.ConstructUnboundGenericType();
-                        var genericTypeString = genericType.ToDisplayString();
-                        var fullName = namedResponse.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                        string formatterString;
-
-                        if (genericTypeString == "T?")
-                        {
-                            var more = namedResponse.TypeArguments[0];
-                            if (more.TypeKind == TypeKind.Enum)
-                            {
-                                MakeEnum(more as INamedTypeSymbol, enumInfos);
-                            }
-
-                            MakeNullable(namedResponse, genericInfos);
-                        }
-                        else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out formatterString))
-                        {
-                            MakeGeneric(namedResponse, formatterString, genericInfos);
-                        }
-                    }
+                    TraverseTypes(p, genericInfos, enumInfos, messagePackGeneratedNamespace);
                 }
 
                 if (method.Parameters.Length > 1)
@@ -401,6 +323,76 @@ namespace MagicOnion
 
             genericInfoResults = genericInfos.Distinct().ToArray();
             enumInfoResults = enumInfos.Distinct().ToArray();
+        }
+
+        static void TraverseTypes(INamedTypeSymbol namedTypeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace)
+        {
+            if (namedTypeSymbol.TypeKind == TypeKind.Array)
+            {
+                var array = namedTypeSymbol as IArrayTypeSymbol;
+                if (embeddedTypes.Contains(array.ToString())) return;
+                MakeArray(array, genericInfos);
+                if (array.ElementType.TypeKind == TypeKind.Enum)
+                {
+                    MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                }
+            }
+            else if (namedTypeSymbol.TypeKind == TypeKind.Enum)
+            {
+                MakeEnum(namedTypeSymbol, enumInfos);
+            }
+            else if (namedTypeSymbol.IsGenericType)
+            {
+                var genericType = namedTypeSymbol.ConstructUnboundGenericType();
+                var genericTypeString = genericType.ToDisplayString();
+
+                if (genericTypeString == "T?")
+                {
+                    // Nullable<T> (T?)
+                    var more = namedTypeSymbol.TypeArguments[0];
+                    if (more.TypeKind == TypeKind.Enum)
+                    {
+                        MakeEnum(more as INamedTypeSymbol, enumInfos);
+                    }
+
+                    MakeNullable(namedTypeSymbol, genericInfos);
+                }
+                else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out var formatterString))
+                {
+                    // Well-known generic type.
+                    // System.Collections.Generic.List<T> ...
+                    MakeGenericWellKnown(namedTypeSymbol, formatterString, genericInfos);
+                }
+                else
+                {
+                    // User-defined generic type.
+                    // The object formatter is generated by MessagePack.Generator
+
+                    // MyProject.MyClass<T> --> global::MessagePack.Formatters.MyProject.MyClassFormatter<T>
+                    // MyProject.MyClass<T1, T2> --> global::MessagePack.Formatters.MyProject.MyClassFormatter<T1, T2>
+                    //     MyProject.MyClass<MyObject> --> global::MessagePack.Generated.MyProject.MyClassFormatter<global::MyProject.MyObject>
+                    //     MyProject.MyClass<MyObject, OtherObject> --> global::MessagePack.Generated.MyProject.MyClassFormatter<global::MyProject.MyObject, global::MyProject.OtherObject>
+                    //         global::{MessagePackGeneratedNamespace}.{Namespace}.{ClassName}Formatter<{TypeArgs}>
+
+                    var typeNamespace = namedTypeSymbol.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Replace("global::", "");
+                    var typeName = namedTypeSymbol.Name;
+                    var typeArgs = string.Join(", ", namedTypeSymbol.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)).ToArray());
+                    var formatterFullName =
+                        $"global::{(string.IsNullOrWhiteSpace(messagePackGeneratedNamespace) ? "" : messagePackGeneratedNamespace + ".")}{(string.IsNullOrWhiteSpace(typeNamespace) ? "" : typeNamespace + ".")}{typeName}Formatter<{typeArgs}>";
+                    var genericInfo = new GenericSerializationInfo
+                    {
+                        FormatterName = $"{formatterFullName}()",
+                        FullName = formatterFullName,
+                    };
+                    genericInfos.Add(genericInfo);
+
+                    // Recursively scan generic-types
+                    foreach (var typeArg in namedTypeSymbol.TypeArguments.OfType<INamedTypeSymbol>())
+                    {
+                        TraverseTypes(typeArg, genericInfos, enumInfos, messagePackGeneratedNamespace);
+                    }
+                }
+            }
         }
 
         static void MakeArray(IArrayTypeSymbol array, List<GenericSerializationInfo> list)
@@ -435,7 +427,7 @@ namespace MagicOnion
             list.Add(info);
         }
 
-        static void MakeGeneric(INamedTypeSymbol type, string formatterTemplate, List<GenericSerializationInfo> list)
+        static void MakeGenericWellKnown(INamedTypeSymbol type, string formatterTemplate, List<GenericSerializationInfo> list)
         {
             var typeArgs = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
             var f = formatterTemplate.Replace("TREPLACE", typeArgs);
