@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using System.Diagnostics;
 
 namespace MagicOnion.OpenTelemetry
 {
@@ -73,6 +74,7 @@ namespace MagicOnion.OpenTelemetry
                     configureTracerProvider(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);
+                services.AddSingleton(new ActivitySource(options.ActivitySourceName));
             }
 
             return services;
