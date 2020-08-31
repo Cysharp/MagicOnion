@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter.Prometheus;
+using OpenTelemetry.Exporter.Zipkin;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using System;
@@ -31,13 +32,13 @@ namespace ChatApp.Server
                     (options, provider, tracerBuilder) =>
                     {
                         // open-telemetry with Zipkin exporter
-                        tracerBuilder.UseZipkinExporter(o =>
+                        tracerBuilder.AddZipkinExporter(o =>
                         {
                             o.ServiceName = "ChatApp.Server";
                             o.Endpoint = new Uri(options.TracerExporterEndpoint);
                         });
                         // ConsoleExporter will show current tracer activity
-                        tracerBuilder.UseConsoleExporter();
+                        //tracerBuilder.AddConsoleExporter();
                     });
                     services.AddHostedService<PrometheusExporterMetricsService>();
                 })
@@ -46,8 +47,8 @@ namespace ChatApp.Server
                     var meterProvider = services.BuildServiceProvider().GetService<MeterProvider>();
                     services.Configure<MagicOnionHostingOptions>(options =>
                     {
-                        options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
-                        options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
+                        options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
+                        options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
                         options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider);
                     });
                 })

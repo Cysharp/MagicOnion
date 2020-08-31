@@ -48,12 +48,11 @@ namespace MagicOnion.OpenTelemetry
                 var meterFactoryOption = new MagicOnionOpenTelemetryMeterFactoryOption();
                 configureMeterProvider(options, meterFactoryOption);
 
-                MeterProvider.SetDefault(Sdk.CreateMeterProvider(builder =>
-                {
-                    builder.SetMetricProcessor(meterFactoryOption.MetricProcessor);
-                    builder.SetMetricExporter(meterFactoryOption.MetricExporter);
-                    builder.SetMetricPushInterval(meterFactoryOption.MetricPushInterval);
-                }));
+                MeterProvider.SetDefault(Sdk.CreateMeterProviderBuilder()
+                    .SetProcessor(meterFactoryOption.MetricProcessor)
+                    .SetExporter(meterFactoryOption.MetricExporter)
+                    .SetPushInterval(meterFactoryOption.MetricPushInterval)
+                    .Build());
 
                 services.AddSingleton(meterFactoryOption.MetricExporter);
                 services.AddSingleton(MeterProvider.Default);
@@ -67,10 +66,10 @@ namespace MagicOnion.OpenTelemetry
                     throw new NullReferenceException(nameof(options.ActivitySourceName));
                 }
 
-                var tracerFactory = services.AddOpenTelemetry((provider, builder) =>
+                var tracerFactory = services.AddOpenTelemetryTracerProvider((provider, builder) =>
                 {
                     // ActivitySourceName must match to TracerName.
-                    builder.AddActivitySource(options.ActivitySourceName);
+                    builder.AddSource(options.ActivitySourceName);
                     configureTracerProvider(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);
