@@ -1,20 +1,6 @@
 version: "3"
 
 services:
-  magiconion:
-    build:
-      context: .
-      dockerfile: ./ChatApp.Server.Telemetry/Dockerfile
-    ports:
-      - 12345:12345
-      - 9184:9184
-    environment:
-      - DOTNET_ENVIRONMENT=Development
-      - MagicOnion__ServerPorts__0__Host=0.0.0.0
-      - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
-      - MagicOnion__OpenTelemetry__TracerExporterEndpoint=http://zipkin:9411/api/v2/spans
-      - MagicOnion__OpenTelemetry__PrometheusMetricsHostingEndpoint=http://+:9184/metrics/
-
   prometheus:
     image: prom/prometheus:v2.11.1
     volumes:

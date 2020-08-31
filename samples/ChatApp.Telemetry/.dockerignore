@@ -6,6 +6,7 @@ obj/
 **/.env
 **/.git
 **/.gitignore
+**/.gitattributes
 **/.vs
 **/.vscode
 **/*.*proj.user
