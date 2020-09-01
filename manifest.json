@@ -1673,11 +1673,23 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.yml",
+      "source_relative_path": "api/MagicOnion.OpenTelemetry.MagicOnionTelemetry.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html",
-          "hash": "6RTNvGW5PxjrjrbXAeB0Cw=="
+          "relative_path": "api/MagicOnion.OpenTelemetry.MagicOnionTelemetry.html",
+          "hash": "2pH8Pgo3a3NVBZ2uVFGPUw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html",
+          "hash": "tBU/WcAbTdt35ccyuOH4Fw=="
         }
       },
       "is_incremental": false,
@@ -1697,11 +1709,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.yml",
+      "source_relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html",
-          "hash": "bsA7U5TIEq8xZE4w0Cz6Hg=="
+          "relative_path": "api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html",
+          "hash": "jFLoPkU7s9Jh7y3QbaYnCw=="
         }
       },
       "is_incremental": false,
@@ -1737,7 +1749,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.OpenTelemetry.html",
-          "hash": "/geHyRsfZN8i5BhWZk3b8Q=="
+          "hash": "ZaT4+qc6U9vpCAIk5KzUog=="
         }
       },
       "is_incremental": false,
@@ -2253,7 +2265,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubContext.html",
-          "hash": "Qwu9MpNQxHX0NjWQ4ZizBA=="
+          "hash": "Nt5azkcTQQJeGYz/Iz0xEg=="
         }
       },
       "is_incremental": false,
@@ -2565,7 +2577,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServiceContext.html",
-          "hash": "lZv2rwLiWNz9pCT3YsFpwg=="
+          "hash": "Ho8hJAEzAQHLnAjXSZQngg=="
         }
       },
       "is_incremental": false,
@@ -2578,6 +2590,30 @@
         ".html": {
           "relative_path": "api/MagicOnion.Server.ServiceContextAuthenticationExtensions.html",
           "hash": "8+1EnZopx3hBwonpdVZtWw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.ServiceContextTelemetryExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.ServiceContextTelemetryExtensions.html",
+          "hash": "LlGsKdgK53l+aEJfuK7BOg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.StreamingHubContextTelemetryExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.StreamingHubContextTelemetryExtensions.html",
+          "hash": "8lxZKpFRyn8/XdW34GxtOw=="
         }
       },
       "is_incremental": false,
@@ -2601,7 +2637,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.html",
-          "hash": "X0DifIsLP0r/HPrZfZ/e+w=="
+          "hash": "5CWneiGImFC+Q/OX+cY1zw=="
         }
       },
       "is_incremental": false,
@@ -2769,7 +2805,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "9FALNbm6fy8+rPDa6pWw/w=="
+          "hash": "6jhzJWYE/R97oPdZTNjDUg=="
         }
       },
       "is_incremental": false,
@@ -2823,7 +2859,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 230,
+          "total_file_count": 233,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

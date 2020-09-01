@@ -10038,38 +10038,54 @@ references:
   isSpec: "True"
   fullName: MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracerVersion
   nameWithType: MagicOnionOpenTelemetryOptions.TracerVersion
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute
-  name: OpenTelemetryCollectorFilterAttribute
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html
-  commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute
-  nameWithType: OpenTelemetryCollectorFilterAttribute
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  name: CreateInstance(IServiceLocator)
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_CreateInstance_MagicOnion_Server_IServiceLocator_
-  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  nameWithType: OpenTelemetryCollectorFilterAttribute.CreateInstance(IServiceLocator)
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance*
-  name: CreateInstance
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_CreateInstance_
-  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance
+- uid: MagicOnion.OpenTelemetry.MagicOnionTelemetry
+  name: MagicOnionTelemetry
+  href: api/MagicOnion.OpenTelemetry.MagicOnionTelemetry.html
+  commentId: T:MagicOnion.OpenTelemetry.MagicOnionTelemetry
+  fullName: MagicOnion.OpenTelemetry.MagicOnionTelemetry
+  nameWithType: MagicOnionTelemetry
+- uid: MagicOnion.OpenTelemetry.MagicOnionTelemetry.ServiceContextItemKeyTrace
+  name: ServiceContextItemKeyTrace
+  href: api/MagicOnion.OpenTelemetry.MagicOnionTelemetry.html#MagicOnion_OpenTelemetry_MagicOnionTelemetry_ServiceContextItemKeyTrace
+  commentId: F:MagicOnion.OpenTelemetry.MagicOnionTelemetry.ServiceContextItemKeyTrace
+  fullName: MagicOnion.OpenTelemetry.MagicOnionTelemetry.ServiceContextItemKeyTrace
+  nameWithType: MagicOnionTelemetry.ServiceContextItemKeyTrace
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute
+  name: OpenTelemetryCollectorFilterFactoryAttribute
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html
+  commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute
+  nameWithType: OpenTelemetryCollectorFilterFactoryAttribute
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)
+  name: IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceLocator)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterFactoryAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)
+  name.vb: MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance(IServiceLocator)
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance(MagicOnion.Server.IServiceLocator)
+  nameWithType: OpenTelemetryCollectorFilterFactoryAttribute.IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceLocator)
+  nameWithType.vb: OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance(IServiceLocator)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance*
+  name: IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterFactoryAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_
+  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance
   isSpec: "True"
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.CreateInstance
-  nameWithType: OpenTelemetryCollectorFilterAttribute.CreateInstance
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order
+  name.vb: MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance
+  nameWithType: OpenTelemetryCollectorFilterFactoryAttribute.IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance
+  nameWithType.vb: OpenTelemetryCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.MagicOnionFilterAttribute>.CreateInstance
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order
   name: Order
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_Order
-  commentId: P:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order
-  nameWithType: OpenTelemetryCollectorFilterAttribute.Order
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order*
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterFactoryAttribute_Order
+  commentId: P:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order
+  nameWithType: OpenTelemetryCollectorFilterFactoryAttribute.Order
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order*
   name: Order
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterAttribute_Order_
-  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryCollectorFilterFactoryAttribute_Order_
+  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order
   isSpec: "True"
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterAttribute.Order
-  nameWithType: OpenTelemetryCollectorFilterAttribute.Order
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.Order
+  nameWithType: OpenTelemetryCollectorFilterFactoryAttribute.Order
 - uid: MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger
   name: OpenTelemetryCollectorLogger
   href: api/MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html
@@ -10243,38 +10259,42 @@ references:
   isSpec: "True"
   fullName: MagicOnion.OpenTelemetry.OpenTelemetrygRpcStatusHelper.ConvertStatus
   nameWithType: OpenTelemetrygRpcStatusHelper.ConvertStatus
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute
-  name: OpenTelemetryHubCollectorFilterAttribute
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html
-  commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute
-  nameWithType: OpenTelemetryHubCollectorFilterAttribute
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  name: CreateInstance(IServiceLocator)
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterAttribute_CreateInstance_MagicOnion_Server_IServiceLocator_
-  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance(MagicOnion.Server.IServiceLocator)
-  nameWithType: OpenTelemetryHubCollectorFilterAttribute.CreateInstance(IServiceLocator)
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance*
-  name: CreateInstance
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterAttribute_CreateInstance_
-  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute
+  name: OpenTelemetryHubCollectorFilterFactoryAttribute
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html
+  commentId: T:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute
+  nameWithType: OpenTelemetryHubCollectorFilterFactoryAttribute
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)
+  name: IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance(IServiceLocator)
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterFactoryAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_
+  commentId: M:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)
+  name.vb: MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance(IServiceLocator)
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance(MagicOnion.Server.IServiceLocator)
+  nameWithType: OpenTelemetryHubCollectorFilterFactoryAttribute.IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance(IServiceLocator)
+  nameWithType.vb: OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance(IServiceLocator)
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance*
+  name: IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterFactoryAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_
+  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance
   isSpec: "True"
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.CreateInstance
-  nameWithType: OpenTelemetryHubCollectorFilterAttribute.CreateInstance
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
+  name.vb: MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance
+  nameWithType: OpenTelemetryHubCollectorFilterFactoryAttribute.IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance
+  nameWithType.vb: OpenTelemetryHubCollectorFilterFactoryAttribute.MagicOnion.Server.IMagicOnionFilterFactory<MagicOnion.Server.Hubs.StreamingHubFilterAttribute>.CreateInstance
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order
   name: Order
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterAttribute_Order
-  commentId: P:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
-  nameWithType: OpenTelemetryHubCollectorFilterAttribute.Order
-- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order*
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterFactoryAttribute_Order
+  commentId: P:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order
+  nameWithType: OpenTelemetryHubCollectorFilterFactoryAttribute.Order
+- uid: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order*
   name: Order
-  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterAttribute_Order_
-  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
+  href: api/MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html#MagicOnion_OpenTelemetry_OpenTelemetryHubCollectorFilterFactoryAttribute_Order_
+  commentId: Overload:MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order
   isSpec: "True"
-  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterAttribute.Order
-  nameWithType: OpenTelemetryHubCollectorFilterAttribute.Order
+  fullName: MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.Order
+  nameWithType: OpenTelemetryHubCollectorFilterFactoryAttribute.Order
 - uid: MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions
   name: OpenTelemetryServiceCollectionExtensions
   href: api/MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html
@@ -16068,6 +16088,44 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.ServiceContextAuthenticationExtensions.GetPrincipal
   nameWithType: ServiceContextAuthenticationExtensions.GetPrincipal
+- uid: MagicOnion.Server.ServiceContextTelemetryExtensions
+  name: ServiceContextTelemetryExtensions
+  href: api/MagicOnion.Server.ServiceContextTelemetryExtensions.html
+  commentId: T:MagicOnion.Server.ServiceContextTelemetryExtensions
+  fullName: MagicOnion.Server.ServiceContextTelemetryExtensions
+  nameWithType: ServiceContextTelemetryExtensions
+- uid: MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.ServiceContext)
+  name: GetTraceContext(ServiceContext)
+  href: api/MagicOnion.Server.ServiceContextTelemetryExtensions.html#MagicOnion_Server_ServiceContextTelemetryExtensions_GetTraceContext_MagicOnion_Server_ServiceContext_
+  commentId: M:MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.ServiceContext)
+  fullName: MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.ServiceContext)
+  nameWithType: ServiceContextTelemetryExtensions.GetTraceContext(ServiceContext)
+- uid: MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext*
+  name: GetTraceContext
+  href: api/MagicOnion.Server.ServiceContextTelemetryExtensions.html#MagicOnion_Server_ServiceContextTelemetryExtensions_GetTraceContext_
+  commentId: Overload:MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext
+  isSpec: "True"
+  fullName: MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext
+  nameWithType: ServiceContextTelemetryExtensions.GetTraceContext
+- uid: MagicOnion.Server.StreamingHubContextTelemetryExtensions
+  name: StreamingHubContextTelemetryExtensions
+  href: api/MagicOnion.Server.StreamingHubContextTelemetryExtensions.html
+  commentId: T:MagicOnion.Server.StreamingHubContextTelemetryExtensions
+  fullName: MagicOnion.Server.StreamingHubContextTelemetryExtensions
+  nameWithType: StreamingHubContextTelemetryExtensions
+- uid: MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.Hubs.StreamingHubContext)
+  name: GetTraceContext(StreamingHubContext)
+  href: api/MagicOnion.Server.StreamingHubContextTelemetryExtensions.html#MagicOnion_Server_StreamingHubContextTelemetryExtensions_GetTraceContext_MagicOnion_Server_Hubs_StreamingHubContext_
+  commentId: M:MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.Hubs.StreamingHubContext)
+  fullName: MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.Hubs.StreamingHubContext)
+  nameWithType: StreamingHubContextTelemetryExtensions.GetTraceContext(StreamingHubContext)
+- uid: MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext*
+  name: GetTraceContext
+  href: api/MagicOnion.Server.StreamingHubContextTelemetryExtensions.html#MagicOnion_Server_StreamingHubContextTelemetryExtensions_GetTraceContext_
+  commentId: Overload:MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext
+  isSpec: "True"
+  fullName: MagicOnion.Server.StreamingHubContextTelemetryExtensions.GetTraceContext
+  nameWithType: StreamingHubContextTelemetryExtensions.GetTraceContext
 - uid: MagicOnion.Server.StreamingHubFilterDescriptor
   name: StreamingHubFilterDescriptor
   href: api/MagicOnion.Server.StreamingHubFilterDescriptor.html

@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>MagicOnion.OpenTelemetry Namespace
+    <title>ServiceContextTelemetryExtensions Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="MagicOnion.OpenTelemetry Namespace
+    <meta name="title" content="ServiceContextTelemetryExtensions Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.51.0.0">
     
@@ -71,35 +71,96 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.OpenTelemetry">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.ServiceContextTelemetryExtensions">
   
-  <h1 id="MagicOnion_OpenTelemetry" data-uid="MagicOnion.OpenTelemetry" class="text-break">MagicOnion.OpenTelemetry Namespace
+  <h1 id="MagicOnion_Server_ServiceContextTelemetryExtensions" data-uid="MagicOnion.Server.ServiceContextTelemetryExtensions" class="text-break">ServiceContextTelemetryExtensions Class
   </h1>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.OpenTelemetry.dll</h6>
+  
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
-  <div class="markdown level0 remarks"></div>
-    <h3 id="classes">Classes
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ServiceContextTelemetryExtensions : object</code></pre>
+  </div>
+
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">ServiceContextTelemetryExtensions</span>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  <h3 id="members">Members</h3>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContextTelemetryExtensions.html#MagicOnion_Server_ServiceContextTelemetryExtensions_GetTraceContext_MagicOnion_Server_ServiceContext_">GetTraceContext(ServiceContext)</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets the trace context associated with this service context.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3 id="methods">Methods
   </h3>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html">MagicOnionOpenTelemetryMeterFactoryOption</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionOpenTelemetryOptions.html">MagicOnionOpenTelemetryOptions</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.MagicOnionTelemetry.html">MagicOnionTelemetry</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html">OpenTelemetryCollectorFilterFactoryAttribute</a></h4>
-      <section><p>Collect OpenTelemetry Tracing for Global filter. Handle Unary and most outside logging.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryCollectorLogger.html">OpenTelemetryCollectorLogger</a></h4>
-      <section><p>Collect OpemTelemetry Meter Metrics.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetrygRpcStatusHelper.html">OpenTelemetrygRpcStatusHelper</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html">OpenTelemetryHubCollectorFilterFactoryAttribute</a></h4>
-      <section><p>Collect OpenTelemetry Tracing for StreamingHub Filter. Handle Streaming Hub logging.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html">OpenTelemetryServiceCollectionExtensions</a></h4>
-      <section><p>MagicOnion extensions for Microsoft.Extensions.Hosting classes</p>
-</section>
+  <section>
+  <a id="MagicOnion_Server_ServiceContextTelemetryExtensions_GetTraceContext_" data-uid="MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext*"></a>
+  <h4 id="MagicOnion_Server_ServiceContextTelemetryExtensions_GetTraceContext_MagicOnion_Server_ServiceContext_" data-uid="MagicOnion.Server.ServiceContextTelemetryExtensions.GetTraceContext(MagicOnion.Server.ServiceContext)">GetTraceContext(ServiceContext)</h4>
+  <div class="markdown level1 summary"><p>Gets the trace context associated with this service context.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ActivityContext GetTraceContext(this ServiceContext context)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Server.ServiceContext.html">ServiceContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ActivityContext</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  
+  
 </article>
           </div>
           
