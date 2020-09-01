@@ -38,7 +38,7 @@ namespace ChatApp.Server
                             o.Endpoint = new Uri(options.TracerExporterEndpoint);
                         });
                         // ConsoleExporter will show current tracer activity
-                        //tracerBuilder.AddConsoleExporter();
+                        tracerBuilder.AddConsoleExporter();
                     });
                     services.AddHostedService<PrometheusExporterMetricsService>();
                 })

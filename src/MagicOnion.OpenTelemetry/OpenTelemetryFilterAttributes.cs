@@ -41,6 +41,9 @@ namespace MagicOnion.OpenTelemetry
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
             using var activity = source.StartActivity($"{context.MethodType}:{context.CallContext.Method}", ActivityKind.Server);
 
+            // add trace context to service context. it allows user to add their span directly to this context.
+            context.SetTraceContext(activity.Context);
+
             try
             {
                 activity.SetTag("grpc.method", context.MethodType.ToString());
@@ -105,6 +108,9 @@ namespace MagicOnion.OpenTelemetry
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
             using var activity = source.StartActivity($"{context.ServiceContext.MethodType}:/{context.Path}", ActivityKind.Server);
+
+            // add trace context to service context. it allows user to add their span directly to this hub
+            context.SetTraceContext(activity.Context);
 
             try
             {
