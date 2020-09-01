@@ -1436,7 +1436,7 @@ You can collect telemetry and use exporter on MagicOnion Serverside.
 
 #### try sample app for OpenTelemetry
 
-You can try OpenTelemetry with ChatApp sample app.
+Try OpenTelemetry with ChatApp sample app.
 
 goto [samples/ChatApp](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp) and see README.
 
@@ -1454,31 +1454,6 @@ What you need to do for Telemetry is followings.
 Let's follow the steps. 
 
 **add reference to the MagicOnion.OpenTelemetry**
-
-Add nuget.config to reference opentelemetry-dotnet MyGet v3 endpoint.
-
-```shell
-dotnet new nugetconfig
-```
-
-add package sources reference.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageRestore>
-    <add key="enabled" value="true" />
-    <add key="automatic" value="true" />
-  </packageRestore>
-  <packageSources>
-    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
-    <clear />
-    <add key="nuget" value="https://api.nuget.org/v3/index.json" />
-    <add key="myget.org opentelemetry" value="https://www.myget.org/F/opentelemetry/api/v3/index.json" />
-  </packageSources>
-</configuration>
-
-```
 
 Add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
 
