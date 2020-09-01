@@ -24,13 +24,6 @@ If you want launch on Container, see [Container support](#container-support) sec
 This is Sample Serverside MagicOnion.
 You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
 
-### ChatApp.Server.Telemetry
-
-This is Sample Serverside MagicOnion with OpenTelemetry implementation for Prometheus and Zipkin exporters.
-You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server.Telemetry` project as start up and Start Debug.
-
-> Addtional note: If you want run MagiconOnion with telemetry containers please follow to the [README](https://github.com/Cysharp/MagicOnion#try-visualization-on-localhost)
-
 ### ChatApp.Unity
 
 Sample Clientside Unity.

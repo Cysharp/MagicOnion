@@ -49,7 +49,7 @@ namespace ChatApp.Server
                     {
                         options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
                         options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
-                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider);
+                        options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider, version: "0.5.0-beta.2");
                     });
                 })
                 .RunConsoleAsync();
