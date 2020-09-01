@@ -2,8 +2,10 @@
 
 Provides a sample of a simple chat app using MagicOnion + OpenTelemetry.
 
-Please see here about MagicOnion itself.  
-https://github.com/Cysharp/MagicOnion
+This is Sample Serverside MagicOnion with OpenTelemetry implementation for Prometheus and Zipkin exporters.
+You can launch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server(samples/ChatApp.Telemetry/ChatApp.Server)` project as start up and Start Debug.
+
+> Addtional note: If you want run MagiconOnion with telemetry containers please follow to the [README](https://github.com/Cysharp/MagicOnion#try-visualization-on-localhost)
 
 ## Getting started
 
@@ -13,6 +15,7 @@ To run simple ChatApp.Server,
 2. Run `ChatScene` from UnityEditor.  
 
 If you want launch on Container, see [Container support](#container-support) section.
+
 
 ### ChatApp.Server
 

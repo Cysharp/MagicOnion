@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -17,16 +18,16 @@
     <PackageId>MagicOnion.OpenTelemetry</PackageId>
     <Description>Telemetry Extensions of MagicOnion.</Description>
     <PackageTags>$(PackageTags);OpenTelemetry</PackageTags>
-    <VersionSuffix>beta.402.0</VersionSuffix>
+    <!-- Match to OpenTelemetry-dotnet beta version -->
+    <VersionSuffix>beta-050.2</VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
-    <PackageReference Include="OpenTelemetry" Version="0.4.0-beta.2" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="0.4.0-beta.2" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0-preview.7.20364.11" />
+    <PackageReference Include="OpenTelemetry" Version="0.5.0-beta.2" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="0.5.0-beta.2" />
   </ItemGroup>
 
   <ItemGroup>
