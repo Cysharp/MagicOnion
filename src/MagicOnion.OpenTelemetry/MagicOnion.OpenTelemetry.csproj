@@ -18,7 +18,8 @@
     <PackageId>MagicOnion.OpenTelemetry</PackageId>
     <Description>Telemetry Extensions of MagicOnion.</Description>
     <PackageTags>$(PackageTags);OpenTelemetry</PackageTags>
-    <VersionSuffix>beta.402.0</VersionSuffix>
+    <!-- Match to OpenTelemetry-dotnet beta version -->
+    <VersionSuffix>beta-050.2</VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
