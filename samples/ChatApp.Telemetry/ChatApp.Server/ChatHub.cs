@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using MagicOnion.Server.OpenTelemetry;
 
 namespace ChatApp.Server
 {
