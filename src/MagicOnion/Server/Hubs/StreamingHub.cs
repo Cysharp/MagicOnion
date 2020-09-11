@@ -212,7 +212,7 @@ namespace MagicOnion.Server.Hubs
                         {
                             isErrorOrInterrupted = true;
                             LogError(ex, context);
-                            await context.WriteErrorMessage((int)StatusCode.Internal, "Erorr on " + handler.ToString(), ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                            await context.WriteErrorMessage((int)StatusCode.Internal, "Error on " + handler.ToString(), ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
                         }
                         finally
                         {

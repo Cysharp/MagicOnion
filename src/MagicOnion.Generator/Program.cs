@@ -24,6 +24,7 @@ namespace MagicOnion.Generator
             [Option("o", "Output path(file) or directory base(in separated mode).")]string output,
             [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
             [Option("n", "Set namespace root name.")]string @namespace = "MagicOnion",
+            [Option("m", "Set generated MessagePackFormatter namespace.")]string messagePackGeneratedNamespace = "MessagePack.Formatters",
             [Option("c", "Conditional compiler symbols, split with ','.")]string conditionalSymbol = null)
         {
             await new MagicOnionCompiler(x => Console.WriteLine(x), this.Context.CancellationToken)
@@ -32,7 +33,8 @@ namespace MagicOnion.Generator
                     output,
                     unuseUnityAttr,
                     @namespace,
-                    conditionalSymbol);
+                    conditionalSymbol,
+                    messagePackGeneratedNamespace);
         }
     }
 }

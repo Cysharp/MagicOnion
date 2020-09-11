@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Metrics.Configuration;
 using OpenTelemetry.Trace;
 
 namespace MagicOnion.Server.OpenTelemetry
@@ -41,15 +39,15 @@ namespace MagicOnion.Server.OpenTelemetry
         readonly MeasureMetric<long> broadcastRequestSizeMeasure;
         readonly CounterMetric<long> broadcastGroupCounter;
 
-        public OpenTelemetryCollectorLogger(MeterFactory meterFactory, string metricsPrefix = "magiconion", string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
+        public OpenTelemetryCollectorLogger(MeterProvider meterProvider, string metricsPrefix = "magiconion", string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
         {
-            if (meterFactory == null) throw new ArgumentNullException(nameof(meterFactory));
+            if (meterProvider == null) throw new ArgumentNullException(nameof(meterProvider));
 
             // configure defaultTags included as default tag
             this.defaultLabels = defaultLabels ?? Array.Empty<KeyValuePair<string, string>>();
 
             // todo: how to description?
-            var meter = meterFactory.GetMeter("MagicOnion", version);
+            var meter = meterProvider.GetMeter("MagicOnion", version);
 
             // Service build time. ms
             buildServiceDefinitionMeasure = meter.CreateDoubleMeasure($"{metricsPrefix}_buildservicedefinition_duration_milliseconds"); // sum

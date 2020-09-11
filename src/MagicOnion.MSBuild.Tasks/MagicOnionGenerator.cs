@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Framework;
 using System;
 using System.Threading;
 
@@ -17,6 +17,8 @@ namespace MagicOnion.MSBuild.Tasks
 
         public string Namespace { get; set; }
 
+        public string MessagePackGeneratedNamespace { get; set; }
+
         public bool UnuseUnityAttr { get; set; } = false;
 
         public override bool Execute()
@@ -29,7 +31,8 @@ namespace MagicOnion.MSBuild.Tasks
                         Output,
                         UnuseUnityAttr,
                         Namespace ?? "MagicOnion",
-                        ConditionalSymbol
+                        ConditionalSymbol,
+                        MessagePackGeneratedNamespace ?? "MessagePack.Formatters"
                     )
                     .GetAwaiter().GetResult();
             }

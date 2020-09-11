@@ -3,7 +3,7 @@ name: build-debug
 on:
   push:
     branches:
-      - "**"
+      - master
     tags:
       - "!*" # not a tag push
   pull_request:
@@ -40,6 +40,7 @@ jobs:
       # test
       - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
       - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
+      - run: dotnet test ./tests/MagicOnion.Generator.Tests/ -c Debug
 
   build-unity:
     if: "(github.event == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:')"
@@ -59,12 +60,6 @@ jobs:
     steps:
       - run: apt-get update && apt-get install git -y
       - uses: actions/checkout@v2
-      # get activation file, if fail to activate unity, use this key and activate from https://license.unity3d.com/manual
-      - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile || exit 0
-      - uses: actions/upload-artifact@v1
-        with:
-          name: Unity_v${{ matrix.unity }}.alf
-          path: ./Unity_v${{ matrix.unity }}.alf
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
         env:

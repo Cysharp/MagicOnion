@@ -1416,6 +1416,8 @@ Open `http://localhost:5432`, you can see swagger view.
 
 ### Telemetry
 
+**Supported OpenTelemetry-dotnet version: [0.5.0-beta.2](https://github.com/open-telemetry/opentelemetry-dotnet/releases/tag/0.5.0-beta)**
+
 MagicOnion offer OpenTelemetry support with `MagicOnion.OpenTelemetry` package.
 Let's see overview and how to try on localhost.
 
@@ -1434,7 +1436,7 @@ You can collect telemetry and use exporter on MagicOnion Serverside.
 
 #### try sample app for OpenTelemetry
 
-You can try OpenTelemetry with ChatApp sample app.
+Try OpenTelemetry with ChatApp sample app.
 
 goto [samples/ChatApp](https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp) and see README.
 
@@ -1452,31 +1454,6 @@ What you need to do for Telemetry is followings.
 Let's follow the steps. 
 
 **add reference to the MagicOnion.OpenTelemetry**
-
-Add nuget.config to reference opentelemetry-dotnet MyGet v3 endpoint.
-
-```shell
-dotnet new nugetconfig
-```
-
-add package sources reference.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageRestore>
-    <add key="enabled" value="true" />
-    <add key="automatic" value="true" />
-  </packageRestore>
-  <packageSources>
-    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
-    <clear />
-    <add key="nuget" value="https://api.nuget.org/v3/index.json" />
-    <add key="myget.org opentelemetry" value="https://www.myget.org/F/opentelemetry/api/v3/index.json" />
-  </packageSources>
-</configuration>
-
-```
 
 Add [MagicOnion.OpenTelemetry](https://www.nuget.org/packages/MagicOnion.OpenTelemetry) nuget package to your MagicOnion server project.
 
@@ -1524,14 +1501,16 @@ await MagicOnionHost.CreateDefaultBuilder()
             // open-telemetry with Prometheus exporter
             meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
         },
-        (options, tracerBuilder) =>
+        (options, provider, tracerBuilder) =>
         {
             // open-telemetry with Zipkin exporter
-            tracerBuilder.UseZipkin(o =>
+            tracerBuilder.AddZipkinExporter(o =>
             {
-                o.ServiceName = options.ServiceName;
+                o.ServiceName = "MyApp";
                 o.Endpoint = new Uri(options.TracerExporterEndpoint);
             });
+            // ConsoleExporter will show current tracer activity
+            tracerBuilder.AddConsoleExporter();
         });
     })
 ```
@@ -1551,6 +1530,7 @@ If you use Prometheus Exporter and require Prometheus Server to recieve pull req
     services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
     {
         // your metrics exporter implementation.
+        meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
     },
     (options, tracerBuilder) =>
     {
@@ -1585,9 +1565,9 @@ await MagicOnionHost.CreateDefaultBuilder()
         var meterFactory = services.BuildServiceProvider().GetService<MeterFactory>();
         services.Configure<MagicOnionHostingOptions>(options =>
         {
-            options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterAttribute());
-            options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterAttribute());
-            options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterFactory);
+            options.Service.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
+            options.Service.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
+            options.Service.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider);
         });
     })
     .RunConsoleAsync();
@@ -1597,12 +1577,13 @@ await MagicOnionHost.CreateDefaultBuilder()
 
 All implementation is done, let's Debug run MagicOnion and confirm you can see metrics and tracer.
 
-SampleApp `ChatApp.Server.Telemery` offers sample for Prometheus Metrics exporter and Zipkin Tracer exporter.
+SampleApp `samples/ChatApp.Telemetry/ChatApp.Server` offers sample for Prometheus Metrics exporter and Zipkin Tracer exporter.
 
 Run Zipkin on Docker to recieve tracer from ChatApp.Server.Telemery.
 
 ```shell
-docker run --rm -p 9411:9411 openzipkin/zipkin
+cd samples/ChatApp.Telemetry
+docker-compose -f docker-compose.telemetry.yaml up
 ```
 
 * Prometheus metrics wlll show on http://localhost:9184/metrics.
@@ -1650,11 +1631,11 @@ They will export when Unary/StreamingHub request is comming.
 
 **tips**
 
-* Want insert your own tag to default metrics.
+* Want insert your own tag to default metrics?
 
 Add defaultTags when register `OpenTelemetryCollectorLogger`.
 
-* Want replace magiconion metrics prefix to my magiconion metrics.
+* Want replace magiconion metrics prefix to my magiconion metrics?
 
 Set metricsPrefix when register `OpenTelemetryCollectorLogger`.
 If you pass `yourprefix`, then metrics prefix will change to followings.
@@ -1663,7 +1644,7 @@ If you pass `yourprefix`, then metrics prefix will change to followings.
 yourprefix_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition"} 66.7148 1591066185908
 ```
 
-* Want contain `version` tag to your metrics.
+* Want contain `version` tag to your metrics?
 
 Add version when register `OpenTelemetryCollectorLogger`.
 
@@ -1673,7 +1654,71 @@ This should output like follows, however current opentelemetry-dotnet Prometheus
 magiconion_buildservicedefinition_duration_milliseconds_sum{method="EndBuildServiceDefinition",version="1.0.0"} 66.7148 1591066185908
 ```
 
+#### implement your own trace
+
+Here's Zipkin Tracer sample with MagicOnion.OpenTelemetry.
+
+![image](https://user-images.githubusercontent.com/3856350/91792704-1a8a5180-ec51-11ea-84d6-b05b201eda7b.png)
+
+Let's see example trace.
+MagicOnion.OpenTelemetry automatically trace each StreamingHub and Unary request.
+
+![image](https://user-images.githubusercontent.com/3856350/91793243-9e910900-ec52-11ea-8d2a-a10b6fbc93fe.png)
+
+If you want add your own application trace, use `ActivitySource` which automatically injected by MagicOnion.
+
+![image](https://user-images.githubusercontent.com/3856350/91793396-09424480-ec53-11ea-8c93-a21d1590d06a.png)
+
+Code sample.
+
+```csharp
+public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
+{
+    private ActivitySource activitySource;
+
+    public ChatHub(ActivitySource activitySource)
+    {
+        this.activitySource = activitySource;
+    }
+
+    public async Task JoinAsync(JoinRequest request)
+    {
+        // your logic
+
+        // Trace database operation dummy.
+        using (var activity = activitySource.StartActivity("db:room/insert", ActivityKind.Internal))
+        {
+            // this is sample. use orm or any safe way.
+            activity.SetTag("table", "rooms");
+            activity.SetTag("query", $"INSERT INTO rooms VALUES (0, '{request.RoomName}', '{request.UserName}', '1');");
+            activity.SetTag("parameter.room", request.RoomName);
+            activity.SetTag("parameter.username", request.UserName);
+            await Task.Delay(TimeSpan.FromMilliseconds(2));
+        }
+    }
+}
+```
+
+If you don't want your Trace relates to invoked mehod, use `this.Context.GetTraceContext()` to get your Context's trace directly.
+
+```csharp
+// if you don't want set relation to this method, but directly this streaming hub, set hub trace context to your activiy.
+var hubTraceContext = this.Context.GetTraceContext();
+using (var activity = activitySource.StartActivity("sample:hub_context_relation", ActivityKind.Internal, hubTraceContext))
+{
+    // this is sample. use orm or any safe way.
+    activity.SetTag("message", "this span has no relationship with this method but has with hub context.");
+}
+```
+
+![image](https://user-images.githubusercontent.com/3856350/91793693-dd738e80-ec53-11ea-8a50-a1fbd6fb4cd0.png)
+
+
 #### implement your own metrics
+
+Here's Prometheus exporter sample with MagicOnion.OpenTelemetry.
+
+![image](https://user-images.githubusercontent.com/3856350/91793545-72c25300-ec53-11ea-92f6-e1f167054926.png)
 
 Implement `IMagicOnionLogger` to configure your metrics. You can collect metrics when following callbacks are invoked by filter.
 

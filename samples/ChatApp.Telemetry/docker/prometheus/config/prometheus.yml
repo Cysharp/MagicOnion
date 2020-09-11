@@ -43,6 +43,6 @@ scrape_configs:
     static_configs:
       - targets:
           - "magiconion:9184"
-          # - "host.docker.internal:9184"
+          - "host.docker.internal:9184"
         labels:
           app: "magiconion"

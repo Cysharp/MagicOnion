@@ -1,8 +1,10 @@
 using System;
-using OpenTelemetry.Metrics.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OpenTelemetry.Trace.Configuration;
 using Microsoft.Extensions.Configuration;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using System.Diagnostics;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
@@ -10,60 +12,69 @@ namespace MagicOnion.Server.OpenTelemetry
     public static class OpenTelemetryServiceCollectionExtensions
     {
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
             string configurationName = "")
         {
             var options = BindMagicOnionOpenTelemetryOptions(services, configurationName);
             return AddMagicOnionOpenTelemetry(services, options);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
             MagicOnionOpenTelemetryOptions options)
         {
             return AddMagicOnionOpenTelemetry(services, options, null, null);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
-            Action<MagicOnionOpenTelemetryOptions, TracerBuilder> configureTracerFactory,
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
+            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory,
+            Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerFactory,
             string configurationName = "")
         {
             var options = BindMagicOnionOpenTelemetryOptions(services, configurationName);
             return AddMagicOnionOpenTelemetry(services, options, configureMeterFactory, configureTracerFactory);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
-        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services, 
-            MagicOnionOpenTelemetryOptions options, 
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory, 
-            Action<MagicOnionOpenTelemetryOptions, TracerBuilder> configureTracerFactory)
+        public static IServiceCollection AddMagicOnionOpenTelemetry(this IServiceCollection services,
+            MagicOnionOpenTelemetryOptions options,
+            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterProvider,
+            Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerProvider)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
-            if (string.IsNullOrEmpty(options.ServiceName)) throw new ArgumentNullException($"{nameof(options)}.{nameof(options.ServiceName)}");
 
             services.AddSingleton(options);
 
             // configure MeterFactory
-            if (configureMeterFactory != null)
+            if (configureMeterProvider != null)
             {
                 var meterFactoryOption = new MagicOnionOpenTelemetryMeterFactoryOption();
-                configureMeterFactory(options, meterFactoryOption);
+                configureMeterProvider(options, meterFactoryOption);
 
-                var meterFactory = MeterFactory.Create(mb =>
-                {
-                    mb.SetMetricProcessor(meterFactoryOption.MetricProcessor);
-                    mb.SetMetricExporter(meterFactoryOption.MetricExporter);
-                    mb.SetMetricPushInterval(meterFactoryOption.MetricPushInterval);
-                });
+                MeterProvider.SetDefault(Sdk.CreateMeterProviderBuilder()
+                    .SetProcessor(meterFactoryOption.MetricProcessor)
+                    .SetExporter(meterFactoryOption.MetricExporter)
+                    .SetPushInterval(meterFactoryOption.MetricPushInterval)
+                    .Build());
 
                 services.AddSingleton(meterFactoryOption.MetricExporter);
-                services.AddSingleton(meterFactory);
+                services.AddSingleton(MeterProvider.Default);
             }
 
             // configure TracerFactory
-            if (configureTracerFactory != null)
+            if (configureTracerProvider != null)
             {
-                var tracerFactory = TracerFactory.Create(tracerBuilder => configureTracerFactory(options, tracerBuilder));
+                if (string.IsNullOrEmpty(options.ActivitySourceName))
+                {
+                    throw new NullReferenceException(nameof(options.ActivitySourceName));
+                }
+
+                var tracerFactory = services.AddOpenTelemetryTracerProvider((provider, builder) =>
+                {
+                    // ActivitySourceName must match to TracerName.
+                    builder.AddSource(options.ActivitySourceName);
+                    configureTracerProvider(options, provider, builder);
+                });
                 services.AddSingleton(tracerFactory);
+                services.AddSingleton(new ActivitySource(options.ActivitySourceName));
             }
 
             return services;
