@@ -1,3 +1,4 @@
+using System;
 using MagicOnion.Server.Hubs;
 using MessagePack;
 using System.Collections.Generic;
@@ -15,11 +16,6 @@ namespace MagicOnion.Server
         /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
         /// </summary>
         public bool IsReturnExceptionStackTraceInErrorDetail { get; set; }
-
-        /// <summary>
-        /// Set the diagnostics info logger.
-        /// </summary>
-        public IMagicOnionLogger MagicOnionLogger { get; set; }
 
         /// <summary>
         /// Enable ServiceContext.Current option by AsyncLocal.
@@ -48,7 +44,6 @@ namespace MagicOnion.Server
         {
             this.IsReturnExceptionStackTraceInErrorDetail = false;
             this.SerializerOptions = MessagePackSerializer.DefaultOptions;
-            this.MagicOnionLogger = new NullMagicOnionLogger();
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
             this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();

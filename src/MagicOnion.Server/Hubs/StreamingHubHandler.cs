@@ -196,14 +196,11 @@ namespace MagicOnion.Server.Hubs
     {
         public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
 
-        public IMagicOnionLogger Logger { get; }
-
         public MessagePackSerializerOptions SerializerOptions { get; }
 
         public StreamingHubHandlerOptions(MagicOnionOptions options)
         {
             GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
-            Logger = options.MagicOnionLogger;
             SerializerOptions = options.SerializerOptions;
         }
     }

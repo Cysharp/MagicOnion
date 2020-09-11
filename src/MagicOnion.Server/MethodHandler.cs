@@ -91,7 +91,7 @@ namespace MagicOnion.Server
 
             // options
             this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
-            this.logger = handlerOptions.Logger;
+            this.logger = serviceProvider.GetRequiredService<IMagicOnionLogger>();
             this.enableCurrentContext = handlerOptions.EnableCurrentContext;
 
             // prepare lambda parameters
@@ -597,8 +597,6 @@ namespace MagicOnion.Server
 
         public bool EnableCurrentContext { get; }
 
-        public IMagicOnionLogger Logger { get; }
-
         public MessagePackSerializerOptions SerializerOptions { get; }
 
         public MethodHandlerOptions(MagicOnionOptions options)
@@ -606,7 +604,6 @@ namespace MagicOnion.Server
             GlobalFilters = options.GlobalFilters;
             IsReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
             EnableCurrentContext = options.EnableCurrentContext;
-            Logger = options.MagicOnionLogger;
             SerializerOptions = options.SerializerOptions;
         }
     }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter.Prometheus;
 using OpenTelemetry.Metrics;
@@ -30,6 +31,14 @@ namespace ChatApp.Server
         {
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
 
+            services.AddMagicOnion(options =>
+            {
+                options.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
+                options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
+            });
+            services.RemoveAll<IMagicOnionLogger>();
+            services.AddSingleton<IMagicOnionLogger>(sp => new OpenTelemetryCollectorLogger(sp.GetRequiredService<MeterProvider>(), version: "0.5.0-beta.2"));
+
             services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
                 {
                     // open-telemetry with Prometheus exporter
@@ -48,14 +57,6 @@ namespace ChatApp.Server
                 });
 
             services.AddHostedService<PrometheusExporterMetricsService>();
-
-            var meterProvider = services.BuildServiceProvider().GetService<MeterProvider>();
-            services.AddMagicOnion(options =>
-            {
-                options.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
-                options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
-                options.MagicOnionLogger = new OpenTelemetryCollectorLogger(meterProvider, version: "0.5.0-beta.2");
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

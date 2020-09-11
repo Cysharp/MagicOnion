@@ -75,7 +75,8 @@ namespace MagicOnion.Server
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .ToArray();
 
-            options.MagicOnionLogger.BeginBuildServiceDefinition();
+            var logger = serviceProvider.GetService<IMagicOnionLogger>();
+            logger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 
             try
@@ -171,7 +172,7 @@ namespace MagicOnion.Server
                         {
                             factory = options.DefaultGroupRepositoryFactory;
                         }
-                        StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.SerializerOptions, options.MagicOnionLogger));
+                        StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.SerializerOptions, logger));
                     }
                 }
             }
@@ -183,7 +184,7 @@ namespace MagicOnion.Server
             var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 
             sw.Stop();
-            options.MagicOnionLogger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
+            logger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
             return result;
         }

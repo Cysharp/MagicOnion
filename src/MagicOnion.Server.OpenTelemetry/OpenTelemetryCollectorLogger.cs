@@ -4,11 +4,27 @@ using System.Collections.Generic;
 using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
+    public class OpenTelemetryCollectorLoggerFactory : IMagicOnionLoggerFactory
+    {
+        readonly string version;
+
+        public OpenTelemetryCollectorLoggerFactory(string version = null)
+        {
+            this.version = version;
+        }
+
+        public IMagicOnionLogger CreateLogger(IServiceProvider serviceProvider)
+        {
+            return new OpenTelemetryCollectorLogger(serviceProvider.GetService<MeterProvider>(), version: this.version);
+        }
+    }
+
     /// <summary>
     /// Collect OpemTelemetry Meter Metrics.
     /// </summary>
