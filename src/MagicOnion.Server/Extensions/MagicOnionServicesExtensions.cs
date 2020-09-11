@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IMagicOnionLogger, MagicOnionLogToLogger>();
 
             services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
-            services.AddSingleton(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
+            services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
 
             services.AddOptions<MagicOnionOptions>(configName)
                 .Configure<IConfiguration>((o, configuration) =>
