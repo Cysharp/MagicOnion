@@ -75,7 +75,7 @@ namespace MagicOnion.Server
               .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
               .ToArray();
 
-            var logger = serviceProvider.GetService<IMagicOnionLogger>();
+            var logger = serviceProvider.GetRequiredService<IMagicOnionLogger>();
             logger.BeginBuildServiceDefinition();
             var sw = Stopwatch.StartNew();
 

@@ -77,7 +77,7 @@ namespace MagicOnion.Server
     {
         readonly ILogger _logger;
 
-        public MagicOnionLogToLogger(ILogger logger)
+        public MagicOnionLogToLogger(ILogger<MagicOnionLogToLogger> logger)
         {
             _logger = logger;
         }
@@ -165,7 +165,7 @@ namespace MagicOnion.Server
     {
         readonly ILogger _logger;
 
-        public MagicOnionLogToLoggerWithDataDump(ILogger logger)
+        public MagicOnionLogToLoggerWithDataDump(ILogger<MagicOnionLogToLoggerWithDataDump> logger)
         {
             _logger = logger;
         }
@@ -269,7 +269,7 @@ namespace MagicOnion.Server
         readonly MessagePackSerializerOptions dumpResolverOptions;
         readonly ILogger _logger;
 
-        public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger logger)
+        public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger<MagicOnionLogToGrpcLoggerWithNamedDataDump> logger)
             : this(ContractlessFirstStandardResolver.Instance)
         {
             _logger = logger;

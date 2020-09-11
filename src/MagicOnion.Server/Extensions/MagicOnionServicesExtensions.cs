@@ -16,12 +16,33 @@ namespace Microsoft.Extensions.DependencyInjection
         public static void AddMagicOnion(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
         {
             var configName = Options.Options.DefaultName;
+            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
+            services.AddMagicOnionCore(configureOptions);
+        }
+
+        public static void AddMagicOnion(this IServiceCollection services, Assembly[] searchAssemblies, Action<MagicOnionOptions>? configureOptions = null)
+        {
+            var configName = Options.Options.DefaultName;
+            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchAssemblies, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
+            services.AddMagicOnionCore(configureOptions);
+        }
+
+        public static void AddMagicOnion(this IServiceCollection services, IEnumerable<Type> searchTypes, Action<MagicOnionOptions>? configureOptions = null)
+        {
+            var configName = Options.Options.DefaultName;
+            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, searchTypes, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
+            services.AddMagicOnionCore(configureOptions);
+        }
+
+        private static void AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
+        {
+            var configName = Options.Options.DefaultName;
             var glueServiceType = MagicOnionGlueService.CreateType();
 
-            services.AddSingleton<MagicOnionServiceDefinition>(sp => MagicOnionEngine.BuildServerServiceDefinition(sp, sp.GetRequiredService<IOptionsMonitor<MagicOnionOptions>>().Get(configName)));
-            services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
-            services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
             services.TryAddSingleton<IMagicOnionLogger, MagicOnionLogToLogger>();
+
+            services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
+            services.AddSingleton(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
 
             services.AddOptions<MagicOnionOptions>(configName)
                 .Configure<IConfiguration>((o, configuration) =>
