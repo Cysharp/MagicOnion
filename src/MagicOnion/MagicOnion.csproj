@@ -2,86 +2,30 @@
 
     <PropertyGroup>
         <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) but currently removed(for CI) -->
-        <!--<TargetFrameworks>netstandard2.0;net471</TargetFrameworks>-->
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <!--<TargetFrameworks>netcoreapp3.1;net471</TargetFrameworks>-->
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>NON_UNITY</DefineConstants>
         <Company>Cysharp</Company>
 
         <!-- NuGet -->
         <PackageId>MagicOnion</PackageId>
         <Description>Unified Realtime/API Engine for .NET Core and Unity.</Description>
-    </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' == 'net471'">
-        <DefineConstants>NON_UNITY;ENABLE_SAVE_ASSEMBLY</DefineConstants>
+        <!-- This is only a metapackage -->
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="Icon.png" Pack="true" PackagePath="/" />
     </ItemGroup>
 
-    <!-- NuGet -->
-
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-        <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Grpc" Version="2.23.0" />
-        <PackageReference Include="MessagePack" Version="2.1.90" />
-        <PackageReference Include="System.Buffers" Version="4.5.0" />
-        <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
-    </ItemGroup>
-
-    <!-- Exclude -->
-
-    <ItemGroup>
-        <None Remove="$(ProjectDir)..\**\*.meta" />
-    </ItemGroup>
-
-    <!-- T4 -->
-
-    <ItemGroup>
-        <None Update="DynamicArgumentTuple.tt">
-            <Generator>TextTemplatingFileGenerator</Generator>
-            <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="DynamicArgumentTuple.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <!-- Copy files for unity MagicOnion -->
-    <PropertyGroup>
-        <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\</DestinationRoot>
-    </PropertyGroup>
-    <ItemGroup>
-        <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;**\Server\**\*.*" />
-    </ItemGroup>
-    <ItemGroup>
-      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(ProjectDir)Server\Hubs\BroadcasterHelper.cs" DestinationFiles="$(DestinationRoot)Server\Hubs\BroadcasterHelper.cs" SkipUnchangedFiles="true" />
-        <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-    </Target>
-
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
+    <ProjectReference Include="..\MagicOnion.Client\MagicOnion.Client.csproj" />
+  </ItemGroup>
 </Project>
