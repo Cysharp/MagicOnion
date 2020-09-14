@@ -13,9 +13,6 @@ namespace ChatApp.Server
     {
         public static void Main(string[] args)
         {
-            // WORKAROUND:
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -26,6 +23,7 @@ namespace ChatApp.Server
                     webBuilder
                         .UseKestrel(options =>
                         {
+                            // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during development.
                             options.ConfigureEndpointDefaults(endpointOptions =>
                             {
                                 endpointOptions.Protocols = HttpProtocols.Http2;

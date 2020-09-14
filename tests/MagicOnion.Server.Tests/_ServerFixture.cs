@@ -65,7 +65,7 @@ namespace MagicOnion.Server.Tests
         {
             var port = RandomProvider.ThreadRandom.Next(10000, 30000);
 
-            // WORKAROUND:
+            // WORKAROUND: Use insecure HTTP/2 connections during testing.
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             _hostTask = Host.CreateDefaultBuilder()
@@ -81,6 +81,7 @@ namespace MagicOnion.Server.Tests
                         {
                             options.ListenLocalhost(port, listenOptions =>
                             {
+                                // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during testing.
                                 listenOptions.Protocols = HttpProtocols.Http2;
                             });
                         })
