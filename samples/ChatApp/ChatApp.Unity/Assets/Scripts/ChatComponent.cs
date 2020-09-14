@@ -1,3 +1,4 @@
+using System;
 using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using ChatApp.Shared.Services;
@@ -57,7 +58,7 @@ namespace Assets.Scripts
         private void InitializeClient()
         {
             // Initialize the Hub
-            this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+            this.channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
             // for SSL/TLS connection
             //var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
             //this.channel = new Channel("test.example.com", 12345, serverCred);
@@ -87,10 +88,14 @@ namespace Assets.Scripts
                 // you can wait disconnected event
                 await streamingClient.WaitForDisconnect();
             }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
             finally
             {
                 // try-to-reconnect? logging event? close? etc...
-                Debug.Log("disconnected server.");
+                Debug.Log($"disconnected server.: {this.channel.State}");
 
                 if (this.isSelfDisConnected)
                 {
