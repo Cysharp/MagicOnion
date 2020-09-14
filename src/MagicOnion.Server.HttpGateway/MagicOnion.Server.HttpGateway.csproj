@@ -12,9 +12,9 @@
         <NoWarn>1701;1702;1705;1591</NoWarn>
         <DefineConstants>NON_UNITY</DefineConstants>
         <LangVersion>latest</LangVersion>
-        <nullable>enable</nullable>
+        <!--<nullable>enable</nullable>-->
 
-      <!-- NuGet -->
+        <!-- NuGet -->
         <PackageId>MagicOnion.Server.HttpGateway</PackageId>
         <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
     </PropertyGroup>
