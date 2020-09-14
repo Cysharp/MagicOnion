@@ -7,6 +7,10 @@
     <LangVersion>latest</LangVersion>
     <nullable>enable</nullable>
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Server</PackageId>
+    <Description>Unified Realtime/API Engine for .NET Core.</Description>
   </PropertyGroup>
 
   <ItemGroup>

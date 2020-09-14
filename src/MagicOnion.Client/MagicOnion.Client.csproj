@@ -11,6 +11,11 @@
     <!--<nullable>enable</nullable>-->
 
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+
+
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Client</PackageId>
+    <Description>Client library for MagicOnion. Unified Realtime/API Engine for .NET Core / Unity.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'net461'">
