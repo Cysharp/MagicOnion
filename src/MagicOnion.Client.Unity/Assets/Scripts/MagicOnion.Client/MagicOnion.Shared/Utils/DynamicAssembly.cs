@@ -1,4 +1,4 @@
-﻿#if NON_UNITY || !NET_STANDARD_2_0
+#if NON_UNITY || !NET_STANDARD_2_0
 
 using System;
 using System.Reflection;
@@ -38,8 +38,8 @@ namespace MagicOnion.Utils
 
             // HACK: Allow access to `internal` classes from dynamically generated assembly.
             // https://www.strathweb.com/2018/10/no-internalvisibleto-no-problem-bypassing-c-visibility-rules-with-roslyn/
-            var ignoreAccessChecksTo = new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] {typeof(string)}), new []{ "MagicOnion" });
-            this.assemblyBuilder.SetCustomAttribute(ignoreAccessChecksTo);
+            this.assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) }), new[] { "MagicOnion.Client" }));
+            this.assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) }), new[] { "MagicOnion.Server" }));
         }
 
         // requires lock on mono environment(for example, UnityEditor). see: https://github.com/neuecc/MessagePack-CSharp/issues/161
