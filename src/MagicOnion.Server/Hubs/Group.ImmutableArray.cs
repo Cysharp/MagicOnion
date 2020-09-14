@@ -3,6 +3,7 @@ using MessagePack;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -41,7 +42,7 @@ namespace MagicOnion.Server.Hubs
             return new ImmutableArrayGroup(groupName, this, serializerOptions, logger);
         }
 
-        public bool TryGet(string groupName, out IGroup group)
+        public bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group)
         {
             return dictionary.TryGetValue(groupName, out group);
         }
@@ -60,7 +61,7 @@ namespace MagicOnion.Server.Hubs
         readonly IMagicOnionLogger logger;
 
         ImmutableArray<ServiceContext> members;
-        IInMemoryStorage inmemoryStorage;
+        IInMemoryStorage? inmemoryStorage;
 
         public string GroupName { get; }
 
@@ -270,7 +271,7 @@ namespace MagicOnion.Server.Hubs
         {
             // oh, copy is bad but current gRPC interface only accepts byte[]...
             var message = new byte[msg.Count];
-            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+            Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
 
             var source = members;
             if (fireAndForget)
@@ -314,7 +315,7 @@ namespace MagicOnion.Server.Hubs
         {
             // oh, copy is bad but current gRPC interface only accepts byte[]...
             var message = new byte[msg.Count];
-            Array.Copy(msg.Array, msg.Offset, message, 0, message.Length);
+            Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
 
             var source = members;
             if (fireAndForget)
@@ -366,7 +367,7 @@ namespace MagicOnion.Server.Hubs
             {
                 try
                 {
-                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -382,7 +383,7 @@ namespace MagicOnion.Server.Hubs
             {
                 try
                 {
-                    await context.ResponseStream.WriteAsync(value).ConfigureAwait(false);
+                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

@@ -91,7 +91,7 @@ namespace MagicOnion.Server
                     }
 
                     var isStreamingHub = typeof(IStreamingHubMarker).IsAssignableFrom(classType);
-                    HashSet<StreamingHubHandler> tempStreamingHubHandlers = null;
+                    HashSet<StreamingHubHandler>? tempStreamingHubHandlers = null;
                     if (isStreamingHub)
                     {
                         tempStreamingHubHandlers = new HashSet<StreamingHubHandler>();
@@ -135,7 +135,7 @@ namespace MagicOnion.Server
                         if (isStreamingHub && methodName != "Connect")
                         {
                             var streamingHandler = new StreamingHubHandler(classType, methodInfo, new StreamingHubHandlerOptions(options), serviceProvider);
-                            if (!tempStreamingHubHandlers.Add(streamingHandler))
+                            if (!tempStreamingHubHandlers!.Add(streamingHandler))
                             {
                                 throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
                             }
@@ -154,13 +154,13 @@ namespace MagicOnion.Server
 
                     if (isStreamingHub)
                     {
-                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect"), "Connect", new MethodHandlerOptions(options), serviceProvider);
+                        var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", new MethodHandlerOptions(options), serviceProvider);
                         if (!handlers.Add(connectHandler))
                         {
                             throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
                         }
 
-                        streamingHubHandlers.AddRange(tempStreamingHubHandlers);
+                        streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
                         StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers.ToArray());
                         IGroupRepositoryFactory factory;
                         var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);

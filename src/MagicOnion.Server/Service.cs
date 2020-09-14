@@ -13,7 +13,7 @@ namespace MagicOnion.Server
 
         public ServiceBase()
         {
-
+            this.Context = default!;
         }
 
         internal ServiceBase(ServiceContext context)
@@ -36,7 +36,9 @@ namespace MagicOnion.Server
         protected TResponse ReturnStatusCode<TResponse>(int statusCode, string detail)
         {
             Context.CallContext.Status = new Status((StatusCode)statusCode, detail ?? "");
-            return default(TResponse);
+#pragma warning disable CS8603 // Possible null reference return.
+            return default;
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         protected UnaryResult<TResponse> ReturnStatus<TResponse>(StatusCode statusCode, string detail)

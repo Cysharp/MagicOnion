@@ -3,6 +3,7 @@ using MessagePack;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -13,12 +14,12 @@ namespace MagicOnion.Server
 {
     public class ServiceContext
     {
-        internal static AsyncLocal<ServiceContext> currentServiceContext = new AsyncLocal<ServiceContext>();
+        internal static AsyncLocal<ServiceContext?> currentServiceContext = new AsyncLocal<ServiceContext?>();
 
         /// <summary>
         /// Get Current ServiceContext. This property requires to MagicOnionOptions.Enable
         /// </summary>
-        public static ServiceContext Current
+        public static ServiceContext? Current
         {
             get
             {
@@ -26,7 +27,7 @@ namespace MagicOnion.Server
             }
         }
 
-        ConcurrentDictionary<string, object> items;
+        ConcurrentDictionary<string, object>? items;
 
         /// <summary>Object storage per invoke.</summary>
         public ConcurrentDictionary<string, object> Items
@@ -63,19 +64,19 @@ namespace MagicOnion.Server
 
         // internal, used from there methods.
         internal bool IsIgnoreSerialization { get; set; }
-        byte[] request;
+        byte[]? request;
         internal ReadOnlyMemory<byte> Request => request;
-        internal IAsyncStreamReader<byte[]> RequestStream { get; set; }
-        internal IAsyncStreamWriter<byte[]> ResponseStream { get; set; }
-        internal byte[] Result { get; set; }
+        internal IAsyncStreamReader<byte[]>? RequestStream { get; set; }
+        internal IAsyncStreamWriter<byte[]>? ResponseStream { get; set; }
+        internal byte[]? Result { get; set; }
         internal IMagicOnionLogger MagicOnionLogger { get; private set; }
         internal MethodHandler MethodHandler { get; private set; }
 
         // used in StreamingHub
-        internal AsyncLock AsyncWriterLock { get; set; }
+        internal AsyncLock AsyncWriterLock { get; set; } = default!; /* lateinit */
 
         /// <summary>Get Raw Request.</summary>
-        public byte[] GetRawRequest()
+        public byte[]? GetRawRequest()
         {
             return request;
         }
@@ -87,7 +88,7 @@ namespace MagicOnion.Server
         }
 
         /// <summary>Can get after method body was finished.</summary>
-        public byte[] GetRawResponse()
+        public byte[]? GetRawResponse()
         {
             return Result;
         }
@@ -98,7 +99,17 @@ namespace MagicOnion.Server
             Result = response;
         }
 
-        public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup<Type, Attribute> attributeLookup, MethodType methodType, ServerCallContext context, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceProvider serviceProvider)
+        public ServiceContext(
+            Type serviceType,
+            MethodInfo methodInfo,
+            ILookup<Type, Attribute> attributeLookup,
+            MethodType methodType,
+            ServerCallContext context, 
+            MessagePackSerializerOptions serializerOptions,
+            IMagicOnionLogger logger,
+            MethodHandler methodHandler,
+            IServiceProvider serviceProvider
+        )
         {
             this.ContextId = Guid.NewGuid();
             this.ServiceType = serviceType;
@@ -141,13 +152,13 @@ namespace MagicOnion.Server
         public ClientStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.inner = context.RequestStream;
+            this.inner = context.RequestStream!;
             this.logger = context.MagicOnionLogger;
         }
 
         public ServiceContext ServiceContext { get { return context; } }
 
-        public TRequest Current { get; private set; }
+        public TRequest Current { get; private set; } = default!; /* lateinit */
 
         public async Task<bool> MoveNext(CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -208,7 +219,7 @@ namespace MagicOnion.Server
         public ServerStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.inner = context.ResponseStream;
+            this.inner = context.ResponseStream!;
             this.logger = context.MagicOnionLogger;
         }
 
@@ -258,15 +269,15 @@ namespace MagicOnion.Server
         public DuplexStreamingContext(ServiceContext context)
         {
             this.context = context;
-            this.innerReader = context.RequestStream;
-            this.innerWriter = context.ResponseStream;
+            this.innerReader = context.RequestStream!;
+            this.innerWriter = context.ResponseStream!;
             this.logger = context.MagicOnionLogger;
         }
 
         public ServiceContext ServiceContext { get { return context; } }
 
         /// <summary>IAsyncStreamReader Methods.</summary>
-        public TRequest Current { get; private set; }
+        public TRequest Current { get; private set; } = default!; /* lateinit */
 
         /// <summary>IAsyncStreamReader Methods.</summary>
         public async Task<bool> MoveNext(CancellationToken cancellationToken = default(CancellationToken))

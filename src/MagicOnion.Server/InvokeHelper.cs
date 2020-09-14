@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection.Emit;
@@ -19,9 +19,9 @@ namespace MagicOnion.Server
 
         static InvokeHelper()
         {
-            var fieldInvoke = typeof(InvokeHelper<TArg1, TDelegate>).GetField("Invoke");
-            var fieldNext = typeof(InvokeHelper<TArg1, TDelegate>).GetField("Next");
-            var methodInvoke = typeof(Func<TArg1, TDelegate, ValueTask>).GetMethod("Invoke");
+            var fieldInvoke = typeof(InvokeHelper<TArg1, TDelegate>).GetField("Invoke")!;
+            var fieldNext = typeof(InvokeHelper<TArg1, TDelegate>).GetField("Next")!;
+            var methodInvoke = typeof(Func<TArg1, TDelegate, ValueTask>).GetMethod("Invoke")!;
 
             if (RuntimeInformation.FrameworkDescription.StartsWith(".NET Core 4")) /* .NET Core 2.x returns ".NET Core 4.x.y.z" */
             {

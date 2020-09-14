@@ -44,7 +44,6 @@ namespace MagicOnion.Server
         readonly bool responseIsTask;
 
         readonly Func<ServiceContext, ValueTask> methodBody;
-        public Func<object, byte> serialize;
 
         // reflection cache
         static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
@@ -63,17 +62,19 @@ namespace MagicOnion.Server
             this.MethodInfo = methodInfo;
             this.MethodName = methodName;
             MethodType mt;
-            this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out this.RequestType);
+            this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out var requestType);
             this.MethodType = mt;
             this.serializerOptions = handlerOptions.SerializerOptions;
 
             var parameters = methodInfo.GetParameters();
-            if (RequestType == null)
+            if (requestType == null)
             {
                 var resolver = this.serializerOptions.Resolver;
-                this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
+                requestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
                 this.serializerOptions = this.serializerOptions.WithResolver(resolver);
             }
+
+            this.RequestType = requestType;
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
                 .Concat(methodInfo.GetCustomAttributes(true))
@@ -232,10 +233,10 @@ namespace MagicOnion.Server
             return MessagePackSerializer.Deserialize(UnwrappedResponseType, responseValue, serializerOptions);
         }
 
-        static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type requestTypeIfExists)
+        static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type? requestTypeIfExists)
         {
             var t = methodInfo.ReturnType;
-            if (!t.GetTypeInfo().IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+            if (!t.GetTypeInfo().IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
 
             // Task<Unary<T>>
             if (t.GetGenericTypeDefinition() == typeof(Task<>))
@@ -253,7 +254,7 @@ namespace MagicOnion.Server
             if (returnType == typeof(UnaryResult<>))
             {
                 methodType = MethodType.Unary;
-                requestTypeIfExists = null;
+                requestTypeIfExists = default;
                 return t.GetGenericArguments()[0];
             }
             else if (returnType == typeof(ClientStreamingResult<,>))
@@ -266,7 +267,7 @@ namespace MagicOnion.Server
             else if (returnType == typeof(ServerStreamingResult<>))
             {
                 methodType = MethodType.ServerStreaming;
-                requestTypeIfExists = null;
+                requestTypeIfExists = default;
                 return t.GetGenericArguments()[0];
             }
             else if (returnType == typeof(DuplexStreamingResult<,>))
@@ -278,7 +279,7 @@ namespace MagicOnion.Server
             }
             else
             {
-                throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+                throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
             }
         }
 
@@ -567,16 +568,16 @@ namespace MagicOnion.Server
             return ServiceName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
         }
 
-        public bool Equals(MethodHandler other)
+        public bool Equals(MethodHandler? other)
         {
-            return ServiceName.Equals(other.ServiceName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
+            return other != null && ServiceName.Equals(other.ServiceName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
         }
 
         public class UniqueEqualityComparer : IEqualityComparer<MethodHandler>
         {
-            public bool Equals(MethodHandler x, MethodHandler y)
+            public bool Equals(MethodHandler? x, MethodHandler? y)
             {
-                return x.methodHandlerId.Equals(y.methodHandlerId);
+                return (x == null && y == null) || (x != null && y != null && x.methodHandlerId.Equals(y.methodHandlerId));
             }
 
             public int GetHashCode(MethodHandler obj)

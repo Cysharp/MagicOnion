@@ -11,8 +11,8 @@ namespace MagicOnion.Server
     public abstract class MagicOnionFilterDescriptor<TAttribute> : IMagicOnionFilterFactory<TAttribute>
         where TAttribute: class
     {
-        public IMagicOnionFilterFactory<TAttribute> Factory { get; }
-        public TAttribute Instance { get; }
+        public IMagicOnionFilterFactory<TAttribute>? Factory { get; }
+        public TAttribute? Instance { get; }
         public int Order { get; }
 
         protected MagicOnionFilterDescriptor(Type type, int order = 0)
@@ -25,13 +25,13 @@ namespace MagicOnion.Server
         protected MagicOnionFilterDescriptor(TAttribute instance, int order = 0)
         {
             Factory = null;
-            Instance = instance;
+            Instance = instance ?? throw new ArgumentNullException(nameof(instance));
             Order = order;
         }
 
         protected MagicOnionFilterDescriptor(IMagicOnionFilterFactory<TAttribute> factory, int order = 0)
         {
-            Factory = factory;
+            Factory = factory ?? throw new ArgumentNullException(nameof(factory));
             Instance = null;
             Order = order;
         }
@@ -39,8 +39,9 @@ namespace MagicOnion.Server
         public TAttribute CreateInstance(IServiceProvider serviceProvider)
         {
             if (Instance != null) return Instance;
+            if (Factory != null) return Factory.CreateInstance(serviceProvider);
 
-            return Factory.CreateInstance(serviceProvider);
+            throw new InvalidOperationException("MagicOnionFilterDescriptor requires instance or factory");
         }
 
         // Create a filter instance from specified type.
@@ -113,7 +114,7 @@ namespace MagicOnion.Server
                 {
                     throw new InvalidOperationException($"Type '{typeof(T).FullName}' has no parameter-less constructor. You can also use `Add(instance)` overload method.");
                 }
-                descriptors.Add(new MagicOnionServiceFilterDescriptor((IMagicOnionFilterFactory<MagicOnionFilterAttribute>)Activator.CreateInstance<T>()));
+                descriptors.Add(new MagicOnionServiceFilterDescriptor((IMagicOnionFilterFactory<MagicOnionFilterAttribute>)Activator.CreateInstance<T>()!));
             }
             else if (typeof(MagicOnionFilterAttribute).IsAssignableFrom(typeof(T)))
             {
@@ -162,7 +163,7 @@ namespace MagicOnion.Server
                 {
                     throw new InvalidOperationException($"Type '{typeof(T).FullName}' has no parameter-less constructor. You can also use `Add(instance)` overload method.");
                 }
-                descriptors.Add(new StreamingHubFilterDescriptor((IMagicOnionFilterFactory<StreamingHubFilterAttribute>)Activator.CreateInstance<T>()));
+                descriptors.Add(new StreamingHubFilterDescriptor((IMagicOnionFilterFactory<StreamingHubFilterAttribute>)Activator.CreateInstance<T>()!));
             }
             else if (typeof(StreamingHubFilterAttribute).IsAssignableFrom(typeof(T)))
             {

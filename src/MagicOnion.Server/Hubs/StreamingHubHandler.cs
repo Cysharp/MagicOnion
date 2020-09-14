@@ -23,7 +23,7 @@ namespace MagicOnion.Server.Hubs
 
         readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
         internal readonly Type RequestType;
-        readonly Type UnwrappedResponseType;
+        readonly Type? UnwrappedResponseType;
         internal readonly MessagePackSerializerOptions serializerOptions;
         internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
@@ -63,10 +63,8 @@ namespace MagicOnion.Server.Hubs
 
             var resolver = handlerOptions.SerializerOptions.Resolver;
             var parameters = methodInfo.GetParameters();
-            if (RequestType == null)
-            {
-                this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
-            }
+            this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
+
             this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
 
             this.AttributeLookup = classType.GetCustomAttributes(true)
@@ -128,8 +126,8 @@ namespace MagicOnion.Server.Hubs
                 var callBody = Expression.Call(getInstanceCast, methodInfo, arguments);
 
                 var finalMethod = (methodInfo.ReturnType.IsGenericType)
-                    ? typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessage), flags).MakeGenericMethod(UnwrappedResponseType)
-                    : typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessageNil), flags);
+                    ? typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessage), flags)!.MakeGenericMethod(UnwrappedResponseType!)
+                    : typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessageNil), flags)!;
                 callBody = Expression.Call(contextArg, finalMethod, callBody);
 
                 var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
@@ -143,10 +141,10 @@ namespace MagicOnion.Server.Hubs
             }
         }
 
-        static Type UnwrapResponseType(MethodInfo methodInfo)
+        static Type? UnwrapResponseType(MethodInfo methodInfo)
         {
             var t = methodInfo.ReturnType;
-            if (!typeof(Task).IsAssignableFrom(t)) throw new Exception($"Invalid return type, Hub return type must be Task or Task<T>. path:{methodInfo.DeclaringType.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+            if (!typeof(Task).IsAssignableFrom(t)) throw new Exception($"Invalid return type, Hub return type must be Task or Task<T>. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
 
             if (t.IsGenericType)
             {
@@ -183,9 +181,9 @@ namespace MagicOnion.Server.Hubs
             return getHashCodeCache;
         }
 
-        public bool Equals(StreamingHubHandler other)
+        public bool Equals(StreamingHubHandler? other)
         {
-            return HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
+            return other != null && HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
         }
     }
 

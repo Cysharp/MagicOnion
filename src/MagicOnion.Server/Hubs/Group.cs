@@ -31,7 +31,7 @@ namespace MagicOnion.Server.Hubs
     public interface IGroupRepository
     {
         IGroup GetOrAdd(string groupName);
-        bool TryGet(string groupName, out IGroup group);
+        bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group);
         bool TryRemove(string groupName);
     }
 
@@ -182,6 +182,7 @@ namespace MagicOnion.Server.Hubs
     {
         ICollection<T> AllValues { get; }
         void Set(Guid connectionId, T value);
+        [return: MaybeNull]
         T Get(Guid connectionId);
     }
 

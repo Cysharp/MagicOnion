@@ -51,13 +51,13 @@ namespace MagicOnion.Server.Hubs
         public static readonly Type BroadcasterType_ToOne;
         public static readonly Type BroadcasterType_ToMany;
 
-        static readonly MethodInfo groupWriteAllMethodInfo = typeof(IGroup).GetMethod(nameof(IGroup.WriteAllAsync));
+        static readonly MethodInfo groupWriteAllMethodInfo = typeof(IGroup).GetMethod(nameof(IGroup.WriteAllAsync))!;
         static readonly MethodInfo groupWriteExceptOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && !x.GetParameters()[2].ParameterType.IsArray);
         static readonly MethodInfo groupWriteExceptManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteExceptAsync) && x.GetParameters()[2].ParameterType.IsArray);
         static readonly MethodInfo groupWriteToOneMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteToAsync) && !x.GetParameters()[2].ParameterType.IsArray);
         static readonly MethodInfo groupWriteToManyMethodInfo = typeof(IGroup).GetMethods().First(x => x.Name == nameof(IGroup.WriteToAsync) && x.GetParameters()[2].ParameterType.IsArray);
 
-        static readonly MethodInfo fireAndForget = typeof(DynamicBroadcasterBuilder<T>).GetMethod(nameof(FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly MethodInfo fireAndForget = typeof(DynamicBroadcasterBuilder<T>).GetMethod(nameof(FireAndForget), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
 
         static DynamicBroadcasterBuilder()
         {
@@ -70,34 +70,34 @@ namespace MagicOnion.Server.Hubs
             BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
 
             {
-                var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Broadcaster_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
+                var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}Broadcaster_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t })!;
                 var (group, ctor) = DefineConstructor(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteAllMethodInfo, null);
-                BroadcasterType = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType = typeBuilder.CreateTypeInfo()!.AsType();
             }
             {
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptOne_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, except, ctor) = DefineConstructor2(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteExceptOneMethodInfo, except);
-                BroadcasterType_ExceptOne = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ExceptOne = typeBuilder.CreateTypeInfo()!.AsType();
             }
             {
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterExceptMany_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, except, ctor) = DefineConstructor3(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteExceptManyMethodInfo, except);
-                BroadcasterType_ExceptMany = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ExceptMany = typeBuilder.CreateTypeInfo()!.AsType();
             }
             {
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterToOne_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, to, ctor) = DefineConstructor2(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteToOneMethodInfo, to);
-                BroadcasterType_ToOne = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ToOne = typeBuilder.CreateTypeInfo()!.AsType();
             }
             {
                 var typeBuilder = asm.DefineType($"{AssemblyHolder.ModuleName}.{ti.FullName}BroadcasterToMany_{Guid.NewGuid().ToString()}", TypeAttributes.Public, typeof(object), new Type[] { t });
                 var (group, to, ctor) = DefineConstructor3(typeBuilder);
                 DefineMethods(typeBuilder, t, group, methodDefinitions, groupWriteToManyMethodInfo, to);
-                BroadcasterType_ToMany = typeBuilder.CreateTypeInfo().AsType();
+                BroadcasterType_ToMany = typeBuilder.CreateTypeInfo()!.AsType();
             }
         }
 
@@ -163,7 +163,7 @@ namespace MagicOnion.Server.Hubs
             return (groupField, connectionIdsField, ctor);
         }
 
-        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, FieldInfo groupField, BroadcasterHelper.MethodDefinition[] definitions, MethodInfo writeMethod, FieldInfo exceptField)
+        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, FieldInfo groupField, BroadcasterHelper.MethodDefinition[] definitions, MethodInfo writeMethod, FieldInfo? exceptField)
         {
             // Proxy Methods
             for (int i = 0; i < definitions.Length; i++)
@@ -193,12 +193,12 @@ namespace MagicOnion.Server.Hubs
                     il.Emit(OpCodes.Ldarg, j + 1);
                 }
 
-                Type callType = null;
+                Type? callType = null;
                 if (parameters.Length == 0)
                 {
                     // use Nil.
                     callType = typeof(Nil);
-                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default"));
+                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default")!);
                 }
                 else if (parameters.Length == 1)
                 {
@@ -214,6 +214,7 @@ namespace MagicOnion.Server.Hubs
 
                 if (writeMethod != groupWriteAllMethodInfo)
                 {
+                    if (exceptField == null) throw new InvalidOperationException("Non group-wide write method requires except field.");
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, exceptField);
                 }

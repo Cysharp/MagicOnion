@@ -17,7 +17,7 @@ namespace MagicOnion.Server
         void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted);
 
         void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type);
-        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted);
+        void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted);
         void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
 
         void WriteToStream(ServiceContext context, byte[] writeData, Type type);
@@ -57,7 +57,7 @@ namespace MagicOnion.Server
         {
         }
 
-        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)
         {
         }
 
@@ -137,7 +137,7 @@ namespace MagicOnion.Server
 
         }
 
-        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)
         {
             var msg = isErrorOrInterrupted ? "error" : "";
             _logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
@@ -240,7 +240,7 @@ namespace MagicOnion.Server
             _logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, context.SerializerOptions)}");
         }
 
-        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)
         {
             var msg = isErrorOrInterrupted ? "error" : "";
             _logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
@@ -267,48 +267,48 @@ namespace MagicOnion.Server
     public class MagicOnionLogToGrpcLoggerWithNamedDataDump : IMagicOnionLogger
     {
         readonly MessagePackSerializerOptions dumpResolverOptions;
-        readonly ILogger _logger;
+        readonly ILogger logger;
 
         public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger<MagicOnionLogToGrpcLoggerWithNamedDataDump> logger)
-            : this(ContractlessFirstStandardResolver.Instance)
+            : this(logger, ContractlessFirstStandardResolver.Instance)
         {
-            _logger = logger;
         }
 
-        public MagicOnionLogToGrpcLoggerWithNamedDataDump(IFormatterResolver dumpResolver)
+        public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger<MagicOnionLogToGrpcLoggerWithNamedDataDump> logger, IFormatterResolver dumpResolver)
         {
+            this.logger = logger;
             this.dumpResolverOptions = MessagePackSerializerOptions.Standard.WithResolver(dumpResolver);
         }
 
         public void BeginBuildServiceDefinition()
         {
-            _logger.LogDebug(nameof(BeginBuildServiceDefinition));
+            logger.LogDebug(nameof(BeginBuildServiceDefinition));
         }
 
         public void EndBuildServiceDefinition(double elapsed)
         {
-            _logger.LogDebug($"{nameof(EndBuildServiceDefinition)} elapsed:{elapsed}");
+            logger.LogDebug($"{nameof(EndBuildServiceDefinition)} elapsed:{elapsed}");
         }
 
         public void BeginInvokeMethod(ServiceContext context, byte[] request, Type type)
         {
-            _logger.LogDebug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method} size:{request.Length} {ToJson(request, type, context)}");
+            logger.LogDebug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method} size:{request.Length} {ToJson(request, type, context)}");
         }
 
         public void EndInvokeMethod(ServiceContext context, byte[] response, Type type, double elapsed, bool isErrorOrInterrupted)
         {
             var msg = isErrorOrInterrupted ? "error" : "";
-            _logger.LogDebug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{response.Length} elapsed:{elapsed} {msg} {ToJson(response, type, context)}");
+            logger.LogDebug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{response.Length} elapsed:{elapsed} {msg} {ToJson(response, type, context)}");
         }
 
         public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
         {
-            _logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length} {ToJson(writeData, type, context)}");
+            logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length} {ToJson(writeData, type, context)}");
         }
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
-            _logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData, type, context)}");
+            logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete} {ToJson(readData, type, context)}");
         }
 
         string ToJson(byte[] bytes, Type type, ServiceContext context)
@@ -352,27 +352,27 @@ namespace MagicOnion.Server
         }
         public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
         {
-            _logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, type, context.SerializerOptions)}");
+            logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length} {ToJson(request, type, context.SerializerOptions)}");
         }
 
-        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)
+        public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)
         {
             var msg = isErrorOrInterrupted ? "error" : "";
-            _logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
+            logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
         }
 
         public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
         {
-            _logger.LogDebug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
+            logger.LogDebug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
         }
 
         public void Error(Exception ex, ServerCallContext context)
         {
-            _logger.LogError(ex, "MagicOnionHandler throws exception occured in " + context.Method);
+            logger.LogError(ex, "MagicOnionHandler throws exception occured in " + context.Method);
         }
         public void Error(Exception ex, StreamingHubContext context)
         {
-            _logger.LogError(ex, "Hub Method Handler throws exception occured in " + context.Path);
+            logger.LogError(ex, "Hub Method Handler throws exception occured in " + context.Path);
         }
     }
 
@@ -394,14 +394,14 @@ namespace MagicOnion.Server
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
         }
 
         static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> formatter;
+            public static readonly IMessagePackFormatter<T>? formatter;
 
             static FormatterCache()
             {

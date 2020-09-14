@@ -1,4 +1,4 @@
-﻿using MagicOnion.Utils;
+using MagicOnion.Utils;
 using MessagePack;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +8,7 @@ namespace MagicOnion.Server.Hubs
 {
     public class StreamingHubContext
     {
-        ConcurrentDictionary<string, object> items;
+        ConcurrentDictionary<string, object>? items;
 
         /// <summary>Object storage per invoke.</summary>
         public ConcurrentDictionary<string, object> Items
@@ -24,23 +24,23 @@ namespace MagicOnion.Server.Hubs
         }
 
         /// <summary>Raw gRPC Context.</summary>
-        public ServiceContext ServiceContext { get; internal set; }
-        public object HubInstance { get; internal set; }
+        public ServiceContext ServiceContext { get; internal set; } = default!; /* lateinit */
+        public object HubInstance { get; internal set; } = default!; /* lateinit */
 
         public ReadOnlyMemory<byte> Request { get; internal set; }
-        public string Path { get; internal set; }
+        public string Path { get; internal set; } = default!; /* lateinit */
         public DateTime Timestamp { get; internal set; }
 
         // helper for reflection
-        internal MessagePackSerializerOptions SerializerOptions { get; set; }
+        internal MessagePackSerializerOptions SerializerOptions { get; set; } = default!; /* lateinit */
         public Guid ConnectionId => ServiceContext.ContextId;
 
-        public AsyncLock AsyncWriterLock { get; internal set; }
+        public AsyncLock AsyncWriterLock { get; internal set; } = default!; /* lateinit */
         internal int MessageId { get; set; }
         internal int MethodId { get; set; }
 
         internal int responseSize = -1;
-        internal Type responseType;
+        internal Type? responseType;
 
         // helper for reflection
         internal async ValueTask WriteResponseMessageNil(Task value)
@@ -71,7 +71,7 @@ namespace MagicOnion.Server.Hubs
             var result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
-                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
+                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
             }
             responseSize = result.Length;
             responseType = typeof(Nil);
@@ -104,13 +104,13 @@ namespace MagicOnion.Server.Hubs
             byte[] result = BuildMessage(vv);
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
-                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
+                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
             }
             responseSize = result.Length;
             responseType = typeof(T);
         }
 
-        internal async ValueTask WriteErrorMessage(int statusCode, string detail, Exception ex, bool isReturnExceptionStackTraceInErrorDetail)
+        internal async ValueTask WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
         {
             // MessageFormat:
             // error-response:  [messageId, statusCode, detail, StringMessage]
@@ -124,7 +124,7 @@ namespace MagicOnion.Server.Hubs
                     writer.Write(statusCode);
                     writer.Write(detail);
 
-                    var msg = (isReturnExceptionStackTraceInErrorDetail)
+                    var msg = (isReturnExceptionStackTraceInErrorDetail && ex != null)
                         ? ex.ToString()
                         : null;
 
@@ -144,7 +144,7 @@ namespace MagicOnion.Server.Hubs
             var result = BuildMessage();
             using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
             {
-                await ServiceContext.ResponseStream.WriteAsync(result).ConfigureAwait(false);
+                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
             }
             responseSize = result.Length;
         }

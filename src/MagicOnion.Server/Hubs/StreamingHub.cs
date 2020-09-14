@@ -11,7 +11,7 @@ namespace MagicOnion.Server.Hubs
         static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
         static protected readonly ValueTask CompletedTask = new ValueTask();
 
-        public HubGroupRepository Group { get; private set; }
+        public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
         protected Guid ConnectionId { get { return Context.ContextId; } }
 
@@ -21,7 +21,7 @@ namespace MagicOnion.Server.Hubs
         protected TReceiver Broadcast(IGroup group)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
-            return (TReceiver)Activator.CreateInstance(type, group);
+            return (TReceiver)Activator.CreateInstance(type, group)!;
         }
 
         [Ignore]
@@ -34,14 +34,14 @@ namespace MagicOnion.Server.Hubs
         protected TReceiver BroadcastExcept(IGroup group, Guid except)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
-            return (TReceiver)Activator.CreateInstance(type, new object[] { group, except });
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, except })!;
         }
 
         [Ignore]
         protected TReceiver BroadcastExcept(IGroup group, Guid[] excepts)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
-            return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts });
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts })!;
         }
 
         [Ignore]
@@ -54,14 +54,14 @@ namespace MagicOnion.Server.Hubs
         protected TReceiver BroadcastTo(IGroup group, Guid toConnectionId)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
-            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId });
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId })!;
         }
 
         [Ignore]
         protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)
         {
             var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToMany;
-            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionIds });
+            return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionIds })!;
         }
 
         /// <summary>
@@ -104,8 +104,8 @@ namespace MagicOnion.Server.Hubs
         async Task HandleMessageAsync()
         {
             var ct = Context.CallContext.CancellationToken;
-            var reader = Context.RequestStream;
-            var writer = Context.ResponseStream;
+            var reader = Context.RequestStream!;
+            var writer = Context.ResponseStream!;
 
             var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 
