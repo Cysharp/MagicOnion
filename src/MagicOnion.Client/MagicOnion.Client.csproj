@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!--Ignore target for .NET Framework when building in CI-->
     <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
+    <TargetFramework Condition="'$(DISABLE_NETFX_TARGET_BUILD)' != ''">netstandard2.1</TargetFramework>
+
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
     <LangVersion>latest</LangVersion>
