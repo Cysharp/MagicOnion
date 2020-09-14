@@ -12,7 +12,6 @@
 
 <#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
     using Grpc.Core;
-    using Grpc.Core.Logging;
     using MagicOnion;
     using MagicOnion.Client;
     using MessagePack;
@@ -33,7 +32,7 @@
 
         readonly <#= interfaceDef.FullName #> __fireAndForgetClient;
 
-        public <#= clientName #>(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, ILogger logger)
+        public <#= clientName #>(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
             : base(callInvoker, host, option, serializerOptions, logger)
         {
             this.__fireAndForgetClient = new FireAndForgetClient(this);
