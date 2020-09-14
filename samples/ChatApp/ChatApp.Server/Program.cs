@@ -1,7 +1,5 @@
 using Grpc.Core;
-using MagicOnion.Hosting;
-using MagicOnion.Server;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.IO;
@@ -11,13 +9,16 @@ namespace ChatApp.Server
 {
     class Program
     {
-        static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            //GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
-
-            await MagicOnionHost.CreateDefaultBuilder()
-                .UseMagicOnion()
-                .RunConsoleAsync();
+            CreateHostBuilder(args).Build().Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
