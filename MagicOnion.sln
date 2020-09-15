@@ -25,7 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-2
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		.circleci\config.yml = .circleci\config.yml
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -72,6 +71,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.HttpGateway", "src\MagicOnion.Server.HttpGateway\MagicOnion.Server.HttpGateway.csproj", "{34C724ED-7459-4F62-855D-90C276A6F5EA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.Tests", "tests\MagicOnion.Server.Tests\MagicOnion.Server.Tests.csproj", "{E3F88CE3-F892-42AB-9D92-178BC9AD46FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{A8550C24-2486-49DA-8D1A-DB6BBB2E9905}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-canary.yml = .github\workflows\build-canary.yml
+		.github\workflows\build-debug.yml = .github\workflows\build-debug.yml
+		.github\workflows\build-docs.yml = .github\workflows\build-docs.yml
+		.github\workflows\build-release.yml = .github\workflows\build-release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -191,6 +198,7 @@ Global
 		{80127E7E-FB71-4F68-B52B-2905AD39029B} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{34C724ED-7459-4F62-855D-90C276A6F5EA} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{E3F88CE3-F892-42AB-9D92-178BC9AD46FD} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{A8550C24-2486-49DA-8D1A-DB6BBB2E9905} = {42EBB7E4-52D7-4E57-80AD-79FDD4900E13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

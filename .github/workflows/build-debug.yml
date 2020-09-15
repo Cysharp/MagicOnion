@@ -30,16 +30,17 @@ jobs:
       # build
       - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Hosting/ -c Debug
-      - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Redis/ -c Debug
-      - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Shared/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Client/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Server/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Server.HttpGateway/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Server.Redis/ -c Debug
+      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Debug
+      #- run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Debug
       - run: dotnet build ./src/MagicOnion.Generator/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Debug
       # test
-      - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Debug
-      - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Debug
+      - run: dotnet test ./tests/MagicOnion.Server.Tests/ -c Debug
       - run: dotnet test ./tests/MagicOnion.Generator.Tests/ -c Debug
 
   build-unity:
