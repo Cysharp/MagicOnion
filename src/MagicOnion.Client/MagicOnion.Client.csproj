@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--Ignore target for .NET Framework when building in CI-->
-    <TargetFrameworks>netstandard2.1;net461</TargetFrameworks>
-    <TargetFrameworks Condition="'$(DISABLE_NETFX_TARGET_BUILD)' != ''">netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
@@ -12,16 +10,15 @@
 
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>
 
-
     <!-- NuGet -->
     <PackageId>MagicOnion.Client</PackageId>
     <Description>Client library for MagicOnion. Unified Realtime/API Engine for .NET Core / Unity.</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
     <PackageReference Include="Grpc.Net.Client" Version="2.30.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Grpc" Version="2.30.0" />
   </ItemGroup>
 
