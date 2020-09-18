@@ -21,7 +21,7 @@ MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(bina
 MagicOnion is for Microservices(communicate between .NET Core Servers like Orleans, ServiceFabric, AMBROSIA), API Service(for WinForms/WPF like WCF, ASP.NET Core MVC), Native Client’s API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
 
 ## Quick Start
-for .NET 4.6, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity supports see [Unity client Supports](#unity-client-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](#swagger) section.
+for .NET 4.6.1, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity supports see [Unity client Supports](#unity-client-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](#swagger) section.
 
 ```
 Install-Package MagicOnion
