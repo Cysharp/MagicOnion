@@ -39,7 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var configName = Options.Options.DefaultName;
             var glueServiceType = MagicOnionGlueService.CreateType();
 
-            services.TryAddSingleton<IMagicOnionLogger, MagicOnionLogToLogger>();
+            services.TryAddSingleton<IMagicOnionLogger, NullMagicOnionLogger>();
 
             services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
             services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
