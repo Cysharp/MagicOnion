@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: chatapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: nlb.example.com
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: ssl
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:ap-northeast-1:123456781234:certificate/12345678-abcd-1234-efgh-1234abcd5678
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: magiconion
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  name: chatapp-svc
+  namespace: chatapp
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - name: magiconion
+      port: 12345
+      protocol: TCP
+      targetPort: magiconion
+  selector:
+    app: magiconion
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: magiconion
+  name: chatapp
+  namespace: chatapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: magiconion
+  template:
+    metadata:
+      labels:
+        app: magiconion
+    spec:
+      containers:
+        - env:
+            - name: DOTNET_ENVIRONMENT
+              value: Production
+          image: cysharp/magiconion_sample_chatapp:3.0.13-chatapp
+          imagePullPolicy: Always
+          name: chatapp
+          ports:
+            - containerPort: 12345
+              name: magiconion
