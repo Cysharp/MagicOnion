@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - run: echo "::set-env name=MAGICONION_VERSION::ci-`date '+%Y%m%d-%H%M%S'`+${GITHUB_SHA:0:6}"
+      - run: echo "MAGICONION_VERSION=ci-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
@@ -78,7 +78,7 @@ jobs:
           dotnet-version: 3.1.101
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
-      - run: echo "::set-env name=VSS_NUGET_EXTERNAL_FEED_ENDPOINTS::${FEED_ENDPOINTS}"
+      - run: echo "VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=${FEED_ENDPOINTS}" >> $GITHUB_ENV
         env:
           FEED_ENDPOINTS: ${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
