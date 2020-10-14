@@ -1213,7 +1213,7 @@ You must establish TLS connection for both "NLB (Listener) & Client" and "NLB (T
 Server <-- TLS (Self-signed) --> NLB <-- TLS (ACM) --> Client
 ```
 
-* NLB (Listener) & Client: NLB Listener work with ACM.
+* NLB (Listener) & Client: NLB Listener work with ACM. Client use Gprpc.Core.dll embedded [roots.pem](https://github.com/grpc/grpc/blob/master/etc/roots.pem) by default.
 * NLB (TargetGroup) & Server: You need set TargetGroup as TLS and listen gRPC Server as TLS. You can use self-signed cert, Let's Encrypt and others. (This README use self-signed cert.)
 
 #### Generate self-signed certificate
