@@ -1206,9 +1206,15 @@ AWS LoadBalancer supports ALPN with ALB (Application Load Balancer) and NLB (Net
 
 **Connection flow**
 
+To establish HTTP/2 between Client and Server with NLB, gRPC connection should follow full `HTTP/2 over TLS`.
+You must establish TLS connection for both "NLB (Listener) & Client" and "NLB (TargetGroup) & Server".
+
 ```
 Server <-- TLS (Self-signed) --> NLB <-- TLS (ACM) --> Client
 ```
+
+* NLB (Listener) & Client: NLB Listener work with ACM.
+* NLB (TargetGroup) & Server: You need set TargetGroup as TLS and listen gRPC Server as TLS. You can use self-signed cert, Let's Encrypt and others. (This README use self-signed cert.)
 
 #### Generate self-signed certificate
 
