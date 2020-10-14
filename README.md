@@ -1235,13 +1235,13 @@ $ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 730
 Please modify `/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com` to your domain.
 Make sure `CN=xxxx` should match to domain that your MagicOnion Server will recieve request from your client.
 
-> ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
+> ATTENTION: **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
 
 #### Server configuration
 
-> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](#generate-certificate) section and copy them.
+> NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](#generate-self-signed-certificate) section and copy them.
 
-Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
+Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add following lines before `</Project>`.
 
 ```xml
   <ItemGroup>
@@ -1389,7 +1389,7 @@ $ cp server.crt ../ChatApp.Unity/Assets/StreamingAssets/server.crt
 Please modify `/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com` your domain.
 Make sure `CN=xxxx` should match to domain that your MagicOnion Server will recieve request from your client.
 
-> ATTENTION: Make sure **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
+> ATTENTION: **server.key** is very sensitive file, while **server.crt** can be public. DO NOT COPY server.key to your client.
 
 #### Simulate dummy domain via hosts
 
@@ -1427,7 +1427,7 @@ pinging to dummy.example.com [127.0.0.1] 32 bytes data:
 
 > NOTE: Server will use **server.crt** and **server.key**, if you didn't copy OpenSSL generated `server.crt` and `server.key`, please back to [generate certificate](#generate-certificate) section and copy them.
 
-Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add folloging lines before `</Project>`.
+Open `samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj` and add following lines before `</Project>`.
 
 ```xml
   <ItemGroup>
