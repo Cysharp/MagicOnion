@@ -22,7 +22,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
       # tag
-      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+      - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       # build
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
@@ -82,7 +82,7 @@ jobs:
       - name: Activate Unity, always returns a success. But if a subsequent run fails, the activation may have failed(if succeeded, shows `Next license update check is after` and not shows other message(like GUID != GUID). If fails not). In that case, upload the artifact's .alf file to https://license.unity3d.com/manual to get the .ulf file and set it to secrets.
         run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
 
-      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+      - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       # execute scripts/Export Package
       - name: Export unitypackage
@@ -108,7 +108,7 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.101
-      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+      - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       # Create Release
       - uses: actions/create-release@v1
         id: create_release
