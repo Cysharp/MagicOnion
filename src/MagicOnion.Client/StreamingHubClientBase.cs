@@ -218,7 +218,9 @@ namespace MagicOnion.Client
         protected async Task<TResponse> WriteMessageAsyncFireAndForget<TRequest, TResponse>(int methodId, TRequest message)
         {
             await WriteMessageAsync(methodId, message).ConfigureAwait(false);
-            return default(TResponse);
+#pragma warning disable CS8603 // Possible null reference return.
+            return default;
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
