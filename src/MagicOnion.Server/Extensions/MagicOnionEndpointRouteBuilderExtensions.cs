@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.Routing
     {
         public static GrpcServiceEndpointConventionBuilder MapMagicOnionService(this IEndpointRouteBuilder builder)
         {
-            var descriptor = builder.ServiceProvider.GetService<MagicOnionServiceDefinitionGlueDescriptor>();
+            var descriptor = builder.ServiceProvider.GetRequiredService<MagicOnionServiceDefinitionGlueDescriptor>();
 
             // builder.MapGrpcService<GlueServiceType>();
             var mapGrpcServiceMethod = typeof(GrpcEndpointRouteBuilderExtensions)

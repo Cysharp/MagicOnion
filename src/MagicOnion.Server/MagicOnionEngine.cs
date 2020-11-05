@@ -55,7 +55,10 @@ namespace MagicOnion.Server
                       return ex.Types.Where(t => t != null);
                   }
               });
+
+#pragma warning disable CS8620 // Argument of type cannot be used for parameter of type in due to differences in the nullability of reference types.
             return BuildServerServiceDefinition(serviceProvider, types, options);
+#pragma warning restore CS8620 // Argument of type cannot be used for parameter of type in due to differences in the nullability of reference types.
         }
 
         /// <summary>
