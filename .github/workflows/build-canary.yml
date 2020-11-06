@@ -11,9 +11,6 @@ on:
 jobs:
   canary-build:
     if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
-    strategy:
-      matrix:
-        dotnet: ["3.1.202"] # support latest only
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -21,11 +18,16 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
       DISABLE_NETFX_TARGET_BUILD: 1
+      DOTNET_SDK_VERSION_3: "3.1.403"
+      DOTNET_SDK_VERSION_5: "5.0.100-rc.2.20479.15"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
       - run: echo "::set-env name=MAGICONION_VERSION::ci-`date '+%Y%m%d-%H%M%S'`+${GITHUB_SHA:0:6}"
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build

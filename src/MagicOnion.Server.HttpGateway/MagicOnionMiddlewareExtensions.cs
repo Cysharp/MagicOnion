@@ -1,3 +1,4 @@
+#nullable enable
 using Grpc.Core;
 using MagicOnion.Server.HttpGateway;
 using MagicOnion.Server.HttpGateway.Swagger;
