@@ -16,8 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Templates\**\*" Exclude="Templates\**\bin\**;Templates\**\obj\**" />
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
     <Compile Remove="**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>
