@@ -1,0 +1,4 @@
+ChatApp.Unity/
+!ChatApp.Unity/Assets/Scripts
+k8s/
+.vs/
