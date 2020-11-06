@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Cysharp, Inc.",
+  "classifications": [ "MagicOnion" ],
+  "name": "MagicOnion Server Application",
+  "identity": "MagicOnion.Server",
+  "shortName": "magiconion-server",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Company.MagicOnionServer1",
+  "defaultName": "MagicOnionServer1",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "netcoreapp3.1",
+          "description": "Target netcoreapp3.1"
+        }
+      ],
+      "replaces": "netcoreapp3.1",
+      "defaultValue": "netcoreapp3.1"
+    },
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    }
+  },
+  "postActions": [
+    {
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        { "text": "Run 'dotnet restore'" }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageType>Template</PackageType>
+
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Templates</PackageId>
+    <Title>Project templates for MagicOnion</Title>
+    <Description>Templates to use when creating an application built on MagicOnion.</Description>
+    <PackageTags>dotnet-new;templates;magiconion</PackageTags>
+
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\**\*" Exclude="Templates\**\bin\**;Templates\**\obj\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>
