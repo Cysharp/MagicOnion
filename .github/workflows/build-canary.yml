@@ -62,8 +62,8 @@ jobs:
           path: ./publish/
       # publish moc
       - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r win-x64 -o ./src/MagicOnion.Generator/bin/moc/win-x64
-      - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./src/MagicOnion.Generator/bin/moc/linux-x64
-      - run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./src/MagicOnion.Generator/bin/moc/osx-x64
+      #- run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r linux-x64 -o ./src/MagicOnion.Generator/bin/moc/linux-x64
+      #- run: dotnet publish ./src/MagicOnion.Generator/ -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeSymbolsInSingleFile=true --self-contained -r osx-x64 -o ./src/MagicOnion.Generator/bin/moc/osx-x64
       - run: zip -r moc.${{ env.MAGICONION_VERSION }}.zip ./src/MagicOnion.Generator/bin/moc
       - uses: actions/upload-artifact@v1
         with:
