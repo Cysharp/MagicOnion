@@ -27,16 +27,15 @@ namespace JwtAuthApp.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
-            services.AddMagicOnion();
-
-            services.AddMagicOnionJwtAuthentication<CustomJwtAuthenticationProvider>(options =>
-            {
-                var preSharedKey = Convert.FromBase64String(Configuration.GetSection("JwtAuthApp.Server:Secret").Value);
-                var algorithm = new HS512Algorithm(preSharedKey); // Use Symmetric algorithm (HMAC SHA-512)
-                options.Encoder = new JwtEncoder(algorithm);
-                options.Decoder = new JwtDecoder(new JwtAlgorithmResolver(algorithm));
-                options.Expire = TimeSpan.FromSeconds(5);
-            });
+            services.AddMagicOnion()
+                .AddJwtAuthentication<CustomJwtAuthenticationProvider>(options =>
+                {
+                    var preSharedKey = Convert.FromBase64String(Configuration.GetSection("JwtAuthApp.Server:Secret").Value);
+                    var algorithm = new HS512Algorithm(preSharedKey); // Use Symmetric algorithm (HMAC SHA-512)
+                    options.Encoder = new JwtEncoder(algorithm);
+                    options.Decoder = new JwtDecoder(new JwtAlgorithmResolver(algorithm));
+                    options.Expire = TimeSpan.FromSeconds(5);
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
