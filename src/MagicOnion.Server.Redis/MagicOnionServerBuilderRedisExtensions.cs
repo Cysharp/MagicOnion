@@ -11,10 +11,14 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MagicOnionServerBuilderRedisExtensions
     {
-        public static IMagicOnionServerBuilder UseRedisGroupRepository(this IMagicOnionServerBuilder builder, Action<RedisGroupOptions> configure)
+        public static IMagicOnionServerBuilder UseRedisGroupRepository(this IMagicOnionServerBuilder builder, Action<RedisGroupOptions> configure, bool registerAsDefault = false)
         {
-            builder.Services.RemoveAll<IGroupRepositoryFactory>();
-            builder.Services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
+            if (registerAsDefault)
+            {
+                builder.Services.RemoveAll<IGroupRepositoryFactory>();
+                builder.Services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
+
+            }
             builder.Services.Configure<RedisGroupOptions>(configure);
 
             return builder;
