@@ -12,7 +12,7 @@
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Client</PackageId>
-    <Description>Client library for MagicOnion. Unified Realtime/API Engine for .NET Core / Unity.</Description>
+    <Description>Provides MagicOnion client-side library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">

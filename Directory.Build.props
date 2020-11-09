@@ -16,5 +16,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Icon.png</PackageIcon>
+
+    <MagicOnionPackageDescription>Unified Realtime/API framework for .NET platform and Unity.</MagicOnionPackageDescription>
+
   </PropertyGroup>
 </Project>

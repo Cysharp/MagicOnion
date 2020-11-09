@@ -10,7 +10,7 @@
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server</PackageId>
-    <Description>Unified Realtime/API Engine for .NET Core.</Description>
+    <Description>Provides MagicOnion server-side runtime library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
   <ItemGroup>
