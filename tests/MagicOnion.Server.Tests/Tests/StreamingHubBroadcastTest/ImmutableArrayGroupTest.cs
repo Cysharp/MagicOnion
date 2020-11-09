@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,9 +16,13 @@ namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest
     {
         public class CustomServerFixture : ServerFixture<StreamingHubBroadcastTestHub>
         {
+            protected override void ConfigureServices(IServiceCollection services)
+            {
+                services.RemoveAll<IGroupRepositoryFactory>();
+                services.TryAddSingleton<IGroupRepositoryFactory, ImmutableArrayGroupRepositoryFactory>();
+            }
             protected override void ConfigureMagicOnion(MagicOnionOptions options)
             {
-                options.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
             }
         }
     }
