@@ -16,7 +16,7 @@ namespace JwtAuthApp.Client
 
         private async Task MainCore(string[] args)
         {
-            var channel = GrpcChannel.ForAddress("http://localhost:5000");
+            var channel = GrpcChannel.ForAddress("https://localhost:5001");
 
             // 1. Call an API without an authentication token.
             {
