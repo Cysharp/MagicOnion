@@ -264,17 +264,17 @@ namespace MagicOnion.Server
     /// <summary>
     /// Named data dump is most heavy, recommended to only use debugging.
     /// </summary>
-    public class MagicOnionLogToGrpcLoggerWithNamedDataDump : IMagicOnionLogger
+    public class MagicOnionLogToLoggerWithNamedDataDump : IMagicOnionLogger
     {
         readonly MessagePackSerializerOptions dumpResolverOptions;
         readonly ILogger logger;
 
-        public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger<MagicOnionLogToGrpcLoggerWithNamedDataDump> logger)
+        public MagicOnionLogToLoggerWithNamedDataDump(ILogger<MagicOnionLogToLoggerWithNamedDataDump> logger)
             : this(logger, ContractlessFirstStandardResolver.Instance)
         {
         }
 
-        public MagicOnionLogToGrpcLoggerWithNamedDataDump(ILogger<MagicOnionLogToGrpcLoggerWithNamedDataDump> logger, IFormatterResolver dumpResolver)
+        public MagicOnionLogToLoggerWithNamedDataDump(ILogger<MagicOnionLogToLoggerWithNamedDataDump> logger, IFormatterResolver dumpResolver)
         {
             this.logger = logger;
             this.dumpResolverOptions = MessagePackSerializerOptions.Standard.WithResolver(dumpResolver);
