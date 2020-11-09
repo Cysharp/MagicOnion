@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
-using MagicOnion.Server.Extensions;
-using MagicOnion.Server.HttpGateway.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +28,10 @@ namespace Sandbox.AspNetCore
 
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
             services.AddMagicOnion();
+                //.UseRedisGroupRepository(options =>
+                //{
+                //    options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect("localhost:6379");
+                //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

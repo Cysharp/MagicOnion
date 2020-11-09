@@ -9,35 +9,6 @@ using System.Threading.Tasks;
 
 namespace MagicOnion.Server.Redis
 {
-    public class RedisGroupOptions
-    {
-        public ConnectionMultiplexer ConnectionMultiplexer { get; }
-        public int Db { get; }
-
-        public RedisGroupOptions(ConnectionMultiplexer connectionMultiplexer, int db = -1)
-        {
-            ConnectionMultiplexer = connectionMultiplexer;
-            Db = db;
-        }
-    }
-
-    public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
-    {
-        private readonly RedisGroupOptions _options;
-        private readonly ConnectionMultiplexer _connection;
-
-        public RedisGroupRepositoryFactory(RedisGroupOptions options, ConnectionMultiplexer connection)
-        {
-            _options = options ?? new RedisGroupOptions(connection);
-            _connection = connection ?? throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
-        }
-
-        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
-        {
-            return new RedisGroupRepository(serializerOptions, _options, logger);
-        }
-    }
-
     public class RedisGroupRepository : IGroupRepository
     {
         MessagePackSerializerOptions serializerOptions;
@@ -53,7 +24,7 @@ namespace MagicOnion.Server.Redis
             this.serializerOptions = serializerOptions;
             this.logger = logger;
             this.factory = CreateGroup;
-            this.connection = redisGroupOptions.ConnectionMultiplexer;
+            this.connection = redisGroupOptions.ConnectionMultiplexer ?? throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
             this.db = redisGroupOptions.Db;
         }
 

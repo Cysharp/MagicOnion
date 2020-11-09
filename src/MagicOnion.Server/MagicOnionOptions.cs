@@ -33,11 +33,6 @@ namespace MagicOnion.Server
         public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; set; }
 
         /// <summary>
-        /// Default GroupRepository factory for StreamingHub.
-        /// </summary>
-        public IGroupRepositoryFactory DefaultGroupRepositoryFactory { get; set; }
-
-        /// <summary>
         /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
         /// </summary>
         public MagicOnionOptions()
@@ -46,7 +41,6 @@ namespace MagicOnion.Server
             this.SerializerOptions = MessagePackSerializer.DefaultOptions;
             this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
             this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
-            this.DefaultGroupRepositoryFactory = new ImmutableArrayGroupRepositoryFactory();
             this.EnableCurrentContext = false;
         }
     }

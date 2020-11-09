@@ -5,6 +5,7 @@ using System.Text;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
 using MagicOnion.Server.Glue;
+using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -40,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var glueServiceType = MagicOnionGlueService.CreateType();
 
             services.TryAddSingleton<IMagicOnionLogger, NullMagicOnionLogger>();
+            services.TryAddSingleton<IGroupRepositoryFactory, ImmutableArrayGroupRepositoryFactory>();
 
             services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
             services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
