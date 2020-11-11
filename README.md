@@ -46,13 +46,13 @@ First, you need to create a **gRPC Service** project from within Visual Studio o
 
 When you create a project, it contains `Protos` and `Services` folders, which are not needed in MagicOnion projects and should be removed.
 
-Adds NuGet package `MagicOnion.Server` to your project. If you are using the .NET CLI tools to add it, you can run the following command.
+Add NuGet package `MagicOnion.Server` to your project. If you are using the .NET CLI tools to add it, you can run the following command.
 
 ```bash
 dotnet add package MagicOnion.Server
 ```
 
-Next, open Startup.cs and add the following line to `ConfigureServices` method.
+Open Startup.cs and add the following line to `ConfigureServices` method.
 
 ```csharp
 services.AddMagicOnion();
@@ -74,77 +74,85 @@ app.UseEndpoints(endpoints =>
 
 Now you are ready to use MagicOnion on your server project.
 
+#### Implements a service on MagicOnion
+MagicOnion provides a Web API-like RPC service and a StreamingHub for real-time communication. This section implements a Web API-like RPC service.
+
+Add an `IMyFirstService` interface to be shared between the server and the client (namespace should match the project).
+
+```csharp
 using System;
+using MagicOnion;
 
-// define interface as Server/Client IDL.
-// implements T : IService<T> and share this type between server and client.
-public interface IMyFirstService : IService<IMyFirstService>
+namespace MyApp.Share
 {
-    // Return type must be `UnaryResult<T>` or `Task<UnaryResult<T>>`.
-    // If you can use C# 7.0 or newer, recommend to use `UnaryResult<T>`.
-    UnaryResult<int> SumAsync(int x, int y);
-}
-
-// implement RPC service to Server Project.
-// inehrit ServiceBase<interface>, interface
-public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
-{
-    // You can use async syntax directly.
-    public async UnaryResult<int> SumAsync(int x, int y)
+    // Defines .NET interface as a Server/Client IDL.
+    // The interface is shared between server and client.
+    public interface IMyFirstService : IService<IMyFirstService>
     {
-        Logger.Debug($"Received:{x}, {y}");
-
-        return x + y;
+        // The return type must be `UnaryResult<T>`.
+        UnaryResult<int> SumAsync(int x, int y);
     }
 }
 ```
 
-
-and, launch the server.
+Add a class that implements the interface `IMyFirstService`. The client calls this class.
 
 ```csharp
-class Program
+using System;
+using MagicOnion;
+using MagicOnion.Server;
+using MyApp.Share;
+
+namespace MyApp.Services
 {
-    static void Main(string[] args)
+    // Implements RPC service in the server project.
+    // The implementation class must inehrit `ServiceBase<IMyFirstService>` and `IMyFirstService`
+    public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
     {
-        GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
-
-        // setup MagicOnion and option.
-        var service = MagicOnionEngine.BuildServerServiceDefinition(isReturnExceptionStackTraceInErrorDetail: true);
-
-        var server = new global::Grpc.Core.Server
+        // `UnaryResult<T>` allows the method to be treated as `async` method.
+        public async UnaryResult<int> SumAsync(int x, int y)
         {
-            Services = { service },
-            Ports = { new ServerPort("localhost", 12345, ServerCredentials.Insecure) }
-        };
-        
-        // launch gRPC Server.
-        server.Start();
-
-        // and wait.
-        Console.ReadLine();
+            Console.WriteLine($"Received:{x}, {y}");
+            return x + y;
+        }
     }
 }
 ```
 
-write the client.
+The service is now defined and implemented. That's it.
+
+Now you can start MagicOnion server as you would a ASP.NET Core project using the F5 key or the `dotnet run` command.
+
+Then create a client that calls the created service.
+
+### Client-side: Call the service on MagicOnion
+
+**NOTE:** If you want to use it with Unity clients, see also the [Unity client support](#unity-client-support) section.
+
+Create a **Console application** project and add NuGet package `MagicOnion.Client` to the project.
+
+Share `IMyFirstService` interface with the client. Share the interface definition in some way, such as file links, shared libraries, or copy and paste.
+
+In the client code, Create `MagicOnionClient` client proxy on the shared interface and calls the service transparently.
 
 ```csharp
-// standard gRPC channel
-var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+using Grpc.Net.Client;
+using MagicOnion.Client;
+using MyApp.Shared;
 
-// get MagicOnion dynamic client proxy
+// Connect to the server using gRPC channel.
+var channel = GrpcChannel.ForAddress("https://localhost:5001");
+
+// NOTE: If your project targets non-.NET Standard 2.1, use `Grpc.Core.Channel` class instead.
+// var channel = new Channel("localhost", 5001, new SslCredentials());
+
+// Create a proxy to call the server transparently.
 var client = MagicOnionClient.Create<IMyFirstService>(channel);
 
-// call method.
-var result = await client.SumAsync(100, 200);
-Console.WriteLine("Client Received:" + result);
+// Call the server-side method using the proxy.
+var result = await client.SumAsync(123, 456);
+Console.WriteLine($"Result: {result}");
 ```
-
-MagicOnion allows primitive, multiple request value. Complex type is serialized by LZ4 Compressed MsgPack by [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) so type should follow MessagePack for C# rules.
-
-> for Server Hosting, We recommend to use `MagicOnion.Hosting`, it is easy to host and wait terminate signal, load from config, support DI, etc. see [Server host](#server-host) section.
-
 
 ## 📖 Table of contents
 
