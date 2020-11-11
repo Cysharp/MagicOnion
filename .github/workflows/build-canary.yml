@@ -18,9 +18,13 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
       DISABLE_NETFX_TARGET_BUILD: 1
+      DOTNET_SDK_VERSION_3: "3.1.403"
       DOTNET_SDK_VERSION_5: "5.0.100"
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
