@@ -1,37 +1,79 @@
 # MagicOnion
 ![build-debug](https://github.com/Cysharp/MagicOnion/workflows/build-debug/badge.svg) ![build-canary](https://github.com/Cysharp/MagicOnion/workflows/build-canary/badge.svg) ![build-release](https://github.com/Cysharp/MagicOnion/workflows/build-release/badge.svg) [![Releases](https://img.shields.io/github/release/Cysharp/MagicOnion.svg)](https://github.com/Cysharp/MagicOnion/releases)
 
-Unified Realtime/API Engine for .NET Core and Unity.
+Unified Realtime/API framework for .NET platform and Unity.
 
 [📖 Table of contents](#-table-of-contents)
 
-## What is it?
-MagicOnion is an Realtime Network Engine like [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR), [Socket.io](https://socket.io/) and RPC-Web API Framework like any web-framework.
+## About MagicOnion
+MagicOnion is a RPC framework for .NET platform that provides bi-directional real-time communications such as [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR) and [Socket.io](https://socket.io/) and RPC mechanisms such as WCF and web-based APIs.
 
-MagicOnion is built on [gRPC](https://grpc.io/) so fast(HTTP/2) and compact(binary) network transport. It does not requires `.proto` and generate unlike plain gRPC. Protocol schema can share a C# interface and classes.
+This framework is based on [gRPC](https://grpc.io/), which is a fast and compact binary network transport for HTTP/2. However, unlike plain gRPC, it treats C# interfaces as a protocol schema, enabling seamless code sharing between C# projects without the `.proto` (Protocol Buffers IDL).
 
 ![image](https://user-images.githubusercontent.com/46207/50965239-c4fdb000-1514-11e9-8365-304c776ffd77.png)
 
-> Share interface as schema and request as API Service seems like normal C# code
+> Interfaces are schemas and provide API services, just like the plain C# code
 
 ![image](https://user-images.githubusercontent.com/46207/50965825-7bae6000-1516-11e9-9501-dc91582f4d1b.png)
 
-> StreamingHub realtime service, broadcast data to many connected clients
+> Using the StreamingHub real-time communication service, the server can broadcast data to multiple clients
 
-MagicOnion is for Microservices(communicate between .NET Core Servers like Orleans, ServiceFabric, AMBROSIA), API Service(for WinForms/WPF like WCF, ASP.NET Core MVC), Native Client’s API(for Xamarin, Unity) and Realtime Server that replacement like Socket.io, SignalR, Photon, UNet, etc.
+MagicOnion can be adopted or replaced in the following use cases:
+
+- RPC services such as gRPC, used by Microservices, and WCF, commonly used by WinForms/WPF
+- API services such as ASP.NET Core MVC targeting Unity, Xamarin, and Windows clients
+- Bi-directional real-time communication such as Socket.io, SignalR, Photon and UNet
+
+MagicOnion uses [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) to serialize call arguments and return values. NET primitives and other complex types that can be serialized into MessagePack objects. See MessagePack for C# for details about serialization.
+
+## Requirements
+MagicOnion server requires NET Core 3.1 or .NET 5.0+.
+
+MagicOnion client supports a wide range of platforms, including .NET Framework 4.6.1 to .NET 5.0 as well as Unity.
+
+- Server-side (MagicOnion.Server)
+    - .NET 5.0+
+    - .NET Core 3.1
+- Client-side (MagicOnion.Client)
+    - .NET Standard 2.1 (.NET Core 3.x+, .NET 5.0+, Xamarin)
+    - .NET Standard 2.0 (.NET Framework 4.6.1+, Universal Windows Platform, .NET Core 2.x)
+    - Unity 2018.3+
 
 ## Quick Start
-for .NET 4.6.1, 4.7 and .NET Standard 2.0(.NET Core) available in NuGet. Unity supports see [Unity client Supports](#unity-client-supports) section. HttpGateway + Swagger Intergarion supports see [Swagger](#swagger) section.
+### Server-side project
+#### Setup a project for MagicOnion
+First, you need to create a **gRPC Service** project from within Visual Studio or the .NET CLI tools. MagicOnion Server is built on top of ASP.NET Core and gRPC, so the server project must be an ASP.NET Core project.
 
+When you create a project, it contains `Protos` and `Services` folders, which are not needed in MagicOnion projects and should be removed.
+
+Adds NuGet package `MagicOnion.Server` to your project. If you are using the .NET CLI tools to add it, you can run the following command.
+
+```bash
+dotnet add package MagicOnion.Server
 ```
-Install-Package MagicOnion
-```
-MagicOnion has two sides, `Service` for like web-api and `StreamingHub` for realtime communication. At first, see define `Service`.
+
+Next, open Startup.cs and add the following line to `ConfigureServices` method.
 
 ```csharp
-using Grpc.Core;
-using MagicOnion;
-using MagicOnion.Server;
+services.AddMagicOnion();
+```
+
+`app.UseEndpoints` call in `Configure` method is rewritten as follows.
+
+```csharp
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapMagicOnionService();
+
+    endpoints.MapGet("/", async context =>
+    {
+        await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+    });
+});
+```
+
+Now you are ready to use MagicOnion on your server project.
+
 using System;
 
 // define interface as Server/Client IDL.
