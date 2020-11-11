@@ -962,7 +962,7 @@ Now you can detect client network disconnection on serverside, let's override `O
 ## Deployment
 MagicOnion is also supported in Docker containers and running on Kubernetes.
 
-See [docs/deployment.md](docs/deployment.md) for information on deploying to Amazon Web Service and other cloud services.
+See [docs/articles/deployment/](docs/articles/deployment/) for information on deploying to Amazon Web Service and other cloud services.
 
 ## Integrations
 ### Swagger
