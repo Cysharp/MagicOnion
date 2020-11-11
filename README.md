@@ -341,7 +341,7 @@ Here is example of what kind of filter can be stacked.
 
 GlobalFilter can attach to MagicOnionOptions.
 
-MagicOnion filters supports [DI](#dependency-injection) by [MagicOnion.Hosting](#server-host).
+MagicOnion filters supports [DI](#dependency-injection).
 
 ```csharp
 public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
@@ -456,8 +456,11 @@ public class AppendHeaderFilter : IClientFilter
     {
         // add the common header(like authentcation).
         var header = context.CallOptions.Headers;
-        header.Add("x-foo", "abcdefg");
-        header.Add("x-bar", "hijklmn");
+        if (!header.Any(x => x.Key == "x-foo"))
+        {
+            header.Add("x-foo", "abcdefg");
+            header.Add("x-bar", "hijklmn");
+        }
 
         return await next(context);
     }
@@ -678,18 +681,24 @@ MagicOnion has distribute system called redis-backplane for group broadcast.
 
 ![image](https://user-images.githubusercontent.com/46207/50974777-5f6aed00-152f-11e9-97f3-ba2a0c97f0eb.png)
 
-* Install-Package MagicOnion.Redis
+```bash
+dotnet add package MagicOnion.Server.Redis
+```
 
 ```csharp
-// set RedisGroupRepositoryFactory
+services.AddMagicOnion()
+    .UseRedisGroupRepository(options =>
+    {
+        options.ConnectionMultiplexer = ConnectionMultiplexer.Connect("localhost:6379");
+    });
+    // If you want to use Redis backplane by default, you can specify `registerAsDefault: true`.
+```
+```csharp
+// Use Redis as backplane
 [GroupConfiguration(typeof(RedisGroupRepositoryFactory))]
 public class ...
 {
 }
-
-// configure ConnectionMultiplexer(StackExchange.Redis) to MagicOnionOption.ServiceLocator
-var option = new MagicOnionOption();
-option.ServiceLocator.Register(new ConnectionMultiplexer(...));
 ```
 
 ### Project Structure
@@ -720,23 +729,9 @@ see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page a
 
 
 ### Dependency Injection
-You can use DI(constructor injection) by GenericHost.
+You can use DI(constructor injection) on the server.
 
 ```csharp
-static async Task Main(string[] args)
-{
-    await MagicOnionHost.CreateDefaultBuilder()
-        .ConfigureServices((hostContext, services) =>
-        {
-            // DI, you can register types on this section.
-
-            // mapping config json to IOption<MyConfig>
-            // requires "Microsoft.Extensions.Options.ConfigurationExtensions" package
-            services.Configure<MyConfig>(hostContext.Configuration);
-        })
-        .RunConsoleAsync();
-}
-
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
     IOptions<MyConfig> config;
@@ -819,10 +814,10 @@ Full options are below.
 />
 ```
 
-Project structure and code generation sample, see [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
+Project structure and code generation samples are found in [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) directory and README.
 
-### iOS build with grpc
-Grpc iOS build require two additional operation on build.
+## iOS build with gRPC
+gRPC iOS build require two additional operation on build.
 
 1. Disable Bitcode
 1. Add libz.tbd
@@ -864,8 +859,8 @@ public class BuildIos
 #endif
 ```
 
-### Stripping debug symbols from ios/libgrpc.a
-When you download grpc daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
+## Stripping debug symbols from ios/libgrpc.a
+When you download gRPC daily build and extract Native Libararies for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
 The reason of libgrpc.a file size is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
 
 We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`, it's about 17MB.
@@ -1575,25 +1570,24 @@ Open `http://localhost:5432`, you can see swagger view.
 ![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
 
 ## Advanced
-### MagicOnionOption/Logging
-
+### MagicOnionOption
 
 `MagicOnionOption` can pass to `MagicOnionEngine.BuildServerServiceDefinition(MagicOnionOptions option)`.
 
 | Property | Description |
 | --- | --- |
-| `IMagicOnionLogger` MagicOnionLogger | Set the diagnostics info logger. |
 | `IList<MagicOnionFilterDescriptor>` GlobalFilters | Global MagicOnion filters. |
 | `bool` EnableCurrentContext | Enable ServiceContext.Current option by AsyncLocal, default is false. |
 | `IList<StreamingHubFilterDescriptor>` Global StreamingHub filters. | GlobalStreamingHubFilters |
 | `IGroupRepositoryFactory` DefaultGroupRepositoryFactory | Default GroupRepository factory for StreamingHub, default is ``. |
-| `IServiceLocator` ServiceLocator | Add the extra typed option. |
 | `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
-| `IFormatterResolver` FormatterResolver | MessagePack serialization resolver. Default is used ambient default(MessagePackSerialzier.Default). |
+| `MessagePackSerializerOptions` SerializerOptions | MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions). |
 
-`IMagicOnionLogger` is structured logger of MagicOnion. Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToGrpcLogger` that structured log to string log and send to `GrpcEnvironment.Logger`. `MagicOnionLogToGrpcLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToGrpcLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+### Internal Logging
+`IMagicOnionLogger` is structured logger of MagicOnion internal information.
 
-If you want to add many loggers, you can use `CompositeLogger`(for gRPC logging), `CompositeMagicOnionLogger`(for MagicOnion structured logging) to composite many loggers.
+ Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToLogger` that structured log to string log and send to `Microsoft.Extensions.Logging.ILogger`. `MagicOnionLogToLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+
 ### Raw gRPC APIs
 MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
 
