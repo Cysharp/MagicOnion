@@ -148,8 +148,9 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
 
 ## 📖 Table of contents
 
-- [What is it?](#what-is-it)
+- [About MagicOnion](#about-magiconion)
 - [Quick Start](#quick-start)
+- [Installation](#installation)
 - Fundamentals
     - [StreamingHub](#streaminghub)
     - [Filter](#filter)
@@ -164,7 +165,6 @@ MagicOnion allows primitive, multiple request value. Complex type is serialized 
         - [iOS build with gRPC](#ios-build-with-grpc)
         - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
     - [gRPC Keepalive](#grpc-keepalive)
-- Deployment
 - [Deployment](#deployment)
 - Integrations
     - [Swagger](#swagger)
