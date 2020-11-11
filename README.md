@@ -1503,69 +1503,53 @@ Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOni
 
 ## Integrations
 ### Swagger
-MagicOnion has built-in Http1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
+MagicOnion has built-in HTTP/1.1 JSON Gateway and [Swagger](http://swagger.io/) integration for Unary operation. It can execute and debug RPC-API easily.
 
-* Install-Package MagicOnion.HttpGateway
-
-HttpGateway is built on ASP.NET Core. for example, with `Microsoft.AspNetCore.Server.WebListener`.
+```bash
+dotnet add package MagicOnion.Server.HttpGateway
+```
 
 ```csharp
-// using MagicOnion.Hosting;
-// using Microsoft.Extensions.DependencyInjection;
-// using Microsoft.Extensions.Hosting;
-
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        // setup MagicOnion hosting.
-        var magicOnionHost = MagicOnionHost.CreateDefaultBuilder()
-            .UseMagicOnion(
-                new MagicOnionOptions(isReturnExceptionStackTraceInErrorDetail: true),
-                new ServerPort("localhost", 12345, ServerCredentials.Insecure))
-            .UseConsoleLifetime()
-            .Build();
-
-        // NuGet: Microsoft.AspNetCore.Server.Kestrel
-        var webHost = new WebHostBuilder()
-            .ConfigureServices(collection =>
-            {
-                // Add MagicOnionServiceDefinition for reference from Startup.
-                collection.AddSingleton<MagicOnionServiceDefinition>(magicOnionHost.Services.GetService<MagicOnionHostedServiceDefinition>().ServiceDefinition);
-            })
-            .UseKestrel()
-            .UseStartup<Startup>()
-            .UseUrls("http://localhost:5432")
-            .Build();
-
-        // Run and wait both.
-        await Task.WhenAll(webHost.RunAsync(), magicOnionHost.RunAsync());
-    }
-}
-
-// WebAPI Startup configuration.
 public class Startup
 {
-    // Inject MagicOnionServiceDefinition from DIl
-    public void Configure(IApplicationBuilder app, MagicOnionServiceDefinition magicOnion)
+    public Startup(IConfiguration configuration)
     {
-        // Optional:Add Summary to Swagger
-        // var xmlName = "Sandbox.NetCoreServer.xml";
-        // var xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), xmlName);
+        Configuration = configuration;
+    }
 
-        // HttpGateway requires two middlewares.
-        // One is SwaggerView(MagicOnionSwaggerMiddleware)
-        // One is Http1-JSON to gRPC-MagicOnion gateway(MagicOnionHttpGateway)
-        app.UseMagicOnionSwagger(magicOnion.MethodHandlers, new SwaggerOptions("MagicOnion.Server", "Swagger Integration Test", "/")
+    public IConfiguration Configuration { get; }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllersWithViews();
+
+        services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
+        services.AddMagicOnion();
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
         {
-            // XmlDocumentPath = xmlPath
+            app.UseDeveloperExceptionPage();
+        }
+
+        app.UseRouting();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapMagicOnionHttpGateway("_", app.ApplicationServices.GetService<MagicOnion.Server.MagicOnionServiceDefinition>().MethodHandlers, GrpcChannel.ForAddress("https://localhost:5001"));
+            endpoints.MapMagicOnionSwagger("swagger", app.ApplicationServices.GetService<MagicOnion.Server.MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+
+            endpoints.MapMagicOnionService();
         });
-        app.UseMagicOnionHttpGateway(magicOnion.MethodHandlers, new Channel("localhost:12345", ChannelCredentials.Insecure));
     }
 }
 ```
 
-Open `http://localhost:5432`, you can see swagger view.
+Open `http://localhost:5000`, you can see swagger view.
 
 ![image](https://cloud.githubusercontent.com/assets/46207/21295663/6a9d3e28-c59d-11e6-8081-18d14e359567.png)
 
