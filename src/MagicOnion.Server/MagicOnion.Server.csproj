@@ -10,7 +10,7 @@
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server</PackageId>
-    <Description>Provides MagicOnion server-side runtime library. $(MagicOnionPackageDescription)</Description>
+    <Description>MagicOnion server built on top of ASP.NET Core. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
   <ItemGroup>
