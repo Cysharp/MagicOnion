@@ -3,14 +3,14 @@ title: Home
 ---
 # MagicOnion
 
-Unified Realtime/API Engine for .NET Core and Unity.
+Unified Realtime/API framework for .NET platform and Unity.
 
 https://github.com/Cysharp/MagicOnion
 
-## What is it?
-MagicOnion is an Realtime Network Engine like SignalR, Socket.io and RPC-Web API Framework like any web-framework.
+## About MagicOnion
+MagicOnion is a RPC framework for .NET platform that provides bi-directional real-time communications such as [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR) and [Socket.io](https://socket.io/) and RPC mechanisms such as WCF and web-based APIs.
 
-MagicOnion is built on gRPC so fast(HTTP/2) and compact(binary) network transport. It does not requires .proto and generate unlike plain gRPC. Protocol schema can share a C# interface and classes.
+This framework is based on [gRPC](https://grpc.io/), which is a fast and compact binary network transport for HTTP/2. However, unlike plain gRPC, it treats C# interfaces as a protocol schema, enabling seamless code sharing between C# projects without the `.proto` (Protocol Buffers IDL).
 
 ## License
 This library is under the MIT License.

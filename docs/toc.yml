@@ -1,6 +1,9 @@
+- name: Deployment
+  href: articles/deployment/
+
 - name: API Documentation
   href: api/
-  homepage: api/MagicOnion.html
+  homepage: api/MagicOnion.yml
 
 - name: Repository
   href: https://github.com/Cysharp/MagicOnion
