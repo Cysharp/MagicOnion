@@ -127,7 +127,7 @@ Then create a client that calls the created service.
 
 ### Client-side: Call the service on MagicOnion
 
-> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Unity client support](#unity-client-support) section.
+> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Support for Unity client](#support-for-unity-client) section.
 
 Create a **Console application** project and add NuGet package `MagicOnion.Client` to the project.
 
@@ -157,7 +157,7 @@ Console.WriteLine($"Result: {result}");
 ## Installation
 MagicOnion is available in four NuGet packages. Please install any of the packages as needed.
 
-> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Unity client support](#unity-client-support) section.
+> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Support for Unity client](#support-for-unity-client) section.
 
 The package `MagicOnion.Server` to implement the server. You need to install this package to implement services on your server.
 
@@ -199,7 +199,7 @@ dotnet add package MagicOnion
     - [Project Structure](#project-structure)
     - [Dependency Injection](#dependency-injection)
 - Client
-    - [Unity client support](#unity-client-support)
+    - [Support for Unity client](#support-for-unity-client)
         - [iOS build with gRPC](#ios-build-with-grpc)
         - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
     - [gRPC Keepalive](#grpc-keepalive)
@@ -822,16 +822,34 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 }
 ```
 
-## Server and Clients
+# Clients
 
-### Unity client Supports
+## Support for Unity client
+MagicOnion supports Unity version, which is available for `.NET 4.x` runtime and C# 7.3 or later. (Unity 2018.3+)
 
-You can download `MagicOnion.Client.Unity.package` and `moc.zip`(MagicOnionCompiler) in the [releases page](https://github.com/cysharp/MagicOnion/releases). But MagicOnion has no dependency so download gRPC lib from [gRPC daily builds](https://packages.grpc.io/), click Build ID and download `grpc_unity_package.*.*.*-dev.zip`. One more, requires MessagePack for C# for serialization, you can download `MessagePack.Unity.*.*.*.unitypackage` from [MessagePack-CSharp/releases](https://github.com/neuecc/MessagePack-CSharp/releases).
+Using MagicOnion with Unity client requires the following four things:
 
-MagicOnion only supports `.NET 4.x` runtime and recommend to supports C# 7.0(Unity 2018.3) version.
+- MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
+- gRPC library for Unity client (gRPC official)
+- MessagePack for C#
+- MagicOnion code generator
 
-Default MagicOnion's Unity client works well on Unity Editor or not IL2CPP env. But for IL2CPP environment, you need client code generation. `moc` is cross-platform standalone application but it requires [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download).
+### MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
+`MagicOnion.Client.Unity.package` is available for download from [Releases](https://github.com/cysharp/MagicOnion/releases) page of this repository.
 
+The package contains the code to use MagicOnion with Unity. It consists of several extensions for Unity in addition to MagicOnion.Client NuGet package.
+
+### gRPC library for Unity client (gRPC official)
+gRPC library is not included in MagicOnion package. You need to download and install separately.
+
+gRPC library can be found at [gRPC daily builds](https://packages.grpc.io/), click `Build ID`, then click `grpc_unity_package.*.*.*-dev.zip` to download the library. See [gRPC C# の experimental support for Unity](https://github.com/grpc/grpc/tree/master/src/csharp/experimental#unity) for details.
+
+> **NOTE**: If you encounter error about `Google.Protobuf.dll`, you can remove the library. MagicOnion does not depend `Google.Protobuf.dll`. ([Issue#296](https://github.com/Cysharp/MagicOnion/issues/296))
+
+### MessagePack for C#
+MessagePack for C# is not included in MagicOnion package. You need to download and install separately.
+
+See [MessagePack for C# installation for Unity](https://github.com/neuecc/MessagePack-CSharp#unity) for details.
 ```
 argument list:
 -i, -input: Input path of analyze csproj or directory.
