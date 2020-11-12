@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -138,10 +138,7 @@ namespace MagicOnion
             }
             else
             {
-                // 3.0.4, use this.
-                // return SymbolEqualityComparer.Default.Equals(left, right);
-                // 3.0.1 use this.
-                return left.Equals(right);
+                return SymbolEqualityComparer.Default.Equals(left, right);
             }
         }
     }

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>latest</LangVersion>
+    <!--<nullable>enable</nullable>-->
+
+    <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Client</PackageId>
+    <Description>MagicOnion client-side runtime library. $(MagicOnionPackageDescription)</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
+    <PackageReference Include="Grpc.Net.Client" Version="2.30.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Grpc" Version="2.30.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Sync codes: MagicOnion.Client for Unity -->
+  <PropertyGroup>
+    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Client\</DestinationRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

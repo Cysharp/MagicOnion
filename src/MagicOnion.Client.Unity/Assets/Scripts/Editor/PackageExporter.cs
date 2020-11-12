@@ -14,7 +14,7 @@ public static class PackageExporter
         // configure
         var roots = new[]
         {
-            "Scripts/MagicOnion",
+            "Scripts/MagicOnion.Client",
             "Scripts/MagicOnion.Abstractions",
             "Scripts/MagicOnion.Unity",
         };

@@ -3,7 +3,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <VersionPrefix>3.0.13</VersionPrefix>
+    <VersionPrefix>4.0.0</VersionPrefix>
 
     <!-- NuGet Packaging -->
     <PackageVersion>$(Version)</PackageVersion>
@@ -16,5 +16,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Icon.png</PackageIcon>
+
+    <MagicOnionPackageDescription>Unified Realtime/API framework for .NET platform and Unity.</MagicOnionPackageDescription>
+
   </PropertyGroup>
 </Project>

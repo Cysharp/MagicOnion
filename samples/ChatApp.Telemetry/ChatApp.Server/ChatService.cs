@@ -5,16 +5,19 @@ using MessagePack;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ChatApp.Server
 {
     public class ChatService : ServiceBase<IChatService>, IChatService
     {
         private ActivitySource activitySource;
+        private ILogger logger;
 
-        public ChatService(ActivitySource activitySource)
+        public ChatService(ILogger<ChatService> logger, ActivitySource activitySource)
         {
             this.activitySource = activitySource;
+            this.logger = logger;
         }
 
         public async UnaryResult<Nil> GenerateException(string message)
@@ -33,7 +36,7 @@ namespace ChatApp.Server
 
         public UnaryResult<Nil> SendReportAsync(string message)
         {
-            Logger.Debug($"{message}");
+            logger.LogDebug($"{message}");
 
             return UnaryResult(Nil.Default);
         }

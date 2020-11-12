@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <DefineConstants>NON_UNITY</DefineConstants>
+        <Company>Cysharp</Company>
+
+        <!-- NuGet -->
+        <PackageId>MagicOnion.Server.Redis</PackageId>
+        <Description>Redis backplane for MagicOnion.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MessagePack" Version="2.1.90" />
+        <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+        <PackageReference Include="System.Buffers" Version="4.5.0" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+    </ItemGroup>
+</Project>

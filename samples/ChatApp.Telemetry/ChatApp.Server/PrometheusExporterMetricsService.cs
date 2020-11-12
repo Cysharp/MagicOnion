@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using MagicOnion.OpenTelemetry;
+using MagicOnion.Server.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

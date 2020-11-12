@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Grpc.Net.Client;
 using JwtAuthApp.Shared;
 using MagicOnion.Client;
 
@@ -15,7 +16,7 @@ namespace JwtAuthApp.Client
 
         private async Task MainCore(string[] args)
         {
-            var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
+            var channel = GrpcChannel.ForAddress("https://localhost:5001");
 
             // 1. Call an API without an authentication token.
             {
@@ -95,9 +96,9 @@ namespace JwtAuthApp.Client
     {
         private readonly string _signInId;
         private readonly string _password;
-        private readonly Channel _channel;
+        private readonly GrpcChannel _channel;
 
-        public WithAuthenticationFilter(string signInId, string password, Channel channel)
+        public WithAuthenticationFilter(string signInId, string password, GrpcChannel channel)
         {
             _signInId = signInId ?? throw new ArgumentNullException(nameof(signInId));
             _password = password ?? throw new ArgumentNullException(nameof(password));

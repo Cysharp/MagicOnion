@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1987061F-8970-4018-8D58-6932961C9EB4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5A3F5158-7B17-4586-9885-9E60C1393185}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{15598FE3-201F-4255-9ADA-622B52D2A6ED}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.circleci\config.yml = .circleci\config.yml
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{42EBB7E4-52D7-4E57-80AD-79FDD4900E13}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ChatApp.Telemetry", "ChatApp.Telemetry", "{134A64BF-3792-44EC-BD32-DD076A6B5643}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server", "samples\ChatApp.Telemetry\ChatApp.Server\ChatApp.Server.csproj", "{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Shared", "samples\ChatApp.Telemetry\ChatApp.Shared\ChatApp.Shared.csproj", "{A54E6CE7-6053-4186-94BF-EAF57432256B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.OpenTelemetry", "src\MagicOnion.Server.OpenTelemetry\MagicOnion.Server.OpenTelemetry.csproj", "{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A54E6CE7-6053-4186-94BF-EAF57432256B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54E6CE7-6053-4186-94BF-EAF57432256B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54E6CE7-6053-4186-94BF-EAF57432256B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54E6CE7-6053-4186-94BF-EAF57432256B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{134A64BF-3792-44EC-BD32-DD076A6B5643} = {5A3F5158-7B17-4586-9885-9E60C1393185}
+		{B72BEFE9-AB6C-4340-BB0D-C6E300E1C442} = {134A64BF-3792-44EC-BD32-DD076A6B5643}
+		{A54E6CE7-6053-4186-94BF-EAF57432256B} = {134A64BF-3792-44EC-BD32-DD076A6B5643}
+		{BD3A9267-EE7C-4D3A-B877-1772DCAD7358} = {1987061F-8970-4018-8D58-6932961C9EB4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
+	EndGlobalSection
+EndGlobal

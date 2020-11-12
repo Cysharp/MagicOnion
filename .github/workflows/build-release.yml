@@ -7,45 +7,51 @@ on:
 
 jobs:
   build-dotnet:
-    strategy:
-      matrix:
-        dotnet: ["3.1.202"] # support latest only
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
+      DOTNET_SDK_VERSION_3: "3.1.403"
+      DOTNET_SDK_VERSION_5: "5.0.100"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
       # tag
       - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       # build
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
-      - run: dotnet build ./src/MagicOnion.Hosting/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
-      - run: dotnet build ./src/MagicOnion.HttpGateway/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
-      - run: dotnet build ./src/MagicOnion.Redis/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
-      - run: dotnet build ./src/MagicOnion.OpenTelemetry/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Shared/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Client/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Server/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Server.HttpGateway/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Server.Redis/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
+      #- run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
-      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       # test
       # - run: dotnet test ./tests/MagicOnion.NetCoreTests/ -c Release
       # - run: dotnet test ./tests/MagicOnion.Hosting.Tests/ -c Release
       # pack nuget
       - run: dotnet pack ./src/MagicOnion/MagicOnion.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
       - run: dotnet pack ./src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
-      - run: dotnet pack ./src/MagicOnion.Hosting/MagicOnion.Hosting.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
-      - run: dotnet pack ./src/MagicOnion.HttpGateway/MagicOnion.HttpGateway.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
-      - run: dotnet pack ./src/MagicOnion.Redis/MagicOnion.Redis.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
-      - run: dotnet pack ./src/MagicOnion.OpenTelemetry/MagicOnion.OpenTelemetry.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Shared/MagicOnion.Shared.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Client/MagicOnion.Client.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server/MagicOnion.Server.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server.HttpGateway/MagicOnion.Server.HttpGateway.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server.Redis/MagicOnion.Server.Redis.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server.Authentication/MagicOnion.Server.Authentication.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
+      #- run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
       - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
       - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
-      - run: dotnet pack ./src/MagicOnion.Server.Authentication/MagicOnion.Server.Authentication.csproj -c Release --no-build -p:VersionPrefix=${{ env.GIT_TAG }} -o ./publish
       - uses: actions/upload-artifact@v1
         with:
           name: nuget

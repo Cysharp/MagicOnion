@@ -52,7 +52,7 @@ namespace MagicOnion.Server.Authentication
             }
         }
 
-        public MagicOnionFilterAttribute CreateInstance(IServiceLocator serviceLocator)
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceProvider)
         {
             return new AuthorizeFilter(Roles);
         }
