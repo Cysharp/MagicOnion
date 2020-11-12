@@ -634,8 +634,8 @@ Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it
 | `MethodInfo` MethodInfo | Invoked Method. |
 | `ILookup<Type, Attribute> AttributeLookup | Cached Attributes that merged both service and method. |
 | `ServerCallContext` CallContext | Raw gRPC Context. |
-| `IFormatterResolver` FormatterResolver | Using MessagePack resolver. |
-| `IServiceLocator` ServiceLocator | Get the registered service. |
+| `MessagePackSerializerOptions` SerializerOptions | Using MessagePack serializer options. |
+| `IServiceProvider` ServiceProvider | Get the service provider. |
 
 `Items` is useful, for example authentication filter add UserId to Items and take out from service method.
 
