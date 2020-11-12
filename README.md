@@ -1020,10 +1020,10 @@ Make sure you can build app with iOS and works fine.
 ## gRPC Keepalive
 When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
 
-## Applied to .NET Standard 2.1 platforms (Grpc.Net.Client)
+### Applied to .NET Standard 2.1 platforms (Grpc.Net.Client)
 See [keep alive pings | Performance best practices with gRPC | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/performance?view=aspnetcore-5.0#keep-alive-pings) for information on setting up keepalive for Grpc.Net.Client.
 
-## Applied to .NET Standard 2.0 or Unity platforms (Grpc.Core)
+### Applied to .NET Standard 2.0 or Unity platforms (Grpc.Core)
 Follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
 
 MagicOnion offers two ways to configure gRPC Core Keepalive, `ChannelOption` and `MagicOnionOption`.
