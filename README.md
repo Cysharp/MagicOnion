@@ -78,7 +78,6 @@ The complete Startup.cs will look like this:
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 namespace MyApp
 {
@@ -117,7 +116,7 @@ Add an `IMyFirstService` interface to be shared between the server and the clien
 using System;
 using MagicOnion;
 
-namespace MyApp.Share
+namespace MyApp.Shared
 {
     // Defines .NET interface as a Server/Client IDL.
     // The interface is shared between server and client.
@@ -135,7 +134,7 @@ Add a class that implements the interface `IMyFirstService`. The client calls th
 using System;
 using MagicOnion;
 using MagicOnion.Server;
-using MyApp.Share;
+using MyApp.Shared;
 
 namespace MyApp.Services
 {
