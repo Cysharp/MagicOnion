@@ -211,7 +211,6 @@ dotnet add package MagicOnion
     - [Zero deserialization mapping](#zero-deserialization-mapping)
 - Experimentals
     - [OpenTelemetry](#opentelemetry)
-- [Author Info](#author-info)
 - [License](#license)
 
 ## Fundamentals
@@ -845,6 +844,8 @@ gRPC library can be found at [gRPC daily builds](https://packages.grpc.io/), cli
 
 > **NOTE**: If you encounter error about `Google.Protobuf.dll`, you can remove the library. MagicOnion does not depend `Google.Protobuf.dll`. ([Issue#296](https://github.com/Cysharp/MagicOnion/issues/296))
 
+> **NOTE**: gRPC native library for iOS has a file size of over 100MB, which may cause problems when pushing to GitHub or others. For more information on solutions, see [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca).
+
 ### MessagePack for C#
 MessagePack for C# is not included in MagicOnion package. You need to download and install separately.
 
@@ -1017,9 +1018,13 @@ $ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
 Make sure you can build app with iOS and works fine.
 
 ## gRPC Keepalive
-
 When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
-It's nothing special, just follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
+
+## Applied to .NET Standard 2.1 platforms (Grpc.Net.Client)
+See [keep alive pings | Performance best practices with gRPC | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/performance?view=aspnetcore-5.0#keep-alive-pings) for information on setting up keepalive for Grpc.Net.Client.
+
+## Applied to .NET Standard 2.0 or Unity platforms (Grpc.Core)
+Follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
 
 MagicOnion offers two ways to configure gRPC Core Keepalive, `ChannelOption` and `MagicOnionOption`.
 
@@ -1434,12 +1439,6 @@ I believe that this can be easily and effectively applied to sending a large num
 MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Prometheus](https://prometheus.io/), [StackDriver](https://cloud.google.com/stackdriver/pricing), [Zipkin](https://zipkin.io/) and others.
 
 See details at [MagicOnion.Server.OpenTelemetry](src/MagicOnion.Server.OpenTelemetry)
-
-## Author Info
-This library is mainly developed by Yoshifumi Kawai(a.k.a. neuecc).  
-He is the CEO/CTO of Cysharp which is a subsidiary of [Cygames](https://www.cygames.co.jp/en/).  
-He is awarding Microsoft MVP for Developer Technologies(C#) since 2011.  
-He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) and [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp/).
 
 ## License
 This library is under the MIT License.
