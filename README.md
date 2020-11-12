@@ -830,7 +830,7 @@ Using MagicOnion with Unity client requires the following four things:
 - MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
 - gRPC library for Unity client (gRPC official)
 - MessagePack for C#
-- MagicOnion code generator
+- MagicOnion code generator (for IL2CPP)
 
 ### MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
 `MagicOnion.Client.Unity.package` is available for download from [Releases](https://github.com/cysharp/MagicOnion/releases) page of this repository.
@@ -849,7 +849,7 @@ MessagePack for C# is not included in MagicOnion package. You need to download a
 
 See [MessagePack for C# installation for Unity](https://github.com/neuecc/MessagePack-CSharp#unity) for details.
 
-### MagicOnion code generator
+### MagicOnion code generator (for IL2CPP)
 
 MagicOnion's default client only supports Unity Editor or non-IL2CPP environments (e.g. Windows/macOS/Linux Standalone). If you want to use MagicOnion on IL2CPP environments, you need to generate a client and register it in your Unity project.
 
