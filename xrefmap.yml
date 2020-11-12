@@ -15414,6 +15414,25 @@ references:
   commentId: N:Microsoft.AspNetCore.Builder
   fullName: Microsoft.AspNetCore.Builder
   nameWithType: Microsoft.AspNetCore.Builder
+- uid: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions
+  name: MagicOnionEndpointRouteBuilderExtensions
+  href: api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html
+  commentId: T:Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions
+  fullName: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions
+  nameWithType: MagicOnionEndpointRouteBuilderExtensions
+- uid: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
+  name: MapMagicOnionService(IEndpointRouteBuilder)
+  href: api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_
+  commentId: M:Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
+  fullName: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
+  nameWithType: MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
+- uid: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*
+  name: MapMagicOnionService
+  href: api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Builder_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_
+  commentId: Overload:Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
+  isSpec: "True"
+  fullName: Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
+  nameWithType: MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
 - uid: Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions
   name: MagicOnionMiddlewareExtensions
   href: api/Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions.html
@@ -15452,31 +15471,6 @@ references:
   isSpec: "True"
   fullName: Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions.MapMagicOnionSwagger
   nameWithType: MagicOnionMiddlewareExtensions.MapMagicOnionSwagger
-- uid: Microsoft.AspNetCore.Routing
-  name: Microsoft.AspNetCore.Routing
-  href: api/Microsoft.AspNetCore.Routing.html
-  commentId: N:Microsoft.AspNetCore.Routing
-  fullName: Microsoft.AspNetCore.Routing
-  nameWithType: Microsoft.AspNetCore.Routing
-- uid: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions
-  name: MagicOnionEndpointRouteBuilderExtensions
-  href: api/Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.html
-  commentId: T:Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions
-  fullName: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions
-  nameWithType: MagicOnionEndpointRouteBuilderExtensions
-- uid: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
-  name: MapMagicOnionService(IEndpointRouteBuilder)
-  href: api/Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Routing_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_IEndpointRouteBuilder_
-  commentId: M:Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
-  fullName: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
-  nameWithType: MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService(IEndpointRouteBuilder)
-- uid: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService*
-  name: MapMagicOnionService
-  href: api/Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.html#Microsoft_AspNetCore_Routing_MagicOnionEndpointRouteBuilderExtensions_MapMagicOnionService_
-  commentId: Overload:Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
-  isSpec: "True"
-  fullName: Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
-  nameWithType: MagicOnionEndpointRouteBuilderExtensions.MapMagicOnionService
 - uid: Microsoft.Extensions.DependencyInjection
   name: Microsoft.Extensions.DependencyInjection
   href: api/Microsoft.Extensions.DependencyInjection.html

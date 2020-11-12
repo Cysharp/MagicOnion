@@ -2549,6 +2549,18 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html",
+          "hash": "fqADT2/SJZNSm6z6bwaE9A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions.yml",
       "output": {
         ".html": {
@@ -2565,31 +2577,7 @@
       "output": {
         ".html": {
           "relative_path": "api/Microsoft.AspNetCore.Builder.html",
-          "hash": "mioG2ZBa7x3mRn5lmBlPDw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Microsoft.AspNetCore.Routing.MagicOnionEndpointRouteBuilderExtensions.html",
-          "hash": "FIbdiIu1S7/NDm8ZKkxluA=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/Microsoft.AspNetCore.Routing.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/Microsoft.AspNetCore.Routing.html",
-          "hash": "pGtky7LjPToF4YWXIBIMtw=="
+          "hash": "1Kb+XlAan2VB6C0HfwhGlw=="
         }
       },
       "is_incremental": false,
@@ -2649,7 +2637,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "mRI67N53y8FYC8YLpUkm9A=="
+          "hash": "23GOVmoC4dwGXnHq0vvEzQ=="
         }
       },
       "is_incremental": false,
@@ -2736,7 +2724,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 220,
+          "total_file_count": 219,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
