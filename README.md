@@ -127,7 +127,7 @@ Then create a client that calls the created service.
 
 ### Client-side: Call the service on MagicOnion
 
-> **NOTE:** If you want to use MagicOnion client with Unity clients, see also the [Unity client support](#unity-client-support) section.
+> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Unity client support](#unity-client-support) section.
 
 Create a **Console application** project and add NuGet package `MagicOnion.Client` to the project.
 
@@ -157,7 +157,7 @@ Console.WriteLine($"Result: {result}");
 ## Installation
 MagicOnion is available in four NuGet packages. Please install any of the packages as needed.
 
-> **NOTE:** If you want to use MagicOnion client with Unity clients, see also the [Unity client support](#unity-client-support) section.
+> **NOTE:** If you want to use MagicOnion client with Unity clients, see also [Unity client support](#unity-client-support) section.
 
 The package `MagicOnion.Server` to implement the server. You need to install this package to implement services on your server.
 
