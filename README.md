@@ -127,7 +127,7 @@ Then create a client that calls the created service.
 
 ### Client-side: Call the service on MagicOnion
 
-**NOTE:** If you want to use it with Unity clients, see also the [Unity client support](#unity-client-support) section.
+> **NOTE:** If you want to use it with Unity clients, see also the [Unity client support](#unity-client-support) section.
 
 Create a **Console application** project and add NuGet package `MagicOnion.Client` to the project.
 
@@ -152,6 +152,36 @@ var client = MagicOnionClient.Create<IMyFirstService>(channel);
 // Call the server-side method using the proxy.
 var result = await client.SumAsync(123, 456);
 Console.WriteLine($"Result: {result}");
+```
+
+## Installation
+MagicOnion is available in four NuGet packages. Please install any of the packages as needed.
+
+> **NOTE:** If you want to use it with Unity clients, see also the [Unity client support](#unity-client-support) section.
+
+The package `MagicOnion.Server` to implement the server. You need to install this package to implement services on your server.
+
+```bash
+dotnet add package MagicOnion.Server
+```
+
+The package `MagicOnion.Client` to implement the client. To implement the client such as as WPF and Xamarin, you need to install this package.
+
+```bash
+dotnet add package MagicOnion.Client
+```
+
+The package `MagicOnion.Abstractions` provides interfaces and attributes commonly used by servers and clients. To create a class library project which is shared between the servers and the clients, you need to install this package.
+
+```bash
+dotnet add package MagicOnion.Abstractions
+```
+
+The package `MagicOnion` is meta package to implements the role of both server and client.
+To implement server-to-server communicaiton such as Microservices, that can be both a server and a client, we recommend to install this package.
+
+```bash
+dotnet add package MagicOnion
 ```
 
 ## 📖 Table of contents
