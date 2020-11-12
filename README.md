@@ -8,7 +8,7 @@ Unified Realtime/API framework for .NET platform and Unity.
 ## About MagicOnion
 MagicOnion is a RPC framework for .NET platform that provides bi-directional real-time communications such as [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR) and [Socket.io](https://socket.io/) and RPC mechanisms such as WCF and web-based APIs.
 
-This framework is based on [gRPC](https://grpc.io/), which is a fast and compact binary network transport for HTTP/2. However, unlike plain gRPC, it treats C# interfaces as a protocol schema, enabling seamless code sharing between C# projects without the `.proto` (Protocol Buffers IDL).
+This framework is based on [gRPC](https://grpc.io/), which is a fast and compact binary network transport for HTTP/2. However, unlike plain gRPC, it treats C# interfaces as a protocol schema, enabling seamless code sharing between C# projects without `.proto` (Protocol Buffers IDL).
 
 ![image](https://user-images.githubusercontent.com/46207/50965239-c4fdb000-1514-11e9-8365-304c776ffd77.png)
 
@@ -122,8 +122,6 @@ namespace MyApp.Services
 The service is now defined and implemented. That's it.
 
 Now you can start MagicOnion server as you would a ASP.NET Core project using the F5 key or the `dotnet run` command.
-
-Then create a client that calls the created service.
 
 ### Client-side: Call the service on MagicOnion
 
