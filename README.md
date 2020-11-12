@@ -1026,8 +1026,6 @@ See [keep alive pings | Performance best practices with gRPC | Microsoft Docs](h
 ### Applied to .NET Standard 2.0 or Unity platforms (Grpc.Core)
 Follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
 
-MagicOnion offers two ways to configure gRPC Core Keepalive, `ChannelOption` and `MagicOnionOption`.
-
 **ChannelOption**
 
 ChannelOptions is primitive way to configure options.
@@ -1054,7 +1052,7 @@ var options = new[]
 };
 ```
 
-Pass this options to Channel on Client, or to `IHostBuilder.UseMagicOnion` on Server will configure Keepalive.
+Pass this options to Channel on Client will configure Keepalive.
 
 ```csharp
 // Client
