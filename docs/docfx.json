@@ -32,6 +32,9 @@
           "articles/**/toc.yml",
           "toc.yml",
           "*.md"
+        ],
+        "exclude": [
+          "_HOW_TO_BUILD_DOCS.md"
         ]
       }
     ],
