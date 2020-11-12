@@ -11,7 +11,7 @@
 
         <!-- NuGet -->
         <PackageId>MagicOnion</PackageId>
-        <Description>$(MagicOnionPackageDescription). This package is meta package that includes MagicOnion.Server and MagicOnion.Client.</Description>
+        <Description>$(MagicOnionPackageDescription) This package is meta package that includes MagicOnion.Server and MagicOnion.Client.</Description>
 
         <!-- This is only a metapackage -->
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
