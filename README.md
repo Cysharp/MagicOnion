@@ -842,7 +842,7 @@ The package contains the code to use MagicOnion with Unity. It consists of sever
 ### gRPC library for Unity client (gRPC official)
 gRPC library is not included in MagicOnion package. You need to download and install separately.
 
-gRPC library can be found at [gRPC daily builds](https://packages.grpc.io/), click `Build ID`, then click `grpc_unity_package.*.*.*-dev.zip` to download the library. See [gRPC C# の experimental support for Unity](https://github.com/grpc/grpc/tree/master/src/csharp/experimental#unity) for details.
+gRPC library can be found at [gRPC daily builds](https://packages.grpc.io/), click `Build ID`, then click `grpc_unity_package.*.*.*-dev.zip` to download the library. See [gRPC C# - experimental support for Unity](https://github.com/grpc/grpc/tree/master/src/csharp/experimental#unity) for details.
 
 > **NOTE**: If you encounter error about `Google.Protobuf.dll`, you can remove the library. MagicOnion does not depend `Google.Protobuf.dll`. ([Issue#296](https://github.com/Cysharp/MagicOnion/issues/296))
 
