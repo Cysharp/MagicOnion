@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using MagicOnion.Server.Glue;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.Routing
+namespace Microsoft.AspNetCore.Builder
 {
     public static class MagicOnionEndpointRouteBuilderExtensions
     {
