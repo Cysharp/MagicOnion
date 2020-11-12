@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Client_MagicOnionClient" data-uid="MagicOnion.Client.MagicOnionClient" class="text-break">MagicOnionClient Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Client.html">MagicOnion.Client</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Client.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
@@ -134,19 +134,19 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_Channel_">Create&lt;T&gt;(Channel)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_">Create&lt;T&gt;(GrpcChannel)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_Channel_MagicOnion_Client_IClientFilter___">Create&lt;T&gt;(Channel, IClientFilter[])</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_MagicOnion_Client_IClientFilter___">Create&lt;T&gt;(GrpcChannel, IClientFilter[])</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_Channel_MessagePackSerializerOptions_">Create&lt;T&gt;(Channel, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_MessagePackSerializerOptions_">Create&lt;T&gt;(GrpcChannel, MessagePackSerializerOptions)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -345,19 +345,19 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_Channel_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(Channel)">Create&lt;T&gt;(Channel)</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(GrpcChannel)">Create&lt;T&gt;(GrpcChannel)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(Channel channel)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(GrpcChannel channel)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>channel</code></span> <span class="xref">Channel</span></dt>
+    <dt><span class="parametername"><code>channel</code></span> <span class="xref">GrpcChannel</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -390,19 +390,19 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_Channel_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(Channel,MagicOnion.Client.IClientFilter[])">Create&lt;T&gt;(Channel, IClientFilter[])</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(GrpcChannel,MagicOnion.Client.IClientFilter[])">Create&lt;T&gt;(GrpcChannel, IClientFilter[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(Channel channel, IClientFilter[] clientFilters)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(GrpcChannel channel, IClientFilter[] clientFilters)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>channel</code></span> <span class="xref">Channel</span></dt>
+    <dt><span class="parametername"><code>channel</code></span> <span class="xref">GrpcChannel</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>clientFilters</code></span> <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
     <dd></dd>
@@ -437,19 +437,19 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_Channel_MessagePackSerializerOptions_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(Channel,MessagePackSerializerOptions)">Create&lt;T&gt;(Channel, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_GrpcChannel_MessagePackSerializerOptions_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(GrpcChannel,MessagePackSerializerOptions)">Create&lt;T&gt;(GrpcChannel, MessagePackSerializerOptions)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(Channel channel, MessagePackSerializerOptions serializerOptions)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(GrpcChannel channel, MessagePackSerializerOptions serializerOptions)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>channel</code></span> <span class="xref">Channel</span></dt>
+    <dt><span class="parametername"><code>channel</code></span> <span class="xref">GrpcChannel</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
     <dd></dd>

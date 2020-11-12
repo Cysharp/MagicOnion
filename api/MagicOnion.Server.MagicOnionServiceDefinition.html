@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Server_MagicOnionServiceDefinition" data-uid="MagicOnion.Server.MagicOnionServiceDefinition" class="text-break">MagicOnionServiceDefinition Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
@@ -110,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition__ctor_ServerServiceDefinition_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__">MagicOnionServiceDefinition(ServerServiceDefinition, IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition__ctor_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__">MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -134,31 +134,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition_ServerServiceDefinition">ServerServiceDefinition</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
           <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers">StreamingHubHandlers</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
-  <h4>Operators
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html#MagicOnion_Server_MagicOnionServiceDefinition_op_Implicit_MagicOnion_Server_MagicOnionServiceDefinition__ServerServiceDefinition">Implicit(MagicOnionServiceDefinition to ServerServiceDefinition)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -169,19 +145,17 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_MagicOnionServiceDefinition__ctor_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.#ctor*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition__ctor_ServerServiceDefinition_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.#ctor(ServerServiceDefinition,IReadOnlyList{MagicOnion.Server.MethodHandler},IReadOnlyList{MagicOnion.Server.Hubs.StreamingHubHandler})">MagicOnionServiceDefinition(ServerServiceDefinition, IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</h4>
+  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition__ctor_IReadOnlyList_MagicOnion_Server_MethodHandler__IReadOnlyList_MagicOnion_Server_Hubs_StreamingHubHandler__" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.#ctor(IReadOnlyList{MagicOnion.Server.MethodHandler},IReadOnlyList{MagicOnion.Server.Hubs.StreamingHubHandler})">MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt;, IReadOnlyList&lt;StreamingHubHandler&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MagicOnionServiceDefinition(ServerServiceDefinition definition, IReadOnlyList&lt;MethodHandler&gt; handlers, IReadOnlyList&lt;StreamingHubHandler&gt; streamingHubHandlers)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionServiceDefinition(IReadOnlyList&lt;MethodHandler&gt; handlers, IReadOnlyList&lt;StreamingHubHandler&gt; streamingHubHandlers)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>definition</code></span> <span class="xref">ServerServiceDefinition</span></dt>
-    <dd></dd>
     <dt><span class="parametername"><code>handlers</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>streamingHubHandlers</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandler.html">StreamingHubHandler</a>&gt;</dt>
@@ -234,36 +208,6 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_MagicOnionServiceDefinition_ServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.ServerServiceDefinition*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition_ServerServiceDefinition" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.ServerServiceDefinition">ServerServiceDefinition</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ServerServiceDefinition ServerServiceDefinition { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ServerServiceDefinition</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
   <a id="MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.StreamingHubHandlers*"></a>
   <h4 id="MagicOnion_Server_MagicOnionServiceDefinition_StreamingHubHandlers" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.StreamingHubHandlers">StreamingHubHandlers</h4>
   <div class="markdown level1 summary"></div>
@@ -284,45 +228,6 @@
     <dd></dd>
   </dl>
   </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <h3 id="operators">Operators
-  </h3>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionServiceDefinition_op_Implicit_" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.op_Implicit*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionServiceDefinition_op_Implicit_MagicOnion_Server_MagicOnionServiceDefinition__ServerServiceDefinition" data-uid="MagicOnion.Server.MagicOnionServiceDefinition.op_Implicit(MagicOnion.Server.MagicOnionServiceDefinition)~ServerServiceDefinition">Implicit(MagicOnionServiceDefinition to ServerServiceDefinition)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static implicit operator ServerServiceDefinition(MagicOnionServiceDefinition self)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>self</code></span> <a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html">MagicOnionServiceDefinition</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ServerServiceDefinition</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
   
   
   

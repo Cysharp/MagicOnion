@@ -82,22 +82,10 @@
   </h3>
       <h4><a class="xref" href="MagicOnion.Server.ClientStreamingContext-2.html">ClientStreamingContext&lt;TRequest, TResponse&gt;</a></h4>
       <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.CompositeLogger.html">CompositeLogger</a></h4>
-      <section><p>Provides the ILogger to composite multiple loggers.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.Server.CompositeMagicOnionLogger.html">CompositeMagicOnionLogger</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.DefaultMagicOnionServiceActivator.html">DefaultMagicOnionServiceActivator</a></h4>
-      <section><p>Provides MagicOnion service activation default-mechanism. This activator doesn't use <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a> for constructor.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.Server.DefaultServiceLocator.html">DefaultServiceLocator</a></h4>
-      <section><p>Implements a simple ServiceLocator and provides registration mechanism.
-<a class="xref" href="MagicOnion.Server.DefaultServiceLocator.html">DefaultServiceLocator</a> doesn't support scoped-services. It always returns itself by <a class="xref" href="MagicOnion.Server.DefaultServiceLocator.html#MagicOnion_Server_DefaultServiceLocator_CreateScope">CreateScope()</a>.</p>
-</section>
       <h4><a class="xref" href="MagicOnion.Server.DuplexStreamingContext-2.html">DuplexStreamingContext&lt;TRequest, TResponse&gt;</a></h4>
       <section></section>
       <h4><a class="xref" href="MagicOnion.Server.FromServiceFilterAttribute.html">FromServiceFilterAttribute</a></h4>
-      <section><p>A MagicOnion filter that provided another filter via <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a>.</p>
+      <section><p>A MagicOnion filter that provided another filter via <see cref="!:IServiceProvider"></see>.</p>
 </section>
       <h4><a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html">FromTypeFilterAttribute</a></h4>
       <section><p>A MagicOnion filter that creates another filter of type.</p>
@@ -110,12 +98,12 @@
       <section></section>
       <h4><a class="xref" href="MagicOnion.Server.MagicOnionFilterDescriptorExtensions.html">MagicOnionFilterDescriptorExtensions</a></h4>
       <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToGrpcLogger.html">MagicOnionLogToGrpcLogger</a></h4>
+      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToLogger.html">MagicOnionLogToLogger</a></h4>
       <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToGrpcLoggerWithDataDump.html">MagicOnionLogToGrpcLoggerWithDataDump</a></h4>
+      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToLoggerWithDataDump.html">MagicOnionLogToLoggerWithDataDump</a></h4>
       <section><p>Data dump is slightly heavy, recommended to only use debugging.</p>
 </section>
-      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToGrpcLoggerWithNamedDataDump.html">MagicOnionLogToGrpcLoggerWithNamedDataDump</a></h4>
+      <h4><a class="xref" href="MagicOnion.Server.MagicOnionLogToLoggerWithNamedDataDump.html">MagicOnionLogToLoggerWithNamedDataDump</a></h4>
       <section><p>Named data dump is most heavy, recommended to only use debugging.</p>
 </section>
       <h4><a class="xref" href="MagicOnion.Server.MagicOnionOptions.html">MagicOnionOptions</a></h4>
@@ -141,10 +129,6 @@
       <section></section>
       <h4><a class="xref" href="MagicOnion.Server.ServiceContextAuthenticationExtensions.html">ServiceContextAuthenticationExtensions</a></h4>
       <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.ServiceContextTelemetryExtensions.html">ServiceContextTelemetryExtensions</a></h4>
-      <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.StreamingHubContextTelemetryExtensions.html">StreamingHubContextTelemetryExtensions</a></h4>
-      <section></section>
       <h4><a class="xref" href="MagicOnion.Server.StreamingHubFilterDescriptor.html">StreamingHubFilterDescriptor</a></h4>
       <section></section>
     <h3 id="interfaces">Interfaces
@@ -153,14 +137,7 @@
       <section></section>
       <h4><a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html">IMagicOnionLogger</a></h4>
       <section></section>
-      <h4><a class="xref" href="MagicOnion.Server.IMagicOnionServiceActivator.html">IMagicOnionServiceActivator</a></h4>
-      <section><p>An interface for MagicOnion services (<a class="xref" href="MagicOnion.IService-1.html">IService&lt;TSelf&gt;</a>, <a class="xref" href="MagicOnion.IStreamingHub-2.html">IStreamingHub&lt;TSelf, TReceiver&gt;</a>) activator.</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></h4>
-      <section><p>An interface of service locator for non-MagicOnion types.
-<a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a> doesn't provide MagicOnion related types (<a class="xref" href="MagicOnion.IService-1.html">IService&lt;TSelf&gt;</a>, <a class="xref" href="MagicOnion.IStreamingHub-2.html">IStreamingHub&lt;TSelf, TReceiver&gt;</a>, formatter, etc...).</p>
-</section>
-      <h4><a class="xref" href="MagicOnion.Server.IServiceLocatorScope.html">IServiceLocatorScope</a></h4>
+      <h4><a class="xref" href="MagicOnion.Server.IMagicOnionServerBuilder.html">IMagicOnionServerBuilder</a></h4>
       <section></section>
 </article>
           </div>

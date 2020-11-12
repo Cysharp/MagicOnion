@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Server_Hubs_StreamingHubHandler" data-uid="MagicOnion.Server.Hubs.StreamingHubHandler" class="text-break">StreamingHubHandler Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Hubs.html">MagicOnion.Server.Hubs</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
@@ -110,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandler.html#MagicOnion_Server_Hubs_StreamingHubHandler__ctor_Type_MethodInfo_MagicOnion_Server_Hubs_StreamingHubHandlerOptions_">StreamingHubHandler(Type, MethodInfo, StreamingHubHandlerOptions)</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandler.html#MagicOnion_Server_Hubs_StreamingHubHandler__ctor_Type_MethodInfo_MagicOnion_Server_Hubs_StreamingHubHandlerOptions_IServiceProvider_">StreamingHubHandler(Type, MethodInfo, StreamingHubHandlerOptions, IServiceProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -193,12 +193,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Hubs_StreamingHubHandler__ctor_" data-uid="MagicOnion.Server.Hubs.StreamingHubHandler.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubHandler__ctor_Type_MethodInfo_MagicOnion_Server_Hubs_StreamingHubHandlerOptions_" data-uid="MagicOnion.Server.Hubs.StreamingHubHandler.#ctor(Type,MethodInfo,MagicOnion.Server.Hubs.StreamingHubHandlerOptions)">StreamingHubHandler(Type, MethodInfo, StreamingHubHandlerOptions)</h4>
+  <h4 id="MagicOnion_Server_Hubs_StreamingHubHandler__ctor_Type_MethodInfo_MagicOnion_Server_Hubs_StreamingHubHandlerOptions_IServiceProvider_" data-uid="MagicOnion.Server.Hubs.StreamingHubHandler.#ctor(Type,MethodInfo,MagicOnion.Server.Hubs.StreamingHubHandlerOptions,IServiceProvider)">StreamingHubHandler(Type, MethodInfo, StreamingHubHandlerOptions, IServiceProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)</code></pre>
   </div>
 
   <section>
@@ -209,6 +209,8 @@
     <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">MethodInfo</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>handlerOptions</code></span> <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubHandlerOptions.html">StreamingHubHandlerOptions</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
     <dd></dd>
   </dl>
   </section>

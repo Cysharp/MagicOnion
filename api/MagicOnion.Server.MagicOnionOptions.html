@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Server_MagicOnionOptions" data-uid="MagicOnion.Server.MagicOnionOptions" class="text-break">MagicOnionOptions Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
@@ -110,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions__ctor_System_Boolean_">MagicOnionOptions(Boolean)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions__ctor">MagicOnionOptions()</a>
         </td>
         <td class="markdown level1 summary"><p>Constructor can handle only error detail. If you want to set the other options, you can use object initializer.</p>
 </td>
@@ -127,13 +127,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_DefaultGroupRepositoryFactory">DefaultGroupRepositoryFactory</a>
-        </td>
-        <td class="markdown level1 summary"><p>Default GroupRepository factory for StreamingHub.</p>
-</td>
-      </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_EnableCurrentContext">EnableCurrentContext</a>
@@ -164,30 +157,9 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_MagicOnionLogger">MagicOnionLogger</a>
-        </td>
-        <td class="markdown level1 summary"><p>Set the diagnostics info logger.</p>
-</td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_MagicOnionServiceActivator">MagicOnionServiceActivator</a>
-        </td>
-        <td class="markdown level1 summary"><p>MagicOnion Service instance activator.</p>
-</td>
-      </tr>
-      <tr>
-        <td>
           <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_SerializerOptions">SerializerOptions</a>
         </td>
         <td class="markdown level1 summary"><p>MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).</p>
-</td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_ServiceLocator">ServiceLocator</a>
-        </td>
-        <td class="markdown level1 summary"><p>Add the extra typed option.</p>
 </td>
       </tr>
     </tbody>
@@ -197,23 +169,15 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_MagicOnionOptions__ctor_" data-uid="MagicOnion.Server.MagicOnionOptions.#ctor*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions__ctor_System_Boolean_" data-uid="MagicOnion.Server.MagicOnionOptions.#ctor(System.Boolean)">MagicOnionOptions(Boolean)</h4>
+  <h4 id="MagicOnion_Server_MagicOnionOptions__ctor" data-uid="MagicOnion.Server.MagicOnionOptions.#ctor">MagicOnionOptions()</h4>
   <div class="markdown level1 summary"><p>Constructor can handle only error detail. If you want to set the other options, you can use object initializer.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MagicOnionOptions(bool isReturnExceptionStackTraceInErrorDetail = false)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionOptions()</code></pre>
   </div>
 
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>isReturnExceptionStackTraceInErrorDetail</code></span> <span class="xref">System.Boolean</span></dt>
-    <dd><p>true, when method body throws exception send to client exception.ToString message. It is useful for debugging. Default is false.</p>
-</dd>
-  </dl>
-  </section>
   
   
   
@@ -229,37 +193,6 @@
   </section>
   <h3 id="properties">Properties
   </h3>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionOptions_DefaultGroupRepositoryFactory_" data-uid="MagicOnion.Server.MagicOnionOptions.DefaultGroupRepositoryFactory*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions_DefaultGroupRepositoryFactory" data-uid="MagicOnion.Server.MagicOnionOptions.DefaultGroupRepositoryFactory">DefaultGroupRepositoryFactory</h4>
-  <div class="markdown level1 summary"><p>Default GroupRepository factory for StreamingHub.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IGroupRepositoryFactory DefaultGroupRepositoryFactory { get; set; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.Hubs.IGroupRepositoryFactory.html">IGroupRepositoryFactory</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <section>
   <a id="MagicOnion_Server_MagicOnionOptions_EnableCurrentContext_" data-uid="MagicOnion.Server.MagicOnionOptions.EnableCurrentContext*"></a>
   <h4 id="MagicOnion_Server_MagicOnionOptions_EnableCurrentContext" data-uid="MagicOnion.Server.MagicOnionOptions.EnableCurrentContext">EnableCurrentContext</h4>
@@ -385,68 +318,6 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_MagicOnionOptions_MagicOnionLogger_" data-uid="MagicOnion.Server.MagicOnionOptions.MagicOnionLogger*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions_MagicOnionLogger" data-uid="MagicOnion.Server.MagicOnionOptions.MagicOnionLogger">MagicOnionLogger</h4>
-  <div class="markdown level1 summary"><p>Set the diagnostics info logger.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IMagicOnionLogger MagicOnionLogger { get; set; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionOptions_MagicOnionServiceActivator_" data-uid="MagicOnion.Server.MagicOnionOptions.MagicOnionServiceActivator*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions_MagicOnionServiceActivator" data-uid="MagicOnion.Server.MagicOnionOptions.MagicOnionServiceActivator">MagicOnionServiceActivator</h4>
-  <div class="markdown level1 summary"><p>MagicOnion Service instance activator.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IMagicOnionServiceActivator MagicOnionServiceActivator { get; set; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.IMagicOnionServiceActivator.html">IMagicOnionServiceActivator</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
   <a id="MagicOnion_Server_MagicOnionOptions_SerializerOptions_" data-uid="MagicOnion.Server.MagicOnionOptions.SerializerOptions*"></a>
   <h4 id="MagicOnion_Server_MagicOnionOptions_SerializerOptions" data-uid="MagicOnion.Server.MagicOnionOptions.SerializerOptions">SerializerOptions</h4>
   <div class="markdown level1 summary"><p>MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).</p>
@@ -465,37 +336,6 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">MessagePackSerializerOptions</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionOptions_ServiceLocator_" data-uid="MagicOnion.Server.MagicOnionOptions.ServiceLocator*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions_ServiceLocator" data-uid="MagicOnion.Server.MagicOnionOptions.ServiceLocator">ServiceLocator</h4>
-  <div class="markdown level1 summary"><p>Add the extra typed option.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IServiceLocator ServiceLocator { get; set; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
     <dd></dd>
   </dl>
   </section>

@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MagicOnion Deployment Guide | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="MagicOnion Deployment Guide | MagicOnion ">
+    <meta name="generator" content="docfx 2.51.0.0">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../../">
+                  <img id="logo" src="../../img/Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="magiconion-deployment-guide">MagicOnion Deployment Guide</h1>
+
+<blockquote>
+<p><strong>NOTE</strong>: This article describes MagicOnion v3 configuration.</p>
+</blockquote>
+<h2 id="host-in-docker">Host in Docker</h2>
+<p>If you hosting the samples on a server, recommend to use container. Add Dockerfile like below.</p>
+<pre><code class="lang-dockerfile">FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS sdk
+COPY . ./workspace
+
+RUN dotnet publish ./workspace/samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/core/runtime:2.2
+COPY --from=sdk /app .
+ENTRYPOINT [&quot;dotnet&quot;, &quot;ChatApp.Server.dll&quot;]
+
+# Expose ports.
+EXPOSE 12345
+</code></pre>
+<p>And docker build, send to any container registory.</p>
+<p>Here is the sample of deploy AWS <a href="https://us-east-2.console.aws.amazon.com/ecr/">ECR</a> and <a href="https://us-east-2.console.aws.amazon.com/ecs">ECS</a> by CircleCI.</p>
+<pre><code class="lang-yml">version: 2.1
+orbs:
+# see: https://circleci.com/orbs/registry/orb/circleci/aws-ecr
+# use Environment Variables : AWS_ECR_ACCOUNT_URL
+#                             AWS_ACCESS_KEY_ID	
+#                             AWS_SECRET_ACCESS_KEY
+#                             AWS_REGION  
+  aws-ecr: circleci/aws-ecr@4.0.1
+# see: https://circleci.com/orbs/registry/orb/circleci/aws-ecs
+# use Environment Variables : AWS_ACCESS_KEY_ID	
+#                             AWS_SECRET_ACCESS_KEY
+#                             AWS_REGION
+  aws-ecs: circleci/aws-ecs@0.0.7
+workflows:
+  build-push:
+    jobs:
+      - aws-ecr/build_and_push_image:
+          repo: sample-magiconion
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build_and_push_image
+          family: 'sample-magiconion-service'
+          cluster-name: 'sample-magiconion-cluster'
+          container-image-name-updates: 'container=sample-magiconion-service,tag=latest'
+          
+</code></pre>
+<p>Here is the sample of deploy <a href="https://console.cloud.google.com/">Google Cloud Platform(GCP)</a> by CircleCI.</p>
+<pre><code class="lang-yml">version: 2.1
+orbs:
+  # see: https://circleci.com/orbs/registry/orb/circleci/gcp-gcr
+  # use Environment Variables : GCLOUD_SERVICE_KEY
+  #                             GOOGLE_PROJECT_ID
+  #                             GOOGLE_COMPUTE_ZONE
+    gcp-gcr: circleci/gcp-gcr@0.6.0
+workflows:
+    build_and_push_image:
+        jobs:
+            - gcp-gcr/build-and-push-image:
+                image: sample-magiconion
+                registry-url: asia.gcr.io # other: gcr.io, eu.gcr.io, us.gcr.io
+</code></pre>
+<p>Depending on the registration information of each environment and platform, fine tuning may be necessary, so please refer to the platform documentation and customize your own.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

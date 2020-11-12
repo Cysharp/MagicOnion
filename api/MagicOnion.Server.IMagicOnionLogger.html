@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Server_IMagicOnionLogger" data-uid="MagicOnion.Server.IMagicOnionLogger" class="text-break">IMagicOnionLogger Interface
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
@@ -129,13 +129,25 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html#MagicOnion_Server_IMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_Type_System_Double_System_Boolean_">EndInvokeHubMethod(StreamingHubContext, Int32, Type, Double, Boolean)</a>
+          <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html#MagicOnion_Server_IMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_">EndInvokeHubMethod(StreamingHubContext, Int32, Nullable&lt;Type&gt;, Double, Boolean)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html#MagicOnion_Server_IMagicOnionLogger_EndInvokeMethod_MagicOnion_Server_ServiceContext_System_Byte___Type_System_Double_System_Boolean_">EndInvokeMethod(ServiceContext, Byte[], Type, Double, Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html#MagicOnion_Server_IMagicOnionLogger_Error_Exception_MagicOnion_Server_Hubs_StreamingHubContext_">Error(Exception, StreamingHubContext)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html#MagicOnion_Server_IMagicOnionLogger_Error_Exception_ServerCallContext_">Error(Exception, ServerCallContext)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -285,12 +297,12 @@
   </section>
   <section>
   <a id="MagicOnion_Server_IMagicOnionLogger_EndInvokeHubMethod_" data-uid="MagicOnion.Server.IMagicOnionLogger.EndInvokeHubMethod*"></a>
-  <h4 id="MagicOnion_Server_IMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_Type_System_Double_System_Boolean_" data-uid="MagicOnion.Server.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,Type,System.Double,System.Boolean)">EndInvokeHubMethod(StreamingHubContext, Int32, Type, Double, Boolean)</h4>
+  <h4 id="MagicOnion_Server_IMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_" data-uid="MagicOnion.Server.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)">EndInvokeHubMethod(StreamingHubContext, Int32, Nullable&lt;Type&gt;, Double, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type type, double elapsed, bool isErrorOrInterrupted)</code></pre>
+    <pre><code class="lang-csharp hljs">void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)</code></pre>
   </div>
 
   <section>
@@ -300,7 +312,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>responseSize</code></span> <span class="xref">System.Int32</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>type</code></span> <span class="xref">Type</span></dt>
+    <dt><span class="parametername"><code>type</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Type</span>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>elapsed</code></span> <span class="xref">System.Double</span></dt>
     <dd></dd>
@@ -343,6 +355,70 @@
     <dt><span class="parametername"><code>elapsed</code></span> <span class="xref">System.Double</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>isErrorOrInterrupted</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_IMagicOnionLogger_Error_" data-uid="MagicOnion.Server.IMagicOnionLogger.Error*"></a>
+  <h4 id="MagicOnion_Server_IMagicOnionLogger_Error_Exception_MagicOnion_Server_Hubs_StreamingHubContext_" data-uid="MagicOnion.Server.IMagicOnionLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)">Error(Exception, StreamingHubContext)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Error(Exception ex, StreamingHubContext context)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>ex</code></span> <span class="xref">Exception</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html">StreamingHubContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_IMagicOnionLogger_Error_" data-uid="MagicOnion.Server.IMagicOnionLogger.Error*"></a>
+  <h4 id="MagicOnion_Server_IMagicOnionLogger_Error_Exception_ServerCallContext_" data-uid="MagicOnion.Server.IMagicOnionLogger.Error(Exception,ServerCallContext)">Error(Exception, ServerCallContext)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">void Error(Exception ex, ServerCallContext context)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>ex</code></span> <span class="xref">Exception</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>context</code></span> <span class="xref">ServerCallContext</span></dt>
     <dd></dd>
   </dl>
   </section>

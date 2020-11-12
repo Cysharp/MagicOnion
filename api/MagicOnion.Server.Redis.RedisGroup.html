@@ -1,0 +1,804 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>RedisGroup Class
+   | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="RedisGroup Class
+   | MagicOnion ">
+    <meta name="generator" content="docfx 2.51.0.0">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../">
+                  <img id="logo" src="../img/Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Redis.RedisGroup">
+  
+  <h1 id="MagicOnion_Server_Redis_RedisGroup" data-uid="MagicOnion.Server.Redis.RedisGroup" class="text-break">RedisGroup Class
+  </h1>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Redis.html">MagicOnion.Server.Redis</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.Redis.dll</h6>
+  
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class RedisGroup : object, IGroup</code></pre>
+  </div>
+
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">RedisGroup</span>
+  </div>
+  
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></div>
+  </div>
+  
+  
+  
+  
+  
+  
+  <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup__ctor_System_String_MessagePackSerializerOptions_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_">RedisGroup(String, MessagePackSerializerOptions, IGroup, ISubscriber, IDatabaseAsync)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Properties
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_GroupName">GroupName</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_AddAsync_MagicOnion_Server_ServiceContext_">AddAsync(ServiceContext)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_GetInMemoryStorage__1">GetInMemoryStorage&lt;T&gt;()</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_GetMemberCountAsync">GetMemberCountAsync()</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_RemoveAsync_MagicOnion_Server_ServiceContext_">RemoveAsync(ServiceContext)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteAllAsync__1_System_Int32___0_System_Boolean_">WriteAllAsync&lt;T&gt;(Int32, T, Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync__1_System_Int32___0_Guid_System_Boolean_">WriteExceptAsync&lt;T&gt;(Int32, T, Guid, Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync__1_System_Int32___0_Guid___System_Boolean_">WriteExceptAsync&lt;T&gt;(Int32, T, Guid[], Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteExceptRawAsync_ArraySegment_System_Byte__Guid___System_Boolean_">WriteExceptRawAsync(ArraySegment&lt;Byte&gt;, Guid[], Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteToAsync__1_System_Int32___0_Guid_System_Boolean_">WriteToAsync&lt;T&gt;(Int32, T, Guid, Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteToAsync__1_System_Int32___0_Guid___System_Boolean_">WriteToAsync&lt;T&gt;(Int32, T, Guid[], Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup_WriteToRawAsync_ArraySegment_System_Byte__Guid___System_Boolean_">WriteToRawAsync(ArraySegment&lt;Byte&gt;, Guid[], Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup__ctor_" data-uid="MagicOnion.Server.Redis.RedisGroup.#ctor*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup__ctor_System_String_MessagePackSerializerOptions_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.#ctor(System.String,MessagePackSerializerOptions,MagicOnion.Server.Hubs.IGroup,ISubscriber,IDatabaseAsync)">RedisGroup(String, MessagePackSerializerOptions, IGroup, ISubscriber, IDatabaseAsync)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public RedisGroup(string groupName, MessagePackSerializerOptions serializerOptions, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>groupName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>inmemoryGroup</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>redisSubscriber</code></span> <span class="xref">ISubscriber</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>database</code></span> <span class="xref">IDatabaseAsync</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="properties">Properties
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_GroupName_" data-uid="MagicOnion.Server.Redis.RedisGroup.GroupName*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_GroupName" data-uid="MagicOnion.Server.Redis.RedisGroup.GroupName">GroupName</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string GroupName { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_AddAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.AddAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_AddAsync_MagicOnion_Server_ServiceContext_" data-uid="MagicOnion.Server.Redis.RedisGroup.AddAsync(MagicOnion.Server.ServiceContext)">AddAsync(ServiceContext)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask AddAsync(ServiceContext context)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Server.ServiceContext.html">ServiceContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_GetInMemoryStorage_" data-uid="MagicOnion.Server.Redis.RedisGroup.GetInMemoryStorage*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_GetInMemoryStorage__1" data-uid="MagicOnion.Server.Redis.RedisGroup.GetInMemoryStorage``1">GetInMemoryStorage&lt;T&gt;()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IInMemoryStorage&lt;T&gt; GetInMemoryStorage&lt;T&gt;()
+    where T : class</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Server.Hubs.IInMemoryStorage-1.html">IInMemoryStorage</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_GetMemberCountAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.GetMemberCountAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_GetMemberCountAsync" data-uid="MagicOnion.Server.Redis.RedisGroup.GetMemberCountAsync">GetMemberCountAsync()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;int&gt; GetMemberCountAsync()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span>&lt;<span class="xref">System.Int32</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_RemoveAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.RemoveAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_RemoveAsync_MagicOnion_Server_ServiceContext_" data-uid="MagicOnion.Server.Redis.RedisGroup.RemoveAsync(MagicOnion.Server.ServiceContext)">RemoveAsync(ServiceContext)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;bool&gt; RemoveAsync(ServiceContext context)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Server.ServiceContext.html">ServiceContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span>&lt;<span class="xref">System.Boolean</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteAllAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteAllAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteAllAsync__1_System_Int32___0_System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteAllAsync``1(System.Int32,``0,System.Boolean)">WriteAllAsync&lt;T&gt;(Int32, T, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteAllAsync&lt;T&gt;(int methodId, T value, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync__1_System_Int32___0_Guid_System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptAsync``1(System.Int32,``0,Guid,System.Boolean)">WriteExceptAsync&lt;T&gt;(Int32, T, Guid, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteExceptAsync&lt;T&gt;(int methodId, T value, Guid connectionId, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionId</code></span> <span class="xref">Guid</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteExceptAsync__1_System_Int32___0_Guid___System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptAsync``1(System.Int32,``0,Guid[],System.Boolean)">WriteExceptAsync&lt;T&gt;(Int32, T, Guid[], Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteExceptAsync&lt;T&gt;(int methodId, T value, Guid[] connectionIds, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionIds</code></span> <span class="xref">Guid</span>[]</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteExceptRawAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptRawAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteExceptRawAsync_ArraySegment_System_Byte__Guid___System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteExceptRawAsync(ArraySegment{System.Byte},Guid[],System.Boolean)">WriteExceptRawAsync(ArraySegment&lt;Byte&gt;, Guid[], Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteExceptRawAsync(ArraySegment&lt;byte&gt; message, Guid[] exceptConnectionIds, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">ArraySegment</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>exceptConnectionIds</code></span> <span class="xref">Guid</span>[]</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteToAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteToAsync__1_System_Int32___0_Guid_System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToAsync``1(System.Int32,``0,Guid,System.Boolean)">WriteToAsync&lt;T&gt;(Int32, T, Guid, Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteToAsync&lt;T&gt;(int methodId, T value, Guid connectionId, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionId</code></span> <span class="xref">Guid</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteToAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteToAsync__1_System_Int32___0_Guid___System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToAsync``1(System.Int32,``0,Guid[],System.Boolean)">WriteToAsync&lt;T&gt;(Int32, T, Guid[], Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteToAsync&lt;T&gt;(int methodId, T value, Guid[] connectionIds, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionIds</code></span> <span class="xref">Guid</span>[]</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Redis_RedisGroup_WriteToRawAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToRawAsync*"></a>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup_WriteToRawAsync_ArraySegment_System_Byte__Guid___System_Boolean_" data-uid="MagicOnion.Server.Redis.RedisGroup.WriteToRawAsync(ArraySegment{System.Byte},Guid[],System.Boolean)">WriteToRawAsync(ArraySegment&lt;Byte&gt;, Guid[], Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Task WriteToRawAsync(ArraySegment&lt;byte&gt; message, Guid[] connectionIds, bool fireAndForget)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">ArraySegment</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionIds</code></span> <span class="xref">Guid</span>[]</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a>
+  </div>
+  
+  
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

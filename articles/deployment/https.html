@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Configure SSL/TLS | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Configure SSL/TLS | MagicOnion ">
+    <meta name="generator" content="docfx 2.51.0.0">
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../../">
+                  <img id="logo" src="../../img/Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="configure-ssltls">Configure SSL/TLS</h1>
+
+<blockquote>
+<p><strong>NOTE</strong>: This article describes MagicOnion v3 configuration.</p>
+</blockquote>
+<h2 id="ssltls">SSL/TLS</h2>
+<p>As <a href="https://grpc.io/docs/guides/auth/">official gRPC doc</a> notes gRPC supports SSL/TLS, and MagicOnion also support SSL/TLS.</p>
+<blockquote>
+<p>gRPC has SSL/TLS integration and promotes the use of SSL/TLS to authenticate the server, and to encrypt all the data exchanged between the client and the server. Optional mechanisms are available for clients to provide certificates for mutual authentication</p>
+</blockquote>
+<p>Let's use <a href="https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Server">samples/ChatApp/ChatApp.Server</a> for server project, and <a href="https://github.com/Cysharp/MagicOnion/tree/master/samples/ChatApp/ChatApp.Unity">samples/ChatApp/ChatApp.Unity</a> for client project.</p>
+<h2 id="http2-on-amazon-elasticloadbalancer">HTTP/2 on Amazon ElasticLoadBalancer</h2>
+<p>This section explains how to setup &quot;SSL/TLS MagicOnion on AWS&quot; with following 5 steps.</p>
+<ul>
+<li><a href="#generate-self-signed-certificate">Generate self-signed certificate</a></li>
+<li><a href="#server-configuration">Server configuration</a></li>
+<li><a href="#kubernetes-deployments">Kubernetes deployments</a></li>
+<li><a href="#enable-alpn-on-nlb">Enable ALPN on NLB</a></li>
+<li><a href="#client-configuration">Client configuration</a></li>
+</ul>
+<p>AWS LoadBalancer supports ALPN with ALB (Application Load Balancer) and NLB (Network Load Balancer), however ALB doesn't support HTTP/2 to the backend group, you must use NLB.</p>
+<p><strong>Connection flow</strong></p>
+<p>To establish HTTP/2 between Client and Server with NLB, gRPC connection should follow full <code>HTTP/2 over TLS</code>.
+You must establish TLS connection for both &quot;NLB (Listener) &amp; Client&quot; and &quot;NLB (TargetGroup) &amp; Server&quot;.</p>
+<pre><code>Server &lt;-- TLS (Self-signed) --&gt; NLB &lt;-- TLS (ACM) --&gt; Client
+</code></pre>
+<ul>
+<li>NLB (Listener) &amp; Client: NLB Listener work with ACM. Client use Gprpc.Core.dll embedded <a href="https://github.com/grpc/grpc/blob/master/etc/roots.pem">roots.pem</a> by default.</li>
+<li>NLB (TargetGroup) &amp; Server: You need set TargetGroup as TLS and listen gRPC Server as TLS. You can use self-signed cert, Let's Encrypt and others. (This README use self-signed cert.)</li>
+</ul>
+<h2 id="generate-self-signed-certificate">Generate self-signed certificate</h2>
+<p>Following command will create 3 files <code>server.csr</code>, <code>server.key</code> and <code>server.crt</code>.
+gRPC/MagicOnion Server requires server.crt and server.key.</p>
+<pre><code class="lang-shell"># move to your server project
+$ cd samples/ChatApp/ChatApp.Server
+
+# generate certificates
+# NOTE: CN=xxxx should match domain name to magic onion server pointing domain name
+$ openssl genrsa 2048 &gt; server.key
+$ openssl req -new -sha256 -key server.key -out server.csr -subj &quot;/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com&quot;
+$ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
+</code></pre>
+<p>Please modify <code>/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com</code> to your domain.
+Make sure <code>CN=xxxx</code> should match to domain that your MagicOnion Server will recieve request from your client.</p>
+<blockquote>
+<p>ATTENTION: <strong>server.key</strong> is very sensitive file, while <strong>server.crt</strong> can be public. DO NOT COPY server.key to your client.</p>
+</blockquote>
+<h2 id="server-configuration">Server configuration</h2>
+<blockquote>
+<p>NOTE: Server will use <strong>server.crt</strong> and <strong>server.key</strong>, if you didn't copy OpenSSL generated <code>server.crt</code> and <code>server.key</code>, please back to <a href="#generate-self-signed-certificate">generate certificate</a> section and copy them.</p>
+</blockquote>
+<p>Open <code>samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj</code> and add following lines before <code>&lt;/Project&gt;</code>.</p>
+<pre><code class="lang-xml">  &lt;ItemGroup&gt;
+    &lt;Folder Include=&quot;LinkFromUnity\&quot; /&gt;
+  &lt;/ItemGroup&gt;
+
+  &lt;!-- FOR SSL/TLS SUPPORT --&gt;
+  &lt;ItemGroup&gt;
+    &lt;None Update=&quot;server.crt&quot;&gt;
+      &lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+    &lt;/None&gt;
+    &lt;None Update=&quot;server.key&quot;&gt;
+      &lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+    &lt;/None&gt;
+  &lt;/ItemGroup&gt;
+
+&lt;/Project&gt;
+</code></pre>
+<p>MagicOnion.Hosting supports specifing certificate with appsettings.json.</p>
+<pre><code class="lang-json">{
+  &quot;MagicOnion&quot;: {
+    &quot;ServerPorts&quot;: [
+      {
+        &quot;Host&quot;: &quot;0.0.0.0&quot;,
+        &quot;Port&quot;: 12345,
+        &quot;UseInsecureConnection&quot;: false,
+        &quot;ServerCredentials&quot;: [
+          {
+            &quot;CertificatePath&quot;: &quot;./server.crt&quot;,
+            &quot;KeyPath&quot;: &quot;./server.key&quot;
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+<p>Now <code>dotnet publish</code> output dll and certificates, generate your docker image and push it.</p>
+<pre><code class="lang-shell">cd samples/ChatApp
+docker build -t chatapp_magiconion:latest -f ChatApp.Server/Dockerfile .
+docker tag chatapp_magiconion:latest your-image:latest
+docker push your-image:latest
+</code></pre>
+<h2 id="kubernetes-deployments">Kubernetes deployments</h2>
+<p>Apply yaml to configure EKS deployments.</p>
+<pre><code class="lang-shell"># replace with your ACM Arn and others.
+ACM=arn:aws:acm:ap-northeast-1:123456781234:certificate/12345678-abcd-1234-efgh-1234abcd5678
+DOMAIN=your-domain.com
+IMAGE=your-image:latest
+
+cat ./samples/ChatApp/k8s/nlb_acm.yaml \
+    | sed -e &quot;s|arn:aws:acm:ap-northeast-1:123456781234:certificate/12345678-abcd-1234-efgh-1234abcd5678|${ACM}|g&quot; \
+    | sed -e &quot;s|nlb.example.com|${DOMAIN}|g&quot; \
+    | sed -e &quot;s|cysharp/magiconion_sample_chatapp:3.0.13-chatapp|${IMAGE}|g&quot; \
+    | kubectl apply -f -
+</code></pre>
+<h2 id="enable-alpn-on-nlb">Enable ALPN on NLB</h2>
+<p>Current Kubernetes Service AWS integration not support annotations for ALPN.
+Configure NLB Listener's ALPN policy to <code>HTTP2Preferred</code> by following command, or via AWS Console.</p>
+<pre><code class="lang-shell">$ dns=$(kubectl get svc chatapp-svc -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+$ nlb_arn=$(aws elbv2 describe-load-balancers | jq -r &quot;.LoadBalancers[] | select(.DNSName == \&quot;${dns}\&quot;) | .LoadBalancerArn&quot;)
+$ listeners=$(aws elbv2 describe-listeners --load-balancer-arn &quot;${nlb_arn}&quot; | jq -r &quot;.Listeners[].ListenerArn&quot;)
+$ for listner in &quot;${listeners[@]}&quot;; do aws elbv2 modify-listener --listener-arn &quot;${listner}&quot; --alpn-policy HTTP2Preferred; done
+</code></pre>
+<h2 id="client-configuration">Client configuration</h2>
+<blockquote>
+<p>NOTE: Client will use Grpc.Core.dll embedded <strong>roots.pem</strong> when not specify cert file with <code>SslCredentials</code> instance.</p>
+</blockquote>
+<p>Open <code>samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs</code>, channel creation is defined as <code>ChannelCredentials.Insecure</code> in <code>InitializeClient()</code>.
+What you need tois change this line to use <code>SslCredentials</code>.</p>
+<pre><code class="lang-csharp">this.channel = new Channel(&quot;localhost&quot;, 12345, ChannelCredentials.Insecure);
+</code></pre>
+<p>Replace this line to following.</p>
+<pre><code class="lang-csharp">this.channel = new Channel(&quot;NLB.YOUR_DOMAIN.com&quot;, 12345, new SslCredentials());
+</code></pre>
+<p>Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOnion Server.</p>
+<p><img src="https://user-images.githubusercontent.com/3856350/95848171-a632ea00-0d88-11eb-8fb4-d3b322be5fb6.png" alt="image"></p>
+<blockquote>
+<p>NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show <code>disconnected server.</code> log.</p>
+</blockquote>
+<h2 id="tls-on-localhost">TLS on LocalHost</h2>
+<p>This section explains how to setup &quot;SSL/TLS MagicOnion on localhost&quot; with following 4 steps.</p>
+<ul>
+<li><a href="#generate-self-signed-certificate">Generate self-signed certificate</a></li>
+<li><a href="#simulate-dummy-domain-via-hosts">Simulate dummy domain via hosts</a></li>
+<li><a href="#server-configuration">Server configuration</a></li>
+<li><a href="#client-configuration">Client configuration</a></li>
+</ul>
+<p><strong>Connection flow</strong></p>
+<pre><code>Server &lt;-- TLS (Self-signed) --&gt; Client
+</code></pre>
+<h2 id="generate-self-signed-certificate-1">Generate self-signed certificate</h2>
+<p>Certificates are required to establish SSL/TLS with Server/Client channel connection.
+Let's use <a href="https://github.com/openssl/openssl">OpenSSL</a> to create required certificates.</p>
+<p>Following command will create 3 files <code>server.csr</code>, <code>server.key</code> and <code>server.crt</code>.
+gRPC/MagicOnion Server requires server.crt and server.key, and Client require server.crt.</p>
+<pre><code class="lang-shell"># move to your server project
+$ cd MagicOnion/samples/ChatApp/ChatApp.Server
+
+# generate certificates
+# NOTE: CN=xxxx should match domain name to magic onion server pointing domain name
+$ openssl genrsa 2048 &gt; server.key
+$ openssl req -new -sha256 -key server.key -out server.csr -subj &quot;/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com&quot;
+$ openssl x509 -req -in server.csr -signkey server.key -out server.crt -days 7300 -extensions server
+
+# server will use server.crt and server.key, leave generated certificates.
+
+# client will use server.crt, copy certificate to StreamingAssets folder.
+$ mkdir ../ChatApp.Unity/Assets/StreamingAssets
+$ cp server.crt ../ChatApp.Unity/Assets/StreamingAssets/server.crt
+</code></pre>
+<p>Please modify <code>/C=JP/ST=Tokyo/L=Tokyo/O=MagicOnion Demo/OU=Dev/CN=*.example.com</code> your domain.
+Make sure <code>CN=xxxx</code> should match to domain that your MagicOnion Server will recieve request from your client.</p>
+<blockquote>
+<p>ATTENTION: <strong>server.key</strong> is very sensitive file, while <strong>server.crt</strong> can be public. DO NOT COPY server.key to your client.</p>
+</blockquote>
+<h2 id="simulate-dummy-domain-via-hosts">Simulate dummy domain via hosts</h2>
+<p>Editting <code>hosts</code> file is the simple way to redirect dummy domain request to your localhost.</p>
+<p>Let's set your CN to you hosts, example is <code>dummy.example.com</code>.
+Open hosts file and add your entry.</p>
+<pre><code class="lang-shell"># NOTE: edit hosts to test on localhost
+# Windows: (use scoop to install sudo, or open elevated cmd or notepad.)
+PS&gt; sudo notepad c:\windows\system32\drivers\etc\hosts
+# macos:
+$ sudo vim /private/etc/hosts
+# Linux:
+$ sudo vim /etc/hosts
+</code></pre>
+<p>Entry format would be similar to this, please follow to your platform hosts rule.</p>
+<pre><code class="lang-shell">127.0.0.1	dummy.example.com
+</code></pre>
+<p>After modifying hosts, <code>ping</code> to your dummy domain and confirm localhost is responding.</p>
+<pre><code class="lang-shell">$ ping dummy.example.com
+
+pinging to dummy.example.com [127.0.0.1] 32 bytes data:
+127.0.0.1 response: bytecount =32 time &lt;1ms TTL=128
+</code></pre>
+<h2 id="server-configuration-1">Server configuration</h2>
+<blockquote>
+<p>NOTE: Server will use <strong>server.crt</strong> and <strong>server.key</strong>, if you didn't copy OpenSSL generated <code>server.crt</code> and <code>server.key</code>, please back to <a href="#generate-certificate">generate certificate</a> section and copy them.</p>
+</blockquote>
+<p>Open <code>samples/ChatApp/ChatApp.Server/ChatApp.Server.csproj</code> and add following lines before <code>&lt;/Project&gt;</code>.</p>
+<pre><code class="lang-xml">  &lt;ItemGroup&gt;
+    &lt;Folder Include=&quot;LinkFromUnity\&quot; /&gt;
+  &lt;/ItemGroup&gt;
+
+  &lt;!-- FOR SSL/TLS SUPPORT --&gt;
+  &lt;ItemGroup&gt;
+    &lt;None Update=&quot;server.crt&quot;&gt;
+      &lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+    &lt;/None&gt;
+    &lt;None Update=&quot;server.key&quot;&gt;
+      &lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+    &lt;/None&gt;
+  &lt;/ItemGroup&gt;
+
+&lt;/Project&gt;
+</code></pre>
+<p>MagicOnion.Hosting supports specifing certificate with appsettings.json.</p>
+<pre><code class="lang-json">{
+  &quot;MagicOnion&quot;: {
+    &quot;ServerPorts&quot;: [
+      {
+        &quot;Host&quot;: &quot;0.0.0.0&quot;,
+        &quot;Port&quot;: 12345,
+        &quot;UseInsecureConnection&quot;: false,
+        &quot;ServerCredentials&quot;: [
+          {
+            &quot;CertificatePath&quot;: &quot;./server.crt&quot;,
+            &quot;KeyPath&quot;: &quot;./server.key&quot;
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+<p>Debug run server on Visual Studio, any IDE or docker.</p>
+<blockquote>
+<p>NOTE: Set <code>DOTNET_ENVIRONMENT=Production</code> to use tls configured appsettings.json</p>
+</blockquote>
+<pre><code class="lang-shell">D0729 11:08:21.767387 Grpc.Core.Internal.NativeExtension gRPC native library loaded successfully.
+Application started. Press Ctrl+C to shut down.
+Hosting environment: Production
+</code></pre>
+<h2 id="client-configuration-1">Client configuration</h2>
+<blockquote>
+<p>NOTE: Client will use <strong>server.crt</strong>, if you didn't copy OpenSSL generated <code>server.crt</code> and <code>server.key</code>, please back to <a href="#generate-certificate">generate certificate</a> section and copy it.</p>
+</blockquote>
+<p>Open <code>samples/ChatApp/ChatApp.Unity/Assets/ChatComponent.cs</code>, channel creation is defined as <code>ChannelCredentials.Insecure</code> in <code>InitializeClient()</code>.
+What you need tois change this line to use <code>SslCredentials</code>.</p>
+<pre><code class="lang-csharp">this.channel = new Channel(&quot;localhost&quot;, 12345, ChannelCredentials.Insecure);
+</code></pre>
+<p>Replace this line to following.</p>
+<pre><code class="lang-csharp">var serverCred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, &quot;server.crt&quot;)));
+this.channel = new Channel(&quot;dummy.example.com&quot;, 5001, serverCred);
+</code></pre>
+<p>Play on Unity Editor and confirm Unity MagicOnion Client can connect to MagicOnion Server.</p>
+<p><img src="https://user-images.githubusercontent.com/3856350/62017554-1be97f00-b1f2-11e9-9769-70464fe6d425.png" alt="image"></p>
+<blockquote>
+<p>NOTE: If there are any trouble establish SSL/TLS connection, Unity Client will show <code>disconnected server.</code> log.</p>
+</blockquote>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

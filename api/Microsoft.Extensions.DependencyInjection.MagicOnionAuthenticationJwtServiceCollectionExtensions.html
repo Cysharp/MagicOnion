@@ -110,9 +110,9 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddMagicOnionJwtAuthentication__1_IServiceCollection_Action_MagicOnion_Server_Authentication_Jwt_JwtAuthenticationOptions__">AddMagicOnionJwtAuthentication&lt;TProvider&gt;(IServiceCollection, Action&lt;JwtAuthenticationOptions&gt;)</a>
+          <a class="xref" href="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.html#Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddJwtAuthentication__1_MagicOnion_Server_IMagicOnionServerBuilder_Action_MagicOnion_Server_Authentication_Jwt_JwtAuthenticationOptions__">AddJwtAuthentication&lt;TProvider&gt;(IMagicOnionServerBuilder, Action&lt;JwtAuthenticationOptions&gt;)</a>
         </td>
-        <td class="markdown level1 summary"><p>Adds JWT authentication and provider for MagicOnion to the specified <see cref="!:IServiceCollection"></see>.</p>
+        <td class="markdown level1 summary"><p>Adds JWT authentication and provider for MagicOnion to the specified <a class="xref" href="MagicOnion.Server.IMagicOnionServerBuilder.html">IMagicOnionServerBuilder</a>.</p>
 </td>
       </tr>
     </tbody>
@@ -121,21 +121,21 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddMagicOnionJwtAuthentication_" data-uid="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.AddMagicOnionJwtAuthentication*"></a>
-  <h4 id="Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddMagicOnionJwtAuthentication__1_IServiceCollection_Action_MagicOnion_Server_Authentication_Jwt_JwtAuthenticationOptions__" data-uid="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.AddMagicOnionJwtAuthentication``1(IServiceCollection,Action{MagicOnion.Server.Authentication.Jwt.JwtAuthenticationOptions})">AddMagicOnionJwtAuthentication&lt;TProvider&gt;(IServiceCollection, Action&lt;JwtAuthenticationOptions&gt;)</h4>
-  <div class="markdown level1 summary"><p>Adds JWT authentication and provider for MagicOnion to the specified <see cref="!:IServiceCollection"></see>.</p>
+  <a id="Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddJwtAuthentication_" data-uid="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.AddJwtAuthentication*"></a>
+  <h4 id="Microsoft_Extensions_DependencyInjection_MagicOnionAuthenticationJwtServiceCollectionExtensions_AddJwtAuthentication__1_MagicOnion_Server_IMagicOnionServerBuilder_Action_MagicOnion_Server_Authentication_Jwt_JwtAuthenticationOptions__" data-uid="Microsoft.Extensions.DependencyInjection.MagicOnionAuthenticationJwtServiceCollectionExtensions.AddJwtAuthentication``1(MagicOnion.Server.IMagicOnionServerBuilder,Action{MagicOnion.Server.Authentication.Jwt.JwtAuthenticationOptions})">AddJwtAuthentication&lt;TProvider&gt;(IMagicOnionServerBuilder, Action&lt;JwtAuthenticationOptions&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds JWT authentication and provider for MagicOnion to the specified <a class="xref" href="MagicOnion.Server.IMagicOnionServerBuilder.html">IMagicOnionServerBuilder</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static IServiceCollection AddMagicOnionJwtAuthentication&lt;TProvider&gt;(this IServiceCollection services, Action&lt;JwtAuthenticationOptions&gt; configureOptions)
+    <pre><code class="lang-csharp hljs">public static IMagicOnionServerBuilder AddJwtAuthentication&lt;TProvider&gt;(this IMagicOnionServerBuilder builder, Action&lt;JwtAuthenticationOptions&gt; configureOptions)
     where TProvider : class, IJwtAuthenticationProvider</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>services</code></span> <span class="xref">IServiceCollection</span></dt>
+    <dt><span class="parametername"><code>builder</code></span> <a class="xref" href="MagicOnion.Server.IMagicOnionServerBuilder.html">IMagicOnionServerBuilder</a></dt>
     <dd></dd>
     <dt><span class="parametername"><code>configureOptions</code></span> <span class="xref">Action</span>&lt;<a class="xref" href="MagicOnion.Server.Authentication.Jwt.JwtAuthenticationOptions.html">JwtAuthenticationOptions</a>&gt;</dt>
     <dd></dd>
@@ -145,7 +145,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IServiceCollection</span></dt>
+    <dt><a class="xref" href="MagicOnion.Server.IMagicOnionServerBuilder.html">IMagicOnionServerBuilder</a></dt>
     <dd></dd>
   </dl>
   </section>

@@ -76,7 +76,7 @@
   <h1 id="MagicOnion_Server_FromTypeFilterAttribute" data-uid="MagicOnion.Server.FromTypeFilterAttribute" class="text-break">FromTypeFilterAttribute Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.html">MagicOnion.Server</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.dll</h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"><p>A MagicOnion filter that creates another filter of type.</p>
 </div>
@@ -164,7 +164,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_CreateInstance__1_MagicOnion_Server_IServiceLocator_">CreateInstance&lt;T&gt;(IServiceLocator)</a>
+          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_CreateInstance__1_IServiceProvider_">CreateInstance&lt;T&gt;(IServiceProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -182,13 +182,13 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_">IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceLocator)</a>
+          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_IServiceProvider_">IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_">IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceLocator)</a>
+          <a class="xref" href="MagicOnion.Server.FromTypeFilterAttribute.html#MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_IServiceProvider_">IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -323,18 +323,18 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_FromTypeFilterAttribute_CreateInstance_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.CreateInstance*"></a>
-  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_CreateInstance__1_MagicOnion_Server_IServiceLocator_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.CreateInstance``1(MagicOnion.Server.IServiceLocator)">CreateInstance&lt;T&gt;(IServiceLocator)</h4>
+  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_CreateInstance__1_IServiceProvider_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.CreateInstance``1(IServiceProvider)">CreateInstance&lt;T&gt;(IServiceProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected T CreateInstance&lt;T&gt;(IServiceLocator serviceLocator)</code></pre>
+    <pre><code class="lang-csharp hljs">protected T CreateInstance&lt;T&gt;(IServiceProvider serviceProvider)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serviceLocator</code></span> <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -369,18 +369,18 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance*"></a>
-  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)">IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceLocator)</h4>
+  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_Hubs_StreamingHubFilterAttribute__CreateInstance_IServiceProvider_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#Hubs#StreamingHubFilterAttribute}#CreateInstance(IServiceProvider)">IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">StreamingHubFilterAttribute IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceLocator serviceLocator)</code></pre>
+    <pre><code class="lang-csharp hljs">StreamingHubFilterAttribute IMagicOnionFilterFactory&lt;StreamingHubFilterAttribute&gt;.CreateInstance(IServiceProvider serviceProvider)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serviceLocator</code></span> <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -406,18 +406,18 @@
   </section>
   <section>
   <a id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance*"></a>
-  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_MagicOnion_Server_IServiceLocator_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance(MagicOnion.Server.IServiceLocator)">IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceLocator)</h4>
+  <h4 id="MagicOnion_Server_FromTypeFilterAttribute_MagicOnion_Server_IMagicOnionFilterFactory_MagicOnion_Server_MagicOnionFilterAttribute__CreateInstance_IServiceProvider_" data-uid="MagicOnion.Server.FromTypeFilterAttribute.MagicOnion#Server#IMagicOnionFilterFactory{MagicOnion#Server#MagicOnionFilterAttribute}#CreateInstance(IServiceProvider)">IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">MagicOnionFilterAttribute IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceLocator serviceLocator)</code></pre>
+    <pre><code class="lang-csharp hljs">MagicOnionFilterAttribute IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;.CreateInstance(IServiceProvider serviceProvider)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serviceLocator</code></span> <a class="xref" href="MagicOnion.Server.IServiceLocator.html">IServiceLocator</a></dt>
+    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
     <dd></dd>
   </dl>
   </section>
