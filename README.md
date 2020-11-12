@@ -1080,7 +1080,7 @@ If the client supports .NET Standard 2.0, MagicOnion uses `Grpc.Core` (C-library
 
 Grpc.Core has its [own certificate store built into the library](https://github.com/grpc/grpc/blob/master/etc/roots.pem) and uses it unless you specify a certificate. This certificate store contains common CAs and is rarely a problem in production environment.
 
-However, there is a problem when communicating with a server using [ASP.NET Core development certificate](https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=visual-studio#trust-the-aspnet-core-https-development-certificate-on-windows-and-macos). For example, if you see the following exceptions when you try to connect, the server certificate validation may have failed.
+However, there is a problem when connecting with a server using [ASP.NET Core development certificate](https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=visual-studio#trust-the-aspnet-core-https-development-certificate-on-windows-and-macos). For example, if you see the following exceptions when you try to connect, the server certificate validation may have failed.
 
 ```
 Grpc.Core.RpcException: 'Status(StatusCode="Unavailable", Detail="failed to connect to all addresses", ...')
