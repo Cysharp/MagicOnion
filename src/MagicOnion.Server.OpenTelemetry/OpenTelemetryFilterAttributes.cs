@@ -53,7 +53,8 @@ namespace MagicOnion.Server.OpenTelemetry
                 activity.SetTag("rpc.method", context.CallContext.Method);
                 // todo: context.CallContext.Peer/Host format is https://github.com/grpc/grpc/blob/master/doc/naming.md and not uri standard.
                 activity.SetTag("net.peer.name", context.CallContext.Peer);
-                activity.SetTag("net.host.name", context.CallContext.Host);
+                activity.SetTag("http.host", context.CallContext.Host);
+                activity.SetTag("http.useragent", context.CallContext.RequestHeaders.GetValue("user-agent"));
                 activity.SetTag("message.type", "RECIEVED");
                 activity.SetTag("message.id", context.ContextId.ToString());
                 activity.SetTag("message.uncompressed_size", context.GetRawRequest()?.LongLength.ToString() ?? "0");
@@ -121,7 +122,8 @@ namespace MagicOnion.Server.OpenTelemetry
                 activity.SetTag("rpc.method", $"/{context.Path}");
                 // todo: context.CallContext.Peer/Host format is https://github.com/grpc/grpc/blob/master/doc/naming.md and not uri standard.
                 activity.SetTag("net.peer.ip", context.ServiceContext.CallContext.Peer);
-                activity.SetTag("net.host.name", context.ServiceContext.CallContext.Host);
+                activity.SetTag("http.host", context.ServiceContext.CallContext.Host);
+                activity.SetTag("http.useragent", context.ServiceContext.CallContext.RequestHeaders.GetValue("user-agent"));
                 activity.SetTag("message.type", "RECIEVED");
                 activity.SetTag("message.id", context.ServiceContext.ContextId.ToString());
                 activity.SetTag("message.uncompressed_size", context.Request.Length.ToString());
