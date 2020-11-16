@@ -30,14 +30,12 @@ namespace ChatApp.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
-
             services.AddMagicOnion(options =>
             {
                 options.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
                 options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
             });
-            services.RemoveAll<IMagicOnionLogger>();
-            services.AddSingleton<IMagicOnionLogger>(sp => new OpenTelemetryCollectorLogger(sp.GetRequiredService<MeterProvider>(), version: "0.5.0-beta.2"));
+            services.AddSingleton<IMagicOnionLogger>(sp => new OpenTelemetryCollectorLogger(sp.GetRequiredService<MeterProvider>(), version: "0.8.0-beta.1"));
 
             services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
                 {
@@ -46,14 +44,36 @@ namespace ChatApp.Server
                 },
                 (options, provider, tracerBuilder) =>
                 {
-                    // open-telemetry with Zipkin exporter
-                    tracerBuilder.AddZipkinExporter(o =>
+                    // Switch between Jaeger/Zipkin by setting UseExporter in appsettings.json.
+                    var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
+                    switch (exporter)
                     {
-                        o.ServiceName = "ChatApp.Server";
-                        o.Endpoint = new Uri(options.TracerExporterEndpoint);
-                    });
-                    // ConsoleExporter will show current tracer activity
-                    tracerBuilder.AddConsoleExporter();
+                        case "jaeger":
+                            tracerBuilder
+                                .AddAspNetCoreInstrumentation()
+                                .AddJaegerExporter(jaegerOptions =>
+                                {
+                                    jaegerOptions.ServiceName = options.ServiceName;
+                                    jaegerOptions.AgentHost = this.Configuration.GetValue<string>("Jaeger:Host");
+                                    jaegerOptions.AgentPort = this.Configuration.GetValue<int>("Jaeger:Port");
+                                });
+                            break;
+                        case "zipkin":
+                            tracerBuilder
+                                .AddAspNetCoreInstrumentation()
+                                .AddZipkinExporter(zipkinOptions =>
+                                {
+                                    zipkinOptions.ServiceName = options.ServiceName;
+                                    zipkinOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Zipkin:Endpoint"));
+                                });
+                            break;
+                        default:
+                            // ConsoleExporter will show current tracer activity
+                            tracerBuilder
+                                .AddAspNetCoreInstrumentation()
+                                .AddConsoleExporter();
+                            break;
+                    }
                 });
 
             services.AddHostedService<PrometheusExporterMetricsService>();

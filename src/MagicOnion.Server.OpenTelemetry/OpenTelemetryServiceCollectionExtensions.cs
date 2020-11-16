@@ -1,6 +1,6 @@
 using System;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -62,19 +62,19 @@ namespace MagicOnion.Server.OpenTelemetry
             // configure TracerFactory
             if (configureTracerProvider != null)
             {
-                if (string.IsNullOrEmpty(options.ActivitySourceName))
+                if (string.IsNullOrEmpty(options.ServiceName))
                 {
-                    throw new NullReferenceException(nameof(options.ActivitySourceName));
+                    throw new NullReferenceException(nameof(options.ServiceName));
                 }
 
-                var tracerFactory = services.AddOpenTelemetryTracerProvider((provider, builder) =>
+                var tracerFactory = services.AddOpenTelemetryTracing((provider, builder) =>
                 {
                     // ActivitySourceName must match to TracerName.
-                    builder.AddSource(options.ActivitySourceName);
-                    configureTracerProvider(options, provider, builder);
+                    builder.AddSource(options.ServiceName);
+                    configureTracerProvider?.Invoke(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);
-                services.AddSingleton(new ActivitySource(options.ActivitySourceName));
+                services.AddSingleton(new ActivitySource(options.ServiceName));
             }
 
             return services;

@@ -37,18 +37,18 @@ namespace ChatApp.Server
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "rooms");
-                activity.SetTag("query", $"INSERT INTO rooms VALUES (0, '{request.RoomName}', '{request.UserName}', '1');");
+                activity.SetTag("query", $"INSERT INTO rooms VALUES (0, '@room', '@username', '1');");
                 activity.SetTag("parameter.room", request.RoomName);
                 activity.SetTag("parameter.username", request.UserName);
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
             }
 
-            // if you don't want set relation to this method, but directly this streaming hub, set hub trace context to your activiy.
+            // use hub trace context to set your span on same level. Otherwise parent will automatically set.
             var hubTraceContext = this.Context.GetTraceContext();
-            using (var activity = activitySource.StartActivity("sample:hub_context_relation", ActivityKind.Internal, hubTraceContext))
+            using (var activity = activitySource.StartActivity("ChatHub:hub_context_relation", ActivityKind.Internal, hubTraceContext))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("message", "this span has no relationship with this method but has with hub context.");
+                activity.SetTag("message", "this span has no relationship with this method but relate with hub context. This means no relation with parent method.");
             }
         }
 
@@ -63,7 +63,7 @@ namespace ChatApp.Server
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "rooms");
-                activity.SetTag("query", $"UPDATE rooms SET status=0 WHERE id={this.room.GroupName} AND name='{this.myName}';");
+                activity.SetTag("query", $"UPDATE rooms SET status=0 WHERE id='room' AND name='@username';");
                 activity.SetTag("parameter.room", this.room.GroupName);
                 activity.SetTag("parameter.username", this.myName);
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
@@ -76,10 +76,11 @@ namespace ChatApp.Server
             this.Broadcast(this.room).OnSendMessage(response);
 
             // dummy external operation.
-            using (var activity = activitySource.StartActivity($"redis:message_room_{room.GroupName}", ActivityKind.Internal))
+            using (var activity = activitySource.StartActivity($"redis:chat_latest_message", ActivityKind.Internal))
             {
-                activity.SetTag("parameter.room", room.GroupName);
-                activity.SetTag("parameter.username", myName);
+                activity.SetTag("command", "set");
+                activity.SetTag("parameter.key", room.GroupName);
+                activity.SetTag("parameter.value", $"{myName}={message}");
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
             }
 

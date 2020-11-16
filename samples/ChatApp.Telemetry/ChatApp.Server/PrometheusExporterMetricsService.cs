@@ -22,7 +22,7 @@ namespace ChatApp.Server
             this.options = options;
             if (exporter is PrometheusExporter prometheusExporter)
             {
-                metricsExporterHostingEndpoint = configuration.GetSection("MagicOnion:OpenTelemetry").GetValue("PrometheusMetricsHostingEndpoint", options.MetricsExporterEndpoint);
+                metricsExporterHostingEndpoint = options.MetricsExporterHostingEndpoint;
                 server = new PrometheusExporterMetricsHttpServerCustom(prometheusExporter, metricsExporterHostingEndpoint);
             }
         }

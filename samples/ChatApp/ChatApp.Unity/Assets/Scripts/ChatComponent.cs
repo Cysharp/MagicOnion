@@ -61,8 +61,8 @@ namespace Assets.Scripts
             this.channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
             // for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
-            //this.channel = new Channel("dummy.example.com", 12345, cred); // local tls
-            //this.channel = new Channel("your-nlb-domain.com", 12345, new SslCredentials()); // aws nlb tls
+            //this.channel = new Channel("dummy.example.com", 5000, cred); // local tls
+            //this.channel = new Channel("your-nlb-domain.com", 5000, new SslCredentials()); // aws nlb tls
 
             this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
             this.RegisterDisconnectEvent(streamingClient);
