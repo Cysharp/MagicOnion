@@ -18,7 +18,7 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <summary>
         /// Tracer ServiceName use as ActivitySource
         /// </summary>
-        public string ServiceName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
+        public string MagicOnionActivityName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
     }
 
     public class MagicOnionOpenTelemetryMeterFactoryOption

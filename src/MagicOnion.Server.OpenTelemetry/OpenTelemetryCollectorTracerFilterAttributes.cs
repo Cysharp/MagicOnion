@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Trace;
@@ -19,7 +17,9 @@ namespace MagicOnion.Server.OpenTelemetry
 
         MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
         {
-            return new OpenTelemetryCollectorTracerFilterAttribute(serviceProvider.GetService<ActivitySource>(), serviceProvider.GetService<MagicOnionOpenTelemetryOptions>());
+            var activitySource = serviceProvider.GetService<ActivitySource>();
+            var options = serviceProvider.GetService<MagicOnionOpenTelemetryOptions>();
+            return new OpenTelemetryCollectorTracerFilterAttribute(activitySource, options);
         }
     }
 
@@ -88,7 +88,9 @@ namespace MagicOnion.Server.OpenTelemetry
 
         StreamingHubFilterAttribute IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
         {
-            return new OpenTelemetryHubCollectorTracerFilterAttribute(serviceProvider.GetService<ActivitySource>(), serviceProvider.GetService<MagicOnionOpenTelemetryOptions>());
+            var activitySource = serviceProvider.GetService<ActivitySource>();
+            var options = serviceProvider.GetService<MagicOnionOpenTelemetryOptions>();
+            return new OpenTelemetryHubCollectorTracerFilterAttribute(activitySource, options);
         }
     }
 

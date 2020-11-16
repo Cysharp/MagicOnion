@@ -52,7 +52,7 @@ namespace ChatApp.Server
                                 .AddAspNetCoreInstrumentation()
                                 .AddJaegerExporter(jaegerOptions =>
                                 {
-                                    jaegerOptions.ServiceName = options.ServiceName;
+                                    jaegerOptions.ServiceName = "ChatApp.Server";
                                     jaegerOptions.AgentHost = this.Configuration.GetValue<string>("Jaeger:Host");
                                     jaegerOptions.AgentPort = this.Configuration.GetValue<int>("Jaeger:Port");
                                 });
@@ -62,7 +62,7 @@ namespace ChatApp.Server
                                 .AddAspNetCoreInstrumentation()
                                 .AddZipkinExporter(zipkinOptions =>
                                 {
-                                    zipkinOptions.ServiceName = options.ServiceName;
+                                    zipkinOptions.ServiceName = "ChatApp.Server";
                                     zipkinOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Zipkin:Endpoint"));
                                 });
                             break;
