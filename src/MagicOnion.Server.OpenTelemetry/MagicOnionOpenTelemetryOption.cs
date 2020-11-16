@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Metrics.Export;
 
 namespace MagicOnion.Server.OpenTelemetry
@@ -29,10 +30,14 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <summary>
         /// OpenTelemetry MetricsExporter Implementation to use.
         /// </summary>
-        public MetricExporter MetricExporter { get; set; }
+        public MetricExporter MetricsExporter { get; set; }
         /// <summary>
         /// OpenTelemetry Metric Push Interval.
         /// </summary>
         public TimeSpan MetricPushInterval { get; set; } = TimeSpan.FromSeconds(10);
+        /// <summary>
+        /// MagicOnionLogger to collect OpenTelemetry metrics.
+        /// </summary>
+        public Func<MeterProvider, IMagicOnionLogger> MeterLogger { get; set; }
     }
 }

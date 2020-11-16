@@ -51,12 +51,15 @@ namespace MagicOnion.Server.OpenTelemetry
 
                 MeterProvider.SetDefault(Sdk.CreateMeterProviderBuilder()
                     .SetProcessor(meterFactoryOption.MetricProcessor)
-                    .SetExporter(meterFactoryOption.MetricExporter)
+                    .SetExporter(meterFactoryOption.MetricsExporter)
                     .SetPushInterval(meterFactoryOption.MetricPushInterval)
                     .Build());
 
-                services.AddSingleton(meterFactoryOption.MetricExporter);
-                services.AddSingleton(MeterProvider.Default);
+                services.AddSingleton(meterFactoryOption.MetricsExporter);
+                if (meterFactoryOption.MeterLogger != null)
+                {
+                    services.AddSingleton<IMagicOnionLogger>(meterFactoryOption.MeterLogger.Invoke(MeterProvider.Default));
+                }
             }
 
             // configure TracerFactory

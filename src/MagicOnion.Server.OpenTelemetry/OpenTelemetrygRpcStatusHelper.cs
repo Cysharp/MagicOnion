@@ -2,7 +2,7 @@ using Grpc.Core;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
-    public static class OpenTelemetrygRpcStatusHelper
+    public static class OpenTelemetryHelper
     {
         /// <summary>
         /// Convert gRPC StatusCode to OpenTelemetry Status.
@@ -10,7 +10,7 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <remarks>spec: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#set-status</remarks>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static global::OpenTelemetry.Trace.Status ConvertStatus(StatusCode code)
+        public static global::OpenTelemetry.Trace.Status GrpcToOpenTelemetryStatus(StatusCode code)
         {
             switch (code)
             {

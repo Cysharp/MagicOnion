@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Exporter.Prometheus;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace ChatApp.Server
@@ -32,15 +31,15 @@ namespace ChatApp.Server
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
             services.AddMagicOnion(options =>
             {
-                options.GlobalFilters.Add(new OpenTelemetryCollectorFilterFactoryAttribute());
-                options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorFilterFactoryAttribute());
+                options.GlobalFilters.Add(new OpenTelemetryCollectorTracerFilterFactoryAttribute());
+                options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorTracerFilterFactoryAttribute());
             });
-            services.AddSingleton<IMagicOnionLogger>(sp => new OpenTelemetryCollectorLogger(sp.GetRequiredService<MeterProvider>(), version: "0.8.0-beta.1"));
 
             services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
                 {
                     // open-telemetry with Prometheus exporter
-                    meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
+                    meterOptions.MetricsExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
+                    meterOptions.MeterLogger = (mp) => new OpenTelemetryCollectorMeterLogger(mp, "0.8.0-beta.1");
                 },
                 (options, provider, tracerBuilder) =>
                 {
