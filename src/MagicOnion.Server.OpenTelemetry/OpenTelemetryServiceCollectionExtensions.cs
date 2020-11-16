@@ -77,7 +77,11 @@ namespace MagicOnion.Server.OpenTelemetry
                     configureTracerProvider?.Invoke(options, provider, builder);
                 });
                 services.AddSingleton(tracerFactory);
-                services.AddSingleton(new ActivitySource(options.MagicOnionActivityName));
+
+                // Avoid directly register ActivitySource to Singleton for easier identification.
+                var activitySource = new ActivitySource(options.MagicOnionActivityName);
+                var magicOnionActivitySources = new MagicOnionActivitySources(activitySource);
+                services.AddSingleton(magicOnionActivitySources);
             }
 
             return services;

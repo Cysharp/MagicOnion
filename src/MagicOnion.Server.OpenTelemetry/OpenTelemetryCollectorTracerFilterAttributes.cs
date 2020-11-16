@@ -17,9 +17,9 @@ namespace MagicOnion.Server.OpenTelemetry
 
         MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
         {
-            var activitySource = serviceProvider.GetService<ActivitySource>();
+            var activitySource = serviceProvider.GetService<MagicOnionActivitySources>();
             var options = serviceProvider.GetService<MagicOnionOpenTelemetryOptions>();
-            return new OpenTelemetryCollectorTracerFilterAttribute(activitySource, options);
+            return new OpenTelemetryCollectorTracerFilterAttribute(activitySource.Current, options);
         }
     }
 
@@ -88,9 +88,9 @@ namespace MagicOnion.Server.OpenTelemetry
 
         StreamingHubFilterAttribute IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
         {
-            var activitySource = serviceProvider.GetService<ActivitySource>();
+            var activitySource = serviceProvider.GetService<MagicOnionActivitySources>();
             var options = serviceProvider.GetService<MagicOnionOpenTelemetryOptions>();
-            return new OpenTelemetryHubCollectorTracerFilterAttribute(activitySource, options);
+            return new OpenTelemetryHubCollectorTracerFilterAttribute(activitySource.Current, options);
         }
     }
 
