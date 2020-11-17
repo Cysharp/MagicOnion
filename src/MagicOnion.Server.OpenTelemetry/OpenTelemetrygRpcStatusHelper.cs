@@ -12,13 +12,11 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <returns></returns>
         public static global::OpenTelemetry.Trace.Status GrpcToOpenTelemetryStatus(StatusCode code)
         {
-            switch (code)
+            return code switch
             {
-                case StatusCode.OK:
-                    return global::OpenTelemetry.Trace.Status.Ok;
-                default:
-                    return global::OpenTelemetry.Trace.Status.Error;
-            }
+                StatusCode.OK => global::OpenTelemetry.Trace.Status.Ok,
+                _ => global::OpenTelemetry.Trace.Status.Error,
+            };
         }
     }
 }
