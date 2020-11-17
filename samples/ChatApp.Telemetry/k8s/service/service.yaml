@@ -8,7 +8,7 @@ spec:
   type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 12345
+      port: 5000
       targetPort: magiconion
 ---
 apiVersion: v1
