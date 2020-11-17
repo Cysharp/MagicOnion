@@ -1,12 +1,11 @@
 using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.OpenTelemetry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using MagicOnion.Server.OpenTelemetry;
 
 namespace ChatApp.Server
 {
@@ -22,7 +21,7 @@ namespace ChatApp.Server
         private readonly ActivitySource mysqlActivity;
         private readonly ActivitySource redisActivity;
 
-        public ChatHub(MagicOnionActivitySources magiconionActivity, BackendActivitySources backendActivity, MagicOnionOpenTelemetryOptions options)
+        public ChatHub(MagicOnionActivitySources magiconionActivity, BackendActivitySources backendActivity)
         {
             this.magiconionActivity = magiconionActivity.Current;
             this.mysqlActivity = backendActivity.Get("mysql");

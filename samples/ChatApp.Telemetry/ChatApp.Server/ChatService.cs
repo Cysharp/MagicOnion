@@ -11,12 +11,12 @@ namespace ChatApp.Server
 {
     public class ChatService : ServiceBase<IChatService>, IChatService
     {
-        private ActivitySource activitySource;
+        private ActivitySource mysqlActivitySource;
         private ILogger logger;
 
-        public ChatService(ILogger<ChatService> logger, ActivitySource activitySource)
+        public ChatService(ILogger<ChatService> logger, BackendActivitySources backendActivity)
         {
-            this.activitySource = activitySource;
+            this.mysqlActivitySource = backendActivity.Get("mysql");
             this.logger = logger;
         }
 
@@ -24,7 +24,7 @@ namespace ChatApp.Server
         {
             var ex = new System.NotImplementedException();
             // dummy external operation.
-            using (var activity = activitySource.StartActivity("db:errors/insert", ActivityKind.Internal))
+            using (var activity = mysqlActivitySource.StartActivity("db:errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "errors");

@@ -98,6 +98,7 @@ namespace ChatApp.Server
                 .Build();
             services.AddSingleton(new BackendActivitySources(new[] { new ActivitySource("mysql"), new ActivitySource("redis") }));
 
+            // host Prometheus Metrics Server
             services.AddHostedService<PrometheusExporterMetricsService>();
         }
 

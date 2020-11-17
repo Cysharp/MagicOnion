@@ -24,9 +24,9 @@ obj/
 **/values.dev.yaml
 **/.toolstarget
 
+.github/
 docs/
-samples/ChatApp/
-samples/ChatApp.Telemetry/ChatApp.Unity/Temp/
-samples/ChatApp.Telemetry/ChatApp.Unity/Library/
+samples/ChatApp/ChatApp.Unity/Temp/
+samples/ChatApp/ChatApp.Unity/Library/
 sandbox/
 tests/
