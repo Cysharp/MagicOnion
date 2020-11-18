@@ -10479,19 +10479,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Hubs.GroupConfigurationAttribute.GroupConfigurationAttribute
   nameWithType: GroupConfigurationAttribute.GroupConfigurationAttribute
-- uid: MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create
-  name: Create()
-  href: api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html#MagicOnion_Server_Hubs_GroupConfigurationAttribute_Create
-  commentId: M:MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create
-  fullName: MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create()
-  nameWithType: GroupConfigurationAttribute.Create()
-- uid: MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create*
-  name: Create
-  href: api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html#MagicOnion_Server_Hubs_GroupConfigurationAttribute_Create_
-  commentId: Overload:MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create
+- uid: MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType
+  name: FactoryType
+  href: api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html#MagicOnion_Server_Hubs_GroupConfigurationAttribute_FactoryType
+  commentId: P:MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType
+  fullName: MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType
+  nameWithType: GroupConfigurationAttribute.FactoryType
+- uid: MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType*
+  name: FactoryType
+  href: api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html#MagicOnion_Server_Hubs_GroupConfigurationAttribute_FactoryType_
+  commentId: Overload:MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType
   isSpec: "True"
-  fullName: MagicOnion.Server.Hubs.GroupConfigurationAttribute.Create
-  nameWithType: GroupConfigurationAttribute.Create
+  fullName: MagicOnion.Server.Hubs.GroupConfigurationAttribute.FactoryType
+  nameWithType: GroupConfigurationAttribute.FactoryType
 - uid: MagicOnion.Server.Hubs.HubGroupRepository
   name: HubGroupRepository
   href: api/MagicOnion.Server.Hubs.HubGroupRepository.html
