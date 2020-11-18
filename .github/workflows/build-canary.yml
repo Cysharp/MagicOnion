@@ -39,7 +39,7 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Server.HttpGateway/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.Server.Redis/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
-      #- run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       - run: dotnet build ./src/MagicOnion.Generator/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
       # test
@@ -53,7 +53,7 @@ jobs:
       - run: dotnet pack ./src/MagicOnion.Server.HttpGateway/MagicOnion.Server.HttpGateway.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - run: dotnet pack ./src/MagicOnion.Server.Redis/MagicOnion.Server.Redis.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - run: dotnet pack ./src/MagicOnion.Server.Authentication/MagicOnion.Server.Authentication.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
-      #- run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - run: dotnet pack ./src/MagicOnion.MSBuild.Tasks/MagicOnion.MSBuild.Tasks.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - run: dotnet pack ./src/MagicOnion.Generator/MagicOnion.Generator.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - uses: actions/upload-artifact@v1
