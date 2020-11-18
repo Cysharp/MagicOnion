@@ -91,7 +91,6 @@ kubectl kustomize ./k8s/common | kubectl apply -f -
 helm upgrade --install nginx-ingress --namespace chatapp stable/nginx-ingress
 helm upgrade --install prometheus --namespace chatapp -f ./k8s/prometheus/values.yaml stable/prometheus
 helm upgrade --install grafana --namespace chatapp -f ./k8s/grafana/values.yaml stable/grafana
-helm upgrade --install grafana --namespace chatapp -f ./k8s/grafana/values.yaml stable/grafana
 ```
 
 wait until resources are launch complete.
@@ -139,7 +138,6 @@ Before accesing Grafana dashboard, put `Hosts` entry to your OS, this enable you
 ```txt
 127.0.0.1 grafana.chatapp.magiconion.local
 127.0.0.1 prometheus.chatapp.magiconion.local
-127.0.0.1 jaeger.chatapp.magiconion.local
 ```
 
 **access to Grafana**

@@ -1,5 +1,0 @@
-query:
-  ingress:
-    enabled: true
-    hosts:
-      - jaeger.chatapp.magiconion.local
