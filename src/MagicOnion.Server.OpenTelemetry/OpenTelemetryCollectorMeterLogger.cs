@@ -13,7 +13,7 @@ namespace MagicOnion.Server.OpenTelemetry
     /// </summary>
     public class OpenTelemetryCollectorMeterLogger : IMagicOnionLogger
     {
-        static readonly string MethodKey = "method";
+        const string MethodKey = "method";
 
         readonly IEnumerable<KeyValuePair<string, string>> defaultLabels;
         readonly ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>> labelCache = new ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>>();

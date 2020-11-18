@@ -1,12 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RestoreAdditionalProjectSources>
-            https://www.myget.org/F/opentelemetry/api/v3/index.json;
-        </RestoreAdditionalProjectSources>
-        <LangVersion>latest</LangVersion>
-
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <SignAssembly>true</SignAssembly>
@@ -16,6 +11,8 @@
         <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         <NoWarn>1701;1702;1705;1591</NoWarn>
         <DefineConstants>NON_UNITY</DefineConstants>
+        <!--<nullable>enable</nullable>-->
+        <LangVersion>latest</LangVersion>
 
         <!-- NuGet -->
         <PackageId>MagicOnion.Server.OpenTelemetry</PackageId>

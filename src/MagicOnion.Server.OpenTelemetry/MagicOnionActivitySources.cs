@@ -18,9 +18,7 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public MagicOnionActivitySources(ActivitySource activitySource)
         {
-            if (activitySource == null)
-                throw new ArgumentNullException(nameof(activitySource));
-            this.activitySource = activitySource;
+            this.activitySource = activitySource ?? throw new ArgumentNullException(nameof(activitySource));
         }
     }
 }
