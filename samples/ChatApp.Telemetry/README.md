@@ -4,17 +4,27 @@ This is Sample to run MagicOnion with OpenTelemetry implementation.
 
 ## Getting started
 
-Run Server and Client to confirm how it works.
+To run simple ChatApp.Server, 
 
-1. Open console and run `docker-compose -f docker-compose.yaml -f docker-compose.telemetry.yaml up` to start server and telemetry apps.
-1. Open UnityEditor and open `samples/ChatApp/ChatApp.Unity`, open `ChatScene` scene then Play Unity.
-1. You can access to Telemery via Web UI Dashboards.
-    * [jaeger](http://localhost:16686/)
-    * [zipkin](http://localhost:9411/)
-        * no data on default. you can switch with jaeger.
-    * [prometheus](http://localhost:9090/)
-    * [grafana](http://localhost:3000/)
-        * user/password is `admin/admin`.
+1. Run `docker-compose -f docker-compose.telemetry.yaml up`.
+1. Launch `ChatApp.Server.Telemetry` from VisualStudio.  
+1. Run `ChatScene` from UnityEditor.  
+1. Access Telemery's Web UI.
+
+Server and Telemetries are fully containernized.
+
+1. Run `docker-compose -f docker-compose.yaml -f docker-compose.telemetry.yaml up`.
+1. Run `ChatScene` from UnityEditor. 
+1. Access Telemery's Web UI.
+
+Telemetry's Web UI address.
+
+* [jaeger](http://localhost:16686/)
+* [zipkin](http://localhost:9411/)
+    * no data on default. you can switch with jaeger.
+* [prometheus](http://localhost:9090/)
+* [grafana](http://localhost:3000/)
+    * user/password is `admin/admin`.
 
 ## Projects
 
@@ -30,19 +40,16 @@ There are 3 projects for this sample.
 
 **ChatApp.Unity** is Unity App to connect ChatApp.Server.
 
-
 ## ChatApp.Server
 
-MagicOnion is 100% capble to container.
-Let's see how it work on Docker and Kubernetes.
+This is Sample Serverside MagicOnion.
+You can lanunch via Visual Studio 2019, open `MagicOnion.Experimental.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
+
+> NOTE: To avoid port conflict, stop docker/kubernetes ChatApp.Server before debug on Visual Studio.
 
 ### Docker
 
-Docker example launch ChatApp.Server and telemetry applications on containers.
-
-> NOTE: Make sure you have installed docker and docker-compose on your machine.
-
-**run**
+Launch ChatApp.Server and telemetry applications on docker.
 
 Run both ChatApp.Server and telemetry applications on container via command.
 
@@ -60,7 +67,7 @@ Now ChatApp.Unity can access to ChatApp.Server running on docker.
 
 ### Kubernetes
 
-Kubernetes example launch ChatApp.Server and telemetry applications on pods.
+Launch ChatApp.Server and telemetry applications on kubernetes.
 
 * kubectl 1.18
 * kubectx
@@ -68,9 +75,7 @@ Kubernetes example launch ChatApp.Server and telemetry applications on pods.
 
 > ProTips: If you are using Windows, you can use kubernetes on Docker for Windows.
 
-**Getting started**
-
-Let's run ChatApp on kubernetes cluster, deploy your manifests to the cluster.
+Run ChatApp on kubernetes cluster, deploy your manifests to the cluster.
 
 ```shell
 cd samples/ChatApp.Telemetry
@@ -108,19 +113,15 @@ kubectl get deploy,svc,daemonset,ingress
 
 Now ChatApp.Unity can access to ChatApp.Server running on kubernetes.
 
-### Visual Studio
-
-You can launch ChatApp.Server on Visual Studio and run instead container.
-Open `MagicOnion.Experimental.sln` and start Debug for `ChatApp.Server`.
-
-> NOTE: please stop docker ChatApp.Server before debug on Visual Studio, due to port conflict.
 
 ## ChatApp.Unity
 
-ChatApp.Unity is sample implementations of MagicOnion.Client running on Unity.
-Once you have launched ChatApp.Server, you can use ChatApp.Unity to try how it works.
+Sample Clientside Unity.
+You can ran with Unity from 2018.4.5f1 and higher then start on unity editor.
 
-ChatApp.Unity can access to ChatApp.Unity with `localhost:5000`, launch ChatApp.Unity and enjoy chat.
+> TIPS: confirmed run on 2019.1.10f1
+
+Now unity client automatically connect to MagicOnion Server, try chat app!
 
 ## Check Telemetry
 
