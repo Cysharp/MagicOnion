@@ -169,7 +169,7 @@ namespace MagicOnion.Server
                         var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                         if (attr != null)
                         {
-                            factory = attr.Create();
+                            factory = (IGroupRepositoryFactory)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
                         }
                         else
                         {

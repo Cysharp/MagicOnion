@@ -10,16 +10,16 @@ namespace MagicOnion.Server.Hubs
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class GroupConfigurationAttribute : Attribute
     {
-        Type type;
+        public Type FactoryType { get; }
 
         public GroupConfigurationAttribute(Type groupRepositoryFactoryType)
         {
-            this.type = groupRepositoryFactoryType;
-        }
+            if (!typeof(IGroupRepositoryFactory).IsAssignableFrom(groupRepositoryFactoryType) && (groupRepositoryFactoryType.IsAbstract || groupRepositoryFactoryType.IsInterface))
+            {
+                throw new ArgumentException("A Group repository factory must implement IGroupRepositoryFactory interface and must be a concrete class.");
+            }
 
-        public IGroupRepositoryFactory Create()
-        {
-            return (IGroupRepositoryFactory)Activator.CreateInstance(type)!;
+            this.FactoryType = groupRepositoryFactoryType;
         }
     }
 
