@@ -41,7 +41,7 @@ namespace ChatApp.Server
             services.AddMagicOnionOpenTelemetry((options, meterOptions) =>
             {
                 // open-telemetry with Prometheus exporter
-                meterOptions.MetricsExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
+                meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
                 meterOptions.MeterLogger = (mp) => new OpenTelemetryCollectorMeterLogger(mp, "0.8.0-beta.1");
             },
             (options, provider, tracerBuilder) =>
@@ -117,11 +117,11 @@ namespace ChatApp.Server
         private void AddAdditionalTracer(string[] services)
         {
             var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-            switch (exporter)
+            foreach (var service in services)
             {
-                case "jaeger":
-                    foreach (var service in services)
-                    {
+                switch (exporter)
+                {
+                    case "jaeger":
                         OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .AddJaegerExporter(jaegerOptions =>
@@ -131,11 +131,8 @@ namespace ChatApp.Server
                                 jaegerOptions.AgentPort = this.Configuration.GetValue<int>("Jaeger:Port");
                             })
                             .Build();
-                    }
-                    break;
-                case "zipkin":
-                    foreach (var service in services)
-                    {
+                        break;
+                    case "zipkin":
                         OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .AddZipkinExporter(zipkinOptions =>
@@ -144,19 +141,15 @@ namespace ChatApp.Server
                                 zipkinOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Zipkin:Endpoint"));
                             })
                             .Build();
-                    }
-                    break;
-                default:
-                    // ConsoleExporter will show current tracer activity
-                    foreach (var service in services)
-                    {
+                        break;
+                    default:
+                        // ConsoleExporter will show current tracer activity
                         OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .AddConsoleExporter()
                             .Build();
-                    }
-                    break;
+                        break;
+                }
             }
         }
     }
-}

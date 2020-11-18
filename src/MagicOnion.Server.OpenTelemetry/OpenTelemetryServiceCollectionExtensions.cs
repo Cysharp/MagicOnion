@@ -51,11 +51,11 @@ namespace MagicOnion.Server.OpenTelemetry
 
                 MeterProvider.SetDefault(Sdk.CreateMeterProviderBuilder()
                     .SetProcessor(meterFactoryOption.MetricProcessor)
-                    .SetExporter(meterFactoryOption.MetricsExporter)
+                    .SetExporter(meterFactoryOption.MetricExporter)
                     .SetPushInterval(meterFactoryOption.MetricPushInterval)
                     .Build());
 
-                services.AddSingleton(meterFactoryOption.MetricsExporter);
+                services.AddSingleton(meterFactoryOption.MetricExporter);
                 if (meterFactoryOption.MeterLogger != null)
                 {
                     services.AddSingleton<IMagicOnionLogger>(meterFactoryOption.MeterLogger.Invoke(MeterProvider.Default));

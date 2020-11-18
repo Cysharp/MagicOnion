@@ -30,7 +30,7 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <summary>
         /// OpenTelemetry MetricsExporter Implementation to use.
         /// </summary>
-        public MetricExporter MetricsExporter { get; set; }
+        public MetricExporter MetricExporter { get; set; }
         /// <summary>
         /// OpenTelemetry Metric Push Interval.
         /// </summary>
