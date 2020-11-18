@@ -12,7 +12,7 @@ namespace MagicOnion.Server.OpenTelemetry
         private readonly ActivitySource activitySource;
 
         /// <summary>
-        /// MagicOnion's <see cref="System.Diagnostics.ActivitySource"/>
+        /// <see cref="System.Diagnostics.ActivitySource"/> used for MagicOnion
         /// </summary>
         public ActivitySource Current => activitySource;
 
