@@ -1,7 +1,9 @@
 using Grpc.Core;
 using MessagePack;
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Connections;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -91,6 +93,11 @@ namespace MagicOnion.Server.Hubs
             {
                 await OnConnecting();
                 await HandleMessageAsync();
+            }
+            catch (IOException ex) when (ex.InnerException is ConnectionAbortedException)
+            {
+                // NOTE: If DuplexStreaming is disconnected by the client, IOException will be thrown.
+                //       However, such behavior is expected. the exception can be ignored.
             }
             finally
             {
