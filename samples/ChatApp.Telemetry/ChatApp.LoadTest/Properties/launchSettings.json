@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "ChatApp.LoadTest": {
+      "commandName": "Project",
+      "commandLineArgs": "10",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

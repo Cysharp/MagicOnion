@@ -237,7 +237,7 @@ namespace ChatApp.Shared.Hubs {
 
         readonly global::ChatApp.Shared.Hubs.IChatHub __fireAndForgetClient;
 
-        public ChatHubClient(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
+        public ChatHubClient(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, ILogger logger)
             : base(callInvoker, host, option, serializerOptions, logger)
         {
             this.__fireAndForgetClient = new FireAndForgetClient(this);

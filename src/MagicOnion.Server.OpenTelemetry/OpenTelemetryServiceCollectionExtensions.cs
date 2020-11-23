@@ -75,6 +75,14 @@ namespace MagicOnion.Server.OpenTelemetry
                 });
                 services.AddSingleton(tracerFactory);
                 services.AddSingleton(new ActivitySource(options.ActivitySourceName));
+
+                var activityListener = new ActivityListener
+                {
+                    ShouldListenTo = s => true,
+                    SampleUsingParentId = (ref ActivityCreationOptions<string> activityOptions) => ActivitySamplingResult.AllData,
+                    Sample = (ref ActivityCreationOptions<ActivityContext> activityOptions) => ActivitySamplingResult.AllData
+                };
+                ActivitySource.AddActivityListener(activityListener);
             }
 
             return services;
