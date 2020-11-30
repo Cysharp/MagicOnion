@@ -70,13 +70,12 @@ namespace MagicOnion.Server.OpenTelemetry
                     throw new NullReferenceException(nameof(options.MagicOnionActivityName));
                 }
 
-                var tracerFactory = builder.Services.AddOpenTelemetryTracing((provider, builder) =>
+                builder.Services.AddOpenTelemetryTracing((provider, builder) =>
                 {
                     // ActivitySourceName must match to TracerName.
                     builder.AddSource(options.MagicOnionActivityName);
                     configureTracerProvider?.Invoke(options, provider, builder);
                 });
-                builder.Services.AddSingleton(tracerFactory);
 
                 // Avoid directly register ActivitySource to Singleton for easier identification.
                 var activitySource = new ActivitySource(options.MagicOnionActivityName);
