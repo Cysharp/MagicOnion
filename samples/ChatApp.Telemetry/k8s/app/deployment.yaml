@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: chatapp
-          image: cysharp/magiconion_sample_chatapp_telemetry:4.0.1-0.8.0.beta1
+          image: cysharp/magiconion_sample_chatapp_telemetry:4.0.1-1.0.0.rc2
           ports:
             - containerPort: 80
               name: magiconion

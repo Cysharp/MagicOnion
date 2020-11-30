@@ -42,7 +42,7 @@ namespace ChatApp.Server
                 {
                     // open-telemetry with Prometheus exporter
                     meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
-                    meterOptions.MeterLogger = (mp) => new OpenTelemetryCollectorMeterLogger(mp, "0.8.0-beta.1");
+                    meterOptions.MeterLogger = (mp) => new OpenTelemetryCollectorMeterLogger(mp, "1.0.0-rc.1");
                 },
                 (options, provider, tracerBuilder) =>
                 {
