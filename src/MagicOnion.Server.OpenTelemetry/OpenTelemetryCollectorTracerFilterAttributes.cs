@@ -42,7 +42,11 @@ namespace MagicOnion.Server.OpenTelemetry
             using var activity = source.StartActivity($"{context.MethodType}:{context.CallContext.Method}", ActivityKind.Server);
 
             // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
-            if (activity == null) return;
+            if (activity == null)
+            {
+                await next(context);
+                return;
+            }
 
             // add trace context to service context. it allows user to add their span directly to this context.
             context.SetTraceContext(activity.Context);
@@ -115,7 +119,11 @@ namespace MagicOnion.Server.OpenTelemetry
             using var activity = source.StartActivity($"{context.ServiceContext.MethodType}:/{context.Path}", ActivityKind.Server);
 
             // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
-            if (activity == null) return;
+            if (activity == null)
+            {
+                await next(context);
+                return;
+            }
 
             // add trace context to service context. it allows user to add their span directly to this hub
             context.SetTraceContext(activity.Context);
