@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.Net.Client" Version="2.33.1" />
     <PackageReference Include="MagicOnion.Client" Version="4.0.2" />
   </ItemGroup>
 
