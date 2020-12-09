@@ -58,11 +58,11 @@ namespace Assets.Scripts
         private void InitializeClient()
         {
             // Initialize the Hub
-            this.channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
+            this.channel = new Channel("localhost", 8080, ChannelCredentials.Insecure);
             // for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
             //this.channel = new Channel("dummy.example.com", 12345, cred); // local tls
-            //this.channel = new Channel("your-nlb-domain.com", 12345, new SslCredentials()); // aws nlb tls
+            //this.channel = new Channel("envoytest.eks-sandbox.dev.cysharp.io", 443, new SslCredentials()); // aws acm NLB/ALB
 
             this.streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
             this.RegisterDisconnectEvent(streamingClient);
