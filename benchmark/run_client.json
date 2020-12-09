@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+    "commands": [
+      "#!/bin/bash",
+      "export DOTNET_CLI_HOME=/tmp",
+      "sudo killall dotnet || true",
+      "dotnet --version",
+      "dotnet ~/client/Benchmark.Client"
+    ]
+  }
+}

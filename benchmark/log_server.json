@@ -1,0 +1,9 @@
+{
+  "Parameters": {
+    "commands": [
+      "#!/bin/bash",
+      "sudo systemctl status Benchmark.Server",
+      "sudo journalctl -u Benchmark.Server"
+    ]
+  }
+}
