@@ -5,12 +5,17 @@ namespace Benchmark.Client
 {
     public class Statistics : IDisposable
     {
+        public string Name { get; }
+        public DateTime Begin { get; }
+        public DateTime End { get; private set; }
         public TimeSpan Duration { get; private set; }
-        public TimeSpan Current => _stopwatch.Elapsed;
+        public TimeSpan Elapsed => _stopwatch.Elapsed;
         
         private readonly Stopwatch _stopwatch;
-        public Statistics()
+        public Statistics(string name = "")
         {
+            Name = name;
+            Begin = DateTime.UtcNow;
             _stopwatch = Stopwatch.StartNew();
         }
 
@@ -32,10 +37,11 @@ namespace Benchmark.Client
 
         public void Dispose()
         {
-            Duration = Current;
+            End = DateTime.UtcNow;
+            Duration = Elapsed;
             _stopwatch.Stop();
 
-            Console.WriteLine($"Elapsed time: {Duration.TotalMilliseconds}ms");
+            Console.WriteLine($" * Elapsed({Name}): {Duration.TotalMilliseconds}ms");
         }
     }
 }

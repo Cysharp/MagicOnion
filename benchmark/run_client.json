@@ -3,9 +3,9 @@
     "commands": [
       "#!/bin/bash",
       "export DOTNET_CLI_HOME=/tmp",
-      "sudo killall dotnet || true",
+      "sudo killall Benchmark.Client || true",
       "dotnet --version",
-      "dotnet ~/client/Benchmark.Client"
+      "~/client/Benchmark.Client http://localhost:80 10000"
     ]
   }
 }

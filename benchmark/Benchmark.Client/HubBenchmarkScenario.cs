@@ -1,11 +1,9 @@
+using Benchmark.Client.Reports;
 using Benchmark.Server.Shared;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Benchmark.Client
@@ -14,19 +12,44 @@ namespace Benchmark.Client
     {
         private IBenchmarkHub _client;
         private GrpcChannel _channel;
+        private BenchReporter _reporter;
 
-        public HubBenchmarkScenario(GrpcChannel channel)
+        public HubBenchmarkScenario(GrpcChannel channel, BenchReporter reporter)
         {
             _channel = channel;
+            _reporter = reporter;
         }
 
         public async Task Run(int requestCount)
         {
-            using (var statistics = new Statistics())
+            using (var statistics = new Statistics(nameof(ConnectAsync)))
             {
-                // todo: write my scenario
                 await ConnectAsync("console-client");
+
+                _reporter.AddBenchDetail(new BenchReportItem
+                {
+                    TestName = nameof(ConnectAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    DurationMs = statistics.Elapsed.TotalMilliseconds,
+                    RequestCount = 1,
+                    Type = nameof(HubBenchmarkScenario),
+                });
+            }
+
+            using (var statistics = new Statistics(nameof(PlainTextAsync)))
+            {
                 await PlainTextAsync(requestCount);
+
+                _reporter.AddBenchDetail(new BenchReportItem
+                {
+                    TestName = nameof(PlainTextAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    DurationMs = statistics.Elapsed.TotalMilliseconds,
+                    RequestCount = requestCount,
+                    Type = nameof(HubBenchmarkScenario),
+                });
             }
         }
 
