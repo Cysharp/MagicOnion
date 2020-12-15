@@ -1,7 +1,10 @@
 {
   "profiles": {
     "Benchmark.Client": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "environmentVariables": {
+        "BENCHCLIENT_RUNASWEB": "true"
+      }
     }
   }
 }

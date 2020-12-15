@@ -9,7 +9,7 @@ SyslogIdentifier=MagicOnion.Benchmark.Server
 User=root
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_CLI_HOME=/tmp
-WorkingDirectory=/var/MagicOnion.Benchmark/
+WorkingDirectory=/var/MagicOnion.Benchmark/server
 
 [Install]
 WantedBy=multi-user.target

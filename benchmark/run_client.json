@@ -2,10 +2,8 @@
   "Parameters": {
     "commands": [
       "#!/bin/bash",
-      "export DOTNET_CLI_HOME=/tmp",
-      "sudo killall Benchmark.Client || true",
-      "dotnet --version",
-      "~/client/Benchmark.Client http://localhost:80 10000"
+      "sudo systemctl restart Benchmark.Client",
+      "sudo systemctl status Benchmark.Client"
     ]
   }
 }

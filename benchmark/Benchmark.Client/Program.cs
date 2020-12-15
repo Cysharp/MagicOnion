@@ -1,44 +1,56 @@
-using System;
-using Grpc.Net.Client;
 using Benchmark.Client;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Linq;
 using Benchmark.Client.Reports;
+using ConsoleAppFramework;
+using Grpc.Net.Client;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+using ZLogger;
 
-var hostAddress = "http://localhost:5000";
-var itelation = 10000;
-var id = Guid.NewGuid().ToString();
-if (args.Length >= 1)
-{
-    hostAddress = args[0];
-    if (args.Length >= 2)
+var builder = Host.CreateDefaultBuilder()
+    .ConfigureLogging((hostContext, logging) =>
     {
-        itelation = int.Parse(args[1]);
-        if (args.Length >= 3)
-        {
-            id = args[2];
-        }
-    }
+        logging.ClearProviders();
+        logging.AddZLoggerConsole(configure => configure.EnableStructuredLogging = false);
+        logging.SetMinimumLevel(LogLevel.Trace);
+    });
+if (Environment.GetEnvironmentVariable("BENCHCLIENT_RUNASWEB") == "true")
+{
+    var hostAddress = Environment.GetEnvironmentVariable("BENCHCLIENT_HOSTADDRESS");    
+    await builder.RunConsoleAppFrameworkWebHostingAsync(hostAddress ?? "http://localhost:8080");
+}
+else
+{
+    await builder.RunConsoleAppFrameworkAsync<Main>(args);
 }
 
-// Connect to the server using gRPC channel.
-var channel = GrpcChannel.ForAddress(hostAddress);
-var reporter = new BenchReporter(id);
+public class Main : ConsoleAppBase
+{
+    public async Task BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string id = "")
+    {
+        if (string.IsNullOrEmpty(id))
+            id = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
 
-await Task.Delay(TimeSpan.FromSeconds(3));
-// Unary
-Console.WriteLine($"Begin unary requests.");
-var unary = new UnaryBenchmarkScenario(channel, reporter);
-await unary.Run(itelation);
-Console.WriteLine($"Completed all unary requests.");
+        // Connect to the server using gRPC channel.
+        var channel = GrpcChannel.ForAddress(hostAddress);
+        var reporter = new BenchReporter(id);
 
-// StreamingHub
-Console.WriteLine($"Begin Streaming requests.");
-await using var hub = new HubBenchmarkScenario(channel, reporter);
-await hub.Run(itelation);
-Console.WriteLine($"Completed Streaming requests.");
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        // Unary
+        Context.Logger.LogInformation($"Begin unary requests.");
+        var unary = new UnaryBenchmarkScenario(channel, reporter);
+        await unary.Run(itelation);
+        Context.Logger.LogInformation($"Completed all unary requests.");
 
-var benchJson = reporter.OutputJson();
-Console.WriteLine(benchJson);
-Console.ReadLine();
+        // StreamingHub
+        Context.Logger.LogInformation($"Begin Streaming requests.");
+        await using var hub = new HubBenchmarkScenario(channel, reporter);
+        await hub.Run(itelation);
+        Context.Logger.LogInformation($"Completed Streaming requests.");
+
+        // output
+        var benchJson = reporter.OutputJson();
+        Context.Logger.LogInformation(benchJson);
+    }
+}

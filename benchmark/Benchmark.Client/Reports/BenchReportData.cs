@@ -9,6 +9,8 @@ namespace Benchmark.Client.Reports
         public string Id { get; set; }
         [JsonPropertyName("client")]
         public string Client { get; set; }
+        [JsonPropertyName("duration_ms")]
+        public double DurationMs { get; set; }
         [JsonPropertyName("items")]
         public BenchReportItem[] Items { get; set; }
     }

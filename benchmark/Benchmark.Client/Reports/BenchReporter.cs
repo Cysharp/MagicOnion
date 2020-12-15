@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -27,7 +28,6 @@ namespace Benchmark.Client.Reports
                 WriteIndented = true, // prety print
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, // ignore null                
             };
-
         }
 
         /// <summary>
@@ -46,6 +46,7 @@ namespace Benchmark.Client.Reports
         public void AddBenchDetail(BenchReportItem item)
         {
             _items.Add(item);
+            _report.DurationMs = _items.Sum(x => x.DurationMs);
             _report.Items = _items.ToArray();
         }
 

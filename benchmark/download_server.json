@@ -6,7 +6,7 @@
       "aws s3 sync s3://bench-magiconion-s3-bucket-5c7e45b/assembly/linux/server/ ~/server",
       "sudo chmod +x ~/server/Benchmark.Server",
       "cp -Rf ~/server/ /var/MagicOnion.Benchmark/.",
-      "ls -lR /var/MagicOnion.Benchmark/"
+      "ls -lR /var/MagicOnion.Benchmark/server"
     ]
   }
 }

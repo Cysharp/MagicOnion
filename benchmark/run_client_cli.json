@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+    "commands": [
+      "#!/bin/bash",
+      "export DOTNET_CLI_HOME=/tmp",
+      "sudo killall Benchmark.Client || true",
+      "dotnet --version",
+      "BENCHCLIENT_RUNASWEB=false ~/client/Benchmark.Client -hostAddress http://localhost:80 -itelation 10000"
+    ]
+  }
+}

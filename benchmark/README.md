@@ -118,6 +118,10 @@ aws s3 sync ./out/linux/client/ s3://${BUCKET}/assembly/linux/client/
 instanceId=$(aws ssm describe-instance-information --output json --filters Key=tag-key,Values=bench --filters=Key=PingStatus,Values=Online | jq -r ".InstanceInformationList[].InstanceId")
 commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://download_client.json --output json | jq -r ".Command.CommandId")
 aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://register_client.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://run_client.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
 ```
 
 get instanceid
@@ -141,10 +145,51 @@ aws ssm list-command-invocations \
     | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
 ```
 
+register to systemd
+
+```shell
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://register_client.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations \
+	--command-id "${commandId}" \
+	--details \
+    | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+```
+
 run
 
 ```shell
 commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://run_client.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations \
+	--command-id "${commandId}" \
+	--details \
+    | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+```
+
+run (CLI)
+
+```shell
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://run_client_cli.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations \
+	--command-id "${commandId}" \
+	--details \
+    | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+```
+
+
+logs
+
+```shell
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://log_client.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations \
+	--command-id "${commandId}" \
+	--details \
+    | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+```
+
+stop
+
+```shell
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://stop_client.json --output json | jq -r ".Command.CommandId")
 aws ssm list-command-invocations \
 	--command-id "${commandId}" \
 	--details \
