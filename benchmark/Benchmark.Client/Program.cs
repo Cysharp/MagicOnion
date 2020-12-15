@@ -36,7 +36,8 @@ public class Main : ConsoleAppBase
         var channel = GrpcChannel.ForAddress(hostAddress);
         var reporter = new BenchReporter(id);
 
-        await Task.Delay(TimeSpan.FromSeconds(3));
+        //await Task.Delay(TimeSpan.FromSeconds(3));
+
         // Unary
         Context.Logger.LogInformation($"Begin unary requests.");
         var unary = new UnaryBenchmarkScenario(channel, reporter);
@@ -52,5 +53,31 @@ public class Main : ConsoleAppBase
         // output
         var benchJson = reporter.OutputJson();
         Context.Logger.LogInformation(benchJson);
+
+        // todo: put json to s3
+    }
+
+    public async Task ListClients()
+    {
+        // todo: call ssm to list up client instanceids
+    }
+
+    public async Task GenerateHtml(string s3Bucket, string prefix)
+    {
+        // todo: access s3 and download json from prefix
+        // todo: convert json to html report
+        // todo: upload html report to s3
+    }
+
+    public async Task RunAllClient()
+    {
+        // todo: call ssm to execute Clients via CLI mode.
+        // todo: call GenerateHtml to gene report
+    }
+
+    public async Task UpdateServerBinary()
+    {
+        // todo: call ssm to update server binary
+        // todo: start server via ssm
     }
 }
