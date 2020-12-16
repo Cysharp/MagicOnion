@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,12 +12,17 @@ namespace Benchmark.Client.Reports
         private readonly List<BenchReportItem> _items;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public BenchReporter(string id)
+        public string Id { get; }
+        public string Name { get; }
+
+        public BenchReporter(string id, string name)
         {
+            Id = id;
+            Name = name;
             _report = new BenchReport
             {
                 Id = id,
-                Client = Dns.GetHostName(),
+                Client = name,
             };
             _items = new List<BenchReportItem>();
             _jsonSerializerOptions = new JsonSerializerOptions
