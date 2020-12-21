@@ -115,7 +115,17 @@ namespace MagicOnion.Client
                                     var offset = (int)messagePackReader.Consumed;
                                     var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
                                     var error = MessagePackSerializer.Deserialize<string>(rest, serializerOptions);
-                                    (future as ITaskCompletion).TrySetException(new RpcException(new Status((StatusCode)statusCode, detail), error));
+                                    var ex = default(RpcException);
+                                    if (string.IsNullOrWhiteSpace(error))
+                                    {
+                                        ex = new RpcException(new Status((StatusCode)statusCode, detail));
+                                    }
+                                    else
+                                    {
+                                        ex = new RpcException(new Status((StatusCode)statusCode, detail), detail + Environment.NewLine + error);
+                                    }
+
+                                    (future as ITaskCompletion).TrySetException(ex);
                                 }
                             }
                             else

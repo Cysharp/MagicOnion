@@ -219,7 +219,7 @@ namespace MagicOnion.Server.Hubs
                         {
                             isErrorOrInterrupted = true;
                             Context.MethodHandler.logger.Error(ex, context);
-                            await context.WriteErrorMessage((int)StatusCode.Internal, "Erorr on " + handler.ToString(), ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                            await context.WriteErrorMessage((int)StatusCode.Internal, $"An error occurred while processing handler '{handler.ToString()}'.", ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
                         }
                         finally
                         {
