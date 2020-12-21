@@ -1,10 +1,14 @@
 using Benchmark.Client;
+using Benchmark.Client.Converters;
 using Benchmark.Client.Reports;
+using Benchmark.Client.Scenarios;
+using Benchmark.Client.Storage;
 using ConsoleAppFramework;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using ZLogger;
@@ -28,7 +32,13 @@ else
 
 public class Main : ConsoleAppBase
 {
-    public async Task BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string id = "")
+    private readonly string _path;
+    public Main()
+    {
+        _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? "bench-magiconion-s3-bucket-5c7e45b";
+    }
+
+    public async Task<BenchReport> BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string id = "")
     {
         if (string.IsNullOrEmpty(id))
             id = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
@@ -37,41 +47,85 @@ public class Main : ConsoleAppBase
         var channel = GrpcChannel.ForAddress(hostAddress);
         var reporter = new BenchReporter(id, Dns.GetHostName());
 
-        //await Task.Delay(TimeSpan.FromSeconds(3));
+        reporter.Begin();
+        {
+            // Unary
+            Context.Logger.LogInformation($"Begin unary requests.");
+            var unary = new UnaryBenchmarkScenario(channel, reporter);
+            await unary.Run(itelation);
+            Context.Logger.LogInformation($"Completed all unary requests.");
 
-        // Unary
-        Context.Logger.LogInformation($"Begin unary requests.");
-        var unary = new UnaryBenchmarkScenario(channel, reporter);
-        await unary.Run(itelation);
-        Context.Logger.LogInformation($"Completed all unary requests.");
-
-        // StreamingHub
-        Context.Logger.LogInformation($"Begin Streaming requests.");
-        await using var hub = new HubBenchmarkScenario(channel, reporter);
-        await hub.Run(itelation);
-        Context.Logger.LogInformation($"Completed Streaming requests.");
+            // StreamingHub
+            Context.Logger.LogInformation($"Begin Streaming requests.");
+            await using var hub = new HubBenchmarkScenario(channel, reporter);
+            await hub.Run(itelation);
+            Context.Logger.LogInformation($"Completed Streaming requests.");
+        }
+        reporter.End();
 
         // output
-        var benchJson = reporter.OutputJson();
+        var benchJson = reporter.ToJson();
         Context.Logger.LogInformation(benchJson);
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Upload("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.Id}", reporter.Name + ".json", benchJson, Context.CancellationToken);
+        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.Id}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+
+        return reporter.GetReport();
     }
 
-    public async Task ListJson(string s3Bucket, string prefix)
+    public async Task<string[]> ListReports(string prefix, string path = "")
     {
-        // todo: access s3 and List json from prefix
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(path))
+            path = _path;
+
+        // access s3 and List json from prefix
+        var storage = StorageFactory.Create(Context.Logger);
+        var reports = await storage.List(path, $"reports/{prefix}", Context.CancellationToken);
+        foreach (var report in reports)
+        {
+            Context.Logger.LogInformation(report);
+        }
+        return reports;
     }
 
-    public async Task GenerateHtml(string s3Bucket, string prefix)
+    public async Task<BenchReport[]> GetReports(string prefix, string path = "")
     {
-        // todo: access s3 and download json from prefix
-        // todo: convert json to html report
-        // todo: upload html report to s3
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(path))
+            path = _path;
+
+        // access s3 and get jsons from prefix
+        var storage = StorageFactory.Create(Context.Logger);
+        var reportJsons = await storage.Get(path, $"reports/{prefix}", Context.CancellationToken);
+        var reports = new List<BenchReport>();
+        foreach (var json in reportJsons)
+        {
+            var report = JsonConvert.Deserialize<BenchReport>(json);
+            reports.Add(report);
+        }
+        return reports.ToArray();
+    }
+
+    public async Task GenerateHtml(string prefix, string path = "")
+    {
+        if (string.IsNullOrEmpty(path))
+            path = _path;
+
+        // access s3 and download json from prefix
+        var reports = await GetReports(prefix, path);
+
+        // generate html based on json data
+        var htmlReporter = new HtmlBenchReporter();
+        var htmlReport = htmlReporter.CreateReport(reports);
+        var page = new BenchmarkReportPageTemplate()
+        {
+            Report = htmlReport,
+        };
+        var content = NormalizeNewLine(page.TransformText());
+
+        // upload html report to s3
+        var storage = StorageFactory.Create(Context.Logger);
+        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"html/{htmlReport.Summary.Id}", "index.html", content, overwrite: true, Context.CancellationToken);
     }
 
     public async Task ListClients()
@@ -92,5 +146,13 @@ public class Main : ConsoleAppBase
         // todo: call ssm to update server binary
         // todo: start server via ssm
         throw new NotImplementedException();
+    }
+
+
+    private static string NormalizeNewLine(string content)
+    {
+        return content
+            .Replace("\r\n", "\n", StringComparison.OrdinalIgnoreCase)
+            .Replace("\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
     }
 }

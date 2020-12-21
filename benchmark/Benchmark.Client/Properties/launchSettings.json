@@ -2,6 +2,7 @@
   "profiles": {
     "Benchmark.Client": {
       "commandName": "Project",
+      "commandLineArgs": "-delaySec 3",
       "environmentVariables": {
         "BENCHCLIENT_RUNASWEB": "true"
       }

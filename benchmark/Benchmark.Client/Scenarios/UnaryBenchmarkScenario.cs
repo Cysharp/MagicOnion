@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Benchmark.Client
+namespace Benchmark.Client.Scenarios
 {
     public class UnaryBenchmarkScenario
     {
@@ -33,7 +33,7 @@ namespace Benchmark.Client
                     TestName = nameof(PlainTextAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
-                    DurationMs = statistics.Elapsed.TotalMilliseconds,
+                    Duration = statistics.Elapsed,
                     RequestCount = requestCount,
                     Type = nameof(UnaryBenchmarkScenario),
                 });

@@ -1,5 +1,8 @@
+using Benchmark.Client.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,12 +13,11 @@ namespace Benchmark.Client.Reports
     {
         private readonly BenchReport _report;
         private readonly List<BenchReportItem> _items;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public string Id { get; }
         public string Name { get; }
 
-        public BenchReporter(string id, string name)
+        public BenchReporter(string id, string name, string framework = "MagicOnion")
         {
             Id = id;
             Name = name;
@@ -23,14 +25,15 @@ namespace Benchmark.Client.Reports
             {
                 Id = id,
                 Client = name,
+                OS = RuntimeInformation.OSDescription,
+                OsArchitecture = RuntimeInformation.OSArchitecture.ToString(),
+                ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString(),
+                CpuNumber = Environment.ProcessorCount,
+                SystemMemory = GetSystemMemory(),
+                Framework = framework,
+                Version = typeof(MagicOnion.IServiceMarker).Assembly.GetName().Version?.ToString(),
             };
             _items = new List<BenchReportItem>();
-            _jsonSerializerOptions = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, // allow Unicode characters
-                WriteIndented = true, // prety print
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, // ignore null                
-            };
         }
 
         /// <summary>
@@ -42,6 +45,17 @@ namespace Benchmark.Client.Reports
             return _report;
         }
 
+        public void Begin()
+        {
+            _report.Begin = DateTime.UtcNow;
+        }
+
+        public void End()
+        {
+            _report.End = DateTime.UtcNow;
+            _report.Duration = _report.End - _report.Begin;
+        }
+
         /// <summary>
         /// Add inidivisual Bench Report Detail
         /// </summary>
@@ -49,7 +63,6 @@ namespace Benchmark.Client.Reports
         public void AddBenchDetail(BenchReportItem item)
         {
             _items.Add(item);
-            _report.DurationMs = _items.Sum(x => x.DurationMs);
             _report.Items = _items.ToArray();
         }
 
@@ -57,11 +70,38 @@ namespace Benchmark.Client.Reports
         /// Output report as a json
         /// </summary>
         /// <returns></returns>
-        public string OutputJson()
+        public string ToJson()
         {
-            var currentReport = GetReport();
-            var json = JsonSerializer.Serialize(currentReport, _jsonSerializerOptions);
-            return json;
+            return JsonConvert.Serialize(_report);
+        }
+
+        /// <summary>
+        /// System Memory for GB
+        /// </summary>
+        /// <returns></returns>
+        private long GetSystemMemory()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // Windows require wmic and priviledged. lets omit
+                return 0;
+            }
+            else
+            {
+                // sample data (64GB machine)
+                // MemTotal:        6110716 kB
+                var memTotal = System.IO.File.ReadAllLines("/proc/meminfo").FirstOrDefault();
+                var lines = memTotal.Split("MemTotal:");
+                if (lines.Length == 2)
+                {
+                    var memString = lines[1].Split("kb")[0];
+                    if (double.TryParse(memString.Trim(), out var memory))
+                    {
+                        return (long)Math.Floor(memory / 1024 / 1024);
+                    }
+                }
+                return 0;
+            }
         }
     }
 }
