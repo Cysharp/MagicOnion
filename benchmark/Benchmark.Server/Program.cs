@@ -5,10 +5,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using ZLogger;
 
@@ -18,8 +16,7 @@ namespace Benchmark.Server
     {
         public static void Main(string[] args)
         {
-            //DebugPath();
-            //DebugEmbedded();
+            //EnableDebugOutput();
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -49,6 +46,11 @@ namespace Benchmark.Server
                         .UseStartup<Startup>();
                 });
 
+        private static void EnableDebugOutput()
+        {
+            DebugPath();
+            DebugEmbedded();
+        }
         private static void DebugPath()
         {
             Console.WriteLine("Debugging path");

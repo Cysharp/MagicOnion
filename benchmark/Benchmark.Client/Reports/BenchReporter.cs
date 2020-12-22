@@ -79,7 +79,7 @@ namespace Benchmark.Client.Reports
         /// System Memory for GB
         /// </summary>
         /// <returns></returns>
-        private long GetSystemMemory()
+        private static long GetSystemMemory()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

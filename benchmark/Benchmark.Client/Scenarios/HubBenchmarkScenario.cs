@@ -3,21 +3,22 @@ using Benchmark.Server.Shared;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Benchmark.Client.Scenarios
 {
     public class HubBenchmarkScenario : IBenchmarkHubReciever, IAsyncDisposable
     {
+        private readonly GrpcChannel _channel;
+        private readonly BenchReporter _reporter;
         private IBenchmarkHub _client;
-        private GrpcChannel _channel;
-        private BenchReporter _reporter;
+        private int _errors = 0;
 
         public HubBenchmarkScenario(GrpcChannel channel, BenchReporter reporter)
         {
             _channel = channel;
             _reporter = reporter;
+            _errors = 0;
         }
 
         public async Task Run(int requestCount)
@@ -32,8 +33,9 @@ namespace Benchmark.Client.Scenarios
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
                     Duration = statistics.Elapsed,
-                    RequestCount = 1,
-                    Type = nameof(HubBenchmarkScenario),
+                    RequestCount = 0, // connect is setup, not count as request.
+                    Errors = _errors,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
                 });
             }
 
@@ -48,32 +50,73 @@ namespace Benchmark.Client.Scenarios
                     End = DateTime.UtcNow,
                     Duration = statistics.Elapsed,
                     RequestCount = requestCount,
-                    Type = nameof(HubBenchmarkScenario),
+                    Errors = _errors,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                });
+            }
+
+            using (var statistics = new Statistics(nameof(EndAsync)))
+            {
+                await EndAsync();
+                _reporter.AddBenchDetail(new BenchReportItem
+                {
+                    TestName = nameof(EndAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    Duration = statistics.Elapsed,
+                    RequestCount = 0, // end is teardown, not count as request.
+                    Errors = _errors,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
                 });
             }
         }
 
         private async Task ConnectAsync(string roomName)
         {
-            _client = StreamingHubClient.Connect<IBenchmarkHub, IBenchmarkHubReciever>(_channel, this);
-            var name = Guid.NewGuid().ToString();
-            await _client.Ready(roomName, name, "plaintext");
+            _errors = 0;
+            try
+            {
+                _client = StreamingHubClient.Connect<IBenchmarkHub, IBenchmarkHubReciever>(_channel, this);
+                var name = Guid.NewGuid().ToString();
+                await _client.Ready(roomName, name, "plaintext");
+            }
+            catch (Exception)
+            {
+                _errors++;
+            }
         }
 
         private async Task PlainTextAsync(int requestCount)
         {
-            var tasks = new List<Task>();
+            _errors = 0;
             for (var i = 0; i <= requestCount; i++)
             {
                 var data = new BenchmarkData
                 {
                     PlainText = i.ToString(),
                 };
-                var task = _client.Process(data);
-                tasks.Add(task);
+                try
+                {
+                    await _client.Process(data);
+                }
+                catch (Exception)
+                {
+                    _errors++;
+                }
             }
-            await Task.WhenAll(tasks);
-            await _client.End();
+        }
+
+        private async Task EndAsync()
+        {
+            _errors = 0;
+            try
+            {
+                await _client.End();
+            }
+            catch (Exception)
+            {
+                _errors++;
+            }
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()

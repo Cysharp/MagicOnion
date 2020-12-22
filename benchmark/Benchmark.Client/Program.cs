@@ -106,7 +106,7 @@ public class Main : ConsoleAppBase
         return reports.ToArray();
     }
 
-    public async Task GenerateHtml(string prefix, string path = "")
+    public async Task GenerateHtml(string prefix, string path = "", string htmlFileName = "index.html")
     {
         if (string.IsNullOrEmpty(path))
             path = _path;
@@ -121,11 +121,11 @@ public class Main : ConsoleAppBase
         {
             Report = htmlReport,
         };
-        var content = NormalizeNewLine(page.TransformText());
+        var content = NormalizeNewLineLf(page.TransformText());
 
         // upload html report to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"html/{htmlReport.Summary.Id}", "index.html", content, overwrite: true, Context.CancellationToken);
+        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"html/{htmlReport.Summary.Id}", htmlFileName, content, overwrite: true, Context.CancellationToken);
     }
 
     public async Task ListClients()
@@ -148,11 +148,16 @@ public class Main : ConsoleAppBase
         throw new NotImplementedException();
     }
 
-
     private static string NormalizeNewLine(string content)
     {
         return content
             .Replace("\r\n", "\n", StringComparison.OrdinalIgnoreCase)
             .Replace("\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string NormalizeNewLineLf(string content)
+    {
+        return content
+            .Replace("\r\n", "\n", StringComparison.OrdinalIgnoreCase);
     }
 }

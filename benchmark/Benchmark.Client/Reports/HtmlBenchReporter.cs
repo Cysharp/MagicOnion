@@ -16,6 +16,8 @@ namespace Benchmark.Client.Reports
                 throw new ArgumentException($"{nameof(reports)} not contains any element.");
 
             var durations = reports.Select(x => x.Duration).ToArray();
+            var unaryItems = reports.SelectMany(x => x.Items).Where(x => x.Type == nameof(Grpc.Core.MethodType.Unary)).ToArray();
+            var hubItems = reports.SelectMany(x => x.Items).Where(x => x.Type == nameof(Grpc.Core.MethodType.DuplexStreaming)).ToArray();
 
             var clientInfo = new HtmlBenchReportClientInfo
             {
@@ -38,11 +40,51 @@ namespace Benchmark.Client.Reports
                 DurationMax = MaxTimeSpan(durations),
                 DurationMin = MinTimeSpan(durations),
             };
-            var resultInfo = new HtmlBenchReportResult
+            var unaryConnectionsResultInfo = new HtmlBenchReportConnectionsResult
             {
+                RequestDurationItems = ConnectionAverage(unaryItems.Where(x => x.RequestCount != 0).OrderBy(x => x.RequestCount)),
+                Errors = unaryItems.Sum(x => x.Errors),
+                Items = reports.Select(x => new HtmlBenchReportConnectionsResultItem
+                {
+                    Client = x.Client,
+                    Durations = x.Items.Where(i => i.Type == nameof(Grpc.Core.MethodType.Unary))
+                        .Where(i => i.RequestCount != 0)
+                        .OrderBy(i => i.RequestCount)
+                        .Select(i => i.Duration)
+                        .ToArray(),
+                }).ToArray(),
+            };
+            var hubConnectionsResultInfo = new HtmlBenchReportConnectionsResult
+            {
+                RequestDurationItems = ConnectionAverage(hubItems.Where(x => x.RequestCount != 0)),
+                Errors = hubItems.Sum(x => x.Errors),
+                Items = reports.Select(x => new HtmlBenchReportConnectionsResultItem
+                {
+                    Client = x.Client,
+                    Durations = x.Items.Where(i => i.Type == nameof(Grpc.Core.MethodType.DuplexStreaming))
+                        .Where(i => i.RequestCount != 0)
+                        .OrderBy(i => i.RequestCount)
+                        .Select(i => i.Duration)
+                        .ToArray(),
+                }).ToArray(),
             };
 
-            return new HtmlBenchReport(clientInfo, summaryInfo, resultInfo);
+            return new HtmlBenchReport(clientInfo, summaryInfo, unaryConnectionsResultInfo, hubConnectionsResultInfo);
+        }
+
+        private HtmlBenchReportRequestsDurationItem[] ConnectionAverage(IEnumerable<BenchReportItem> sources)
+        {
+            // { connections int: duration TimeSpan}
+            if (sources == null) throw new ArgumentNullException(nameof(sources));
+            return sources.GroupBy(x => x.RequestCount)
+                .Select(xs => (requests: xs.Key, duration: AverageTimeSpan(xs.Select(x => x.Duration))))
+                .Select(x => new HtmlBenchReportRequestsDurationItem
+                {
+                    RequestCount = x.requests,
+                    Duration = x.duration,
+                    Rps = x.requests / x.duration.TotalSeconds,
+                })
+                .ToArray();
         }
 
         private static TimeSpan SumTimeSpan(IEnumerable<TimeSpan> sources)
@@ -103,7 +145,7 @@ namespace Benchmark.Client.Reports
             return min.Value;
         }
 
-        private string ToJoinedString(IEnumerable<string> values, char separator = ',')
+        private static string ToJoinedString(IEnumerable<string> values, char separator = ',')
         {
             if (values == null)
                 throw new ArgumentNullException(nameof(values));

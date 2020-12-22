@@ -40,6 +40,11 @@ namespace Benchmark.Server.Services
             {
                 return x + y;
             }
+            catch
+            {
+                Statistics.UnaryError();
+                return 0;
+            }
             finally
             {
                 Statistics.UnaryDisconnected();
@@ -52,12 +57,16 @@ namespace Benchmark.Server.Services
             try
             {
                 ProcessRequest(RequestType.PlainText, data);
-                return Nil.Default;
+            }
+            catch
+            {
+                Statistics.UnaryError();
             }
             finally
             {
                 Statistics.UnaryDisconnected();
             }
+            return Nil.Default;
         }
 
         private void ProcessRequest(RequestType requestType, BenchmarkData body)

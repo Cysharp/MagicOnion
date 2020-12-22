@@ -18,28 +18,21 @@ namespace Benchmark.Client
     /// <summary>
     /// Class to produce the template output
     /// </summary>
-    
-    #line 1 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class BenchmarkReportPageTemplate : BenchmarkReportPageTemplateBase
     {
-#line hidden
         /// <summary>
         /// Create the template output
         /// </summary>
         public virtual string TransformText()
         {
             this.Write("\r\n");
-            
-            #line 8 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
 
     var client = Report.Client;
     var summary = Report.Summary;
-    var result = Report.Result;
+    var unaryConnectionsResult = Report.UnaryConnectionsResult;
+    var hubConnectionsResult = Report.HubConnectionsResult;
 
-            
-            #line default
-            #line hidden
             this.Write(@"
 <!-- auto-generated -->
 <!DOCTYPE html>
@@ -69,19 +62,9 @@ namespace Benchmark.Client
                     </ul>
                 </div>
                 <span class=""navbar-text"">");
-            
-            #line 41 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Framework));
-            
-            #line default
-            #line hidden
             this.Write(" v");
-            
-            #line 41 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Version));
-            
-            #line default
-            #line hidden
             this.Write(@"</span>
             </div>
         </nav>
@@ -93,12 +76,7 @@ namespace Benchmark.Client
 
                 <h1 class=""text-muted"">Test Result</h1>
                 <p class=""text-muted"">Id: ");
-            
-            #line 51 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Id));
-            
-            #line default
-            #line hidden
             this.Write(@"</p>
 
                 <div class=""table-responsive"">
@@ -113,33 +91,13 @@ namespace Benchmark.Client
                         </thead>
                         <tr>
                             <td>");
-            
-            #line 64 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Os));
-            
-            #line default
-            #line hidden
             this.Write(" (");
-            
-            #line 64 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Architecture));
-            
-            #line default
-            #line hidden
             this.Write(")</td>\r\n                            <td>");
-            
-            #line 65 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Processors));
-            
-            #line default
-            #line hidden
             this.Write("</td>\r\n                            <td>");
-            
-            #line 66 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(client.Memory));
-            
-            #line default
-            #line hidden
             this.Write(@"GiB</td>
                         </tr>
                         </tbody>
@@ -161,139 +119,210 @@ namespace Benchmark.Client
                         </thead>
                         <tr>
                             <td>");
-            
-            #line 86 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Clients));
-            
-            #line default
-            #line hidden
             this.Write("</td>\r\n                            <td>");
-            
-            #line 87 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Itelations));
-            
-            #line default
-            #line hidden
             this.Write("</td>\r\n                            <td>");
-            
-            #line 88 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Begin));
-            
-            #line default
-            #line hidden
             this.Write("</td>\r\n                            <td>");
-            
-            #line 89 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.End));
-            
-            #line default
-            #line hidden
             this.Write("</td>\r\n                            <td>");
-            
-            #line 90 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.DurationTotal.TotalSeconds));
-            
-            #line default
-            #line hidden
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationTotal.TotalSeconds)));
             this.Write(" sec</td>\r\n                            <td>");
-            
-            #line 91 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.DurationAvg.TotalSeconds));
-            
-            #line default
-            #line hidden
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationAvg.TotalSeconds)));
             this.Write(" sec</td>\r\n                            <td>");
-            
-            #line 92 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.DurationMin.TotalSeconds));
-            
-            #line default
-            #line hidden
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationMin.TotalSeconds)));
             this.Write(" sec</td>\r\n                            <td>");
-            
-            #line 93 "C:\git\cysharp\MagicOnion\benchmark\Benchmark.Client\BenchmarkReportPageTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.DurationMax.TotalSeconds));
-            
-            #line default
-            #line hidden
-            this.Write(" sec</td>\r\n                        </tr>\r\n                        </tbody>\r\n     " +
-                    "               </table>\r\n                </div>\r\n\r\n                <div class=\"t" +
-                    "able-responsive\">\r\n                    <h2 class=\"text-muted\">Result</h2>\r\n     " +
-                    "               <table class=\"table table-striped table-sm\">\r\n                   " +
-                    "     <thead>\r\n                            <th scope=\"col\">%{256}%</th>\r\n        " +
-                    "                    <th scope=\"col\">%{1024}%</th>\r\n                            <" +
-                    "th scope=\"col\">%{4096}%</th>\r\n                            <th scope=\"col\">%{1638" +
-                    "4}%</th>\r\n                            <th scope=\"col\">Errors</th>\r\n             " +
-                    "           </thead>\r\n                        <tr>\r\n                            <" +
-                    "td>%{10sec}%</td>\r\n                            <td>%{30sec}%</td>\r\n             " +
-                    "               <td>%{60sec}%</td>\r\n                            <td>%{120sec}%</t" +
-                    "d>\r\n                            <td>%{0}%</td>\r\n                        </tr>\r\n " +
-                    "                       </tbody>\r\n                    </table>\r\n                <" +
-                    "/div>\r\n\r\n                <div>\r\n                    <h2>積み上げグラフ</h2>\r\n          " +
-                    "          <canvas id=\"benchmarkStackBar\"></canvas>\r\n\r\n                    <scrip" +
-                    "t>\r\n                        var ctx = document.getElementById(\"benchmarkStackBar" +
-                    "\");\r\n                        var myChart = new Chart(ctx, {\r\n                   " +
-                    "         type: \'bar\',\r\n                            data: {\r\n                    " +
-                    "            labels: [\"%{256}%\", \"%{1024}%\", \"%{4096}%\", \"%{16384}%\"],\r\n         " +
-                    "                       datasets: [{\r\n                                    label: " +
-                    "\"%{Client1}%\",\r\n                                    borderWidth: 1,\r\n           " +
-                    "                         backgroundColor: \"#121554\",\r\n                          " +
-                    "          borderColor: \"#121554\",\r\n                                    data: [10" +
-                    ", 200, 500, 5000]\r\n                                },\r\n                         " +
-                    "       {\r\n                                    label: \"%{Client2}%\",\r\n           " +
-                    "                         borderWidth: 1,\r\n                                    ba" +
-                    "ckgroundColor: \"#1d3681\",\r\n                                    borderColor: \"#1d" +
-                    "3681\",\r\n                                    data: [10, 200, 500, 5000]\r\n        " +
-                    "                        }, {\r\n                                    label: \"%{Clie" +
-                    "nt2}%\",\r\n                                    borderWidth: 1,\r\n                  " +
-                    "                  backgroundColor: \"#2e70a7\",\r\n                                 " +
-                    "   borderColor: \"#2e70a7\",\r\n                                    data: [10, 200, " +
-                    "500, 5000]\r\n                                }, {\r\n                              " +
-                    "      label: \"%{Client3}%\",\r\n                                    borderWidth: 1," +
-                    "\r\n                                    backgroundColor: \"#4eadc7\",\r\n             " +
-                    "                       borderColor: \"#4eadc7\",\r\n                                " +
-                    "    data: [10, 200, 500, 5000]\r\n                                }, {\r\n          " +
-                    "                          label: \"%{Client3}%\",\r\n                               " +
-                    "     borderWidth: 1,\r\n                                    backgroundColor: \"#a7d" +
-                    "8bf\",\r\n                                    borderColor: \"#a7d8bf\",\r\n            " +
-                    "                        data: [10, 200, 500, 5000]\r\n                            " +
-                    "    }]\r\n\r\n                            },\r\n                            options: {" +
-                    "\r\n                                title: {\r\n                                    " +
-                    "display: true,\r\n                                    text: \'MagicOnion Benchmark\'" +
-                    ",\r\n                                    padding: 3\r\n                             " +
-                    "   },\r\n                                scales: {\r\n                              " +
-                    "      xAxes: [{\r\n                                        stacked: true, // use s" +
-                    "tacked bar chart\r\n                                        categoryPercentage: 0." +
-                    "4 // width of bar\r\n                                    }],\r\n                    " +
-                    "                yAxes: [{\r\n                                        stacked: true" +
-                    " // use stacked bar chart\r\n                                    }]\r\n             " +
-                    "                   },\r\n                                legend: {\r\n              " +
-                    "                      labels: {\r\n                                        boxWidt" +
-                    "h: 30,\r\n                                        padding: 20\r\n                   " +
-                    "                 },\r\n                                    display: true\r\n        " +
-                    "                        },\r\n                                tooltips: {\r\n       " +
-                    "                             mode: \'label\' // data colum for tooltip\r\n          " +
-                    "                      }\r\n                            }\r\n                        " +
-                    "});\r\n                    </script>\r\n                </div>\r\n\r\n            </div>" +
-                    "\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"padding-t" +
-                    "op: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n            <a " +
-                    "href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n              " +
-                    "  <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p class=\"text-c" +
-                    "enter\">\r\n            GitHub:\r\n                <a class=\"text-dark\" href=\"https:/" +
-                    "/github.com/cysharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n          " +
-                    "  © 2020 Copyright:\r\n                <a class=\"text-dark\" href=\"https://cysharp." +
-                    "co.jp/\">Cysharp</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <scr" +
-                    "ipt src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"" +
-                    "\r\n        integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp7" +
-                    "5j7Bh/kR0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    " +
-                    "<script type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-u" +
-                    "i-kit/3.0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationMax.TotalSeconds)));
+            this.Write(@" sec</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class=""table-responsive"">
+                    <h2 class=""text-muted"">Unary Connections</h2>
+                    <table class=""table table-striped table-sm"">
+                        <thead>
+                        ");
+ foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <th scope=\"col\">Requests</th>\r\n                      " +
+                    "      <th scope=\"col\">");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write(" con</th>\r\n                        ");
+ } 
+            this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
+                    "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
+                    "</td>\r\n                        ");
+ foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
+            this.Write(" sec</td>\r\n                        ");
+ } 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(unaryConnectionsResult.Errors));
+            this.Write(@"</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class=""table-responsive"">
+                    <h2 class=""text-muted"">Hub Connections</h2>
+                    <table class=""table table-striped table-sm"">
+                        <thead>
+                        ");
+ foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <th scope=\"col\">Requests</th>\r\n                      " +
+                    "      <th scope=\"col\">");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write(" con</th>\r\n                        ");
+ } 
+            this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
+                    "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
+                    "</td>\r\n                            ");
+ foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
+            this.Write(" sec</td>\r\n                            ");
+ } 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubConnectionsResult.Errors));
+            this.Write(@"</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h2>Unary Connections & Duration</h2>
+                    <canvas id=""unaryConnectionStackBar""></canvas>
+
+                    <script>
+                        var ctx = document.getElementById(""unaryConnectionStackBar"");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                ");
+ foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+            this.Write("                                    \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write("\",\r\n                                ");
+ } 
+            this.Write("                                ],\r\n                                datasets: [\r\n" +
+                    "                                ");
+ for(var i = 0; i < unaryConnectionsResult.Items.Length; i++) { 
+            this.Write("                                {\r\n                                    ");
+
+                                        var item = unaryConnectionsResult.Items[i];
+                                        var color = GetColor(i);
+                                    
+            this.Write("                                    label: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Client));
+            this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
+                    "            backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(color));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(color));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
+ foreach(var duration in item.Durations) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(duration.TotalSeconds));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write("                                    ]\r\n                                },\r\n      " +
+                    "                          ");
+ } 
+            this.Write("                                ]\r\n                            },\r\n              " +
+                    "              options: {\r\n                                title: {\r\n            " +
+                    "                        display: true,\r\n                                    text" +
+                    ": \'Unary\',\r\n                                    padding: 3\r\n                    " +
+                    "            },\r\n                                scales: {\r\n                     " +
+                    "               xAxes: [{\r\n                                        stacked: true," +
+                    " // use stacked bar chart\r\n                                        categoryPerce" +
+                    "ntage: 0.4 // width of bar\r\n                                    }],\r\n           " +
+                    "                         yAxes: [{\r\n                                        stac" +
+                    "ked: true // use stacked bar chart\r\n                                    }]\r\n    " +
+                    "                            },\r\n                                legend: {\r\n     " +
+                    "                               labels: {\r\n                                      " +
+                    "  boxWidth: 30,\r\n                                        padding: 20\r\n          " +
+                    "                          },\r\n                                    display: true\r" +
+                    "\n                                },\r\n                                tooltips: {" +
+                    "\r\n                                    mode: \'label\' // data colum for tooltip\r\n " +
+                    "                               }\r\n                            }\r\n               " +
+                    "         });\r\n                    </script>\r\n                </div>\r\n\r\n         " +
+                    "       <div>\r\n                    <h2>Hub Connections & Duration</h2>\r\n         " +
+                    "           <canvas id=\"hubConnectionStackBar\"></canvas>\r\n\r\n                    <" +
+                    "script>\r\n                        var ctx = document.getElementById(\"hubConnectio" +
+                    "nStackBar\");\r\n                        var myChart = new Chart(ctx, {\r\n          " +
+                    "                  type: \'bar\',\r\n                            data: {\r\n           " +
+                    "                     labels: [\r\n                                ");
+ foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+            this.Write("                                    \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write("\",\r\n                                ");
+ } 
+            this.Write("                                ],\r\n                                datasets: [\r\n" +
+                    "                                ");
+ for(var i = 0; i < hubConnectionsResult.Items.Length; i++) { 
+            this.Write("                                {\r\n                                    ");
+
+                                        var item = hubConnectionsResult.Items[i];
+                                        var color = GetColor(i);
+                                    
+            this.Write("                                    label: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Client));
+            this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
+                    "            backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(color));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(color));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
+ foreach(var duration in item.Durations) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(duration.TotalSeconds));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write("                                    ]\r\n                                },\r\n      " +
+                    "                          ");
+ } 
+            this.Write("                                ]\r\n                            },\r\n              " +
+                    "              options: {\r\n                                title: {\r\n            " +
+                    "                        display: true,\r\n                                    text" +
+                    ": \'Hub\',\r\n                                    padding: 3\r\n                      " +
+                    "          },\r\n                                scales: {\r\n                       " +
+                    "             xAxes: [{\r\n                                        stacked: true, /" +
+                    "/ use stacked bar chart\r\n                                        categoryPercent" +
+                    "age: 0.4 // width of bar\r\n                                    }],\r\n             " +
+                    "                       yAxes: [{\r\n                                        stacke" +
+                    "d: true // use stacked bar chart\r\n                                    }]\r\n      " +
+                    "                          },\r\n                                legend: {\r\n       " +
+                    "                             labels: {\r\n                                        " +
+                    "boxWidth: 30,\r\n                                        padding: 20\r\n            " +
+                    "                        },\r\n                                    display: true\r\n " +
+                    "                               },\r\n                                tooltips: {\r\n" +
+                    "                                    mode: \'label\' // data colum for tooltip\r\n   " +
+                    "                             }\r\n                            }\r\n                 " +
+                    "       });\r\n                    </script>\r\n                </div>\r\n\r\n           " +
+                    " </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"pa" +
+                    "dding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n        " +
+                    "    <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n       " +
+                    "         <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p class=" +
+                    "\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/cy" +
+                    "sharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Copyr" +
+                    "ight:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cyshar" +
+                    "p, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script src=" +
+                    "\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n      " +
+                    "  integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR" +
+                    "0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <script " +
+                    "type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3." +
+                    "0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }
-    
-    #line default
-    #line hidden
     #region Base class
     /// <summary>
     /// Base class for this transformation

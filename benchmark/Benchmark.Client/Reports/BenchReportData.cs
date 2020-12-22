@@ -48,5 +48,7 @@ namespace Benchmark.Client.Reports
         public TimeSpan Duration { get; set; }
         [JsonPropertyName("request_count")]
         public int RequestCount { get; set; }
+        [JsonPropertyName("error_count")]
+        public int Errors { get; set; }
     }
 }

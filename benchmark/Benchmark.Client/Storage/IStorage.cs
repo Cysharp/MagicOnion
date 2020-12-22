@@ -120,11 +120,12 @@ namespace Benchmark.Client.Storage
         public async Task Save(string path, string prefix, string name, string content, bool overwrite = false, CancellationToken ct = default)
         {
             var dir = $"{path}/{prefix.TrimEnd('/')}";
-            _logger.LogInformation($"Save content to local storage {dir}");
-
             Directory.CreateDirectory(dir);
+
             var basePath = Path.Combine(dir, name);
             var savePath = overwrite ? basePath : GetSafeSavePath(basePath, 1);
+
+            _logger.LogInformation($"Save content to local storage {savePath}");
             await File.WriteAllTextAsync(savePath, content, ct);
         }
 

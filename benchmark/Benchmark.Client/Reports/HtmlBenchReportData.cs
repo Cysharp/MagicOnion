@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Benchmark.Client.Reports
 {
-    public record HtmlBenchReport(HtmlBenchReportClientInfo Client, HtmlBenchReportSummary Summary, HtmlBenchReportResult Result);
+    public record HtmlBenchReport(HtmlBenchReportClientInfo Client, HtmlBenchReportSummary Summary, HtmlBenchReportConnectionsResult UnaryConnectionsResult, HtmlBenchReportConnectionsResult HubConnectionsResult);
     public record HtmlBenchReportClientInfo
     {
         public string Os { get; init; }
@@ -25,9 +25,21 @@ namespace Benchmark.Client.Reports
         public TimeSpan DurationMin { get; init; }
         public TimeSpan DurationMax { get; init; }
     }
-    public record HtmlBenchReportResult
+    public record HtmlBenchReportConnectionsResult
     {
-        public Dictionary<int, TimeSpan> BenchItems  { get; init; }
+        public HtmlBenchReportRequestsDurationItem[] RequestDurationItems { get; init; }
         public int Errors { get; init; }
+        public HtmlBenchReportConnectionsResultItem[] Items { get; set; }
+    }
+    public record HtmlBenchReportRequestsDurationItem
+    {
+        public int RequestCount { get; set; }
+        public TimeSpan Duration { get; set; }
+        public double Rps { get; set; }
+    }
+    public record HtmlBenchReportConnectionsResultItem
+    {
+        public string Client { get; init; }
+        public TimeSpan[] Durations { get; init; }
     }
 }

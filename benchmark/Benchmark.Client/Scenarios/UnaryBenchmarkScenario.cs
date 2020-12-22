@@ -2,11 +2,8 @@ using Benchmark.Client.Reports;
 using Benchmark.Server.Shared;
 using Benchmark.Shared;
 using Grpc.Net.Client;
-using MagicOnion;
 using MagicOnion.Client;
-using MessagePack;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Benchmark.Client.Scenarios
@@ -15,11 +12,13 @@ namespace Benchmark.Client.Scenarios
     {
         private readonly IBenchmarkService client;
         private readonly BenchReporter _reporter;
+        private int _errors = 0;
 
         public UnaryBenchmarkScenario(GrpcChannel channel, BenchReporter reporter)
         {
             client = MagicOnionClient.Create<IBenchmarkService>(channel);
             _reporter = reporter;
+            _errors = 0;
         }
 
         public async Task Run(int requestCount)
@@ -35,7 +34,7 @@ namespace Benchmark.Client.Scenarios
                     End = DateTime.UtcNow,
                     Duration = statistics.Elapsed,
                     RequestCount = requestCount,
-                    Type = nameof(UnaryBenchmarkScenario),
+                    Type = nameof(Grpc.Core.MethodType.Unary),
                 });
             }
         }
@@ -44,20 +43,17 @@ namespace Benchmark.Client.Scenarios
         {
             for (var i = 0; i <= requestCount; i++)
             {
-                // Call the server-side method using the proxy.
-                _ = await client.SumAsync(i, i);
+                try
+                {
+                    // Call the server-side method using the proxy.
+                    _ = await client.SumAsync(i, i);
+                }
+                catch
+                {
+                    _errors++;
+                }
+
             }
-        }
-        public async Task SumParallel(int requestCount)
-        {
-            var tasks = new List<UnaryResult<int>>();
-            for (var i = 0; i <= requestCount; i++)
-            {
-                // Call the server-side method using the proxy.
-                var task = client.SumAsync(i, i);
-                tasks.Add(task);
-            }
-            await ValueTaskUtils.WhenAll(tasks.ToArray());
         }
 
         private async Task PlainTextAsync(int requestCount)
@@ -68,22 +64,15 @@ namespace Benchmark.Client.Scenarios
                 {
                     PlainText = i.ToString(),
                 };
-                _ = await client.PlainTextAsync(data);
-            }
-        }
-        private async Task PlainTextParallel(int requestCount)
-        {
-            var tasks = new List<UnaryResult<Nil>>();
-            for (var i = 0; i <= requestCount; i++)
-            {
-                var data = new BenchmarkData
+                try
                 {
-                    PlainText = i.ToString(),
-                };
-                var task = client.PlainTextAsync(data);
-                tasks.Add(task);
+                    _ = await client.PlainTextAsync(data);
+                }
+                catch (Exception)
+                {
+                    _errors++;
+                }
             }
-            await ValueTaskUtils.WhenAll(tasks);
         }
     }
 }
