@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using System;
 
 namespace MagicOnion
@@ -9,6 +9,7 @@ namespace MagicOnion
         public string Detail { get; private set; }
 
         public ReturnStatusException(StatusCode statusCode, string detail)
+            : base($"The method has returned the status code '{statusCode}'." + (string.IsNullOrWhiteSpace(detail) ? "" : $" (Detail={detail})"))
         {
             this.StatusCode = statusCode;
             this.Detail = detail;
