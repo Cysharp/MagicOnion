@@ -29,6 +29,8 @@ namespace Benchmark.Client.Scenarios
 
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
+                    ExecuteId = _reporter.ExecuteId,
+                    Client = _reporter.Name,
                     TestName = nameof(ConnectAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -45,6 +47,8 @@ namespace Benchmark.Client.Scenarios
 
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
+                    ExecuteId = _reporter.ExecuteId,
+                    Client = _reporter.Name,
                     TestName = nameof(PlainTextAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -60,6 +64,8 @@ namespace Benchmark.Client.Scenarios
                 await EndAsync();
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
+                    ExecuteId = _reporter.ExecuteId,
+                    Client = _reporter.Name,
                     TestName = nameof(EndAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,

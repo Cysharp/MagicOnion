@@ -6,8 +6,10 @@ namespace Benchmark.Client.Reports
 {
     public class BenchReport
     {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("report_id")]
+        public string ReportId { get; set; }
+        [JsonPropertyName("execute_id")]
+        public string ExecuteId { get; set; }
         [JsonPropertyName("client")]
         public string Client { get; set; }
         [JsonPropertyName("os")]
@@ -36,6 +38,10 @@ namespace Benchmark.Client.Reports
 
     public class BenchReportItem
     {
+        [JsonPropertyName("execute_id")]
+        public string ExecuteId { get; set; }
+        [JsonPropertyName("client")]
+        public string Client { get; set; }
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("test_name")]

@@ -30,7 +30,7 @@ namespace Benchmark.Client.Reports
             };
             var summaryInfo = new HtmlBenchReportSummary
             {
-                Id = reports.Select(x => x.Id).First(),
+                Id = reports.Select(x => x.ReportId).First(),
                 Clients = reports.Length,
                 Itelations = reports.SelectMany(xs => xs.Items.Select(x => x.RequestCount)).Sum(),
                 Begin = reports.Select(x => x.Begin).OrderBy(x => x).First(),
@@ -44,29 +44,35 @@ namespace Benchmark.Client.Reports
             {
                 RequestDurationItems = ConnectionAverage(unaryItems.Where(x => x.RequestCount != 0).OrderBy(x => x.RequestCount)),
                 Errors = unaryItems.Sum(x => x.Errors),
-                Items = reports.Select(x => new HtmlBenchReportConnectionsResultItem
-                {
-                    Client = x.Client,
-                    Durations = x.Items.Where(i => i.Type == nameof(Grpc.Core.MethodType.Unary))
-                        .Where(i => i.RequestCount != 0)
-                        .OrderBy(i => i.RequestCount)
-                        .Select(i => i.Duration)
+                ClientDurationItems = unaryItems.OrderBy(x => x.Begin)
+                        .GroupBy(x => x.ExecuteId)
+                        .Select(xs => (Client: xs.Select(x => x.Client).First(), Items: xs.Select(x => new HtmlBenchReportRequestsDurationItem
+                            {
+                                RequestCount = x.RequestCount,
+                                Duration = x.Duration,
+                                Rps = x.RequestCount / x.Duration.TotalSeconds,
+                            })
+                            .OrderBy(xs => xs.RequestCount)
+                            .ToArray())
+                        )
                         .ToArray(),
-                }).ToArray(),
             };
             var hubConnectionsResultInfo = new HtmlBenchReportConnectionsResult
             {
                 RequestDurationItems = ConnectionAverage(hubItems.Where(x => x.RequestCount != 0)),
                 Errors = hubItems.Sum(x => x.Errors),
-                Items = reports.Select(x => new HtmlBenchReportConnectionsResultItem
-                {
-                    Client = x.Client,
-                    Durations = x.Items.Where(i => i.Type == nameof(Grpc.Core.MethodType.DuplexStreaming))
-                        .Where(i => i.RequestCount != 0)
-                        .OrderBy(i => i.RequestCount)
-                        .Select(i => i.Duration)
+                ClientDurationItems = hubItems.OrderBy(x => x.Begin)
+                        .GroupBy(x => x.ExecuteId)
+                        .Select(xs => (Client: xs.Select(x => x.Client).First(), Items: xs.Select(x => new HtmlBenchReportRequestsDurationItem
+                        {
+                            RequestCount = x.RequestCount,
+                            Duration = x.Duration,
+                            Rps = x.RequestCount / x.Duration.TotalSeconds,
+                        })
+                            .OrderBy(xs => xs.RequestCount)
+                            .ToArray())
+                        )
                         .ToArray(),
-                }).ToArray(),
             };
 
             return new HtmlBenchReport(clientInfo, summaryInfo, unaryConnectionsResultInfo, hubConnectionsResultInfo);

@@ -14,16 +14,20 @@ namespace Benchmark.Client.Reports
         private readonly BenchReport _report;
         private readonly List<BenchReportItem> _items;
 
-        public string Id { get; }
+        public string ReportId { get; }
         public string Name { get; }
+        public string ExecuteId { get; }
 
-        public BenchReporter(string id, string name, string framework = "MagicOnion")
+        public BenchReporter(string reportId, string executeId, string name, string framework = "MagicOnion")
         {
-            Id = id;
+            ReportId = reportId;
             Name = name;
+            ExecuteId = executeId;
+
             _report = new BenchReport
             {
-                Id = id,
+                ReportId = reportId,
+                ExecuteId = executeId,
                 Client = name,
                 OS = RuntimeInformation.OSDescription,
                 OsArchitecture = RuntimeInformation.OSArchitecture.ToString(),

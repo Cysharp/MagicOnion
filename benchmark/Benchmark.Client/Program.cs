@@ -38,14 +38,55 @@ public class Main : ConsoleAppBase
         _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? "bench-magiconion-s3-bucket-5c7e45b";
     }
 
-    public async Task<BenchReport> BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string id = "")
+    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
     {
-        if (string.IsNullOrEmpty(id))
-            id = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+        if (string.IsNullOrEmpty(reportId))
+            reportId = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+
+        var executeId = Guid.NewGuid().ToString();
+        Context.Logger.LogInformation($"reportId: {reportId}, executeId: {executeId}");
+
+        var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
+        var itelations = new[] { 256, 1024, 4096, 16384, 20000 };
+        reporter.Begin();
+        {
+            foreach (var itelation in itelations)
+            {
+                // Connect to the server using gRPC channel.
+                var channel = GrpcChannel.ForAddress(hostAddress);
+
+                // Unary
+                Context.Logger.LogInformation($"Begin unary {itelation} requests.");
+                var unary = new UnaryBenchmarkScenario(channel, reporter);
+                await unary.Run(itelation);
+            }
+        }
+        reporter.End();
+
+        // output
+        var benchJson = reporter.ToJson();
+        if (debug)
+        {
+            Context.Logger.LogInformation(benchJson);
+        }
+
+        // put json to s3
+        var storage = StorageFactory.Create(Context.Logger);
+        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+    }
+
+    public async Task BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string reportId = "")
+    {
+        if (string.IsNullOrEmpty(reportId))
+            reportId = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+
+        var executeId = Guid.NewGuid().ToString();
+        Context.Logger.LogInformation($"reportId: {reportId}, executeId: {executeId}");
+
+        var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
 
         // Connect to the server using gRPC channel.
         var channel = GrpcChannel.ForAddress(hostAddress);
-        var reporter = new BenchReporter(id, Dns.GetHostName());
 
         reporter.Begin();
         {
@@ -69,9 +110,7 @@ public class Main : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.Id}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
-
-        return reporter.GetReport();
+        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
     }
 
     public async Task<string[]> ListReports(string prefix, string path = "")

@@ -144,10 +144,10 @@ namespace Benchmark.Client
                     <h2 class=""text-muted"">Unary Connections</h2>
                     <table class=""table table-striped table-sm"">
                         <thead>
+                            <th scope=""col"">Requests</th>
                         ");
  foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
-            this.Write("                            <th scope=\"col\">Requests</th>\r\n                      " +
-                    "      <th scope=\"col\">");
+            this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write(" con</th>\r\n                        ");
  } 
@@ -161,8 +161,14 @@ namespace Benchmark.Client
  } 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(unaryConnectionsResult.Errors));
-            this.Write(@"</td>
-                        </tr>
+            this.Write("</td>\r\n                        </tr>\r\n                        <tr>\r\n             " +
+                    "               <td>Rps</td>\r\n                        ");
+ foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Rps)));
+            this.Write(" rps</td>\r\n                        ");
+ } 
+            this.Write(@"                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -171,25 +177,31 @@ namespace Benchmark.Client
                     <h2 class=""text-muted"">Hub Connections</h2>
                     <table class=""table table-striped table-sm"">
                         <thead>
+                            <th scope=""col"">Requests</th>
                         ");
  foreach(var item in hubConnectionsResult.RequestDurationItems) { 
-            this.Write("                            <th scope=\"col\">Requests</th>\r\n                      " +
-                    "      <th scope=\"col\">");
+            this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write(" con</th>\r\n                        ");
  } 
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
-                    "</td>\r\n                            ");
+                    "</td>\r\n                        ");
  foreach(var item in hubConnectionsResult.RequestDurationItems) { 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
-            this.Write(" sec</td>\r\n                            ");
+            this.Write(" sec</td>\r\n                        ");
  } 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubConnectionsResult.Errors));
-            this.Write(@"</td>
-                        </tr>
+            this.Write("</td>\r\n                        </tr>\r\n                        <tr>\r\n             " +
+                    "               <td>Rps</td>\r\n                        ");
+ foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+            this.Write("                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Rps)));
+            this.Write(" rps</td>\r\n                        ");
+ } 
+            this.Write(@"                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -212,14 +224,15 @@ namespace Benchmark.Client
  } 
             this.Write("                                ],\r\n                                datasets: [\r\n" +
                     "                                ");
- for(var i = 0; i < unaryConnectionsResult.Items.Length; i++) { 
+ for(var i = 0; i < unaryConnectionsResult.ClientDurationItems.Length; i++) { 
             this.Write("                                {\r\n                                    ");
 
-                                        var item = unaryConnectionsResult.Items[i];
+                                        var current = unaryConnectionsResult.ClientDurationItems[i];
+                                        var items = current.Items;
                                         var color = GetColor(i);
                                     
             this.Write("                                    label: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Client));
+            this.Write(this.ToStringHelper.ToStringWithCulture(current.Client));
             this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
                     "            backgroundColor: \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
@@ -227,9 +240,9 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
             this.Write("\",\r\n                                    data: [\r\n                                " +
                     "    ");
- foreach(var duration in item.Durations) { 
+ foreach(var item in items) { 
             this.Write("                                        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
             this.Write(",\r\n                                    ");
  } 
             this.Write("                                    ]\r\n                                },\r\n      " +
@@ -266,14 +279,15 @@ namespace Benchmark.Client
  } 
             this.Write("                                ],\r\n                                datasets: [\r\n" +
                     "                                ");
- for(var i = 0; i < hubConnectionsResult.Items.Length; i++) { 
+ for(var i = 0; i < hubConnectionsResult.ClientDurationItems.Length; i++) { 
             this.Write("                                {\r\n                                    ");
 
-                                        var item = hubConnectionsResult.Items[i];
+                                        var current = hubConnectionsResult.ClientDurationItems[i];
+                                        var items = current.Items;
                                         var color = GetColor(i);
                                     
             this.Write("                                    label: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Client));
+            this.Write(this.ToStringHelper.ToStringWithCulture(current.Client));
             this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
                     "            backgroundColor: \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
@@ -281,9 +295,9 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
             this.Write("\",\r\n                                    data: [\r\n                                " +
                     "    ");
- foreach(var duration in item.Durations) { 
+ foreach(var item in items) { 
             this.Write("                                        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
             this.Write(",\r\n                                    ");
  } 
             this.Write("                                    ]\r\n                                },\r\n      " +

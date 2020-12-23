@@ -29,17 +29,12 @@ namespace Benchmark.Client.Reports
     {
         public HtmlBenchReportRequestsDurationItem[] RequestDurationItems { get; init; }
         public int Errors { get; init; }
-        public HtmlBenchReportConnectionsResultItem[] Items { get; set; }
+        public (string Client, HtmlBenchReportRequestsDurationItem[] Items)[] ClientDurationItems { get; set; }
     }
     public record HtmlBenchReportRequestsDurationItem
     {
         public int RequestCount { get; set; }
         public TimeSpan Duration { get; set; }
         public double Rps { get; set; }
-    }
-    public record HtmlBenchReportConnectionsResultItem
-    {
-        public string Client { get; init; }
-        public TimeSpan[] Durations { get; init; }
     }
 }
