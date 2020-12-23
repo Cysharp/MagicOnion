@@ -146,7 +146,7 @@ namespace Benchmark.Client
                         <thead>
                             <th scope=""col"">Requests</th>
                         ");
- foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write(" con</th>\r\n                        ");
@@ -154,7 +154,7 @@ namespace Benchmark.Client
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
                     "</td>\r\n                        ");
- foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
             this.Write(" sec</td>\r\n                        ");
@@ -163,7 +163,7 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(unaryConnectionsResult.Errors));
             this.Write("</td>\r\n                        </tr>\r\n                        <tr>\r\n             " +
                     "               <td>Rps</td>\r\n                        ");
- foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Rps)));
             this.Write(" rps</td>\r\n                        ");
@@ -179,7 +179,7 @@ namespace Benchmark.Client
                         <thead>
                             <th scope=""col"">Requests</th>
                         ");
- foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write(" con</th>\r\n                        ");
@@ -187,7 +187,7 @@ namespace Benchmark.Client
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
                     "</td>\r\n                        ");
- foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
             this.Write(" sec</td>\r\n                        ");
@@ -196,7 +196,7 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(hubConnectionsResult.Errors));
             this.Write("</td>\r\n                        </tr>\r\n                        <tr>\r\n             " +
                     "               <td>Rps</td>\r\n                        ");
- foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Rps)));
             this.Write(" rps</td>\r\n                        ");
@@ -217,7 +217,7 @@ namespace Benchmark.Client
                             data: {
                                 labels: [
                                 ");
- foreach(var item in unaryConnectionsResult.RequestDurationItems) { 
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                                    \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write("\",\r\n                                ");
@@ -264,15 +264,16 @@ namespace Benchmark.Client
                     "                          },\r\n                                    display: true\r" +
                     "\n                                },\r\n                                tooltips: {" +
                     "\r\n                                    mode: \'label\' // data colum for tooltip\r\n " +
-                    "                               }\r\n                            }\r\n               " +
-                    "         });\r\n                    </script>\r\n                </div>\r\n\r\n         " +
-                    "       <div>\r\n                    <h2>Hub Connections & Duration</h2>\r\n         " +
-                    "           <canvas id=\"hubConnectionStackBar\"></canvas>\r\n\r\n                    <" +
-                    "script>\r\n                        var ctx = document.getElementById(\"hubConnectio" +
-                    "nStackBar\");\r\n                        var myChart = new Chart(ctx, {\r\n          " +
-                    "                  type: \'bar\',\r\n                            data: {\r\n           " +
-                    "                     labels: [\r\n                                ");
- foreach(var item in hubConnectionsResult.RequestDurationItems) { 
+                    "                               },\r\n                                responsive: t" +
+                    "rue\r\n                            }\r\n                        });\r\n               " +
+                    "     </script>\r\n                </div>\r\n\r\n                <div>\r\n               " +
+                    "     <h2>Hub Connections & Duration</h2>\r\n                    <canvas id=\"hubCon" +
+                    "nectionStackBar\"></canvas>\r\n\r\n                    <script>\r\n                    " +
+                    "    var ctx = document.getElementById(\"hubConnectionStackBar\");\r\n               " +
+                    "         var myChart = new Chart(ctx, {\r\n                            type: \'bar\'" +
+                    ",\r\n                            data: {\r\n                                labels: " +
+                    "[\r\n                                ");
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                                    \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
             this.Write("\",\r\n                                ");
@@ -319,21 +320,22 @@ namespace Benchmark.Client
                     "                        },\r\n                                    display: true\r\n " +
                     "                               },\r\n                                tooltips: {\r\n" +
                     "                                    mode: \'label\' // data colum for tooltip\r\n   " +
-                    "                             }\r\n                            }\r\n                 " +
-                    "       });\r\n                    </script>\r\n                </div>\r\n\r\n           " +
-                    " </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"pa" +
-                    "dding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n        " +
-                    "    <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n       " +
-                    "         <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p class=" +
-                    "\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/cy" +
-                    "sharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Copyr" +
-                    "ight:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cyshar" +
-                    "p, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script src=" +
-                    "\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n      " +
-                    "  integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR" +
-                    "0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <script " +
-                    "type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3." +
-                    "0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
+                    "                             },\r\n                                responsive: tru" +
+                    "e\r\n                            }\r\n                        });\r\n                 " +
+                    "   </script>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n    " +
+                    "</main>\r\n\r\n    <footer class=\"text-muted\" style=\"padding-top: 3rem;padding-botto" +
+                    "m: 3rem;\">\r\n        <div class=container>\r\n            <a href=\"#\" class=\"btn bt" +
+                    "n-outline-info float-right\" role=\"button\">\r\n                <i class=\"fa fa-angl" +
+                    "e-up\"></i>\r\n            </a>\r\n            <p class=\"text-center\">\r\n             " +
+                    "   <a class=\"text-dark\" href=\"https://github.com/cysharp/MagicOnion/\">Visit the " +
+                    "GitHub</a>\r\n            /\r\n            © 2020 Copyright:\r\n                <a cla" +
+                    "ss=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysharp, Inc.</a>\r\n            </p>" +
+                    "\r\n        </div>\r\n    </footer>\r\n\r\n    <script src=\"https://stackpath.bootstrapc" +
+                    "dn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n        integrity=\"sha384-OgVRvuATP" +
+                    "1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI\"\r\n        crossorigin=\"a" +
+                    "nonymous\"></script>\r\n    <!-- MDB -->\r\n    <script type=\"text/javascript\" src=\"h" +
+                    "ttps://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.js\"></script>\r\n</" +
+                    "body>\r\n\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }

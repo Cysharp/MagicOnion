@@ -102,21 +102,21 @@
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col">Requests</th>
-                        <# foreach(var item in unaryConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                             <th scope="col"><#= item.RequestCount #> con</th>
                         <# } #>
                             <th scope="col">Errors</th>
                         </thead>
                         <tr>
                             <td>Duration</td>
-                        <# foreach(var item in unaryConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
                         <# } #>
                             <td><#= unaryConnectionsResult.Errors #></td>
                         </tr>
                         <tr>
                             <td>Rps</td>
-                        <# foreach(var item in unaryConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Rps) #> rps</td>
                         <# } #>
                         </tr>
@@ -129,21 +129,21 @@
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col">Requests</th>
-                        <# foreach(var item in hubConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                             <th scope="col"><#= item.RequestCount #> con</th>
                         <# } #>
                             <th scope="col">Errors</th>
                         </thead>
                         <tr>
                             <td>Duration</td>
-                        <# foreach(var item in hubConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
                         <# } #>
                             <td><#= hubConnectionsResult.Errors #></td>
                         </tr>
                         <tr>
                             <td>Rps</td>
-                        <# foreach(var item in hubConnectionsResult.RequestDurationItems) { #>
+                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Rps) #> rps</td>
                         <# } #>
                         </tr>
@@ -161,7 +161,7 @@
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in unaryConnectionsResult.RequestDurationItems) { #>
+                                <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
@@ -210,7 +210,8 @@
                                 },
                                 tooltips: {
                                     mode: 'label' // data colum for tooltip
-                                }
+                                },
+                                responsive: true
                             }
                         });
                     </script>
@@ -226,7 +227,7 @@
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in hubConnectionsResult.RequestDurationItems) { #>
+                                <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
@@ -275,7 +276,8 @@
                                 },
                                 tooltips: {
                                     mode: 'label' // data colum for tooltip
-                                }
+                                },
+                                responsive: true
                             }
                         });
                     </script>
