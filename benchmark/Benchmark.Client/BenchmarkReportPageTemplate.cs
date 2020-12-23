@@ -33,6 +33,9 @@ namespace Benchmark.Client
     var unaryConnectionsResult = Report.UnaryConnectionsResult;
     var hubConnectionsResult = Report.HubConnectionsResult;
 
+    var lineColor = GetLineColor();
+    var barColor = GetColor();
+
             this.Write(@"
 <!-- auto-generated -->
 <!DOCTYPE html>
@@ -207,9 +210,80 @@ namespace Benchmark.Client
                 </div>
 
                 <div>
-                    <h2>Unary Connections & Duration</h2>
+                    <h2>Unary Connection Bench</h2>
+                    <canvas id=""unaryConnectionAvg""></canvas>
                     <canvas id=""unaryConnectionStackBar""></canvas>
 
+                    <script>
+                        var ctx = document.getElementById(""unaryConnectionAvg"");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                ");
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
+            this.Write("                                    \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write("\",\r\n                                ");
+ } 
+            this.Write(@"                                ],
+                                datasets: [
+                                {
+                                    type: 'line',
+                                    label: ""Duration"",
+                                    pointBackgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    fill: false,\r\n                           " +
+                    "         data: [\r\n                                    ");
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write(@"                                    ]
+                                },
+                                {
+                                    type: 'bar',
+                                    label: ""Rps"",
+                                    backgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
+ foreach(var item in unaryConnectionsResult.SummaryItems) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Rps));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write(@"                                    ]
+                                },
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: 'Average Duration & Rps (Unary)',
+                                    padding: 3
+                                },
+                                legend: {
+                                    labels: {
+                                        boxWidth: 30,
+                                        padding: 20
+                                    },
+                                    display: true
+                                },
+                                tooltips: {
+                                    mode: 'label' // data colum for tooltip
+                                },
+                                responsive: true
+                            }
+                        });
+                    </script>
                     <script>
                         var ctx = document.getElementById(""unaryConnectionStackBar"");
                         var myChart = new Chart(ctx, {
@@ -231,7 +305,8 @@ namespace Benchmark.Client
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     
-            this.Write("                                    label: \"");
+            this.Write("                                    type: \'bar\',\r\n                               " +
+                    "     label: \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(current.Client));
             this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
                     "            backgroundColor: \"");
@@ -251,28 +326,99 @@ namespace Benchmark.Client
             this.Write("                                ]\r\n                            },\r\n              " +
                     "              options: {\r\n                                title: {\r\n            " +
                     "                        display: true,\r\n                                    text" +
-                    ": \'Unary\',\r\n                                    padding: 3\r\n                    " +
-                    "            },\r\n                                scales: {\r\n                     " +
-                    "               xAxes: [{\r\n                                        stacked: true," +
-                    " // use stacked bar chart\r\n                                        categoryPerce" +
-                    "ntage: 0.4 // width of bar\r\n                                    }],\r\n           " +
-                    "                         yAxes: [{\r\n                                        stac" +
-                    "ked: true // use stacked bar chart\r\n                                    }]\r\n    " +
-                    "                            },\r\n                                legend: {\r\n     " +
-                    "                               labels: {\r\n                                      " +
-                    "  boxWidth: 30,\r\n                                        padding: 20\r\n          " +
-                    "                          },\r\n                                    display: true\r" +
-                    "\n                                },\r\n                                tooltips: {" +
-                    "\r\n                                    mode: \'label\' // data colum for tooltip\r\n " +
-                    "                               },\r\n                                responsive: t" +
-                    "rue\r\n                            }\r\n                        });\r\n               " +
-                    "     </script>\r\n                </div>\r\n\r\n                <div>\r\n               " +
-                    "     <h2>Hub Connections & Duration</h2>\r\n                    <canvas id=\"hubCon" +
-                    "nectionStackBar\"></canvas>\r\n\r\n                    <script>\r\n                    " +
-                    "    var ctx = document.getElementById(\"hubConnectionStackBar\");\r\n               " +
+                    ": \'Stacked Duration per Client (Unary)\',\r\n                                    pa" +
+                    "dding: 3\r\n                                },\r\n                                sc" +
+                    "ales: {\r\n                                    xAxes: [{\r\n                        " +
+                    "                stacked: true, // use stacked bar chart\r\n                       " +
+                    "                 categoryPercentage: 0.4 // width of bar\r\n                      " +
+                    "              }],\r\n                                    yAxes: [{\r\n              " +
+                    "                          stacked: true // use stacked bar chart\r\n              " +
+                    "                      }]\r\n                                },\r\n                  " +
+                    "              legend: {\r\n                                    labels: {\r\n        " +
+                    "                                boxWidth: 30,\r\n                                 " +
+                    "       padding: 20\r\n                                    },\r\n                    " +
+                    "                display: true\r\n                                },\r\n             " +
+                    "                   tooltips: {\r\n                                    mode: \'label" +
+                    "\' // data colum for tooltip\r\n                                },\r\n               " +
+                    "                 responsive: true\r\n                            }\r\n              " +
+                    "          });\r\n                    </script>\r\n                </div>\r\n\r\n        " +
+                    "        <div>\r\n                    <h2>Hub Connection Bench</h2>\r\n              " +
+                    "      <canvas id=\"hubConnectionAvg\"></canvas>\r\n                    <canvas id=\"h" +
+                    "ubConnectionStackBar\"></canvas>\r\n\r\n                    <script>\r\n               " +
+                    "         var ctx = document.getElementById(\"hubConnectionAvg\");\r\n               " +
                     "         var myChart = new Chart(ctx, {\r\n                            type: \'bar\'" +
                     ",\r\n                            data: {\r\n                                labels: " +
                     "[\r\n                                ");
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
+            this.Write("                                    \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
+            this.Write("\",\r\n                                ");
+ } 
+            this.Write(@"                                ],
+                                datasets: [
+                                {
+                                    type: 'line',
+                                    label: ""Duration"",
+                                    pointBackgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    fill: false,\r\n                           " +
+                    "         data: [\r\n                                    ");
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write(@"                                    ]
+                                },
+                                {
+                                    type: 'bar',
+                                    label: ""Rps"",
+                                    backgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    borderColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
+ foreach(var item in hubConnectionsResult.SummaryItems) { 
+            this.Write("                                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Rps));
+            this.Write(",\r\n                                    ");
+ } 
+            this.Write(@"                                    ]
+                                },
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: 'Average Duration & Rps (Hub)',
+                                    padding: 3
+                                },
+                                legend: {
+                                    labels: {
+                                        boxWidth: 30,
+                                        padding: 20
+                                    },
+                                    display: true
+                                },
+                                tooltips: {
+                                    mode: 'label' // data colum for tooltip
+                                },
+                                responsive: true
+                            }
+                        });
+                    </script>
+                    <script>
+                        var ctx = document.getElementById(""hubConnectionStackBar"");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                ");
  foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                                    \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
@@ -287,7 +433,8 @@ namespace Benchmark.Client
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     
-            this.Write("                                    label: \"");
+            this.Write("                                    type: \'bar\',\r\n                               " +
+                    "     label: \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(current.Client));
             this.Write("\",\r\n                                    borderWidth: 1,\r\n                        " +
                     "            backgroundColor: \"");
@@ -307,35 +454,35 @@ namespace Benchmark.Client
             this.Write("                                ]\r\n                            },\r\n              " +
                     "              options: {\r\n                                title: {\r\n            " +
                     "                        display: true,\r\n                                    text" +
-                    ": \'Hub\',\r\n                                    padding: 3\r\n                      " +
-                    "          },\r\n                                scales: {\r\n                       " +
-                    "             xAxes: [{\r\n                                        stacked: true, /" +
-                    "/ use stacked bar chart\r\n                                        categoryPercent" +
-                    "age: 0.4 // width of bar\r\n                                    }],\r\n             " +
-                    "                       yAxes: [{\r\n                                        stacke" +
-                    "d: true // use stacked bar chart\r\n                                    }]\r\n      " +
-                    "                          },\r\n                                legend: {\r\n       " +
-                    "                             labels: {\r\n                                        " +
-                    "boxWidth: 30,\r\n                                        padding: 20\r\n            " +
-                    "                        },\r\n                                    display: true\r\n " +
-                    "                               },\r\n                                tooltips: {\r\n" +
-                    "                                    mode: \'label\' // data colum for tooltip\r\n   " +
-                    "                             },\r\n                                responsive: tru" +
-                    "e\r\n                            }\r\n                        });\r\n                 " +
-                    "   </script>\r\n                </div>\r\n\r\n            </div>\r\n        </div>\r\n    " +
-                    "</main>\r\n\r\n    <footer class=\"text-muted\" style=\"padding-top: 3rem;padding-botto" +
-                    "m: 3rem;\">\r\n        <div class=container>\r\n            <a href=\"#\" class=\"btn bt" +
-                    "n-outline-info float-right\" role=\"button\">\r\n                <i class=\"fa fa-angl" +
-                    "e-up\"></i>\r\n            </a>\r\n            <p class=\"text-center\">\r\n             " +
-                    "   <a class=\"text-dark\" href=\"https://github.com/cysharp/MagicOnion/\">Visit the " +
-                    "GitHub</a>\r\n            /\r\n            © 2020 Copyright:\r\n                <a cla" +
-                    "ss=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysharp, Inc.</a>\r\n            </p>" +
-                    "\r\n        </div>\r\n    </footer>\r\n\r\n    <script src=\"https://stackpath.bootstrapc" +
-                    "dn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n        integrity=\"sha384-OgVRvuATP" +
-                    "1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI\"\r\n        crossorigin=\"a" +
-                    "nonymous\"></script>\r\n    <!-- MDB -->\r\n    <script type=\"text/javascript\" src=\"h" +
-                    "ttps://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.js\"></script>\r\n</" +
-                    "body>\r\n\r\n</html>");
+                    ": \'Stacked Duration per Client (Hub)\',\r\n                                    padd" +
+                    "ing: 3\r\n                                },\r\n                                scal" +
+                    "es: {\r\n                                    xAxes: [{\r\n                          " +
+                    "              stacked: true, // use stacked bar chart\r\n                         " +
+                    "               categoryPercentage: 0.4 // width of bar\r\n                        " +
+                    "            }],\r\n                                    yAxes: [{\r\n                " +
+                    "                        stacked: true // use stacked bar chart\r\n                " +
+                    "                    }]\r\n                                },\r\n                    " +
+                    "            legend: {\r\n                                    labels: {\r\n          " +
+                    "                              boxWidth: 30,\r\n                                   " +
+                    "     padding: 20\r\n                                    },\r\n                      " +
+                    "              display: true\r\n                                },\r\n               " +
+                    "                 tooltips: {\r\n                                    mode: \'label\' " +
+                    "// data colum for tooltip\r\n                                },\r\n                 " +
+                    "               responsive: true\r\n                            }\r\n                " +
+                    "        });\r\n                    </script>\r\n                </div>\r\n\r\n          " +
+                    "  </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"p" +
+                    "adding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n       " +
+                    "     <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n      " +
+                    "          <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p class" +
+                    "=\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/c" +
+                    "ysharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Copy" +
+                    "right:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysha" +
+                    "rp, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script src" +
+                    "=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n     " +
+                    "   integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/k" +
+                    "R0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <script" +
+                    " type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3" +
+                    ".0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }

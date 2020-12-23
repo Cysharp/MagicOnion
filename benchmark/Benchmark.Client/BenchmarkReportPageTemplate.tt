@@ -10,6 +10,9 @@
     var summary = Report.Summary;
     var unaryConnectionsResult = Report.UnaryConnectionsResult;
     var hubConnectionsResult = Report.HubConnectionsResult;
+
+    var lineColor = GetLineColor();
+    var barColor = GetColor();
 #>
 
 <!-- auto-generated -->
@@ -152,9 +155,67 @@
                 </div>
 
                 <div>
-                    <h2>Unary Connections & Duration</h2>
+                    <h2>Unary Connection Bench</h2>
+                    <canvas id="unaryConnectionAvg"></canvas>
                     <canvas id="unaryConnectionStackBar"></canvas>
 
+                    <script>
+                        var ctx = document.getElementById("unaryConnectionAvg");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                    "<#= item.RequestCount #>",
+                                <# } #>
+                                ],
+                                datasets: [
+                                {
+                                    type: 'line',
+                                    label: "Duration",
+                                    pointBackgroundColor: "<#= lineColor #>",
+                                    backgroundColor: "<#= lineColor #>",
+                                    borderColor: "<#= lineColor #>",
+                                    fill: false,
+                                    data: [
+                                    <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                        <#= item.Duration.TotalSeconds #>,
+                                    <# } #>
+                                    ]
+                                },
+                                {
+                                    type: 'bar',
+                                    label: "Rps",
+                                    backgroundColor: "<#= barColor #>",
+                                    borderColor: "<#= barColor #>",
+                                    data: [
+                                    <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                        <#= item.Rps #>,
+                                    <# } #>
+                                    ]
+                                },
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: 'Average Duration & Rps (Unary)',
+                                    padding: 3
+                                },
+                                legend: {
+                                    labels: {
+                                        boxWidth: 30,
+                                        padding: 20
+                                    },
+                                    display: true
+                                },
+                                tooltips: {
+                                    mode: 'label' // data colum for tooltip
+                                },
+                                responsive: true
+                            }
+                        });
+                    </script>
                     <script>
                         var ctx = document.getElementById("unaryConnectionStackBar");
                         var myChart = new Chart(ctx, {
@@ -173,6 +234,7 @@
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     #>
+                                    type: 'bar',
                                     label: "<#= current.Client #>",
                                     borderWidth: 1,
                                     backgroundColor: "<#= color #>",
@@ -189,7 +251,7 @@
                             options: {
                                 title: {
                                     display: true,
-                                    text: 'Unary',
+                                    text: 'Stacked Duration per Client (Unary)',
                                     padding: 3
                                 },
                                 scales: {
@@ -218,9 +280,67 @@
                 </div>
 
                 <div>
-                    <h2>Hub Connections & Duration</h2>
+                    <h2>Hub Connection Bench</h2>
+                    <canvas id="hubConnectionAvg"></canvas>
                     <canvas id="hubConnectionStackBar"></canvas>
 
+                    <script>
+                        var ctx = document.getElementById("hubConnectionAvg");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                    "<#= item.RequestCount #>",
+                                <# } #>
+                                ],
+                                datasets: [
+                                {
+                                    type: 'line',
+                                    label: "Duration",
+                                    pointBackgroundColor: "<#= lineColor #>",
+                                    backgroundColor: "<#= lineColor #>",
+                                    borderColor: "<#= lineColor #>",
+                                    fill: false,
+                                    data: [
+                                    <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                        <#= item.Duration.TotalSeconds #>,
+                                    <# } #>
+                                    ]
+                                },
+                                {
+                                    type: 'bar',
+                                    label: "Rps",
+                                    backgroundColor: "<#= barColor #>",
+                                    borderColor: "<#= barColor #>",
+                                    data: [
+                                    <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                        <#= item.Rps #>,
+                                    <# } #>
+                                    ]
+                                },
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: 'Average Duration & Rps (Hub)',
+                                    padding: 3
+                                },
+                                legend: {
+                                    labels: {
+                                        boxWidth: 30,
+                                        padding: 20
+                                    },
+                                    display: true
+                                },
+                                tooltips: {
+                                    mode: 'label' // data colum for tooltip
+                                },
+                                responsive: true
+                            }
+                        });
+                    </script>
                     <script>
                         var ctx = document.getElementById("hubConnectionStackBar");
                         var myChart = new Chart(ctx, {
@@ -239,6 +359,7 @@
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     #>
+                                    type: 'bar',
                                     label: "<#= current.Client #>",
                                     borderWidth: 1,
                                     backgroundColor: "<#= color #>",
@@ -255,7 +376,7 @@
                             options: {
                                 title: {
                                     display: true,
-                                    text: 'Hub',
+                                    text: 'Stacked Duration per Client (Hub)',
                                     padding: 3
                                 },
                                 scales: {
