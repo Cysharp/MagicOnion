@@ -5,7 +5,7 @@
       "export DOTNET_CLI_HOME=/tmp",
       "sudo killall Benchmark.Client || true",
       "dotnet --version",
-      "BENCHCLIENT_RUNASWEB=false ~/client/Benchmark.Client -hostAddress http://localhost:80 -itelation 10000"
+      "BENCHCLIENT_RUNASWEB=false ~/client/Benchmark.Client benchmarkrunner benchall -hostAddress http://localhost:80 -reportId 20201216043919.398-bb396621-c615-4ec8-b74a-c8994a777ea1"
     ]
   }
 }

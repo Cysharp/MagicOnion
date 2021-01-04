@@ -5,6 +5,7 @@
       "mkdir -p /var/MagicOnion.Benchmark/client",
       "aws s3 sync s3://bench-magiconion-s3-bucket-5c7e45b/assembly/linux/client/ ~/client",
       "sudo chmod +x ~/client/Benchmark.Client",
+      "ls -lR ~/client",
       "cp -Rf ~/client/ /var/MagicOnion.Benchmark/.",
       "ls -lR /var/MagicOnion.Benchmark/client"
     ]
