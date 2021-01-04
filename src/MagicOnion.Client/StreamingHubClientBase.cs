@@ -60,112 +60,45 @@ namespace MagicOnion.Client
             this.receiver = receiver;
 
             // Establish StreamingHub connection between the client and the server.
-            // If an error is returned from `IService.Connect` method on a server-side, `ConnectAsync` (client-side) throws an exception here.
             try
             {
+                // The client can read the response headers before any StreamingHub's message.
+                // NOTE: MagicOnion.Server v4.0.x or before doesn't send any response headers. The client is incompatible with that versions.
                 await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
             }
             catch (RpcException e)
             {
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
             }
-            var status = streamingResult.GetStatus();
-            if (status.StatusCode != StatusCode.OK)
+
+            // If an error is returned from `StreamingHub.Connect` method on a server-side,
+            // ResponseStream.MoveNext synchronously returns a task that is `IsFaulted = true`.
+            // `ConnectAsync` method should throw an exception here immediately.
+            var firstMoveNextTask = connection.RawStreamingCall.ResponseStream.MoveNext(cts.Token);
+            if (firstMoveNextTask.IsFaulted)
             {
-                throw new RpcException(status, $"An error was returned from StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}' while connecting. ({status})");
+                await firstMoveNextTask.ConfigureAwait(false);
+                return;
             }
 
-            this.subscription = StartSubscribe();
+            this.subscription = StartSubscribe(firstMoveNextTask);
         }
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
 
-        async Task StartSubscribe()
+        async Task StartSubscribe(Task<bool> firstMoveNext)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var reader = connection.RawStreamingCall.ResponseStream;
             try
             {
-                while (await reader.MoveNext(cts.Token).ConfigureAwait(false)) // avoid Post to SyncContext(it losts one-frame per operation)
+                var moveNext = firstMoveNext;
+                while (await moveNext.ConfigureAwait(false)) // avoid Post to SyncContext(it losts one-frame per operation)
                 {
                     try
                     {
-                        // MessageFormat:
-                        // broadcast: [methodId, [argument]]
-                        // response:  [messageId, methodId, response]
-                        // error-response: [messageId, statusCode, detail, StringMessage]
-                        void ConsumeData(byte[] data)
-                        {
-                            var messagePackReader = new MessagePackReader(data);
-                            var arrayLength = messagePackReader.ReadArrayHeader();
-                            if (arrayLength == 3)
-                            {
-                                var messageId = messagePackReader.ReadInt32();
-                                object future;
-                                if (responseFutures.TryRemove(messageId, out future))
-                                {
-                                    var methodId = messagePackReader.ReadInt32();
-                                    try
-                                    {
-                                        var offset = (int)messagePackReader.Consumed;
-                                        var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
-                                        OnResponseEvent(methodId, future, rest);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if (!(future as ITaskCompletion).TrySetException(ex))
-                                        {
-                                            throw;
-                                        }
-                                    }
-                                }
-                            }
-                            else if (arrayLength == 4)
-                            {
-                                var messageId = messagePackReader.ReadInt32();
-                                object future;
-                                if (responseFutures.TryRemove(messageId, out future))
-                                {
-                                    var statusCode = messagePackReader.ReadInt32();
-                                    var detail = messagePackReader.ReadString();
-                                    var offset = (int)messagePackReader.Consumed;
-                                    var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
-                                    var error = MessagePackSerializer.Deserialize<string>(rest, serializerOptions);
-                                    var ex = default(RpcException);
-                                    if (string.IsNullOrWhiteSpace(error))
-                                    {
-                                        ex = new RpcException(new Status((StatusCode)statusCode, detail));
-                                    }
-                                    else
-                                    {
-                                        ex = new RpcException(new Status((StatusCode)statusCode, detail), detail + Environment.NewLine + error);
-                                    }
-
-                                    (future as ITaskCompletion).TrySetException(ex);
-                                }
-                            }
-                            else
-                            {
-                                var methodId = messagePackReader.ReadInt32();
-                                var offset = (int)messagePackReader.Consumed;
-                                if (syncContext != null)
-                                {
-                                    var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
-                                    syncContext.Post(state =>
-                                    {
-                                        var t = (Tuple<int, byte[], int, int>)state;
-                                        OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
-                                    }, tuple);
-                                }
-                                else
-                                {
-                                    OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
-                                }
-                            }
-                        }
-
-                        ConsumeData(reader.Current);
+                        ConsumeData(syncContext, reader.Current);
                     }
                     catch (Exception ex)
                     {
@@ -180,6 +113,8 @@ namespace MagicOnion.Client
                             logger.Error(ex, msg);
                         }
                     }
+
+                    moveNext = reader.MoveNext(cts.Token);
                 }
             }
             catch (Exception ex)
@@ -217,6 +152,79 @@ namespace MagicOnion.Client
             }
         }
 
+        // MessageFormat:
+        // broadcast: [methodId, [argument]]
+        // response:  [messageId, methodId, response]
+        // error-response: [messageId, statusCode, detail, StringMessage]
+        void ConsumeData(SynchronizationContext syncContext, byte[] data)
+        {
+            var messagePackReader = new MessagePackReader(data);
+            var arrayLength = messagePackReader.ReadArrayHeader();
+            if (arrayLength == 3)
+            {
+                var messageId = messagePackReader.ReadInt32();
+                object future;
+                if (responseFutures.TryRemove(messageId, out future))
+                {
+                    var methodId = messagePackReader.ReadInt32();
+                    try
+                    {
+                        var offset = (int)messagePackReader.Consumed;
+                        var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
+                        OnResponseEvent(methodId, future, rest);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!(future as ITaskCompletion).TrySetException(ex))
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+            else if (arrayLength == 4)
+            {
+                var messageId = messagePackReader.ReadInt32();
+                object future;
+                if (responseFutures.TryRemove(messageId, out future))
+                {
+                    var statusCode = messagePackReader.ReadInt32();
+                    var detail = messagePackReader.ReadString();
+                    var offset = (int)messagePackReader.Consumed;
+                    var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
+                    var error = MessagePackSerializer.Deserialize<string>(rest, serializerOptions);
+                    var ex = default(RpcException);
+                    if (string.IsNullOrWhiteSpace(error))
+                    {
+                        ex = new RpcException(new Status((StatusCode)statusCode, detail));
+                    }
+                    else
+                    {
+                        ex = new RpcException(new Status((StatusCode)statusCode, detail), detail + Environment.NewLine + error);
+                    }
+
+                    (future as ITaskCompletion).TrySetException(ex);
+                }
+            }
+            else
+            {
+                var methodId = messagePackReader.ReadInt32();
+                var offset = (int)messagePackReader.Consumed;
+                if (syncContext != null)
+                {
+                    var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
+                    syncContext.Post(state =>
+                    {
+                        var t = (Tuple<int, byte[], int, int>)state;
+                        OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
+                    }, tuple);
+                }
+                else
+                {
+                    OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                }
+            }
+        }
 
         protected async Task WriteMessageAsync<T>(int methodId, T message)
         {

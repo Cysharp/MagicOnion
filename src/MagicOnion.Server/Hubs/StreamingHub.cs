@@ -114,6 +114,10 @@ namespace MagicOnion.Server.Hubs
             var reader = Context.RequestStream!;
             var writer = Context.ResponseStream!;
 
+            // Send a hint to the client to start sending messages.
+            // The client can read the response headers before any StreamingHub's message.
+            await Context.CallContext.WriteResponseHeadersAsync(Metadata.Empty);
+
             var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 
             // Main loop of StreamingHub.
