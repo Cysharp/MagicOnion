@@ -46,7 +46,7 @@ namespace MagicOnion.Client
         protected abstract Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
 
         // call immediately after create.
-        public void __ConnectAndSubscribe(TReceiver receiver)
+        public async Task __ConnectAndSubscribeAsync(TReceiver receiver)
         {
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
             var streamingResult = new DuplexStreamingResult<byte[], byte[]>(
@@ -58,6 +58,23 @@ namespace MagicOnion.Client
 
             this.connection = streamingResult;
             this.receiver = receiver;
+
+            // Establish StreamingHub connection between the client and the server.
+            // If an error is returned from `IService.Connect` method on a server-side, `ConnectAsync` (client-side) throws an exception here.
+            try
+            {
+                await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
+            }
+            catch (RpcException e)
+            {
+                throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
+            }
+            var status = streamingResult.GetStatus();
+            if (status.StatusCode != StatusCode.OK)
+            {
+                throw new RpcException(status, $"An error was returned from StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}' while connecting. ({status})");
+            }
+
             this.subscription = StartSubscribe();
         }
 
