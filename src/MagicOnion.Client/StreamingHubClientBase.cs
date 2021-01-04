@@ -169,7 +169,7 @@ namespace MagicOnion.Client
                     }
                     catch (Exception ex)
                     {
-                        const string msg = "Error on consume received message, but keep subscribe.";
+                        const string msg = "An error occurred when consuming a received message, but the subscription is still alive.";
                         // log post on main thread.
                         if (syncContext != null)
                         {
@@ -188,7 +188,7 @@ namespace MagicOnion.Client
                 {
                     return;
                 }
-                const string msg = "Error on subscribing message.";
+                const string msg = "An error occurred while subscribing to messages.";
                 // log post on main thread.
                 if (syncContext != null)
                 {
@@ -283,7 +283,10 @@ namespace MagicOnion.Client
 
         void ThrowIfDisposed()
         {
-            if (disposed) throw new ObjectDisposedException("StreamingHubClient");
+            if (disposed)
+            {
+                throw new ObjectDisposedException("StreamingHubClient", $"The StreamingHub has already been disconnected from the server.");
+            }
         }
 
         public Task WaitForDisconnect()
