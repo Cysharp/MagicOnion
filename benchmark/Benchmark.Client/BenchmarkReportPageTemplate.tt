@@ -52,7 +52,7 @@
             <div class="container" style="padding-top: 3rem;">
 
                 <h1 class="text-muted">Test Result</h1>
-                <p class="text-muted">Id: <#= summary.Id #></p>
+                <p class="text-muted">ReportId: <#= summary.ReportId #></p>
 
                 <div class="table-responsive">
                     <h2 class="text-muted">Client</h2>
@@ -78,19 +78,21 @@
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col"># Clients</th>
-                            <th scope="col"># Itelations</th>
+                            <th scope="col"># Requests Ttl</th>
                             <th scope="col">Begin</th>
                             <th scope="col">End</th>
-                            <th scope="col">Duration Total</th>
-                            <th scope="col">Duration Avg</th>
-                            <th scope="col">Duration Min</th>
-                            <th scope="col">Duration Max</th>
+                            <th scope="col">Rps</th>
+                            <th scope="col">Duration Ttl</th>
+                            <th scope="col">Avg</th>
+                            <th scope="col">Min</th>
+                            <th scope="col">Max</th>
                         </thead>
                         <tr>
                             <td><#= summary.Clients #></td>
-                            <td><#= summary.Itelations #></td>
+                            <td><#= summary.RequestTotal #></td>
                             <td><#= summary.Begin #></td>
                             <td><#= summary.End #></td>
+                            <td><#= string.Format("{0:f2}", summary.Rps) #> rps</td>
                             <td><#= string.Format("{0:f2}", summary.DurationTotal.TotalSeconds) #> sec</td>
                             <td><#= string.Format("{0:f2}", summary.DurationAvg.TotalSeconds) #> sec</td>
                             <td><#= string.Format("{0:f2}", summary.DurationMin.TotalSeconds) #> sec</td>
@@ -101,12 +103,12 @@
                 </div>
 
                 <div class="table-responsive">
-                    <h2 class="text-muted">Unary Connections</h2>
+                    <h2 class="text-muted">Unary Summary</h2>
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col">Requests</th>
                         <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
-                            <th scope="col"><#= item.RequestCount #> con</th>
+                            <th scope="col"><#= item.RequestCount #> req</th>
                         <# } #>
                             <th scope="col">Errors</th>
                         </thead>
@@ -128,12 +130,12 @@
                 </div>
 
                 <div class="table-responsive">
-                    <h2 class="text-muted">Hub Connections</h2>
+                    <h2 class="text-muted">Hub Summary</h2>
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col">Requests</th>
                         <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
-                            <th scope="col"><#= item.RequestCount #> con</th>
+                            <th scope="col"><#= item.RequestCount #> req</th>
                         <# } #>
                             <th scope="col">Errors</th>
                         </thead>
@@ -171,12 +173,10 @@
                                 ],
                                 datasets: [
                                 {
-                                    type: 'line',
+                                    type: 'bar',
                                     label: "Duration",
-                                    pointBackgroundColor: "<#= lineColor #>",
-                                    backgroundColor: "<#= lineColor #>",
-                                    borderColor: "<#= lineColor #>",
-                                    fill: false,
+                                    backgroundColor: "<#= barColor #>",
+                                    borderColor: "<#= barColor #>",
                                     data: [
                                     <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                                         <#= item.Duration.TotalSeconds #>,
@@ -184,10 +184,12 @@
                                     ]
                                 },
                                 {
-                                    type: 'bar',
+                                    type: 'line',
                                     label: "Rps",
-                                    backgroundColor: "<#= barColor #>",
-                                    borderColor: "<#= barColor #>",
+                                    pointBackgroundColor: "<#= lineColor #>",
+                                    backgroundColor: "<#= lineColor #>",
+                                    borderColor: "<#= lineColor #>",
+                                    fill: false,
                                     data: [
                                     <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
                                         <#= item.Rps #>,
@@ -240,8 +242,10 @@
                                     backgroundColor: "<#= color #>",
                                     borderColor: "<#= color #>",
                                     data: [
-                                    <# foreach(var item in items) { #>
-                                        <#= item.Duration.TotalSeconds #>,
+                                    <# foreach(var summaries in items) { #>
+                                        <# foreach(var item in summaries.SummaryItems) { #>
+                                            <#= item.Duration.TotalSeconds #>,
+                                        <# } #>
                                     <# } #>
                                     ]
                                 },
@@ -268,7 +272,7 @@
                                         boxWidth: 30,
                                         padding: 20
                                     },
-                                    display: true
+                                    display: false
                                 },
                                 tooltips: {
                                     mode: 'label' // data colum for tooltip
@@ -296,12 +300,10 @@
                                 ],
                                 datasets: [
                                 {
-                                    type: 'line',
+                                    type: 'bar',
                                     label: "Duration",
-                                    pointBackgroundColor: "<#= lineColor #>",
-                                    backgroundColor: "<#= lineColor #>",
-                                    borderColor: "<#= lineColor #>",
-                                    fill: false,
+                                    backgroundColor: "<#= barColor #>",
+                                    borderColor: "<#= barColor #>",
                                     data: [
                                     <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                                         <#= item.Duration.TotalSeconds #>,
@@ -309,10 +311,12 @@
                                     ]
                                 },
                                 {
-                                    type: 'bar',
+                                    type: 'line',
                                     label: "Rps",
-                                    backgroundColor: "<#= barColor #>",
-                                    borderColor: "<#= barColor #>",
+                                    pointBackgroundColor: "<#= lineColor #>",
+                                    backgroundColor: "<#= lineColor #>",
+                                    borderColor: "<#= lineColor #>",
+                                    fill: false,
                                     data: [
                                     <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
                                         <#= item.Rps #>,
@@ -365,8 +369,10 @@
                                     backgroundColor: "<#= color #>",
                                     borderColor: "<#= color #>",
                                     data: [
-                                    <# foreach(var item in items) { #>
-                                        <#= item.Duration.TotalSeconds #>,
+                                    <# foreach(var summaries in items) { #>
+                                        <# foreach(var item in summaries.SummaryItems) { #>
+                                            <#= item.Duration.TotalSeconds #>,
+                                        <# } #>
                                     <# } #>
                                     ]
                                 },
@@ -393,7 +399,7 @@
                                         boxWidth: 30,
                                         padding: 20
                                     },
-                                    display: true
+                                    display: false
                                 },
                                 tooltips: {
                                     mode: 'label' // data colum for tooltip

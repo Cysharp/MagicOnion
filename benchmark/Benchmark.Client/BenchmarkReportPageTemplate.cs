@@ -78,8 +78,8 @@ namespace Benchmark.Client
             <div class=""container"" style=""padding-top: 3rem;"">
 
                 <h1 class=""text-muted"">Test Result</h1>
-                <p class=""text-muted"">Id: ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.Id));
+                <p class=""text-muted"">ReportId: ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(summary.ReportId));
             this.Write(@"</p>
 
                 <div class=""table-responsive"">
@@ -112,24 +112,27 @@ namespace Benchmark.Client
                     <table class=""table table-striped table-sm"">
                         <thead>
                             <th scope=""col""># Clients</th>
-                            <th scope=""col""># Itelations</th>
+                            <th scope=""col""># Requests Ttl</th>
                             <th scope=""col"">Begin</th>
                             <th scope=""col"">End</th>
-                            <th scope=""col"">Duration Total</th>
-                            <th scope=""col"">Duration Avg</th>
-                            <th scope=""col"">Duration Min</th>
-                            <th scope=""col"">Duration Max</th>
+                            <th scope=""col"">Rps</th>
+                            <th scope=""col"">Duration Ttl</th>
+                            <th scope=""col"">Avg</th>
+                            <th scope=""col"">Min</th>
+                            <th scope=""col"">Max</th>
                         </thead>
                         <tr>
                             <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Clients));
             this.Write("</td>\r\n                            <td>");
-            this.Write(this.ToStringHelper.ToStringWithCulture(summary.Itelations));
+            this.Write(this.ToStringHelper.ToStringWithCulture(summary.RequestTotal));
             this.Write("</td>\r\n                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.Begin));
             this.Write("</td>\r\n                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(summary.End));
             this.Write("</td>\r\n                            <td>");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.Rps)));
+            this.Write(" rps</td>\r\n                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationTotal.TotalSeconds)));
             this.Write(" sec</td>\r\n                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", summary.DurationAvg.TotalSeconds)));
@@ -144,7 +147,7 @@ namespace Benchmark.Client
                 </div>
 
                 <div class=""table-responsive"">
-                    <h2 class=""text-muted"">Unary Connections</h2>
+                    <h2 class=""text-muted"">Unary Summary</h2>
                     <table class=""table table-striped table-sm"">
                         <thead>
                             <th scope=""col"">Requests</th>
@@ -152,7 +155,7 @@ namespace Benchmark.Client
  foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
-            this.Write(" con</th>\r\n                        ");
+            this.Write(" req</th>\r\n                        ");
  } 
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
@@ -177,7 +180,7 @@ namespace Benchmark.Client
                 </div>
 
                 <div class=""table-responsive"">
-                    <h2 class=""text-muted"">Hub Connections</h2>
+                    <h2 class=""text-muted"">Hub Summary</h2>
                     <table class=""table table-striped table-sm"">
                         <thead>
                             <th scope=""col"">Requests</th>
@@ -185,7 +188,7 @@ namespace Benchmark.Client
  foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
-            this.Write(" con</th>\r\n                        ");
+            this.Write(" req</th>\r\n                        ");
  } 
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
@@ -229,16 +232,14 @@ namespace Benchmark.Client
             this.Write(@"                                ],
                                 datasets: [
                                 {
-                                    type: 'line',
+                                    type: 'bar',
                                     label: ""Duration"",
-                                    pointBackgroundColor: """);
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
-            this.Write("\",\r\n                                    backgroundColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+                                    backgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
             this.Write("\",\r\n                                    borderColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
-            this.Write("\",\r\n                                    fill: false,\r\n                           " +
-                    "         data: [\r\n                                    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
  foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                                        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
@@ -247,14 +248,16 @@ namespace Benchmark.Client
             this.Write(@"                                    ]
                                 },
                                 {
-                                    type: 'bar',
+                                    type: 'line',
                                     label: ""Rps"",
-                                    backgroundColor: """);
-            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+                                    pointBackgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
             this.Write("\",\r\n                                    borderColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
-            this.Write("\",\r\n                                    data: [\r\n                                " +
-                    "    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    fill: false,\r\n                           " +
+                    "         data: [\r\n                                    ");
  foreach(var item in unaryConnectionsResult.SummaryItems) { 
             this.Write("                                        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Rps));
@@ -315,10 +318,14 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
             this.Write("\",\r\n                                    data: [\r\n                                " +
                     "    ");
- foreach(var item in items) { 
+ foreach(var summaries in items) { 
             this.Write("                                        ");
+ foreach(var item in summaries.SummaryItems) { 
+            this.Write("                                            ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
-            this.Write(",\r\n                                    ");
+            this.Write(",\r\n                                        ");
+ } 
+            this.Write("                                    ");
  } 
             this.Write("                                    ]\r\n                                },\r\n      " +
                     "                          ");
@@ -337,18 +344,18 @@ namespace Benchmark.Client
                     "              legend: {\r\n                                    labels: {\r\n        " +
                     "                                boxWidth: 30,\r\n                                 " +
                     "       padding: 20\r\n                                    },\r\n                    " +
-                    "                display: true\r\n                                },\r\n             " +
-                    "                   tooltips: {\r\n                                    mode: \'label" +
-                    "\' // data colum for tooltip\r\n                                },\r\n               " +
-                    "                 responsive: true\r\n                            }\r\n              " +
-                    "          });\r\n                    </script>\r\n                </div>\r\n\r\n        " +
-                    "        <div>\r\n                    <h2>Hub Connection Bench</h2>\r\n              " +
-                    "      <canvas id=\"hubConnectionAvg\"></canvas>\r\n                    <canvas id=\"h" +
-                    "ubConnectionStackBar\"></canvas>\r\n\r\n                    <script>\r\n               " +
-                    "         var ctx = document.getElementById(\"hubConnectionAvg\");\r\n               " +
-                    "         var myChart = new Chart(ctx, {\r\n                            type: \'bar\'" +
-                    ",\r\n                            data: {\r\n                                labels: " +
-                    "[\r\n                                ");
+                    "                display: false\r\n                                },\r\n            " +
+                    "                    tooltips: {\r\n                                    mode: \'labe" +
+                    "l\' // data colum for tooltip\r\n                                },\r\n              " +
+                    "                  responsive: true\r\n                            }\r\n             " +
+                    "           });\r\n                    </script>\r\n                </div>\r\n\r\n       " +
+                    "         <div>\r\n                    <h2>Hub Connection Bench</h2>\r\n             " +
+                    "       <canvas id=\"hubConnectionAvg\"></canvas>\r\n                    <canvas id=\"" +
+                    "hubConnectionStackBar\"></canvas>\r\n\r\n                    <script>\r\n              " +
+                    "          var ctx = document.getElementById(\"hubConnectionAvg\");\r\n              " +
+                    "          var myChart = new Chart(ctx, {\r\n                            type: \'bar" +
+                    "\',\r\n                            data: {\r\n                                labels:" +
+                    " [\r\n                                ");
  foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                                    \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
@@ -357,16 +364,14 @@ namespace Benchmark.Client
             this.Write(@"                                ],
                                 datasets: [
                                 {
-                                    type: 'line',
+                                    type: 'bar',
                                     label: ""Duration"",
-                                    pointBackgroundColor: """);
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
-            this.Write("\",\r\n                                    backgroundColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+                                    backgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
             this.Write("\",\r\n                                    borderColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
-            this.Write("\",\r\n                                    fill: false,\r\n                           " +
-                    "         data: [\r\n                                    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+            this.Write("\",\r\n                                    data: [\r\n                                " +
+                    "    ");
  foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                                        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
@@ -375,14 +380,16 @@ namespace Benchmark.Client
             this.Write(@"                                    ]
                                 },
                                 {
-                                    type: 'bar',
+                                    type: 'line',
                                     label: ""Rps"",
-                                    backgroundColor: """);
-            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
+                                    pointBackgroundColor: """);
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    backgroundColor: \"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
             this.Write("\",\r\n                                    borderColor: \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(barColor));
-            this.Write("\",\r\n                                    data: [\r\n                                " +
-                    "    ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(lineColor));
+            this.Write("\",\r\n                                    fill: false,\r\n                           " +
+                    "         data: [\r\n                                    ");
  foreach(var item in hubConnectionsResult.SummaryItems) { 
             this.Write("                                        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Rps));
@@ -443,10 +450,14 @@ namespace Benchmark.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(color));
             this.Write("\",\r\n                                    data: [\r\n                                " +
                     "    ");
- foreach(var item in items) { 
+ foreach(var summaries in items) { 
             this.Write("                                        ");
+ foreach(var item in summaries.SummaryItems) { 
+            this.Write("                                            ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
-            this.Write(",\r\n                                    ");
+            this.Write(",\r\n                                        ");
+ } 
+            this.Write("                                    ");
  } 
             this.Write("                                    ]\r\n                                },\r\n      " +
                     "                          ");
@@ -465,24 +476,24 @@ namespace Benchmark.Client
                     "            legend: {\r\n                                    labels: {\r\n          " +
                     "                              boxWidth: 30,\r\n                                   " +
                     "     padding: 20\r\n                                    },\r\n                      " +
-                    "              display: true\r\n                                },\r\n               " +
-                    "                 tooltips: {\r\n                                    mode: \'label\' " +
-                    "// data colum for tooltip\r\n                                },\r\n                 " +
-                    "               responsive: true\r\n                            }\r\n                " +
-                    "        });\r\n                    </script>\r\n                </div>\r\n\r\n          " +
-                    "  </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"p" +
-                    "adding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n       " +
-                    "     <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n      " +
-                    "          <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p class" +
-                    "=\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/c" +
-                    "ysharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Copy" +
-                    "right:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysha" +
-                    "rp, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script src" +
-                    "=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n     " +
-                    "   integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/k" +
-                    "R0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <script" +
-                    " type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3" +
-                    ".0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
+                    "              display: false\r\n                                },\r\n              " +
+                    "                  tooltips: {\r\n                                    mode: \'label\'" +
+                    " // data colum for tooltip\r\n                                },\r\n                " +
+                    "                responsive: true\r\n                            }\r\n               " +
+                    "         });\r\n                    </script>\r\n                </div>\r\n\r\n         " +
+                    "   </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"" +
+                    "padding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n      " +
+                    "      <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n     " +
+                    "           <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p clas" +
+                    "s=\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/" +
+                    "cysharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Cop" +
+                    "yright:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysh" +
+                    "arp, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script sr" +
+                    "c=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n    " +
+                    "    integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/" +
+                    "kR0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <scrip" +
+                    "t type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/" +
+                    "3.0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
             return this.GenerationEnvironment.ToString();
         }
     }

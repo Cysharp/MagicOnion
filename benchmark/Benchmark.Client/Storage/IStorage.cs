@@ -44,24 +44,31 @@ namespace Benchmark.Client.Storage
 
     public static class StorageFactory
     {
+        private static IStorage storage;
+
         public static IStorage Create(ILogger logger)
         {
+            if (storage != null)
+                return storage;
+
             // todo: Google... etc...?
             if (AmazonUtils.IsAmazonEc2())
             {
-                return new AmazonS3Storage(logger);
+                storage = new AmazonS3Storage(logger);
             }
             else
             {
                 // fall back
-                return new LocalStorage(logger);
+                storage = new LocalStorage(logger);
             }
+            return storage;
         }
     }
 
-
     public class LocalStorage : IStorage
     {
+        private static readonly object lockObj = new object();
+
         private readonly ILogger _logger;
         public LocalStorage(ILogger logger)
         {
@@ -123,10 +130,18 @@ namespace Benchmark.Client.Storage
             Directory.CreateDirectory(dir);
 
             var basePath = Path.Combine(dir, name);
-            var savePath = overwrite ? basePath : GetSafeSavePath(basePath, 1);
+            Save(content, basePath, overwrite);
+        }
 
-            _logger.LogInformation($"Save content to local storage {savePath}");
-            await File.WriteAllTextAsync(savePath, content, ct);
+        private void Save(string content, string path, bool overwrite)
+        {
+            lock (lockObj)
+            {
+                var savePath = overwrite ? path : GetSafeSavePath(path, 1);
+
+                _logger.LogInformation($"Save content to local storage {savePath}");
+                File.WriteAllText(savePath, content);
+            }
         }
 
         /// <summary>
@@ -137,9 +152,9 @@ namespace Benchmark.Client.Storage
         /// <param name="suffixNamePattern"></param>
         /// <param name="savePath"></param>
         /// <returns></returns>
-        private string GetSafeSavePath(string basePath, int index, string suffixNamePattern = "{0:000}", string savePath = "")
+        private static string GetSafeSavePath(string basePath, int index, string suffixNamePattern = "{0:00000}", string savePath = "")
         {
-            if (index == 999)
+            if (index == 99999)
                 return savePath;
             if (string.IsNullOrEmpty(savePath))
                 savePath = basePath;

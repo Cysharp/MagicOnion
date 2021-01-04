@@ -2,8 +2,11 @@ using Benchmark.Client.Reports;
 using Benchmark.Server.Shared;
 using Benchmark.Shared;
 using Grpc.Net.Client;
+using MagicOnion;
 using MagicOnion.Client;
+using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Benchmark.Client.Scenarios
@@ -43,23 +46,26 @@ namespace Benchmark.Client.Scenarios
 
         private async Task SumAsync(int requestCount)
         {
+            var tasks = new List<UnaryResult<int>>();
             for (var i = 0; i <= requestCount; i++)
             {
                 try
                 {
                     // Call the server-side method using the proxy.
-                    _ = await client.SumAsync(i, i);
+                    var task = client.SumAsync(i, i);
+                    tasks.Add(task);
                 }
                 catch
                 {
                     _errors++;
                 }
-
             }
+            await ValueTaskUtils.WhenAll(tasks);
         }
 
         private async Task PlainTextAsync(int requestCount)
         {
+            var tasks = new List<UnaryResult<Nil>>();
             for (var i = 0; i <= requestCount; i++)
             {
                 var data = new BenchmarkData
@@ -68,13 +74,15 @@ namespace Benchmark.Client.Scenarios
                 };
                 try
                 {
-                    _ = await client.PlainTextAsync(data);
+                    var task = client.PlainTextAsync(data);
+                    tasks.Add(task);
                 }
                 catch (Exception)
                 {
                     _errors++;
                 }
             }
+            await ValueTaskUtils.WhenAll(tasks);
         }
     }
 }

@@ -3,6 +3,7 @@ using Benchmark.Server.Shared;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Benchmark.Client.Scenarios
@@ -94,6 +95,7 @@ namespace Benchmark.Client.Scenarios
 
         private async Task PlainTextAsync(int requestCount)
         {
+            var tasks = new List<Task>();
             _errors = 0;
             for (var i = 0; i <= requestCount; i++)
             {
@@ -103,13 +105,15 @@ namespace Benchmark.Client.Scenarios
                 };
                 try
                 {
-                    await _client.Process(data);
+                    var task = _client.Process(data);
+                    tasks.Add(task);
                 }
                 catch (Exception)
                 {
                     _errors++;
                 }
             }
+            await Task.WhenAll(tasks);
         }
 
         private async Task EndAsync()

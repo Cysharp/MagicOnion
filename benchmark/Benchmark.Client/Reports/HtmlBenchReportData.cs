@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Benchmark.Client.Reports
 {
-    public record HtmlBenchReport(HtmlBenchReportClientInfo Client, HtmlBenchReportSummary Summary, HtmlBenchReportConnectionsResult UnaryConnectionsResult, HtmlBenchReportConnectionsResult HubConnectionsResult);
+    public record HtmlBenchReport(HtmlBenchReportClientInfo Client, HtmlBenchReportSummary Summary, HtmlBenchReportRequestResult UnaryConnectionsResult, HtmlBenchReportRequestResult HubConnectionsResult);
     public record HtmlBenchReportClientInfo
     {
         public string Os { get; init; }
@@ -15,26 +15,32 @@ namespace Benchmark.Client.Reports
     }
     public record HtmlBenchReportSummary
     {
-        public string Id { get; init; }
+        public string ReportId { get; init; }
         public int Clients { get; init; }
-        public int Itelations { get; init; }
+        public long RequestTotal { get; init; }
         public DateTime Begin { get; init; }
         public DateTime End { get; init; }
+        public double Rps { get; init; }
         public TimeSpan DurationTotal { get; init; }
         public TimeSpan DurationAvg { get; init; }
         public TimeSpan DurationMin { get; init; }
         public TimeSpan DurationMax { get; init; }
     }
-    public record HtmlBenchReportConnectionsResult
+    public record HtmlBenchReportRequestResult
     {
-        public HtmlBenchReportRequestsDurationItem[] SummaryItems { get; init; }
+        public HtmlBenchReportRequestResultSummaryItem[] SummaryItems { get; init; }
         public int Errors { get; init; }
-        public (string Client, HtmlBenchReportRequestsDurationItem[] Items)[] ClientDurationItems { get; set; }
+        public (string Client, HtmlBenchReportRequestResultClientDurationItem[] Items)[] ClientDurationItems { get; init; }
     }
-    public record HtmlBenchReportRequestsDurationItem
+    public record HtmlBenchReportRequestResultSummaryItem
     {
-        public int RequestCount { get; set; }
-        public TimeSpan Duration { get; set; }
-        public double Rps { get; set; }
+        public int RequestCount { get; init; }
+        public TimeSpan Duration { get; init; }
+        public double Rps { get; init; }
+    }
+    public record HtmlBenchReportRequestResultClientDurationItem
+    {
+        public int RequestCount { get; init; }
+        public HtmlBenchReportRequestResultSummaryItem[] SummaryItems { get; init; }
     }
 }

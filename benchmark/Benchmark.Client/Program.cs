@@ -22,43 +22,105 @@ var builder = Host.CreateDefaultBuilder()
     });
 if (Environment.GetEnvironmentVariable("BENCHCLIENT_RUNASWEB") == "true")
 {
-    var hostAddress = Environment.GetEnvironmentVariable("BENCHCLIENT_HOSTADDRESS");    
-    await builder.RunConsoleAppFrameworkWebHostingAsync(hostAddress ?? "http://localhost:8080");
+    var hostAddress = Environment.GetEnvironmentVariable("BENCHCLIENT_HOSTADDRESS") ?? "http://localhost:8080";
+    await builder.RunConsoleAppFrameworkWebHostingAsync(hostAddress);
 }
 else
 {
-    await builder.RunConsoleAppFrameworkAsync<Main>(args);
+    await builder.RunConsoleAppFrameworkAsync(args);
 }
 
-public class Main : ConsoleAppBase
+public class BenchmarkRunner : ConsoleAppBase
 {
     private readonly string _path;
-    public Main()
+    public BenchmarkRunner()
     {
         _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? "bench-magiconion-s3-bucket-5c7e45b";
     }
 
-    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    private string GetReportId() => DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// Run Unary and Hub Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="iteration"></param>
+    /// <param name="reportId"></param>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public async Task Bench(string hostAddress = "http://localhost:5000", int iteration = 10000, string reportId = "", bool debug = false)
     {
         if (string.IsNullOrEmpty(reportId))
-            reportId = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+            reportId = GetReportId();
 
         var executeId = Guid.NewGuid().ToString();
-        Context.Logger.LogInformation($"reportId: {reportId}, executeId: {executeId}");
+        Context.Logger.LogInformation($"reportId: {reportId}");
+        Context.Logger.LogInformation($"executeId: {executeId}");
 
         var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
-        var itelations = new[] { 256, 1024, 4096, 16384, 20000 };
         reporter.Begin();
         {
-            foreach (var itelation in itelations)
+            // Connect to the server using gRPC channel.
+            var channel = GrpcChannel.ForAddress(hostAddress);
+
+            // Unary
+            Context.Logger.LogInformation($"Begin unary {iteration} requests.");
+            var unary = new UnaryBenchmarkScenario(channel, reporter);
+            await unary.Run(iteration);
+
+            // StreamingHub
+            Context.Logger.LogInformation($"Begin Streaming {iteration} requests.");
+            await using var hub = new HubBenchmarkScenario(channel, reporter);
+            await hub.Run(iteration);
+        }
+        reporter.End();
+
+        // output
+        var benchJson = reporter.ToJson();
+        if (debug)
+        {
+            Context.Logger.LogInformation(benchJson);
+        }
+
+        // put json to s3
+        var storage = StorageFactory.Create(Context.Logger);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+    }
+
+    /// <summary>
+    /// Run Unary and Hub Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="reportId"></param>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public async Task BenchAll(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    {
+        if (string.IsNullOrEmpty(reportId))
+            reportId = GetReportId();
+
+        var executeId = Guid.NewGuid().ToString();
+        Context.Logger.LogInformation($"reportId: {reportId}");
+        Context.Logger.LogInformation($"executeId: {executeId}");
+
+        var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
+        var iterations = new[] { 256, 1024, 4096, 16384, 20000 };
+        reporter.Begin();
+        {
+            foreach (var iteration in iterations)
             {
                 // Connect to the server using gRPC channel.
                 var channel = GrpcChannel.ForAddress(hostAddress);
 
                 // Unary
-                Context.Logger.LogInformation($"Begin unary {itelation} requests.");
+                Context.Logger.LogInformation($"Begin unary {iteration} requests.");
                 var unary = new UnaryBenchmarkScenario(channel, reporter);
-                await unary.Run(itelation);
+                await unary.Run(iteration);
+
+                // StreamingHub
+                Context.Logger.LogInformation($"Begin Streaming {iteration} requests.");
+                await using var hub = new HubBenchmarkScenario(channel, reporter);
+                await hub.Run(iteration);
             }
         }
         reporter.End();
@@ -72,30 +134,83 @@ public class Main : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
     }
 
+    /// <summary>
+    /// Run Unary Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="reportId"></param>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    {
+        if (string.IsNullOrEmpty(reportId))
+            reportId = GetReportId();
+
+        var executeId = Guid.NewGuid().ToString();
+        Context.Logger.LogInformation($"reportId: {reportId}");
+        Context.Logger.LogInformation($"executeId: {executeId}");
+
+        var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
+        var iterations = new[] { 256, 1024, 4096, 16384, 20000 };
+        reporter.Begin();
+        {
+            foreach (var iteration in iterations)
+            {
+                // Connect to the server using gRPC channel.
+                var channel = GrpcChannel.ForAddress(hostAddress);
+
+                // Unary
+                Context.Logger.LogInformation($"Begin unary {iteration} requests.");
+                var unary = new UnaryBenchmarkScenario(channel, reporter);
+                await unary.Run(iteration);
+            }
+        }
+        reporter.End();
+
+        // output
+        var benchJson = reporter.ToJson();
+        if (debug)
+        {
+            Context.Logger.LogInformation(benchJson);
+        }
+
+        // put json to s3
+        var storage = StorageFactory.Create(Context.Logger);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+    }
+
+    /// <summary>
+    /// Run Hub Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="reportId"></param>
+    /// <param name="debug"></param>
+    /// <returns></returns>
     public async Task BenchHub(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
     {
         if (string.IsNullOrEmpty(reportId))
-            reportId = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
+            reportId = GetReportId();
 
         var executeId = Guid.NewGuid().ToString();
-        Context.Logger.LogInformation($"reportId: {reportId}, executeId: {executeId}");
+        Context.Logger.LogInformation($"reportId: {reportId}");
+        Context.Logger.LogInformation($"executeId: {executeId}");
 
         var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
-        var itelations = new[] { 256, 1024, 4096, 16384, 20000 };
+        var iterations = new[] { 256, 1024, 4096, 16384, 20000 };
         reporter.Begin();
         {
-            foreach (var itelation in itelations)
+            foreach (var iteration in iterations)
             {
                 // Connect to the server using gRPC channel.
                 var channel = GrpcChannel.ForAddress(hostAddress);
 
                 // StreamingHub
-                Context.Logger.LogInformation($"Begin Streaming requests.");
+                Context.Logger.LogInformation($"Begin Streaming {iteration} requests.");
                 await using var hub = new HubBenchmarkScenario(channel, reporter);
-                await hub.Run(itelation);
+                await hub.Run(iteration);
             }
         }
         reporter.End();
@@ -109,55 +224,19 @@ public class Main : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
     }
 
-    public async Task BenchAll(string hostAddress = "http://localhost:5000", int itelation = 10000, string reportId = "")
+    /// <summary>
+    /// List Reports
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    public async Task<string[]> ListReports(string reportId)
     {
-        if (string.IsNullOrEmpty(reportId))
-            reportId = DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
-
-        var executeId = Guid.NewGuid().ToString();
-        Context.Logger.LogInformation($"reportId: {reportId}, executeId: {executeId}");
-
-        var reporter = new BenchReporter(reportId, executeId, Dns.GetHostName());
-
-        // Connect to the server using gRPC channel.
-        var channel = GrpcChannel.ForAddress(hostAddress);
-
-        reporter.Begin();
-        {
-            // Unary
-            Context.Logger.LogInformation($"Begin unary requests.");
-            var unary = new UnaryBenchmarkScenario(channel, reporter);
-            await unary.Run(itelation);
-            Context.Logger.LogInformation($"Completed all unary requests.");
-
-            // StreamingHub
-            Context.Logger.LogInformation($"Begin Streaming requests.");
-            await using var hub = new HubBenchmarkScenario(channel, reporter);
-            await hub.Run(itelation);
-            Context.Logger.LogInformation($"Completed Streaming requests.");
-        }
-        reporter.End();
-
-        // output
-        var benchJson = reporter.ToJson();
-        Context.Logger.LogInformation(benchJson);
-
-        // put json to s3
+        // access s3 and List json from reportId
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
-    }
-
-    public async Task<string[]> ListReports(string prefix, string path = "")
-    {
-        if (string.IsNullOrEmpty(path))
-            path = _path;
-
-        // access s3 and List json from prefix
-        var storage = StorageFactory.Create(Context.Logger);
-        var reports = await storage.List(path, $"reports/{prefix}", Context.CancellationToken);
+        var reports = await storage.List(_path, $"reports/{reportId}", Context.CancellationToken);
         foreach (var report in reports)
         {
             Context.Logger.LogInformation(report);
@@ -165,14 +244,16 @@ public class Main : ConsoleAppBase
         return reports;
     }
 
-    public async Task<BenchReport[]> GetReports(string prefix, string path = "")
+    /// <summary>
+    /// Get Report
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    public async Task<BenchReport[]> GetReports(string reportId)
     {
-        if (string.IsNullOrEmpty(path))
-            path = _path;
-
-        // access s3 and get jsons from prefix
+        // access s3 and get jsons from reportId
         var storage = StorageFactory.Create(Context.Logger);
-        var reportJsons = await storage.Get(path, $"reports/{prefix}", Context.CancellationToken);
+        var reportJsons = await storage.Get(_path, $"reports/{reportId}", Context.CancellationToken);
         var reports = new List<BenchReport>();
         foreach (var json in reportJsons)
         {
@@ -182,13 +263,16 @@ public class Main : ConsoleAppBase
         return reports.ToArray();
     }
 
-    public async Task GenerateHtml(string prefix, string path = "", string htmlFileName = "index.html")
+    /// <summary>
+    /// Generate Report Html
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <param name="htmlFileName"></param>
+    /// <returns></returns>
+    public async Task GenerateHtml(string reportId, string htmlFileName = "index.html")
     {
-        if (string.IsNullOrEmpty(path))
-            path = _path;
-
-        // access s3 and download json from prefix
-        var reports = await GetReports(prefix, path);
+        // access s3 and download json from reportId
+        var reports = await GetReports(reportId);
 
         // generate html based on json data
         var htmlReporter = new HtmlBenchReporter();
@@ -201,20 +285,29 @@ public class Main : ConsoleAppBase
 
         // upload html report to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save("bench-magiconion-s3-bucket-5c7e45b", $"html/{htmlReport.Summary.Id}", htmlFileName, content, overwrite: true, Context.CancellationToken);
+        await storage.Save(_path, $"html/{htmlReport.Summary.ReportId}", htmlFileName, content, overwrite: true, Context.CancellationToken);
     }
 
     public async Task ListClients()
     {
         // todo: call ssm to list up client instanceids
-        throw new NotImplementedException();
+        var loadTester = LoadTesterFactory.Create(Context.Logger, this);
+        await loadTester.ListClients();
     }
 
-    public async Task RunAllClient()
+    public async Task RunAllClient(int[] workerCounts, int executeCount, string hostAddress = "http://localhost:5000", string reportId = "")
     {
+        if (string.IsNullOrEmpty(reportId))
+            reportId = GetReportId();
+
         // todo: call ssm to execute Clients via CLI mode.
         // todo: call GenerateHtml to gene report
-        throw new NotImplementedException();
+
+        var loadTester = LoadTesterFactory.Create(Context.Logger, this);
+        foreach (var workerCount in workerCounts)
+        {
+            await loadTester.Run(workerCount, executeCount, hostAddress, reportId);
+        }
     }
 
     public async Task UpdateServerBinary()
