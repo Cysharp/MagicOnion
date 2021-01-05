@@ -9,12 +9,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.Server;
 using System.Buffers;
+using System.Linq;
 
 namespace MagicOnion.Client
 {
     public abstract class StreamingHubClientBase<TStreamingHub, TReceiver>
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
+        const string StreamingHubVersionHeaderKey = "x-magiconion-streaminghub-version";
+        const string StreamingHubVersionHeaderValue = "2";
+
         readonly string host;
         readonly CallOptions option;
         readonly CallInvoker callInvoker;
@@ -48,6 +52,7 @@ namespace MagicOnion.Client
         // call immediately after create.
         public async Task __ConnectAndSubscribeAsync(TReceiver receiver)
         {
+            var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
             var streamingResult = new DuplexStreamingResult<byte[], byte[]>(
                 callResult,
@@ -60,36 +65,53 @@ namespace MagicOnion.Client
             this.receiver = receiver;
 
             // Establish StreamingHub connection between the client and the server.
+            Metadata.Entry messageVersion = default;
             try
             {
                 // The client can read the response headers before any StreamingHub's message.
-                // NOTE: MagicOnion.Server v4.0.x or before doesn't send any response headers. The client is incompatible with that versions.
-                await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
+                // MagicOnion.Server v4.0.x or before doesn't send any response headers. The client is incompatible with that versions.
+                // NOTE: Grpc.Net:
+                //           If the channel can not be connected, ResponseHeadersAsync will throw an exception.
+                //       C-core:
+                //           If the channel can not be connected, ResponseHeadersAsync will **return** an empty metadata.
+                var headers = await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
+                messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
+
+                // Check message version of StreamingHub.
+                if (messageVersion != null && messageVersion.Value != StreamingHubVersionHeaderValue)
+                {
+                    throw new RpcException(new Status(StatusCode.Internal, $"The message version of StreamingHub mismatch between the client and the server. (ServerVersion={messageVersion?.Value}; Expected={StreamingHubVersionHeaderValue})"));
+                }
             }
             catch (RpcException e)
             {
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
             }
 
-            // If an error is returned from `StreamingHub.Connect` method on a server-side,
-            // ResponseStream.MoveNext synchronously returns a task that is `IsFaulted = true`.
-            // `ConnectAsync` method should throw an exception here immediately.
             var firstMoveNextTask = connection.RawStreamingCall.ResponseStream.MoveNext(cts.Token);
-            if (firstMoveNextTask.IsFaulted)
+            if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
+                // NOTE: Grpc.Net:
+                //           If an error is returned from `StreamingHub.Connect` method on a server-side,
+                //           ResponseStream.MoveNext synchronously returns a task that is `IsFaulted = true`.
+                //           `ConnectAsync` method should throw an exception here immediately.
+                //       C-core:
+                //           `firstMoveNextTask` is incomplete task (`IsFaulted = false`) whether ResponseHeadersAsync is failed or not.
+                //           If the channel is disconnected or the server returns an error (StatusCode != OK), awaiting the Task will throw an exception.
                 await firstMoveNextTask.ConfigureAwait(false);
-                return;
+
+                // NOTE: C-core: If the execution reaches here, Connect method returns without any error (StatusCode = OK). but MessageVersion isn't provided from the server.
+                throw new RpcException(new Status(StatusCode.Internal, $"The message version of StreamingHub is not provided from the server."));
             }
 
-            this.subscription = StartSubscribe(firstMoveNextTask);
+            this.subscription = StartSubscribe(syncContext, firstMoveNextTask);
         }
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
 
-        async Task StartSubscribe(Task<bool> firstMoveNext)
+        async Task StartSubscribe(SynchronizationContext syncContext, Task<bool> firstMoveNext)
         {
-            var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var reader = connection.RawStreamingCall.ResponseStream;
             try
             {
