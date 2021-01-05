@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Benchmark.Client.LoadTester
     public interface ILoadTester
     {
         Task<ClientInfo[]> ListClients(CancellationToken ct = default);
-        Task Run(int processCount, int executeCount, string hostAddress, string reportId, CancellationToken ct = default);
+        Task Run(int processCount, int executeCount, string benchCommand, string hostAddress, string reportId, CancellationToken ct = default);
     }
 
     public class ClientInfo
@@ -84,13 +85,22 @@ namespace Benchmark.Client.LoadTester
             return new[] { CurrentInfo };
         }
 
-        public async Task Run(int processCount, int executeCount, string hostAddress, string reportId, CancellationToken ct = default)
+        public async Task Run(int processCount, int executeCount, string benchCommand, string hostAddress, string reportId, CancellationToken ct = default)
         {
             var tasks = new List<Task>();
+            var m = _runner.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(x => string.Equals(x.Name, benchCommand, StringComparison.OrdinalIgnoreCase));
+            if (m == null)
+                throw new NullReferenceException($"BenchCommand {benchCommand} not found.");
+
             for (var i = 0; i < processCount; i++)
             {
-                var task = _runner.BenchAll(hostAddress, reportId: reportId);
-                tasks.Add(task);
+                var obj = m.Invoke(_runner, new object[] { hostAddress, reportId });
+                if (obj is Task task)
+                {
+                    tasks.Add(task);
+                }
+                //var task = _runner.BenchAll(hostAddress, reportId: reportId);
             }
             await Task.WhenAll(tasks);
         }
@@ -134,9 +144,8 @@ namespace Benchmark.Client.LoadTester
             return clients;
         }
 
-        public async Task Run(int processCount, int executeCount, string hostAddress, string reportId, CancellationToken ct = default)
+        public async Task Run(int processCount, int executeCount, string benchCommand, string hostAddress, string reportId, CancellationToken ct = default)
         {
-            var benchCommand = "benchall";
             var command = new List<string> {
                 "#!/bin/bash",
                 "export DOTNET_CLI_HOME=/tmp",
@@ -156,26 +165,27 @@ namespace Benchmark.Client.LoadTester
             if (processCount <= clients.Length)
             {
                 _logger.LogInformation($"Running on {string.Join(',', workers)}");
-                await RunCore(command, workers, ct);
+                await RunCore(command, workers, reportId, ct);
             }
             else
             {
                 var tasks = workers.Select(async x =>
                 {
                     _logger.LogInformation($"Running on {x}");
-                    await RunCore(command, new List<string> { x }, ct);
+                    await RunCore(command, new List<string> { x }, reportId, ct);
                 });
                 await Task.WhenAll(tasks);
             }
         }
 
-        private async Task RunCore(List<string> command, List<string> workers, CancellationToken ct)
+        private async Task RunCore(List<string> command, List<string> workers, string reportId, CancellationToken ct)
         {
             // aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_client_cli.json --output json
             var response = await _client.SendCommandAsync(new SendCommandRequest
             {
                 DocumentName = "AWS-RunShellScript",
                 InstanceIds = workers,
+                Comment = reportId,
                 Parameters = new Dictionary<string, List<string>>
                     {
                         {"commands", command},
@@ -203,7 +213,7 @@ namespace Benchmark.Client.LoadTester
                 {
                     foreach (var failed in fails)
                     {
-                        _logger.LogInformation($"Command failed on {failed.InstanceId} for {failed.StatusDetails}");
+                        _logger.LogInformation($"Command failed for {failed.Comment} on {failed.InstanceId} ({failed.CommandId})");
                     }
                 }
 

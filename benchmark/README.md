@@ -56,6 +56,12 @@ aws s3 sync --exact-timestamps ./benchmark/out/linux/server/ s3://${BUCKET}/asse
 instanceId=$(aws ssm describe-instance-information --output json --filters Key=tag-key,Values=bench --filters=Key=PingStatus,Values=Online | jq -r ".InstanceInformationList[].InstanceId")
 commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/download_server.json --output json | jq -r ".Command.CommandId")
 aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/register_server.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/stop_server.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
+commandId=$(aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_server.json --output json | jq -r ".Command.CommandId")
+aws ssm list-command-invocations --command-id "${commandId}" --details | jq -r ".CommandInvocations[].Status, .CommandInvocations[].CommandPlugins[].Output"
 ```
 
 get instanceid

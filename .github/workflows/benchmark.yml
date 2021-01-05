@@ -1,0 +1,55 @@
+name: benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+      DISABLE_NETFX_TARGET_BUILD: 1
+      DOTNET_SDK_VERSION_3: "3.1.403"
+      DOTNET_SDK_VERSION_5: "5.0.100"
+      BUCKET: bench-magiconion-s3-bucket-5c7e45b
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
+      # build
+      - run: dotnet build ./benchmark/Benchmark.Server/ -c Release
+      - run: dotnet build ./benchmark/Benchmark.Client/ -c Release
+      - run: dotnet publish ./benchmark/Benchmark.Server/ -c Release -r linux-x64 -p:PublishSingleFile=true --no-self-contained -o benchmark/out/linux/server
+      - run: dotnet publish ./benchmark/Benchmark.Client/ -c Release  -r linux-x64 -p:PublishSingleFile=true --no-self-contained -o benchmark/out/linux/client
+      # upload
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      - run: aws s3 sync --exact-timestamps ./benchmark/out/linux/server/ s3://${BUCKET}/assembly/linux/server/
+      - run: aws s3 sync --exact-timestamps ./benchmark/out/linux/client/ s3://${BUCKET}/assembly/linux/client/
+      - name: update server binary
+        run: |
+          instanceId=$(aws ssm describe-instance-information --output json --filters Key=tag-key,Values=bench --filters=Key=PingStatus,Values=Online | jq -r ".InstanceInformationList[].InstanceId")
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/download_server.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/register_server.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/stop_server.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_server.json --output json | jq -r ".Command.CommandId"
+      - name: update client binary
+        run: |
+          instanceId=$(aws ssm describe-instance-information --output json --filters Key=tag-key,Values=bench --filters=Key=PingStatus,Values=Online | jq -r ".InstanceInformationList[].InstanceId")
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/download_client.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/register_client.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/stop_client.json --output json | jq -r ".Command.CommandId"
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_client.json --output json | jq -r ".Command.CommandId"
+      # run
+      - run: |
+          aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_client_ci.json --output json | jq -r ".Command.CommandId"

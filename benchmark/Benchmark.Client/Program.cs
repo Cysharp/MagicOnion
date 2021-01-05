@@ -48,9 +48,8 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="hostAddress"></param>
     /// <param name="iteration"></param>
     /// <param name="reportId"></param>
-    /// <param name="debug"></param>
     /// <returns></returns>
-    public async Task Bench(string hostAddress = "http://localhost:5000", int iteration = 10000, string reportId = "", bool debug = false)
+    public async Task Bench(string hostAddress = "http://localhost:5000", int iteration = 10000, string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
@@ -79,10 +78,6 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // output
         var benchJson = reporter.ToJson();
-        if (debug)
-        {
-            Context.Logger.LogInformation(benchJson);
-        }
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
@@ -94,9 +89,8 @@ public class BenchmarkRunner : ConsoleAppBase
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="reportId"></param>
-    /// <param name="debug"></param>
     /// <returns></returns>
-    public async Task BenchAll(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    public async Task BenchAll(string hostAddress = "http://localhost:5000", string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
@@ -129,10 +123,6 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // output
         var benchJson = reporter.ToJson();
-        if (debug)
-        {
-            Context.Logger.LogInformation(benchJson);
-        }
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
@@ -144,9 +134,8 @@ public class BenchmarkRunner : ConsoleAppBase
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="reportId"></param>
-    /// <param name="debug"></param>
     /// <returns></returns>
-    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
@@ -174,10 +163,6 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // output
         var benchJson = reporter.ToJson();
-        if (debug)
-        {
-            Context.Logger.LogInformation(benchJson);
-        }
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
@@ -189,9 +174,8 @@ public class BenchmarkRunner : ConsoleAppBase
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="reportId"></param>
-    /// <param name="debug"></param>
     /// <returns></returns>
-    public async Task BenchHub(string hostAddress = "http://localhost:5000", string reportId = "", bool debug = false)
+    public async Task BenchHub(string hostAddress = "http://localhost:5000", string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
@@ -219,10 +203,6 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // output
         var benchJson = reporter.ToJson();
-        if (debug)
-        {
-            Context.Logger.LogInformation(benchJson);
-        }
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
@@ -302,7 +282,7 @@ public class BenchmarkRunner : ConsoleAppBase
         return clients;
     }
 
-    public async Task RunAllClient(int processCount, int executeCount = 10000, string hostAddress = "http://localhost:5000", string reportId = "")
+    public async Task RunAllClient(int processCount, int executeCount = 10000, string benchCommand = "benchall", string hostAddress = "http://localhost:5000", string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
@@ -313,7 +293,7 @@ public class BenchmarkRunner : ConsoleAppBase
         var loadTester = LoadTesterFactory.Create(Context.Logger, this);
         try
         {
-            await loadTester.Run(processCount, executeCount, hostAddress, reportId, Context.CancellationToken);
+            await loadTester.Run(processCount, executeCount, benchCommand, hostAddress, reportId, Context.CancellationToken);
         }
         catch (Exception ex)
         {

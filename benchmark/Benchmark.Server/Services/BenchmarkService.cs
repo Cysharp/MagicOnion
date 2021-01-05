@@ -56,7 +56,7 @@ namespace Benchmark.Server.Services
             Statistics.UnaryConnected();
             try
             {
-                ProcessRequest(RequestType.PlainText, data);
+                //ProcessRequest(RequestType.PlainText, data);
             }
             catch
             {
