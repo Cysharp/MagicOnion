@@ -7,7 +7,7 @@ namespace MagicOnion.Client
 {
     public static partial class StreamingHubClient
     {
-        [Obsolete]
+        [Obsolete("Use ConnectAsync instead.")]
         public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
