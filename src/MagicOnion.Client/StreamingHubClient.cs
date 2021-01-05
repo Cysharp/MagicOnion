@@ -12,7 +12,22 @@ namespace MagicOnion.Client
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerOptions, logger);
-            _ = client.__ConnectAndSubscribeAsync(receiver);
+
+            async void ConnectAndForget()
+            {
+                var task = client.__ConnectAndSubscribeAsync(receiver);
+                try
+                {
+                    await task;
+                }
+                catch (Exception e)
+                {
+                    logger?.Error(e, "An error occurred while connecting to the server.");
+                }
+            }
+
+            ConnectAndForget();
+
             return (TStreamingHub)(object)client;
         }
 
