@@ -1,13 +1,47 @@
 using Grpc.Core;
 using MessagePack;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
     public static partial class StreamingHubClient
     {
+        [Obsolete("Use ConnectAsync instead.")]
         public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerOptions, logger);
+
+            async void ConnectAndForget()
+            {
+                var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
+                try
+                {
+                    await task;
+                }
+                catch (Exception e)
+                {
+                    logger?.Error(e, "An error occurred while connecting to the server.");
+                }
+            }
+
+            ConnectAndForget();
+
+            return (TStreamingHub)(object)client;
+        }
+
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerOptions, logger);
+            await client.__ConnectAndSubscribeAsync(receiver, cancellationToken).ConfigureAwait(false);
+            return (TStreamingHub)(object)client;
+        }
+        
+        private static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var ctor = StreamingHubClientRegistry<TStreamingHub, TReceiver>.consturtor;
             StreamingHubClientBase<TStreamingHub, TReceiver> client = null;
@@ -25,8 +59,7 @@ namespace MagicOnion.Client
                 client = (StreamingHubClientBase<TStreamingHub, TReceiver>)(object)ctor(callInvoker, receiver, host, option, serializerOptions, logger);
             }
 
-            client.__ConnectAndSubscribe(receiver);
-            return (TStreamingHub)(object)client;
+            return client;
         }
     }
 

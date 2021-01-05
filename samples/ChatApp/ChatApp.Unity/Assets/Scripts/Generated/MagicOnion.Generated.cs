@@ -221,7 +221,6 @@ namespace ChatApp.Shared.Services {
 
 namespace ChatApp.Shared.Hubs {
     using Grpc.Core;
-    using Grpc.Core.Logging;
     using MagicOnion;
     using MagicOnion.Client;
     using MessagePack;
