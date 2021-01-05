@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using MessagePack;
@@ -17,10 +18,10 @@ namespace MagicOnion.Client
             return Connect<TStreamingHub, TReceiver>(new DefaultCallInvoker(channel), receiver, host, option, serializerOptions, logger);
         }
 
-        public static Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(Channel channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
+        public static Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(Channel channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            return ConnectAsync<TStreamingHub, TReceiver>(new DefaultCallInvoker(channel), receiver, host, option, serializerOptions, logger);
+            return ConnectAsync<TStreamingHub, TReceiver>(new DefaultCallInvoker(channel), receiver, host, option, serializerOptions, logger, cancellationToken);
         }
     }
 }

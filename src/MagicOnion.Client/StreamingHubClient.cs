@@ -1,6 +1,7 @@
 using Grpc.Core;
 using MessagePack;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Client
@@ -15,7 +16,7 @@ namespace MagicOnion.Client
 
             async void ConnectAndForget()
             {
-                var task = client.__ConnectAndSubscribeAsync(receiver);
+                var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
                 try
                 {
                     await task;
@@ -31,11 +32,11 @@ namespace MagicOnion.Client
             return (TStreamingHub)(object)client;
         }
 
-        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerOptions, logger);
-            await client.__ConnectAndSubscribeAsync(receiver).ConfigureAwait(false);
+            await client.__ConnectAndSubscribeAsync(receiver, cancellationToken).ConfigureAwait(false);
             return (TStreamingHub)(object)client;
         }
         

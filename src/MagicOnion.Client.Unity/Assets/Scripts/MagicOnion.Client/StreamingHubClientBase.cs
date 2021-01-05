@@ -50,7 +50,7 @@ namespace MagicOnion.Client
         protected abstract Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
 
         // call immediately after create.
-        public async Task __ConnectAndSubscribeAsync(TReceiver receiver)
+        public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
@@ -77,6 +77,8 @@ namespace MagicOnion.Client
                 var headers = await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
                 messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // Check message version of StreamingHub.
                 if (messageVersion != null && messageVersion.Value != StreamingHubVersionHeaderValue)
                 {
@@ -88,7 +90,7 @@ namespace MagicOnion.Client
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
             }
 
-            var firstMoveNextTask = connection.RawStreamingCall.ResponseStream.MoveNext(cts.Token);
+            var firstMoveNextTask = connection.RawStreamingCall.ResponseStream.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
             if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
                 // NOTE: Grpc.Net:
