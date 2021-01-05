@@ -252,7 +252,7 @@ namespace MagicOnion.Client
 
         protected async Task WriteMessageAsync<T>(int methodId, T message)
         {
-            ThrowIfDisposedOrDisconnected();
+            ThrowIfDisposed();
 
             byte[] BuildMessage()
             {
@@ -284,7 +284,7 @@ namespace MagicOnion.Client
 
         protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
-            ThrowIfDisposedOrDisconnected();
+            ThrowIfDisposed();
 
             var mid = Interlocked.Increment(ref messageId);
             var tcs = new TaskCompletionSourceEx<TResponse>(); // use Ex
@@ -313,16 +313,11 @@ namespace MagicOnion.Client
             return await tcs.Task; // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
         }
 
-        void ThrowIfDisposedOrDisconnected()
+        void ThrowIfDisposed()
         {
             if (disposed)
             {
                 throw new ObjectDisposedException("StreamingHubClient", $"The StreamingHub has already been disconnected from the server.");
-            }
-
-            if (subscription == null)
-            {
-                throw new InvalidOperationException("The StreamingHub is not connected to the server yet.");
             }
         }
 
