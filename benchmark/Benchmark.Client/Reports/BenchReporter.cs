@@ -79,6 +79,11 @@ namespace Benchmark.Client.Reports
             return JsonConvert.Serialize(_report);
         }
 
+        public string GetJsonFileName()
+        {
+            return Name + "-" + ExecuteId + ".json";
+        }
+
         /// <summary>
         /// System Memory for GB
         /// </summary>

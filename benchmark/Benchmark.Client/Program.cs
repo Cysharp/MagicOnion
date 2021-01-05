@@ -1,5 +1,6 @@
 using Benchmark.Client;
 using Benchmark.Client.Converters;
+using Benchmark.Client.LoadTester;
 using Benchmark.Client.Reports;
 using Benchmark.Client.Scenarios;
 using Benchmark.Client.Storage;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using ZLogger;
 
@@ -84,7 +86,7 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: Context.CancellationToken);
     }
 
     /// <summary>
@@ -134,7 +136,7 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: Context.CancellationToken);
     }
 
     /// <summary>
@@ -179,7 +181,7 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: Context.CancellationToken);
     }
 
     /// <summary>
@@ -224,7 +226,7 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // put json to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.Name + ".json", benchJson, ct: Context.CancellationToken);
+        await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: Context.CancellationToken);
     }
 
     /// <summary>
@@ -288,26 +290,24 @@ public class BenchmarkRunner : ConsoleAppBase
         await storage.Save(_path, $"html/{htmlReport.Summary.ReportId}", htmlFileName, content, overwrite: true, Context.CancellationToken);
     }
 
-    public async Task ListClients()
+    public async Task<ClientInfo[]> ListClients()
     {
-        // todo: call ssm to list up client instanceids
+        // call ssm to list up client instanceids
         var loadTester = LoadTesterFactory.Create(Context.Logger, this);
-        await loadTester.ListClients();
+        var clients = await loadTester.ListClients();
+        var json = JsonConvert.Serialize(clients);
+        Context.Logger.LogInformation(json);
+        return clients;
     }
 
-    public async Task RunAllClient(int[] workerCounts, int executeCount, string hostAddress = "http://localhost:5000", string reportId = "")
+    public async Task RunAllClient(int processCount, int executeCount = 10000, string hostAddress = "http://localhost:5000", string reportId = "")
     {
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
 
-        // todo: call ssm to execute Clients via CLI mode.
-        // todo: call GenerateHtml to gene report
-
+        // call ssm to execute Clients via CLI mode.
         var loadTester = LoadTesterFactory.Create(Context.Logger, this);
-        foreach (var workerCount in workerCounts)
-        {
-            await loadTester.Run(workerCount, executeCount, hostAddress, reportId);
-        }
+        await loadTester.Run(processCount, executeCount, hostAddress, reportId, Context.CancellationToken);
     }
 
     public async Task UpdateServerBinary()
