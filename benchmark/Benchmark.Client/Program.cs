@@ -287,7 +287,9 @@ public class BenchmarkRunner : ConsoleAppBase
 
         // upload html report to s3
         var storage = StorageFactory.Create(Context.Logger);
-        await storage.Save(_path, $"html/{htmlReport.Summary.ReportId}", htmlFileName, content, overwrite: true, Context.CancellationToken);
+        await storage.Save(_path, $"html/{reportId}", htmlFileName, content, overwrite: true, Context.CancellationToken);
+
+        Context.Logger.LogInformation($"https://{_path}.s3-ap-northeast-1.amazonaws.com/html/{reportId}/index.html");
     }
 
     public async Task<ClientInfo[]> ListClients()
@@ -305,9 +307,21 @@ public class BenchmarkRunner : ConsoleAppBase
         if (string.IsNullOrEmpty(reportId))
             reportId = GetReportId();
 
+        Context.Logger.LogInformation($"reportId: {reportId}");
+
         // call ssm to execute Clients via CLI mode.
         var loadTester = LoadTesterFactory.Create(Context.Logger, this);
-        await loadTester.Run(processCount, executeCount, hostAddress, reportId, Context.CancellationToken);
+        try
+        {
+            await loadTester.Run(processCount, executeCount, hostAddress, reportId, Context.CancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Context.Logger.LogError(ex, "Run failed.");
+        }
+
+        // Generate Html Report
+        await GenerateHtml(reportId);
     }
 
     public async Task UpdateServerBinary()

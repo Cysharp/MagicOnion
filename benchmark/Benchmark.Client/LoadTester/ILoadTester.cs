@@ -39,26 +39,20 @@ namespace Benchmark.Client.LoadTester
             if (loadTester != null)
                 return loadTester;
 
-            var config = new AmazonSimpleSystemsManagementConfig
+            // todo: Google... etc...?
+            if (AmazonUtils.IsAmazonEc2())
             {
-                RegionEndpoint = Amazon.RegionEndpoint.APNortheast1,
-            };
-            loadTester = new SsmLoadTester(logger, runner, config);
-
-            //// todo: Google... etc...?
-            //if (AmazonUtils.IsAmazonEc2())
-            //{
-            //    var config = new AmazonSimpleSystemsManagementConfig
-            //    {
-            //        RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
-            //    };
-            //    loadTester = new SsmLoadTester(logger, runner, config);
-            //}
-            //else
-            //{
-            //    // fall back
-            //    loadTester = new LocalLoadTester(logger, runner);
-            //}
+                var config = new AmazonSimpleSystemsManagementConfig
+                {
+                    RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
+                };
+                loadTester = new SsmLoadTester(logger, runner, config);
+            }
+            else
+            {
+                // fall back
+                loadTester = new LocalLoadTester(logger, runner);
+            }
             return loadTester;
         }
     }
@@ -107,7 +101,6 @@ namespace Benchmark.Client.LoadTester
         private readonly ILogger _logger;
         private readonly BenchmarkRunner _runner;
         private readonly AmazonSimpleSystemsManagementClient _client;
-        private int workerCount;
 
         public SsmLoadTester(ILogger logger, BenchmarkRunner runner, AmazonSimpleSystemsManagementConfig config)
         {
@@ -143,16 +136,17 @@ namespace Benchmark.Client.LoadTester
 
         public async Task Run(int processCount, int executeCount, string hostAddress, string reportId, CancellationToken ct = default)
         {
+            var benchCommand = "benchall";
             var command = new List<string> {
                 "#!/bin/bash",
                 "export DOTNET_CLI_HOME=/tmp",
-                $"BENCHCLIENT_RUNASWEB=false ~/client/Benchmark.Client benchmarkrunner benchall -hostAddress {hostAddress} -reportId {reportId}"
+                $"BENCHCLIENT_RUNASWEB=false ~/client/Benchmark.Client benchmarkrunner {benchCommand} -hostAddress {hostAddress} -reportId {reportId}"
             };
 
             // get target clients
             var clients = await ListClients(ct);
 
-            // aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_client_cli.json --output json
+            // execute
             var workers = new List<string>();
             for (var i = 0; i < processCount; i++)
             {
@@ -162,37 +156,62 @@ namespace Benchmark.Client.LoadTester
             if (processCount <= clients.Length)
             {
                 _logger.LogInformation($"Running on {string.Join(',', workers)}");
-                try
-                {
-                    await _client.SendCommandAsync(new SendCommandRequest
-                    {
-                        DocumentName = "AWS-RunShellScript",
-                        InstanceIds = workers,
-                        Parameters = new Dictionary<string, List<string>>
-                    {
-                        {"commands", command},
-                    },
-                    }, ct);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                await RunCore(command, workers, ct);
             }
             else
             {
-                foreach(var worker in workers)
+                var tasks = workers.Select(async x =>
                 {
-                    _logger.LogInformation($"Running on {worker}");
-                    await _client.SendCommandAsync(new SendCommandRequest
+                    _logger.LogInformation($"Running on {x}");
+                    await RunCore(command, new List<string> { x }, ct);
+                });
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private async Task RunCore(List<string> command, List<string> workers, CancellationToken ct)
+        {
+            // aws ssm send-command --document-name "AWS-RunShellScript" --targets "Key=InstanceIds,Values=${instanceId}" --cli-input-json file://benchmark/run_client_cli.json --output json
+            var response = await _client.SendCommandAsync(new SendCommandRequest
+            {
+                DocumentName = "AWS-RunShellScript",
+                InstanceIds = workers,
+                Parameters = new Dictionary<string, List<string>>
                     {
-                        DocumentName = "AWS-RunShellScript",
-                        InstanceIds = new List<string>{ worker },
-                        Parameters = new Dictionary<string, List<string>>
-                        {
-                            {"commands", command},
-                        },
-                    }, ct);
+                        {"commands", command},
+                    },
+            }, ct);
+
+            // wait while processing
+            bool running = true;
+            while (running)
+            {
+                var commandresult = await _client.ListCommandInvocationsAsync(new ListCommandInvocationsRequest
+                {
+                    CommandId = response.Command.CommandId,
+                }, ct);
+
+                if (!commandresult.CommandInvocations.Any())
+                {
+                    // wait 10 sec. tekito-
+                    await Task.Delay(TimeSpan.FromSeconds(10), ct);
+                    continue;
+                }
+
+                var fails = commandresult.CommandInvocations.Where(x => x.Status == CommandInvocationStatus.Failed).ToArray();
+                if (fails.Any())
+                {
+                    foreach (var failed in fails)
+                    {
+                        _logger.LogInformation($"Command failed on {failed.InstanceId} for {failed.StatusDetails}");
+                    }
+                }
+
+                running = commandresult.CommandInvocations.Any(x => x.Status == CommandInvocationStatus.InProgress || x.Status == CommandInvocationStatus.Pending);
+                if (running)
+                {
+                    // wait 10 sec. tekito-
+                    await Task.Delay(TimeSpan.FromSeconds(10), ct);
                 }
             }
         }
