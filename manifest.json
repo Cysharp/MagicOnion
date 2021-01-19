@@ -189,7 +189,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClient.html",
-          "hash": "hVwswkuuBB+oodR7yTxm3g=="
+          "hash": "p4cVa5xdIBFgGXEaUHomxw=="
         }
       },
       "is_incremental": false,
@@ -201,7 +201,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.html",
-          "hash": "E51QgAh8sVRACL2VeOyzrg=="
+          "hash": "g/ZQHJ8ymbsdXAS/wNsx5A=="
         }
       },
       "is_incremental": false,
