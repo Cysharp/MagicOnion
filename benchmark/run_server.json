@@ -1,9 +1,0 @@
-{
-  "Parameters": {
-    "commands": [
-      "#!/bin/bash",
-      "sudo systemctl restart Benchmark.Server",
-      "sudo systemctl status Benchmark.Server"
-    ]
-  }
-}

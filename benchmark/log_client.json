@@ -1,8 +1,0 @@
-{
-  "Parameters": {
-    "commands": [
-      "#!/bin/bash",
-      "sudo journalctl -u Benchmark.Client | tail -n 10"
-    ]
-  }
-}
