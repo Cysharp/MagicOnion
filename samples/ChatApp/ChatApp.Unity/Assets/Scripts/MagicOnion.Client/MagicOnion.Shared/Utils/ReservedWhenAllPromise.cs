@@ -1,4 +1,4 @@
-﻿#if NON_UNITY
+#if NON_UNITY
 
 using System;
 using System.Runtime.CompilerServices;

@@ -13,6 +13,11 @@ namespace MagicOnion.Server.Hubs
         static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
         static protected readonly ValueTask CompletedTask = new ValueTask();
 
+        static readonly Metadata ResponseHeaders = new Metadata()
+        {
+            { "x-magiconion-streaminghub-version", "2" },
+        };
+
         public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
         protected Guid ConnectionId { get { return Context.ContextId; } }
@@ -113,6 +118,10 @@ namespace MagicOnion.Server.Hubs
             var ct = Context.CallContext.CancellationToken;
             var reader = Context.RequestStream!;
             var writer = Context.ResponseStream!;
+
+            // Send a hint to the client to start sending messages.
+            // The client can read the response headers before any StreamingHub's message.
+            await Context.CallContext.WriteResponseHeadersAsync(ResponseHeaders);
 
             var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 
