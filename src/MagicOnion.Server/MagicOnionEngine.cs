@@ -32,7 +32,44 @@ namespace MagicOnion.Server
         /// <param name="options">The options for MagicOnion server</param>
         public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options)
         {
-            return BuildServerServiceDefinition(serviceProvider, AppDomain.CurrentDomain.GetAssemblies(), options);
+            // NOTE: Exclude well-known system assemblies from automatic discovery of services.
+            var wellKnownIgnoreAssemblies = new[]
+            {
+                "netstandard",
+                "System.*",
+                "Microsoft.Win32.*",
+                "Microsoft.Extensions.*",
+                "Microsoft.AspNetCore",
+                "Microsoft.AspNetCore.*",
+                "Grpc.*",
+                "MessagePack",
+                "MessagePack.*",
+                "MagicOnion.Server",
+                "MagicOnion.Server.*",
+                "MagicOnion.Client",
+                "MagicOnion.Client.*", // MagicOnion.Client.DynamicClient (MagicOnionClient.Create<T>)
+                "MagicOnion.Abstractions",
+                "MagicOnion.Shared",
+            };
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(x =>
+                {
+                    return !wellKnownIgnoreAssemblies.Any(y =>
+                    {
+                        if (y.EndsWith('*'))
+                        {
+                            return x.GetName().Name!.StartsWith(y.Substring(0, y.Length - 1));
+                        }
+                        else
+                        {
+                            return x.GetName().Name == y;
+                        }
+                    });
+                })
+                .ToArray();
+
+            return BuildServerServiceDefinition(serviceProvider, assemblies, options);
         }
 
         /// <summary>
