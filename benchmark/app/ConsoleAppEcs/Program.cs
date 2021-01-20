@@ -26,7 +26,7 @@ namespace ConsoleAppEcs
             if (args.Length == 0)
             {
                 // master
-                args = "request -processCount 10 -workerPerProcess 10 -executePerWorker 1 -workerName UnaryWorker".Split(' ');
+                args = "request -processCount 1 -workerPerProcess 100 -executePerWorker 1 -workerName UnaryWorker".Split(' ');
             }
             else if (args.Contains("--worker-flag"))
             {
@@ -48,6 +48,7 @@ namespace ConsoleAppEcs
                 })
                 .RunDFrameLoadTestingAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new EcsScalingProvider())
                 {
+                    Timeout = TimeSpan.FromMinutes(10),
                 });
                 //.RunDFrameLoadTestingAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new InProcessScalingProvider())
                 // {
@@ -67,15 +68,12 @@ namespace ConsoleAppEcs
         public override async Task SetupAsync(WorkerContext context)
         {
             Console.WriteLine("SetupAsync");
-            _iterations = "256,1024";
+            _iterations = "100";
             _cts = new CancellationTokenSource();
             _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
             _reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
-            Console.WriteLine($"iterations {_iterations}");
-            Console.WriteLine($"hostAddress {_hostAddress}");
-            Console.WriteLine($"reportId {_reportId}");
-            Console.WriteLine($"path {path}");
+            Console.WriteLine($"iterations {_iterations}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
 
             _benchmarker = new Benchmarker(path, null, _cts.Token);
         }

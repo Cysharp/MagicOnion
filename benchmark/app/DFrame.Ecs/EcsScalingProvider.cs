@@ -86,7 +86,7 @@ namespace DFrame.Ecs
             }
             if (!await _ecsMaster.ExistsServiceAsync())
             {
-                _failSignal.TrySetException(new EcsException($"ECS Service not found in ECS Cluster {_ecsMaster.ClusterName}. Please confirm provided name {nameof(_ecsWorker.ServiceName)} is valid."));
+                _failSignal.TrySetException(new EcsException($"ECS Service not found in ECS Cluster {_ecsMaster.ClusterName}. Please confirm provided name {nameof(_ecsMaster.ServiceName)} is valid."));
                 return;
             }
 
