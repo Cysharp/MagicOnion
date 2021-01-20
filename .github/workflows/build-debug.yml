@@ -63,7 +63,8 @@ jobs:
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
       - run: apt-get update && apt-get install git -y
-      - uses: actions/checkout@v2
+      # v2 was accidentally fall back to http. let's use v1 instead.
+      - uses: actions/checkout@v1
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
         env:
