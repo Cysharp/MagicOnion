@@ -63,7 +63,9 @@ jobs:
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
       # Ubuntu 18.04 git is too old, use ppa latest git.
-      - run: add-apt-repository ppa:git-core/ppa && apt-get update && apt-get install git -y
+      - run: |
+          apt-get update && apt-get install --no-install-recommends -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
+          apt-get update && apt-get install --no-install-recommends -y git
       - uses: actions/checkout@v2
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
