@@ -20,25 +20,16 @@ namespace Cdk
     {
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
-            var reportId = props switch
+            var (now, reportId) = props switch
             {
-                ReportStackProps r => r.ReportId,
-                StackProps _ => Guid.NewGuid().ToString(),
+                ReportStackProps r => (r.ExecuteTime, r.ReportId),
+                StackProps _ => (DateTime.Now, Guid.NewGuid().ToString()),
                 _ => throw new NotImplementedException(),
             };
             var dframeWorkerLogGroup = "MagicOnionBenchWorkerLogGroup";
             var dframeMasterLogGroup = "MagicOnionBenchMasterLogGroup";
 
-            var vpc = new Vpc(this, "Vpc", new VpcProps { MaxAzs = 2 });
-            var subnets = new SubnetSelection { SubnetType = SubnetType.PRIVATE };
-            var sg = new SecurityGroup(this, "MasterSg", new SecurityGroupProps
-            {
-                AllowAllOutbound = true,
-                Vpc = vpc,
-            });
-            foreach (var subnet in vpc.PrivateSubnets)
-                sg.AddIngressRule(Peer.Ipv4(subnet.Ipv4CidrBlock), Port.AllTcp(), "VPC", true);
-
+            // s3 deploy
             var s3 = new Bucket(this, "Bucket", new BucketProps
             {
                 AutoDeleteObjects = true,
@@ -50,7 +41,7 @@ namespace Cdk
             {
                 Sid = "AllowPublicRead",
                 Effect = Effect.ALLOW,
-                Principals = new[] { new AnyPrincipal()},
+                Principals = new[] { new AnyPrincipal() },
                 Actions = new[] { "s3:GetObject*" },
                 Resources = new[] { $"{s3.BucketArn}/html/*" },
             }));
@@ -60,10 +51,47 @@ namespace Cdk
                 Sources = new[] { Source.Asset(Path.Combine(Directory.GetCurrentDirectory(), "out/linux/server/")) },
                 DestinationKeyPrefix = "assembly/linux/server/"
             });
-            var iamMagicOnionRole = GetIamMagicOnionRole(s3);
-            var iamEcsTaskExecuteRole = GetIamEcsTaskExecuteRole(new[] { dframeWorkerLogGroup , dframeMasterLogGroup });
-            var iamDFrameTaskDefRole = GetIamDframeTaskDefRole(s3);
-            var iamWorkerTaskDefRole = GetIamWorkerTaskDefRole(s3);
+
+            // docker deploy
+            var dockerImage = new DockerImageAsset(this, "dframeWorkerImage", new DockerImageAssetProps
+            {
+                Directory = Path.Combine(Directory.GetCurrentDirectory(), "app"),
+                File = "ConsoleAppEcs/Dockerfile.Ecs",
+            });
+            var dframeImage = ContainerImage.FromDockerImageAsset(dockerImage);
+
+            // network
+            var vpc = new Vpc(this, "Vpc", new VpcProps { MaxAzs = 1, NatGateways = 0, });
+            var subnets = new SubnetSelection { Subnets = vpc.PublicSubnets };
+            var sg = new SecurityGroup(this, "MasterSg", new SecurityGroupProps
+            {
+                AllowAllOutbound = true,
+                Vpc = vpc,
+            });
+            foreach (var subnet in vpc.PublicSubnets)
+                sg.AddIngressRule(Peer.Ipv4(vpc.VpcCidrBlock), Port.AllTcp(), "VPC", true);
+
+            // service discovery
+            var serviceDiscoveryDomain = "local";
+            var serverMapName = "server";
+            var dframeMapName = "dframe-master";
+            var ns = new PrivateDnsNamespace(this, "Namespace", new PrivateDnsNamespaceProps
+            {
+                Vpc = vpc,
+                Name = serviceDiscoveryDomain,
+            });
+            var serviceDiscoveryServer = ns.CreateService("server", new DnsServiceProps
+            {
+                Name = serverMapName,
+                DnsRecordType = DnsRecordType.A,
+                RoutingPolicy = RoutingPolicy.MULTIVALUE,
+            });
+
+            // iam
+            var iamEc2MagicOnionRole = GetIamEc2MagicOnionRole(s3, serviceDiscoveryServer);
+            var iamEcsTaskExecuteRole = GetIamEcsTaskExecuteRole(new[] { dframeWorkerLogGroup, dframeMasterLogGroup });
+            var iamDFrameTaskDefRole = GetIamEcsDframeTaskDefRole(s3);
+            var iamWorkerTaskDefRole = GetIamEcsWorkerTaskDefRole(s3);
 
             // MagicOnion
             var asg = new AutoScalingGroup(this, "MagicOnionAsg", new AutoScalingGroupProps
@@ -75,18 +103,30 @@ namespace Cdk
                 InstanceType = InstanceType.Of(InstanceClass.STANDARD3, InstanceSize.MEDIUM),
                 DesiredCapacity = 1,
                 MaxCapacity = 1,
-                AssociatePublicIpAddress = false,
-                MachineImage = new AmazonLinuxImage(),
+                MinCapacity = 0,
+                AssociatePublicIpAddress = true,
+                MachineImage = new AmazonLinuxImage(new AmazonLinuxImageProps
+                {
+                    CpuType = AmazonLinuxCpuType.X86_64,
+                    Generation = AmazonLinuxGeneration.AMAZON_LINUX_2,
+                    Storage = AmazonLinuxStorage.GENERAL_PURPOSE,
+                    Virtualization = AmazonLinuxVirt.HVM,
+                }),
                 AllowAllOutbound = true,
                 GroupMetrics = new[] { GroupMetrics.All() },
-                Role = iamMagicOnionRole,
+                Role = iamEc2MagicOnionRole,
+                UpdatePolicy = UpdatePolicy.ReplacingUpdate(),
+                Signals = Signals.WaitForAll(new SignalsOptions
+                {
+                    Timeout = Duration.Minutes(10),
+                }),
             });
             asg.AddUserData(@$"#!/bin/bash
-# install .NET 5 Runtime
+# install .NET 5
 sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
 sudo yum install -y dotnet-sdk-5.0 aspnetcore-runtime-5.0
 . /etc/profile.d/dotnet-cli-tools-bin-path.sh
-
+# download server
 mkdir -p /var/MagicOnion.Benchmark/server
 aws s3 sync --exact-timestamps s3://{s3.BucketName}/assembly/linux/server/ ~/server
 sudo chmod +x ~/server/Benchmark.Server
@@ -94,20 +134,64 @@ sudo cp -Rf ~/server/ /var/MagicOnion.Benchmark/.
 sudo cp -f /var/MagicOnion.Benchmark/server/Benchmark.Server.service /etc/systemd/system/.
 sudo systemctl enable Benchmark.Server
 sudo systemctl restart Benchmark.Server
+
+# cloudmap
+sudo yum update -y && sudo yum install -y jq
+EC2_METADATA=http://169.254.169.254/latest
+REGION=$(curl -s $EC2_METADATA/dynamic/instance-identity/document | jq -r '.region')
+INSTANCE_ID=$(curl -s $EC2_METADATA/meta-data/instance-id);
+INSTANCE_IP=$(curl -s $EC2_METADATA/meta-data/local-ipv4);
+
+sudo cat > /etc/init.d/cloudmap-register <<-EOF
+#! /bin/bash -ex
+aws servicediscovery register-instance \
+    --region $REGION \
+    --service-id {serviceDiscoveryServer.ServiceId} \
+    --instance-id $INSTANCE_ID \
+    --attributes AWS_INSTANCE_IPV4=$INSTANCE_IP,AWS_INSTANCE_PORT=80
+exit 0
+EOF
+sudo chmod a+x /etc/init.d/cloudmap-register
+
+sudo cat > /etc/init.d/cloudmap-deregister <<-EOF
+#! /bin/bash -ex
+aws servicediscovery deregister-instance \
+    --region $REGION \
+    --service-id {serviceDiscoveryServer.ServiceId} \
+    --instance-id $INSTANCE_ID
+exit 0
+EOF
+sudo chmod a+x /etc/init.d/cloudmap-deregister
+
+sudo cat > /usr/lib/systemd/system/cloudmap.service <<-EOF
+[Unit]
+Description=Run CloudMap service
+Requires=network-online.target network.target
+DefaultDependencies=no
+Before=shutdown.target reboot.target halt.target
+
+[Service]
+Type=oneshot
+KillMode=none
+RemainAfterExit=yes
+ExecStart=/etc/init.d/cloudmap-register
+ExecStop=/etc/init.d/cloudmap-deregister
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable cloudmap.service
+sudo systemctl start  cloudmap.service
 ".Replace("\r\n", "\n"));
             asg.Node.AddDependency(masterDllDeployment);
-
-            // AppMesh
-            var mesh = new Mesh(this, "Mesh", new MeshProps
+            new CfnScheduledAction(this, "ScheduleIn", new CfnScheduledActionProps
             {
-                EgressFilter = MeshFilterType.ALLOW_ALL,
+                AutoScalingGroupName = asg.AutoScalingGroupName,
+                DesiredCapacity = 0,
+                MaxSize = 0,
+                StartTime = now.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ss"),
             });
-            var ns = new PrivateDnsNamespace(this, "Namespace", new PrivateDnsNamespaceProps
-            {
-                Vpc = vpc,
-                Name = "local",
-            });
-            ns.CreateService("app");
 
             // ECS
             var cluster = new Cluster(this, "WorkerCluster", new ClusterProps
@@ -117,12 +201,6 @@ sudo systemctl restart Benchmark.Server
 
             // dframe-worker
             var dframeWorkerContainerName = "worker";
-            var dockerImage = new DockerImageAsset(this, "dframeWorkerImage", new DockerImageAssetProps
-            {
-                Directory = Path.Combine(Directory.GetCurrentDirectory(), "app"),
-                File = "ConsoleAppEcs/Dockerfile.Ecs",
-            });
-            var dframeImage = ContainerImage.FromDockerImageAsset(dockerImage);
             var dframeWorkerTaskDef = new FargateTaskDefinition(this, "DFrameWorkerTaskDef", new FargateTaskDefinitionProps
             {
                 ExecutionRole = iamEcsTaskExecuteRole,
@@ -136,9 +214,9 @@ sudo systemctl restart Benchmark.Server
                 Command = new[] { "--worker-flag" },
                 Environment = new Dictionary<string, string>
                 {
-                    { "DFRAME_MASTER_CONNECT_TO_HOST", "dframe-master.local"},
+                    { "DFRAME_MASTER_CONNECT_TO_HOST", $"{dframeMapName}.{serviceDiscoveryDomain}"},
                     { "DFRAME_MASTER_CONNECT_TO_PORT", "12345"},
-                    { "BENCH_SERVER_HOST", "http://10.0.178.167" },
+                    { "BENCH_SERVER_HOST", $"http://{serverMapName}.{serviceDiscoveryDomain}" },
                     { "BENCH_REPORTID", reportId },
                     { "BENCH_S3BUCKET", s3.BucketName },
                 },
@@ -161,7 +239,8 @@ sudo systemctl restart Benchmark.Server
                 VpcSubnets = subnets,
                 SecurityGroups = new[] { sg },
                 PlatformVersion = FargatePlatformVersion.VERSION1_4,
-                MinHealthyPercent = 0,                
+                MinHealthyPercent = 0,
+                AssignPublicIp = true,
             });
 
             // dframe-master
@@ -207,13 +286,14 @@ sudo systemctl restart Benchmark.Server
                 SecurityGroups = new[] { sg },
                 PlatformVersion = FargatePlatformVersion.VERSION1_4,
                 MinHealthyPercent = 0,
-                CloudMapOptions = new CloudMapOptions
-                {
-                    CloudMapNamespace = ns,
-                    Name = "dframe-master",
-                    DnsRecordType = DnsRecordType.A,
-                    DnsTtl = Duration.Seconds(300),
-                },
+                AssignPublicIp = true,
+            });
+            dframeMasterService.EnableCloudMap(new CloudMapOptions
+            {
+                CloudMapNamespace = ns,
+                Name = dframeMapName,
+                DnsRecordType = DnsRecordType.A,
+                DnsTtl = Duration.Seconds(300),
             });
 
             // output
@@ -229,7 +309,7 @@ sudo systemctl restart Benchmark.Server
             new CfnOutput(this, "DFrameWorkerEcsTaskdefImage", new CfnOutputProps { Value = dockerImage.ImageUri });
         }
 
-        private Role GetIamMagicOnionRole(Bucket s3)
+        private Role GetIamEc2MagicOnionRole(Bucket s3, Service meshService)
         {
             var policy = new Policy(this, "MasterPolicy", new PolicyProps
             {
@@ -250,6 +330,11 @@ sudo systemctl restart Benchmark.Server
                         Actions = new[] { "s3:GetObject" },
                         Resources = new[] { $"{s3.BucketArn}/*" },
                     }),
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Actions = new[] { "servicediscovery:RegisterInstance", "servicediscovery:DeregisterInstance"},
+                        Resources = new[] { meshService.ServiceArn },
+                    }),
                 }
             });
             var role = new Role(this, "MasterRole", new RoleProps
@@ -257,6 +342,7 @@ sudo systemctl restart Benchmark.Server
                 AssumedBy = new ServicePrincipal("ec2.amazonaws.com"),
             });
             role.AttachInlinePolicy(policy);
+            role.AddManagedPolicy(ManagedPolicy.FromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"));
             return role;
         }
         private Role GetIamEcsTaskExecuteRole(string[] logGroups)
@@ -286,7 +372,7 @@ sudo systemctl restart Benchmark.Server
             return role;
         }
 
-        private Role GetIamDframeTaskDefRole(Bucket s3)
+        private Role GetIamEcsDframeTaskDefRole(Bucket s3)
         {
             var policy = new Policy(this, "DframeTaskDefTaskPolicy", new PolicyProps
             {
@@ -349,7 +435,7 @@ sudo systemctl restart Benchmark.Server
             role.AttachInlinePolicy(policy);
             return role;
         }
-        private Role GetIamWorkerTaskDefRole(Bucket s3)
+        private Role GetIamEcsWorkerTaskDefRole(Bucket s3)
         {
             var policy = new Policy(this, "WorkerTaskDefTaskPolicy", new PolicyProps
             {

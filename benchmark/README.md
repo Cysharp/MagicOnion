@@ -22,7 +22,7 @@ npm install -g aws-cdk
 ```
 
 ```shell
-dotnet build src
+dotnet publish app/Benchmark.Server/ -o out/linux/server -r linux-x64 -p:PublishSingleFile=true --no-self-contained
 cdk synth
 cdk bootstrap # only on initial execution
 cdk deploy
