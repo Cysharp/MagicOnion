@@ -34,8 +34,8 @@ jobs:
       - run: dotnet publish ./app/Benchmark.Server/ -c Release -o out/linux/server -r linux-x64 -p:PublishSingleFile=true --no-self-contained
       - uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.CDK_USER_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.CDK_USER_ACCESS_SECRET }}
           aws-region: ap-northeast-1
       - run: cdk synth
       - run: cdk diff
