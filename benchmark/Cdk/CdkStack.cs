@@ -62,7 +62,7 @@ namespace Cdk
             });
             var iamMagicOnionRole = GetIamMagicOnionRole(s3);
             var iamEcsTaskExecuteRole = GetIamEcsTaskExecuteRole(new[] { dframeWorkerLogGroup , dframeMasterLogGroup });
-            var iamDFrameTaskDefRole = GetIamDframeTaskDefRole();
+            var iamDFrameTaskDefRole = GetIamDframeTaskDefRole(s3);
             var iamWorkerTaskDefRole = GetIamWorkerTaskDefRole(s3);
 
             // MagicOnion
@@ -183,6 +183,8 @@ sudo systemctl restart Benchmark.Server
                     { "DFRAME_WORKER_SERVICE_NAME", dframeWorkerService.ServiceName },
                     { "DFRAME_WORKER_TASK_NAME", Fn.Select(1, Fn.Split("/", dframeWorkerTaskDef.TaskDefinitionArn)) },
                     { "DFRAME_WORKER_IMAGE", dockerImage.ImageUri },
+                    { "BENCH_REPORTID", reportId },
+                    { "BENCH_S3BUCKET", s3.BucketName },
                 },
                 Logging = LogDriver.AwsLogs(new AwsLogDriverProps
                 {
@@ -284,7 +286,7 @@ sudo systemctl restart Benchmark.Server
             return role;
         }
 
-        private Role GetIamDframeTaskDefRole()
+        private Role GetIamDframeTaskDefRole(Bucket s3)
         {
             var policy = new Policy(this, "DframeTaskDefTaskPolicy", new PolicyProps
             {
@@ -315,6 +317,28 @@ sudo systemctl restart Benchmark.Server
                             "iam:PassRole",
                         },
                         Resources = new [] { "*" },
+                    }),
+                    // s3
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Actions = new[] { "s3:ListAllMyBuckets" },
+                        Resources = new[] { "arn:aws:s3:::*" },
+                    }),
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Actions = new[] { "s3:ListBucket","s3:GetBucketLocation" },
+                        Resources = new[] { s3.BucketArn },
+                    }),
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Actions = new[]
+                        {
+                            "s3:PutObject",
+                            "s3:PutObjectAcl",
+                            "s3:GetObject",
+                            "s3:GetObjectAcl",
+                        },
+                        Resources = new[] { $"{s3.BucketArn}/*" },
                     }),
                 }
             });

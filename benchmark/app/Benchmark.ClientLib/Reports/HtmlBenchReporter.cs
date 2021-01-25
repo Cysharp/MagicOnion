@@ -8,7 +8,7 @@ namespace Benchmark.ClientLib.Reports
 {
     public class HtmlBenchReporter
     {
-        public HtmlBenchReport CreateReport(BenchReport[] reports)
+        public HtmlBenchReport CreateReport(BenchReport[] reports, bool generateDetail)
         {
             if (reports == null)
                 throw new ArgumentNullException(nameof(reports));
@@ -46,7 +46,8 @@ namespace Benchmark.ClientLib.Reports
             {
                 SummaryItems = GetSummaryItems(unaryItems.Where(x => x.RequestCount != 0).OrderBy(x => x.RequestCount)),
                 Errors = unaryItems.Sum(x => x.Errors),
-                ClientDurationItems = unaryItems.OrderBy(x => x.Begin)
+                ClientDurationItems = generateDetail 
+                    ? unaryItems.OrderBy(x => x.Begin)
                         .GroupBy(x => (x.ExecuteId, x.Client))
                         .Select(xs => (Client: xs.Key.Client, Items: xs
                             .Where(x => x.RequestCount != 0)
@@ -72,40 +73,43 @@ namespace Benchmark.ClientLib.Reports
                                 .ToArray()
                             )
                         )
-                        .ToArray(),
+                        .ToArray()
+                    : Array.Empty<(string, HtmlBenchReportRequestResultClientDurationItem[])>(),
             };
             var grps = hubItems.OrderBy(x => x.Begin).GroupBy(x => x.RequestCount).ToArray();
             var hubConnectionsResultInfo = new HtmlBenchReportRequestResult
             {
                 SummaryItems = GetSummaryItems(hubItems.Where(x => x.RequestCount != 0).OrderBy(x => x.RequestCount)),
                 Errors = hubItems.Sum(x => x.Errors),
-                ClientDurationItems = hubItems.OrderBy(x => x.Begin)
-                        .GroupBy(x => (x.ExecuteId, x.Client))
-                        .Select(xs => (Client: xs.Key.Client, Items: xs
-                            .Where(x => x.RequestCount != 0)
-                            .GroupBy(x => x.RequestCount)
-                                .Select(xs =>
-                                {
-                                    return new HtmlBenchReportRequestResultClientDurationItem
+                ClientDurationItems = generateDetail
+                    ? hubItems.OrderBy(x => x.Begin)
+                            .GroupBy(x => (x.ExecuteId, x.Client))
+                            .Select(xs => (Client: xs.Key.Client, Items: xs
+                                .Where(x => x.RequestCount != 0)
+                                .GroupBy(x => x.RequestCount)
+                                    .Select(xs =>
                                     {
-                                        RequestCount = xs.Key,
-                                        SummaryItems = xs.Select(x =>
+                                        return new HtmlBenchReportRequestResultClientDurationItem
                                         {
-                                            return new HtmlBenchReportRequestResultSummaryItem
+                                            RequestCount = xs.Key,
+                                            SummaryItems = xs.Select(x =>
                                             {
-                                                RequestCount = x.RequestCount,
-                                                Duration = x.Duration,
-                                                Rps = x.RequestCount / x.Duration.TotalSeconds,
-                                            };
-                                        })
-                                        .ToArray(),
-                                    };
-                                })
-                                .OrderBy(x => x.RequestCount)
-                                .ToArray()
+                                                return new HtmlBenchReportRequestResultSummaryItem
+                                                {
+                                                    RequestCount = x.RequestCount,
+                                                    Duration = x.Duration,
+                                                    Rps = x.RequestCount / x.Duration.TotalSeconds,
+                                                };
+                                            })
+                                            .ToArray(),
+                                        };
+                                    })
+                                    .OrderBy(x => x.RequestCount)
+                                    .ToArray()
+                                )
                             )
-                        )
-                        .ToArray(),
+                            .ToArray()
+                    : Array.Empty<(string, HtmlBenchReportRequestResultClientDurationItem[])>(),
             };
 
             return new HtmlBenchReport(clientInfo, summaryInfo, unaryConnectionsResultInfo, hubConnectionsResultInfo);

@@ -21,12 +21,16 @@ namespace ConsoleAppEcs
             var host = "0.0.0.0";
             var port = int.Parse(Environment.GetEnvironmentVariable("DFRAME_MASTER_CONNECT_TO_PORT") ?? "12345");
             var workerConnectToHost = Environment.GetEnvironmentVariable("DFRAME_MASTER_CONNECT_TO_HOST") ?? $"dframe-master.local";
-            Console.WriteLine($"port: {port}, workerConnectToHost: {workerConnectToHost}");
+            Console.WriteLine($"port {port}, workerConnectToHost {workerConnectToHost}");
+
+            var reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
+            var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
+            Console.WriteLine($"bucket {path}, reportId {reportId}");
 
             if (args.Length == 0)
             {
                 // master
-                args = "request -processCount 1 -workerPerProcess 100 -executePerWorker 1 -workerName UnaryWorker".Split(' ');
+                args = "request -processCount 1 -workerPerProcess 10 -executePerWorker 100 -workerName UnaryWorker".Split(' ');
             }
             else if (args.Contains("--worker-flag"))
             {
@@ -46,13 +50,30 @@ namespace ConsoleAppEcs
                         options.EnableStructuredLogging = false;
                     });
                 })
-                .RunDFrameLoadTestingAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new EcsScalingProvider())
+                .RunDFrameAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new EcsScalingProvider())
                 {
                     Timeout = TimeSpan.FromMinutes(10),
+                    OnExecuteResult = (results, option, scenario) =>
+                    {
+                        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+                        Console.WriteLine("Generating html.");
+                        var benchmarker = new Benchmarker(path, null, cts.Token);
+                        benchmarker.GenerateHtml(reportId, generateDetail: false).GetAwaiter().GetResult();
+                    },
                 });
-                //.RunDFrameLoadTestingAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new InProcessScalingProvider())
-                // {
-                // });
+                //.RunDFrameAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new InProcessScalingProvider())
+                //{
+                //    OnExecuteResult = async (results, option, scenario) => 
+                //    {
+                //        var benchmarker = new Benchmarker(path, null, default);
+                //        var reports = await benchmarker.GetReports(reportId);
+                //        if (reports.Any())
+                //        {
+                //            Console.WriteLine("Generating html.");
+                //            await benchmarker.GenerateHtml(reportId, generateDetail: false);
+                //        }
+                //    },
+                //});
         }
     }
 
@@ -68,11 +89,14 @@ namespace ConsoleAppEcs
         public override async Task SetupAsync(WorkerContext context)
         {
             Console.WriteLine("SetupAsync");
-            _iterations = "100";
+            _iterations = "1,10";
             _cts = new CancellationTokenSource();
             _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
             _reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
+            //_hostAddress = "http://localhost:5000";
+            //_reportId = "abc-123";
+            //var path = "sample-bucket";
             Console.WriteLine($"iterations {_iterations}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
 
             _benchmarker = new Benchmarker(path, null, _cts.Token);
@@ -93,12 +117,6 @@ namespace ConsoleAppEcs
         public override async Task TeardownAsync(WorkerContext context)
         {
             Console.WriteLine("Teardown");
-            var reports = await _benchmarker.GetReports(_reportId);
-            if (reports.Any())
-            {
-                Console.WriteLine("Generating html.");
-                await _benchmarker.GenerateHtml(_reportId);
-            }
             _cts.Cancel();
             _cts.Dispose();
         }

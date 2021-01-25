@@ -58,10 +58,10 @@
         "Benchmark.Client": {}
       }
     },
-    "BenchServer + BenchClientWeb": {
+    "BenchServer + ConsoleAppEcs": {
       "Projects": {
         "Benchmark.Server": {},
-        "Benchmark.Web": {}
+        "ConsoleAppEcs": {}
       }
     }
   }

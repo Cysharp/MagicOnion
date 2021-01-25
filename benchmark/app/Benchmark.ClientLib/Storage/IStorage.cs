@@ -59,7 +59,7 @@ namespace Benchmark.ClientLib.Storage
                 var config = new AmazonS3Config()
                 {
                     RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
-                };                
+                };
                 storage = new AmazonS3Storage(logger, config);
             }
             else if (Environment.GetEnvironmentVariable("BENCHCLIENT_EMULATE_S3") == "1")
@@ -220,17 +220,13 @@ namespace Benchmark.ClientLib.Storage
             _logger?.LogInformation($"downloading content from S3. bucket {path}, prefix {prefix}");
 
             // todo: continuation
-            var objects = await _client.ListObjectsV2Async(new Amazon.S3.Model.ListObjectsV2Request
-            {
-                BucketName = path,
-                Prefix = prefix,
-            }, ct);
+            var objects = await ListObjectsAsync(path, prefix, ct);
 
-            if (objects.KeyCount == 0)
+            if (!objects.Any())
                 return Array.Empty<string>();
 
             var contents = new ConcurrentBag<string>();
-            var tasks = objects.S3Objects.Select(async x =>
+            var tasks = objects.Select(async x =>
             {
                 using var res = await _client.GetObjectAsync(new Amazon.S3.Model.GetObjectRequest
                 {
@@ -256,12 +252,8 @@ namespace Benchmark.ClientLib.Storage
         public async Task<string[]> List(string path, string prefix, CancellationToken ct)
         {
             _logger?.LogInformation($"listing content from S3. bucket {path}, prefix {prefix}");
-            var objects = await _client.ListObjectsV2Async(new Amazon.S3.Model.ListObjectsV2Request
-            {
-                BucketName = path,
-                Prefix = prefix,
-            }, ct);
-            return objects.S3Objects.Select(x => x.Key).ToArray();
+            var objects = await ListObjectsAsync(path, prefix, ct);
+            return objects.Select(x => x.Key).ToArray();
         }
 
         /// <summary>
@@ -325,12 +317,8 @@ namespace Benchmark.ClientLib.Storage
         private async Task<bool> Exists(string bucket, string key, CancellationToken ct)
         {
             var prefix = GetPrefix(key);
-            var lists = await _client.ListObjectsV2Async(new Amazon.S3.Model.ListObjectsV2Request
-            {
-                BucketName = bucket,
-                Prefix = prefix,
-            }, ct);
-            return lists.S3Objects.Any(x => x.Key == key);
+            var objects = await ListObjectsAsync(bucket, prefix, ct);
+            return objects.Any(x => x.Key == key);
         }
 
         private static string GetPrefix(string path)
@@ -388,6 +376,25 @@ namespace Benchmark.ClientLib.Storage
             var extension = ".";
             extension += files[^1];
             return extension;
+        }
+
+        private async Task<List<Amazon.S3.Model.S3Object>> ListObjectsAsync(string bucket, string prefix, CancellationToken ct = default)
+        {
+            var request = new Amazon.S3.Model.ListObjectsV2Request
+            {
+                BucketName = bucket,
+                Prefix = prefix,
+            };
+            var objects = new List<Amazon.S3.Model.S3Object>();
+            Amazon.S3.Model.ListObjectsV2Response response;
+
+            do
+            {
+                response = await _client.ListObjectsV2Async(request, ct);
+                objects.AddRange(response.S3Objects);
+                request.ContinuationToken = response.ContinuationToken;
+            } while (response.IsTruncated);
+            return objects;
         }
     }
 }

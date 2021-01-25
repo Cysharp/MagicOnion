@@ -194,16 +194,19 @@ namespace Benchmark.ClientLib
         /// Generate Report Html
         /// </summary>
         /// <param name="reportId"></param>
+        /// <param name="generateDetail"></param>
         /// <param name="htmlFileName"></param>
         /// <returns></returns>
-        public async Task GenerateHtml(string reportId, string htmlFileName = "index.html")
+        public async Task GenerateHtml(string reportId, bool generateDetail = true, string htmlFileName = "index.html")
         {
             // access s3 and download json from reportId
             var reports = await GetReports(reportId);
+            if (!reports.Any())
+                return;
 
             // generate html based on json data
             var htmlReporter = new HtmlBenchReporter();
-            var htmlReport = htmlReporter.CreateReport(reports);
+            var htmlReport = htmlReporter.CreateReport(reports, generateDetail);
             var page = new BenchmarkReportPageTemplate()
             {
                 Report = htmlReport,
