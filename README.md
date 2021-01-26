@@ -37,7 +37,7 @@ MagicOnion client supports a wide range of platforms, including .NET Framework 4
 - Client-side (MagicOnion.Client)
     - .NET Standard 2.1 (.NET Core 3.x+, .NET 5.0+, Xamarin)
     - .NET Standard 2.0 (.NET Framework 4.6.1+, Universal Windows Platform, .NET Core 2.x)
-    - Unity 2018.3+
+    - Unity 2018.4.13f1+
 
 ## Quick Start
 ### Server-side project
@@ -856,7 +856,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 # Clients
 
 ## Support for Unity client
-MagicOnion supports Unity version, which is available for `.NET 4.x` runtime and C# 7.3 or later. (Unity 2018.3+)
+MagicOnion supports Unity version, which is available for `.NET 4.x` runtime and Unity 2018.4.13f1+ or latest. (C# 7.3)
 
 Using MagicOnion with Unity client requires the following four things:
 
@@ -1293,7 +1293,7 @@ public interface IMyFirstService : IService<IMyFirstService>
 // Server
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
-    // VisualStudio 2017(C# 7.0), Unity 2018.3 supports return `async UnaryResult` directly
+    // VisualStudio 2017(C# 7.0), Unity 2018.3+ supports return `async UnaryResult` directly
     // I recommend disable async-warning on project level. <NoWarn>1998</NoWarn>
     public async UnaryResult<string> SumAsync(int x, int y)
     {
@@ -1377,7 +1377,7 @@ Client sample.
 ```csharp
 static async Task UnaryRun(IMyFirstService client)
 {
-    // await(C# 7.0, Unity 2018.3)
+    // await(C# 7.0, Unity 2018.3+)
     var vvvvv = await client.SumAsync(10, 20);
     Console.WriteLine("SumAsync:" + vvvvv);
     
