@@ -1,7 +1,8 @@
 {
     "name": "MagicOnion.Abstractions",
     "references": [
-        "MessagePack"
+        "MessagePack",
+        "MessagePack.Annotations"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
