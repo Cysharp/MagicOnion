@@ -26,7 +26,7 @@ MagicOnion.IgnoreAttribute</Description>
 
   <!-- Copy files for unity MagicOnion -->
    <PropertyGroup>
-     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Abstractions\</DestinationRoot>
+     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Abstractions\</DestinationRoot>
    </PropertyGroup>
    <ItemGroup>
      <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;InternalsVisibleTo.cs" />

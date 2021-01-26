@@ -33,7 +33,7 @@
 
   <!-- Sync codes: MagicOnion.Client for Unity -->
   <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Client\</DestinationRoot>
+    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</DestinationRoot>
   </PropertyGroup>
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
