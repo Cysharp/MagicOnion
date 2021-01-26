@@ -1,0 +1,17 @@
+  {
+    "name": "com.cysharp.magiconion.unity",
+    "displayName": "MagicOnion.Unity",
+    "version": "4.0.4",
+    "unity": "2018.3",
+    "description": "Unified Realtime/API framework for .NET platform and Unity.",
+    "keywords": [
+      "grpc",
+      "magiconion"
+    ],
+    "license": "MIT",
+    "category": "grpc",
+    "dependencies": {
+      "com.cysharp.magiconion.abstractions": "4.0.4",
+      "com.cysharp.magiconion.client": "4.0.4"
+    }
+  }

@@ -1,0 +1,16 @@
+  {
+    "name": "com.cysharp.magiconion.abstractions",
+    "displayName": "MagicOnion.Abstractions",
+    "version": "4.0.4",
+    "unity": "2018.3",
+    "description": "Unified Realtime/API framework for .NET platform and Unity.",
+    "keywords": [
+      "grpc",
+      "magiconion"
+    ],
+    "license": "MIT",
+    "category": "grpc",
+    "dependencies": {
+      "com.neuecc.messagepack": "2.1.90"
+    }
+  }
