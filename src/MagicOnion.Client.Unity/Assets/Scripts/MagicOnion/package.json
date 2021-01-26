@@ -10,7 +10,5 @@
     ],
     "license": "MIT",
     "category": "grpc",
-    "dependencies": {
-      "com.neuecc.messagepack": "2.1.90"
-    }
+    "dependencies": {}
   }
