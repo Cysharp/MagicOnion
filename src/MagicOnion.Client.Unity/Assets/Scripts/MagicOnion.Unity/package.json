@@ -11,7 +11,6 @@
     "license": "MIT",
     "category": "grpc",
     "dependencies": {
-      "com.cysharp.magiconion.abstractions": "4.0.4",
-      "com.cysharp.magiconion.client": "4.0.4"
+      "com.neuecc.messagepack": "2.1.90"
     }
   }
