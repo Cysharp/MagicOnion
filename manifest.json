@@ -1977,7 +1977,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.IMagicOnionServerBuilder.html",
-          "hash": "oijEo7/MJ0aMf9IMFShUtA=="
+          "hash": "ggSJ5QXFkJI23Aiw04v+zA=="
         }
       },
       "is_incremental": false,
@@ -2153,11 +2153,23 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionActivitySources.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionActivitySources.html",
+          "hash": "PsahoNJXCowjAltNlBDEgw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.yml",
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryMeterFactoryOption.html",
-          "hash": "3JRmWOMZXEzTyLfxGojQ/A=="
+          "hash": "bkI6iy2vzgDPCeXMsdSvvw=="
         }
       },
       "is_incremental": false,
@@ -2169,7 +2181,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html",
-          "hash": "NPo30rGua/D8rY8mS4F0zg=="
+          "hash": "4jwY53DWwSCY+8Lr54AVyQ=="
         }
       },
       "is_incremental": false,
@@ -2189,11 +2201,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.yml",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorMeterLogger.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorFilterFactoryAttribute.html",
-          "hash": "jvrjWOuqwRUsM1UX6GY4eg=="
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorMeterLogger.html",
+          "hash": "ARdL1MRMr2lusZ35E33toA=="
         }
       },
       "is_incremental": false,
@@ -2201,11 +2213,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorLogger.yml",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorTracerFilterFactoryAttribute.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorLogger.html",
-          "hash": "1EXY9HqoAlOcg2JPPLI8Qg=="
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryCollectorTracerFilterFactoryAttribute.html",
+          "hash": "pk7qjwE3tYypzrLlw6pZZQ=="
         }
       },
       "is_incremental": false,
@@ -2213,11 +2225,23 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.yml",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHubCollectorFilterFactoryAttribute.html",
-          "hash": "n/ES57PHArdjx8LkF5M90w=="
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper.html",
+          "hash": "cfkBa7eQHcQi9ikA6NoroQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHubCollectorTracerFilterFactoryAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryHubCollectorTracerFilterFactoryAttribute.html",
+          "hash": "pTd9YV87B2G2J2Cif1TiNw=="
         }
       },
       "is_incremental": false,
@@ -2229,19 +2253,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetryServiceCollectionExtensions.html",
-          "hash": "0Wt9/bgrN2jjRLfkzurMdQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetrygRpcStatusHelper.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.Server.OpenTelemetry.OpenTelemetrygRpcStatusHelper.html",
-          "hash": "vNoT+g2MBK4cFLwM3PwQWA=="
+          "hash": "KBIBfP+EWNjAvEnuZmgItg=="
         }
       },
       "is_incremental": false,
@@ -2277,7 +2289,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.OpenTelemetry.html",
-          "hash": "OkTNinLEtPOPJMw/mxs9Cg=="
+          "hash": "xk+99Gmlh7p69D/AHKt77w=="
         }
       },
       "is_incremental": false,
@@ -2637,7 +2649,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "23GOVmoC4dwGXnHq0vvEzQ=="
+          "hash": "9eq1r2VH3bifX36jjd0wUg=="
         }
       },
       "is_incremental": false,
@@ -2724,7 +2736,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 219,
+          "total_file_count": 220,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
