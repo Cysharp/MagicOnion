@@ -2,14 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="0.5.0-beta.2" />
-    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="0.5.0-beta.2" />
-    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="0.5.0-beta.2" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc1.1" />
   </ItemGroup>
 
   <ItemGroup>

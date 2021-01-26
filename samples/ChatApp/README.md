@@ -9,15 +9,8 @@ https://github.com/Cysharp/MagicOnion
 
 To run simple ChatApp.Server, 
 
-1. Launch `ChatApp.Server` from VisualStudio.  
-2. Run `ChatScene` from UnityEditor.  
-
-To run ChatApp.Server with OpenTelemetry,
-
-1. Launch `ChatApp.Server.Telemetry` from VisualStudio.  
-2. Run `ChatScene` from UnityEditor.  
-
-If you want launch on Container, see [Container support](#container-support) section.
+1. Launch `ChatApp.Server` from VisualStudio. 
+2. Run `ChatScene` from UnityEditor. 
 
 ### ChatApp.Server
 

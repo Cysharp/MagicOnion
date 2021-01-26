@@ -12,11 +12,11 @@ namespace ChatApp.Server
     /// <summary>
     /// A HTTP listener used to expose Prometheus metrics.
     /// </summary>
-    sealed class PrometheusExporterMetricsHttpServerCustom : IDisposable
+    internal class PrometheusExporterMetricsHttpServerCustom : IDisposable
     {
         private readonly PrometheusExporter exporter;
         private readonly HttpListener httpListener = new HttpListener();
-        private readonly object lck = new object();
+        private readonly object syncObject = new object();
 
         private CancellationTokenSource tokenSource;
         private Task workerThread;
@@ -25,10 +25,9 @@ namespace ChatApp.Server
         /// Initializes a new instance of the <see cref="PrometheusExporterMetricsHttpServer"/> class.
         /// </summary>
         /// <param name="exporter">The <see cref="PrometheusExporter"/> instance.</param>
-        /// <param name="listenerUrl">listener endpoint</param>
         public PrometheusExporterMetricsHttpServerCustom(PrometheusExporter exporter, string listenerUrl)
         {
-            this.exporter = exporter;
+            this.exporter = exporter ?? throw new ArgumentNullException(nameof(exporter));
             this.httpListener.Prefixes.Add(listenerUrl);
         }
 
@@ -38,7 +37,7 @@ namespace ChatApp.Server
         /// <param name="token">An optional <see cref="CancellationToken"/> that can be used to stop the htto server.</param>
         public void Start(CancellationToken token = default)
         {
-            lock (this.lck)
+            lock (this.syncObject)
             {
                 if (this.tokenSource != null)
                 {
@@ -50,7 +49,7 @@ namespace ChatApp.Server
                     new CancellationTokenSource() :
                     CancellationTokenSource.CreateLinkedTokenSource(token);
 
-                this.workerThread = Task.Factory.StartNew((Action)this.WorkerThread, TaskCreationOptions.LongRunning);
+                this.workerThread = Task.Factory.StartNew(this.WorkerThread, default, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
         }
 
@@ -59,7 +58,7 @@ namespace ChatApp.Server
         /// </summary>
         public void Stop()
         {
-            lock (this.lck)
+            lock (this.syncObject)
             {
                 if (this.tokenSource == null)
                 {
@@ -72,14 +71,23 @@ namespace ChatApp.Server
             }
         }
 
-        /// <summary>
-        /// Disposes of managed resources.
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by this class and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
         {
             if (this.httpListener != null && this.httpListener.IsListening)
             {
                 this.Stop();
+                this.httpListener.Close();
             }
         }
 
@@ -99,20 +107,16 @@ namespace ChatApp.Server
                     ctx.Response.StatusCode = 200;
                     ctx.Response.ContentType = "text/plain; version = 0.0.4";
 
-                    using (var output = ctx.Response.OutputStream)
-                    using (var writer = new StreamWriter(output))
-                    {
-                        this.exporter.WriteMetricsCollection(writer);
-                    }
+                    using var output = ctx.Response.OutputStream;
+                    using var writer = new StreamWriter(output);
+                    this.exporter.WriteMetricsCollection(writer);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                // this will happen when cancellation will be requested
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: report error
             }
             finally
             {

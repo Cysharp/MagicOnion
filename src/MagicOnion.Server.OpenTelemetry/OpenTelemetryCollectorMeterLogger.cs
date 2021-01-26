@@ -2,20 +2,18 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Grpc.Core;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>
-    /// Collect OpemTelemetry Meter Metrics.
+    /// Collect OpemTelemetry Meter Logger.
     /// </summary>
-    public class OpenTelemetryCollectorLogger : IMagicOnionLogger
+    public class OpenTelemetryCollectorMeterLogger : IMagicOnionLogger
     {
-        static readonly string MethodKey = "method";
+        const string MethodKey = "method";
 
         readonly IEnumerable<KeyValuePair<string, string>> defaultLabels;
         readonly ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>> labelCache = new ConcurrentDictionary<string, HashSet<KeyValuePair<string, string>>>();
@@ -40,7 +38,7 @@ namespace MagicOnion.Server.OpenTelemetry
         readonly MeasureMetric<long> broadcastRequestSizeMeasure;
         readonly CounterMetric<long> broadcastGroupCounter;
 
-        public OpenTelemetryCollectorLogger(MeterProvider meterProvider, string metricsPrefix = "magiconion", string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
+        public OpenTelemetryCollectorMeterLogger(MeterProvider meterProvider, string meterName = "MagicOnion", string metricsPrefix = "magiconion", string version = null, IEnumerable<KeyValuePair<string, string>> defaultLabels = null)
         {
             if (meterProvider == null) throw new ArgumentNullException(nameof(meterProvider));
 
@@ -48,7 +46,7 @@ namespace MagicOnion.Server.OpenTelemetry
             this.defaultLabels = defaultLabels ?? Array.Empty<KeyValuePair<string, string>>();
 
             // todo: how to description?
-            var meter = meterProvider.GetMeter("MagicOnion", version);
+            var meter = meterProvider.GetMeter(meterName, version);
 
             // Service build time. ms
             buildServiceDefinitionMeasure = meter.CreateDoubleMeasure($"{metricsPrefix}_buildservicedefinition_duration_milliseconds"); // sum
@@ -198,18 +196,22 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
         {
+            // todo: read stream count
         }
 
         public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
         {
+            // todo: write stream count
         }
 
         public void Error(Exception ex, ServerCallContext context)
         {
+            // todo: exception count
         }
 
         public void Error(Exception ex, StreamingHubContext context)
         {
+            // todo: exception count
         }
     }
 }
