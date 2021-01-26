@@ -12,7 +12,7 @@ on:
         default: "false"
 
 jobs:
-  stale:
+  update:
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ github.event.inputs.version }}
