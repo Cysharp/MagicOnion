@@ -14,9 +14,9 @@ public static class PackageExporter
         // configure
         var roots = new[]
         {
-            "Scripts/MagicOnion.Client",
-            "Scripts/MagicOnion.Abstractions",
-            "Scripts/MagicOnion.Unity",
+            "Scripts/MagicOnion/MagicOnion.Client",
+            "Scripts/MagicOnion/MagicOnion.Abstractions",
+            "Scripts/MagicOnion/MagicOnion.Unity",
         };
         var fileName = string.IsNullOrEmpty(version) ? "MagicOnion.Client.Unity.unitypackage" : $"MagicOnion.Client.Unity.{version}.unitypackage";
         var exportPath = "./" + fileName;
