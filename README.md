@@ -856,7 +856,7 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 # Clients
 
 ## Support for Unity client
-MagicOnion supports Unity version, which is available for `.NET 4.x` runtime and Unity 2018.4.13f1+ or latest. (C# 7.3)
+MagicOnion supports from Unity version 2018.4.13f1 and above, which is available for `.NET 4.x` runtime and C# 7.3 or latest.
 
 Using MagicOnion with Unity client requires the following four things:
 
