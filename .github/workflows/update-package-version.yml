@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Unity Package Version you want update to. (sample 1.0.0)"
+        description: "version: Unity Package Version you want update to. (sample 1.0.0)"
         required: true
       dry_run:
-        description: "dry run. true will never create commit/pr."
+        description: "dry_run: true will never create commit/pr."
         required: true
         default: "false"
 
