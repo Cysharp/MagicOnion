@@ -18,6 +18,7 @@ namespace MessagePack
         /// <summary>
         /// Serialize an object to JSON string.
         /// </summary>
+        /// <exception cref="MessagePackSerializationException">Thrown if an error occurs during serialization.</exception>
         public static void SerializeToJson<T>(TextWriter textWriter, T obj, MessagePackSerializerOptions options = null, CancellationToken cancellationToken = default)
         {
             using (var sequenceRental = SequencePool.Shared.Rent())
@@ -39,6 +40,7 @@ namespace MessagePack
         /// <summary>
         /// Serialize an object to JSON string.
         /// </summary>
+        /// <exception cref="MessagePackSerializationException">Thrown if an error occurs during serialization.</exception>
         public static string SerializeToJson<T>(T obj, MessagePackSerializerOptions options = null, CancellationToken cancellationToken = default)
         {
             var writer = new StringWriter();
@@ -49,11 +51,13 @@ namespace MessagePack
         /// <summary>
         /// Convert a message-pack binary to a JSON string.
         /// </summary>
+        /// <exception cref="MessagePackSerializationException">Thrown if an error occurs while reading the messagepack data or writing out the JSON.</exception>
         public static string ConvertToJson(ReadOnlyMemory<byte> bytes, MessagePackSerializerOptions options = null, CancellationToken cancellationToken = default) => ConvertToJson(new ReadOnlySequence<byte>(bytes), options, cancellationToken);
 
         /// <summary>
         /// Convert a message-pack binary to a JSON string.
         /// </summary>
+        /// <exception cref="MessagePackSerializationException">Thrown if an error occurs while reading the messagepack data or writing out the JSON.</exception>
         public static string ConvertToJson(in ReadOnlySequence<byte> bytes, MessagePackSerializerOptions options = null, CancellationToken cancellationToken = default)
         {
             var jsonWriter = new StringWriter();
@@ -68,6 +72,7 @@ namespace MessagePack
         /// <summary>
         /// Convert a message-pack binary to a JSON string.
         /// </summary>
+        /// <exception cref="MessagePackSerializationException">Thrown if an error occurs while reading the messagepack data or writing out the JSON.</exception>
         public static void ConvertToJson(ref MessagePackReader reader, TextWriter jsonWriter, MessagePackSerializerOptions options = null)
         {
             if (reader.End)
@@ -76,32 +81,39 @@ namespace MessagePack
             }
 
             options = options ?? DefaultOptions;
-            if (options.Compression == MessagePackCompression.Lz4Block)
+            try
             {
-                using (var scratchRental = SequencePool.Shared.Rent())
+                if (options.Compression.IsCompression())
                 {
-                    if (TryDecompress(ref reader, scratchRental.Value))
+                    using (var scratchRental = SequencePool.Shared.Rent())
                     {
-                        var scratchReader = new MessagePackReader(scratchRental.Value)
+                        if (TryDecompress(ref reader, scratchRental.Value))
                         {
-                            CancellationToken = reader.CancellationToken,
-                        };
-                        if (scratchReader.End)
-                        {
-                            return;
-                        }
+                            var scratchReader = new MessagePackReader(scratchRental.Value)
+                            {
+                                CancellationToken = reader.CancellationToken,
+                            };
+                            if (scratchReader.End)
+                            {
+                                return;
+                            }
 
-                        ToJsonCore(ref scratchReader, jsonWriter);
-                    }
-                    else
-                    {
-                        ToJsonCore(ref reader, jsonWriter);
+                            ToJsonCore(ref scratchReader, jsonWriter, options);
+                        }
+                        else
+                        {
+                            ToJsonCore(ref reader, jsonWriter, options);
+                        }
                     }
                 }
+                else
+                {
+                    ToJsonCore(ref reader, jsonWriter, options);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ToJsonCore(ref reader, jsonWriter);
+                throw new MessagePackSerializationException("Error occurred while translating msgpack to JSON.", ex);
             }
         }
 
@@ -253,7 +265,7 @@ namespace MessagePack
             return count;
         }
 
-        private static void ToJsonCore(ref MessagePackReader reader, TextWriter writer)
+        private static void ToJsonCore(ref MessagePackReader reader, TextWriter writer, MessagePackSerializerOptions options)
         {
             MessagePackType type = reader.NextMessagePackType;
             switch (type)
@@ -293,56 +305,73 @@ namespace MessagePack
                 case MessagePackType.Array:
                     {
                         int length = reader.ReadArrayHeader();
-                        writer.Write("[");
-                        for (int i = 0; i < length; i++)
+                        options.Security.DepthStep(ref reader);
+                        try
                         {
-                            ToJsonCore(ref reader, writer);
-
-                            if (i != length - 1)
+                            writer.Write("[");
+                            for (int i = 0; i < length; i++)
                             {
-                                writer.Write(",");
+                                ToJsonCore(ref reader, writer, options);
+
+                                if (i != length - 1)
+                                {
+                                    writer.Write(",");
+                                }
                             }
+
+                            writer.Write("]");
+                        }
+                        finally
+                        {
+                            reader.Depth--;
                         }
 
-                        writer.Write("]");
                         return;
                     }
 
                 case MessagePackType.Map:
                     {
                         int length = reader.ReadMapHeader();
-                        writer.Write("{");
-                        for (int i = 0; i < length; i++)
+                        options.Security.DepthStep(ref reader);
+                        try
                         {
-                            // write key
+                            writer.Write("{");
+                            for (int i = 0; i < length; i++)
                             {
-                                MessagePackType keyType = reader.NextMessagePackType;
-                                if (keyType == MessagePackType.String || keyType == MessagePackType.Binary)
+                                // write key
                                 {
-                                    ToJsonCore(ref reader, writer);
+                                    MessagePackType keyType = reader.NextMessagePackType;
+                                    if (keyType == MessagePackType.String || keyType == MessagePackType.Binary)
+                                    {
+                                        ToJsonCore(ref reader, writer, options);
+                                    }
+                                    else
+                                    {
+                                        writer.Write("\"");
+                                        ToJsonCore(ref reader, writer, options);
+                                        writer.Write("\"");
+                                    }
                                 }
-                                else
+
+                                writer.Write(":");
+
+                                // write body
                                 {
-                                    writer.Write("\"");
-                                    ToJsonCore(ref reader, writer);
-                                    writer.Write("\"");
+                                    ToJsonCore(ref reader, writer, options);
+                                }
+
+                                if (i != length - 1)
+                                {
+                                    writer.Write(",");
                                 }
                             }
 
-                            writer.Write(":");
-
-                            // write body
-                            {
-                                ToJsonCore(ref reader, writer);
-                            }
-
-                            if (i != length - 1)
-                            {
-                                writer.Write(",");
-                            }
+                            writer.Write("}");
                         }
-
-                        writer.Write("}");
+                        finally
+                        {
+                            reader.Depth--;
+                        }
 
                         return;
                     }
@@ -363,7 +392,7 @@ namespace MessagePack
                         var privateBuilder = new StringBuilder();
                         var typeNameTokenBuilder = new StringBuilder();
                         SequencePosition positionBeforeTypeNameRead = reader.Position;
-                        ToJsonCore(ref reader, new StringWriter(typeNameTokenBuilder));
+                        ToJsonCore(ref reader, new StringWriter(typeNameTokenBuilder), options);
                         int typeNameReadSize = (int)reader.Sequence.Slice(positionBeforeTypeNameRead, reader.Position).Length;
                         if (extHeader.Length > typeNameReadSize)
                         {
@@ -374,7 +403,7 @@ namespace MessagePack
                                 privateBuilder.Append("{");
                             }
 
-                            ToJsonCore(ref reader, new StringWriter(privateBuilder));
+                            ToJsonCore(ref reader, new StringWriter(privateBuilder), options);
 
                             // insert type name token to start of object map or array
                             if (typeInside != MessagePackType.Array)
@@ -404,12 +433,12 @@ namespace MessagePack
 #endif
                     else
                     {
-                        ExtensionResult ext = reader.ReadExtensionFormat();
+                        var data = reader.ReadRaw((long)extHeader.Length);
                         writer.Write("[");
-                        writer.Write(ext.TypeCode);
+                        writer.Write(extHeader.TypeCode);
                         writer.Write(",");
                         writer.Write("\"");
-                        writer.Write(Convert.ToBase64String(ext.Data.ToArray()));
+                        writer.Write(Convert.ToBase64String(data.ToArray()));
                         writer.Write("\"");
                         writer.Write("]");
                     }
