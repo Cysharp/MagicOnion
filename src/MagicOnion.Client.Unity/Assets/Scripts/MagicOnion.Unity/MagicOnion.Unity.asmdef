@@ -9,7 +9,10 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Grpc.Core.dll",
+        "Grpc.Core.Api.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": []
 }
