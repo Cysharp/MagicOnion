@@ -84,17 +84,20 @@ namespace MessagePack.Formatters
             {
                 return null;
             }
-            else
-            {
-                var len = reader.ReadArrayHeader();
-                var array = new String[len];
-                for (int i = 0; i < array.Length; i++)
-                {
-                    array[i] = reader.ReadString();
-                }
 
-                return array;
+            var len = reader.ReadArrayHeader();
+            if (len == 0)
+            {
+                return Array.Empty<String>();
             }
+
+            var array = new String[len];
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = reader.ReadString();
+            }
+
+            return array;
         }
     }
 
@@ -108,13 +111,83 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, decimal value, MessagePackSerializerOptions options)
         {
-            writer.Write(value.ToString(CultureInfo.InvariantCulture));
-            return;
+            var dest = writer.GetSpan(MessagePackRange.MaxFixStringLength);
+            if (System.Buffers.Text.Utf8Formatter.TryFormat(value, dest.Slice(1), out var written))
+            {
+                // write header
+                dest[0] = (byte)(MessagePackCode.MinFixStr | written);
+                writer.Advance(written + 1);
+            }
+            else
+            {
+                // reset writer's span previously acquired that does not use
+                writer.Advance(0);
+                writer.Write(value.ToString(CultureInfo.InvariantCulture));
+            }
         }
 
         public decimal Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            return decimal.Parse(reader.ReadString(), CultureInfo.InvariantCulture);
+            if (!(reader.ReadStringSequence() is ReadOnlySequence<byte> sequence))
+            {
+                throw new MessagePackSerializationException(string.Format("Unexpected msgpack code {0} ({1}) encountered.", MessagePackCode.Nil, MessagePackCode.ToFormatName(MessagePackCode.Nil)));
+            }
+
+            if (sequence.IsSingleSegment)
+            {
+                var span = sequence.First.Span;
+                if (System.Buffers.Text.Utf8Parser.TryParse(span, out decimal result, out var bytesConsumed))
+                {
+                    if (span.Length != bytesConsumed)
+                    {
+                        throw new MessagePackSerializationException("Unexpected length of string.");
+                    }
+
+                    return result;
+                }
+            }
+            else
+            {
+                // sequence.Length is not free
+                var seqLen = (int)sequence.Length;
+                if (seqLen < 128)
+                {
+                    Span<byte> span = stackalloc byte[seqLen];
+                    sequence.CopyTo(span);
+                    if (System.Buffers.Text.Utf8Parser.TryParse(span, out decimal result, out var bytesConsumed))
+                    {
+                        if (seqLen != bytesConsumed)
+                        {
+                            throw new MessagePackSerializationException("Unexpected length of string.");
+                        }
+
+                        return result;
+                    }
+                }
+                else
+                {
+                    var rentArray = ArrayPool<byte>.Shared.Rent(seqLen);
+                    try
+                    {
+                        sequence.CopyTo(rentArray);
+                        if (System.Buffers.Text.Utf8Parser.TryParse(rentArray.AsSpan(0, seqLen), out decimal result, out var bytesConsumed))
+                        {
+                            if (seqLen != bytesConsumed)
+                            {
+                                throw new MessagePackSerializationException("Unexpected length of string.");
+                            }
+
+                            return result;
+                        }
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(rentArray);
+                    }
+                }
+            }
+
+            throw new MessagePackSerializationException("Can't parse to decimal, input string was not in a correct format.");
         }
     }
 
@@ -227,7 +300,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.Write(value.ToString());
+                writer.Write(value.OriginalString);
             }
         }
 
@@ -298,9 +371,17 @@ namespace MessagePack.Formatters
             }
 
             IFormatterResolver resolver = options.Resolver;
-            TKey key = resolver.GetFormatterWithVerify<TKey>().Deserialize(ref reader, options);
-            TValue value = resolver.GetFormatterWithVerify<TValue>().Deserialize(ref reader, options);
-            return new KeyValuePair<TKey, TValue>(key, value);
+            options.Security.DepthStep(ref reader);
+            try
+            {
+                TKey key = resolver.GetFormatterWithVerify<TKey>().Deserialize(ref reader, options);
+                TValue value = resolver.GetFormatterWithVerify<TValue>().Deserialize(ref reader, options);
+                return new KeyValuePair<TKey, TValue>(key, value);
+            }
+            finally
+            {
+                reader.Depth--;
+            }
         }
     }
 
@@ -395,6 +476,27 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, System.Numerics.BigInteger value, MessagePackSerializerOptions options)
         {
+#if NETCOREAPP
+            if (!writer.OldSpec)
+            {
+                // try to get bin8 buffer.
+                var span = writer.GetSpan(byte.MaxValue);
+                if (value.TryWriteBytes(span.Slice(2), out var written))
+                {
+                    span[0] = MessagePackCode.Bin8;
+                    span[1] = (byte)written;
+
+                    writer.Advance(written + 2);
+                    return;
+                }
+                else
+                {
+                    // reset writer's span previously acquired that does not use
+                    writer.Advance(0);
+                }
+            }
+#endif
+
             writer.Write(value.ToByteArray());
             return;
         }
@@ -402,7 +504,7 @@ namespace MessagePack.Formatters
         public System.Numerics.BigInteger Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             ReadOnlySequence<byte> bytes = reader.ReadBytes().Value;
-#if NETCOREAPP2_1
+#if NETCOREAPP
             if (bytes.IsSingleSegment)
             {
                 return new System.Numerics.BigInteger(bytes.First.Span);
@@ -482,11 +584,55 @@ namespace MessagePack.Formatters
             }
             else
             {
-                // deserialize immediately(no delay, because capture byte[] causes memory leak)
-                IFormatterResolver resolver = options.Resolver;
-                T v = resolver.GetFormatterWithVerify<T>().Deserialize(ref reader, options);
-                return new Lazy<T>(() => v);
+                options.Security.DepthStep(ref reader);
+                try
+                {
+                    // deserialize immediately(no delay, because capture byte[] causes memory leak)
+                    IFormatterResolver resolver = options.Resolver;
+                    T v = resolver.GetFormatterWithVerify<T>().Deserialize(ref reader, options);
+                    return new Lazy<T>(() => v);
+                }
+                finally
+                {
+                    reader.Depth--;
+                }
             }
+        }
+    }
+
+    /// <summary>
+    /// Serializes any instance of <see cref="Type"/> by its <see cref="Type.AssemblyQualifiedName"/> value.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="Type"/> class itself or a derived type.</typeparam>
+    public sealed class TypeFormatter<T> : IMessagePackFormatter<T>
+        where T : Type
+    {
+        public static readonly IMessagePackFormatter<T> Instance = new TypeFormatter<T>();
+
+        private TypeFormatter()
+        {
+        }
+
+        public void Serialize(ref MessagePackWriter writer, T value, MessagePackSerializerOptions options)
+        {
+            if (value is null)
+            {
+                writer.WriteNil();
+            }
+            else
+            {
+                writer.Write(value.AssemblyQualifiedName);
+            }
+        }
+
+        public T Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            return (T)Type.GetType(reader.ReadString(), throwOnError: true);
         }
     }
 }

@@ -1,15 +1,18 @@
 {
-    "name": "MagicOnion.Unity",
+    "name": "MagicOnion.Abstractions",
     "references": [
-        "MagicOnion.Abstractions",
-        "MagicOnion.Client"
+        "MessagePack",
+        "MessagePack.Annotations"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Grpc.Core.dll",
+        "Grpc.Core.Api.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": []
 }
