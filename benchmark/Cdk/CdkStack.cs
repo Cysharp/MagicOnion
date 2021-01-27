@@ -116,54 +116,52 @@ namespace Cdk
                 GroupMetrics = new[] { GroupMetrics.All() },
                 Role = iamEc2MagicOnionRole,
                 UpdatePolicy = UpdatePolicy.ReplacingUpdate(),
-                Signals = Signals.WaitForAll(new SignalsOptions
+                Signals = Signals.WaitForCount(1, new SignalsOptions
                 {
                     Timeout = Duration.Minutes(10),
                 }),
             });
             asg.AddUserData(@$"#!/bin/bash
 # install .NET 5
-sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
-sudo yum install -y dotnet-sdk-5.0 aspnetcore-runtime-5.0
+rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
+yum install -y dotnet-sdk-5.0 aspnetcore-runtime-5.0
 . /etc/profile.d/dotnet-cli-tools-bin-path.sh
 # download server
 mkdir -p /var/MagicOnion.Benchmark/server
 aws s3 sync --exact-timestamps s3://{s3.BucketName}/assembly/linux/server/ ~/server
-sudo chmod +x ~/server/Benchmark.Server
-sudo cp -Rf ~/server/ /var/MagicOnion.Benchmark/.
-sudo cp -f /var/MagicOnion.Benchmark/server/Benchmark.Server.service /etc/systemd/system/.
-sudo systemctl enable Benchmark.Server
-sudo systemctl restart Benchmark.Server
+chmod +x ~/server/Benchmark.Server
+cp -Rf ~/server/ /var/MagicOnion.Benchmark/.
+cp -f /var/MagicOnion.Benchmark/server/Benchmark.Server.service /etc/systemd/system/.
+systemctl enable Benchmark.Server
+systemctl restart Benchmark.Server
 
 # cloudmap
-sudo yum update -y && sudo yum install -y jq
 EC2_METADATA=http://169.254.169.254/latest
-REGION=$(curl -s $EC2_METADATA/dynamic/instance-identity/document | jq -r '.region')
 INSTANCE_ID=$(curl -s $EC2_METADATA/meta-data/instance-id);
 INSTANCE_IP=$(curl -s $EC2_METADATA/meta-data/local-ipv4);
 
 sudo cat > /etc/init.d/cloudmap-register <<-EOF
 #! /bin/bash -ex
 aws servicediscovery register-instance \
-    --region $REGION \
+    --region {this.Region} \
     --service-id {serviceDiscoveryServer.ServiceId} \
     --instance-id $INSTANCE_ID \
     --attributes AWS_INSTANCE_IPV4=$INSTANCE_IP,AWS_INSTANCE_PORT=80
 exit 0
 EOF
-sudo chmod a+x /etc/init.d/cloudmap-register
+chmod a+x /etc/init.d/cloudmap-register
 
 sudo cat > /etc/init.d/cloudmap-deregister <<-EOF
 #! /bin/bash -ex
 aws servicediscovery deregister-instance \
-    --region $REGION \
-    --service-id {serviceDiscoveryServer.ServiceId} \
-    --instance-id $INSTANCE_ID
+ --region {this.Region} \
+ --service-id {serviceDiscoveryServer.ServiceId} \
+ --instance-id $INSTANCE_ID
 exit 0
 EOF
-sudo chmod a+x /etc/init.d/cloudmap-deregister
+chmod a+x /etc/init.d/cloudmap-deregister
 
-sudo cat > /usr/lib/systemd/system/cloudmap.service <<-EOF
+cat > /usr/lib/systemd/system/cloudmap.service <<-EOF
 [Unit]
 Description=Run CloudMap service
 Requires=network-online.target network.target
@@ -181,9 +179,11 @@ ExecStop=/etc/init.d/cloudmap-deregister
 WantedBy=multi-user.target
 EOF
 
-sudo systemctl enable cloudmap.service
-sudo systemctl start  cloudmap.service
+systemctl enable cloudmap.service
+systemctl start  cloudmap.service
+
 ".Replace("\r\n", "\n"));
+            asg.UserData.AddSignalOnExitCommand(asg);
             asg.Node.AddDependency(masterDllDeployment);
             new CfnScheduledAction(this, "ScheduleIn", new CfnScheduledActionProps
             {
@@ -198,6 +198,7 @@ sudo systemctl start  cloudmap.service
             {
                 Vpc = vpc,
             });
+            cluster.Node.AddDependency(asg); // wait until asg is up
 
             // dframe-worker
             var dframeWorkerContainerName = "worker";
