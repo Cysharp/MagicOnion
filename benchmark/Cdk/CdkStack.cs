@@ -185,12 +185,20 @@ systemctl start  cloudmap.service
 ".Replace("\r\n", "\n"));
             asg.UserData.AddSignalOnExitCommand(asg);
             asg.Node.AddDependency(masterDllDeployment);
+            // could not roll back to desired count = 1
+            new CfnScheduledAction(this, "ScheduleOut", new CfnScheduledActionProps
+            {
+                AutoScalingGroupName = asg.AutoScalingGroupName,
+                DesiredCapacity = 1,
+                MaxSize = 1,
+                Recurrence = "0 1 * 1-5 *",
+            });
             new CfnScheduledAction(this, "ScheduleIn", new CfnScheduledActionProps
             {
                 AutoScalingGroupName = asg.AutoScalingGroupName,
                 DesiredCapacity = 0,
                 MaxSize = 0,
-                StartTime = now.AddHours(1).ToString("yyyy-MM-ddTHH:mm:ss"),
+                Recurrence = "0 10 * 1-5 *",
             });
 
             // ECS
@@ -300,6 +308,7 @@ systemctl start  cloudmap.service
             // output
             var masterTaskFamilyRevision = Fn.Select(1, Fn.Split("/", dframeMasterService.TaskDefinition.TaskDefinitionArn));
             var workerTaskFamilyRevision = Fn.Select(1, Fn.Split("/", dframeWorkerService.TaskDefinition.TaskDefinitionArn));
+            new CfnOutput(this, "ReportUrl", new CfnOutputProps { Value = $"https://{s3.BucketRegionalDomainName}/html/{reportId}/index.html" });
             new CfnOutput(this, "EcsClusterName", new CfnOutputProps { Value = cluster.ClusterName });
             new CfnOutput(this, "DFrameMasterEcsServiceName", new CfnOutputProps { Value = dframeMasterService.ServiceName });
             new CfnOutput(this, "DFrameMasterEcsTaskdefArn", new CfnOutputProps { Value = dframeMasterService.TaskDefinition.TaskDefinitionArn });
