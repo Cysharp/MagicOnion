@@ -115,12 +115,7 @@ Now ChatApp.Unity can access to ChatApp.Server running on kubernetes.
 
 ## ChatApp.Unity
 
-Sample Clientside Unity.
-You can ran with Unity from 2018.4.5f1 and higher then start on unity editor.
-
-> TIPS: confirmed run on 2019.1.10f1
-
-Now unity client automatically connect to MagicOnion Server, try chat app!
+Sample Clientside Unity automatically connect to MagicOnion Server on play.
 
 ## Check Telemetry
 
