@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Net.Client" Version="2.30.0" />
     <PackageReference Include="MessagePack" Version="2.1.90" />
     <PackageReference Include="MessagePack.UnityShims" Version="1.9.11" />
   </ItemGroup>
