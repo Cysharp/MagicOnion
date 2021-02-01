@@ -99,6 +99,11 @@ namespace MagicOnion.Server.Hubs
                 await OnConnecting();
                 await HandleMessageAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // NOTE: If DuplexStreaming is disconnected by the client, OperationCanceledException will be thrown.
+                //       However, such behavior is expected. the exception can be ignored.
+            }
             catch (IOException ex) when (ex.InnerException is ConnectionAbortedException)
             {
                 // NOTE: If DuplexStreaming is disconnected by the client, IOException will be thrown.
