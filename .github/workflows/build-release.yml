@@ -53,7 +53,7 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.TAG }}
+          branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.GIT_TAG }}
           tags: false
         if: env.DRY_RUN == 'true'
 
@@ -213,10 +213,10 @@ jobs:
     needs: [build-dotnet, build-unity]
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ github.event.inputs.tag }}
+      GIT_TAG: ${{ github.event.inputs.tag }}
     steps:
       - name: Delete branch
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{ github.token }}
-          branches: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.TAG }}
+          branches: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.GIT_TAG }}
