@@ -265,9 +265,9 @@ systemctl start  cloudmap.service
                 Image = dframeImage,                
                 Environment = new Dictionary<string, string>
                 {
+                    { "DFRAME_CLUSTER_NAME", cluster.ClusterName },
                     { "DFRAME_MASTER_SERVICE_NAME", "DFrameMasterService" },
                     { "DFRAME_WORKER_CONTAINER_NAME", dframeWorkerContainerName },
-                    { "DFRAME_WORKER_CLUSTER_NAME", cluster.ClusterName },
                     { "DFRAME_WORKER_SERVICE_NAME", dframeWorkerService.ServiceName },
                     { "DFRAME_WORKER_TASK_NAME", Fn.Select(1, Fn.Split("/", dframeWorkerTaskDef.TaskDefinitionArn)) },
                     { "DFRAME_WORKER_IMAGE", dockerImage.ImageUri },

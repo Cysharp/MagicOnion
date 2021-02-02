@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DFrame.Ecs
 {
-    internal class EcsService
+    internal class EcsService : IDisposable
     {
         private readonly IAmazonECS _client;
         public string ClusterName { get; }
@@ -24,6 +24,11 @@ namespace DFrame.Ecs
             ContainerName = containerName;
 
             _client = new AmazonECSClient();
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
         }
 
         public async Task<Cluster> GetClusterAsync(CancellationToken ct = default)
@@ -95,7 +100,6 @@ namespace DFrame.Ecs
                 Volumes =taskDefinition.Volumes,
                 TaskRoleArn = taskDefinition.TaskRoleArn,
                 ExecutionRoleArn = taskDefinition.ExecutionRoleArn,
-                
             }, ct).ConfigureAwait(false);
 
             return new NewTaskDefinition
@@ -165,7 +169,6 @@ namespace DFrame.Ecs
 
         private async Task<bool> WaitTillUpdateServiceComplete(DescribeServicesRequest describeRequest, CancellationToken ct = default)
         {
-            long start = DateTime.Now.Ticks;
             Service service = null;
             do
             {

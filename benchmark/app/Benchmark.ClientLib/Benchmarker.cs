@@ -164,6 +164,7 @@ namespace Benchmark.ClientLib
             // access s3 and List json from reportId
             var storage = StorageFactory.Create(_logger);
             var reports = await storage.List(_path, $"reports/{reportId}", _cancellationToken);
+            _logger.LogInformation($"Total {reports.Length} reports");
             foreach (var report in reports)
             {
                 _logger?.LogInformation(report);

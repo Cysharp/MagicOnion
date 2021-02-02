@@ -54,27 +54,13 @@ namespace Benchmark.ClientLib.Storage
                 return storage;
 
             // todo: Google... etc...?
-            if (AmazonUtils.IsAmazonEc2())
+            if (AmazonUtils.IsAmazonEc2() || Environment.GetEnvironmentVariable("BENCHCLIENT_USE_S3") == "1")
             {
                 var config = new AmazonS3Config()
                 {
                     RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
                 };
                 storage = new AmazonS3Storage(logger, config);
-            }
-            else if (Environment.GetEnvironmentVariable("BENCHCLIENT_EMULATE_S3") == "1")
-            {
-                // emulate S3 access via minio.
-                // make sure you have launched minio on your local by docker-compose.
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.USEast1, // MUST set this before setting ServiceURL and it should match the `MINIO_REGION` environment variable.
-                    ServiceURL = "http://localhost:9000", // replace http://localhost:9000 with URL of your MinIO server
-                    ForcePathStyle = true, // MUST be true to work correctly with MinIO server
-                };
-                var accessKey = "AKIA_MINIO_ACCESS_KEY";
-                var accessSecret = "minio_secret_key";
-                storage = new AmazonS3Storage(logger, config, accessKey, accessSecret);
             }
             else
             {
@@ -272,7 +258,9 @@ namespace Benchmark.ClientLib.Storage
             try
             {
                 var basePath = $"{prefix}/{name}";
-                var savePath = overwrite ? basePath : await GetSafeSavePath(path, basePath, 1, ct);
+                // too many object will refected by s3 ListObjectV2 API
+                //var savePath = overwrite ? basePath : await GetSafeSavePath(path, basePath, 1, ct);
+                var savePath = basePath;
 
                 _logger?.LogInformation($"uploading content to S3. bucket {path} key {savePath}");
                 await _client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest
@@ -392,7 +380,7 @@ namespace Benchmark.ClientLib.Storage
             {
                 response = await _client.ListObjectsV2Async(request, ct);
                 objects.AddRange(response.S3Objects);
-                request.ContinuationToken = response.ContinuationToken;
+                request.ContinuationToken = response.NextContinuationToken;
             } while (response.IsTruncated);
             return objects;
         }

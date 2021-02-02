@@ -4,9 +4,9 @@
       "commandName": "Project",
       "commandLineArgs": "-delaySec 3",
       "environmentVariables": {
-        "BENCHCLIENT_S3BUCKET": "sample-bucket",
-        "BENCHCLIENT_RUNASWEB": "true",
-        "BENCHCLIENT_EMULATE_S3": "0"
+        "BENCHCLIENT_USE_S3": "1",
+        "BENCHCLIENT_S3BUCKET": "magiconionbenchmarkcdkstack-bucket83908e77-ezuzcg4isj05",
+        "BENCHCLIENT_RUNASWEB": "true"
       }
     },
     "Docker": {

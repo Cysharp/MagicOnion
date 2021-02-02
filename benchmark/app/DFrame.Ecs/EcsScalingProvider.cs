@@ -7,17 +7,17 @@ namespace DFrame.Ecs
     public class EcsEnvironment
     {
         /// <summary>
-        /// Worker ECS cluster name.
+        /// ECS cluster name.
         /// </summary>
-        public string ClusterName { get; set; } = Environment.GetEnvironmentVariable("DFRAME_WORKER_CLUSTER_NAME") ?? "dframe-worker-cluster";
-        /// <summary>
-        /// Worker ECS service name.
-        /// </summary>
-        public string WorkerServiceName { get; set; } = Environment.GetEnvironmentVariable("DFRAME_WORKER_SERVICE_NAME") ?? "dframe-worker-service";
+        public string ClusterName { get; set; } = Environment.GetEnvironmentVariable("DFRAME_CLUSTER_NAME") ?? "dframe-cluster";
         /// <summary>
         /// Master ECS service name.
         /// </summary>
         public string MasterServiceName { get; set; } = Environment.GetEnvironmentVariable("DFRAME_MASTER_SERVICE_NAME") ?? "dframe-master-service";
+        /// <summary>
+        /// Worker ECS service name.
+        /// </summary>
+        public string WorkerServiceName { get; set; } = Environment.GetEnvironmentVariable("DFRAME_WORKER_SERVICE_NAME") ?? "dframe-worker-service";
         /// <summary>
         /// Worker ECS task name.
         /// </summary>
@@ -42,6 +42,14 @@ namespace DFrame.Ecs
         /// null => false
         /// </remarks>
         public bool PreserveWorker { get; set; } = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DFRAME_WORKER_PRESERVE"));
+        /// <summary>
+        /// Preserve Master ECS Service after execution. default false.
+        /// </summary>
+        /// <remarks>
+        /// any value => true
+        /// null => false
+        /// </remarks>
+        public bool PreserveMaster { get; set; } = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DFRAME_MASTER_PRESERVE"));
     }
 
     public class EcsScalingProvider : IScalingProvider
@@ -66,27 +74,27 @@ namespace DFrame.Ecs
         {
             _failSignal = failSignal;
 
-            Console.WriteLine($"scale out {processCount} workers. Cluster: {_ecsWorker.ClusterName}, Service: {_ecsWorker.ServiceName}, TaskDef: {_ecsWorker.TaskDefinitionName}");
+            Console.WriteLine($"Scale out {processCount} workers. Cluster: {_ecsWorker.ClusterName}, Service: {_ecsWorker.ServiceName}, TaskDef: {_ecsWorker.TaskDefinitionName}");
 
             Console.WriteLine($"checking ECS is ready.");
-            if (!await _ecsWorker.ExistsClusterAsync())
+            if (!await _ecsMaster.ExistsClusterAsync())
             {
-                _failSignal.TrySetException(new EcsException($"ECS Cluster not found. Please confirm provided name {nameof(_ecsWorker.ClusterName)} is valid."));
-                return;
-            }
-            if (!await _ecsWorker.ExistsServiceAsync())
-            {
-                _failSignal.TrySetException(new EcsException($"ECS Service not found in ECS Cluster {_ecsWorker.ClusterName}. Please confirm provided name {nameof(_ecsWorker.ServiceName)} is valid."));
-                return;
-            }
-            if (!await _ecsWorker.ExistsTaskDefinitionAsync())
-            {
-                _failSignal.TrySetException(new EcsException($"ECS TaskDefinition not found. Please confirm provided name {nameof(_ecsWorker.TaskDefinitionName)} is valid."));
+                _failSignal.TrySetException(new EcsException($"ECS Cluster {_ecsMaster.ClusterName} not found."));
                 return;
             }
             if (!await _ecsMaster.ExistsServiceAsync())
             {
-                _failSignal.TrySetException(new EcsException($"ECS Service not found in ECS Cluster {_ecsMaster.ClusterName}. Please confirm provided name {nameof(_ecsMaster.ServiceName)} is valid."));
+                _failSignal.TrySetException(new EcsException($"ECS Service {_ecsMaster.ServiceName} not found in ECS Cluster {_ecsMaster.ClusterName}."));
+                return;
+            }
+            if (!await _ecsWorker.ExistsServiceAsync())
+            {
+                _failSignal.TrySetException(new EcsException($"ECS Service {_ecsWorker.ServiceName} not found in ECS Cluster {_ecsWorker.ClusterName}."));
+                return;
+            }
+            if (!await _ecsWorker.ExistsTaskDefinitionAsync())
+            {
+                _failSignal.TrySetException(new EcsException($"ECS TaskDefinition {_ecsWorker.TaskDefinitionName} not found."));
                 return;
             }
 
@@ -102,22 +110,31 @@ namespace DFrame.Ecs
 
         public async ValueTask DisposeAsync()
         {
-            Console.WriteLine($"scale in workers. Cluster: {_ecsWorker.ClusterName}, Service: {_ecsWorker.ServiceName}, TaskDef: {_ecsWorker.TaskDefinitionName}");
+            Console.WriteLine($"Begin Scale in");
+            using var cts = new CancellationTokenSource(120 * 1000);
+
             if (!_env.PreserveWorker)
             {
-                using var cts = new CancellationTokenSource(120 * 1000);
+                Console.WriteLine($"Scale in workers. Cluster {_ecsWorker.ClusterName}, Service {_ecsWorker.ServiceName}");
                 await _ecsWorker.ScaleServiceAsync(0, cts.Token);
-
-                if (!string.IsNullOrEmpty(_env.MasterServiceName))
-                {
-                    Console.WriteLine($"scale in master. Cluster: {_ecsMaster.ClusterName}, Service: {_ecsMaster.ServiceName}");
-                    await _ecsMaster.ScaleServiceAsync(0, cts.Token);
-                }
             }
             else
             {
-                Console.WriteLine($"detected preserve worker, scale in action skipped.");
+                Console.WriteLine($"Detected preserve worker {_ecsWorker.ServiceName}, scale in action skipped.");
             }
+
+            if (!_env.PreserveMaster && !string.IsNullOrEmpty(_env.MasterServiceName))
+            {
+                Console.WriteLine($"Scale in master. Cluster {_ecsMaster.ClusterName}, Service {_ecsMaster.ServiceName}");
+                await _ecsMaster.ScaleServiceAsync(0, cts.Token);
+            }
+            else
+            {
+                Console.WriteLine($"Detected preserve master {_ecsMaster.ServiceName}, scale in action skipped.");
+            }
+
+            _ecsMaster.Dispose();
+            _ecsWorker.Dispose();
         }
     }
 }

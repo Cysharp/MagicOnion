@@ -95,10 +95,10 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="reportId"></param>
     /// <param name="htmlFileName"></param>
     /// <returns></returns>
-    public async Task GenerateHtml(string reportId, string htmlFileName = "index.html")
+    public async Task GenerateHtml(string reportId, bool generateDetail, string htmlFileName = "index.html")
     {
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
-        await benchmarker.GenerateHtml(reportId, htmlFileName);
+        await benchmarker.GenerateHtml(reportId, generateDetail, htmlFileName);
     }
 
     public async Task ListClients()
