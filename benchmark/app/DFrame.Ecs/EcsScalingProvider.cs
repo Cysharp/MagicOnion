@@ -74,7 +74,7 @@ namespace DFrame.Ecs
         {
             _failSignal = failSignal;
 
-            Console.WriteLine($"Scale out {processCount} workers. Cluster: {_ecsWorker.ClusterName}, Service: {_ecsWorker.ServiceName}, TaskDef: {_ecsWorker.TaskDefinitionName}");
+            Console.WriteLine($"Scale out {processCount} workers. Cluster {_ecsWorker.ClusterName}, MasterService {_ecsMaster.ServiceName}, WorkerService {_ecsWorker.ServiceName}, TaskDef {_ecsWorker.TaskDefinitionName}");
 
             Console.WriteLine($"checking ECS is ready.");
             if (!await _ecsMaster.ExistsClusterAsync())

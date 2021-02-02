@@ -12,8 +12,6 @@ namespace Cdk
             var app = new App();
             new CdkStack(app, "MagicOnionBenchmarkCdkStack", new ReportStackProps
             {
-                ExecuteTime = DateTime.Now,
-                ReportId = Guid.NewGuid().ToString(),
                 Tags = new Dictionary<string, string>()
                 {
                     { "environment", "bench" },
@@ -28,5 +26,12 @@ namespace Cdk
     {
         public DateTime ExecuteTime { get; set; }
         public string ReportId { get; set; }
+
+        public ReportStackProps()
+        {
+            var now = DateTime.Now;
+            ExecuteTime = now;
+            ReportId = $"{now.ToString("yyyyMMddHHmmss")}-{Guid.NewGuid().ToString()}";
+        }
     }
 }
