@@ -11,6 +11,9 @@ on:
         required: true
         default: "false"
 
+env:
+  DRY_RUN_BRANCH_PREFIX: "test_release"
+
 jobs:
   update-packagejson:
     runs-on: ubuntu-latest
@@ -35,13 +38,24 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git commit -m "feat: Update package.json to ${{ env.GIT_TAG }}" -a
           echo "::set-output name=sha::$(git rev-parse HEAD)"
-        if: env.DRY_RUN == 'false'
+      - name: check sha
+        run: echo "SHA ${SHA}"
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+          tags: false
         if: env.DRY_RUN == 'false'
+      - name: Push changes (dry_run)
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.SYNCED_GITHUB_TOKEN_REPO }} # must use PAT to trigger other workflow
+          branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.TAG }}
+          tags: false
+        if: env.DRY_RUN == 'true'
 
   build-dotnet:
     needs: [update-packagejson]
@@ -55,9 +69,10 @@ jobs:
       DOTNET_SDK_VERSION_3: "3.1.403"
       DOTNET_SDK_VERSION_5: "5.0.100"
     steps:
+      - run: echo ${{ needs.update-packagejson.outputs.sha }}
       - uses: actions/checkout@v2
         with:
-          ref: ${{ needs.update-tag-release.outputs.sha }}
+          ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
@@ -121,10 +136,13 @@ jobs:
       # https://hub.docker.com/r/gableroux/unity3d/tags
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
-      - run: apt-get update && apt-get install git -y
+      # Ubuntu 18.04 git is too old, use ppa latest git.
+      - run: |
+          apt-get update && apt-get install --no-install-recommends -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
+          apt-get update && apt-get install --no-install-recommends -y git
       - uses: actions/checkout@v2
         with:
-          ref: ${{ needs.update-tag-release.outputs.sha }}
+          ref: ${{ needs.update-packagejson.outputs.sha }}
       # activate Unity from manual license file(ulf)
       - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
         env:
@@ -189,3 +207,16 @@ jobs:
           asset_path: ./MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
           asset_name: MagicOnion.Client.Unity.unitypackage
           asset_content_type: application/octet-stream
+
+  cleanup:
+    if: github.event.inputs.dry_run == 'true'
+    needs: [build-dotnet, build-unity]
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag }}
+    steps:
+      - name: Delete branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ github.token }}
+          branches: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.TAG }}
