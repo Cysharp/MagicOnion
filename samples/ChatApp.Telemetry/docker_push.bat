@@ -1,6 +1,7 @@
+:: run from this directory
 :: cysharp/magiconion_sample_chatapp_telemetry
-docker-compose -f docker-compose.yaml build magiconion
+docker build -t chatapp_magiconion:latest -f ChatApp.Server/Dockerfile .
 docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:latest
-docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:3.0.13
+docker tag chatapp_magiconion:latest cysharp/magiconion_sample_chatapp_telemetry:4.0.1-1.0.0.rc2
 docker push cysharp/magiconion_sample_chatapp_telemetry:latest
-docker push cysharp/magiconion_sample_chatapp_telemetry:3.0.13
+docker push cysharp/magiconion_sample_chatapp_telemetry:4.0.1-1.0.0.rc2

@@ -37,3 +37,5 @@ dashboards:
       gnetId: 10584
       revision: 9
       datasource: Prometheus
+
+adminPassword: admin

@@ -64,8 +64,8 @@ namespace Assets.Scripts
             this.channel = new Channel("localhost", 8080, ChannelCredentials.Insecure);
             // for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
-            //this.channel = new Channel("dummy.example.com", 12345, cred); // local tls
-            //this.channel = new Channel("envoytest.eks-sandbox.dev.cysharp.io", 443, new SslCredentials()); // aws acm NLB/ALB
+            //this.channel = new Channel("dummy.example.com", 5000, cred); // local tls
+            //this.channel = new Channel("your-nlb-domain.com", 5000, new SslCredentials()); // aws nlb tls
 
             while (!shutdownCancellation.IsCancellationRequested)
             {

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   prometheus:
-    image: prom/prometheus:v2.11.1
+    image: prom/prometheus:v2.22.2
     volumes:
       # persistent prometheus database
       - ./docker/prometheus/data/:/prometheus
@@ -11,7 +11,15 @@ services:
     ports:
       - "9090:9090"
 
-  # # if you want monitor linux host machine, install node-exporter or use it through container.
+  alertmanager:
+    image: prom/alertmanager:v0.21.0
+    volumes:
+      - ./docker/alertmanager/config.yml:/etc/alertmanager/config.yml
+    command: "--config.file=/etc/alertmanager/config.yml"
+    ports:
+      - 9093:9093
+
+  # # if you want monitor linux host machine, install node-exporter or use container.
   # # settings detail: https://qiita.com/kanga/items/21acb042237f8a27f437
   # node-exporter:
   #   image: prom/node-exporter:latest
@@ -45,15 +53,13 @@ services:
     ports:
       - 3000:3000
 
-  alertmanager:
-    image: prom/alertmanager
-    volumes:
-      - ./docker/alertmanager/config.yml:/etc/alertmanager/config.yml
-    command: "--config.file=/etc/alertmanager/config.yml"
-    ports:
-      - 9093:9093
-
   zipkin:
-    image: openzipkin/zipkin
+    image: openzipkin/zipkin:2.22
     ports:
       - 9411:9411
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.20
+    ports:
+      - 6831:6831/udp # client post
+      - 16686:16686 # web

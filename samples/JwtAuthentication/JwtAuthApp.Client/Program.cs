@@ -51,7 +51,7 @@ namespace JwtAuthApp.Client
 
             // 5. Call StreamingHub with authentication
             {
-                var timerHubClient = StreamingHubClient.Connect<ITimerHub, ITimerHubReceiver>(
+                var timerHubClient = await StreamingHubClient.ConnectAsync<ITimerHub, ITimerHubReceiver>(
                     channel,
                     this,
                     option: new CallOptions().WithHeaders(new Metadata()

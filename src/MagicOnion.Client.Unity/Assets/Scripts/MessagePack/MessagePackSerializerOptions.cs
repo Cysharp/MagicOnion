@@ -21,7 +21,7 @@ namespace MessagePack
         /// A collection of known dangerous types that are not expected in a typical MessagePack stream,
         /// and thus are rejected by the default implementation of <see cref="ThrowIfDeserializingTypeIsDisallowed(Type)"/>.
         /// </summary>
-        private static readonly HashSet<string> BlacklistCheck = new HashSet<string>
+        private static readonly HashSet<string> DisallowedTypes = new HashSet<string>
         {
             "System.CodeDom.Compiler.TempFileCollection",
             "System.Management.IWbemClassObjectFreeThreaded",
@@ -59,6 +59,7 @@ namespace MessagePack
             this.OldSpec = copyFrom.OldSpec;
             this.OmitAssemblyVersion = copyFrom.OmitAssemblyVersion;
             this.AllowAssemblyVersionMismatch = copyFrom.AllowAssemblyVersionMismatch;
+            this.Security = copyFrom.Security;
         }
 
         /// <summary>
@@ -105,6 +106,14 @@ namespace MessagePack
         public bool AllowAssemblyVersionMismatch { get; private set; }
 
         /// <summary>
+        /// Gets the security-related options for deserializing messagepack sequences.
+        /// </summary>
+        /// <value>
+        /// The default value is to use <see cref="MessagePackSecurity.TrustedData"/>.
+        /// </value>
+        public MessagePackSecurity Security { get; private set; } = MessagePackSecurity.TrustedData;
+
+        /// <summary>
         /// Gets a type given a string representation of the type.
         /// </summary>
         /// <param name="typeName">The name of the type to load. This is typically the <see cref="Type.AssemblyQualifiedName"/> but may use the assembly's simple name.</param>
@@ -137,7 +146,7 @@ namespace MessagePack
         /// </remarks>
         public virtual void ThrowIfDeserializingTypeIsDisallowed(Type type)
         {
-            if (BlacklistCheck.Contains(type.FullName))
+            if (DisallowedTypes.Contains(type.FullName))
             {
                 throw new MessagePackSerializationException("Deserialization attempted to create the type " + type.FullName + " which is not allowed.");
             }
@@ -225,6 +234,28 @@ namespace MessagePack
 
             var result = this.Clone();
             result.AllowAssemblyVersionMismatch = allowAssemblyVersionMismatch;
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a copy of these options with the <see cref="Security"/> property set to a new value.
+        /// </summary>
+        /// <param name="security">The new value for the <see cref="Security"/> property.</param>
+        /// <returns>The new instance; or the original if the value is unchanged.</returns>
+        public MessagePackSerializerOptions WithSecurity(MessagePackSecurity security)
+        {
+            if (security is null)
+            {
+                throw new ArgumentNullException(nameof(security));
+            }
+
+            if (this.Security == security)
+            {
+                return this;
+            }
+
+            var result = this.Clone();
+            result.Security = security;
             return result;
         }
 

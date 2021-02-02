@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Core.Api" Version="2.30.0" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.35.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +46,7 @@
 
   <!-- Sync codes: MagicOnion.Shared for Unity -->
   <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion.Client\MagicOnion.Shared\</DestinationRoot>
+    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\MagicOnion.Shared\</DestinationRoot>
   </PropertyGroup>
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />

@@ -5,5 +5,5 @@ curl -skf \
 --max-time 60 \
 -H "Accept: application/json" \
 -H "Content-Type: application/json;charset=UTF-8" \
-    "https://grafana.com/api/dashboards/10584/revisions/9/download" | sed 's/"datasource":[^,]*/"datasource": "Prometheus"/g'\
+    "https://grafana.com/api/dashboards/10584/revisions/8/download" | sed 's/"datasource":[^,]*/"datasource": "Prometheus"/g'\
 > "/var/tmp/grafana/dashboards/default/magiconion-overview.json"
