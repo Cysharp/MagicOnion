@@ -52,7 +52,7 @@ jobs:
       - name: Push changes (dry_run)
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.SYNCED_GITHUB_TOKEN_REPO }} # must use PAT to trigger other workflow
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.TAG }}
           tags: false
         if: env.DRY_RUN == 'true'
