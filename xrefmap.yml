@@ -7766,6 +7766,162 @@ references:
   commentId: F:MagicOnion.MagicOnionMarshallers.UnsafeNilBytes
   fullName: MagicOnion.MagicOnionMarshallers.UnsafeNilBytes
   nameWithType: MagicOnionMarshallers.UnsafeNilBytes
+- uid: MagicOnion.MarshallingAsyncStreamReader`1
+  name: MarshallingAsyncStreamReader<T>
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html
+  commentId: T:MagicOnion.MarshallingAsyncStreamReader`1
+  name.vb: MarshallingAsyncStreamReader(Of T)
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T)
+  nameWithType: MarshallingAsyncStreamReader<T>
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T)
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.#ctor(IAsyncStreamReader{System.Byte[]},MessagePackSerializerOptions)
+  name: MarshallingAsyncStreamReader(IAsyncStreamReader<Byte[]>, MessagePackSerializerOptions)
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1__ctor_IAsyncStreamReader_System_Byte____MessagePackSerializerOptions_
+  commentId: M:MagicOnion.MarshallingAsyncStreamReader`1.#ctor(IAsyncStreamReader{System.Byte[]},MessagePackSerializerOptions)
+  name.vb: MarshallingAsyncStreamReader(IAsyncStreamReader(Of Byte()), MessagePackSerializerOptions)
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.MarshallingAsyncStreamReader(IAsyncStreamReader<System.Byte[]>, MessagePackSerializerOptions)
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).MarshallingAsyncStreamReader(IAsyncStreamReader(Of System.Byte()), MessagePackSerializerOptions)
+  nameWithType: MarshallingAsyncStreamReader<T>.MarshallingAsyncStreamReader(IAsyncStreamReader<Byte[]>, MessagePackSerializerOptions)
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).MarshallingAsyncStreamReader(IAsyncStreamReader(Of Byte()), MessagePackSerializerOptions)
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.#ctor*
+  name: MarshallingAsyncStreamReader
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1__ctor_
+  commentId: Overload:MagicOnion.MarshallingAsyncStreamReader`1.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.MarshallingAsyncStreamReader
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).MarshallingAsyncStreamReader
+  nameWithType: MarshallingAsyncStreamReader<T>.MarshallingAsyncStreamReader
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).MarshallingAsyncStreamReader
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.Current
+  name: Current
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_Current
+  commentId: P:MagicOnion.MarshallingAsyncStreamReader`1.Current
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.Current
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).Current
+  nameWithType: MarshallingAsyncStreamReader<T>.Current
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).Current
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.Current*
+  name: Current
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_Current_
+  commentId: Overload:MagicOnion.MarshallingAsyncStreamReader`1.Current
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.Current
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).Current
+  nameWithType: MarshallingAsyncStreamReader<T>.Current
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).Current
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.Dispose
+  name: Dispose()
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_Dispose
+  commentId: M:MagicOnion.MarshallingAsyncStreamReader`1.Dispose
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.Dispose()
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).Dispose()
+  nameWithType: MarshallingAsyncStreamReader<T>.Dispose()
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).Dispose()
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.Dispose*
+  name: Dispose
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_Dispose_
+  commentId: Overload:MagicOnion.MarshallingAsyncStreamReader`1.Dispose
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.Dispose
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).Dispose
+  nameWithType: MarshallingAsyncStreamReader<T>.Dispose
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).Dispose
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.MoveNext(CancellationToken)
+  name: MoveNext(CancellationToken)
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_MoveNext_CancellationToken_
+  commentId: M:MagicOnion.MarshallingAsyncStreamReader`1.MoveNext(CancellationToken)
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.MoveNext(CancellationToken)
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).MoveNext(CancellationToken)
+  nameWithType: MarshallingAsyncStreamReader<T>.MoveNext(CancellationToken)
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).MoveNext(CancellationToken)
+- uid: MagicOnion.MarshallingAsyncStreamReader`1.MoveNext*
+  name: MoveNext
+  href: api/MagicOnion.MarshallingAsyncStreamReader-1.html#MagicOnion_MarshallingAsyncStreamReader_1_MoveNext_
+  commentId: Overload:MagicOnion.MarshallingAsyncStreamReader`1.MoveNext
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingAsyncStreamReader<T>.MoveNext
+  fullName.vb: MagicOnion.MarshallingAsyncStreamReader(Of T).MoveNext
+  nameWithType: MarshallingAsyncStreamReader<T>.MoveNext
+  nameWithType.vb: MarshallingAsyncStreamReader(Of T).MoveNext
+- uid: MagicOnion.MarshallingClientStreamWriter`1
+  name: MarshallingClientStreamWriter<T>
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html
+  commentId: T:MagicOnion.MarshallingClientStreamWriter`1
+  name.vb: MarshallingClientStreamWriter(Of T)
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T)
+  nameWithType: MarshallingClientStreamWriter<T>
+  nameWithType.vb: MarshallingClientStreamWriter(Of T)
+- uid: MagicOnion.MarshallingClientStreamWriter`1.#ctor(IClientStreamWriter{System.Byte[]},MessagePackSerializerOptions)
+  name: MarshallingClientStreamWriter(IClientStreamWriter<Byte[]>, MessagePackSerializerOptions)
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1__ctor_IClientStreamWriter_System_Byte____MessagePackSerializerOptions_
+  commentId: M:MagicOnion.MarshallingClientStreamWriter`1.#ctor(IClientStreamWriter{System.Byte[]},MessagePackSerializerOptions)
+  name.vb: MarshallingClientStreamWriter(IClientStreamWriter(Of Byte()), MessagePackSerializerOptions)
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.MarshallingClientStreamWriter(IClientStreamWriter<System.Byte[]>, MessagePackSerializerOptions)
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).MarshallingClientStreamWriter(IClientStreamWriter(Of System.Byte()), MessagePackSerializerOptions)
+  nameWithType: MarshallingClientStreamWriter<T>.MarshallingClientStreamWriter(IClientStreamWriter<Byte[]>, MessagePackSerializerOptions)
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).MarshallingClientStreamWriter(IClientStreamWriter(Of Byte()), MessagePackSerializerOptions)
+- uid: MagicOnion.MarshallingClientStreamWriter`1.#ctor*
+  name: MarshallingClientStreamWriter
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1__ctor_
+  commentId: Overload:MagicOnion.MarshallingClientStreamWriter`1.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.MarshallingClientStreamWriter
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).MarshallingClientStreamWriter
+  nameWithType: MarshallingClientStreamWriter<T>.MarshallingClientStreamWriter
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).MarshallingClientStreamWriter
+- uid: MagicOnion.MarshallingClientStreamWriter`1.CompleteAsync
+  name: CompleteAsync()
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_CompleteAsync
+  commentId: M:MagicOnion.MarshallingClientStreamWriter`1.CompleteAsync
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.CompleteAsync()
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).CompleteAsync()
+  nameWithType: MarshallingClientStreamWriter<T>.CompleteAsync()
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).CompleteAsync()
+- uid: MagicOnion.MarshallingClientStreamWriter`1.CompleteAsync*
+  name: CompleteAsync
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_CompleteAsync_
+  commentId: Overload:MagicOnion.MarshallingClientStreamWriter`1.CompleteAsync
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.CompleteAsync
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).CompleteAsync
+  nameWithType: MarshallingClientStreamWriter<T>.CompleteAsync
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).CompleteAsync
+- uid: MagicOnion.MarshallingClientStreamWriter`1.WriteAsync(`0)
+  name: WriteAsync(T)
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_WriteAsync__0_
+  commentId: M:MagicOnion.MarshallingClientStreamWriter`1.WriteAsync(`0)
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.WriteAsync(T)
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).WriteAsync(T)
+  nameWithType: MarshallingClientStreamWriter<T>.WriteAsync(T)
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).WriteAsync(T)
+- uid: MagicOnion.MarshallingClientStreamWriter`1.WriteAsync*
+  name: WriteAsync
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_WriteAsync_
+  commentId: Overload:MagicOnion.MarshallingClientStreamWriter`1.WriteAsync
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.WriteAsync
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).WriteAsync
+  nameWithType: MarshallingClientStreamWriter<T>.WriteAsync
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).WriteAsync
+- uid: MagicOnion.MarshallingClientStreamWriter`1.WriteOptions
+  name: WriteOptions
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_WriteOptions
+  commentId: P:MagicOnion.MarshallingClientStreamWriter`1.WriteOptions
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.WriteOptions
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).WriteOptions
+  nameWithType: MarshallingClientStreamWriter<T>.WriteOptions
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).WriteOptions
+- uid: MagicOnion.MarshallingClientStreamWriter`1.WriteOptions*
+  name: WriteOptions
+  href: api/MagicOnion.MarshallingClientStreamWriter-1.html#MagicOnion_MarshallingClientStreamWriter_1_WriteOptions_
+  commentId: Overload:MagicOnion.MarshallingClientStreamWriter`1.WriteOptions
+  isSpec: "True"
+  fullName: MagicOnion.MarshallingClientStreamWriter<T>.WriteOptions
+  fullName.vb: MagicOnion.MarshallingClientStreamWriter(Of T).WriteOptions
+  nameWithType: MarshallingClientStreamWriter<T>.WriteOptions
+  nameWithType.vb: MarshallingClientStreamWriter(Of T).WriteOptions
 - uid: MagicOnion.MetadataExtensions
   name: MetadataExtensions
   href: api/MagicOnion.MetadataExtensions.html
