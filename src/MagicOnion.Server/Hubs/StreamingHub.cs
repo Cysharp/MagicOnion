@@ -3,6 +3,7 @@ using MessagePack;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using MagicOnion.Utils;
 using Microsoft.AspNetCore.Connections;
 
 namespace MagicOnion.Server.Hubs
@@ -127,6 +128,26 @@ namespace MagicOnion.Server.Hubs
             // Send a hint to the client to start sending messages.
             // The client can read the response headers before any StreamingHub's message.
             await Context.CallContext.WriteResponseHeadersAsync(ResponseHeaders);
+
+            // Write a marker that is the beginning of the stream.
+            // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
+            static byte[] BuildMarkerResponse()
+            {
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+
+                    // response:  [messageId, methodId, response]
+                    // HACK: If the ID of the message is `-1`, the client will ignore the message.
+                    writer.WriteArrayHeader(3);
+                    writer.Write(-1);
+                    writer.Write(0);
+                    writer.WriteNil();
+                    writer.Flush();
+                    return buffer.WrittenSpan.ToArray();
+                }
+            }
+            await writer.WriteAsync(BuildMarkerResponse());
 
             var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 
