@@ -3,7 +3,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <VersionPrefix>4.1.0</VersionPrefix>
+    <VersionPrefix>4.1.2</VersionPrefix>
 
     <!-- NuGet Packaging -->
     <PackageVersion>$(Version)</PackageVersion>
