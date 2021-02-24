@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "BenchmarkServer";
+option csharp_namespace = "Benchmark.Server";
 
 package greet;
 
@@ -10,12 +10,12 @@ service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply);
 }
 
-// The request message containing the user's name.
+// The request message containing bool.
 message HelloRequest {
-  string name = 1;
+  bool value = 1;
 }
 
-// The response message containing the greetings.
+// The response message containing bool.
 message HelloReply {
-  string message = 1;
+  bool message = 1;
 }

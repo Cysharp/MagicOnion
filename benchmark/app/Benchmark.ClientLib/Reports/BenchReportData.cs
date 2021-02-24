@@ -10,8 +10,13 @@ namespace Benchmark.ClientLib.Reports
         public string ReportId { get; set; }
         [JsonPropertyName("execute_id")]
         public string ExecuteId { get; set; }
-        [JsonPropertyName("client")]
-        public string Client { get; set; }
+        /// <summary>
+        /// Client Identifier for Same Machine Execution but treat as different client.
+        /// </summary>
+        [JsonPropertyName("client_id")]
+        public string ClientId { get; set; }
+        [JsonPropertyName("host_name")]
+        public string HostName { get; set; }
         [JsonPropertyName("os")]
         public string OS { get; set; }
         [JsonPropertyName("os_architecture")]
@@ -40,8 +45,8 @@ namespace Benchmark.ClientLib.Reports
     {
         [JsonPropertyName("execute_id")]
         public string ExecuteId { get; set; }
-        [JsonPropertyName("client")]
-        public string Client { get; set; }
+        [JsonPropertyName("client_id")]
+        public string ClientId { get; set; }
         [JsonPropertyName("type")]
         public string Type { get; set; }
         [JsonPropertyName("test_name")]

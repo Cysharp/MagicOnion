@@ -8,8 +8,9 @@
 <#
     var client = Report.Client;
     var summary = Report.Summary;
-    var unaryConnectionsResult = Report.UnaryConnectionsResult;
-    var hubConnectionsResult = Report.HubConnectionsResult;
+    var unaryClientResult = Report.UnaryClientResult;
+    var unaryRequestResult = Report.UnaryRequestResult;
+    var hubRequestResult = Report.HubRequestResult;
 
     var lineColor = GetLineColor();
     var barColor = GetColor();
@@ -94,9 +95,9 @@
                             <td><#= summary.End #></td>
                             <td><#= string.Format("{0:f2}", summary.Rps) #> rps</td>
                             <td><#= string.Format("{0:f2}", summary.DurationTotal.TotalSeconds) #> sec</td>
-                            <td><#= string.Format("{0:f2}", summary.DurationAvg.TotalSeconds) #> sec</td>
-                            <td><#= string.Format("{0:f2}", summary.DurationMin.TotalSeconds) #> sec</td>
-                            <td><#= string.Format("{0:f2}", summary.DurationMax.TotalSeconds) #> sec</td>
+                            <td><#= string.Format("{0:f3}", summary.DurationAvg.TotalMilliseconds) #> ms</td>
+                            <td><#= string.Format("{0:f3}", summary.DurationMin.TotalMilliseconds) #> ms</td>
+                            <td><#= string.Format("{0:f3}", summary.DurationMax.TotalMilliseconds) #> ms</td>
                         </tr>
                         </tbody>
                     </table>
@@ -107,67 +108,38 @@
                     <table class="table table-striped table-sm">
                         <thead>
                             <th scope="col">Requests</th>
-                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                        <# foreach(var item in unaryRequestResult.SummaryItems) { #>
                             <th scope="col"><#= item.RequestCount #> req</th>
                         <# } #>
                             <th scope="col">Errors</th>
                         </thead>
                         <tr>
                             <td>Duration</td>
-                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                        <# foreach(var item in unaryRequestResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
                         <# } #>
-                            <td><#= unaryConnectionsResult.Errors #></td>
+                            <td><#= unaryRequestResult.Errors #></td>
                         </tr>
                         <tr>
                             <td>Rps</td>
-                        <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                        <# foreach(var item in unaryRequestResult.SummaryItems) { #>
                             <td><#= string.Format("{0:f2}", item.Rps) #> rps</td>
                         <# } #>
                         </tr>
                         </tbody>
                     </table>
-                </div>
 
-                <div class="table-responsive">
-                    <h2 class="text-muted">Hub Summary</h2>
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <th scope="col">Requests</th>
-                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
-                            <th scope="col"><#= item.RequestCount #> req</th>
-                        <# } #>
-                            <th scope="col">Errors</th>
-                        </thead>
-                        <tr>
-                            <td>Duration</td>
-                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
-                            <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
-                        <# } #>
-                            <td><#= hubConnectionsResult.Errors #></td>
-                        </tr>
-                        <tr>
-                            <td>Rps</td>
-                        <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
-                            <td><#= string.Format("{0:f2}", item.Rps) #> rps</td>
-                        <# } #>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div>
-                    <h2>Unary Connection Bench</h2>
-                    <canvas id="unaryConnectionAvg"></canvas>
-                    <canvas id="unaryConnectionStackBar"></canvas>
+                    <canvas id="unaryClientAvg"></canvas>
+                    <canvas id="unaryRequestAvg"></canvas>
+                    <canvas id="unaryRequestStackBar"></canvas>
 
                     <script>
-                        var ctx = document.getElementById("unaryConnectionAvg");
+                        var ctx = document.getElementById("unaryClientAvg");
                         var myChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                <# foreach(var item in unaryClientResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
@@ -178,7 +150,7 @@
                                     backgroundColor: "<#= barColor #>",
                                     borderColor: "<#= barColor #>",
                                     data: [
-                                    <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                    <# foreach(var item in unaryClientResult.SummaryItems) { #>
                                         <#= item.Duration.TotalSeconds #>,
                                     <# } #>
                                     ]
@@ -191,7 +163,65 @@
                                     borderColor: "<#= lineColor #>",
                                     fill: false,
                                     data: [
-                                    <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                    <# foreach(var item in unaryClientResult.SummaryItems) { #>
+                                        <#= item.Rps #>,
+                                    <# } #>
+                                    ]
+                                },
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: 'Client Average Duration & Rps (Unary)',
+                                    padding: 3
+                                },
+                                legend: {
+                                    labels: {
+                                        boxWidth: 30,
+                                        padding: 20
+                                    },
+                                    display: true
+                                },
+                                tooltips: {
+                                    mode: 'label' // data colum for tooltip
+                                },
+                                responsive: true
+                            }
+                        });
+                    </script>
+
+                    <script>
+                        var ctx = document.getElementById("unaryRequestAvg");
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                <# foreach(var item in unaryRequestResult.SummaryItems) { #>
+                                    "<#= item.RequestCount #>",
+                                <# } #>
+                                ],
+                                datasets: [
+                                {
+                                    type: 'bar',
+                                    label: "Duration",
+                                    backgroundColor: "<#= barColor #>",
+                                    borderColor: "<#= barColor #>",
+                                    data: [
+                                    <# foreach(var item in unaryRequestResult.SummaryItems) { #>
+                                        <#= item.Duration.TotalSeconds #>,
+                                    <# } #>
+                                    ]
+                                },
+                                {
+                                    type: 'line',
+                                    label: "Rps",
+                                    pointBackgroundColor: "<#= lineColor #>",
+                                    backgroundColor: "<#= lineColor #>",
+                                    borderColor: "<#= lineColor #>",
+                                    fill: false,
+                                    data: [
+                                    <# foreach(var item in unaryRequestResult.SummaryItems) { #>
                                         <#= item.Rps #>,
                                     <# } #>
                                     ]
@@ -219,20 +249,20 @@
                         });
                     </script>
                     <script>
-                        var ctx = document.getElementById("unaryConnectionStackBar");
+                        var ctx = document.getElementById("unaryRequestStackBar");
                         var myChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in unaryConnectionsResult.SummaryItems) { #>
+                                <# foreach(var item in unaryRequestResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
                                 datasets: [
-                                <# for(var i = 0; i < unaryConnectionsResult.ClientDurationItems.Length; i++) { #>
+                                <# for(var i = 0; i < unaryRequestResult.ClientDurationItems.Length; i++) { #>
                                 {
                                     <#
-                                        var current = unaryConnectionsResult.ClientDurationItems[i];
+                                        var current = unaryRequestResult.ClientDurationItems[i];
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     #>
@@ -283,18 +313,42 @@
                     </script>
                 </div>
 
-                <div>
-                    <h2>Hub Connection Bench</h2>
-                    <canvas id="hubConnectionAvg"></canvas>
-                    <canvas id="hubConnectionStackBar"></canvas>
+                <div class="table-responsive">
+                    <h2 class="text-muted">Hub Summary</h2>
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <th scope="col">Requests</th>
+                        <# foreach(var item in hubRequestResult.SummaryItems) { #>
+                            <th scope="col"><#= item.RequestCount #> req</th>
+                        <# } #>
+                            <th scope="col">Errors</th>
+                        </thead>
+                        <tr>
+                            <td>Duration</td>
+                        <# foreach(var item in hubRequestResult.SummaryItems) { #>
+                            <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
+                        <# } #>
+                            <td><#= hubRequestResult.Errors #></td>
+                        </tr>
+                        <tr>
+                            <td>Rps</td>
+                        <# foreach(var item in hubRequestResult.SummaryItems) { #>
+                            <td><#= string.Format("{0:f2}", item.Rps) #> rps</td>
+                        <# } #>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <canvas id="hubRequestAvg"></canvas>
+                    <canvas id="hubRequestStackBar"></canvas>
 
                     <script>
-                        var ctx = document.getElementById("hubConnectionAvg");
+                        var ctx = document.getElementById("hubRequestAvg");
                         var myChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                <# foreach(var item in hubRequestResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
@@ -305,7 +359,7 @@
                                     backgroundColor: "<#= barColor #>",
                                     borderColor: "<#= barColor #>",
                                     data: [
-                                    <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                    <# foreach(var item in hubRequestResult.SummaryItems) { #>
                                         <#= item.Duration.TotalSeconds #>,
                                     <# } #>
                                     ]
@@ -318,7 +372,7 @@
                                     borderColor: "<#= lineColor #>",
                                     fill: false,
                                     data: [
-                                    <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                    <# foreach(var item in hubRequestResult.SummaryItems) { #>
                                         <#= item.Rps #>,
                                     <# } #>
                                     ]
@@ -346,20 +400,20 @@
                         });
                     </script>
                     <script>
-                        var ctx = document.getElementById("hubConnectionStackBar");
+                        var ctx = document.getElementById("hubRequestStackBar");
                         var myChart = new Chart(ctx, {
                             type: 'bar',
                             data: {
                                 labels: [
-                                <# foreach(var item in hubConnectionsResult.SummaryItems) { #>
+                                <# foreach(var item in hubRequestResult.SummaryItems) { #>
                                     "<#= item.RequestCount #>",
                                 <# } #>
                                 ],
                                 datasets: [
-                                <# for(var i = 0; i < hubConnectionsResult.ClientDurationItems.Length; i++) { #>
+                                <# for(var i = 0; i < hubRequestResult.ClientDurationItems.Length; i++) { #>
                                 {
                                     <#
-                                        var current = hubConnectionsResult.ClientDurationItems[i];
+                                        var current = hubRequestResult.ClientDurationItems[i];
                                         var items = current.Items;
                                         var color = GetColor(i);
                                     #>

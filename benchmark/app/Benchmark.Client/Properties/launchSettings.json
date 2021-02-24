@@ -5,7 +5,7 @@
       "commandLineArgs": "-delaySec 3",
       "environmentVariables": {
         "BENCHCLIENT_USE_S3": "1",
-        "BENCHCLIENT_S3BUCKET": "magiconionbenchmarkcdkstack-bucket83908e77-ezuzcg4isj05",
+        "BENCHCLIENT_S3BUCKET": "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb",
         "BENCHCLIENT_RUNASWEB": "true"
       }
     },

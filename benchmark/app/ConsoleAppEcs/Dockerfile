@@ -11,7 +11,6 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["app/ConsoleAppEcs/ConsoleAppEcs.csproj", "app/ConsoleAppEcs/"]
 COPY ["app/Benchmark.ClientLib/Benchmark.ClientLib.csproj", "app/Benchmark.ClientLib/"]
-COPY ["app/DFrame.Ecs/DFrame.Ecs.csproj", "app/DFrame.Ecs/"]
 RUN dotnet restore "app/ConsoleAppEcs/ConsoleAppEcs.csproj"
 COPY . .
 WORKDIR "/src/app/ConsoleAppEcs"

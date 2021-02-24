@@ -3,7 +3,13 @@ using System.Collections.Generic;
 
 namespace Benchmark.ClientLib.Reports
 {
-    public record HtmlBenchReport(HtmlBenchReportClientInfo Client, HtmlBenchReportSummary Summary, HtmlBenchReportRequestResult UnaryConnectionsResult, HtmlBenchReportRequestResult HubConnectionsResult);
+    public record HtmlBenchReport(
+        HtmlBenchReportClientInfo Client, 
+        HtmlBenchReportSummary Summary,
+        HtmlBenchReportClientResult UnaryClientResult,
+        HtmlBenchReportRequestResult UnaryRequestResult, 
+        // todo: add HubClientRequest
+        HtmlBenchReportRequestResult HubRequestResult);
     public record HtmlBenchReportClientInfo
     {
         public string Os { get; init; }
@@ -26,6 +32,26 @@ namespace Benchmark.ClientLib.Reports
         public TimeSpan DurationMin { get; init; }
         public TimeSpan DurationMax { get; init; }
     }
+    // client base
+    public record HtmlBenchReportClientResult
+    {
+        public HtmlBenchReportClientResultSummaryItem[] SummaryItems { get; init; }
+        public int Errors { get; init; }
+        public (string Client, HtmlBenchReportClientResultClientDurationItem[] Items)[] ClientDurationItems { get; init; }
+    }
+    public record HtmlBenchReportClientResultSummaryItem
+    {
+        public int RequestCount { get; init; }
+        public TimeSpan Duration { get; init; }
+        public double Rps { get; init; }
+    }
+    public record HtmlBenchReportClientResultClientDurationItem
+    {
+        public int ClientCount { get; init; }
+        public HtmlBenchReportClientResultSummaryItem[] SummaryItems { get; init; }
+    }
+
+    // request base
     public record HtmlBenchReportRequestResult
     {
         public HtmlBenchReportRequestResultSummaryItem[] SummaryItems { get; init; }

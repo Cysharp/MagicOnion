@@ -7,24 +7,23 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.5.6.5" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.5.8.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.34.0" />
-    <PackageReference Include="MagicOnion.Client" Version="4.0.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.35.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MagicOnion.Client" Version="4.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="System.CodeDom" Version="5.0.0" />
     <PackageReference Include="ZLogger" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Benchmark.Server\Shared\Data\Paths.cs" Link="Shared\Data\Paths.cs" />
-    <Compile Include="..\Benchmark.Server\Shared\Data\RequestType.cs" Link="Shared\Data\RequestType.cs" />
-    <Compile Include="..\Benchmark.Server\Shared\IBenchmarkHub.cs" Link="Shared\IBenchmarkHub.cs" />
-    <Compile Include="..\Benchmark.Server\Shared\IBenchmarkService.cs" Link="Shared\IBenchmarkService.cs" />
+    <Compile Include="..\Benchmark.Server\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Protobuf Include="..\Benchmark.Server\Protos\**\*.proto" Link="Protos\%(RecursiveDir)\%(FileName)%(Extension)" GrpcServices="Client" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\Data\" />
-  </ItemGroup>
-  
+ 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>

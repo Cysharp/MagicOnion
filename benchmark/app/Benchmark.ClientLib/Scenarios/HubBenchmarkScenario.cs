@@ -31,7 +31,7 @@ namespace Benchmark.ClientLib.Scenarios
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
                     ExecuteId = _reporter.ExecuteId,
-                    Client = _reporter.Name,
+                    ClientId = _reporter.ClientId,
                     TestName = nameof(ConnectAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -49,7 +49,7 @@ namespace Benchmark.ClientLib.Scenarios
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
                     ExecuteId = _reporter.ExecuteId,
-                    Client = _reporter.Name,
+                    ClientId = _reporter.ClientId,
                     TestName = nameof(PlainTextAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -66,7 +66,7 @@ namespace Benchmark.ClientLib.Scenarios
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
                     ExecuteId = _reporter.ExecuteId,
-                    Client = _reporter.Name,
+                    ClientId = _reporter.ClientId,
                     TestName = nameof(EndAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -96,7 +96,7 @@ namespace Benchmark.ClientLib.Scenarios
         private async Task PlainTextAsync(int requestCount)
         {
             _errors = 0;
-            for (var i = 0; i <= requestCount; i++)
+            for (var i = 0; i < requestCount; i++)
             {
                 var data = new BenchmarkData
                 {
@@ -117,7 +117,7 @@ namespace Benchmark.ClientLib.Scenarios
         {
             var tasks = new List<Task>();
             _errors = 0;
-            for (var i = 0; i <= requestCount; i++)
+            for (var i = 0; i < requestCount; i++)
             {
                 var data = new BenchmarkData
                 {

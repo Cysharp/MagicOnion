@@ -13,13 +13,13 @@ namespace Benchmark.ClientLib.Scenarios
 {
     public class UnaryBenchmarkScenario
     {
-        private readonly IBenchmarkService client;
+        private readonly IBenchmarkService _client;
         private readonly BenchReporter _reporter;
         private int _errors = 0;
 
         public UnaryBenchmarkScenario(GrpcChannel channel, BenchReporter reporter)
         {
-            client = MagicOnionClient.Create<IBenchmarkService>(channel);
+            _client = MagicOnionClient.Create<IBenchmarkService>(channel);
             _reporter = reporter;
             _errors = 0;
         }
@@ -33,7 +33,7 @@ namespace Benchmark.ClientLib.Scenarios
                 _reporter.AddBenchDetail(new BenchReportItem
                 {
                     ExecuteId = _reporter.ExecuteId,
-                    Client = _reporter.Name,
+                    ClientId = _reporter.ClientId,
                     TestName = nameof(PlainTextAsync),
                     Begin = statistics.Begin,
                     End = DateTime.UtcNow,
@@ -47,12 +47,12 @@ namespace Benchmark.ClientLib.Scenarios
         private async Task SumAsync(int requestCount)
         {
             var tasks = new List<UnaryResult<int>>();
-            for (var i = 0; i <= requestCount; i++)
+            for (var i = 0; i < requestCount; i++)
             {
                 try
                 {
                     // Call the server-side method using the proxy.
-                    var task = client.SumAsync(i, i);
+                    var task = _client.SumAsync(i, i);
                     tasks.Add(task);
                 }
                 catch
@@ -65,7 +65,7 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task PlainTextAsync(int requestCount)
         {
-            for (var i = 0; i <= requestCount; i++)
+            for (var i = 0; i < requestCount; i++)
             {
                 var data = new BenchmarkData
                 {
@@ -73,7 +73,7 @@ namespace Benchmark.ClientLib.Scenarios
                 };
                 try
                 {
-                    await client.PlainTextAsync(data);
+                    await _client.PlainTextAsync(data);
                 }
                 catch (Exception)
                 {
@@ -85,7 +85,7 @@ namespace Benchmark.ClientLib.Scenarios
         private async Task PlainTextAsyncParallel(int requestCount)
         {
             var tasks = new List<UnaryResult<Nil>>();
-            for (var i = 0; i <= requestCount; i++)
+            for (var i = 0; i < requestCount; i++)
             {
                 var data = new BenchmarkData
                 {
@@ -93,7 +93,7 @@ namespace Benchmark.ClientLib.Scenarios
                 };
                 try
                 {
-                    var task = client.PlainTextAsync(data);
+                    var task = _client.PlainTextAsync(data);
                     tasks.Add(task);
                 }
                 catch (Exception)

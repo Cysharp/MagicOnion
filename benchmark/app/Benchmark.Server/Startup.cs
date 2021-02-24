@@ -33,6 +33,7 @@ namespace Benchmark.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapMagicOnionService();
+                endpoints.MapGrpcService<GreeterService>();
 
                 endpoints.MapGet("/", async context =>
                 {
