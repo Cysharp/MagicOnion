@@ -260,7 +260,7 @@ namespace Cdk
                     StreamPrefix = dframeMasterLogGroup,
                 }),
             });
-            dframeWorkerTaskDef.AddDatadogContainer($"dframe-datadog", ddToken, () => stackProps.UseFargateDatadogAgentProfiler);
+            dframeMasterTaskDef.AddDatadogContainer($"dframe-datadog", ddToken, () => stackProps.UseFargateDatadogAgentProfiler);
             var dframeMasterService = new FargateService(this, "DFrameMasterService", new FargateServiceProps
             {
                 ServiceName = "DFrameMasterService",

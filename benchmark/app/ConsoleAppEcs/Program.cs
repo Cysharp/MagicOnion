@@ -189,7 +189,7 @@ namespace ConsoleAppEcs
             //_reportId = "abc-123";
             //path = "sample-bucket";
             var iterations = new[] { 1 };
-            _waitMilliseconds = 300_000; // 300sec
+            _waitMilliseconds = 60_000; // 1000 = 1sec
 
             Console.WriteLine($"waitMilliseconds {_waitMilliseconds}ms, iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
             _benchmarker = new Benchmarker(path, iterations, null, _cts.Token);
