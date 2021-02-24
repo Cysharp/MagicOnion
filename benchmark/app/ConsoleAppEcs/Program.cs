@@ -35,8 +35,9 @@ namespace ConsoleAppEcs
                 //args = "request -processCount 5 -workerPerProcess 50 -executePerWorker 100 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 10 -workerPerProcess 100 -executePerWorker 150 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 20 -workerPerProcess 10 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
-                args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
+                //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName GrpcWorker".Split(' ');
+                args = "request -processCount 1 -workerPerProcess 500 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
             }
             else if (args.Contains("--worker-flag"))
             {

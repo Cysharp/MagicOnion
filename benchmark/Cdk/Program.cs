@@ -19,7 +19,7 @@ namespace Cdk
                 UseFargateDatadogAgentProfiler = true,
                 MagicOnionInstanceType = InstanceType.Of(InstanceClass.COMPUTE5_AMD, InstanceSize.LARGE),
                 MasterFargateSpec = new FargateSpec(CpuSpec.Half, MemorySpec.Low),
-                WorkerFargateSpec = new FargateSpec(CpuSpec.Single, MemorySpec.Low),
+                WorkerFargateSpec = new FargateSpec(CpuSpec.Quater, MemorySpec.Low),
                 Tags = new Dictionary<string, string>()
                 {
                     { "environment", "bench" },
