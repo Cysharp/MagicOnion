@@ -37,7 +37,8 @@ namespace ConsoleAppEcs
                 //args = "request -processCount 20 -workerPerProcess 10 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName GrpcWorker".Split(' ');
-                args = "request -processCount 1 -workerPerProcess 1000 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
+                //args = "request -processCount 40 -workerPerProcess 100 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
+                args = "request -processCount 10 -workerPerProcess 100 -executePerWorker 1 -workerName CCoreLongRunHubWorker".Split(' ');
 
                 // expand thread pool
                 //ModifyThreadPool(Environment.ProcessorCount * 5, Environment.ProcessorCount * 5);
@@ -211,7 +212,7 @@ namespace ConsoleAppEcs
             //_reportId = "abc-123";
             //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
             var iterations = new[] { 1 };
-            _waitMilliseconds = 30_000; // 1000 = 1sec
+            _waitMilliseconds = 240_000; // 1000 = 1sec
 
             Console.WriteLine($"waitMilliseconds {_waitMilliseconds}ms, iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
             _benchmarker = new Benchmarker(path, iterations, null, _cts.Token);
@@ -220,7 +221,51 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchLongRunHub(_waitMilliseconds, false, _hostAddress, _reportId);
+                await _benchmarker.BenchLongRunHub(_waitMilliseconds, parallel: false, _hostAddress, _reportId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception on ExecuteAsync. {ex.Message} {ex.StackTrace}");
+                throw;
+            }
+        }
+        public override async Task TeardownAsync(WorkerContext context)
+        {
+            Console.WriteLine("Teardown");
+            _cts.Cancel();
+            _cts.Dispose();
+        }
+    }
+
+    public class CCoreLongRunHubWorker : Worker
+    {
+        private CancellationTokenSource _cts;
+        private string _hostAddress;
+        private string _reportId;
+        private Benchmarker _benchmarker;
+        private int _waitMilliseconds;
+
+        public override async Task SetupAsync(WorkerContext context)
+        {
+            Console.WriteLine("Setup");
+            _cts = new CancellationTokenSource();
+            _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST")?.Replace("http://", "").Replace("https://", "") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
+            _reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
+            var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
+            //_hostAddress = "localhost:5000";
+            //_reportId = "abc-123";
+            //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
+            var iterations = new[] { 1 };
+            _waitMilliseconds = 240_000; // 1000 = 1sec
+
+            Console.WriteLine($"waitMilliseconds {_waitMilliseconds}ms, iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
+            _benchmarker = new Benchmarker(path, iterations, null, _cts.Token);
+        }
+        public override async Task ExecuteAsync(WorkerContext context)
+        {
+            try
+            {
+                await _benchmarker.BenchCCoreLongRunHub(_waitMilliseconds, insecure: true, parallel: false, _hostAddress, _reportId);
             }
             catch (Exception ex)
             {

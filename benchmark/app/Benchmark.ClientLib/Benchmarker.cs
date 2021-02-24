@@ -4,6 +4,7 @@ using Benchmark.ClientLib.Reports;
 using Benchmark.ClientLib.Scenarios;
 using Benchmark.ClientLib.Storage;
 using Benchmark.ClientLib.Utils;
+using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using System;
@@ -23,7 +24,8 @@ namespace Benchmark.ClientLib
         private readonly ILogger _logger;
         private readonly CancellationToken _cancellationToken;
         private readonly string _clientId;
-        private ConcurrentDictionary<string, GrpcChannel> _channelCache;
+        private ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache;
+        private ConcurrentDictionary<string, Channel> _ccoreChannelCache;
 
         public Benchmarker(string path, int[] iterations, ILogger logger, CancellationToken cancellationToken)
         {
@@ -32,36 +34,11 @@ namespace Benchmark.ClientLib
             _logger = logger;
             _cancellationToken = cancellationToken;
             _clientId = Guid.NewGuid().ToString();
-            _channelCache = new ConcurrentDictionary<string, GrpcChannel>();
+            _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
         }
 
         private static string NewReportId() => DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
         
-        private GrpcChannel GetOrCreateChannel(string hostAddress)
-        {
-            return _channelCache.GetOrAdd(hostAddress, GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
-            {
-                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
-                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                HttpHandler = new SocketsHttpHandler
-                {
-                    EnableMultipleHttp2Connections = true,
-                }
-            }));
-        }
-        private GrpcChannel CreateChannel(string hostAddress)
-        {
-            return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
-            {
-                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
-                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                HttpHandler = new SocketsHttpHandler
-                {
-                    EnableMultipleHttp2Connections = true,
-                }
-            });
-        }
-
         /// <summary>
         /// Run Unary and Hub Benchmark
         /// </summary>
@@ -89,7 +66,7 @@ namespace Benchmark.ClientLib
                 {
                     // separate channel
                     // Connect to the server using gRPC channel.
-                    var channel = CreateChannel(hostAddress);
+                    var channel = CreateGrpcChannel(hostAddress);
                     var unary = new UnaryBenchmarkScenario(channel, reporter);
                     await using var hub = new HubBenchmarkScenario(channel, reporter);
 
@@ -139,7 +116,7 @@ namespace Benchmark.ClientLib
                 {
                     // separate channel
                     // Connect to the server using gRPC channel.
-                    var channel = CreateChannel(hostAddress);
+                    var channel = CreateGrpcChannel(hostAddress);
                     var scenario = new UnaryBenchmarkScenario(channel, reporter);
 
                     // Unary
@@ -183,7 +160,7 @@ namespace Benchmark.ClientLib
                 foreach (var iteration in _iterations)
                 {
                     // separate channel
-                    var channel = GetOrCreateChannel(hostAddress);
+                    var channel = CreateGrpcChannel(hostAddress);
                     await using var scenario = new HubBenchmarkScenario(channel, reporter);
 
                     // StreamingHub
@@ -229,12 +206,64 @@ namespace Benchmark.ClientLib
                 {
                     // separate channel
                     // Connect to the server using gRPC channel.
-                    var channel = GetOrCreateChannel(hostAddress);
+                    var channel = CreateGrpcChannel(hostAddress);
                     await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
 
                     // StreamingHub
                     _logger?.LogInformation($"Begin Streaming {iteration} requests.");
                     await scenario.Run(iteration, waitMilliseconds, parallel);
+                }
+            }
+            reporter.End();
+
+            // output
+            var benchJson = reporter.ToJson();
+
+            // put json to s3
+            var storage = StorageFactory.Create(_logger);
+            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+        }
+
+        /// <summary>
+        /// Run Hub Benchmark for LongRun Serverside wait
+        /// </summary>
+        /// <param name="waitMilliseconds"></param>
+        /// <param name="insecure"></param>
+        /// <param name="parallel"></param>
+        /// <param name="hostAddress">IP:Port Style address.</param>
+        /// <param name="reportId"></param>
+        /// <returns></returns>
+        public async Task BenchCCoreLongRunHub(int waitMilliseconds, bool insecure = true, bool parallel = false, string hostAddress = "localhost:5000", string reportId = "")
+        {
+            if (string.IsNullOrEmpty(reportId))
+                reportId = NewReportId();
+
+            var executeId = Guid.NewGuid().ToString();
+            _logger?.LogInformation($"reportId: {reportId}");
+            _logger?.LogInformation($"executeId: {executeId}");
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            reporter.Begin();
+            {
+                var credentials = insecure ? ChannelCredentials.Insecure : new SslCredentials();
+
+                //// single chnannel
+                //var channel = GetOrCreateCCoreChannel(hostAddress, credentials);
+                //await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
+
+                foreach (var iteration in _iterations)
+                {
+                    // separate channel
+                    // Connect to the server using gRPC channel.
+                    var channel = CreateCCoreChannel(hostAddress, credentials);
+                    await using var scenario = new CCoreHubLongRunBenchmarkScenario(channel, reporter);
+
+                    // StreamingHub
+                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
+                    await scenario.Run(iteration, waitMilliseconds, parallel);
+
+                    // shutdown channel
+                    await channel.ShutdownAsync();
                 }
             }
             reporter.End();
@@ -274,7 +303,7 @@ namespace Benchmark.ClientLib
                 {
                     // separate channel
                     // Connect to the server using gRPC channel.
-                    var channel = GetOrCreateChannel(hostAddress);
+                    var channel = CreateGrpcChannel(hostAddress);
                     var scenario = new GrpcBenchmarkScenario(channel, reporter);
 
                     // Unary
@@ -423,6 +452,62 @@ namespace Benchmark.ClientLib
                     CommandId = command.CommandId,
                 }, _cancellationToken);
             }
+        }
+
+        /// <summary>
+        /// Get GrpcChannel from cache or create GrpcChannel if not exists.
+        /// </summary>
+        /// <param name="hostAddress">http style address. e.g. http://localhost:5000</param>
+        /// <returns></returns>
+        private GrpcChannel GetOrGrpcCreateChannel(string hostAddress)
+        {
+            return _grpcChannelCache.GetOrAdd(hostAddress, GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
+            {
+                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
+                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
+                HttpHandler = new SocketsHttpHandler
+                {
+                    EnableMultipleHttp2Connections = true,
+                }
+            }));
+        }
+        /// <summary>
+        /// Create GrpcChannel
+        /// </summary>
+        /// <param name="hostAddress">http style address. e.g. http://localhost:5000</param>
+        /// <returns></returns>
+        private GrpcChannel CreateGrpcChannel(string hostAddress)
+        {
+            return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
+            {
+                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
+                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
+                HttpHandler = new SocketsHttpHandler
+                {
+                    EnableMultipleHttp2Connections = true,
+                }
+            });
+        }
+
+        /// <summary>
+        /// Get CCore Channel from cache or create Channel if not exists.
+        /// </summary>
+        /// <param name="hostAddress">IP:Port style address. e.g. localhost:5000</param>
+        /// <param name="credentials"></param>
+        /// <returns></returns>
+        private Channel GetOrCreateCCoreChannel(string hostAddress, ChannelCredentials credentials)
+        {
+            return _ccoreChannelCache.GetOrAdd(hostAddress, new Channel(hostAddress, credentials));
+        }
+        /// <summary>
+        /// Create CCore Channel
+        /// </summary>
+        /// <param name="hostAddress">IP:Port style address. e.g. localhost:5000</param>
+        /// <param name="credentials"></param>
+        /// <returns></returns>
+        private Channel CreateCCoreChannel(string hostAddress, ChannelCredentials credentials)
+        {
+            return new Channel(hostAddress, credentials);
         }
 
         private static string NormalizeNewLine(string content)
