@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "master"
-      - "feature/BetterStreamingHubClientErrors"
+      - "hotfix/WriteEmptyResponse"
     tags:
       - "!*" # not a tag push
 
