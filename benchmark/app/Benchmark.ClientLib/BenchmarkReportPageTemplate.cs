@@ -141,13 +141,10 @@ namespace Benchmark.ClientLib
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f3}", summary.DurationMin.TotalMilliseconds)));
             this.Write(" ms</td>\r\n                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f3}", summary.DurationMax.TotalMilliseconds)));
-            this.Write(@" ms</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class=""table-responsive"">
+            this.Write(" ms</td>\r\n                        </tr>\r\n                        </tbody>\r\n      " +
+                    "              </table>\r\n                </div>\r\n\r\n                ");
+ if (unaryRequestResult.SummaryItems.Any()) {
+            this.Write(@"                <div class=""table-responsive"">
                     <h2 class=""text-muted"">Unary Summary</h2>
                     <table class=""table table-striped table-sm"">
                         <thead>
@@ -160,11 +157,11 @@ namespace Benchmark.ClientLib
  } 
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
-                    "</td>\r\n                        ");
+                    " (Avg)</td>\r\n                        ");
  foreach(var item in unaryRequestResult.SummaryItems) { 
             this.Write("                            <td>");
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
-            this.Write(" sec</td>\r\n                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalMilliseconds)));
+            this.Write(" ms</td>\r\n                        ");
  } 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(unaryRequestResult.Errors));
@@ -208,7 +205,7 @@ namespace Benchmark.ClientLib
                     "    ");
  foreach(var item in unaryClientResult.SummaryItems) { 
             this.Write("                                        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalMilliseconds));
             this.Write(",\r\n                                    ");
  } 
             this.Write(@"                                    ]
@@ -279,7 +276,7 @@ namespace Benchmark.ClientLib
                     "    ");
  foreach(var item in unaryRequestResult.SummaryItems) { 
             this.Write("                                        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalMilliseconds));
             this.Write(",\r\n                                    ");
  } 
             this.Write(@"                                    ]
@@ -359,7 +356,7 @@ namespace Benchmark.ClientLib
             this.Write("                                        ");
  foreach(var item in summaries.SummaryItems) { 
             this.Write("                                            ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalMilliseconds));
             this.Write(",\r\n                                        ");
  } 
             this.Write("                                    ");
@@ -385,11 +382,17 @@ namespace Benchmark.ClientLib
                     "                    tooltips: {\r\n                                    mode: \'labe" +
                     "l\' // data colum for tooltip\r\n                                },\r\n              " +
                     "                  responsive: true\r\n                            }\r\n             " +
-                    "           });\r\n                    </script>\r\n                </div>\r\n\r\n       " +
-                    "         <div class=\"table-responsive\">\r\n                    <h2 class=\"text-mut" +
-                    "ed\">Hub Summary</h2>\r\n                    <table class=\"table table-striped tabl" +
-                    "e-sm\">\r\n                        <thead>\r\n                            <th scope=\"" +
-                    "col\">Requests</th>\r\n                        ");
+                    "           });\r\n                    </script>\r\n                </div>\r\n         " +
+                    "       ");
+}
+            this.Write("\r\n                ");
+ if (hubRequestResult.SummaryItems.Any()) {
+            this.Write(@"                <div class=""table-responsive"">
+                    <h2 class=""text-muted"">Hub Summary</h2>
+                    <table class=""table table-striped table-sm"">
+                        <thead>
+                            <th scope=""col"">Requests</th>
+                        ");
  foreach(var item in hubRequestResult.SummaryItems) { 
             this.Write("                            <th scope=\"col\">");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.RequestCount));
@@ -397,11 +400,11 @@ namespace Benchmark.ClientLib
  } 
             this.Write("                            <th scope=\"col\">Errors</th>\r\n                        " +
                     "</thead>\r\n                        <tr>\r\n                            <td>Duration" +
-                    "</td>\r\n                        ");
+                    " (Avg)</td>\r\n                        ");
  foreach(var item in hubRequestResult.SummaryItems) { 
             this.Write("                            <td>");
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalSeconds)));
-            this.Write(" sec</td>\r\n                        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Format("{0:f2}", item.Duration.TotalMilliseconds)));
+            this.Write(" ms</td>\r\n                        ");
  } 
             this.Write("                            <td>");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubRequestResult.Errors));
@@ -444,7 +447,7 @@ namespace Benchmark.ClientLib
                     "    ");
  foreach(var item in hubRequestResult.SummaryItems) { 
             this.Write("                                        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalMilliseconds));
             this.Write(",\r\n                                    ");
  } 
             this.Write(@"                                    ]
@@ -524,7 +527,7 @@ namespace Benchmark.ClientLib
             this.Write("                                        ");
  foreach(var item in summaries.SummaryItems) { 
             this.Write("                                            ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalSeconds));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Duration.TotalMilliseconds));
             this.Write(",\r\n                                        ");
  } 
             this.Write("                                    ");
@@ -550,20 +553,36 @@ namespace Benchmark.ClientLib
                     "                  tooltips: {\r\n                                    mode: \'label\'" +
                     " // data colum for tooltip\r\n                                },\r\n                " +
                     "                responsive: true\r\n                            }\r\n               " +
-                    "         });\r\n                    </script>\r\n                </div>\r\n\r\n         " +
-                    "   </div>\r\n        </div>\r\n    </main>\r\n\r\n    <footer class=\"text-muted\" style=\"" +
-                    "padding-top: 3rem;padding-bottom: 3rem;\">\r\n        <div class=container>\r\n      " +
-                    "      <a href=\"#\" class=\"btn btn-outline-info float-right\" role=\"button\">\r\n     " +
-                    "           <i class=\"fa fa-angle-up\"></i>\r\n            </a>\r\n            <p clas" +
-                    "s=\"text-center\">\r\n                <a class=\"text-dark\" href=\"https://github.com/" +
-                    "cysharp/MagicOnion/\">Visit the GitHub</a>\r\n            /\r\n            © 2020 Cop" +
-                    "yright:\r\n                <a class=\"text-dark\" href=\"https://cysharp.co.jp/\">Cysh" +
-                    "arp, Inc.</a>\r\n            </p>\r\n        </div>\r\n    </footer>\r\n\r\n    <script sr" +
-                    "c=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js\"\r\n    " +
-                    "    integrity=\"sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/" +
-                    "kR0JKI\"\r\n        crossorigin=\"anonymous\"></script>\r\n    <!-- MDB -->\r\n    <scrip" +
-                    "t type=\"text/javascript\" src=\"https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/" +
-                    "3.0.0/mdb.min.js\"></script>\r\n</body>\r\n\r\n</html>");
+                    "         });\r\n                    </script>\r\n                </div>\r\n           " +
+                    "     ");
+}
+            this.Write(@"
+            </div>
+        </div>
+    </main>
+
+    <footer class=""text-muted"" style=""padding-top: 3rem;padding-bottom: 3rem;"">
+        <div class=container>
+            <a href=""#"" class=""btn btn-outline-info float-right"" role=""button"">
+                <i class=""fa fa-angle-up""></i>
+            </a>
+            <p class=""text-center"">
+                <a class=""text-dark"" href=""https://github.com/cysharp/MagicOnion/"">Visit the GitHub</a>
+            /
+            © 2020 Copyright:
+                <a class=""text-dark"" href=""https://cysharp.co.jp/"">Cysharp, Inc.</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src=""https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js""
+        integrity=""sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI""
+        crossorigin=""anonymous""></script>
+    <!-- MDB -->
+    <script type=""text/javascript"" src=""https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.js""></script>
+</body>
+
+</html>");
             return this.GenerationEnvironment.ToString();
         }
     }

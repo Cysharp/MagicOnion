@@ -103,6 +103,7 @@
                     </table>
                 </div>
 
+                <# if (unaryRequestResult.SummaryItems.Any()) {#>
                 <div class="table-responsive">
                     <h2 class="text-muted">Unary Summary</h2>
                     <table class="table table-striped table-sm">
@@ -114,9 +115,9 @@
                             <th scope="col">Errors</th>
                         </thead>
                         <tr>
-                            <td>Duration</td>
+                            <td>Duration (Avg)</td>
                         <# foreach(var item in unaryRequestResult.SummaryItems) { #>
-                            <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
+                            <td><#= string.Format("{0:f2}", item.Duration.TotalMilliseconds) #> ms</td>
                         <# } #>
                             <td><#= unaryRequestResult.Errors #></td>
                         </tr>
@@ -151,7 +152,7 @@
                                     borderColor: "<#= barColor #>",
                                     data: [
                                     <# foreach(var item in unaryClientResult.SummaryItems) { #>
-                                        <#= item.Duration.TotalSeconds #>,
+                                        <#= item.Duration.TotalMilliseconds #>,
                                     <# } #>
                                     ]
                                 },
@@ -209,7 +210,7 @@
                                     borderColor: "<#= barColor #>",
                                     data: [
                                     <# foreach(var item in unaryRequestResult.SummaryItems) { #>
-                                        <#= item.Duration.TotalSeconds #>,
+                                        <#= item.Duration.TotalMilliseconds #>,
                                     <# } #>
                                     ]
                                 },
@@ -274,7 +275,7 @@
                                     data: [
                                     <# foreach(var summaries in items) { #>
                                         <# foreach(var item in summaries.SummaryItems) { #>
-                                            <#= item.Duration.TotalSeconds #>,
+                                            <#= item.Duration.TotalMilliseconds #>,
                                         <# } #>
                                     <# } #>
                                     ]
@@ -312,7 +313,9 @@
                         });
                     </script>
                 </div>
+                <#}#>
 
+                <# if (hubRequestResult.SummaryItems.Any()) {#>
                 <div class="table-responsive">
                     <h2 class="text-muted">Hub Summary</h2>
                     <table class="table table-striped table-sm">
@@ -324,9 +327,9 @@
                             <th scope="col">Errors</th>
                         </thead>
                         <tr>
-                            <td>Duration</td>
+                            <td>Duration (Avg)</td>
                         <# foreach(var item in hubRequestResult.SummaryItems) { #>
-                            <td><#= string.Format("{0:f2}", item.Duration.TotalSeconds) #> sec</td>
+                            <td><#= string.Format("{0:f2}", item.Duration.TotalMilliseconds) #> ms</td>
                         <# } #>
                             <td><#= hubRequestResult.Errors #></td>
                         </tr>
@@ -360,7 +363,7 @@
                                     borderColor: "<#= barColor #>",
                                     data: [
                                     <# foreach(var item in hubRequestResult.SummaryItems) { #>
-                                        <#= item.Duration.TotalSeconds #>,
+                                        <#= item.Duration.TotalMilliseconds #>,
                                     <# } #>
                                     ]
                                 },
@@ -425,7 +428,7 @@
                                     data: [
                                     <# foreach(var summaries in items) { #>
                                         <# foreach(var item in summaries.SummaryItems) { #>
-                                            <#= item.Duration.TotalSeconds #>,
+                                            <#= item.Duration.TotalMilliseconds #>,
                                         <# } #>
                                     <# } #>
                                     ]
@@ -463,6 +466,7 @@
                         });
                     </script>
                 </div>
+                <#}#>
 
             </div>
         </div>

@@ -38,7 +38,7 @@ namespace ConsoleAppEcs
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName GrpcWorker".Split(' ');
                 //args = "request -processCount 40 -workerPerProcess 100 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
-                args = "request -processCount 10 -workerPerProcess 100 -executePerWorker 1 -workerName CCoreLongRunHubWorker".Split(' ');
+                args = "request -processCount 100 -workerPerProcess 100 -executePerWorker 1 -workerName CCoreLongRunHubWorker".Split(' ');
 
                 // expand thread pool
                 //ModifyThreadPool(Environment.ProcessorCount * 5, Environment.ProcessorCount * 5);

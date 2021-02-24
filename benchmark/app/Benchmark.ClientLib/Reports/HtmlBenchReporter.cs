@@ -167,7 +167,7 @@ namespace Benchmark.ClientLib.Reports
                     return new HtmlBenchReportClientResultSummaryItem
                     {
                         RequestCount = xs.Key,
-                        Duration = duration,
+                        Duration = AverageTimeSpan(xs.Select(x => x.Duration)),
                         Rps = xs.Select(x => x.RequestCount).Sum() / duration.TotalSeconds,
                     };
                 })
@@ -184,7 +184,7 @@ namespace Benchmark.ClientLib.Reports
                     return new HtmlBenchReportRequestResultSummaryItem
                     {
                         RequestCount = xs.Key,
-                        Duration = duration,
+                        Duration = AverageTimeSpan(xs.Select(x => x.Duration)),
                         Rps = xs.Select(x => x.RequestCount).Sum() / duration.TotalSeconds,
                     };
                 })

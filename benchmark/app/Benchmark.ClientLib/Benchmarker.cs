@@ -458,15 +458,7 @@ namespace Benchmark.ClientLib
         /// <returns></returns>
         private GrpcChannel GetOrGrpcCreateChannel(string hostAddress)
         {
-            return _grpcChannelCache.GetOrAdd(hostAddress, GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
-            {
-                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
-                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                HttpHandler = new SocketsHttpHandler
-                {
-                    EnableMultipleHttp2Connections = true,
-                }
-            }));
+            return _grpcChannelCache.GetOrAdd(hostAddress, CreateGrpcChannel(hostAddress));
         }
         /// <summary>
         /// Create GrpcChannel
@@ -494,7 +486,7 @@ namespace Benchmark.ClientLib
         /// <returns></returns>
         private Channel GetOrCreateCCoreChannel(string hostAddress, ChannelCredentials credentials)
         {
-            return _ccoreChannelCache.GetOrAdd(hostAddress, new Channel(hostAddress, credentials));
+            return _ccoreChannelCache.GetOrAdd(hostAddress, CreateCCoreChannel(hostAddress, credentials));
         }
         /// <summary>
         /// Create CCore Channel
