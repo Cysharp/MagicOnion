@@ -83,7 +83,7 @@ namespace Benchmark.ClientLib.Scenarios
             _errors = 0;
             try
             {
-                _client = StreamingHubClient.Connect<IBenchmarkHub, IBenchmarkHubReciever>(_channel, this);
+                _client = await StreamingHubClient.ConnectAsync<IBenchmarkHub, IBenchmarkHubReciever>(_channel, this);
                 var name = Guid.NewGuid().ToString();
                 await _client.Ready(roomName, name, "plaintext");
             }
