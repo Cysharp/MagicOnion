@@ -169,7 +169,7 @@ namespace Benchmark.ClientLib.Scenarios
 
         async ValueTask IAsyncDisposable.DisposeAsync()
         {
-            await _client.DisposeAsync();
+            await _client?.DisposeAsync();
         }
 
         void ILongRunBenchmarkHubReciever.OnStart(string requestType)

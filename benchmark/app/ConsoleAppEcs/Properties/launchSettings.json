@@ -3,7 +3,7 @@
     "ConsoleAppEcs": {
       "commandName": "Project",
       "environmentVariables": {
-        "BENCH_S3BUCKET": "sample-bucket",
+        "BENCH_S3BUCKET": "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb",
         "DFRAME_MASTER_CONNECT_TO_HOST": "localhost",
         "DFRAME_WORKER_CLUSTER_NAME": "MagicOnionBenchmarkCdkStack-WorkerClusterB2BB5BD9-yLDvC4AGFi9t",
         "DFRAME_WORKER_CONTAINER_NAME": "worker",

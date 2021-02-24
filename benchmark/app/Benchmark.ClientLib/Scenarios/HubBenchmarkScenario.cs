@@ -24,57 +24,60 @@ namespace Benchmark.ClientLib.Scenarios
 
         public async Task Run(int requestCount)
         {
-            using (var statistics = new Statistics(nameof(ConnectAsync)))
+            using (var total = new Statistics("Total"))
             {
-                await ConnectAsync("console-client");
-
-                _reporter.AddBenchDetail(new BenchReportItem
+                using (var statistics = new Statistics(nameof(ConnectAsync)))
                 {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(ConnectAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = 0, // connect is setup, not count as request.
-                    Errors = _errors,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
-            }
+                    await ConnectAsync("console-client");
 
-            using (var statistics = new Statistics(nameof(PlainTextAsync)))
-            {
-                await PlainTextAsync(requestCount);
+                    _reporter.AddBenchDetail(new BenchReportItem
+                    {
+                        ExecuteId = _reporter.ExecuteId,
+                        ClientId = _reporter.ClientId,
+                        TestName = nameof(ConnectAsync),
+                        Begin = statistics.Begin,
+                        End = DateTime.UtcNow,
+                        Duration = statistics.Elapsed,
+                        RequestCount = 0, // connect is setup, not count as request.
+                        Errors = _errors,
+                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                    });
+                }
 
-                _reporter.AddBenchDetail(new BenchReportItem
+                using (var statistics = new Statistics(nameof(PlainTextAsync)))
                 {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(PlainTextAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = requestCount,
-                    Errors = _errors,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
-            }
+                    await PlainTextAsync(requestCount);
 
-            using (var statistics = new Statistics(nameof(EndAsync)))
-            {
-                await EndAsync();
-                _reporter.AddBenchDetail(new BenchReportItem
+                    _reporter.AddBenchDetail(new BenchReportItem
+                    {
+                        ExecuteId = _reporter.ExecuteId,
+                        ClientId = _reporter.ClientId,
+                        TestName = nameof(PlainTextAsync),
+                        Begin = statistics.Begin,
+                        End = DateTime.UtcNow,
+                        Duration = statistics.Elapsed,
+                        RequestCount = requestCount,
+                        Errors = _errors,
+                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                    });
+                }
+
+                using (var statistics = new Statistics(nameof(EndAsync)))
                 {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(EndAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = 0, // end is teardown, not count as request.
-                    Errors = _errors,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
+                    await EndAsync();
+                    _reporter.AddBenchDetail(new BenchReportItem
+                    {
+                        ExecuteId = _reporter.ExecuteId,
+                        ClientId = _reporter.ClientId,
+                        TestName = nameof(EndAsync),
+                        Begin = statistics.Begin,
+                        End = DateTime.UtcNow,
+                        Duration = statistics.Elapsed,
+                        RequestCount = 0, // end is teardown, not count as request.
+                        Errors = _errors,
+                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                    });
+                }
             }
         }
 

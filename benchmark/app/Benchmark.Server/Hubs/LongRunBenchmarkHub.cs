@@ -1,3 +1,4 @@
+using System;
 using Benchmark.Server.Shared;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ namespace Benchmark.Server.Hubs
 
         public async Task Process(LongRunBenchmarkData data)
         {
-            await Task.Delay(data.WaitMilliseconds);
+            await Task.Delay(TimeSpan.FromMilliseconds(data.WaitMilliseconds));
         }
 
         public async Task End()

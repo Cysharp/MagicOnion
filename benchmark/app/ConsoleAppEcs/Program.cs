@@ -37,7 +37,10 @@ namespace ConsoleAppEcs
                 //args = "request -processCount 20 -workerPerProcess 10 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName GrpcWorker".Split(' ');
-                args = "request -processCount 1 -workerPerProcess 500 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
+                args = "request -processCount 1 -workerPerProcess 1000 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
+
+                // expand thread pool
+                //ModifyThreadPool(Environment.ProcessorCount * 5, Environment.ProcessorCount * 5);
             }
             else if (args.Contains("--worker-flag"))
             {
@@ -62,7 +65,7 @@ namespace ConsoleAppEcs
                     Timeout = TimeSpan.FromMinutes(120),
                     OnExecuteResult = (results, option, scenario) =>
                     {
-                        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+                        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
                         Console.WriteLine("Generating html.");
                         var benchmarker = new Benchmarker(path, null, null, cts.Token);
                         benchmarker.GenerateHtml(reportId, generateDetail: false).GetAwaiter().GetResult();
@@ -70,17 +73,37 @@ namespace ConsoleAppEcs
                 });
                 //.RunDFrameAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new InProcessScalingProvider())
                 //{
-                //    OnExecuteResult = async (results, option, scenario) => 
+                //    Timeout = TimeSpan.FromMinutes(120),
+                //    OnExecuteResult = async (results, option, scenario) =>
                 //    {
-                //        var benchmarker = new Benchmarker(path, null, default);
-                //        var reports = await benchmarker.GetReports(reportId);
-                //        if (reports.Any())
-                //        {
-                //            Console.WriteLine("Generating html.");
-                //            await benchmarker.GenerateHtml(reportId, generateDetail: false);
-                //        }
+                //        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+                //        Console.WriteLine("Generating html.");
+                //        var benchmarker = new Benchmarker(path, null, null, cts.Token);
+                //        await benchmarker.GenerateHtml(reportId, generateDetail: false);
                 //    },
                 //});
+        }
+
+        private static void ModifyThreadPool(int workerThread, int completionPortThread)
+        {
+            GetCurrentThread();
+            SetThread(workerThread, completionPortThread);
+            GetCurrentThread();
+        }
+        private static void GetCurrentThread()
+        {
+            ThreadPool.GetMinThreads(out var minWorkerThread, out var minCompletionPorlThread);
+            ThreadPool.GetAvailableThreads(out var availWorkerThread, out var availCompletionPorlThread);
+            ThreadPool.GetMaxThreads(out var maxWorkerThread, out var maxCompletionPorlThread);
+            Console.WriteLine($"min: {minWorkerThread} {minCompletionPorlThread}");
+            Console.WriteLine($"max: {maxWorkerThread} {maxCompletionPorlThread}");
+            Console.WriteLine($"available: {availWorkerThread} {availCompletionPorlThread}");
+        }
+
+        private static void SetThread(int workerThread, int completionPortThread)
+        {
+            Console.WriteLine($"Changing ThreadPools. workerthread: {workerThread} completionPortThread: {completionPortThread}");
+            ThreadPool.SetMinThreads(workerThread, completionPortThread);
         }
     }
 
@@ -101,7 +124,7 @@ namespace ConsoleAppEcs
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
             //_hostAddress = "http://localhost:5000";
             //_reportId = "abc-123";
-            //path = "sample-bucket";
+            //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
             var iterations = new[] { 1, 2, 5, 10, 20, 50, 100, 200 };
 
             Console.WriteLine($"iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
@@ -176,7 +199,6 @@ namespace ConsoleAppEcs
         private string _reportId;
         private Benchmarker _benchmarker;
         private int _waitMilliseconds;
-        private bool _isParallel = false;
 
         public override async Task SetupAsync(WorkerContext context)
         {
@@ -187,9 +209,9 @@ namespace ConsoleAppEcs
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
             //_hostAddress = "http://localhost:5000";
             //_reportId = "abc-123";
-            //path = "sample-bucket";
+            //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
             var iterations = new[] { 1 };
-            _waitMilliseconds = 60_000; // 1000 = 1sec
+            _waitMilliseconds = 30_000; // 1000 = 1sec
 
             Console.WriteLine($"waitMilliseconds {_waitMilliseconds}ms, iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
             _benchmarker = new Benchmarker(path, iterations, null, _cts.Token);
@@ -198,7 +220,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchLongRunHub(_waitMilliseconds, _isParallel, _hostAddress, _reportId);
+                await _benchmarker.BenchLongRunHub(_waitMilliseconds, false, _hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -230,7 +252,7 @@ namespace ConsoleAppEcs
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
             //_hostAddress = "http://localhost:5000";
             //_reportId = "abc-123";
-            //path = "sample-bucket";
+            //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
             var iterations = new[] { 1, 2, 5, 10, 20, 50, 100, 200 };
 
             Console.WriteLine($"iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");

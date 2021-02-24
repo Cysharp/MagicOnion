@@ -8,6 +8,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using ZLogger;
 
 namespace Benchmark.Server
@@ -16,6 +17,9 @@ namespace Benchmark.Server
     {
         public static void Main(string[] args)
         {
+            // expand thread pool
+            //ModifyThreadPool(Environment.ProcessorCount * 2, Environment.ProcessorCount * 2);
+
             //EnableDebugOutput();
             CreateHostBuilder(args).Build().Run();
         }
@@ -45,6 +49,28 @@ namespace Benchmark.Server
                         })
                         .UseStartup<Startup>();
                 });
+
+        private static void ModifyThreadPool(int workerThread, int completionPortThread)
+        {
+            GetCurrentThread();
+            SetThread(workerThread, completionPortThread);
+            GetCurrentThread();
+        }
+        private static void GetCurrentThread()
+        {
+            ThreadPool.GetMinThreads(out var minWorkerThread, out var minCompletionPorlThread);
+            ThreadPool.GetAvailableThreads(out var availWorkerThread, out var availCompletionPorlThread);
+            ThreadPool.GetMaxThreads(out var maxWorkerThread, out var maxCompletionPorlThread);
+            Console.WriteLine($"min: {minWorkerThread} {minCompletionPorlThread}");
+            Console.WriteLine($"max: {maxWorkerThread} {maxCompletionPorlThread}");
+            Console.WriteLine($"available: {availWorkerThread} {availCompletionPorlThread}");
+        }
+
+        private static void SetThread(int workerThread, int completionPortThread)
+        {
+            Console.WriteLine($"Changing ThreadPools. workerthread: {workerThread} completionPortThread: {completionPortThread}");
+            ThreadPool.SetMinThreads(workerThread, completionPortThread);
+        }
 
         private static void EnableDebugOutput()
         {
