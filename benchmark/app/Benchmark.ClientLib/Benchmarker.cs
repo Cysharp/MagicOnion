@@ -171,6 +171,46 @@ namespace Benchmark.ClientLib
             await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
         }
 
+        /// <summary>
+        /// Run Hub Benchmark for LongRun Serverside wait
+        /// </summary>
+        /// <param name="waitMilliseconds"></param>
+        /// <param name="parallel"></param>
+        /// <param name="hostAddress"></param>
+        /// <param name="reportId"></param>
+        /// <returns></returns>
+        public async Task BenchLongRunHub(int waitMilliseconds, bool parallel, string hostAddress = "http://localhost:5000", string reportId = "")
+        {
+            if (string.IsNullOrEmpty(reportId))
+                reportId = NewReportId();
+
+            var executeId = Guid.NewGuid().ToString();
+            _logger?.LogInformation($"reportId: {reportId}");
+            _logger?.LogInformation($"executeId: {executeId}");
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            reporter.Begin();
+            {
+                // Connect to the server using gRPC channel.
+                var channel = GetOrCreateChannel(hostAddress);
+                await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
+
+                foreach (var iteration in _iterations)
+                {
+                    // StreamingHub
+                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
+                    await scenario.Run(iteration, waitMilliseconds, parallel);
+                }
+            }
+            reporter.End();
+
+            // output
+            var benchJson = reporter.ToJson();
+
+            // put json to s3
+            var storage = StorageFactory.Create(_logger);
+            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+        }
 
         /// <summary>
         /// Run Grpc Benchmark

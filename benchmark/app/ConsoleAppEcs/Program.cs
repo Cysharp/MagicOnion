@@ -168,6 +168,50 @@ namespace ConsoleAppEcs
         }
     }
 
+    public class LongRunHubWorker : Worker
+    {
+        private CancellationTokenSource _cts;
+        private string _hostAddress;
+        private string _reportId;
+        private Benchmarker _benchmarker;
+        private int _waitMilliseconds;
+        private bool _isParallel = false;
+
+        public override async Task SetupAsync(WorkerContext context)
+        {
+            Console.WriteLine("Setup");
+            _cts = new CancellationTokenSource();
+            _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
+            _reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
+            var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
+            //_hostAddress = "http://localhost:5000";
+            //_reportId = "abc-123";
+            //path = "sample-bucket";
+            var iterations = new[] { 1 };
+            _waitMilliseconds = 300_000; // 300sec
+
+            Console.WriteLine($"waitMilliseconds {_waitMilliseconds}ms, iterations {string.Join(",", iterations)}, hostAddress {_hostAddress}, reportId {_reportId}, path {path}");
+            _benchmarker = new Benchmarker(path, iterations, null, _cts.Token);
+        }
+        public override async Task ExecuteAsync(WorkerContext context)
+        {
+            try
+            {
+                await _benchmarker.BenchLongRunHub(_waitMilliseconds, _isParallel, _hostAddress, _reportId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception on ExecuteAsync. {ex.Message} {ex.StackTrace}");
+                throw;
+            }
+        }
+        public override async Task TeardownAsync(WorkerContext context)
+        {
+            Console.WriteLine("Teardown");
+            _cts.Cancel();
+            _cts.Dispose();
+        }
+    }
 
     public class GrpcWorker : Worker
     {
