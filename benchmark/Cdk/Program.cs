@@ -13,7 +13,7 @@ namespace Cdk
             new CdkStack(app, "MagicOnionBenchmarkCdkStack", new ReportStackProps
             {
                 ForceRecreateMagicOnion = false,
-                EnableCronScaleInEc2 = false,
+                EnableCronScaleInEc2 = true,
                 UseEc2CloudWatchAgentProfiler = true,
                 UseEc2DatadogAgentProfiler = false,
                 UseFargateDatadogAgentProfiler = true,
