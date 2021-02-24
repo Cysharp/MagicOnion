@@ -73,16 +73,16 @@ namespace ConsoleAppEcs
                     },
                 });
                 //.RunDFrameAsync(args, new DFrameOptions(host, port, workerConnectToHost, port, new InProcessScalingProvider())
-                //{
-                //    Timeout = TimeSpan.FromMinutes(120),
-                //    OnExecuteResult = async (results, option, scenario) =>
-                //    {
-                //        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
-                //        Console.WriteLine("Generating html.");
-                //        var benchmarker = new Benchmarker(path, null, null, cts.Token);
-                //        await benchmarker.GenerateHtml(reportId, generateDetail: false);
-                //    },
-                //});
+                // {
+                //     Timeout = TimeSpan.FromMinutes(120),
+                //     OnExecuteResult = async (results, option, scenario) =>
+                //     {
+                //         using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+                //         Console.WriteLine("Generating html.");
+                //         var benchmarker = new Benchmarker(path, null, null, cts.Token);
+                //         await benchmarker.GenerateHtml(reportId, generateDetail: false);
+                //     },
+                // });
         }
 
         private static void ModifyThreadPool(int workerThread, int completionPortThread)
@@ -249,9 +249,10 @@ namespace ConsoleAppEcs
         {
             Console.WriteLine("Setup");
             _cts = new CancellationTokenSource();
-            _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST")?.Replace("http://", "").Replace("https://", "") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
+            _hostAddress = Environment.GetEnvironmentVariable("BENCH_SERVER_HOST") ?? throw new ArgumentNullException($"Environment variables BENCH_SERVER_HOST is missing.");
             _reportId = Environment.GetEnvironmentVariable("BENCH_REPORTID") ?? throw new ArgumentNullException($"Environment variables BENCH_REPORTID is missing.");
             var path = Environment.GetEnvironmentVariable("BENCH_S3BUCKET") ?? throw new ArgumentNullException($"Environment variables BENCH_S3BUCKET is missing.");
+            _hostAddress = _hostAddress?.Replace("http://", "")?.Replace("https://", "") + ":80"; // must add port as :80
             //_hostAddress = "localhost:5000";
             //_reportId = "abc-123";
             //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";

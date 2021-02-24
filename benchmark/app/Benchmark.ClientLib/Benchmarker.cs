@@ -261,9 +261,6 @@ namespace Benchmark.ClientLib
                     // StreamingHub
                     _logger?.LogInformation($"Begin Streaming {iteration} requests.");
                     await scenario.Run(iteration, waitMilliseconds, parallel);
-
-                    // shutdown channel
-                    await channel.ShutdownAsync();
                 }
             }
             reporter.End();
