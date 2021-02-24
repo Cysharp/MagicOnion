@@ -49,6 +49,18 @@ namespace Benchmark.ClientLib
                 }
             }));
         }
+        private GrpcChannel CreateChannel(string hostAddress)
+        {
+            return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
+            {
+                // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
+                // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
+                HttpHandler = new SocketsHttpHandler
+                {
+                    EnableMultipleHttp2Connections = true,
+                }
+            });
+        }
 
         /// <summary>
         /// Run Unary and Hub Benchmark
@@ -67,13 +79,20 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId);
             reporter.Begin();
             {
-                // Connect to the server using gRPC channel.
-                var channel = GetOrCreateChannel(hostAddress);
-                var unary = new UnaryBenchmarkScenario(channel, reporter);
-                await using var hub = new HubBenchmarkScenario(channel, reporter);
+                // single channel
+                //// Connect to the server using gRPC channel.
+                //var channel = GetOrCreateChannel(hostAddress);
+                //var unary = new UnaryBenchmarkScenario(channel, reporter);
+                //await using var hub = new HubBenchmarkScenario(channel, reporter);
 
                 foreach (var iteration in _iterations)
                 {
+                    // separate channel
+                    // Connect to the server using gRPC channel.
+                    var channel = CreateChannel(hostAddress);
+                    var unary = new UnaryBenchmarkScenario(channel, reporter);
+                    await using var hub = new HubBenchmarkScenario(channel, reporter);
+
                     // Unary
                     _logger?.LogInformation($"Begin unary {iteration} requests.");
                     await unary.Run(iteration);
@@ -111,12 +130,18 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId);
             reporter.Begin();
             {
-                // Connect to the server using gRPC channel.
-                var channel = GetOrCreateChannel(hostAddress);
-                var scenario = new UnaryBenchmarkScenario(channel, reporter);
+                //// single channel
+                //// Connect to the server using gRPC channel.
+                //var channel = GetOrCreateChannel(hostAddress);
+                //var scenario = new UnaryBenchmarkScenario(channel, reporter);
 
                 foreach (var iteration in _iterations)
                 {
+                    // separate channel
+                    // Connect to the server using gRPC channel.
+                    var channel = CreateChannel(hostAddress);
+                    var scenario = new UnaryBenchmarkScenario(channel, reporter);
+
                     // Unary
                     _logger?.LogInformation($"Begin unary {iteration} requests.");
                     await scenario.Run(iteration);
@@ -150,12 +175,17 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId);
             reporter.Begin();
             {
-                // Connect to the server using gRPC channel.
-                var channel = GetOrCreateChannel(hostAddress);
-                await using var scenario = new HubBenchmarkScenario(channel, reporter);
+                // single channel
+                //// Connect to the server using gRPC channel.
+                //var channel = GetOrCreateChannel(hostAddress);
+                //await using var scenario = new HubBenchmarkScenario(channel, reporter);
 
                 foreach (var iteration in _iterations)
                 {
+                    // separate channel
+                    var channel = GetOrCreateChannel(hostAddress);
+                    await using var scenario = new HubBenchmarkScenario(channel, reporter);
+
                     // StreamingHub
                     _logger?.LogInformation($"Begin Streaming {iteration} requests.");
                     await scenario.Run(iteration);
@@ -179,7 +209,7 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchLongRunHub(int waitMilliseconds, bool parallel, string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task BenchLongRunHub(int waitMilliseconds, bool parallel = false, string hostAddress = "http://localhost:5000", string reportId = "")
         {
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
@@ -191,12 +221,17 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId);
             reporter.Begin();
             {
-                // Connect to the server using gRPC channel.
-                var channel = GetOrCreateChannel(hostAddress);
-                await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
+                //// single chnannel
+                //var channel = GetOrCreateChannel(hostAddress);
+                //await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
 
                 foreach (var iteration in _iterations)
                 {
+                    // separate channel
+                    // Connect to the server using gRPC channel.
+                    var channel = GetOrCreateChannel(hostAddress);
+                    await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
+
                     // StreamingHub
                     _logger?.LogInformation($"Begin Streaming {iteration} requests.");
                     await scenario.Run(iteration, waitMilliseconds, parallel);
@@ -230,12 +265,18 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.GrpcDotnet);
             reporter.Begin();
             {
+                // single channel
                 // Connect to the server using gRPC channel.
-                var channel = GetOrCreateChannel(hostAddress);
-                var scenario = new GrpcBenchmarkScenario(channel, reporter);
+                //var channel = GetOrCreateChannel(hostAddress);
+                //var scenario = new GrpcBenchmarkScenario(channel, reporter);
 
                 foreach (var iteration in _iterations)
                 {
+                    // separate channel
+                    // Connect to the server using gRPC channel.
+                    var channel = GetOrCreateChannel(hostAddress);
+                    var scenario = new GrpcBenchmarkScenario(channel, reporter);
+
                     // Unary
                     _logger?.LogInformation($"Begin grpc {iteration} requests.");
                     await scenario.Run(iteration);
