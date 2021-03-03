@@ -26,12 +26,10 @@ namespace Cdk
         internal CdkStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
             var stackProps = ReportStackProps.ParseOrDefault(props);
-            // recreate MagicOnion Ec2 via renew userdata
-            var recreateMagicOnionTrigger = stackProps.ForceRecreateMagicOnion ? $"echo {stackProps.ExecuteTime}" : "";
             var dframeWorkerLogGroup = "MagicOnionBenchWorkerLogGroup";
             var dframeMasterLogGroup = "MagicOnionBenchMasterLogGroup";
             var benchNetwork = stackProps.GetBenchNetwork();
-            var magicOnionBinaryName = benchNetwork.ListenMagicOnionTls ? "Benchmark.Server.Https" : "Benchmark.Server";
+            var recreateMagicOnionTrigger = stackProps.GetBenchmarkServerBinariesHash();
 
             // s3
             var s3 = new Bucket(this, "Bucket", new BucketProps
@@ -69,8 +67,8 @@ namespace Cdk
             var masterDllDeployment = new BucketDeployment(this, "DeployMasterDll", new BucketDeploymentProps
             {
                 DestinationBucket = s3,
-                Sources = new[] { Source.Asset(Path.Combine(Directory.GetCurrentDirectory(), $"out/linux/server/{magicOnionBinaryName}")) },
-                DestinationKeyPrefix = $"assembly/linux/server/{magicOnionBinaryName}"
+                Sources = new[] { Source.Asset(Path.Combine(Directory.GetCurrentDirectory(), $"out/linux/server")) },
+                DestinationKeyPrefix = $"assembly/linux/server"
             });
             var userdataDeployment = new BucketDeployment(this, "UserData", new BucketDeploymentProps
             {
@@ -122,71 +120,13 @@ namespace Cdk
 
             // alb
             var albDnsName = "benchmark-alb";
-            IApplicationTargetGroup targetGroup = null;
+            var benchToMagicOnionDnsName = benchNetwork.RequireAlb
+                ? $"{benchNetwork.EndpointScheme}://{albDnsName}.{stackProps.AlbDomain.domain}"
+                : $"{benchNetwork.EndpointScheme}://{serverMapName}.{serviceDiscoveryDomain}";
+            IApplicationTargetGroup grpcTargetGroup = null;
+            IApplicationTargetGroup httpsTargetGroup = null;
             if (benchNetwork.RequireAlb)
             {
-                // https://github.com/intercept6/example-aws-cdk-custom-resource
-                // CustomResource Lambda for TargetGroup support ProtocolVersion Grpc
-                var targetGroupEventHandler = new SingletonFunction(this, "grpc-targetgroup", new SingletonFunctionProps
-                {
-                    Uuid = "4ddd3cf8-0a1b-43ee-994e-c15a2ffe1bd2",
-                    Code = Code.FromAsset(Path.Combine(Directory.GetCurrentDirectory(), "lambda"), new Amazon.CDK.AWS.S3.Assets.AssetOptions
-                    {
-                        AssetHashType = AssetHashType.OUTPUT,
-                        Bundling = new BundlingOptions
-                        {
-                            Image = Runtime.NODEJS_12_X.BundlingDockerImage,
-                            User = "root",
-                            Command = new []
-                            {
-                                "bash",
-                                "-c",
-                                string.Join(" && ", new []
-                                {
-                                    "cp -au src package.json yarn.lock /tmp",
-                                    "cd /tmp",
-                                    "npm install --global yarn",
-                                    "yarn install",
-                                    "yarn -s esbuild src/lambda/target-group.ts --bundle --platform=node --target=node12 --outfile=/asset-output/index.js",
-                                }),
-                            },
-                        },
-                    }),
-                    Runtime = Runtime.NODEJS_12_X,
-                    Handler = "index.handler",
-                    MemorySize = 512,
-                    Timeout = Duration.Minutes(10),
-                    InitialPolicy = new[] { new PolicyStatement(new PolicyStatementProps
-                    {
-                        Actions = new [] { "elasticloadbalancing:*" },
-                        Resources = new [] { "*" },
-                    })},
-                });
-                var provider = new Provider(this, "customProvider", new ProviderProps
-                {
-                    OnEventHandler = targetGroupEventHandler,
-                });
-                var grpcTargetGroupResource = new CustomResource(this, "grpc-target-group-lambda", new CustomResourceProps
-                {
-                    ServiceToken = provider.ServiceToken,
-                    Properties = new Dictionary<string, object?>()
-                    {
-                        { "Name", "grpc-target-group" },
-                        { "Port", 80 },
-                        { "Protocol", "HTTP" },
-                        { "ProtocolVersion", "GRPC" },
-                        { "VpcId", vpc.VpcId },
-                        { "TargetType", "instance"},
-                        { "HealthCheckEnabled", true },
-                        { "HealthCheckProtocol", "HTTP" },
-                        { "HealthyThresholdCount", 2 },
-                        { "HealthCheckIntervalSeconds", 15 },
-                        { "HealthCheckTimeoutSeconds", 10 },
-                        { "HealthCheckPath", "/grpc.health.v1.Health/Check" },
-                        { "Matcher", new Dictionary<string, string> { {"GrpcCode", "0-99"} } },
-                    },
-                });
-
                 // route53
                 var hostedZone = HostedZone.FromHostedZoneAttributes(this, "HostedZone", new HostedZoneAttributes
                 {
@@ -213,19 +153,10 @@ namespace Cdk
                     InternetFacing = false,
                     Http2Enabled = true,
                 });
-                targetGroup = ApplicationTargetGroup.FromTargetGroupAttributes(this, "grpc-target-group", new TargetGroupAttributes
-                {
-                    TargetGroupArn = grpcTargetGroupResource.Ref,
-                });
-                var listener = lb.AddListener("HttpsListener", new BaseApplicationListenerProps
-                {
-                    Port = 443,
-                    Certificates = new[] { new ListenerCertificate(certificate.CertificateArn) },
-                });
-                listener.AddTargetGroups("TargetGroupAttachment", new AddApplicationTargetGroupsProps
-                {
-                    TargetGroups = new[] { targetGroup },
-                });
+                grpcTargetGroup = AddGrpcTargetGroup(benchNetwork, vpc, certificate, lb);
+                httpsTargetGroup = AddHttpsTargetGroup(benchNetwork, vpc, certificate, lb);
+
+                // Dns Record
                 _ = new CnameRecord(this, "alb-alias-record", new CnameRecordProps
                 {
                     RecordName = $"{albDnsName}.{stackProps.AlbDomain.domain}",
@@ -234,9 +165,6 @@ namespace Cdk
                     DomainName = lb.LoadBalancerDnsName,
                 });
             }
-            var benchToMagicOnionDnsName = benchNetwork.RequireAlb
-                ? $"{benchNetwork.EndpointSchema}://{albDnsName}.{stackProps.AlbDomain.domain}"
-                : $"{benchNetwork.EndpointSchema}://{serverMapName}.{serviceDiscoveryDomain}";
 
             // iam
             var iamEc2MagicOnionRole = GetIamEc2MagicOnionRole(s3, serviceDiscoveryServer);
@@ -279,12 +207,12 @@ namespace Cdk
                 }),
             });
             asg.AddSecretsReadGrant(ddToken, () => stackProps.UseEc2DatadogAgentProfiler);
-            var userdata = GetUserData(recreateMagicOnionTrigger, s3.BucketName, magicOnionBinaryName, serviceDiscoveryServer.ServiceId, stackProps.UseEc2CloudWatchAgentProfiler, stackProps.UseEc2DatadogAgentProfiler);
+            var userdata = GetUserData(recreateMagicOnionTrigger, s3.BucketName, stackProps.BenchmarkBinaryNames, serviceDiscoveryServer.ServiceId, stackProps.UseEc2CloudWatchAgentProfiler, stackProps.UseEc2DatadogAgentProfiler);
             asg.AddUserData(userdata);
             asg.UserData.AddSignalOnExitCommand(asg);
             asg.Node.AddDependency(masterDllDeployment);
             asg.Node.AddDependency(userdataDeployment);
-            if (stackProps.EnableCronScaleInEc2)
+            if (stackProps.EnableMagicOnionScaleInCron)
             {
                 asg.ScaleOnSchedule("ScheduleOut", new BasicScheduledActionProps
                 {
@@ -303,7 +231,8 @@ namespace Cdk
             }
             if (benchNetwork.RequireAlb)
             {
-                asg.AttachToApplicationTargetGroup(targetGroup);
+                asg.AttachToApplicationTargetGroup(grpcTargetGroup);
+                asg.AttachToApplicationTargetGroup(httpsTargetGroup);
             }
 
             // ECS
@@ -415,31 +344,158 @@ namespace Cdk
 
             // output
             new CfnOutput(this, "ReportUrl", new CfnOutputProps { Value = $"https://{s3.BucketRegionalDomainName}/html/{stackProps.ReportId}/index.html" });
-            new CfnOutput(this, "EndPointStyle", new CfnOutputProps { Value = stackProps.Endpoint.ToString() });
+            new CfnOutput(this, "EndPointStyle", new CfnOutputProps { Value = stackProps.BenchmarkEndpoint.ToString() });
             new CfnOutput(this, "AsgName", new CfnOutputProps { Value = asg.AutoScalingGroupName });
             new CfnOutput(this, "EcsClusterName", new CfnOutputProps { Value = cluster.ClusterName });
             new CfnOutput(this, "DFrameWorkerEcsTaskdefImage", new CfnOutputProps { Value = dockerImage.ImageUri });
         }
 
-        private string GetUserData(string recreateMagicOnionTrigger, string bucketName, string binaryName, string serviceDiscoveryId, bool useCloudWatchAgent, bool useDatadogAgent)
+        private IApplicationTargetGroup AddHttpsTargetGroup(BenchNetwork benchNetwork, Vpc vpc, DnsValidatedCertificate certificate, ApplicationLoadBalancer lb)
+        {
+            var targetGroup = new ApplicationTargetGroup(this, $"{StackName}-https-target-group", new ApplicationTargetGroupProps
+            {
+                Port = benchNetwork.AlbHttpsPort.targetgroupPort,
+                Protocol = ApplicationProtocol.HTTP,
+                Vpc = vpc,
+                TargetType = TargetType.INSTANCE,
+                HealthCheck = new Amazon.CDK.AWS.ElasticLoadBalancingV2.HealthCheck
+                {
+                    Enabled = true,
+                    Protocol = Amazon.CDK.AWS.ElasticLoadBalancingV2.Protocol.HTTP,
+                    HealthyThresholdCount = 2,
+                    Interval = Duration.Seconds(15),
+                    Timeout = Duration.Seconds(10),
+                    Path = "/health",
+                },
+                DeregistrationDelay = Duration.Seconds(30),
+            });
+            var listener = lb.AddListener("HttpsListener", new BaseApplicationListenerProps
+            {
+                Port = benchNetwork.AlbHttpsPort.listenerPort,
+                Protocol = ApplicationProtocol.HTTPS,
+                Certificates = new[] { new ListenerCertificate(certificate.CertificateArn) },
+            });
+            listener.AddTargetGroups("HttpsTargetGroupAttachment", new AddApplicationTargetGroupsProps
+            {
+                TargetGroups = new[] { targetGroup },
+            });
+            return targetGroup;
+        }
+
+        private IApplicationTargetGroup AddGrpcTargetGroup(BenchNetwork benchNetwork, Vpc vpc, DnsValidatedCertificate certificate, ApplicationLoadBalancer lb)
+        {
+            var grpcTargetGroupResource = CreateGrpcTargetGroup(vpc, new Dictionary<string, object>()
+                {
+                    { "Name", "MagicOnionBench-grpc-target" },
+                    { "Port", benchNetwork.AlbGrpcPort.targetgroupPort },
+                    { "Protocol", ApplicationProtocol.HTTP.ToString() },
+                    { "ProtocolVersion", "GRPC" },
+                    { "VpcId", vpc.VpcId },
+                    { "TargetType", "instance"},
+                    { "HealthCheckEnabled", true },
+                    { "HealthCheckProtocol", Amazon.CDK.AWS.ElasticLoadBalancingV2.Protocol.HTTP.ToString() },
+                    { "HealthyThresholdCount", 2 },
+                    { "HealthCheckIntervalSeconds", 15 },
+                    { "HealthCheckTimeoutSeconds", 10 },
+                    { "HealthCheckPath", "/grpc.health.v1.Health/Check" },
+                    { "Matcher", new Dictionary<string, string> { {"GrpcCode", "0-99"} } },
+                });
+            var targetGroup = ApplicationTargetGroup.FromTargetGroupAttributes(this, "grpc-target-group", new TargetGroupAttributes
+            {
+                TargetGroupArn = grpcTargetGroupResource.Ref,
+            });
+            var listener = lb.AddListener("GrpcListener", new BaseApplicationListenerProps
+            {
+                Port = benchNetwork.AlbGrpcPort.listenerPort,
+                Protocol = ApplicationProtocol.HTTPS,
+                Certificates = new[] { new ListenerCertificate(certificate.CertificateArn) },
+            });
+            listener.AddTargetGroups("GrpcTargetGroupAttachment", new AddApplicationTargetGroupsProps
+            {
+                TargetGroups = new[] { targetGroup },
+            });
+            listener.Node.AddDependency(grpcTargetGroupResource);
+
+            return targetGroup;
+        }
+
+        private CustomResource CreateGrpcTargetGroup(Vpc vpc, Dictionary<string, object> properties)
+        {
+            // https://github.com/intercept6/example-aws-cdk-custom-resource
+            // CustomResource Lambda for TargetGroup support ProtocolVersion Grpc
+            var targetGroupEventHandler = new SingletonFunction(this, "grpc-targetgroup", new SingletonFunctionProps
+            {
+                Uuid = "4ddd3cf8-0a1b-43ee-994e-c15a2ffe1bd2",
+                Code = Code.FromAsset(Path.Combine(Directory.GetCurrentDirectory(), "lambda"), new Amazon.CDK.AWS.S3.Assets.AssetOptions
+                {
+                    AssetHashType = AssetHashType.OUTPUT,
+                    Bundling = new BundlingOptions
+                    {
+                        Image = Runtime.NODEJS_12_X.BundlingDockerImage,
+                        User = "root",
+                        Command = new[]
+                        {
+                                "bash",
+                                "-c",
+                                string.Join(" && ", new []
+                                {
+                                    "cp -au src package.json yarn.lock /tmp",
+                                    "cd /tmp",
+                                    "npm install --global yarn",
+                                    "yarn install",
+                                    "yarn -s esbuild src/lambda/target-group.ts --bundle --platform=node --target=node12 --outfile=/asset-output/index.js",
+                                }),
+                            },
+                    },
+                }),
+                Runtime = Runtime.NODEJS_12_X,
+                Handler = "index.handler",
+                MemorySize = 512,
+                Timeout = Duration.Minutes(10),
+                InitialPolicy = new[] { new PolicyStatement(new PolicyStatementProps
+                    {
+                        Actions = new [] { "elasticloadbalancing:*" },
+                        Resources = new [] { "*" },
+                    })},
+            });
+            var provider = new Provider(this, "customProvider", new ProviderProps
+            {
+                OnEventHandler = targetGroupEventHandler,
+            });
+            var grpcTargetGroupResource = new CustomResource(this, "grpc-target-group-lambda", new CustomResourceProps
+            {
+                ServiceToken = provider.ServiceToken,
+                Properties = properties,
+            });
+            return grpcTargetGroupResource;
+        }
+
+        private string GetUserData(string recreateMagicOnionTrigger, string bucketName, string[] binaryNames, string serviceDiscoveryId, bool useCloudWatchAgent, bool useDatadogAgent)
         {
             var source = @$"#!/bin/bash
-{recreateMagicOnionTrigger}";
+echo ""{recreateMagicOnionTrigger}""";
 
-            // server binary
+            // dotnet sdk
             source += @$"
 # install .NET 5
 rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
 yum install -y dotnet-sdk-5.0 aspnetcore-runtime-5.0
-. /etc/profile.d/dotnet-cli-tools-bin-path.sh
+. /etc/profile.d/dotnet-cli-tools-bin-path.sh";
+
+            // server binary
+            source += $@"
 # download server
 mkdir -p /var/MagicOnion.Benchmark/server
-aws s3 sync --exact-timestamps s3://{bucketName}/assembly/linux/server/{binaryName}/ ~/server
-chmod +x ~/server/{binaryName}
-cp -Rf ~/server/ /var/MagicOnion.Benchmark/.
-cp -f /var/MagicOnion.Benchmark/server/{binaryName}.service /etc/systemd/system/.
+aws s3 sync --exact-timestamps s3://{bucketName}/assembly/linux/server/ ~/server
+cp -Rf ~/server/ /var/MagicOnion.Benchmark/.";
+            foreach (var binaryName in binaryNames)
+            {
+                source += $@"
+chmod +x /var/MagicOnion.Benchmark/server/{binaryName}/{binaryName}
+cp -f /var/MagicOnion.Benchmark/server/{binaryName}/{binaryName}.service /etc/systemd/system/.
 systemctl enable {binaryName}
 systemctl restart {binaryName}";
+            }
 
             // ALB だろうが ServiceDiscovery だろうが登録はする。パラメーター変えるだけでどっちでもアクセスできるしね。
             // cloudmap

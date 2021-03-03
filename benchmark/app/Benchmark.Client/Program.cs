@@ -100,6 +100,19 @@ public class BenchmarkRunner : ConsoleAppBase
     }
 
     /// <summary>
+    /// Run REST Api Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    public async Task BenchApi(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    {
+        var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
+        await benchmarker.BenchApi(hostAddress, reportId);
+    }
+
+    /// <summary>
     /// List Reports
     /// </summary>
     /// <param name="reportId"></param>

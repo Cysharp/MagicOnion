@@ -1,15 +1,16 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 EXPOSE 80
+EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["Benchmark.Server/Benchmark.Server.Https.csproj", "Benchmark.Server.Https/"]
-RUN dotnet restore "Benchmark.Server.Https/Benchmark.Server.csproj"
+COPY ["app/Benchmark.Server.Https/Benchmark.Server.Https.csproj", "app/Benchmark.Server.Https/"]
+RUN dotnet restore "app/Benchmark.Server.Https/Benchmark.Server.Https.csproj"
 COPY . .
-WORKDIR "/src/Benchmark.Server.Https"
+WORKDIR "/src/app/Benchmark.Server.Https"
 RUN dotnet build "Benchmark.Server.Https.csproj" -c Release -o /app/build
 
 FROM build AS publish

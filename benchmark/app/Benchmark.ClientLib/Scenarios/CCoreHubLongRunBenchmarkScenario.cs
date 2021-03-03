@@ -8,82 +8,81 @@ using System.Threading.Tasks;
 
 namespace Benchmark.ClientLib.Scenarios
 {
-    public class CCoreHubLongRunBenchmarkScenario : ILongRunBenchmarkHubReciever, IAsyncDisposable
+    public class CCoreHubLongRunBenchmarkScenario : ScenarioBase, ILongRunBenchmarkHubReciever, IAsyncDisposable
     {
         private readonly Channel _channel;
         private readonly BenchReporter _reporter;
         private ILongRunBenchmarkHub _client;
-        private int _errors = 0;
 
-        public CCoreHubLongRunBenchmarkScenario(Channel channel, BenchReporter reporter)
+        public CCoreHubLongRunBenchmarkScenario(Channel channel, BenchReporter reporter, bool failFast) : base(failFast)
         {
             _channel = channel;
             _reporter = reporter;
-            _errors = 0;
         }
 
         public async Task Run(int requestCount, int waitMilliseonds, bool parallel)
         {
-            using (var total = new Statistics("Total"))
+            using (var statistics = new Statistics(nameof(ConnectAsync)))
             {
-                using (var statistics = new Statistics(nameof(ConnectAsync)))
+                await ConnectAsync("console-client");
+
+                _reporter.AddBenchDetail(new BenchReportItem
                 {
-                    await ConnectAsync("console-client");
+                    ExecuteId = _reporter.ExecuteId,
+                    ClientId = _reporter.ClientId,
+                    TestName = nameof(ConnectAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    Duration = statistics.Elapsed,
+                    RequestCount = 0, // connect is setup, not count as request.
+                    Errors = Error,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                });
+                statistics.HasError(Error);
+            }
+            ResetError();
 
-                    _reporter.AddBenchDetail(new BenchReportItem
-                    {
-                        ExecuteId = _reporter.ExecuteId,
-                        ClientId = _reporter.ClientId,
-                        TestName = nameof(ConnectAsync),
-                        Begin = statistics.Begin,
-                        End = DateTime.UtcNow,
-                        Duration = statistics.Elapsed,
-                        RequestCount = 0, // connect is setup, not count as request.
-                        Errors = _errors,
-                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                    });
-                }
+            using (var statistics = new Statistics(nameof(ProcessAsync)))
+            {
+                await ProcessAsync(requestCount, waitMilliseonds, parallel);
 
-                using (var statistics = new Statistics(nameof(ProcessAsync)))
+                _reporter.AddBenchDetail(new BenchReportItem
                 {
-                    await ProcessAsync(requestCount, waitMilliseonds, parallel);
+                    ExecuteId = _reporter.ExecuteId,
+                    ClientId = _reporter.ClientId,
+                    TestName = nameof(ProcessAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    Duration = statistics.Elapsed,
+                    RequestCount = requestCount,
+                    Errors = Error,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                });
+                statistics.HasError(Error);
+            }
+            ResetError();
 
-                    _reporter.AddBenchDetail(new BenchReportItem
-                    {
-                        ExecuteId = _reporter.ExecuteId,
-                        ClientId = _reporter.ClientId,
-                        TestName = nameof(ProcessAsync),
-                        Begin = statistics.Begin,
-                        End = DateTime.UtcNow,
-                        Duration = statistics.Elapsed,
-                        RequestCount = requestCount,
-                        Errors = _errors,
-                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                    });
-                }
-
-                using (var statistics = new Statistics(nameof(EndAsync)))
+            using (var statistics = new Statistics(nameof(EndAsync)))
+            {
+                await EndAsync();
+                _reporter.AddBenchDetail(new BenchReportItem
                 {
-                    await EndAsync();
-                    _reporter.AddBenchDetail(new BenchReportItem
-                    {
-                        ExecuteId = _reporter.ExecuteId,
-                        ClientId = _reporter.ClientId,
-                        TestName = nameof(EndAsync),
-                        Begin = statistics.Begin,
-                        End = DateTime.UtcNow,
-                        Duration = statistics.Elapsed,
-                        RequestCount = 0, // end is teardown, not count as request.
-                        Errors = _errors,
-                        Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                    });
-                }
+                    ExecuteId = _reporter.ExecuteId,
+                    ClientId = _reporter.ClientId,
+                    TestName = nameof(EndAsync),
+                    Begin = statistics.Begin,
+                    End = DateTime.UtcNow,
+                    Duration = statistics.Elapsed,
+                    RequestCount = 0, // end is teardown, not count as request.
+                    Errors = Error,
+                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
+                });
+                statistics.HasError(Error);
             }
         }
 
         private async Task ConnectAsync(string roomName)
         {
-            _errors = 0;
             try
             {
                 _client = await StreamingHubClient.ConnectAsync<ILongRunBenchmarkHub, ILongRunBenchmarkHubReciever>(new DefaultCallInvoker(_channel), this);
@@ -92,8 +91,10 @@ namespace Benchmark.ClientLib.Scenarios
             }
             catch (Exception ex)
             {
+                if (FailFast)
+                    throw;
                 Console.WriteLine($"{ex.Message} {ex.GetType().FullName} {ex.StackTrace}");
-                _errors++;
+                IncrementError();
             }
         }
 
@@ -111,7 +112,6 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task ProcessSequentialAsync(int requestCount, int waitMilliseonds)
         {
-            _errors = 0;
             var data = new LongRunBenchmarkData
             {
                 WaitMilliseconds = waitMilliseonds,
@@ -122,16 +122,19 @@ namespace Benchmark.ClientLib.Scenarios
                 {
                     await _client.Process(data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    _errors++;
+                    if (FailFast)
+                        throw;
+                    IncrementError();
+                    PostException(ex);
                 }
             }
         }
 
         private async Task ProcessParallelAsync(int requestCount, int waitMilliseonds)
         {
-            _errors = 0;
+            IncrementError();
             var tasks = new List<Task>();
             var data = new LongRunBenchmarkData
             {
@@ -146,9 +149,12 @@ namespace Benchmark.ClientLib.Scenarios
                     var task = _client.Process(data);
                     tasks.Add(task);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    _errors++;
+                    if (FailFast)
+                        throw;
+                    IncrementError();
+                    PostException(ex);
                 }
             }
 
@@ -157,14 +163,16 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task EndAsync()
         {
-            _errors = 0;
             try
             {
                 await _client.End();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _errors++;
+                if (FailFast)
+                    throw;
+                IncrementError();
+                PostException(ex);
             }
         }
 

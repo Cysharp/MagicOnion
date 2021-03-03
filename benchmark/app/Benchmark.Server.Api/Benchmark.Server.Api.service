@@ -2,14 +2,14 @@
 Description=MagicOnion.Benchmark.Server version 0.0.1
 
 [Service]
-ExecStart=/var/MagicOnion.Benchmark/server/Benchmark.Server/Benchmark.Server
+ExecStart=/var/MagicOnion.Benchmark/server/Benchmark.Server.Api/Benchmark.Server.Api
 Restart=always
 RestartSec=10
-SyslogIdentifier=MagicOnion.Benchmark.Server
+SyslogIdentifier=MagicOnion.Benchmark.Server.Api
 User=root
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_CLI_HOME=/tmp
-WorkingDirectory=/var/MagicOnion.Benchmark/server/Benchmark.Server
+WorkingDirectory=/var/MagicOnion.Benchmark/server/Benchmark.Server.Api
 
 [Install]
 WantedBy=multi-user.target

@@ -1,24 +1,22 @@
 using Benchmark.ClientLib.Reports;
 using Benchmark.Server.Shared;
-using Benchmark.Shared;
-using Grpc.Net.Client;
-using MagicOnion;
-using MagicOnion.Client;
-using MessagePack;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Benchmark.ClientLib.Scenarios
 {
-    public class UnaryBenchmarkScenario : ScenarioBase
+    public class ApiBenchmarkScenario : ScenarioBase
     {
-        private readonly IBenchmarkService _client;
+        private readonly ApiClient _client;
         private readonly BenchReporter _reporter;
 
-        public UnaryBenchmarkScenario(GrpcChannel channel, BenchReporter reporter, bool failFast) : base(failFast)
+        public ApiBenchmarkScenario(ApiClient client, BenchReporter reporter, bool failFast) : base(failFast)
         {
-            _client = MagicOnionClient.Create<IBenchmarkService>(channel);
+            _client = client;
             _reporter = reporter;
         }
 
@@ -40,13 +38,14 @@ namespace Benchmark.ClientLib.Scenarios
                     Type = nameof(Grpc.Core.MethodType.Unary),
                     Errors = Error,
                 });
+
                 statistics.HasError(Error);
             }
         }
 
         private async Task SumAsync(int requestCount)
         {
-            var tasks = new List<UnaryResult<int>>();
+            var tasks = new List<Task>();
             for (var i = 0; i < requestCount; i++)
             {
                 try
@@ -59,12 +58,11 @@ namespace Benchmark.ClientLib.Scenarios
                 {
                     if (FailFast)
                         throw;
-
                     IncrementError();
-                    PostException(ex);                    
+                    PostException(ex);
                 }
             }
-            await ValueTaskUtils.WhenAll(tasks);
+            await Task.WhenAll(tasks);
         }
 
         private async Task PlainTextAsync(int requestCount)
@@ -75,15 +73,15 @@ namespace Benchmark.ClientLib.Scenarios
                 {
                     PlainText = i.ToString(),
                 };
+                var json = JsonSerializer.Serialize<BenchmarkData>(data);
                 try
                 {
-                    await _client.PlainTextAsync(data);
+                    await _client.PlainTextAsync(json);
                 }
                 catch (Exception ex)
                 {
                     if (FailFast)
                         throw;
-
                     IncrementError();
                     PostException(ex);
                 }
@@ -92,28 +90,58 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task PlainTextAsyncParallel(int requestCount)
         {
-            var tasks = new List<UnaryResult<Nil>>();
+            var tasks = new List<Task>();
             for (var i = 0; i < requestCount; i++)
             {
                 var data = new BenchmarkData
                 {
                     PlainText = i.ToString(),
                 };
+                var json = JsonSerializer.Serialize<BenchmarkData>(data);
                 try
                 {
-                    var task = _client.PlainTextAsync(data);
+                    var task = _client.PlainTextAsync(json);
                     tasks.Add(task);
                 }
                 catch (Exception ex)
                 {
                     if (FailFast)
                         throw;
-
                     IncrementError();
                     PostException(ex);
                 }
             }
-            await ValueTaskUtils.WhenAll(tasks);
+            await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// ThreadSafe client
+        /// </summary>
+        public class ApiClient
+        {
+            private readonly HttpClient _client;
+            private readonly string _endpointPlainText;
+            private readonly string _endpointSum;
+
+            public ApiClient(string endpoint)
+            {
+                _client = new HttpClient();
+                _endpointPlainText = endpoint + "/plaintext";
+                _endpointSum = endpoint + "/sum";
+            }
+
+            public async Task PlainTextAsync(string json)
+            {
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var res = await _client.PostAsync(_endpointPlainText, content);
+                res.EnsureSuccessStatusCode();
+            }
+
+            public async Task SumAsync(int x, int y)
+            {
+                var res = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Post, _endpointSum + $"?x={x}&y={y}"));
+                res.EnsureSuccessStatusCode();
+            }
         }
     }
 }

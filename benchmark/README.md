@@ -25,8 +25,9 @@ npm update -g aws-cdk
 build and deploy
 
 ```shell
-dotnet publish app/Benchmark.Server/ -o out/linux/server/Benchmark.Server -r linux-x64 -p:PublishSingleFile=true --no-self-contained
-dotnet publish app/Benchmark.Server.Https/ -o out/linux/server/Benchmark.Server.Https -r linux-x64 -p:PublishSingleFile=true --no-self-contained
+dotnet publish app/Benchmark.Server/ -c Release -o out/linux/server/Benchmark.Server -r linux-x64 -p:PublishSingleFile=true --no-self-contained
+dotnet publish app/Benchmark.Server.Https/ -c Release -o out/linux/server/Benchmark.Server.Https -r linux-x64 -p:PublishSingleFile=true --no-self-contained
+dotnet publish app/Benchmark.Server.Api/ -c Release -o out/linux/server/Benchmark.Server.Api -r linux-x64 -p:PublishSingleFile=true --no-self-contained
 cdk synth
 cdk bootstrap # only on initial execution
 cdk deploy

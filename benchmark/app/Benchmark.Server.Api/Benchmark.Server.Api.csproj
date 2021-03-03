@@ -2,19 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>a0f56b58-73e8-4d9e-b786-f81f35f55760</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <DockerfileContext>..\..</DockerfileContext>
-    <LangVersion>9.0</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>;NU1605</WarningsAsErrors>
-    <NoWarn>;CS1591;CS1998</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Benchmark.Server.service">
+    <Content Include="Benchmark.Server.Api.service">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile> 
     </Content>
@@ -31,14 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <Compile Include="..\Benchmark.Server\SharedUtils\**\*.cs" Link="SharedUtils\%(RecursiveDir)\%(FileName)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.35.0" />
-    <PackageReference Include="Grpc.HealthCheck" Version="2.36.0" />
-    <PackageReference Include="MagicOnion.Server" Version="4.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="ZLogger" Version="1.4.1" />
   </ItemGroup>
 

@@ -6,20 +6,18 @@ using System.Threading.Tasks;
 
 namespace Benchmark.ClientLib.Scenarios
 {
-    public class GrpcBenchmarkScenario
+    public class GrpcBenchmarkScenario : ScenarioBase
     {
         private readonly Greeter.GreeterClient _client;
         private readonly HelloRequest _simpleRequest;
         private readonly BenchReporter _reporter;
-        private int _errors = 0;
 
-        public GrpcBenchmarkScenario(GrpcChannel channel, BenchReporter reporter)
+        public GrpcBenchmarkScenario(GrpcChannel channel, BenchReporter reporter, bool failFast) : base(failFast)
         {
             _client = new Greeter.GreeterClient(channel);
-            _simpleRequest = new HelloRequest { Value = true };
-
             _reporter = reporter;
-            _errors = 0;
+
+            _simpleRequest = new HelloRequest { Value = true };
         }
 
         public async Task Run(int requestCount)
@@ -38,7 +36,9 @@ namespace Benchmark.ClientLib.Scenarios
                     Duration = statistics.Elapsed,
                     RequestCount = requestCount,
                     Type = nameof(Grpc.Core.MethodType.Unary),
+                    Errors = Error,
                 });
+                statistics.HasError(Error);
             }
         }
 
@@ -50,9 +50,12 @@ namespace Benchmark.ClientLib.Scenarios
                 {
                     await _client.SayHelloAsync(_simpleRequest);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    _errors++;
+                    if (FailFast)
+                        throw;
+                    IncrementError();
+                    PostException(ex);
                 }
             }
         }

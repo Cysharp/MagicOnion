@@ -31,6 +31,8 @@ namespace Benchmark.ClientLib
         private ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache;
         private ConcurrentDictionary<string, Channel> _ccoreChannelCache;
 
+        public bool FailFast { get; set; }
+
         public Benchmarker(string path, int[] iterations, ILogger logger, CancellationToken cancellationToken, bool useHttpsEndpoint)
         {
             _path = path;
@@ -80,8 +82,8 @@ namespace Benchmark.ClientLib
                     // separate channel
                     // Connect to the server using gRPC channel.
                     var channel = CreateGrpcChannel(hostAddress);
-                    var unary = new UnaryBenchmarkScenario(channel, reporter);
-                    await using var hub = new HubBenchmarkScenario(channel, reporter);
+                    var unary = new UnaryBenchmarkScenario(channel, reporter, FailFast);
+                    await using var hub = new HubBenchmarkScenario(channel, reporter, FailFast);
 
                     // Unary
                     _logger?.LogInformation($"Begin unary {iteration} requests.");
@@ -94,12 +96,7 @@ namespace Benchmark.ClientLib
             }
             reporter.End();
 
-            // output
-            var benchJson = reporter.ToJson();
-
-            // put json to s3
-            var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            await OutputAsync(reporter);
         }
 
         /// <summary>
@@ -130,21 +127,15 @@ namespace Benchmark.ClientLib
                     // separate channel
                     // Connect to the server using gRPC channel.
                     var channel = CreateGrpcChannel(hostAddress);
-                    var scenario = new UnaryBenchmarkScenario(channel, reporter);
+                    var scenario = new UnaryBenchmarkScenario(channel, reporter, FailFast);
 
-                    // Unary
                     _logger?.LogInformation($"Begin unary {iteration} requests.");
                     await scenario.Run(iteration);
                 }
             }
             reporter.End();
 
-            // output
-            var benchJson = reporter.ToJson();
-
-            // put json to s3
-            var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            await OutputAsync(reporter);
         }
 
         /// <summary>
@@ -174,21 +165,15 @@ namespace Benchmark.ClientLib
                 {
                     // separate channel
                     var channel = CreateGrpcChannel(hostAddress);
-                    await using var scenario = new HubBenchmarkScenario(channel, reporter);
+                    await using var scenario = new HubBenchmarkScenario(channel, reporter, FailFast);
 
-                    // StreamingHub
                     _logger?.LogInformation($"Begin Streaming {iteration} requests.");
                     await scenario.Run(iteration);
                 }
             }
             reporter.End();
 
-            // output
-            var benchJson = reporter.ToJson();
-
-            // put json to s3
-            var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            await OutputAsync(reporter);
         }
 
         /// <summary>
@@ -220,21 +205,15 @@ namespace Benchmark.ClientLib
                     // separate channel
                     // Connect to the server using gRPC channel.
                     var channel = CreateGrpcChannel(hostAddress);
-                    await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
+                    await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter, FailFast);
 
-                    // StreamingHub
-                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
+                    _logger?.LogInformation($"Begin LongRun Streaming {iteration} requests.");
                     await scenario.Run(iteration, waitMilliseconds, parallel);
                 }
             }
             reporter.End();
 
-            // output
-            var benchJson = reporter.ToJson();
-
-            // put json to s3
-            var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            await OutputAsync(reporter);
         }
 
         /// <summary>
@@ -273,21 +252,15 @@ namespace Benchmark.ClientLib
                     // separate channel
                     // Connect to the server using gRPC channel.
                     var channel = CreateCCoreChannel(hostAddress, credentials);
-                    await using var scenario = new CCoreHubLongRunBenchmarkScenario(channel, reporter);
+                    await using var scenario = new CCoreHubLongRunBenchmarkScenario(channel, reporter, FailFast);
 
-                    // StreamingHub
-                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
+                    _logger?.LogInformation($"Begin Ccore LongRun Streaming {iteration} requests.");
                     await scenario.Run(iteration, waitMilliseconds, parallel);
                 }
             }
             reporter.End();
 
-            // output
-            var benchJson = reporter.ToJson();
-
-            // put json to s3
-            var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            await OutputAsync(reporter);
         }
 
         /// <summary>
@@ -318,15 +291,52 @@ namespace Benchmark.ClientLib
                     // separate channel
                     // Connect to the server using gRPC channel.
                     var channel = CreateGrpcChannel(hostAddress);
-                    var scenario = new GrpcBenchmarkScenario(channel, reporter);
+                    var scenario = new GrpcBenchmarkScenario(channel, reporter, FailFast);
 
-                    // Unary
                     _logger?.LogInformation($"Begin grpc {iteration} requests.");
                     await scenario.Run(iteration);
                 }
             }
             reporter.End();
 
+            await OutputAsync(reporter);
+        }
+
+        /// <summary>
+        /// Run Grpc Benchmark
+        /// </summary>
+        /// <param name="hostAddress"></param>
+        /// <param name="reportId"></param>
+        /// <returns></returns>
+        public async Task BenchApi(string hostAddress = "http://localhost:5000", string reportId = "")
+        {
+            if (string.IsNullOrEmpty(reportId))
+                reportId = NewReportId();
+
+            var executeId = Guid.NewGuid().ToString();
+            _logger?.LogInformation($"reportId: {reportId}");
+            _logger?.LogInformation($"executeId: {executeId}");
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.AspnetCore);
+            reporter.Begin();
+            {
+                // single thread-safe client
+                var apiClient = new ApiBenchmarkScenario.ApiClient(hostAddress);
+                foreach (var iteration in _iterations)
+                {
+                    var scenario = new ApiBenchmarkScenario(apiClient, reporter, FailFast);
+
+                    _logger?.LogInformation($"Begin api {iteration} requests.");
+                    await scenario.Run(iteration);
+                }
+            }
+            reporter.End();
+
+            await OutputAsync(reporter);
+        }
+
+        private async Task OutputAsync(BenchReporter reporter)
+        {
             // output
             var benchJson = reporter.ToJson();
 

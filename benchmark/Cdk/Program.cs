@@ -2,6 +2,9 @@ using Amazon.CDK;
 using Amazon.CDK.AWS.EC2;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace Cdk
 {
@@ -12,10 +15,10 @@ namespace Cdk
             var app = new App();
             new CdkStack(app, "MagicOnionBenchmarkCdkStack", new ReportStackProps
             {
-                Endpoint = Endpoint.ServiceDiscoveryWithHttp,
+                BenchmarkEndpoint = BenchmarkEndpoint.Alb,
                 AlbDomain = ("dev.cysharp.io", "Z075519318R3LY1VXMWII"),
                 ForceRecreateMagicOnion = false,
-                EnableCronScaleInEc2 = true,
+                EnableMagicOnionScaleInCron = true,
                 UseEc2CloudWatchAgentProfiler = true,
                 UseEc2DatadogAgentProfiler = false,
                 UseFargateDatadogAgentProfiler = true,
@@ -35,9 +38,13 @@ namespace Cdk
     public class ReportStackProps : StackProps
     {
         /// <summary>
-        /// EndpointStyle to select BenchCommnicationStyle
+        /// Benchmark BinaryNames
         /// </summary>
-        public Endpoint Endpoint { get; set; } = Endpoint.ServiceDiscoveryWithHttp;
+        public string[] BenchmarkBinaryNames { get; set; } = new[] { "Benchmark.Server", "Benchmark.Server.Https", "Benchmark.Server.Api" };
+        /// <summary>
+        /// MagicOnion Endpoint to accept Worker request
+        /// </summary>
+        public BenchmarkEndpoint BenchmarkEndpoint { get; set; } = BenchmarkEndpoint.ServiceDiscoveryWithHttp;
         /// <summary>
         /// Register AlbDomain on AlbMode
         /// </summary>
@@ -45,15 +52,11 @@ namespace Cdk
         /// <summary>
         /// Enable ScaleIn on 0:00:00 (UTC)
         /// </summary>
-        public bool EnableCronScaleInEc2 { get; set; }
+        public bool EnableMagicOnionScaleInCron { get; set; }
         /// <summary>
-        /// Flag to force recreate MagicOnion Ec2 Server
+        /// Flag to force recreate MagicOnion Instance.
         /// </summary>
         public bool ForceRecreateMagicOnion { get; set; }
-        /// <summary>
-        /// Execution time
-        /// </summary>
-        public DateTime ExecuteTime { get; set; }
         /// <summary>
         /// ReportId
         /// </summary>
@@ -74,6 +77,9 @@ namespace Cdk
         /// Install Datadog Agent as Fargate sidecar container.
         /// </summary>
         public bool UseFargateDatadogAgentProfiler { get; set; }
+        /// <summary>
+        /// MagicOnion InstanceType
+        /// </summary>
         public InstanceType MagicOnionInstanceType { get; set; }
         /// <summary>
         /// Fargate of Dframe master 
@@ -87,13 +93,31 @@ namespace Cdk
         public ReportStackProps()
         {
             var now = DateTime.Now;
-            ExecuteTime = now;
             ReportId = $"{now.ToString("yyyyMMdd-HHmmss")}-{Guid.NewGuid().ToString()}";
         }
 
-        public BenchCommunicationStyle GetBenchCommunicationStyle()
+        public BenchNetwork GetBenchNetwork()
         {
-            return new BenchCommunicationStyle(Endpoint);
+            return new BenchNetwork(BenchmarkEndpoint);
+        }
+
+        public string GetBenchmarkServerBinariesHash()
+        {
+            var hash = string.Join(",", BenchmarkBinaryNames.Select(x => GetBenchmarkServerBinaryHash(x)));
+            if (ForceRecreateMagicOnion )
+            {
+                hash += "-" + Guid.NewGuid().ToString();
+            }
+            return hash;
+        }
+
+        private string GetBenchmarkServerBinaryHash(string binaryName)
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "out/linux/server", binaryName, binaryName);
+            var bytes = File.ReadAllBytes(path);
+            using var provider = new SHA256CryptoServiceProvider();
+            var hash = provider.ComputeHash(bytes);
+            return string.Join("", hash.Select(x => $"{x:x2}"));
         }
 
         public static ReportStackProps ParseOrDefault(IStackProps props, ReportStackProps @default = null)
@@ -109,79 +133,60 @@ namespace Cdk
         }
     }
 
-    public enum Endpoint
+    public enum BenchmarkEndpoint
     {
         /// <summary>
-        /// Worker to Insecure MagicOnion with ServiceDiscovery, gRPC over Insecure TLS
+        /// Worker to Insecure MagicOnion with ServiceDiscovery, direct machine to machine w/gRPC over Insecure TLS
         /// </summary>
         ServiceDiscoveryWithHttp = 0,
         /// <summary>
-        /// Worker to HTTPS MagicOnion with ServiceDiscovery, gRPC over TLS
+        /// Worker to HTTPS MagicOnion with ServiceDiscovery, direct machine to machine/gRPC over TLS
         /// </summary>
         ServiceDiscoveryWithHttps,
         /// <summary>
-        /// Worker to HTTP MagicOnion with ALB (HTTPS), gRPC over TLS.
+        /// Worker to HTTP MagicOnion with ALB (HTTPS), machine to alb over TLS.
         /// </summary>
         Alb,
     }
 
-    public class BenchCommunicationStyle
+    public class BenchNetwork
     {
         /// <summary>
-        /// MagicOnion - Benchmarker communication style. default: ServiceDiscovery.
+        /// Bench worker to target Https MagicOnion Endpoint Http Scheme
         /// </summary>
-        public CommunicationType Type { get; }
+        public string EndpointScheme { get; }
         /// <summary>
         /// Indicate Alb is required.
         /// </summary>
-        public bool RequireAlb => Type == CommunicationType.Alb;
+        public bool RequireAlb { get; }
         /// <summary>
-        /// Listen MagicOnion on Https
+        /// Grpc Alb Ports
         /// </summary>
-        public bool ListenMagicOnionTls { get; }
+        public (int listenerPort, int targetgroupPort) AlbGrpcPort { get; } = (443, 80);
         /// <summary>
-        /// Bench worker to target Https MagicOnion Endpoint
+        /// Https Alb Ports
         /// </summary>
-        public bool UseHttpsEndpoint { get; }
-        public string EndpointSchema => UseHttpsEndpoint ? "https" : "http";
+        public (int listenerPort, int targetgroupPort) AlbHttpsPort { get; } = (5001, 5000);
 
-        public BenchCommunicationStyle(Endpoint endpointStyle)
+        public BenchNetwork(BenchmarkEndpoint endpoint)
         {
-            switch (endpointStyle)
+            switch (endpoint)
             {
-                case Endpoint.ServiceDiscoveryWithHttp:
-                    Type = CommunicationType.ServiceDiscovery;
-                    ListenMagicOnionTls = false;
-                    UseHttpsEndpoint = false;
+                case BenchmarkEndpoint.ServiceDiscoveryWithHttp:
+                    RequireAlb = false;
+                    EndpointScheme = "http";
                     break;
-                case Endpoint.ServiceDiscoveryWithHttps:
-                    Type = CommunicationType.ServiceDiscovery;
-                    ListenMagicOnionTls = true;
-                    UseHttpsEndpoint = true;
+                case BenchmarkEndpoint.ServiceDiscoveryWithHttps:
+                    RequireAlb = false;
+                    EndpointScheme = "https";
                     break;
-                case Endpoint.Alb:
-                    Type = CommunicationType.Alb;
-                    ListenMagicOnionTls = false;
-                    UseHttpsEndpoint = true;
+                case BenchmarkEndpoint.Alb:
+                    RequireAlb = true;
+                    EndpointScheme = "https";
                     break;
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        /// <summary>
-        /// MagicOnion - Benchmarker communication style. default: ServiceDiscovery.
-        /// </summary>
-        public enum CommunicationType
-        {
-            /// <summary>
-            /// Use Service Discovery. (You can choose Non-TLS or TLS)
-            /// </summary>
-            ServiceDiscovery = 0,
-            /// <summary>
-            /// Use ALB.(force HTTP/2 over TLS)
-            /// </summary>
-            Alb,
         }
     }
 

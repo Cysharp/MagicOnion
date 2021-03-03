@@ -12,6 +12,7 @@ namespace Benchmark.ClientLib.Reports
     {
         MagicOnion,
         GrpcDotnet,
+        AspnetCore,
     }
     public class BenchReporter
     {
@@ -47,6 +48,9 @@ namespace Benchmark.ClientLib.Reports
 
         private string GetFrameworkVersion(Framework framework)
         {
+            if (framework == Framework.AspnetCore)
+                return "5.0.0";
+
             var type = framework switch
             {
                 Framework.MagicOnion => typeof(MagicOnion.IServiceMarker),

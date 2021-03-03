@@ -1,4 +1,4 @@
-﻿namespace Benchmark.Server.Shared.Data
+namespace Benchmark.Server.Shared.Data
 {
     public enum RequestType
     {
