@@ -18,6 +18,8 @@ namespace Benchmark.Server
         {
             services.AddGrpc();
             services.AddMagicOnion();
+
+            services.AddGrpcHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +36,8 @@ namespace Benchmark.Server
             {
                 endpoints.MapMagicOnionService();
                 endpoints.MapGrpcService<GreeterService>();
+
+                endpoints.MapGrpcHealthChecksService();
 
                 endpoints.MapGet("/", async context =>
                 {

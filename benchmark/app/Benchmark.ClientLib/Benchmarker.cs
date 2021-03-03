@@ -10,8 +10,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,14 +26,24 @@ namespace Benchmark.ClientLib
         private readonly int[] _iterations;
         private readonly ILogger _logger;
         private readonly CancellationToken _cancellationToken;
+        private readonly bool _useSelfCertHttpsEndpoint;
         private readonly string _clientId;
         private ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache;
         private ConcurrentDictionary<string, Channel> _ccoreChannelCache;
 
-        public Benchmarker(string path, int[] iterations, ILogger logger, CancellationToken cancellationToken)
+        public Benchmarker(string path, int[] iterations, ILogger logger, CancellationToken cancellationToken, bool useHttpsEndpoint)
         {
             _path = path;
             _iterations = iterations;
+            _logger = logger;
+            _cancellationToken = cancellationToken;
+            _useSelfCertHttpsEndpoint = useHttpsEndpoint;
+            _clientId = Guid.NewGuid().ToString();
+            _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
+        }
+        public Benchmarker(string path, ILogger logger, CancellationToken cancellationToken)
+        {
+            _path = path;
             _logger = logger;
             _cancellationToken = cancellationToken;
             _clientId = Guid.NewGuid().ToString();
@@ -245,7 +258,11 @@ namespace Benchmark.ClientLib
             var reporter = new BenchReporter(reportId, _clientId, executeId);
             reporter.Begin();
             {
-                var credentials = insecure ? ChannelCredentials.Insecure : new SslCredentials();
+                var credentials = !insecure 
+                    ? _useSelfCertHttpsEndpoint
+                        ? new SslCredentials(File.ReadAllText("server.local.crt"))
+                        : new SslCredentials()
+                    : ChannelCredentials.Insecure;
 
                 //// single chnannel
                 //var channel = GetOrCreateCCoreChannel(hostAddress, credentials);
@@ -467,14 +484,25 @@ namespace Benchmark.ClientLib
         /// <returns></returns>
         private GrpcChannel CreateGrpcChannel(string hostAddress)
         {
-            return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
+            var handler = new SocketsHttpHandler
             {
                 // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
                 // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                HttpHandler = new SocketsHttpHandler
+                EnableMultipleHttp2Connections = true,
+            };
+            if (_useSelfCertHttpsEndpoint)
+            {
+                // allow non trusted certificate
+                RemoteCertificateValidationCallback validationHandler = (object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors) => true;
+                handler.SslOptions = new SslClientAuthenticationOptions
                 {
-                    EnableMultipleHttp2Connections = true,
-                }
+                    RemoteCertificateValidationCallback = validationHandler,
+                };
+            }
+
+            return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
+            {
+                HttpHandler = handler,
             });
         }
 

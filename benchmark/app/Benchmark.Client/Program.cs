@@ -32,6 +32,8 @@ public class BenchmarkRunner : ConsoleAppBase
         _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? throw new ArgumentNullException("Environment variable 'BENCHCLIENT_S3BUCKET' is not defined.");
     }
 
+    private bool IsHttpsEndpoint(string endpoint) => endpoint.StartsWith("https://");
+
     /// <summary>
     /// Run Unary and Hub Benchmark
     /// </summary>
@@ -41,7 +43,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public async Task BenchAll(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
         await benchmarker.BenchAll(hostAddress, reportId);
     }
 
@@ -54,7 +56,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public async Task BenchUnary(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
         await benchmarker.BenchUnary(hostAddress, reportId);
     }
 
@@ -67,7 +69,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public async Task BenchHub(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
         await benchmarker.BenchHub(hostAddress, reportId);
     }
 
@@ -80,7 +82,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
         await benchmarker.BenchLongRunHub(waitMilliseconds, true, hostAddress, reportId);
     }
 
@@ -93,7 +95,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
         await benchmarker.BenchGrpc(hostAddress, reportId);
     }
 
@@ -104,7 +106,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <returns></returns>
     public async Task ListReports(string reportId)
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.ListReports(reportId);
     }
 
@@ -115,7 +117,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <returns></returns>
     public async Task GetReports(string reportId)
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.GetReports(reportId);
     }
 
@@ -127,25 +129,25 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <returns></returns>
     public async Task GenerateHtml(string reportId, bool generateDetail, string htmlFileName = "index.html")
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.GenerateHtml(reportId, generateDetail, htmlFileName);
     }
 
     public async Task ListClients()
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.ListClients();
     }
 
     public async Task RunAllClient(int processCount, string iterations = "256,1024,4096,16384", string benchCommand = "benchall", string hostAddress = "http://localhost:5000", string reportId = "")
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.RunAllClient(processCount, iterations, benchCommand, hostAddress, reportId);
     }
 
     public async Task CancelCommands()
     {
-        var benchmarker = new Benchmarker(_path, null, Context.Logger, Context.CancellationToken);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.CancelCommands();
     }
 }

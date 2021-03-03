@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Benchmark.Server.service">
+    <Content Include="Benchmark.Server.Https.service">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -25,7 +25,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <None Update="server.local.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="server.local.key">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Benchmark.Server\*.cs" Link="%(FileName)%(Extension)" />
+    <Compile Include="..\Benchmark.Server\HealthCheck\*.cs" Link="HealthCheck\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Compile Include="..\Benchmark.Server\Hubs\**\*.cs" Link="Hubs\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Compile Include="..\Benchmark.Server\Services\**\*.cs" Link="Services\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Compile Include="..\Benchmark.Server\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Protobuf Include="..\Benchmark.Server\Protos\**\*.proto" Link="Protos\%(RecursiveDir)\%(FileName)%(Extension)" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

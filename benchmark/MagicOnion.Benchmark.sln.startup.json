@@ -63,6 +63,18 @@
         "Benchmark.Server": {},
         "ConsoleAppEcs": {}
       }
+    },
+    "BenchServer(https) + BenchClient": {
+      "Projects": {
+        "Benchmark.Server.Https": {},
+        "Benchmark.Client": {}
+      }
+    },
+    "BenchServer(https) + ConsoleAppEcs": {
+      "Projects": {
+        "Benchmark.Server.Https": {},
+        "ConsoleAppEcs": {}
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,9 +10,11 @@
 
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK.AWS.ECS" Version="1.89.0" />
-    <PackageReference Include="Amazon.CDK.AWS.ECS.Patterns" Version="1.89.0" />
-    <PackageReference Include="Amazon.CDK.AWS.S3.Deployment" Version="1.89.0" />
+    <PackageReference Include="Amazon.CDK.AWS.CertificateManager" Version="1.91.0" />
+    <PackageReference Include="Amazon.CDK.AWS.CustomResources" Version="1.91.0" />
+    <PackageReference Include="Amazon.CDK.AWS.ECS" Version="1.91.0" />
+    <PackageReference Include="Amazon.CDK.AWS.ECS.Patterns" Version="1.91.0" />
+    <PackageReference Include="Amazon.CDK.AWS.S3.Deployment" Version="1.91.0" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />

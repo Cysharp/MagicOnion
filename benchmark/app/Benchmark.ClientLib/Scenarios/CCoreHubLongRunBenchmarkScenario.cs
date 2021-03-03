@@ -90,8 +90,9 @@ namespace Benchmark.ClientLib.Scenarios
                 var name = Guid.NewGuid().ToString();
                 await _client.Ready(roomName, name);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"{ex.Message} {ex.GetType().FullName} {ex.StackTrace}");
                 _errors++;
             }
         }
