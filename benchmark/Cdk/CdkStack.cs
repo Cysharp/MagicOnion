@@ -30,8 +30,8 @@ namespace Cdk
             var recreateMagicOnionTrigger = stackProps.ForceRecreateMagicOnion ? $"echo {stackProps.ExecuteTime}" : "";
             var dframeWorkerLogGroup = "MagicOnionBenchWorkerLogGroup";
             var dframeMasterLogGroup = "MagicOnionBenchMasterLogGroup";
-            var benchCommunicationStyle = stackProps.GetBenchCommunicationStyle();
-            var magicOnionBinaryName = benchCommunicationStyle.ListenMagicOnionTls ? "Benchmark.Server.Https" : "Benchmark.Server";
+            var benchNetwork = stackProps.GetBenchNetwork();
+            var magicOnionBinaryName = benchNetwork.ListenMagicOnionTls ? "Benchmark.Server.Https" : "Benchmark.Server";
 
             // s3
             var s3 = new Bucket(this, "Bucket", new BucketProps
@@ -123,7 +123,7 @@ namespace Cdk
             // alb
             var albDnsName = "benchmark-alb";
             IApplicationTargetGroup targetGroup = null;
-            if (benchCommunicationStyle.RequireAlb)
+            if (benchNetwork.RequireAlb)
             {
                 // https://github.com/intercept6/example-aws-cdk-custom-resource
                 // CustomResource Lambda for TargetGroup support ProtocolVersion Grpc
@@ -234,9 +234,9 @@ namespace Cdk
                     DomainName = lb.LoadBalancerDnsName,
                 });
             }
-            var benchToMagicOnionDnsName = benchCommunicationStyle.RequireAlb
-                ? $"{benchCommunicationStyle.EndpointSchema}://{albDnsName}.{stackProps.AlbDomain.domain}"
-                : $"{benchCommunicationStyle.EndpointSchema}://{serverMapName}.{serviceDiscoveryDomain}";
+            var benchToMagicOnionDnsName = benchNetwork.RequireAlb
+                ? $"{benchNetwork.EndpointSchema}://{albDnsName}.{stackProps.AlbDomain.domain}"
+                : $"{benchNetwork.EndpointSchema}://{serverMapName}.{serviceDiscoveryDomain}";
 
             // iam
             var iamEc2MagicOnionRole = GetIamEc2MagicOnionRole(s3, serviceDiscoveryServer);
@@ -301,7 +301,7 @@ namespace Cdk
                     Schedule = Schedule.Expression("0 12 * 1-7 *"),
                 });
             }
-            if (benchCommunicationStyle.RequireAlb)
+            if (benchNetwork.RequireAlb)
             {
                 asg.AttachToApplicationTargetGroup(targetGroup);
             }
