@@ -25,6 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="server.local.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Benchmark.Server\SharedUtils\**\*.cs" Link="SharedUtils\%(RecursiveDir)\%(FileName)%(Extension)" />
   </ItemGroup>
 
