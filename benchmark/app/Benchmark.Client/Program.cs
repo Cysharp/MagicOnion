@@ -10,9 +10,13 @@ using ZLogger;
 var builder = Host.CreateDefaultBuilder()
     .ConfigureLogging((hostContext, logging) =>
     {
+        // set `DOTNET_ENVIRONMENT=Production` or leave blank to use Production.
+        var logLevel = hostContext.HostingEnvironment.IsDevelopment()
+            ? LogLevel.Debug
+            : LogLevel.Information; // output only result
         logging.ClearProviders();
         logging.AddZLoggerConsole(configure => configure.EnableStructuredLogging = false);
-        logging.SetMinimumLevel(LogLevel.Trace);
+        logging.SetMinimumLevel(logLevel);
     });
 if (Environment.GetEnvironmentVariable("BENCHCLIENT_RUNASWEB") == "true")
 {
@@ -21,42 +25,51 @@ if (Environment.GetEnvironmentVariable("BENCHCLIENT_RUNASWEB") == "true")
 }
 else
 {
+    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BENCHCLIENT_DELAY")))
+    {
+        await Task.Delay(TimeSpan.FromSeconds(3));
+    }
     await builder.RunConsoleAppFrameworkAsync(args);
 }
 
 public class BenchmarkRunner : ConsoleAppBase
 {
     private readonly string _path;
+    private readonly bool _generateHtmlReport;
+
     public BenchmarkRunner()
     {
-        _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? throw new ArgumentNullException("Environment variable 'BENCHCLIENT_S3BUCKET' is not defined.");
+        _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? "0";
+        _generateHtmlReport = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BENCHCLIENT_SKIP_HTML"));
     }
 
     private bool IsHttpsEndpoint(string endpoint) => endpoint.StartsWith("https://");
 
     /// <summary>
-    /// Run Unary and Hub Benchmark
-    /// </summary>
-    /// <param name="hostAddress"></param>
-    /// <param name="reportId"></param>
-    /// <returns></returns>
-    public async Task BenchAll(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
-    {
-        var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
-        await benchmarker.BenchAll(hostAddress, reportId);
-    }
-
-    /// <summary>
     /// Run Unary Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
         await benchmarker.BenchUnary(hostAddress, reportId);
     }
 
@@ -64,38 +77,84 @@ public class BenchmarkRunner : ConsoleAppBase
     /// Run Hub Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchHub(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    public async Task BenchHub(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
         await benchmarker.BenchHub(hostAddress, reportId);
     }
 
     /// <summary>
-    /// Run Hub Benchmark
+    /// Run Long running Hub Benchmark
     /// </summary>
+    /// <param name="waitMilliseconds"></param>
     /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
-        await benchmarker.BenchLongRunHub(waitMilliseconds, true, hostAddress, reportId);
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
+        await benchmarker.BenchLongRunHub(waitMilliseconds, hostAddress, reportId);
     }
 
     /// <summary>
     /// Run Grpc Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
         await benchmarker.BenchGrpc(hostAddress, reportId);
     }
 
@@ -103,12 +162,27 @@ public class BenchmarkRunner : ConsoleAppBase
     /// Run REST Api Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchApi(string hostAddress = "http://localhost:5000", string iterations = "256,1024,4096,16384", string reportId = "")
+    public async Task BenchApi(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
-        var benchmarker = new Benchmarker(_path, iter, Context.Logger, Context.CancellationToken, IsHttpsEndpoint(hostAddress));
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
         await benchmarker.BenchApi(hostAddress, reportId);
     }
 
@@ -140,10 +214,10 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="reportId"></param>
     /// <param name="htmlFileName"></param>
     /// <returns></returns>
-    public async Task GenerateHtml(string reportId, bool generateDetail, string htmlFileName = "index.html")
+    public async Task GenerateHtml(string reportId, string htmlFileName = "index.html")
     {
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
-        await benchmarker.GenerateHtml(reportId, generateDetail, htmlFileName);
+        await benchmarker.GenerateHtmlAsync(reportId, htmlFileName);
     }
 
     public async Task ListClients()

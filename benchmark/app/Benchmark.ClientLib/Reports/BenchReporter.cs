@@ -12,6 +12,7 @@ namespace Benchmark.ClientLib.Reports
     {
         MagicOnion,
         GrpcDotnet,
+        GrpcCcore,
         AspnetCore,
     }
     public class BenchReporter
@@ -22,8 +23,9 @@ namespace Benchmark.ClientLib.Reports
         public string ReportId { get; }
         public string ClientId { get; }
         public string ExecuteId { get; }
+        public BenchReport Report => _report;
 
-        public BenchReporter(string reportId, string clientId, string executeId, Framework framework = Framework.MagicOnion)
+        public BenchReporter(string reportId, string clientId, string executeId, Framework framework, string scenarioName, BenchmarkerConfig config)
         {
             ReportId = reportId;
             ClientId = clientId;
@@ -42,8 +44,13 @@ namespace Benchmark.ClientLib.Reports
                 SystemMemory = GetSystemMemory(),
                 Framework = framework.ToString(),
                 Version = GetFrameworkVersion(framework),
+                ScenarioName = scenarioName,
+                Concurrency = config.ClientConcurrency,
+                Connections = config.ClientConnections,
             };
             _items = new List<BenchReportItem>();
+
+            _report.Begin = DateTime.UtcNow;
         }
 
         private string GetFrameworkVersion(Framework framework)
@@ -55,6 +62,7 @@ namespace Benchmark.ClientLib.Reports
             {
                 Framework.MagicOnion => typeof(MagicOnion.IServiceMarker),
                 Framework.GrpcDotnet => typeof(Grpc.Net.Client.GrpcChannel),
+                Framework.GrpcCcore => typeof(Grpc.Core.Channel),
                 _ => throw new NotImplementedException(),
             };
             var version = type.Assembly.GetName().Version?.ToString();
@@ -62,33 +70,71 @@ namespace Benchmark.ClientLib.Reports
         }
 
         /// <summary>
-        /// Get Report
+        /// Begin Reporter
         /// </summary>
-        /// <returns></returns>
-        public BenchReport GetReport()
-        {
-            return _report;
-        }
-
         public void Begin()
         {
             _report.Begin = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// End Reporter and Finalize
+        /// </summary>
         public void End()
         {
             _report.End = DateTime.UtcNow;
             _report.Duration = _report.End - _report.Begin;
+            _report.Items = _items.ToArray();
         }
 
         /// <summary>
-        /// Add inidivisual Bench Report Detail
+        /// Add Detail Report
         /// </summary>
         /// <param name="item"></param>
-        public void AddBenchDetail(BenchReportItem item)
+        public void AddDetail(BenchReportItem item)
         {
             _items.Add(item);
-            _report.Items = _items.ToArray();
+        }
+        /// <summary>
+        /// Add Detail Report
+        /// </summary>
+        /// <param name="testName"></param>
+        /// <param name="testType"></param>
+        /// <param name="reporter"></param>
+        /// <param name="statistics"></param>
+        /// <param name="results"></param>
+        public void AddDetail(string testName, string testType, BenchReporter reporter, Statistics statistics, CallResult[] results)
+        {
+            TimeSpan[] sortedResults = Array.Empty<TimeSpan>();
+            TimeSpan fastest = TimeSpan.Zero;
+            TimeSpan slowest = TimeSpan.Zero;
+            if (results.Any())
+            {
+                sortedResults = results.Select(x => x.Duration).OrderBy(x => x).ToArray();
+                fastest = sortedResults[0];
+                slowest = sortedResults[^1];
+            }
+            var item = new BenchReportItem
+            {
+                ExecuteId = reporter.ExecuteId,
+                ClientId = reporter.ClientId,
+                TestName = testName,
+                Begin = statistics.Begin,
+                End = DateTime.UtcNow,
+                Duration = statistics.Elapsed,
+                RequestCount = results.Length,
+                Type = testType,
+                Average = results.Select(x => x.Duration).Average(),
+                Fastest = fastest,
+                Slowest = slowest,
+                Rps = results.Length / statistics.Elapsed.TotalSeconds,
+                Errors = results.Where(x => x.Error != null).Count(),
+                StatusCodeDistributions = StatusCodeDistribution.FromCallResults(results),
+                ErrorCodeDistribution = ErrorCodeDistribution.FromCallResults(results),
+                Latencies = LatencyDistribution.Calculate(sortedResults),
+                Histogram = HistogramBucket.Calculate(sortedResults, slowest.TotalMilliseconds, fastest.TotalMilliseconds),
+            };
+            _items.Add(item);
         }
 
         /// <summary>
@@ -171,6 +217,5 @@ namespace Benchmark.ClientLib.Reports
                 return description;
             }
         }
-
     }
 }

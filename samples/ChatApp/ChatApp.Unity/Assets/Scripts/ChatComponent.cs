@@ -61,7 +61,7 @@ namespace Assets.Scripts
         private async Task InitializeClientAsync()
         {
             // Initialize the Hub
-            this.channel = new Channel("localhost", 8080, ChannelCredentials.Insecure);
+            this.channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
             // for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
             //this.channel = new Channel("dummy.example.com", 5000, cred); // local tls

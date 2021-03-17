@@ -1,9 +1,9 @@
 using Benchmark.ClientLib.Converters;
+using Benchmark.ClientLib.Internal;
 using Benchmark.ClientLib.LoadTester;
 using Benchmark.ClientLib.Reports;
 using Benchmark.ClientLib.Scenarios;
 using Benchmark.ClientLib.Storage;
-using Benchmark.ClientLib.Utils;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
@@ -23,81 +23,23 @@ namespace Benchmark.ClientLib
     public class Benchmarker
     {
         private readonly string _path;
-        private readonly int[] _iterations;
         private readonly ILogger _logger;
         private readonly CancellationToken _cancellationToken;
-        private readonly bool _useSelfCertHttpsEndpoint;
-        private readonly string _clientId;
-        private ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache;
-        private ConcurrentDictionary<string, Channel> _ccoreChannelCache;
+        private readonly string _clientId = Guid.NewGuid().ToString();
+        private readonly ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
+        private readonly ConcurrentDictionary<string, Channel> _ccoreChannelCache = new ConcurrentDictionary<string, Channel>();
 
-        public bool FailFast { get; set; }
+        public BenchmarkerConfig Config { get; init; } = new BenchmarkerConfig();
 
-        public Benchmarker(string path, int[] iterations, ILogger logger, CancellationToken cancellationToken, bool useHttpsEndpoint)
-        {
-            _path = path;
-            _iterations = iterations;
-            _logger = logger;
-            _cancellationToken = cancellationToken;
-            _useSelfCertHttpsEndpoint = useHttpsEndpoint;
-            _clientId = Guid.NewGuid().ToString();
-            _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
-        }
         public Benchmarker(string path, ILogger logger, CancellationToken cancellationToken)
         {
             _path = path;
             _logger = logger;
             _cancellationToken = cancellationToken;
-            _clientId = Guid.NewGuid().ToString();
-            _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
+            ThreadPools.ModifyThreadPool(Environment.ProcessorCount * 8, Environment.ProcessorCount * 8, logger);
         }
 
         private static string NewReportId() => DateTime.UtcNow.ToString("yyyyMMddHHmmss.fff") + "-" + Guid.NewGuid().ToString();
-        
-        /// <summary>
-        /// Run Unary and Hub Benchmark
-        /// </summary>
-        /// <param name="hostAddress"></param>
-        /// <param name="reportId"></param>
-        /// <returns></returns>
-        public async Task BenchAll(string hostAddress = "http://localhost:5000", string reportId = "")
-        {
-            if (string.IsNullOrEmpty(reportId))
-                reportId = NewReportId();
-            var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
-
-            var reporter = new BenchReporter(reportId, _clientId, executeId);
-            reporter.Begin();
-            {
-                // single channel
-                //// Connect to the server using gRPC channel.
-                //var channel = GetOrCreateChannel(hostAddress);
-                //var unary = new UnaryBenchmarkScenario(channel, reporter);
-                //await using var hub = new HubBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
-                {
-                    // separate channel
-                    // Connect to the server using gRPC channel.
-                    var channel = CreateGrpcChannel(hostAddress);
-                    var unary = new UnaryBenchmarkScenario(channel, reporter, FailFast);
-                    await using var hub = new HubBenchmarkScenario(channel, reporter, FailFast);
-
-                    // Unary
-                    _logger?.LogInformation($"Begin unary {iteration} requests.");
-                    await unary.Run(iteration);
-
-                    // StreamingHub
-                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
-                    await hub.Run(iteration);
-                }
-            }
-            reporter.End();
-
-            await OutputAsync(reporter);
-        }
 
         /// <summary>
         /// Run Unary Benchmark
@@ -111,31 +53,23 @@ namespace Benchmark.ClientLib
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            var channels = Enumerable.Range(0, Config.ClientConnections).Select(x => CreateGrpcChannel(hostAddress)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.MagicOnion, nameof(UnaryBenchmarkScenario), Config);
             reporter.Begin();
             {
-                //// single channel
-                //// Connect to the server using gRPC channel.
-                //var channel = GetOrCreateChannel(hostAddress);
-                //var scenario = new UnaryBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
+                foreach (var request in Config.TotalRequests)
                 {
-                    // separate channel
-                    // Connect to the server using gRPC channel.
-                    var channel = CreateGrpcChannel(hostAddress);
-                    var scenario = new UnaryBenchmarkScenario(channel, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin unary {iteration} requests.");
-                    await scenario.Run(iteration);
+                    _logger?.LogDebug($"Begin unary benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    var scenario = new UnaryBenchmarkScenario(channels, reporter, Config);
+                    await scenario.Run(request, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
         /// <summary>
@@ -150,30 +84,23 @@ namespace Benchmark.ClientLib
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            var channels = Enumerable.Range(0, Config.ClientConnections).Select(x => CreateGrpcChannel(hostAddress)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.MagicOnion, nameof(HubBenchmarkScenario), Config);
             reporter.Begin();
             {
-                // single channel
-                //// Connect to the server using gRPC channel.
-                //var channel = GetOrCreateChannel(hostAddress);
-                //await using var scenario = new HubBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
+                foreach (var request in Config.TotalRequests)
                 {
-                    // separate channel
-                    var channel = CreateGrpcChannel(hostAddress);
-                    await using var scenario = new HubBenchmarkScenario(channel, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin Streaming {iteration} requests.");
-                    await scenario.Run(iteration);
+                    _logger?.LogDebug($"Begin Streaming benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    await using var scenario = new HubBenchmarkScenario(channels, reporter, Config);
+                    await scenario.Run(request, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
         /// <summary>
@@ -184,36 +111,29 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchLongRunHub(int waitMilliseconds, bool parallel = false, string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string reportId = "")
         {
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            var channels = Enumerable.Range(0, Config.ClientConnections).Select(x => CreateGrpcChannel(hostAddress)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.MagicOnion, nameof(HubLongRunBenchmarkScenario), Config);
             reporter.Begin();
             {
-                //// single chnannel
-                //var channel = GetOrCreateChannel(hostAddress);
-                //await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
+                foreach (var request in Config.TotalRequests)
                 {
-                    // separate channel
-                    // Connect to the server using gRPC channel.
-                    var channel = CreateGrpcChannel(hostAddress);
-                    await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin LongRun Streaming {iteration} requests.");
-                    await scenario.Run(iteration, waitMilliseconds, parallel);
+                    _logger?.LogDebug($"Begin LongRunHub Streaming benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    await using var scenario = new HubLongRunBenchmarkScenario(channels, reporter, Config);
+                    await scenario.Run(request, waitMilliseconds, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
         /// <summary>
@@ -225,42 +145,34 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress">IP:Port Style address.</param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchCCoreLongRunHub(int waitMilliseconds, bool insecure = true, bool parallel = false, string hostAddress = "localhost:5000", string reportId = "")
+        public async Task BenchCCoreLongRunHub(int waitMilliseconds, bool insecure = true, string hostAddress = "localhost:5000", string reportId = "")
         {
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId);
+            var credentials = !insecure
+                ? Config.UseSelfCertEndpoint
+                    ? new SslCredentials(File.ReadAllText("server.local.crt"))
+                    : new SslCredentials()
+                : ChannelCredentials.Insecure;
+            var channels = Enumerable.Range(0, Config.ClientConnections).Select(x => CreateCCoreChannel(hostAddress, credentials)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.GrpcCcore, nameof(CCoreHubLongRunBenchmarkScenario), Config);
             reporter.Begin();
             {
-                var credentials = !insecure 
-                    ? _useSelfCertHttpsEndpoint
-                        ? new SslCredentials(File.ReadAllText("server.local.crt"))
-                        : new SslCredentials()
-                    : ChannelCredentials.Insecure;
-
-                //// single chnannel
-                //var channel = GetOrCreateCCoreChannel(hostAddress, credentials);
-                //await using var scenario = new HubLongRunBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
+                foreach (int request in Config.TotalRequests)
                 {
-                    // separate channel
-                    // Connect to the server using gRPC channel.
-                    var channel = CreateCCoreChannel(hostAddress, credentials);
-                    await using var scenario = new CCoreHubLongRunBenchmarkScenario(channel, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin Ccore LongRun Streaming {iteration} requests.");
-                    await scenario.Run(iteration, waitMilliseconds, parallel);
+                    _logger?.LogDebug($"Begin LongRun C-CoreStreaming benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    await using var scenario = new CCoreHubLongRunBenchmarkScenario(channels, reporter, Config);
+                    await scenario.Run(request, waitMilliseconds, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
         /// <summary>
@@ -271,39 +183,32 @@ namespace Benchmark.ClientLib
         /// <returns></returns>
         public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.GrpcDotnet);
+            var channels = Enumerable.Range(0, Config.ClientConnections).Select(x => CreateGrpcChannel(hostAddress)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.GrpcDotnet, nameof(GrpcBenchmarkScenario), Config);
             reporter.Begin();
             {
-                // single channel
-                // Connect to the server using gRPC channel.
-                //var channel = GetOrCreateChannel(hostAddress);
-                //var scenario = new GrpcBenchmarkScenario(channel, reporter);
-
-                foreach (var iteration in _iterations)
+                foreach (int request in Config.TotalRequests)
                 {
-                    // separate channel
-                    // Connect to the server using gRPC channel.
-                    var channel = CreateGrpcChannel(hostAddress);
-                    var scenario = new GrpcBenchmarkScenario(channel, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin grpc {iteration} requests.");
-                    await scenario.Run(iteration);
+                    _logger?.LogDebug($"Begin grpc benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    var scenario = new GrpcBenchmarkScenario(channels, reporter, Config);
+                    await scenario.Run(request, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
         /// <summary>
-        /// Run Grpc Benchmark
+        /// Run REST Api Benchmark
         /// </summary>
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
@@ -314,35 +219,43 @@ namespace Benchmark.ClientLib
                 reportId = NewReportId();
 
             var executeId = Guid.NewGuid().ToString();
-            _logger?.LogInformation($"reportId: {reportId}");
-            _logger?.LogInformation($"executeId: {executeId}");
+            _logger?.LogDebug($"reportId: {reportId}");
 
-            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.AspnetCore);
+            // single thread-safe client
+            var apiClients = Enumerable.Range(0, Config.ClientConnections).Select(x => new ApiBenchmarkScenario.ApiClient(hostAddress)).ToArray();
+
+            var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.AspnetCore, nameof(ApiBenchmarkScenario), Config);
             reporter.Begin();
             {
-                // single thread-safe client
-                var apiClient = new ApiBenchmarkScenario.ApiClient(hostAddress);
-                foreach (var iteration in _iterations)
+                foreach (var request in Config.TotalRequests)
                 {
-                    var scenario = new ApiBenchmarkScenario(apiClient, reporter, FailFast);
-
-                    _logger?.LogInformation($"Begin api {iteration} requests.");
-                    await scenario.Run(iteration);
+                    _logger?.LogDebug($"Begin api benchmark. requests {request}, concurrency {Config.ClientConcurrency}, connections {Config.ClientConnections}");
+                    var scenario = new ApiBenchmarkScenario(apiClients, reporter, Config);
+                    await scenario.Run(request, _cancellationToken);
                 }
             }
             reporter.End();
 
-            await OutputAsync(reporter);
+            await OutputReportAsync(reporter, Config.GenerateHtmlReportAfterBench);
         }
 
-        private async Task OutputAsync(BenchReporter reporter)
+        private async Task OutputReportAsync(BenchReporter reporter, bool generateHtmlReport)
         {
             // output
             var benchJson = reporter.ToJson();
 
-            // put json to s3
+            // save json
             var storage = StorageFactory.Create(_logger);
-            await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            var jsonOutput = await storage.Save(_path, $"reports/{reporter.ReportId}", reporter.GetJsonFileName(), benchJson, ct: _cancellationToken);
+            _logger?.LogDebug($"JsonReport Uri: {jsonOutput}");
+
+            // generate html report
+            if (generateHtmlReport)
+            {
+                await GenerateHtmlAsync(reporter.ReportId);
+            }
+
+            ConsoleOutput(reporter.Report);
         }
 
         /// <summary>
@@ -389,7 +302,7 @@ namespace Benchmark.ClientLib
         /// <param name="generateDetail"></param>
         /// <param name="htmlFileName"></param>
         /// <returns></returns>
-        public async Task GenerateHtml(string reportId, bool generateDetail = true, string htmlFileName = "index.html")
+        public async Task GenerateHtmlAsync(string reportId, string htmlFileName = "index.html")
         {
             // access s3 and download json from reportId
             var reports = await GetReports(reportId);
@@ -397,8 +310,8 @@ namespace Benchmark.ClientLib
                 return;
 
             // generate html based on json data
-            var htmlReporter = new HtmlBenchReporter();
-            var htmlReport = htmlReporter.CreateReport(reports, generateDetail);
+            var htmlReporter = new HtmlReporter();
+            var htmlReport = htmlReporter.CreateReport(reports);
             var page = new BenchmarkReportPageTemplate()
             {
                 Report = htmlReport,
@@ -409,7 +322,7 @@ namespace Benchmark.ClientLib
             var storage = StorageFactory.Create(_logger);
             var outputUri = await storage.Save(_path, $"html/{reportId}", htmlFileName, content, overwrite: true, _cancellationToken);
 
-            _logger?.LogInformation($"HtmlReport Uri: {outputUri}");
+            _logger?.LogDebug($"HtmlReport Uri: {outputUri}");
         }
 
         public async Task<ClientInfo[]> ListClients()
@@ -441,12 +354,12 @@ namespace Benchmark.ClientLib
             }
 
             // Generate Html Report
-            await GenerateHtml(reportId);
+            await GenerateHtmlAsync(reportId);
         }
 
         public async Task CancelCommands()
         {
-            var config = AmazonUtils.IsAmazonEc2()
+            var config = AmazonEnvironment.IsAmazonEc2()
                 ? new Amazon.SimpleSystemsManagement.AmazonSimpleSystemsManagementConfig
                 {
                     RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
@@ -479,15 +392,6 @@ namespace Benchmark.ClientLib
         }
 
         /// <summary>
-        /// Get GrpcChannel from cache or create GrpcChannel if not exists.
-        /// </summary>
-        /// <param name="hostAddress">http style address. e.g. http://localhost:5000</param>
-        /// <returns></returns>
-        private GrpcChannel GetOrGrpcCreateChannel(string hostAddress)
-        {
-            return _grpcChannelCache.GetOrAdd(hostAddress, CreateGrpcChannel(hostAddress));
-        }
-        /// <summary>
         /// Create GrpcChannel
         /// </summary>
         /// <param name="hostAddress">http style address. e.g. http://localhost:5000</param>
@@ -498,12 +402,17 @@ namespace Benchmark.ClientLib
             {
                 // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
                 // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                EnableMultipleHttp2Connections = true,
+                EnableMultipleHttp2Connections = false,
+                // Enable KeepAlive to keep HTTP/2 while non-active status.
+                PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
+                KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+                KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+                ConnectTimeout = TimeSpan.FromSeconds(10),
             };
-            if (_useSelfCertHttpsEndpoint)
+            if (Config.UseSelfCertEndpoint)
             {
                 // allow non trusted certificate
-                RemoteCertificateValidationCallback validationHandler = (object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors) => true;
+                RemoteCertificateValidationCallback validationHandler = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
                 handler.SslOptions = new SslClientAuthenticationOptions
                 {
                     RemoteCertificateValidationCallback = validationHandler,
@@ -513,19 +422,11 @@ namespace Benchmark.ClientLib
             return GrpcChannel.ForAddress(hostAddress, new GrpcChannelOptions
             {
                 HttpHandler = handler,
+                MaxReceiveMessageSize = int.MaxValue,
+                MaxSendMessageSize = int.MaxValue,
             });
         }
 
-        /// <summary>
-        /// Get CCore Channel from cache or create Channel if not exists.
-        /// </summary>
-        /// <param name="hostAddress">IP:Port style address. e.g. localhost:5000</param>
-        /// <param name="credentials"></param>
-        /// <returns></returns>
-        private Channel GetOrCreateCCoreChannel(string hostAddress, ChannelCredentials credentials)
-        {
-            return _ccoreChannelCache.GetOrAdd(hostAddress, CreateCCoreChannel(hostAddress, credentials));
-        }
         /// <summary>
         /// Create CCore Channel
         /// </summary>
@@ -534,7 +435,25 @@ namespace Benchmark.ClientLib
         /// <returns></returns>
         private Channel CreateCCoreChannel(string hostAddress, ChannelCredentials credentials)
         {
-            return new Channel(hostAddress, credentials);
+            return new Channel(hostAddress, credentials, new ChannelOption[]
+            {
+                new ChannelOption("grpc.keepalive_time_ms", 60_000),
+                new ChannelOption("grpc.keepalive_timeout_ms", 30_000),
+                new ChannelOption("grpc.max_receive_message_length", int.MaxValue),
+                new ChannelOption("grpc.max_send_message_length", int.MaxValue),
+
+            });
+        }
+
+        /// <summary>
+        /// Console Output Report
+        /// </summary>
+        /// <param name="report"></param>
+        private void ConsoleOutput(BenchReport report)
+        {
+            var template = new BenchmarkConsoleOutputTemplate(report);
+            var content = NormalizeNewLineLf(template.TransformText());
+            _logger?.LogInformation(content);
         }
 
         private static string NormalizeNewLine(string content)

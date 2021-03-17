@@ -1,194 +1,81 @@
 using Benchmark.ClientLib.Reports;
+using Benchmark.ClientLib.Internal.Runtime;
 using Benchmark.Server.Shared;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Grpc.Core;
 
 namespace Benchmark.ClientLib.Scenarios
 {
-    public class HubLongRunBenchmarkScenario : ScenarioBase, ILongRunBenchmarkHubReciever, IAsyncDisposable
+    public class HubLongRunBenchmarkScenario : ILongRunBenchmarkHubReciever, IAsyncDisposable
     {
-        private readonly GrpcChannel _channel;
+        private readonly BenchmarkerConfig _config;
         private readonly BenchReporter _reporter;
-        private ILongRunBenchmarkHub _client;
+        private ILongRunBenchmarkHub[] _clients;
 
-        public HubLongRunBenchmarkScenario(GrpcChannel channel, BenchReporter reporter, bool failFast) : base(failFast)
+        public HubLongRunBenchmarkScenario(GrpcChannel[] channels, BenchReporter reporter, BenchmarkerConfig config)
         {
-            _channel = channel;
+            _clients = channels.Select(x => StreamingHubClient.ConnectAsync<ILongRunBenchmarkHub, ILongRunBenchmarkHubReciever>(x, this).GetAwaiter().GetResult()).ToArray();
             _reporter = reporter;
+            _config = config;
         }
 
-        public async Task Run(int requestCount, int waitMilliseonds, bool parallel)
+        private ILongRunBenchmarkHub GetClient(int n) => _clients[n % _clients.Length];
+
+        public async Task Run(int requestCount, int waitMilliseonds, CancellationToken ct)
         {
-            using (var statistics = new Statistics(nameof(ConnectAsync)))
+            Statistics statistics = null;
+            CallResult[] results = null;
+            using (statistics = new Statistics(nameof(UnaryBenchmarkScenario) + requestCount))
             {
-                await ConnectAsync("console-client");
-
-                _reporter.AddBenchDetail(new BenchReportItem
-                {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(ConnectAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = 0, // connect is setup, not count as request.
-                    Errors = Error,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
-                statistics.HasError(Error);
+                results = await ProcessAsync(requestCount, waitMilliseonds, ct);
             }
-            ResetError();
 
-            using (var statistics = new Statistics(nameof(ProcessAsync)))
-            {
-                await ProcessAsync(requestCount, waitMilliseonds, parallel);
-
-                _reporter.AddBenchDetail(new BenchReportItem
-                {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(ProcessAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = requestCount,
-                    Errors = Error,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
-                statistics.HasError(Error);
-            }
-            ResetError();
-
-            using (var statistics = new Statistics(nameof(EndAsync)))
-            {
-                await EndAsync();
-                _reporter.AddBenchDetail(new BenchReportItem
-                {
-                    ExecuteId = _reporter.ExecuteId,
-                    ClientId = _reporter.ClientId,
-                    TestName = nameof(EndAsync),
-                    Begin = statistics.Begin,
-                    End = DateTime.UtcNow,
-                    Duration = statistics.Elapsed,
-                    RequestCount = 0, // end is teardown, not count as request.
-                    Errors = Error,
-                    Type = nameof(Grpc.Core.MethodType.DuplexStreaming),
-                });
-                statistics.HasError(Error);
-            }
+            _reporter.AddDetail(nameof(ProcessAsync), nameof(MethodType.DuplexStreaming), _reporter, statistics, results);
         }
 
-        private async Task ConnectAsync(string roomName)
+        private async Task<CallResult[]> ProcessAsync(int requestCount, int waitMilliseonds, CancellationToken ct)
         {
-            try
+            var data = new LongRunBenchmarkData
             {
-                _client = await StreamingHubClient.ConnectAsync<ILongRunBenchmarkHub, ILongRunBenchmarkHubReciever>(_channel, this);
-                var name = Guid.NewGuid().ToString();
-                await _client.Ready(roomName, name);
-            }
-            catch (Exception ex)
-            {
-                if (FailFast)
-                    throw;
-                IncrementError();
-                PostException(ex);
-            }
-        }
+                WaitMilliseconds = waitMilliseonds,
+            };
 
-        private async Task ProcessAsync(int requestCount, int waitMilliseonds, bool parallel)
-        {
-            if (parallel)
+            var duration = _config.GetDuration();
+            if (duration != TimeSpan.Zero)
             {
-                await ProcessParallelAsync(requestCount, waitMilliseonds);
+                // timeout base
+                using var cts = new CancellationTokenSource(duration);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
+                var linkedCt = linkedCts.Token;
+
+                using var pool = new TaskWorkerPool<LongRunBenchmarkData>(_config.ClientConcurrency, linkedCt);
+                pool.RunWorkers((id, data, ct) => GetClient(id).Process(data), data, ct);
+                await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
+                return pool.GetResult();
             }
             else
             {
-                await ProcessSequentialAsync(requestCount, waitMilliseonds);
+                // request base
+                using var pool = new TaskWorkerPool<LongRunBenchmarkData>(_config.ClientConcurrency, ct)
+                {
+                    CompleteCondition = x => x.completed >= requestCount,
+                };
+                pool.RunWorkers((id, data, ct) => GetClient(id).Process(data), data, ct);
+                await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
+                return pool.GetResult();
             }
         }
-
-        private async Task ProcessSequentialAsync(int requestCount, int waitMilliseonds)
-        {
-            var data = new LongRunBenchmarkData
-            {
-                WaitMilliseconds = waitMilliseonds,
-            };
-            for (var i = 0; i < requestCount; i++)
-            {
-                try
-                {
-                    await _client.Process(data);
-                }
-                catch (Exception ex)
-                {
-                    if (FailFast)
-                        throw;
-                    IncrementError();
-                    PostException(ex);
-                }
-            }
-        }
-
-        private async Task ProcessParallelAsync(int requestCount, int waitMilliseonds)
-        {
-            var tasks = new List<Task>();
-            var data = new LongRunBenchmarkData
-            {
-                WaitMilliseconds = waitMilliseonds,
-            };
-            for (var i = 0; i < requestCount; i++)
-            {
-                try
-                {
-                    // no meaing.
-                    // same streaming client will wait sequentially at server, you should not use itelation but must separate client.
-                    var task = _client.Process(data);
-                    tasks.Add(task);
-                }
-                catch (Exception ex)
-                {
-                    if (FailFast)
-                        throw;
-                    IncrementError();
-                    PostException(ex);
-                }
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
-        private async Task EndAsync()
-        {
-            try
-            {
-                await _client.End();
-            }
-            catch (Exception ex)
-            {
-                if (FailFast)
-                    throw;
-                IncrementError();
-                PostException(ex);
-            }
-        }
-
         async ValueTask IAsyncDisposable.DisposeAsync()
         {
-            await _client?.DisposeAsync();
+            await Task.WhenAll(_clients.Select(x => x.DisposeAsync()));
         }
 
-        void ILongRunBenchmarkHubReciever.OnStart(string requestType)
-        {
-            throw new NotImplementedException();
-        }
         void ILongRunBenchmarkHubReciever.OnProcess()
-        {
-            throw new NotImplementedException();
-        }
-        void ILongRunBenchmarkHubReciever.OnEnd()
         {
             throw new NotImplementedException();
         }

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Client", "app\Benchmark.Client\Benchmark.Client.csproj", "{E3DDD0C4-0159-4F78-A6BC-C6BB5E37E660}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server", "app\Benchmark.Server\Benchmark.Server.csproj", "{D7E2E088-B521-4A6C-890C-B524B9DA9D5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server", "app\dotnet_grpc_server_bench\Benchmark.Server.csproj", "{D7E2E088-B521-4A6C-890C-B524B9DA9D5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cdk", "Cdk\Cdk.csproj", "{109E4C9F-4CBA-4B06-8814-8D3B9EE05785}"
 EndProject
@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.ClientLib", "app\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleAppEcs", "app\ConsoleAppEcs\ConsoleAppEcs.csproj", "{DAEFFED9-911E-4179-BA40-BDBF77DE8DAA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server.Https", "app\Benchmark.Server.Https\Benchmark.Server.Https.csproj", "{2E6C2EAD-4C56-4A8B-A8F4-C71B14622C28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server.Https", "app\dotnet_grpc_server_https_bench\Benchmark.Server.Https.csproj", "{2E6C2EAD-4C56-4A8B-A8F4-C71B14622C28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server.Api", "app\Benchmark.Server.Api\Benchmark.Server.Api.csproj", "{DB88D582-FBA6-4C60-A131-8CE18A429BB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server.Api", "app\dotnet_api_server_bench\Benchmark.Server.Api.csproj", "{DB88D582-FBA6-4C60-A131-8CE18A429BB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
 using Amazon.SimpleSystemsManagement;
 using Amazon.SimpleSystemsManagement.Model;
-using Benchmark.ClientLib.Utils;
+using Benchmark.ClientLib.Internal;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Benchmark.ClientLib.LoadTester
                 return loadTester;
 
             // todo: Google... etc...?
-            if (AmazonUtils.IsAmazonEc2())
+            if (AmazonEnvironment.IsAmazonEc2())
             {
                 var config = new AmazonSimpleSystemsManagementConfig
                 {
@@ -79,9 +79,9 @@ namespace Benchmark.ClientLib.LoadTester
             };
         }
 
-        public async Task<ClientInfo[]> ListClients(CancellationToken ct = default)
+        public Task<ClientInfo[]> ListClients(CancellationToken ct = default)
         {
-            return new[] { CurrentInfo };
+            return Task.FromResult(new[] { CurrentInfo });
         }
 
         public async Task Run(int processCount, string iterations, string benchCommand, string hostAddress, string reportId, CancellationToken ct = default)

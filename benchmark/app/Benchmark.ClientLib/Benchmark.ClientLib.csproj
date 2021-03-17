@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -21,23 +21,35 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Benchmark.Server\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
-    <Protobuf Include="..\Benchmark.Server\Protos\**\*.proto" Link="Protos\%(RecursiveDir)\%(FileName)%(Extension)" GrpcServices="Client" />
+    <Compile Include="..\dotnet_grpc_server_bench\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\proto\**\*.proto" Link="Protos/%(RecursiveDir)\%(FileName)%(Extension)" GrpcServices="Client" />
   </ItemGroup>
  
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-  
+ 
   <ItemGroup>
+    <Compile Update="BenchmarkConsoleOutputTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>BenchmarkConsoleOutputTemplate.tt</DependentUpon>
+    </Compile>
     <Compile Update="BenchmarkReportPageTemplate.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>BenchmarkReportPageTemplate.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
+ 
   <ItemGroup>
+    <None Update="BenchmarkConsoleOutputTemplate.tt">
+      <LastGenOutput>BenchmarkConsoleOutputTemplate.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
     <None Update="BenchmarkReportPageTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>BenchmarkReportPageTemplate.cs</LastGenOutput>
