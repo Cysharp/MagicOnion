@@ -2,7 +2,8 @@
     "name": "MagicOnion.Unity.Editor",
     "references": [
         "MagicOnion.Unity",
-        "MagicOnion.Abstractions"
+        "MagicOnion.Abstractions",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

@@ -2,6 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+#if MAGICONION_UNITASK_SUPPORT
+using Cysharp.Threading.Tasks;
+using Channel = Grpc.Core.Channel;
+#endif
 using Grpc.Core;
 using UnityEditor;
 using UnityEngine;

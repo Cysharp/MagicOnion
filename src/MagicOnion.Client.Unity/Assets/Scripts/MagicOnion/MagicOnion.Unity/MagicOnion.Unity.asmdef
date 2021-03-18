@@ -2,7 +2,8 @@
     "name": "MagicOnion.Unity",
     "references": [
         "MagicOnion.Abstractions",
-        "MagicOnion.Client"
+        "MagicOnion.Client",
+        "UniTask"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

@@ -5,6 +5,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+#if MAGICONION_UNITASK_SUPPORT
+using Cysharp.Threading.Tasks;
+using Channel = Grpc.Core.Channel;
+#endif
 using Grpc.Core;
 using MagicOnion.Unity;
 using UnityEngine;
