@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using Channel = Grpc.Core.Channel;
 #endif
 using Grpc.Core;
+using MagicOnion.Client;
 using MagicOnion.Unity;
 using UnityEngine;
 
@@ -90,9 +91,6 @@ namespace MagicOnion
             return _channel.CreateCallInvoker();
 #endif
         }
-
-        public static implicit operator CallInvoker(GrpcChannelx channel)
-            => channel.CreateCallInvoker();
 
         /// <summary>
         /// Connect to the target using gRPC channel. see <see cref="Grpc.Core.Channel.ConnectAsync"/>.
@@ -389,20 +387,6 @@ namespace MagicOnion
             }
         }
 #endif
-    }
-
-    public interface IMagicOnionAwareGrpcChannel
-    {
-        /// <summary>
-        /// Register the StreamingHub under the management of the channel.
-        /// </summary>
-        void ManageStreamingHubClient(IStreamingHubMarker streamingHub, Func<Task> disposeAsync, Task waitForDisconnect);
-
-        /// <summary>
-        /// Gets all StreamingHubs that depends on the channel.
-        /// </summary>
-        /// <returns></returns>
-        IReadOnlyCollection<IStreamingHubMarker> GetAllManagedStreamingHubs();
     }
 
 #if UNITY_EDITOR

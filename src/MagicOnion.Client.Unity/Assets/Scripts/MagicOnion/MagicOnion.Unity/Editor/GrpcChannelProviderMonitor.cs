@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using Channel = Grpc.Core.Channel;
 #endif
 using Grpc.Core;
+using MagicOnion.Client;
 using UnityEditor;
 using UnityEngine;
 

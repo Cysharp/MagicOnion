@@ -1,8 +1,9 @@
 {
     "name": "MagicOnion.Unity.Editor",
     "references": [
-        "MagicOnion.Unity",
         "MagicOnion.Abstractions",
+        "MagicOnion.Client",
+        "MagicOnion.Unity",
         "UniTask"
     ],
     "includePlatforms": [
