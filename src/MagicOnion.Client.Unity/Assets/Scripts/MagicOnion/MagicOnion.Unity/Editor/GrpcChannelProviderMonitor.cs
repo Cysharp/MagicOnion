@@ -100,7 +100,10 @@ namespace MagicOnion.Unity.Editor
                         {
                             foreach (var streamingHub in streamingHubs)
                             {
-                                EditorGUILayout.LabelField(streamingHub.GetType().FullName);
+                                EditorGUILayout.LabelField(streamingHub.StreamingHubType.FullName);
+                                EditorGUI.indentLevel++;
+                                EditorGUILayout.LabelField(streamingHub.Client.GetType().FullName);
+                                EditorGUI.indentLevel--;
                             }
                         }
                     }

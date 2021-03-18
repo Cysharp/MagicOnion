@@ -13,7 +13,7 @@ namespace MagicOnion.Client
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var hubClient = Connect<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, serializerOptions, logger);
-            channel.ManageStreamingHubClient(hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
+            channel.ManageStreamingHubClient(typeof(TStreamingHub), hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
             return hubClient;
         }
 
@@ -21,7 +21,7 @@ namespace MagicOnion.Client
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var hubClient = await ConnectAsync<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, serializerOptions, logger, cancellationToken);
-            channel.ManageStreamingHubClient(hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
+            channel.ManageStreamingHubClient(typeof(TStreamingHub), hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
             return hubClient;
         }
 

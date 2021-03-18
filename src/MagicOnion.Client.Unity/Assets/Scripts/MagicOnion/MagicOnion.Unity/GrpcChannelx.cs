@@ -28,7 +28,7 @@ namespace MagicOnion
 #endif
     {
         private readonly Action<GrpcChannelx> _onDispose;
-        private readonly Dictionary<IStreamingHubMarker, Func<Task>> _streamingHubs = new Dictionary<IStreamingHubMarker, Func<Task>>();
+        private readonly Dictionary<IStreamingHubMarker, (Func<Task> DisposeAsync, ManagedStreamingHubInfo StreamingHubInfo)> _streamingHubs = new Dictionary<IStreamingHubMarker, (Func<Task>, ManagedStreamingHubInfo)>();
         private readonly Channel _channel;
         private bool _disposed;
 
@@ -109,20 +109,20 @@ namespace MagicOnion
 
 
         /// <inheritdoc />
-        IReadOnlyCollection<IStreamingHubMarker> IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs()
+        IReadOnlyCollection<ManagedStreamingHubInfo> IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs()
         {
             lock (_streamingHubs)
             {
-                return _streamingHubs.Keys.ToArray();
+                return _streamingHubs.Values.Select(x => x.StreamingHubInfo).ToArray();
             }
         }
 
         /// <inheritdoc />
-        void IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(IStreamingHubMarker streamingHub, Func<Task> disposeAsync, Task waitForDisconnect)
+        void IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type streamingHubType, IStreamingHubMarker streamingHub, Func<Task> disposeAsync, Task waitForDisconnect)
         {
             lock (_streamingHubs)
             {
-                _streamingHubs.Add(streamingHub, disposeAsync);
+                _streamingHubs.Add(streamingHub, (disposeAsync, new ManagedStreamingHubInfo(streamingHubType, streamingHub)));
 
                 // 切断されたら管理下から外す
                 Forget(WaitForDisconnectAndDisposeAsync(streamingHub, waitForDisconnect));
@@ -143,11 +143,11 @@ namespace MagicOnion
         {
             lock (_streamingHubs)
             {
-                if (_streamingHubs.TryGetValue(streamingHub, out var disposeAsync))
+                if (_streamingHubs.TryGetValue(streamingHub, out var disposeAsyncAndStreamingHubInfo))
                 {
                     try
                     {
-                        Forget(disposeAsync());
+                        Forget(disposeAsyncAndStreamingHubInfo.DisposeAsync());
                     }
                     catch (Exception e)
                     {
