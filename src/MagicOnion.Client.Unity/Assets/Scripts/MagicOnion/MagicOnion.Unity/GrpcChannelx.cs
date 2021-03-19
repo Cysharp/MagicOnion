@@ -20,7 +20,7 @@ namespace MagicOnion
     /// gRPC Channel wrapper that managed by the channel provider.
     /// </summary>
     public sealed partial class GrpcChannelx : IMagicOnionAwareGrpcChannel, IDisposable
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
         , IGrpcChannelxDiagnosticsInfo
 #endif
 #if MAGICONION_UNITASK_SUPPORT
@@ -37,7 +37,7 @@ namespace MagicOnion
 
         public ChannelState ChannelState => _channel.State;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
         private readonly string _stackTrace;
         private readonly IReadOnlyList<ChannelOption> _channelOptions;
         private readonly ChannelStats _channelStats;
@@ -55,7 +55,7 @@ namespace MagicOnion
             _channel = channel;
             _disposed = false;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
             _stackTrace = new System.Diagnostics.StackTrace().ToString();
             _channelStats = new ChannelStats();
             _channelOptions = channelOptions;
@@ -85,7 +85,7 @@ namespace MagicOnion
         public CallInvoker CreateCallInvoker()
         {
             ThrowIfDisposed();
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
             return new ChannelStats.WrappedCallInvoker(((IGrpcChannelxDiagnosticsInfo)this).Stats, _channel.CreateCallInvoker());
 #else
             return _channel.CreateCallInvoker();
@@ -124,7 +124,7 @@ namespace MagicOnion
             {
                 _streamingHubs.Add(streamingHub, (disposeAsync, new ManagedStreamingHubInfo(streamingHubType, streamingHub)));
 
-                // 切断されたら管理下から外す
+                // When the channel is disconnected, unregister it.
                 Forget(WaitForDisconnectAndDisposeAsync(streamingHub, waitForDisconnect));
             }
         }
@@ -249,7 +249,7 @@ namespace MagicOnion
             }
         }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
         public class ChannelStats
         {
             private int _sentBytes = 0;
@@ -283,13 +283,13 @@ namespace MagicOnion
                 }
             }
 
-            public void AddSentBytes(int bytesLength)
+            internal void AddSentBytes(int bytesLength)
             {
                 Interlocked.Add(ref _sentBytes, bytesLength);
                 AddValue(ref _prevSentBytesAt, ref _indexSentBytes, _sentBytesHistory, DateTime.Now, bytesLength);
             }
 
-            public void AddReceivedBytes(int bytesLength)
+            internal void AddReceivedBytes(int bytesLength)
             {
                 Interlocked.Add(ref _receivedBytes, bytesLength);
                 AddValue(ref _prevReceivedBytesAt, ref _indexReceivedBytes, _receivedBytesHistory, DateTime.Now, bytesLength);
@@ -321,7 +321,7 @@ namespace MagicOnion
                 }
             }
 
-            public class WrappedCallInvoker : CallInvoker
+            internal class WrappedCallInvoker : CallInvoker
             {
                 private readonly CallInvoker _baseCallInvoker;
                 private readonly ChannelStats _channelStats;
@@ -389,7 +389,7 @@ namespace MagicOnion
 #endif
     }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
     public interface IGrpcChannelxDiagnosticsInfo
     {
         string StackTrace { get; }
