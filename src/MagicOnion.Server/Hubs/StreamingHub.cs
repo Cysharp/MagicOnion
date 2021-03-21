@@ -111,7 +111,7 @@ namespace MagicOnion.Server.Hubs
             }
             finally
             {
-                Context.isDisocnnected = true;
+                Context.CompleteStreamingHub();
                 await OnDisconnected();
                 await this.Group.DisposeAsync();
             }

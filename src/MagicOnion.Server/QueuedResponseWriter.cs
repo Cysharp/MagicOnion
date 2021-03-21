@@ -39,7 +39,7 @@ namespace MagicOnion.Server
             {
                 while (reader.TryRead(out var item))
                 {
-                    if (serviceContext.isDisocnnected) break;
+                    if (serviceContext.IsDisocnnected) break;
                     try
                     {
                         await stream.WriteAsync(item).ConfigureAwait(false);
@@ -49,7 +49,7 @@ namespace MagicOnion.Server
                         MagicOnionServerInternalLogger.Current.LogError(ex, "error occured on write to client.");
                     }
                 }
-                if (serviceContext.isDisocnnected) break;
+                if (serviceContext.IsDisocnnected) break;
             } while (await reader.WaitToReadAsync().ConfigureAwait(false));
 
         }

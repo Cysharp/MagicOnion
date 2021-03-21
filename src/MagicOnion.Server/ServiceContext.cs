@@ -70,12 +70,18 @@ namespace MagicOnion.Server
         internal MethodHandler MethodHandler { get; private set; }
 
         // used in StreamingHub
-        internal bool isDisocnnected;
+        internal bool IsDisocnnected { get; private set; }
         Lazy<QueuedResponseWriter> streamingResponseWriter;
 
         internal void QueueResponseStreamWrite(byte[] value)
         {
             streamingResponseWriter.Value.Write(value);
+        }
+
+        internal void CompleteStreamingHub()
+        {
+            IsDisocnnected = true;
+            streamingResponseWriter.Value.Dispose();
         }
 
         QueuedResponseWriter CreateQueuedResponseWriter()
