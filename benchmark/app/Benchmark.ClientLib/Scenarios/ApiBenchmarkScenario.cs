@@ -2,7 +2,6 @@ using Benchmark.ClientLib.Internal.Runtime;
 using Benchmark.ClientLib.Reports;
 using Benchmark.Server.Shared;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -40,11 +39,10 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task<CallResult[]> PlainTextAsync(int requestCount, CancellationToken ct)
         {
-            var data = new BenchmarkData
+            var data = new BenchmarkRequest
             {
-                PlainText = _config.GetRequestPayload(),
+                Name = _config.GetRequestPayload(),
             };
-            var json = JsonSerializer.Serialize<BenchmarkData>(data);
 
             var duration = _config.GetDuration();
             if (duration != TimeSpan.Zero)
@@ -54,19 +52,19 @@ namespace Benchmark.ClientLib.Scenarios
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
                 var linkedCt = linkedCts.Token;
 
-                using var pool = new TaskWorkerPool<string>(_config.ClientConcurrency, linkedCt);
-                pool.RunWorkers((id, json, ct) => GetClient(id).PlainTextAsync(json), json, ct);
+                using var pool = new TaskWorkerPool<BenchmarkRequest, BenchmarkReply>(_config.ClientConcurrency, linkedCt);
+                pool.RunWorkers((id, data, ct) => GetClient(id).SayHelloAsync(data), data, ct);
                 await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
                 return pool.GetResult();
             }
             else
             {
                 // request base
-                using var pool = new TaskWorkerPool<string>(_config.ClientConcurrency, ct)
+                using var pool = new TaskWorkerPool<BenchmarkRequest, BenchmarkReply>(_config.ClientConcurrency, ct)
                 {
                     CompleteCondition = x => x.completed >= requestCount,
                 };
-                pool.RunWorkers((id, json, ct) => GetClient(id).PlainTextAsync(json), json, ct);
+                pool.RunWorkers((id, data, ct) => GetClient(id).SayHelloAsync(data), data, ct);
                 await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
                 return pool.GetResult();
             }
@@ -86,11 +84,13 @@ namespace Benchmark.ClientLib.Scenarios
                 _endpointPlainText = endpoint + "/plaintext";
            }
 
-            public async Task PlainTextAsync(string json)
+            public async Task<BenchmarkReply> SayHelloAsync(BenchmarkRequest data)
             {
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var res = await _client.PostAsync(_endpointPlainText, content);
+                var request = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json");
+                var res = await _client.PostAsync(_endpointPlainText, request);
                 res.EnsureSuccessStatusCode();
+                var content = await res.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<BenchmarkReply>(content);
             }
         }
     }

@@ -4,7 +4,6 @@ using Benchmark.Server.Shared;
 using Benchmark.Shared;
 using Grpc.Net.Client;
 using MagicOnion.Client;
-using MessagePack;
 using System;
 using System.Linq;
 using System.Threading;
@@ -42,10 +41,7 @@ namespace Benchmark.ClientLib.Scenarios
 
         private async Task<CallResult[]> PlainTextAsync(int requestCount, CancellationToken ct)
         {
-            var data = new BenchmarkData
-            {
-                PlainText = _config.GetRequestPayload(),
-            };
+            var data = new BenchmarkRequest { Name = _config.GetRequestPayload() };
 
             var duration = _config.GetDuration();
             if (duration != TimeSpan.Zero)
@@ -55,19 +51,19 @@ namespace Benchmark.ClientLib.Scenarios
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
                 var linkedCt = linkedCts.Token;
 
-                using var pool = new UnaryResultWorkerPool<BenchmarkData, Nil>(_config.ClientConcurrency, linkedCt);
-                pool.RunWorkers((id, data, ct) => GetClient(id).PlainTextAsync(data), data, ct);
+                using var pool = new UnaryResultWorkerPool<BenchmarkRequest, BenchmarkReply>(_config.ClientConcurrency, linkedCt);
+                pool.RunWorkers((id, data, ct) => GetClient(id).SayHelloAsync(data), data, ct);
                 await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
                 return pool.GetResult();
             }
             else
             {
                 // request base
-                using var pool = new UnaryResultWorkerPool<BenchmarkData, Nil>(_config.ClientConcurrency, ct)
+                using var pool = new UnaryResultWorkerPool<BenchmarkRequest, BenchmarkReply>(_config.ClientConcurrency, ct)
                 {
                     CompleteCondition = x => x.completed >= requestCount,
                 };
-                pool.RunWorkers((id, data, ct) => GetClient(id).PlainTextAsync(data), data, ct);
+                pool.RunWorkers((id, data, ct) => GetClient(id).SayHelloAsync(data), data, ct);
                 await Task.WhenAny(pool.WaitForCompleteAsync(), pool.WaitForTimeout());
                 return pool.GetResult();
             }

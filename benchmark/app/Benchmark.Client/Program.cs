@@ -46,7 +46,7 @@ public class BenchmarkRunner : ConsoleAppBase
     private bool IsHttpsEndpoint(string endpoint) => endpoint.StartsWith("https://");
 
     /// <summary>
-    /// Run Unary Benchmark
+    /// Run MagicOnion Unary Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="iterations"></param>
@@ -55,7 +55,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchUnary(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
+    public async Task MO(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -70,11 +70,11 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.BenchUnary(hostAddress, reportId);
+        await benchmarker.MagicOnionUnary(hostAddress, reportId);
     }
 
     /// <summary>
-    /// Run Hub Benchmark
+    /// Run MagicOnion Hub Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="iterations"></param>
@@ -83,7 +83,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchHub(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
+    public async Task MOHub(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -98,11 +98,11 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.BenchHub(hostAddress, reportId);
+        await benchmarker.MagicOnionHub(hostAddress, reportId);
     }
 
     /// <summary>
-    /// Run Long running Hub Benchmark
+    /// Run MagicOnion Long running Hub Benchmark
     /// </summary>
     /// <param name="waitMilliseconds"></param>
     /// <param name="hostAddress"></param>
@@ -112,7 +112,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
+    public async Task MOLongRunHub(int waitMilliseconds, string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -127,11 +127,11 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.BenchLongRunHub(waitMilliseconds, hostAddress, reportId);
+        await benchmarker.MagicOnionLongRunHub(waitMilliseconds, hostAddress, reportId);
     }
 
     /// <summary>
-    /// Run Grpc Benchmark
+    /// Run Grpc Unary Benchmark
     /// </summary>
     /// <param name="hostAddress"></param>
     /// <param name="iterations"></param>
@@ -140,7 +140,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
+    public async Task Grpc(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -155,7 +155,7 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.BenchGrpc(hostAddress, reportId);
+        await benchmarker.GrpcUnary(hostAddress, reportId);
     }
 
     /// <summary>
@@ -168,7 +168,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task BenchApi(string hostAddress = "http://localhost:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 50, string reportId = "")
+    public async Task Api(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -183,7 +183,7 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.BenchApi(hostAddress, reportId);
+        await benchmarker.RestApi(hostAddress, reportId);
     }
 
     /// <summary>
@@ -218,23 +218,5 @@ public class BenchmarkRunner : ConsoleAppBase
     {
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
         await benchmarker.GenerateHtmlAsync(reportId, htmlFileName);
-    }
-
-    public async Task ListClients()
-    {
-        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
-        await benchmarker.ListClients();
-    }
-
-    public async Task RunAllClient(int processCount, string iterations = "256,1024,4096,16384", string benchCommand = "benchall", string hostAddress = "http://localhost:5000", string reportId = "")
-    {
-        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
-        await benchmarker.RunAllClient(processCount, iterations, benchCommand, hostAddress, reportId);
-    }
-
-    public async Task CancelCommands()
-    {
-        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken);
-        await benchmarker.CancelCommands();
     }
 }

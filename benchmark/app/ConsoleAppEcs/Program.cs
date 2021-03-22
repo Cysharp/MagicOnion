@@ -34,23 +34,9 @@ namespace ConsoleAppEcs
             if (args.Length == 0)
             {
                 // master
-                // 10 100 200 <- BenchServer CPU 100% / Fargate Task CPU 100%
-                // 20 10 1000 <- BenchServer CPU 100% / Fargate Task CPU 20%
-                //args = "request -processCount 5 -workerPerProcess 50 -executePerWorker 100 -workerName UnaryWorker".Split(' ');
-                //args = "request -processCount 10 -workerPerProcess 100 -executePerWorker 150 -workerName UnaryWorker".Split(' ');
-                //args = "request -processCount 20 -workerPerProcess 10 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
-
                 args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1 -workerName UnaryWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1 -workerName GrpcWorker".Split(' ');
                 //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1 -workerName ApiWorker".Split(' ');
-
-                //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName UnaryWorker".Split(' ');
-                //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName HubWorker".Split(' ');
-                //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName GrpcWorker".Split(' ');
-                //args = "request -processCount 1 -workerPerProcess 1 -executePerWorker 1000 -workerName ApiWorker".Split(' ');
-
-                //args = "request -processCount 40 -workerPerProcess 100 -executePerWorker 1 -workerName LongRunHubWorker".Split(' ');
-                //args = "request -processCount 100 -workerPerProcess 200 -executePerWorker 1 -workerName CCoreLongRunHubWorker".Split(' ');
 
                 // expand thread pool
                 //ModifyThreadPool(Environment.ProcessorCount * 5, Environment.ProcessorCount * 5);
@@ -168,7 +154,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchGrpc(_hostAddress, _reportId);
+                await _benchmarker.GrpcUnary(_hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -232,7 +218,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchApi(_hostAddress, _reportId);
+                await _benchmarker.RestApi(_hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -296,7 +282,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchUnary(_hostAddress, _reportId);
+                await _benchmarker.MagicOnionUnary(_hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -360,7 +346,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchHub(_hostAddress, _reportId);
+                await _benchmarker.MagicOnionHub(_hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -425,7 +411,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchLongRunHub(_waitMilliseconds, _hostAddress, _reportId);
+                await _benchmarker.MagicOnionLongRunHub(_waitMilliseconds, _hostAddress, _reportId);
             }
             catch (Exception ex)
             {
@@ -472,7 +458,7 @@ namespace ConsoleAppEcs
             //_hostAddress = "localhost:5000";
             //_reportId = "abc-123";
             //var path = "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb";
-            
+
             // ssl local host
             //_hostAddress = "server.local:5001"; // makesure you have create hosts record for `server.local`.
             //_reportId = "abc-123";
@@ -499,7 +485,7 @@ namespace ConsoleAppEcs
         {
             try
             {
-                await _benchmarker.BenchCCoreLongRunHub(_waitMilliseconds, insecure: _isHttps, _hostAddress, _reportId);
+                await _benchmarker.GrpcCCoreLongRunHub(_waitMilliseconds, insecure: _isHttps, _hostAddress, _reportId);
             }
             catch (Exception ex)
             {

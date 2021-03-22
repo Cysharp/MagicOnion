@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\dotnet_grpc_server_bench\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
+    <Compile Include="..\dotnet_grpc_bench\Shared\**\*.cs" Link="Shared\%(RecursiveDir)\%(FileName)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

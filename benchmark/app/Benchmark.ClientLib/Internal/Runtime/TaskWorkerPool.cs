@@ -2,7 +2,6 @@ using Benchmark.ClientLib.Reports;
 using Grpc.Core;
 using System;
 using System.Collections.Concurrent;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -18,8 +17,6 @@ namespace Benchmark.ClientLib.Internal.Runtime
         private int _completeCount;
 
         private readonly Channel<Func<int, TRequest, CancellationToken, Task>> _channel;
-        private readonly ChannelWriter<Func<int, TRequest, CancellationToken, Task>> _writer;
-        private readonly ChannelReader<Func<int, TRequest, CancellationToken, Task>> _reader;
 
         private readonly ConcurrentBag<CallResult> _results = new ConcurrentBag<CallResult>();
 
@@ -28,7 +25,7 @@ namespace Benchmark.ClientLib.Internal.Runtime
         public bool Timeouted => _timeoutTcs.Task.IsCompleted;
         public bool Completed => _completeTask.Task.IsCompleted;
 
-        public TaskWorkerPool(int workerCount, CancellationToken ct) : this(workerCount, 1000, ct)
+        public TaskWorkerPool(int workerCount, CancellationToken ct) : this(workerCount, 2000, ct)
         {
         }
 
@@ -43,8 +40,6 @@ namespace Benchmark.ClientLib.Internal.Runtime
                 SingleWriter = true,
                 FullMode = BoundedChannelFullMode.Wait,
             });
-            _writer = _channel.Writer;
-            _reader = _channel.Reader;
         }
 
         /// <summary>
@@ -75,7 +70,7 @@ namespace Benchmark.ClientLib.Internal.Runtime
 
         public void Dispose()
         {
-            _writer.TryComplete();
+            _channel.Writer.TryComplete();
             _results.Clear();
         }
 
@@ -88,14 +83,11 @@ namespace Benchmark.ClientLib.Internal.Runtime
             // write
             Task.Run(async () =>
             {
-                while (await _writer.WaitToWriteAsync(_ct).ConfigureAwait(false))
+                do
                 {
                     try
                     {
-                        if (_ct.IsCancellationRequested)
-                            return;
-
-                        await _writer.WriteAsync(action, _ct).ConfigureAwait(false);
+                        _channel.Writer.TryWrite(action);
                     }
                     catch (ChannelClosedException)
                     {
@@ -103,10 +95,11 @@ namespace Benchmark.ClientLib.Internal.Runtime
                     }
                     catch (OperationCanceledException)
                     {
-                        // canceld
+                        // canceled
                     }
-                }
-            }, _ct);
+
+                } while (await _channel.Writer.WaitToWriteAsync(_ct).ConfigureAwait(false));
+            }, _ct).ConfigureAwait(false);
 
             // read
             var workerId = 0;
@@ -115,54 +108,52 @@ namespace Benchmark.ClientLib.Internal.Runtime
                 var id = workerId++;
                 Task.Run(async () =>
                 {
-                    while (await _reader.WaitToReadAsync(_ct).ConfigureAwait(false))
+                    do
                     {
-                        var sw = ValueStopwatch.StartNew();
-                        Exception error = null;
-                        Status status = Status.DefaultSuccess;
-                        try
+                        while (_channel.Reader.TryRead(out var item))
                         {
-                            var item = await _reader.ReadAsync(_ct).ConfigureAwait(false);
+                            var sw = ValueStopwatch.StartNew();
+                            Exception error = null;
+                            var status = Status.DefaultSuccess;
 
-                            if (_ct.IsCancellationRequested)
-                                return;
-
-                            await item.Invoke(id, request, ct).ConfigureAwait(false);
-                            //Console.WriteLine($"done {_completeCount} ({_reader.Count}, id {id})");
-                        }
-                        catch (HttpRequestException hex)
-                        {
-                            error = hex;
-                            // todo: convert HttpStatusCode -> RpcStatusCode
-                            status = new Status(StatusCode.Unknown, hex.Message);
-                        }
-                        catch (OperationCanceledException oex)
-                        {
-                            error = oex;
-                            status = Status.DefaultCancelled;
-                        }
-                        catch (ChannelClosedException)
-                        {
-                            // already closed.
-                        }
-                        catch (Exception ex)
-                        {
-                            error = ex;
-                            status = new Status(StatusCode.Unknown, ex.Message);
-                        }
-                        finally
-                        {
-                            Interlocked.Increment(ref _completeCount);
-                            _results.Add(new CallResult
+                            try
                             {
-                                Duration = sw.Elapsed,
-                                Error = error,
-                                Status = status,
-                                TimeStamp = DateTime.UtcNow,
-                            });
+                                await item.Invoke(id, request, ct);
+                            }
+                            catch (RpcException rex)
+                            {
+                                error = rex;
+                                status = rex.Status;
+                            }
+                            catch (OperationCanceledException oex)
+                            {
+                                error = oex;
+                                status = Status.DefaultCancelled;
+                            }
+                            catch (ChannelClosedException)
+                            {
+                                // already closed.
+                            }
+                            catch (Exception ex)
+                            {
+                                error = ex;
+                                status = new Status(StatusCode.Internal, ex.Message);
+                            }
+                            finally
+                            {
+                                Interlocked.Increment(ref _completeCount);
+                                _results.Add(new CallResult
+                                {
+                                    Duration = sw.Elapsed,
+                                    Error = error,
+                                    Status = status,
+                                    TimeStamp = DateTime.UtcNow,
+                                });
+                            }
                         }
                     }
-                }, _ct);
+                    while (await _channel.Reader.WaitToReadAsync(_ct).ConfigureAwait(false));
+                }, _ct).ConfigureAwait(false);
             }
         }
 
@@ -171,19 +162,17 @@ namespace Benchmark.ClientLib.Internal.Runtime
             // complete
             Task.Run(async () =>
             {
-                while (!CompleteCondition((_reader.Count, _completeCount)))
+                do
                 {
                     if (_ct.IsCancellationRequested)
                     {
                         _completeTask.SetCanceled();
                         return;
                     }
-
                     await Task.Delay(100).ConfigureAwait(false);
-                }
-                _writer.TryComplete();
+                } while (!CompleteCondition((_channel.Reader.Count, _completeCount)));
                 _completeTask.SetResult();
-            }, _ct);
+            }, _ct).ConfigureAwait(false);
         }
     }
 }

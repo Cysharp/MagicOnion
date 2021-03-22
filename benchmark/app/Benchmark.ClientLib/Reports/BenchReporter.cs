@@ -106,13 +106,13 @@ namespace Benchmark.ClientLib.Reports
         public void AddDetail(string testName, string testType, BenchReporter reporter, Statistics statistics, CallResult[] results)
         {
             TimeSpan[] sortedResults = Array.Empty<TimeSpan>();
-            TimeSpan fastest = TimeSpan.Zero;
-            TimeSpan slowest = TimeSpan.Zero;
+            var (fastest, slowest, average) = (TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
             if (results.Any())
             {
                 sortedResults = results.Select(x => x.Duration).OrderBy(x => x).ToArray();
                 fastest = sortedResults[0];
                 slowest = sortedResults[^1];
+                average = results.Select(x => x.Duration).Average();
             }
             var item = new BenchReportItem
             {
@@ -124,11 +124,12 @@ namespace Benchmark.ClientLib.Reports
                 Duration = statistics.Elapsed,
                 RequestCount = results.Length,
                 Type = testType,
-                Average = results.Select(x => x.Duration).Average(),
+                Average = average,
                 Fastest = fastest,
                 Slowest = slowest,
                 Rps = results.Length / statistics.Elapsed.TotalSeconds,
                 Errors = results.Where(x => x.Error != null).Count(),
+                StandardDeviation = StandardDeviation.Calculate(sortedResults, average),
                 StatusCodeDistributions = StatusCodeDistribution.FromCallResults(results),
                 ErrorCodeDistribution = ErrorCodeDistribution.FromCallResults(results),
                 Latencies = LatencyDistribution.Calculate(sortedResults),
@@ -150,8 +151,6 @@ namespace Benchmark.ClientLib.Reports
         {
             return ClientId + "-" + ExecuteId + ".json";
         }
-
-        // todo: get server cpu / memory via other UnaryCall
 
         /// <summary>
         /// System Memory for GB

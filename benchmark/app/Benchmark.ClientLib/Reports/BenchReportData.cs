@@ -78,6 +78,8 @@ namespace Benchmark.ClientLib.Reports
         public Double Rps { get; set; }
         [JsonPropertyName("error_count")]
         public int Errors { get; set; }
+        [JsonPropertyName("stddev")]
+        public StandardDeviation StandardDeviation { get; set; }
         [JsonPropertyName("statuscodes")]
         public StatusCodeDistribution[] StatusCodeDistributions { get; set; }
         [JsonPropertyName("errorcodes")]
@@ -143,6 +145,41 @@ namespace Benchmark.ClientLib.Reports
         public TimeSpan Duration { get; set; }
         [JsonPropertyName("timestamp")]
         public DateTime TimeStamp { get; set; }
+    }
+
+    public struct StandardDeviation
+    {
+        [JsonPropertyName("stddev")]
+        public double StdDev { get; set; }
+        [JsonPropertyName("stderr")]
+        public double StdErr { get; set; }
+
+        public static StandardDeviation Calculate(TimeSpan[] latencies, TimeSpan mean)
+        {
+            var variance = Variance(latencies, mean);
+            var standardDeviation = Math.Sqrt(variance);
+            var standardError = latencies.Length != 0
+                ? standardDeviation / Math.Sqrt(latencies.Length - 1)
+                : 0;
+            return new StandardDeviation()
+            {
+                StdDev = standardDeviation,
+                StdErr = standardError,
+            };
+        }
+
+        private static double Variance(TimeSpan[] latencies, TimeSpan mean)
+        {
+            if (latencies.Length == 0 || latencies.Length == 1)
+                return 0;
+
+            double variance = 0;
+            foreach (var l in latencies)
+            {
+                variance += (l.TotalMilliseconds - mean.TotalMilliseconds) * (l.TotalMilliseconds - mean.TotalMilliseconds) / (latencies.Length - 1);
+            }
+            return variance;
+        }
     }
 
     public struct LatencyDistribution

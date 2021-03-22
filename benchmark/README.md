@@ -1,98 +1,57 @@
-# Welcome to your CDK C# project!
+# Benchmark
 
-This is a blank project for C# development with CDK.
+This is MagicOnion and gRPC Benchmark project.
+You can run benchmark with `GitHub Actions`, `C# Benchmarker`, `grpc_bench`, `AWS EC2` and `AWS EC2 and ECS`
+If you want run your benchmark on AWS EC2 VM, use AWS CDK.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+* Benchmark apps are locate under `./app`.
+* AWS CDK Benchmark Project is locate under `./Cdk`.
 
-It uses the [.NET Core CLI](https://docs.microsoft.com/dotnet/articles/core/) to compile and execute your project.
+## Benchmark Servers
 
-## Useful commands
+There are 3 servers to compare difference.
 
-* `dotnet build src` compile this app
-* `cdk deploy`       deploy this stack to your default AWS account/region
-* `cdk diff`         compare deployed stack with current state
-* `cdk synth`        emits the synthesized CloudFormation template
+* dotnet_grpc_bench: gRPC server implemeted with both gRPC and MagicOnion.
+* dotnet_grpc_https_bench: Self Cert gRPC server implemeted with both gRPC and MagicOnion.
+* dotnet_api_bench: REST server implemented with ASP.NET Core API.
+VM.
 
-## Step to create
+All Server implementations logic is same for each style, recieve message, deserialize and return response.
+This identify each server performance changes.
 
-install cdk cli.
+## Run Benchmark on GitHub Actions
 
-```shell
-npm install -g aws-cdk
-npm update -g aws-cdk
-```
+Create Issue with title `RUN BENCHMARK`, body `30s`.
+This trigger benchmark on GitHub Actions and report result when completed.
 
-build and deploy
+### Run C# Benchmarker
 
-```shell
-# build servers binary
-dotnet publish app/dotnet_grpc_server_bench/ -c Release -o out/linux/server/Benchmark.Server -r linux-x64 -p:PublishSingleFile=true --no-self-contained
-dotnet publish app/dotnet_grpc_server_https_bench/ -c Release -o out/linux/server/Benchmark.Server.Https -r linux-x64 -p:PublishSingleFile=true --no-self-contained
-dotnet publish app/dotnet_api_server_bench/ -c Release -o out/linux/server/Benchmark.Server.Api -r linux-x64 -p:PublishSingleFile=true --no-self-contained
-# deploy via CDK
-cdk synth
-cdk bootstrap # only on initial execution
-cdk deploy
-```
+C# Benchmarker is minimum implementation with following what comminuty run benchmark do.
+It benchmark to MagicOnion, gRPC and REST API implementaion through C# code sharing.
 
+We use this benchmark to compare out MagicOnion and gRPC performance changes.
 
-## Deploy TIPS
+> see detail [README.md](app/README.md)
 
-* Use Datadog to monitor benchmark ec2 and fargate metrics.
+## Run grpc_bench Benchmarker
 
-CDK template use AWS SecretsManager to keep datadog token.
-First, create datadog token secret with secret-id `magiconion-benchmark-datadog-token` via aws cli.
+[grpc_bench](https://github.com/LesnyRumcajs/grpc_bench) is comminuty run benchmark of different gRPC server implemetaions.
+It benchmark to gRPC implementation though Proto scheme.
 
-```shell
-SECRET_ID=magiconion-benchmark-datadog-token
-DD_TOKEN=abcdefg12345
-aws secretsmanager create-secret --name "$SECRET_ID"
-aws secretsmanager put-secret-value --secret-id "$SECRET_ID" --secret-string "${DD_TOKEN}"
-```
+We use this benchmark to compare out Benchmarker, this identify Server implementation misstake or Client Benchmarker misstake.
 
-Confirm token is successfully set to secrets manager.
+> see detail [README.md](app/README.md)
 
-```shell
-aws secretsmanager describe-secret --secret-id "$SECRET_ID"
-aws secretsmanager get-secret-value --secret-id "$SECRET_ID"
-```
+## Run benchmark on AWS EC2
 
-To install Datadog agent to ec2 or fargate, set `true` in `ReportStackProps` Property.
-EC2 MagicOnion also support install CloudWatch Agent, this agent will collect Mem used and TCP status.
+We offer AWS CDK project building you ec2 benchmark environment and prepare docker and binary on it.
+Deploy CDK will make VM for you, login to ec2 and run your benchmark.
 
-```csharp
-new ReportStackProps
-{
-    UseEc2DatadogAgentProfiler = true, // install datadog agent to MagicOnion Ec2.
-    UseFargateDatadogAgentProfiler = true, // instance datadog fargate agent to bench master/worker.
-    UseEc2CloudWatchAgentProfiler = false, // true to install cloudwatch agent to magiconion ec2
-}
-```
+> see detail [README](CdkGrpcBench/README.CDK.md)
 
-## Destroy TIPS
+## Run benchmark on AWS EC2 & Amazon ECS
 
-* cdk destoy failed because instance remain on service discovery.
+We offer AWS CDK project building you ec2 & run benchmarker from ECS.
+Build binary and deploy CDK will begin benchmark and complete it, you can check result on HTML Report.
 
-use script to remove all instances from service discovery.
-
-```csharp
-async Task Main()
-{
-    var serviceName = "server";
-    var client = new Amazon.ServiceDiscovery.AmazonServiceDiscoveryClient();
-    var services = await client.ListServicesAsync(new ListServicesRequest());
-    var service = services.Services.First(x => x.Name == serviceName);
-    var instances = await client.ListInstancesAsync(new ListInstancesRequest
-    {
-        ServiceId = service.Id,
-    });
-    foreach (var instance in instances.Instances)
-    {
-        await client.DeregisterInstanceAsync(new DeregisterInstanceRequest
-        {
-            InstanceId = instance.Id,
-            ServiceId = service.Id,
-        });
-    }
-}
-```
+> see detail [README.CDK](README.CDK.md)

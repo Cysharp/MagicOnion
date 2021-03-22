@@ -41,6 +41,10 @@ namespace Benchmark.ClientLib
             this.Write(this.ToStringHelper.ToStringWithCulture(FormatMs(Fastest)));
             this.Write(" ms\r\n  Average:    \t");
             this.Write(this.ToStringHelper.ToStringWithCulture(FormatMs(Average)));
+            this.Write(" ms\r\n  StdError:    \t");
+            this.Write(this.ToStringHelper.ToStringWithCulture(FormatMs(StdErr)));
+            this.Write(" ms\r\n  StdDev:    \t");
+            this.Write(this.ToStringHelper.ToStringWithCulture(FormatMs(StdDev)));
             this.Write(" ms\r\n  Requests/sec:\t");
             this.Write(this.ToStringHelper.ToStringWithCulture(FormatMs(Rps)));
             this.Write("\r\n\r\nResponse time histogram:\r\n");

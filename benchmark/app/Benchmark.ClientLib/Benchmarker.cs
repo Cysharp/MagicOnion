@@ -8,7 +8,6 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,8 +25,6 @@ namespace Benchmark.ClientLib
         private readonly ILogger _logger;
         private readonly CancellationToken _cancellationToken;
         private readonly string _clientId = Guid.NewGuid().ToString();
-        private readonly ConcurrentDictionary<string, GrpcChannel> _grpcChannelCache = new ConcurrentDictionary<string, GrpcChannel>();
-        private readonly ConcurrentDictionary<string, Channel> _ccoreChannelCache = new ConcurrentDictionary<string, Channel>();
 
         public BenchmarkerConfig Config { get; init; } = new BenchmarkerConfig();
 
@@ -47,8 +44,9 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchUnary(string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task MagicOnionUnary(string hostAddress = "http://localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
@@ -78,8 +76,9 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchHub(string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task MagicOnionHub(string hostAddress = "http://localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
@@ -111,8 +110,9 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task MagicOnionLongRunHub(int waitMilliseconds, string hostAddress = "http://localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
@@ -145,8 +145,9 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress">IP:Port Style address.</param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchCCoreLongRunHub(int waitMilliseconds, bool insecure = true, string hostAddress = "localhost:5000", string reportId = "")
+        public async Task GrpcCCoreLongRunHub(int waitMilliseconds, bool insecure = true, string hostAddress = "localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
@@ -181,7 +182,7 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchGrpc(string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task GrpcUnary(string hostAddress = "http://localhost:5000", string reportId = "")
         {
             Config.Validate();
             if (string.IsNullOrEmpty(reportId))
@@ -213,8 +214,9 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task BenchApi(string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task RestApi(string hostAddress = "http://localhost:5000", string reportId = "")
         {
+            Config.Validate();
             if (string.IsNullOrEmpty(reportId))
                 reportId = NewReportId();
 
@@ -325,72 +327,6 @@ namespace Benchmark.ClientLib
             _logger?.LogDebug($"HtmlReport Uri: {outputUri}");
         }
 
-        public async Task<ClientInfo[]> ListClients()
-        {
-            // call ssm to list up client instanceids
-            var loadTester = LoadTesterFactory.Create(_logger, this);
-            var clients = await loadTester.ListClients();
-            var json = JsonConvert.Serialize(clients);
-            _logger?.LogInformation(json);
-            return clients;
-        }
-
-        public async Task RunAllClient(int processCount, string iterations = "256,1024,4096,16384", string benchCommand = "benchall", string hostAddress = "http://localhost:5000", string reportId = "")
-        {
-            if (string.IsNullOrEmpty(reportId))
-                reportId = NewReportId();
-
-            _logger?.LogInformation($"reportId: {reportId}");
-
-            // call ssm to execute Clients via CLI mode.
-            var loadTester = LoadTesterFactory.Create(_logger, this);
-            try
-            {
-                await loadTester.Run(processCount, iterations, benchCommand, hostAddress, reportId, _cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Run failed.");
-            }
-
-            // Generate Html Report
-            await GenerateHtmlAsync(reportId);
-        }
-
-        public async Task CancelCommands()
-        {
-            var config = AmazonEnvironment.IsAmazonEc2()
-                ? new Amazon.SimpleSystemsManagement.AmazonSimpleSystemsManagementConfig
-                {
-                    RegionEndpoint = Amazon.Util.EC2InstanceMetadata.Region,
-                }
-                : new Amazon.SimpleSystemsManagement.AmazonSimpleSystemsManagementConfig
-                {
-                    RegionEndpoint = Amazon.RegionEndpoint.APNortheast1,
-                };
-            var client = new Amazon.SimpleSystemsManagement.AmazonSimpleSystemsManagementClient(config);
-            var commands = await client.ListCommandInvocationsAsync(new Amazon.SimpleSystemsManagement.Model.ListCommandInvocationsRequest
-            {
-                Filters = new List<Amazon.SimpleSystemsManagement.Model.CommandFilter>
-                {
-                    new Amazon.SimpleSystemsManagement.Model.CommandFilter
-                    {
-                        Key = "Status",
-                        Value = "InProgress",
-                    }
-                },
-            }, _cancellationToken);
-
-            foreach (var command in commands.CommandInvocations)
-            {
-                _logger?.LogInformation($"Cancelling {command.CommandId}");
-                await client.CancelCommandAsync(new Amazon.SimpleSystemsManagement.Model.CancelCommandRequest
-                {
-                    CommandId = command.CommandId,
-                }, _cancellationToken);
-            }
-        }
-
         /// <summary>
         /// Create GrpcChannel
         /// </summary>
@@ -402,7 +338,7 @@ namespace Benchmark.ClientLib
             {
                 // default HTTP/2 MutipleConnections = 100, true enable additional HTTP/2 connection via channel.
                 // memo: create Channel Pool and random get pool for each connection to avoid too match channel connection.
-                EnableMultipleHttp2Connections = false,
+                EnableMultipleHttp2Connections = true,
                 // Enable KeepAlive to keep HTTP/2 while non-active status.
                 PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
                 KeepAlivePingDelay = TimeSpan.FromSeconds(60),
@@ -441,7 +377,6 @@ namespace Benchmark.ClientLib
                 new ChannelOption("grpc.keepalive_timeout_ms", 30_000),
                 new ChannelOption("grpc.max_receive_message_length", int.MaxValue),
                 new ChannelOption("grpc.max_send_message_length", int.MaxValue),
-
             });
         }
 

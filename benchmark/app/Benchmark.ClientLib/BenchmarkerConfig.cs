@@ -21,11 +21,11 @@ namespace Benchmark.ClientLib
         /// <summary>
         /// Number of connections to use. Concurrency is distributed evenly among all the connections. Default is 1.
         /// </summary>
-        public int ClientConnections { get; init; } = 20;
+        public int ClientConnections { get; init; } = 30;
         /// <summary>
         /// Number of request workers to run concurrently for const concurrency schedule. Default is 1.
         /// </summary>
-        public int ClientConcurrency { get; init; } = 20;
+        public int ClientConcurrency { get; init; } = 50;
         /// <summary>
         /// Benchmark target endpoint is tls.
         /// </summary>
@@ -44,7 +44,7 @@ namespace Benchmark.ClientLib
             if (ClientConcurrency <= 0)
                 throw new ArgumentOutOfRangeException($"number of connections cannot be smaller than 0");
             if (ClientConnections > ClientConcurrency)
-                throw new ArgumentOutOfRangeException($"number of connections cannot be greater than concurrency");
+                throw new ArgumentOutOfRangeException($"number of connections ({ClientConnections}) cannot be greater than concurrency ({ClientConcurrency})");
 
             Durations.Validate(Duration);
         }

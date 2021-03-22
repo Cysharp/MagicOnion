@@ -14,6 +14,8 @@ namespace Benchmark.ClientLib
         public double Slowest { get; }
         public double Fastest { get; }
         public double Average { get; }
+        public double StdErr { get; }
+        public double StdDev { get; }
         public double Rps { get; }
         public string[] FormattedHistograms { get; }
         public LatencyDistribution[] Latencies { get; }
@@ -28,6 +30,8 @@ namespace Benchmark.ClientLib
             Slowest = report.Items.Average(x => x.Slowest.TotalMilliseconds);
             Fastest = report.Items.Average(x => x.Fastest.TotalMilliseconds);
             Average = report.Items.Average(x => x.Average.TotalMilliseconds);
+            StdDev = report.Items.Average(x => x.StandardDeviation.StdDev);
+            StdErr = report.Items.Average(x => x.StandardDeviation.StdErr);
             Rps = report.Items.Average(x => x.Rps);
             FormattedHistograms = report.Items.SelectMany(x => x.Histogram)
                 .GroupBy(x => x.Mark)

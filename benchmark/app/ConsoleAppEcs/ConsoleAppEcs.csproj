@@ -22,10 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\dotnet_grpc_server_https_bench\*.crt" Link="%(FileName)%(Extension)">
+    <Content Include="..\dotnet_grpc_https_bench\*.crt" Link="%(FileName)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\dotnet_grpc_server_https_bench\*.key" Link="%(FileName)%(Extension)">
+    <Content Include="..\dotnet_grpc_https_bench\*.key" Link="%(FileName)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

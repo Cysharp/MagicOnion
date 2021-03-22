@@ -1,5 +1,4 @@
 using Benchmark.ClientLib.Internal;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace Benchmark.ClientLib
