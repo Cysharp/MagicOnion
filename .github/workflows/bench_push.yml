@@ -1,0 +1,23 @@
+name: benchmark(Push)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build images
+        run: bash -x ./build.sh
+        working-directory: ./benchmark/app
+      - name: Run tests
+        id: run_bench
+        run: bash -x ./bench.sh
+        env:
+          GRPC_BENCHMARK_DURATION: 30s
+        working-directory: ./benchmark/app

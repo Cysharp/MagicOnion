@@ -1,0 +1,41 @@
+name: benchmark(EC2)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+      DISABLE_NETFX_TARGET_BUILD: 1
+      DOTNET_SDK_VERSION_3: "3.1.x"
+      DOTNET_SDK_VERSION_5: "5.0.x"
+    defaults:
+      run:
+        working-directory: ./benchmark/CdkGrpcBench
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm install
+      - run: npm install -g aws-cdk
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      - run: cdk synth
+      - run: cdk bootstrap
+      - run: cdk diff
+      - run: cdk deploy --force --ci --require-approval never

@@ -1,0 +1,47 @@
+name: benchmark(Issue)
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.issue.title, 'RUN BENCHMARK')
+    steps:
+      - name: Accept the task
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Serving the benchmark. I will update the issue when it's finished.
+
+            > see progress: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - uses: actions-ecosystem/action-add-labels@v1.1.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          labels: benchmark
+      - uses: actions/checkout@v2
+      - name: Build images
+        run: bash -x ./build.sh
+        working-directory: ./benchmark/app
+      - name: Run tests
+        id: run_bench
+        run: |
+          bash -x ./bench.sh | tee bench.results
+          REPORT="$(cat bench.results)"
+          REPORT="${REPORT//'%'/'%25'}"
+          REPORT="${REPORT//$'\n'/'%0A'}"
+          REPORT="${REPORT//$'\r'/'%0D'}"
+          echo "::set-output name=results::$REPORT"
+        env:
+          GRPC_BENCHMARK_DURATION: ${{github.event.issue.body}}
+        working-directory: ./benchmark/app
+      - name: Close Issue
+        uses: peter-evans/close-issue@v1
+        with:
+          comment: |
+            Here you go!
+            ```
+            ${{ steps.run_bench.outputs.results }}
+            ```
