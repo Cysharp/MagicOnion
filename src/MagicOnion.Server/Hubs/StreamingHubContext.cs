@@ -35,7 +35,7 @@ namespace MagicOnion.Server.Hubs
         internal MessagePackSerializerOptions SerializerOptions { get; set; } = default!; /* lateinit */
         public Guid ConnectionId => ServiceContext.ContextId;
 
-        public AsyncLock AsyncWriterLock { get; internal set; } = default!; /* lateinit */
+        // public AsyncLock AsyncWriterLock { get; internal set; } = default!; /* lateinit */
         internal int MessageId { get; set; }
         internal int MethodId { get; set; }
 
@@ -69,10 +69,7 @@ namespace MagicOnion.Server.Hubs
 
             await value.ConfigureAwait(false);
             var result = BuildMessage();
-            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
-            }
+            ServiceContext.QueueResponseStreamWrite(result);
             responseSize = result.Length;
             responseType = typeof(Nil);
         }
@@ -102,15 +99,12 @@ namespace MagicOnion.Server.Hubs
             
             var vv = await value.ConfigureAwait(false);
             byte[] result = BuildMessage(vv);
-            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
-            }
+            ServiceContext.QueueResponseStreamWrite(result);
             responseSize = result.Length;
             responseType = typeof(T);
         }
 
-        internal async ValueTask WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
+        internal ValueTask WriteErrorMessage(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
         {
             // MessageFormat:
             // error-response:  [messageId, statusCode, detail, StringMessage]
@@ -142,11 +136,9 @@ namespace MagicOnion.Server.Hubs
             }
 
             var result = BuildMessage();
-            using (await AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                await ServiceContext.ResponseStream!.WriteAsync(result).ConfigureAwait(false);
-            }
+            ServiceContext.QueueResponseStreamWrite(result);
             responseSize = result.Length;
+            return default;
         }
     }
 }

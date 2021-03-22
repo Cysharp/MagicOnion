@@ -2,13 +2,10 @@ using Grpc.Core;
 using MessagePack;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server
 {
@@ -73,7 +70,24 @@ namespace MagicOnion.Server
         internal MethodHandler MethodHandler { get; private set; }
 
         // used in StreamingHub
-        internal AsyncLock AsyncWriterLock { get; set; } = default!; /* lateinit */
+        internal bool IsDisconnected { get; private set; }
+        Lazy<QueuedResponseWriter> streamingResponseWriter;
+
+        internal void QueueResponseStreamWrite(byte[] value)
+        {
+            streamingResponseWriter.Value.Write(value);
+        }
+
+        internal void CompleteStreamingHub()
+        {
+            IsDisconnected = true;
+            streamingResponseWriter.Value.Dispose();
+        }
+
+        QueuedResponseWriter CreateQueuedResponseWriter()
+        {
+            return new QueuedResponseWriter(this);
+        }
 
         /// <summary>Get Raw Request.</summary>
         public byte[]? GetRawRequest()
@@ -104,7 +118,7 @@ namespace MagicOnion.Server
             MethodInfo methodInfo,
             ILookup<Type, Attribute> attributeLookup,
             MethodType methodType,
-            ServerCallContext context, 
+            ServerCallContext context,
             MessagePackSerializerOptions serializerOptions,
             IMagicOnionLogger logger,
             MethodHandler methodHandler,
@@ -122,6 +136,16 @@ namespace MagicOnion.Server
             this.MagicOnionLogger = logger;
             this.MethodHandler = methodHandler;
             this.ServiceProvider = serviceProvider;
+
+            // streaming hub
+            if (methodType == MethodType.DuplexStreaming)
+            {
+                this.streamingResponseWriter = new Lazy<QueuedResponseWriter>(new Func<QueuedResponseWriter>(CreateQueuedResponseWriter));
+            }
+            else
+            {
+                this.streamingResponseWriter = null!;
+            }
         }
 
         /// <summary>

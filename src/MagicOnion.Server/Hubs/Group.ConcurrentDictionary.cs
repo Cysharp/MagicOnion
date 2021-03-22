@@ -144,7 +144,7 @@ namespace MagicOnion.Server.Hubs
                 var writeCount = 0;
                 foreach (var item in members)
                 {
-                    WriteInAsyncLockVoid(item.Value, message);
+                    item.Value.QueueResponseStreamWrite(message);
                     writeCount++;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -166,7 +166,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     if (item.Value.ContextId != connectionId)
                     {
-                        WriteInAsyncLockVoid(item.Value, message);
+                        item.Value.QueueResponseStreamWrite(message);
                         writeCount++;
                     }
                 }
@@ -194,7 +194,7 @@ namespace MagicOnion.Server.Hubs
                             goto NEXT;
                         }
                     }
-                    WriteInAsyncLockVoid(item.Value, message);
+                    item.Value.QueueResponseStreamWrite(message);
                     writeCount++;
                     NEXT:
                     continue;
@@ -215,7 +215,7 @@ namespace MagicOnion.Server.Hubs
             {
                 if (members.TryGetValue(connectionId, out var context))
                 {
-                    WriteInAsyncLockVoid(context, message);
+                    context.QueueResponseStreamWrite(message);
                     logger.InvokeHubBroadcast(GroupName, message.Length, 1);
                 }
                 return TaskEx.CompletedTask;
@@ -236,7 +236,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     if (members.TryGetValue(item, out var context))
                     {
-                        WriteInAsyncLockVoid(context, message);
+                        context.QueueResponseStreamWrite(message);
                         writeCount++;
                     }
                 }
@@ -261,7 +261,7 @@ namespace MagicOnion.Server.Hubs
                     var writeCount = 0;
                     foreach (var item in members)
                     {
-                        WriteInAsyncLockVoid(item.Value, message);
+                        item.Value.QueueResponseStreamWrite(message);
                         writeCount++;
                     }
                     logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -279,7 +279,7 @@ namespace MagicOnion.Server.Hubs
                                 goto NEXT;
                             }
                         }
-                        WriteInAsyncLockVoid(item.Value, message);
+                        item.Value.QueueResponseStreamWrite(message);
                         writeCount++;
                         NEXT:
                         continue;
@@ -310,7 +310,7 @@ namespace MagicOnion.Server.Hubs
                     {
                         if (members.TryGetValue(item, out var context))
                         {
-                            WriteInAsyncLockVoid(context, message);
+                            context.QueueResponseStreamWrite(message);
                             writeCount++;
                         }
                     }
@@ -336,36 +336,6 @@ namespace MagicOnion.Server.Hubs
                 MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
                 writer.Flush();
                 return buffer.WrittenSpan.ToArray();
-            }
-        }
-
-        static async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
-        {
-            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                try
-                {
-                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    MagicOnionServerInternalLogger.Current.LogError(ex, "error occured on write to client, but keep to write other clients.");
-                }
-            }
-        }
-
-        static async void WriteInAsyncLockVoid(ServiceContext context, byte[] value)
-        {
-            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                try
-                {
-                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    MagicOnionServerInternalLogger.Current.LogError(ex, "error occured on write to client, but keep to write other clients.");
-                }
             }
         }
 
