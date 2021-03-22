@@ -11595,19 +11595,6 @@ references:
   commentId: T:MagicOnion.Server.Hubs.StreamingHubContext
   fullName: MagicOnion.Server.Hubs.StreamingHubContext
   nameWithType: StreamingHubContext
-- uid: MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock
-  name: AsyncWriterLock
-  href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_AsyncWriterLock
-  commentId: P:MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock
-  fullName: MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock
-  nameWithType: StreamingHubContext.AsyncWriterLock
-- uid: MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock*
-  name: AsyncWriterLock
-  href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_AsyncWriterLock_
-  commentId: Overload:MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock
-  isSpec: "True"
-  fullName: MagicOnion.Server.Hubs.StreamingHubContext.AsyncWriterLock
-  nameWithType: StreamingHubContext.AsyncWriterLock
 - uid: MagicOnion.Server.Hubs.StreamingHubContext.ConnectionId
   name: ConnectionId
   href: api/MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_ConnectionId
