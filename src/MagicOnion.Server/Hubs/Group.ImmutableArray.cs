@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System.Threading.Channels;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -140,7 +141,7 @@ namespace MagicOnion.Server.Hubs
             {
                 for (int i = 0; i < source.Length; i++)
                 {
-                    WriteInAsyncLockVoid(source[i], message);
+                    source[i].QueueResponseStreamWrite(message);
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
                 return TaskEx.CompletedTask;
@@ -163,7 +164,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     if (source[i].ContextId != connectionId)
                     {
-                        WriteInAsyncLockVoid(source[i], message);
+                        source[i].QueueResponseStreamWrite(message);
                         writeCount++;
                     }
                 }
@@ -194,9 +195,9 @@ namespace MagicOnion.Server.Hubs
                         }
                     }
 
-                    WriteInAsyncLockVoid(source[i], message);
+                    source[i].QueueResponseStreamWrite(message);
                     writeCount++;
-                    NEXT:
+                NEXT:
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -221,7 +222,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     if (source[i].ContextId == connectionId)
                     {
-                        WriteInAsyncLockVoid(source[i], message);
+                        source[i].QueueResponseStreamWrite(message);
                         writeCount++;
                         break;
                     }
@@ -249,13 +250,13 @@ namespace MagicOnion.Server.Hubs
                     {
                         if (source[i].ContextId == item)
                         {
-                            WriteInAsyncLockVoid(source[i], message);
+                            source[i].QueueResponseStreamWrite(message);
                             writeCount++;
                             goto NEXT;
                         }
                     }
 
-                    NEXT:
+                NEXT:
                     continue;
                 }
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
@@ -281,7 +282,7 @@ namespace MagicOnion.Server.Hubs
                 {
                     for (int i = 0; i < source.Length; i++)
                     {
-                        WriteInAsyncLockVoid(source[i], message);
+                        source[i].QueueResponseStreamWrite(message);
                         writeCount++;
                     }
                 }
@@ -296,9 +297,9 @@ namespace MagicOnion.Server.Hubs
                                 goto NEXT;
                             }
                         }
-                        WriteInAsyncLockVoid(source[i], message);
+                        source[i].QueueResponseStreamWrite(message);
                         writeCount++;
-                        NEXT:
+                    NEXT:
                         continue;
                     }
                 }
@@ -332,9 +333,9 @@ namespace MagicOnion.Server.Hubs
                                 goto NEXT;
                             }
                         }
-                        WriteInAsyncLockVoid(source[i], message);
+                        source[i].QueueResponseStreamWrite(message);
                         writeCount++;
-                        NEXT:
+                    NEXT:
                         continue;
                     }
 
@@ -358,37 +359,6 @@ namespace MagicOnion.Server.Hubs
                 MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
                 writer.Flush();
                 return buffer.WrittenSpan.ToArray();
-            }
-        }
-
-        static async ValueTask WriteInAsyncLock(ServiceContext context, byte[] value)
-        {
-            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                try
-                {
-                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    MagicOnionServerInternalLogger.Current.LogError(ex, "error occured on write to client, but keep to write other clients.");
-                }
-            }
-        }
-
-        // async void is better than return Task when fire-and-forget to avoid create unnecessary promise.
-        static async void WriteInAsyncLockVoid(ServiceContext context, byte[] value)
-        {
-            using (await context.AsyncWriterLock.LockAsync().ConfigureAwait(false))
-            {
-                try
-                {
-                    await context.ResponseStream!.WriteAsync(value).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    MagicOnionServerInternalLogger.Current.LogError(ex, "error occured on write to client, but keep to write other clients.");
-                }
             }
         }
     }

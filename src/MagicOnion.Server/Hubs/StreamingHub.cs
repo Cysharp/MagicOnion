@@ -91,7 +91,6 @@ namespace MagicOnion.Server.Hubs
         public async Task<DuplexStreamingResult<byte[], byte[]>> Connect()
         {
             var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
-            Context.AsyncWriterLock = new AsyncLock();
 
             var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
             this.Group = new HubGroupRepository(this.Context, group);
@@ -112,6 +111,7 @@ namespace MagicOnion.Server.Hubs
             }
             finally
             {
+                Context.CompleteStreamingHub();
                 await OnDisconnected();
                 await this.Group.DisposeAsync();
             }
@@ -191,7 +191,6 @@ namespace MagicOnion.Server.Hubs
                     {
                         var context = new StreamingHubContext() // create per invoke.
                         {
-                            AsyncWriterLock = Context.AsyncWriterLock,
                             SerializerOptions = handler.serializerOptions,
                             HubInstance = this,
                             ServiceContext = Context,
@@ -229,7 +228,6 @@ namespace MagicOnion.Server.Hubs
                     {
                         var context = new StreamingHubContext() // create per invoke.
                         {
-                            AsyncWriterLock = Context.AsyncWriterLock,
                             SerializerOptions = handler.serializerOptions,
                             HubInstance = this,
                             ServiceContext = Context,
