@@ -19,23 +19,27 @@ VM.
 All Server implementations logic is same for each style, recieve message, deserialize and return response.
 This identify each server performance changes.
 
-### Run C# Benchmarker
+## Run benchmark on docker
 
-C# Benchmarker is minimum implementation with following what comminuty run benchmark do.
-It benchmark to MagicOnion, gRPC and REST API implementaion through C# code sharing.
+We offer docker to benchmark on local or any env.
 
-We use this benchmark to compare out MagicOnion and gRPC performance changes.
+Are you using macOS/Linux? Run bench on Bash.
 
-> see detail [README.md](app/README.md)
+```sh
+git clone https://github.com/Cysharp/MagicOnion.git
+cd MagicOnion/benchmark-lab/benchmark/app
+bash ./build.sh
+bash ./bench.sh
+```
 
-## Run grpc_bench Benchmarker
+Are you using Windows? Run bench via PowerShell.
 
-[grpc_bench](https://github.com/LesnyRumcajs/grpc_bench) is comminuty run benchmark of different gRPC server implemetaions.
-It benchmark to gRPC implementation though Proto scheme.
-
-We use this benchmark to compare out Benchmarker, this identify Server implementation misstake or Client Benchmarker misstake.
-
-> see detail [README.md](app/README.md)
+```sh
+git clone https://github.com/Cysharp/MagicOnion.git
+cd MagicOnion/benchmark-lab/benchmark/app
+./build.ps1
+./bench.ps1
+```
 
 ## Run benchmark on AWS EC2
 
@@ -50,3 +54,25 @@ We offer AWS CDK project building you ec2 & run benchmarker from ECS.
 Build binary and deploy CDK will begin benchmark and complete it, you can check result on HTML Report.
 
 > see detail [README.CDK.md](README.CDK.md)
+
+## Benchmarkers
+
+There are 2 benchmarkers, C# Benchmarker and grpc_bench.
+This project's benchmark is obtain via C# Benchmarker.
+
+> see detail [README.md](app/README.md)
+
+### C# Benchmarker
+
+C# Benchmarker is minimum implementation with following what comminuty run benchmark do.
+It benchmark to MagicOnion, gRPC and REST API implementaion through C# code sharing.
+
+We use this benchmark to compare out MagicOnion and gRPC performance changes.
+
+### grpc_bench Benchmarker
+
+[grpc_bench](https://github.com/LesnyRumcajs/grpc_bench) is comminuty run benchmark of different gRPC server implemetaions.
+It benchmark to gRPC implementation though Proto scheme.
+
+We use this benchmark to compare out Benchmarker, this identify Server implementation misstake or Client Benchmarker misstake.
+
