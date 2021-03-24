@@ -40,7 +40,7 @@ public class BenchmarkRunner : ConsoleAppBase
     public BenchmarkRunner()
     {
         _path = Environment.GetEnvironmentVariable("BENCHCLIENT_S3BUCKET") ?? "0";
-        _generateHtmlReport = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BENCHCLIENT_SKIP_HTML"));
+        _generateHtmlReport = (Environment.GetEnvironmentVariable("BENCHCLIENT_GEN_HTML") ?? "false") == "true";
     }
 
     private bool IsHttpsEndpoint(string endpoint) => endpoint.StartsWith("https://");
@@ -55,7 +55,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task MO(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task MO(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -83,7 +83,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task MOHub(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task MOHub(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -112,7 +112,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task MOLongRunHub(int waitMilliseconds, string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task MOLongRunHub(int waitMilliseconds, string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -140,7 +140,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task Grpc(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task Grpc(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -168,7 +168,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task Api(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task Api(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
@@ -196,7 +196,7 @@ public class BenchmarkRunner : ConsoleAppBase
     /// <param name="connections"></param>
     /// <param name="reportId"></param>
     /// <returns></returns>
-    public async Task ApiHttp2(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    public async Task ApiHttp2(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 5, string reportId = "")
     {
         var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
         var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)

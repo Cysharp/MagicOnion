@@ -7,7 +7,8 @@
         "BENCHCLIENT_S3BUCKET": "magiconionbenchmarkcdkstack-bucket83908e77-1ado8gtcl00cb",
         "DOTNET_ENVIRONMENT": "Development",
         "BENCHCLIENT_RUNASWEB": "true",
-        "BENCHCLIENT_DELAY": "3"
+        "BENCHCLIENT_DELAY": "3",
+        "BENCHCLIENT_GEN_HTML": "false"
       }
     },
     "Docker": {

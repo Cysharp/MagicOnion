@@ -1,6 +1,4 @@
 using Benchmark.ClientLib.Converters;
-using Benchmark.ClientLib.Internal;
-using Benchmark.ClientLib.LoadTester;
 using Benchmark.ClientLib.Reports;
 using Benchmark.ClientLib.Scenarios;
 using Benchmark.ClientLib.Storage;
@@ -254,7 +252,7 @@ namespace Benchmark.ClientLib
             // generate html report
             if (generateHtmlReport)
             {
-                await GenerateHtmlAsync(reporter.ReportId);
+                await GenerateHtmlAsync(reporter.ReportId, new[] { reporter.Report });
             }
 
             ConsoleOutput(reporter.Report);
@@ -308,6 +306,11 @@ namespace Benchmark.ClientLib
         {
             // access s3 and download json from reportId
             var reports = await GetReports(reportId);
+            await GenerateHtmlAsync(reportId, reports, htmlFileName);
+        }
+
+        public async Task GenerateHtmlAsync(string reportId, BenchReport[] reports, string htmlFileName = "index.html")
+        {
             if (!reports.Any())
                 return;
 

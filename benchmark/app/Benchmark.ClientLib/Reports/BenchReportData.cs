@@ -242,7 +242,6 @@ namespace Benchmark.ClientLib.Reports
         [JsonPropertyName("count")]
         public int Count { get; set; }
         [JsonPropertyName("frequency")]
-        [JsonNumberHandling(JsonNumberHandling.AllowNamedFloatingPointLiterals)]
         public double Frequency { get; set; }
 
         public static HistogramBucket[] Calculate(TimeSpan[] latencies, double slowest, double fastest)
@@ -289,7 +288,7 @@ namespace Benchmark.ClientLib.Reports
                 {
                     Mark = buckets[i],
                     Count = counts[i],
-                    Frequency = (double)counts[i] / latencies.Length,
+                    Frequency = counts[i] != 0 ? (double)counts[i] / latencies.Length : 0,
                 };
             }
             return res;
