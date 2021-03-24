@@ -9,7 +9,7 @@ RESULTS_DIR="results/$(date '+%y%d%mT%H%M%S')"
 GRPC_BENCHMARK_DURATION=${GRPC_BENCHMARK_DURATION:-"30s"}
 GRPC_SERVER_CPUS=${GRPC_SERVER_CPUS:-"1"}
 GRPC_SERVER_RAM=${GRPC_SERVER_RAM:-"512m"}
-GRPC_CLIENT_CONNECTIONS=${GRPC_CLIENT_CONNECTIONS:-"20"}
+GRPC_CLIENT_CONNECTIONS=${GRPC_CLIENT_CONNECTIONS:-"5"}
 GRPC_CLIENT_CONCURRENCY=${GRPC_CLIENT_CONCURRENCY:-"50"}
 #GRPC_CLIENT_QPS=${GRPC_CLIENT_QPS:-"0"}
 #GRPC_CLIENT_QPS=$(( GRPC_CLIENT_QPS / GRPC_CLIENT_CONCURRENCY ))
@@ -28,7 +28,7 @@ for benchmark in ${BENCHMARKS_TO_RUN}; do
     echo "==> Running benchmark for ${NAME} / ${command}..."
 
     hostaddress="http://127.0.0.1:5000"
-    if [[ $NAME == *"https"* ]]; then
+    if [[ $NAME == *"https"* ]] || [[ $command == *"http2"* ]]; then
         hostaddress="https://localhost:5001"
     fi
 

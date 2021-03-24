@@ -19,6 +19,7 @@ namespace Cdk
                 AlbDomain = ("dev.cysharp.io", "Z075519318R3LY1VXMWII"),
                 ForceRecreateMagicOnion = false,
                 EnableMagicOnionScaleInCron = true,
+                AutomaticScaleInAfterHour = 1,
                 UseEc2CloudWatchAgentProfiler = true,
                 UseEc2DatadogAgentProfiler = false,
                 UseFargateDatadogAgentProfiler = true,
@@ -53,6 +54,10 @@ namespace Cdk
         /// Enable ScaleIn on 0:00:00 (UTC)
         /// </summary>
         public bool EnableMagicOnionScaleInCron { get; set; }
+        /// <summary>
+        /// Automatically scale in after specified hour. 0 to not scale in.
+        /// </summary>
+        public int AutomaticScaleInAfterHour { get; set; } = 0;
         /// <summary>
         /// Flag to force recreate MagicOnion Instance.
         /// </summary>

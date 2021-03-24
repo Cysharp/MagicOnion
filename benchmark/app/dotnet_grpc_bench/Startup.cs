@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -19,6 +20,8 @@ namespace Benchmark.Server
             services.AddGrpc();
             services.AddMagicOnion();
 
+            services.Configure<RouteOptions>(c => c.SuppressCheckForUnhandledSecurityMetadata = true);
+
             services.AddGrpcHealthChecks();
         }
 
@@ -30,6 +33,7 @@ namespace Benchmark.Server
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<ServiceProvidersMiddleware>();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

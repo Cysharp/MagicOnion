@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run -p src/CdkGrpcBench/CdkGrpcBench.csproj",
+  "app": "dotnet run -p src/CdkEc2Bench/CdkEc2Bench.csproj",
   "context": {
     "@aws-cdk/core:enableStackNameDuplicates": "true",
     "aws-cdk:enableDiffNoFail": "true",

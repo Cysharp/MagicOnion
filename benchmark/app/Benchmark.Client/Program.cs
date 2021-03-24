@@ -183,7 +183,35 @@ public class BenchmarkRunner : ConsoleAppBase
                 GenerateHtmlReportAfterBench = _generateHtmlReport,
             }
         };
-        await benchmarker.RestApi(hostAddress, reportId);
+        await benchmarker.RestApi(hostAddress, reportId, false);
+    }
+
+    /// <summary>
+    /// Run REST Api Http/2 Benchmark
+    /// </summary>
+    /// <param name="hostAddress"></param>
+    /// <param name="iterations"></param>
+    /// <param name="duration"></param>
+    /// <param name="concurrency"></param>
+    /// <param name="connections"></param>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    public async Task ApiHttp2(string hostAddress = "http://127.0.0.1:5000", string iterations = "1", string duration = "30s", int concurrency = 50, int connections = 30, string reportId = "")
+    {
+        var iter = iterations.Split(',').Select(x => int.Parse(x.Trim())).ToArray();
+        var benchmarker = new Benchmarker(_path, Context.Logger, Context.CancellationToken)
+        {
+            Config = new BenchmarkerConfig
+            {
+                ClientConcurrency = concurrency,
+                ClientConnections = connections,
+                Duration = duration,
+                TotalRequests = iter,
+                UseSelfCertEndpoint = IsHttpsEndpoint(hostAddress),
+                GenerateHtmlReportAfterBench = _generateHtmlReport,
+            }
+        };
+        await benchmarker.RestApi(hostAddress, reportId, true);
     }
 
     /// <summary>

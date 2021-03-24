@@ -7,15 +7,22 @@ if ([string]::IsNullOrEmpty($BENCHMARKS_TO_RUN)) {
     $BENCHMARKS_TO_RUN = $((Get-ChildItem -Directory -Path '*_bench').Name | Sort-Object)
 }
 
+function NullOrDefault([string]$Value, [string]$Default) {
+    if ([string]::IsNullOrEmpty($Value)) {
+        return $Default
+    }
+    return $Value
+}
+
 $RESULTS_DIR = "results/$([DateTime]::Now.ToString('yyyyddMMTHHmmss'))"
-$GRPC_BENCHMARK_DURATION = "30s"
-$GRPC_SERVER_CPUS = "1"
-$GRPC_SERVER_RAM = "512m"
-$GRPC_CLIENT_CONNECTIONS = "5"
-$GRPC_CLIENT_CONCURRENCY = "50"
+$GRPC_BENCHMARK_DURATION = $(NullOrDefault -Value $GRPC_BENCHMARK_DURATION -Default "30s")
+$GRPC_SERVER_CPUS = $(NullOrDefault -Value $GRPC_SERVER_CPUS -Default "1")
+$GRPC_SERVER_RAM = $(NullOrDefault -Value $GRPC_SERVER_RAM -Default "512m")
+$GRPC_CLIENT_CONNECTIONS = $(NullOrDefault -Value $GRPC_CLIENT_CONNECTIONS -Default "5")
+$GRPC_CLIENT_CONCURRENCY = $(NullOrDefault -Value $GRPC_CLIENT_CONCURRENCY -Default "50")
 #$GRPC_CLIENT_QPS="0"
 #$GRPC_CLIENT_QPS=$($GRPC_CLIENT_QPS / $GRPC_CLIENT_CONCURRENCY)
-$GRPC_CLIENT_CPUS = "1"
+$GRPC_CLIENT_CPUS = $(NullOrDefault -Value $GRPC_CLIENT_CPUS -Default "1")
 #$GRPC_REQUEST_PAYLOAD="100B"
 
 $CWD = $PWD.Path
@@ -28,7 +35,7 @@ foreach ($benchmark in ${BENCHMARKS_TO_RUN}) {
         echo "==> Running benchmark for ${NAME} / ${command}..."
         
         $hostAddress = "http://127.0.0.1:5000"
-        if ($NAME -match "https") {
+        if (($NAME -match "https") -or ($command -match "http2")) {
             $hostAddress = "https://localhost:5001"
         }
 

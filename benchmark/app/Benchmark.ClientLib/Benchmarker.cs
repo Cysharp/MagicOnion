@@ -214,7 +214,7 @@ namespace Benchmark.ClientLib
         /// <param name="hostAddress"></param>
         /// <param name="reportId"></param>
         /// <returns></returns>
-        public async Task RestApi(string hostAddress = "http://localhost:5000", string reportId = "")
+        public async Task RestApi(string hostAddress = "http://localhost:5000", string reportId = "", bool useHttp2 = false)
         {
             Config.Validate();
             if (string.IsNullOrEmpty(reportId))
@@ -224,7 +224,7 @@ namespace Benchmark.ClientLib
             _logger?.LogDebug($"reportId: {reportId}");
 
             // single thread-safe client
-            var apiClients = Enumerable.Range(0, Config.ClientConnections).Select(x => new ApiBenchmarkScenario.ApiClient(hostAddress)).ToArray();
+            var apiClients = Enumerable.Range(0, Config.ClientConnections).Select(x => new ApiBenchmarkScenario.ApiClient(hostAddress, useHttp2)).ToArray();
 
             var reporter = new BenchReporter(reportId, _clientId, executeId, Framework.AspnetCore, nameof(ApiBenchmarkScenario), Config);
             reporter.Begin();

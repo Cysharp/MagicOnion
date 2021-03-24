@@ -34,6 +34,10 @@ namespace Benchmark.Server
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
+                        .ConfigureKestrel(serverOptions =>
+                        {
+                            serverOptions.Limits.Http2.MaxStreamsPerConnection = 10000;
+                        })
                         .UseKestrel(options =>
                         {
                             // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during development.

@@ -47,7 +47,7 @@ We use this benchmark to compare out Benchmarker, this identify Server implement
 We offer AWS CDK project building you ec2 benchmark environment and prepare docker and binary on it.
 Deploy CDK will make VM for you, login to ec2 and run your benchmark.
 
-> see detail [README](CdkGrpcBench/README.md)
+> see detail [README](CdkEc2Bench/README.md)
 
 ## Run benchmark on AWS EC2 & Amazon ECS
 

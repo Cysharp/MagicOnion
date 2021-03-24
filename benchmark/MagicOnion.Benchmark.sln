@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark.Server.Api", "app
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cdk", "cdk", "{FD29D5F3-D48C-4B00-B661-02D93673FD36}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CdkGrpcBench", "CdkGrpcBench\src\CdkGrpcBench\CdkGrpcBench.csproj", "{64299E07-7F87-4DE0-BF49-11A2B6266A3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CdkEc2Bench", "CdkEc2Bench\src\CdkEc2Bench\CdkEc2Bench.csproj", "{64299E07-7F87-4DE0-BF49-11A2B6266A3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

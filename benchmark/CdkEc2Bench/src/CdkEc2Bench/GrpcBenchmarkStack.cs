@@ -34,7 +34,7 @@ namespace GrpcBenchmark
                 Vpc = vpc,
                 SecurityGroup = sg,
                 VpcSubnets = subnets,
-                InstanceType = InstanceType.Of(InstanceClass.STANDARD5_AMD, InstanceSize.XLARGE4),
+                InstanceType = InstanceType.Of(InstanceClass.COMPUTE5_AMD, InstanceSize.XLARGE4),
                 DesiredCapacity = 1,
                 MaxCapacity = 1,
                 MinCapacity = 0,
