@@ -14,7 +14,7 @@ C# implemented benchmarker for all server implementations `dotnet_grpc_bench`, `
 
 ### Prerequisites
 
-Linux or Windows or MacOS or All platform with Docker. Keep in mind that the results on Docker may not be that reliable, Docker for Mac/Windows runs on a VM.
+Linux or Windows or MacOS or All platform with Docker. Keep in mind that the results on MacOS/Windows may not be that reliable, Docker for Mac/Windows runs on a VM.
 
 ### Running benchmark on Docker
 
@@ -32,18 +32,6 @@ To clean-up the benchmark images use following.
 
 > TIPS: to change benchclient command, write command to `bench_command` file.
 
-### Running benchmark on Host
-
-You need .NET 5 SDK to build and run benchmark on host.
-
-* To build the benchmarks binary use following.
-  * linux: `./publish.sh [BENCH1] [BENCH2]`
-  * windows: `./publish.ps1 [BENCH1] [BENCH2]`
-
-To run the benchmarks use following. They will be run sequentially.
-  * linux: `./run.sh [BENCH1] [BENCH2]`
-  * windows: `./run.ps1 [BENCH1] [BENCH2]`
-
 ## grpc_bench
 
 [grpc_bench](https://github.com/LesnyRumcajs/grpc_bench) is comminuty run benchmark of different gRPC server implemetaions.
@@ -53,7 +41,7 @@ We use this benchmark to compare out Benchmarker, this identify Server implement
 
 ### Prerequisites
 
-Windows or Linux or MacOS with Docker. Keep in mind that the results on MacOS may not be that reliable, Docker for Mac runs on a VM.
+Windows or Linux or MacOS with Docker. Keep in mind that the results on MacOS/Windows may not be that reliable, Docker for Mac/Windows runs on a VM.
 
 ### Running benchmark
 
@@ -70,6 +58,25 @@ To clean-up the benchmark images use following.
   * windows: not supported.
 
 ## TIPS
+
+### [DO] Configuring the benchmark
+
+The benchmark can be configured through the following environment variables:
+
+|**Name**|**Description**|**Default value**|
+|--------|---------------|:---------------:|
+|GRPC_BENCHMARK_DURATION|Duration of the benchmark.|30s|
+|GRPC_SERVER_CPUS|Maximum number of cpus used by the server.|1|
+|GRPC_CLIENT_CONNECTIONS|Number of connections to use.|5|
+|GRPC_CLIENT_CONCURRENCY|Number of requests to run concurrently. It can't be smaller than the number of connections.|50|
+|GRPC_CLIENT_CPUS|Maximum number of cpus used by the client.|1|
+
+### [DO] Parameter recommendations
+
+* `GRPC_BENCHMARK_DURATION` should not be too small. Some implementations need a *warm-up* before achieving their optimal performance and most real-life gRPC services are expected to be long running processes. From what we measured, **300s** should be enough.
+* `GRPC_SERVER_CPUS` + `GRPC_CLIENT_CPUS` should not exceed total number of cores on the machine. The reason for this is that you don't want the `ghz` client to steal precious CPU cycles from the service under test. Keep in mind that having the `GRPC_CLIENT_CPUS` too low may not saturate the service in some of the more performant implementations. Also keep in mind limiting the number of `GRPC_SERVER_CPUS` to 1 will severely hamper the performance for some technologies - is running a service on 1 CPU your use case? It may be, but keep in mind eventual load balancer also incurs some costs.
+
+Other parameters will depend on your use-case. Choose wisely.
 
 ### [DO NOT] Run your benchmarker from Visual Studio
 

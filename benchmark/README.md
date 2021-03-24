@@ -19,11 +19,6 @@ VM.
 All Server implementations logic is same for each style, recieve message, deserialize and return response.
 This identify each server performance changes.
 
-## Run Benchmark on GitHub Actions
-
-Create Issue with title `RUN BENCHMARK`, body `30s`.
-This trigger benchmark on GitHub Actions and report result when completed.
-
 ### Run C# Benchmarker
 
 C# Benchmarker is minimum implementation with following what comminuty run benchmark do.
