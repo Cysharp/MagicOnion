@@ -8,23 +8,33 @@ namespace MagicOnion.Client
     {
         static readonly IClientFilter[] emptyFilters = Array.Empty<IClientFilter>();
 
+        public static T Create<T>(IMagicOnionAwareGrpcChannel channel)
+            where T : IService<T>
+            => Create<T>(channel.CreateCallInvoker());
+
+        public static T Create<T>(IMagicOnionAwareGrpcChannel channel, IClientFilter[] clientFilters)
+            where T : IService<T>
+            => Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, clientFilters);
+
+        public static T Create<T>(IMagicOnionAwareGrpcChannel channel, MessagePackSerializerOptions serializerOptions)
+            where T : IService<T>
+            => Create<T>(channel.CreateCallInvoker(), serializerOptions, emptyFilters);
+
+        public static T Create<T>(IMagicOnionAwareGrpcChannel channel, MessagePackSerializerOptions serializerOptions, IClientFilter[] clientFilters)
+            where T : IService<T>
+            => Create<T>(channel.CreateCallInvoker(), serializerOptions, clientFilters);
+
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
-        {
-            return Create<T>(invoker, MessagePackSerializer.DefaultOptions, emptyFilters);
-        }
+            => Create<T>(invoker, MessagePackSerializer.DefaultOptions, emptyFilters);
 
         public static T Create<T>(CallInvoker invoker, IClientFilter[] clientFilters)
             where T : IService<T>
-        {
-            return Create<T>(invoker, MessagePackSerializer.DefaultOptions, clientFilters);
-        }
+            => Create<T>(invoker, MessagePackSerializer.DefaultOptions, clientFilters);
 
         public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions serializerOptions)
             where T : IService<T>
-        {
-            return Create<T>(invoker, serializerOptions, emptyFilters);
-        }
+            => Create<T>(invoker, serializerOptions, emptyFilters);
 
         public static T Create<T>(CallInvoker invoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] clientFilters)
             where T : IService<T>
