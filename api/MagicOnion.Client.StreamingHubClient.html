@@ -122,6 +122,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_">Connect&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_CallInvoker___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_">ConnectAsync&lt;TStreamingHub, TReceiver&gt;(CallInvoker, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -129,6 +135,12 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_GrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_">ConnectAsync&lt;TStreamingHub, TReceiver&gt;(GrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_">ConnectAsync&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -252,6 +264,63 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Client_StreamingHubClient_Connect_" data-uid="MagicOnion.Client.StreamingHubClient.Connect*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClient_Connect__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_" data-uid="MagicOnion.Client.StreamingHubClient.Connect``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger)">Connect&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TStreamingHub Connect&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel channel, TReceiver receiver, string host = null, CallOptions option = null, MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
+    where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>channel</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionAwareGrpcChannel.html">IMagicOnionAwareGrpcChannel</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>receiver</code></span> <span class="xref">TReceiver</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>host</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>option</code></span> <span class="xref">CallOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TStreamingHub</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TStreamingHub</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TReceiver</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Client_StreamingHubClient_ConnectAsync_" data-uid="MagicOnion.Client.StreamingHubClient.ConnectAsync*"></a>
   <h4 id="MagicOnion_Client_StreamingHubClient_ConnectAsync__2_CallInvoker___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_" data-uid="MagicOnion.Client.StreamingHubClient.ConnectAsync``2(CallInvoker,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)">ConnectAsync&lt;TStreamingHub, TReceiver&gt;(CallInvoker, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)</h4>
   <div class="markdown level1 summary"></div>
@@ -325,6 +394,65 @@
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>channel</code></span> <span class="xref">GrpcChannel</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>receiver</code></span> <span class="xref">TReceiver</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>host</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>option</code></span> <span class="xref">CallOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>cancellationToken</code></span> <span class="xref">CancellationToken</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;TStreamingHub&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TStreamingHub</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TReceiver</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClient_ConnectAsync_" data-uid="MagicOnion.Client.StreamingHubClient.ConnectAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClient_ConnectAsync__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_" data-uid="MagicOnion.Client.StreamingHubClient.ConnectAsync``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)">ConnectAsync&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;TStreamingHub&gt; ConnectAsync&lt;TStreamingHub, TReceiver&gt;(IMagicOnionAwareGrpcChannel channel, TReceiver receiver, string host = null, CallOptions option = null, MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = null)
+    where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>channel</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionAwareGrpcChannel.html">IMagicOnionAwareGrpcChannel</a></dt>
     <dd></dd>
     <dt><span class="parametername"><code>receiver</code></span> <span class="xref">TReceiver</span></dt>
     <dd></dd>

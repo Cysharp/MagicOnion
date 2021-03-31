@@ -105,6 +105,54 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.IClientFilter.SendAsync
   nameWithType: IClientFilter.SendAsync
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel
+  name: IMagicOnionAwareGrpcChannel
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html
+  commentId: T:MagicOnion.Client.IMagicOnionAwareGrpcChannel
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel
+  nameWithType: IMagicOnionAwareGrpcChannel
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker
+  name: CreateCallInvoker()
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_CreateCallInvoker
+  commentId: M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker()
+  nameWithType: IMagicOnionAwareGrpcChannel.CreateCallInvoker()
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker*
+  name: CreateCallInvoker
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_CreateCallInvoker_
+  commentId: Overload:MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker
+  isSpec: "True"
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.CreateCallInvoker
+  nameWithType: IMagicOnionAwareGrpcChannel.CreateCallInvoker
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs
+  name: GetAllManagedStreamingHubs()
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_GetAllManagedStreamingHubs
+  commentId: M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs()
+  nameWithType: IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs()
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs*
+  name: GetAllManagedStreamingHubs
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_GetAllManagedStreamingHubs_
+  commentId: Overload:MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs
+  isSpec: "True"
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs
+  nameWithType: IMagicOnionAwareGrpcChannel.GetAllManagedStreamingHubs
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type,MagicOnion.IStreamingHubMarker,Func{Task},Task)
+  name: ManageStreamingHubClient(Type, IStreamingHubMarker, Func<Task>, Task)
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_ManageStreamingHubClient_Type_MagicOnion_IStreamingHubMarker_Func_Task__Task_
+  commentId: M:MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type,MagicOnion.IStreamingHubMarker,Func{Task},Task)
+  name.vb: ManageStreamingHubClient(Type, IStreamingHubMarker, Func(Of Task), Task)
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type, MagicOnion.IStreamingHubMarker, Func<Task>, Task)
+  fullName.vb: MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type, MagicOnion.IStreamingHubMarker, Func(Of Task), Task)
+  nameWithType: IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type, IStreamingHubMarker, Func<Task>, Task)
+  nameWithType.vb: IMagicOnionAwareGrpcChannel.ManageStreamingHubClient(Type, IStreamingHubMarker, Func(Of Task), Task)
+- uid: MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient*
+  name: ManageStreamingHubClient
+  href: api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html#MagicOnion_Client_IMagicOnionAwareGrpcChannel_ManageStreamingHubClient_
+  commentId: Overload:MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient
+  isSpec: "True"
+  fullName: MagicOnion.Client.IMagicOnionAwareGrpcChannel.ManageStreamingHubClient
+  nameWithType: IMagicOnionAwareGrpcChannel.ManageStreamingHubClient
 - uid: MagicOnion.Client.IMagicOnionClientLogger
   name: IMagicOnionClientLogger
   href: api/MagicOnion.Client.IMagicOnionClientLogger.html
@@ -592,6 +640,51 @@ references:
   fullName.vb: MagicOnion.Client.MagicOnionClientRegistry(Of T).Register
   nameWithType: MagicOnionClientRegistry<T>.Register
   nameWithType.vb: MagicOnionClientRegistry(Of T).Register
+- uid: MagicOnion.Client.ManagedStreamingHubInfo
+  name: ManagedStreamingHubInfo
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html
+  commentId: T:MagicOnion.Client.ManagedStreamingHubInfo
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo
+  nameWithType: ManagedStreamingHubInfo
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.#ctor(Type,MagicOnion.IStreamingHubMarker)
+  name: ManagedStreamingHubInfo(Type, IStreamingHubMarker)
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo__ctor_Type_MagicOnion_IStreamingHubMarker_
+  commentId: M:MagicOnion.Client.ManagedStreamingHubInfo.#ctor(Type,MagicOnion.IStreamingHubMarker)
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.ManagedStreamingHubInfo(Type, MagicOnion.IStreamingHubMarker)
+  nameWithType: ManagedStreamingHubInfo.ManagedStreamingHubInfo(Type, IStreamingHubMarker)
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.#ctor*
+  name: ManagedStreamingHubInfo
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo__ctor_
+  commentId: Overload:MagicOnion.Client.ManagedStreamingHubInfo.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.ManagedStreamingHubInfo
+  nameWithType: ManagedStreamingHubInfo.ManagedStreamingHubInfo
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.Client
+  name: Client
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo_Client
+  commentId: P:MagicOnion.Client.ManagedStreamingHubInfo.Client
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.Client
+  nameWithType: ManagedStreamingHubInfo.Client
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.Client*
+  name: Client
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo_Client_
+  commentId: Overload:MagicOnion.Client.ManagedStreamingHubInfo.Client
+  isSpec: "True"
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.Client
+  nameWithType: ManagedStreamingHubInfo.Client
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType
+  name: StreamingHubType
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo_StreamingHubType
+  commentId: P:MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType
+  nameWithType: ManagedStreamingHubInfo.StreamingHubType
+- uid: MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType*
+  name: StreamingHubType
+  href: api/MagicOnion.Client.ManagedStreamingHubInfo.html#MagicOnion_Client_ManagedStreamingHubInfo_StreamingHubType_
+  commentId: Overload:MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType
+  isSpec: "True"
+  fullName: MagicOnion.Client.ManagedStreamingHubInfo.StreamingHubType
+  nameWithType: ManagedStreamingHubInfo.StreamingHubType
 - uid: MagicOnion.Client.NullMagicOnionClientLogger
   name: NullMagicOnionClientLogger
   href: api/MagicOnion.Client.NullMagicOnionClientLogger.html
@@ -1221,6 +1314,15 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(GrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger)
   nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(GrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
   nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(GrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
+- uid: MagicOnion.Client.StreamingHubClient.Connect``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger)
+  name: Connect<TStreamingHub, TReceiver>(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_
+  commentId: M:MagicOnion.Client.StreamingHubClient.Connect``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger)
+  name.vb: Connect(Of TStreamingHub, TReceiver)(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
+  fullName: MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(MagicOnion.Client.IMagicOnionAwareGrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(MagicOnion.Client.IMagicOnionAwareGrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger)
+  nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
+  nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)
 - uid: MagicOnion.Client.StreamingHubClient.ConnectAsync*
   name: ConnectAsync
   href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync_
@@ -1246,6 +1348,15 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(GrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
   nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(GrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
   nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(GrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
+- uid: MagicOnion.Client.StreamingHubClient.ConnectAsync``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name: ConnectAsync<TStreamingHub, TReceiver>(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_MagicOnion_Client_IMagicOnionAwareGrpcChannel___1_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_
+  commentId: M:MagicOnion.Client.StreamingHubClient.ConnectAsync``2(MagicOnion.Client.IMagicOnionAwareGrpcChannel,``1,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name.vb: ConnectAsync(Of TStreamingHub, TReceiver)(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
+  fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(MagicOnion.Client.IMagicOnionAwareGrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(MagicOnion.Client.IMagicOnionAwareGrpcChannel, TReceiver, System.String, CallOptions, MessagePackSerializerOptions, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
+  nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(IMagicOnionAwareGrpcChannel, TReceiver, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger, CancellationToken)
 - uid: MagicOnion.Client.StreamingHubClientBase`2
   name: StreamingHubClientBase<TStreamingHub, TReceiver>
   href: api/MagicOnion.Client.StreamingHubClientBase-2.html
