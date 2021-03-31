@@ -34,8 +34,8 @@ namespace TempProject
 {
     public interface IMyService : IService<IMyService>
     {
-        UnaryResult A(MyGenericObject<int> a);
-        UnaryResult B(MyGenericObject<MyObject> a);
+        UnaryResult<Nil> A(MyGenericObject<int> a);
+        UnaryResult<Nil> B(MyGenericObject<MyObject> a);
     }
 
     [MessagePackObject]
@@ -81,8 +81,8 @@ namespace TempProject
 {
     public interface IMyService : IService<IMyService>
     {
-        UnaryResult A(MyGenericObject<int, MyObject> a);
-        UnaryResult B(MyGenericObject<MyObject, int> a);
+        UnaryResult<Nil> A(MyGenericObject<int, MyObject> a);
+        UnaryResult<Nil> B(MyGenericObject<MyObject, int> a);
     }
 
     [MessagePackObject]
@@ -128,9 +128,9 @@ namespace TempProject
 {
     public interface IMyService : IService<IMyService>
     {
-        UnaryResult A(MyGenericObject<MyGenericObject<MyObject>> a);
-        UnaryResult B(MyGenericObject<MyGenericObject<MyGenericObject<MyObject>>> a);
-        UnaryResult B(MyGenericObject<MyGenericObject<MyGenericObject<int>>> a);
+        UnaryResult<Nil> A(MyGenericObject<MyGenericObject<MyObject>> a);
+        UnaryResult<Nil> B(MyGenericObject<MyGenericObject<MyGenericObject<MyObject>>> a);
+        UnaryResult<Nil> B(MyGenericObject<MyGenericObject<MyGenericObject<int>>> a);
     }
 
     [MessagePackObject]
