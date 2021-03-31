@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -10,34 +10,39 @@ using Xunit.Abstractions;
 
 namespace MagicOnion.Generator.Tests
 {
-    public class GenerateEnumFormatterTest
+    public class GenerateStreamingHubTest
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public GenerateEnumFormatterTest(ITestOutputHelper testOutputHelper)
+        public GenerateStreamingHubTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
         }
 
         [Fact]
-        public async Task GenerateEnumFormatter_Return()
+        public async Task HubReceiver_1()
         {
             using var tempWorkspace = TemporaryProjectWorkarea.Create();
             tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
+using System.Threading.Tasks;
 using MessagePack;
 using MagicOnion;
 
 namespace TempProject
 {
-    public interface IMyService : IService<IMyService>
+    public interface IMyHubReceiver
     {
-        UnaryResult<MyEnum> GetEnumAsync();
+        void OnMessage(MyObject a);
+    }
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+    {
+        Task A(MyObject a);
     }
 
-    public enum MyEnum
+    [MessagePackObject]
+    public class MyObject
     {
-        A, B, C
     }
 }
             ");
@@ -45,7 +50,7 @@ namespace TempProject
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
                 true,
                 "TempProject.Generated",
                 "",
@@ -54,69 +59,29 @@ namespace TempProject
 
             var compilation = tempWorkspace.GetOutputCompilation();
             compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
-        }
-
-
-        [Fact]
-        public async Task GenerateEnumFormatter_Return_Nullable()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
-using System;
-using MessagePack;
-using MagicOnion;
-
-namespace TempProject
-{
-    public interface IMyService : IService<IMyService>
-    {
-        UnaryResult<MyEnum?> GetEnumAsync();
-    }
-
-    public enum MyEnum
-    {
-        A, B, C
-    }
-}
-            ");
-
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
-
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
 
         [Fact]
-        public async Task GenerateEnumFormatter_Parameter()
+        public async Task Return_Task()
         {
             using var tempWorkspace = TemporaryProjectWorkarea.Create();
             tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
+using System.Threading.Tasks;
 using MessagePack;
 using MagicOnion;
 
 namespace TempProject
 {
-    public interface IMyService : IService<IMyService>
+    public interface IMyHubReceiver { }
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
     {
-        UnaryResult<Nil> GetEnumAsync(MyEnum a);
+        Task A(MyObject a);
     }
 
-    public enum MyEnum
+    [MessagePackObject]
+    public class MyObject
     {
-        A, B, C
     }
 }
             ");
@@ -124,7 +89,7 @@ namespace TempProject
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
                 true,
                 "TempProject.Generated",
                 "",
@@ -133,29 +98,29 @@ namespace TempProject
 
             var compilation = tempWorkspace.GetOutputCompilation();
             compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
 
         [Fact]
-        public async Task GenerateEnumFormatter_Parameter_Nullable()
+        public async Task Return_TaskOfT()
         {
             using var tempWorkspace = TemporaryProjectWorkarea.Create();
             tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
+using System.Threading.Tasks;
 using MessagePack;
 using MagicOnion;
 
 namespace TempProject
 {
-    public interface IMyService : IService<IMyService>
+    public interface IMyHubReceiver { }
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
     {
-        UnaryResult<Nil> GetEnumAsync(MyEnum? a);
+        Task<MyObject> A(MyObject a);
     }
 
-    public enum MyEnum
+    [MessagePackObject]
+    public class MyObject
     {
-        A, B, C
     }
 }
             ");
@@ -163,7 +128,7 @@ namespace TempProject
             var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
                 true,
                 "TempProject.Generated",
                 "",
@@ -172,8 +137,6 @@ namespace TempProject
 
             var compilation = tempWorkspace.GetOutputCompilation();
             compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
     }
 }

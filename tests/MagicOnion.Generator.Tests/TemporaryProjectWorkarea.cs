@@ -147,5 +147,10 @@ namespace MagicOnion.Generator.Tests
                     .Select(x => x.ToString()))
                 .ToArray();
         }
+
+        public IReadOnlyList<Diagnostic> GetCompilationErrors()
+        {
+            return Compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error).ToArray();
+        }
     }
 }
