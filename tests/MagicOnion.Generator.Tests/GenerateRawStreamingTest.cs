@@ -49,8 +49,8 @@ namespace TempProject
                 "MessagePack.Formatters"
             );
 
-            var compilation = tempWorkspace.GetOutputCompilation().Compilation;
-            compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error).Should().BeEmpty();
+            var compilation = tempWorkspace.GetOutputCompilation();
+            compilation.GetCompilationErrors().Should().BeEmpty();
         }
     }
 }
