@@ -129,33 +129,26 @@ jobs:
         unity: ["2019.3.9f1"]
         include:
           - unity: 2019.3.9f1
-            license: UNITY_2019_3
+            license: UNITY_LICENSE_2019
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    container:
-      # https://hub.docker.com/r/gableroux/unity3d/tags
-      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
-      # Ubuntu 18.04 git is too old, use ppa latest git.
-      - run: |
-          apt-get update && apt-get install --no-install-recommends -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
-          apt-get update && apt-get install --no-install-recommends -y git
       - uses: actions/checkout@v2
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      # activate Unity from manual license file(ulf)
-      - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
+      # execute scripts/Export Package
+      # /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
+      - name: Export unitypackage
+        uses: game-ci/unity-builder@v2.0-alpha-6
         env:
           UNITY_LICENSE: ${{ secrets[matrix.license] }}
-      - name: Activate Unity, always returns a success. But if a subsequent run fails, the activation may have failed(if succeeded, shows `Next license update check is after` and not shows other message(like GUID != GUID). If fails not). In that case, upload the artifact's .alf file to https://license.unity3d.com/manual to get the .ulf file and set it to secrets.
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
-
-      # execute scripts/Export Package
-      - name: Export unitypackage
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
-        working-directory: src/MagicOnion.Client.Unity
-        env:
           UNITY_PACKAGE_VERSION: ${{ env.GIT_TAG }}
+        with:
+          projectPath: src/MagicOnion.Client.Unity
+          unityVersion: ${{ matrix.unity }}
+          targetPlatform: StandaloneLinux64
+          buildMethod: PackageExporter.Export
+          versioning: None
 
       - name: check all .meta is commited
         run: |
