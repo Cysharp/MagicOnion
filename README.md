@@ -221,6 +221,7 @@ dotnet add package MagicOnion
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - Fundamentals
+    - [Service](#service)
     - [StreamingHub](#streaminghub)
     - [Filter](#filter)
     - [ClientFilter](#clientfilter)
@@ -247,8 +248,55 @@ dotnet add package MagicOnion
 - [License](#license)
 
 ## Fundamentals
+### Service
+A service is a mechanism that provides a request/response API in the style of RPC or Web-API, and is implemented as a Unary call to gRPC. 
+A service can be defined as a C# interface to benefit from the type. This means that it can be observed as a request over HTTP/2.
+
+#### Service definition (Shared library)
+```csharp
+using System;
+using MagicOnion;
+
+namespace MyApp.Shared
+{
+    // Defines .NET interface as a Server/Client IDL.
+    // The interface is shared between server and client.
+    public interface IMyFirstService : IService<IMyFirstService>
+    {
+        // The return type must be `UnaryResult<T>`.
+        UnaryResult<int> SumAsync(int x, int y);
+    }
+}
+```
+
+#### Service implementation (Server-side)
+```csharp
+using System;
+using MagicOnion;
+using MagicOnion.Server;
+using MyApp.Shared;
+
+namespace MyApp.Services
+{
+    // Implements RPC service in the server project.
+    // The implementation class must inehrit `ServiceBase<IMyFirstService>` and `IMyFirstService`
+    public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+    {
+        // `UnaryResult<T>` allows the method to be treated as `async` method.
+        public async UnaryResult<int> SumAsync(int x, int y)
+        {
+            Console.WriteLine($"Received:{x}, {y}");
+            return x + y;
+        }
+    }
+}
+```
+
+In MagicOnion, unlike gRPC in general, the body of the request is serialized by MessagePack for sending and receiving.
+
+
 ### StreamingHub
-StreamingHub is a fully-typed realtime server<->client communication framework.
+StreamingHub is a fully-typed realtime server <--> client communication framework.
 
 This sample is for Unity(use Vector3, GameObject, etc) but StreamingHub supports .NET Core, too.
 
