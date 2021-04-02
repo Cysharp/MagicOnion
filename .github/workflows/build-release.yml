@@ -41,6 +41,7 @@ jobs:
 
       - name: Commit files
         id: commit
+        if: steps.check_update.outputs.changed == '1'
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -53,7 +54,7 @@ jobs:
           SHA: ${{ steps.commit.outputs.sha }}
 
       - name: Create Tag
-        if: env.DRY_RUN == 'false' && steps.check_update.outputs.changed == '1'
+        if: steps.check_update.outputs.changed == '1'
         run: git tag ${{ env.GIT_TAG }}
 
       - name: Push changes
