@@ -163,8 +163,8 @@ jobs:
       # Store artifacts.
       - uses: actions/upload-artifact@v1
         with:
-          name: MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
-          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
+          name: MagicOnion.Client.Unity.unitypackage
+          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
 
   create-release:
     if: github.event.inputs.dry_run == 'false'
@@ -207,7 +207,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
+          asset_path: ./MagicOnion.Client.Unity.unitypackage/MagicOnion.Client.Unity.unitypackage
           asset_name: MagicOnion.Client.Unity.unitypackage
           asset_content_type: application/octet-stream
 
