@@ -93,7 +93,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClient.html",
-          "hash": "PWtOkfygi4ev5m83oEC+Ag=="
+          "hash": "i+k/KNZtmD5sMOE5qUvWdg=="
         }
       },
       "is_incremental": false,
@@ -213,7 +213,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClient.html",
-          "hash": "YlKMAXfr63MvPE5MQR/P4w=="
+          "hash": "ehdEeP5izxCwjP/otcM/YQ=="
         }
       },
       "is_incremental": false,
