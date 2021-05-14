@@ -1,0 +1,26 @@
+{
+    "name": "MagicOnion.Unity",
+    "references": [
+        "MagicOnion.Abstractions",
+        "MagicOnion.Client",
+        "UniTask"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Grpc.Core.dll",
+        "Grpc.Core.Api.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "MAGICONION_UNITASK_SUPPORT"
+        }
+    ]
+}
