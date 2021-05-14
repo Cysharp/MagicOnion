@@ -8,6 +8,24 @@ namespace MagicOnion.Client
     {
         static readonly IClientFilter[] emptyFilters = Array.Empty<IClientFilter>();
 
+        public static T Create<T>(ChannelBase channel)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, emptyFilters);
+        }
+
+        public static T Create<T>(ChannelBase channel, IClientFilter[] clientFilters)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, clientFilters);
+        }
+
+        public static T Create<T>(ChannelBase channel, MessagePackSerializerOptions serializerOptions)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), serializerOptions, emptyFilters);
+        }
+
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {

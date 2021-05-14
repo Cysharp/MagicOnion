@@ -19,7 +19,7 @@ namespace MagicOnion
     /// <summary>
     /// gRPC Channel wrapper that managed by the channel provider.
     /// </summary>
-    public sealed partial class GrpcChannelx : IMagicOnionAwareGrpcChannel, IDisposable
+    public sealed partial class GrpcChannelx : ChannelBase, IMagicOnionAwareGrpcChannel, IDisposable
 #if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
         , IGrpcChannelxDiagnosticsInfo
 #endif
@@ -32,7 +32,7 @@ namespace MagicOnion
         private readonly Channel _channel;
         private bool _disposed;
 
-        public Uri Target { get; }
+        public Uri TargetUri { get; }
         public int Id { get; }
 
         public ChannelState ChannelState => _channel.State;
@@ -47,10 +47,11 @@ namespace MagicOnion
         IReadOnlyList<ChannelOption> IGrpcChannelxDiagnosticsInfo.ChannelOptions => _channelOptions;
 #endif
 
-        public GrpcChannelx(int id, Action<GrpcChannelx> onDispose, Channel channel, Uri target, IReadOnlyList<ChannelOption> channelOptions)
+        public GrpcChannelx(int id, Action<GrpcChannelx> onDispose, Channel channel, Uri targetUri, IReadOnlyList<ChannelOption> channelOptions)
+            : base(targetUri.ToString())
         {
             Id = id;
-            Target = target;
+            TargetUri = targetUri;
             _onDispose = onDispose;
             _channel = channel;
             _disposed = false;
@@ -82,13 +83,22 @@ namespace MagicOnion
         /// Create a <see cref="CallInvoker"/>.
         /// </summary>
         /// <returns></returns>
-        public CallInvoker CreateCallInvoker()
+        public override CallInvoker CreateCallInvoker()
         {
             ThrowIfDisposed();
 #if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
             return new ChannelStats.WrappedCallInvoker(((IGrpcChannelxDiagnosticsInfo)this).Stats, _channel.CreateCallInvoker());
 #else
             return _channel.CreateCallInvoker();
+#endif
+        }
+
+        protected override async Task ShutdownAsyncCore()
+        {
+#if MAGICONION_UNITASK_SUPPORT
+            await ShutdownInternalAsync();
+#else
+            await ShutdownInternalAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -190,7 +200,7 @@ namespace MagicOnion
             try
             {
                 DisposeAllManagedStreamingHubs();
-                Forget(ShutdownCoreAsync());
+                Forget(ShutdownInternalAsync());
             }
             finally
             {
@@ -210,7 +220,7 @@ namespace MagicOnion
             try
             {
                 DisposeAllManagedStreamingHubs();
-                await ShutdownCoreAsync();
+                await ShutdownInternalAsync();
             }
             finally
             {
@@ -219,12 +229,12 @@ namespace MagicOnion
         }
 
 #if MAGICONION_UNITASK_SUPPORT
-        private async UniTask ShutdownCoreAsync()
+        private async UniTask ShutdownInternalAsync()
 #else
-        private async Task ShutdownCoreAsync()
+        private async Task ShutdownInternalAsync()
 #endif
         {
-            await _channel.ShutdownAsync();
+            await _channel.ShutdownAsync().ConfigureAwait(false);
         }
 
         private void ThrowIfDisposed()

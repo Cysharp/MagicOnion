@@ -69,7 +69,7 @@ namespace MagicOnion.Unity
         public void UnregisterChannel(GrpcChannelx channel)
         {
             _baseProvider.UnregisterChannel(channel);
-            Debug.Log($"Channel Unregistered: {channel.Target.Host}:{channel.Target.Port} [{channel.Id}]");
+            Debug.Log($"Channel Unregistered: {channel.TargetUri.Host}:{channel.TargetUri.Port} [{channel.Id}]");
         }
 
         public void ShutdownAllChannels()
