@@ -63,11 +63,11 @@ namespace Assets.Scripts
         private async Task InitializeClientAsync()
         {
             // Initialize the Hub
-            this.channel = GrpcChannelx.FromAddress("http://localhost:5000");
+            this.channel = GrpcChannelx.ForAddress("http://localhost:5000");
             // for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
-            //this.channel = GrpcChannelx.FromTarget(new GrpcChannelTarget("dummy.example.com", 5000, cred)); // local tls
-            //this.channel = GrpcChannelx.FromTarget(new GrpcChannelTarget("your-nlb-domain.com", 5000, new SslCredentials())); // aws nlb tls
+            //this.channel = GrpcChannelx.ForTarget(new GrpcChannelTarget("dummy.example.com", 5000, cred)); // local tls
+            //this.channel = GrpcChannelx.ForTarget(new GrpcChannelTarget("your-nlb-domain.com", 5000, new SslCredentials())); // aws nlb tls
 
             while (!shutdownCancellation.IsCancellationRequested)
             {

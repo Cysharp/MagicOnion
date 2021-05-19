@@ -1046,8 +1046,9 @@ The editor extension also provides the ability to display the communication stat
 
 #### New APIs
 - `MagicOnion.GrpcChannelx` class
-  - `GrpcChannelx.FromTarget(GrpcChannelTarget)` method
-  - `GrpcChannelx.FromAddress(Uri)` method
+  - `GrpcChannelx.ForTarget(GrpcChannelTarget)` method
+  - `GrpcChannelx.ForAddress(Uri)` method
+  - `GrpcChannelx.ForAddress(string)` method
 - `MagicOnion.Unity.GrpcChannelProviderHost` class
   - `GrpcChannelProviderHost.Initialize(IGrpcChannelProvider)` method
 - `MagicOnion.Unity.IGrpcChannelProvider` interface
@@ -1077,18 +1078,18 @@ GrpcChannelProviderHost will be created as DontDestroyOnLoad and keeps existing 
 
 ![image](https://user-images.githubusercontent.com/9012/111586444-2eb82980-8804-11eb-8a4f-a898c86e5a60.png)
 
-##### 2. Use `GrpcChannelx.FromTarget` or `GrpcChannelx.FromAddress` to create a channel.
-Use `GrpcChannelx.FromTarget` or `GrpcChannelx.FromAddress` to create a channel instead of `new Channel(...)`.
+##### 2. Use `GrpcChannelx.ForTarget` or `GrpcChannelx.ForAddress` to create a channel.
+Use `GrpcChannelx.ForTarget` or `GrpcChannelx.ForAddress` to create a channel instead of `new Channel(...)`.
 
 ```csharp
-var channel = GrpcChannelx.FromTarget(new GrpcChannelTarget("localhost", 12345, ChannelCredentials.Insecure));
+var channel = GrpcChannelx.ForTarget(new GrpcChannelTarget("localhost", 12345, ChannelCredentials.Insecure));
 // or
-var channel = GrpcChannelx.FromAddress(new Uri("http://localhost:12345"));
+var channel = GrpcChannelx.ForAddress("http://localhost:12345");
 ```
 
 ##### 3. Use the channel instead of `Grpc.Core.Channel`.
 ```csharp
-var channel = GrpcChannelx.FromAddress(new Uri("http://localhost:12345"));
+var channel = GrpcChannelx.ForAddress("http://localhost:12345");
 
 var serviceClient = MagicOnionClient.Create<IGreeterService>(channel);
 var hubClient = StreamingHubClient.ConnectAsync<IGreeterHub, IGreeterHubReceiver>(channel, this);
@@ -1284,7 +1285,7 @@ webBuilder
 ```
 
 #### Client-side (.NET Standard 2.1; Grpc.Net.Client)
-When calling `GrpcChannel.FromAddress`, change the URL scheme to HTTP and the port to an unencrypted port.
+When calling `GrpcChannel.ForAddress`, change the URL scheme to HTTP and the port to an unencrypted port.
 
 ```csharp
 var channel = GrpcChannel.ForAddress("http://localhost:5000");

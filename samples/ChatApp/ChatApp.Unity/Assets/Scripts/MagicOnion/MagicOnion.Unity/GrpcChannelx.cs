@@ -68,6 +68,8 @@ namespace MagicOnion
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
+        [Obsolete("Use ForTarget instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static GrpcChannelx FromTarget(GrpcChannelTarget target)
             => GrpcChannelProvider.Default.CreateChannel(target);
 
@@ -76,15 +78,33 @@ namespace MagicOnion
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static GrpcChannelx FromAddress(string target)
-            => FromAddress(new Uri(target));
+        [Obsolete("Use ForAddress instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static GrpcChannelx FromAddress(Uri target)
+            => GrpcChannelProvider.Default.CreateChannel(target.Host, target.Port, (target.Scheme == "http" ? ChannelCredentials.Insecure : new SslCredentials()));
 
         /// <summary>
         /// Create a channel to the specified target.
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static GrpcChannelx FromAddress(Uri target)
+        public static GrpcChannelx ForTarget(GrpcChannelTarget target)
+            => GrpcChannelProvider.Default.CreateChannel(target);
+
+        /// <summary>
+        /// Create a channel to the specified target.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static GrpcChannelx ForAddress(string target)
+            => ForAddress(new Uri(target));
+
+        /// <summary>
+        /// Create a channel to the specified target.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static GrpcChannelx ForAddress(Uri target)
             => GrpcChannelProvider.Default.CreateChannel(target.Host, target.Port, (target.Scheme == "http" ? ChannelCredentials.Insecure : new SslCredentials()));
 
         /// <summary>
