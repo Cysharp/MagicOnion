@@ -7,6 +7,7 @@
     <LangVersion>latest</LangVersion>
     <!--<nullable>enable</nullable>-->
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <RootNamespace>MagicOnion</RootNamespace>
     <Description>Provides shared classes and interfaces used by MagicOnion server and client. $(MagicOnionPackageDescription)</Description>

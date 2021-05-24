@@ -5,6 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>NON_UNITY</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <PackageId>MagicOnion.Abstractions</PackageId>
     <Description>MagicOnion interfaces and abstractions for server and client.
