@@ -44,7 +44,7 @@ namespace MagicOnion.Client
                 var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
                 try
                 {
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -64,7 +64,7 @@ namespace MagicOnion.Client
             await client.__ConnectAndSubscribeAsync(receiver, cancellationToken).ConfigureAwait(false);
             return (TStreamingHub)(object)client;
         }
-        
+
         private static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {

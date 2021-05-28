@@ -44,7 +44,7 @@ namespace MagicOnion.Client
                 var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
                 try
                 {
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
