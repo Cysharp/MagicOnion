@@ -1,12 +1,16 @@
-using System.Reflection;
+using System;
+using System.Collections.Generic;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
+    /// <summary>
+    /// OpenTelemetry Options to inject Application Information
+    /// </summary>
     public class MagicOnionOpenTelemetryOptions
     {
         /// <summary>
-        /// Tracer ServiceName use as ActivitySource
+        /// Application specific OpenTelemetry Tracing tags
         /// </summary>
-        public string MagicOnionActivityName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
+        public Dictionary<string, string> TracingTags { get; set; } = new Dictionary<string, string>();
     }
 }

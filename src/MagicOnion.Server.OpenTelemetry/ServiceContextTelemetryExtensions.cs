@@ -9,7 +9,7 @@ namespace MagicOnion.Server.OpenTelemetry
     public static class ServiceContextTelemetryExtensions
     {
         /// <summary>
-        /// Set the trace context with this service context
+        /// Set the trace context with this service context. This allows user to add their span directly to this context.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="activityContext"></param>
@@ -25,14 +25,18 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <returns></returns>
         public static ActivityContext GetTraceContext(this ServiceContext context)
         {
-            return (ActivityContext)context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace];
+            if (context.Items.TryGetValue(MagicOnionTelemetry.ServiceContextItemKeyTrace, out var activityContext))
+            {
+                return (ActivityContext)activityContext;
+            }
+            return default;
         }
     }
 
     public static class StreamingHubContextTelemetryExtensions
     {
         /// <summary>
-        /// Set the trace context with this streaming hub context
+        /// Set the trace context with this streaming hub context. This allows user to add their span directly to this context
         /// </summary>
         /// <param name="context"></param>
         /// <param name="activityContext"></param>
@@ -48,7 +52,11 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <returns></returns>
         public static ActivityContext GetTraceContext(this StreamingHubContext context)
         {
-            return (ActivityContext)context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace];
+            if (context.Items.TryGetValue(MagicOnionTelemetry.ServiceContextItemKeyTrace, out var activityContext))
+            {
+                return (ActivityContext)activityContext;
+            }
+            return default;
         }
     }
 }

@@ -7,6 +7,7 @@ namespace MagicOnion.Server.OpenTelemetry
     /// <summary>
     /// ActivitySource for MagicOnion OpenTelemetry
     /// </summary>
+    /// <remarks>Avoid directly register ActivitySource to Singleton for easier identification.</remarks>
     public class MagicOnionActivitySources
     {
         private readonly ActivitySource activitySource;

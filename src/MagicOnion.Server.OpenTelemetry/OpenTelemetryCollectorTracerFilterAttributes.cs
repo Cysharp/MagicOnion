@@ -26,16 +26,23 @@ namespace MagicOnion.Server.OpenTelemetry
     internal class OpenTelemetryCollectorTracerFilterAttribute : MagicOnionFilterAttribute
     {
         readonly ActivitySource source;
-        readonly MagicOnionOpenTelemetryOptions telemetryOption;
+        readonly MagicOnionOpenTelemetryOptions options;
 
         public OpenTelemetryCollectorTracerFilterAttribute(ActivitySource activitySource, MagicOnionOpenTelemetryOptions telemetryOption)
         {
             this.source = activitySource;
-            this.telemetryOption = telemetryOption;
+            this.options = telemetryOption;
         }
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
+            // short-circuit current activity
+            if (!source.HasListeners())
+            {
+                await next(context);
+                return;
+            }
+
             // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
 
             // span name must be `$package.$service/$method` but MagicOnion has no $package.
@@ -48,11 +55,15 @@ namespace MagicOnion.Server.OpenTelemetry
                 return;
             }
 
-            // add trace context to service context. it allows user to add their span directly to this context.
+            // add trace context to service context. 
             context.SetTraceContext(activity.Context);
 
             try
             {
+                // application tags
+                foreach (var tag in options.TracingTags)
+                    activity.SetTag(tag.Key, tag.Value);
+
                 // request
                 activity.SetTag("rpc.grpc.method", context.MethodType.ToString());
                 activity.SetTag("rpc.system", "grpc");
@@ -71,6 +82,7 @@ namespace MagicOnion.Server.OpenTelemetry
                 activity.SetTag("magiconion.auth.peer.authenticated", context.CallContext.AuthContext.IsPeerAuthenticated.ToString());
 
                 await next(context);
+
                 // response
                 activity.SetTag("rpc.grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
                 activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.CallContext.Status.StatusCode));
@@ -105,18 +117,24 @@ namespace MagicOnion.Server.OpenTelemetry
     internal class OpenTelemetryHubCollectorTracerFilterAttribute : StreamingHubFilterAttribute
     {
         readonly ActivitySource source;
-        readonly MagicOnionOpenTelemetryOptions telemetryOption;
+        readonly MagicOnionOpenTelemetryOptions options;
 
         public OpenTelemetryHubCollectorTracerFilterAttribute(ActivitySource activitySource, MagicOnionOpenTelemetryOptions telemetryOption)
         {
             this.source = activitySource;
-            this.telemetryOption = telemetryOption;
+            this.options = telemetryOption;
         }
 
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
-            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
+            // short-circuit current activity
+            if (!source.HasListeners())
+            {
+                await next(context);
+                return;
+            }
 
+            // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
             using var activity = source.StartActivity($"{context.ServiceContext.MethodType}:/{context.Path}", ActivityKind.Server);
 
             // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
@@ -126,11 +144,15 @@ namespace MagicOnion.Server.OpenTelemetry
                 return;
             }
 
-            // add trace context to service context. it allows user to add their span directly to this hub
+            // add trace context to service context. 
             context.SetTraceContext(activity.Context);
 
             try
             {
+                // application tags
+                foreach (var tag in options.TracingTags)
+                    activity.SetTag(tag.Key, tag.Value);
+
                 // request
                 activity.SetTag("rpc.grpc.method", context.ServiceContext.MethodType.ToString());
                 activity.SetTag("rpc.system", "grpc");
@@ -149,6 +171,7 @@ namespace MagicOnion.Server.OpenTelemetry
                 activity.SetTag("magiconion.auth.peer.authenticated", context.ServiceContext.CallContext.AuthContext.IsPeerAuthenticated.ToString());
 
                 await next(context);
+
                 // response
                 activity.SetTag("rpc.grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
                 activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.ServiceContext.CallContext.Status.StatusCode));

@@ -73,8 +73,7 @@ namespace ChatApp.Server
                 });
 
             // additional Tracer for user's own service.
-            AddAdditionalTracer(new[] { "mysql", "redis" });
-            services.AddSingleton(new BackendActivitySources(new[] { new ActivitySource("mysql"), new ActivitySource("redis") }));
+            services.AddAdditionalTracer(Configuration, new[] { "mysql", "redis" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,11 +103,14 @@ namespace ChatApp.Server
                 });
             });
         }
+    }
 
-        private void AddAdditionalTracer(string[] services)
+    public static class TelemetryExtensions
+    {
+        public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration, string[] serviceNames)
         {
-            var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-            foreach (var service in services)
+            var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
+            foreach (var service in serviceNames)
             {
                 switch (exporter)
                 {
@@ -135,6 +137,9 @@ namespace ChatApp.Server
                         break;
                 }
             }
+
+            services.AddSingleton(new BackendActivitySources(new[] { new ActivitySource("mysql"), new ActivitySource("redis") }));
         }
+
     }
 }
