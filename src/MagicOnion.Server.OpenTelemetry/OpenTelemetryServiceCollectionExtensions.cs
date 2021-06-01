@@ -2,7 +2,6 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
 
@@ -22,45 +21,26 @@ namespace MagicOnion.Server.OpenTelemetry
         public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder,
             MagicOnionOpenTelemetryOptions options)
         {
-            return AddOpenTelemetry(builder, options, null, null);
+            return AddOpenTelemetry(builder, options, null);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
         public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder,
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterFactory,
             Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerFactory,
             string configurationName = "")
         {
             var options = BindMagicOnionOpenTelemetryOptions(builder, configurationName);
-            return AddOpenTelemetry(builder, options, configureMeterFactory, configureTracerFactory);
+            return AddOpenTelemetry(builder, options, configureTracerFactory);
         }
         /// <summary>add MagicOnion Telemetry.</summary>
         public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder,
             MagicOnionOpenTelemetryOptions options,
-            Action<MagicOnionOpenTelemetryOptions, MagicOnionOpenTelemetryMeterFactoryOption> configureMeterProvider,
             Action<MagicOnionOpenTelemetryOptions, IServiceProvider, TracerProviderBuilder> configureTracerProvider)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             builder.Services.AddSingleton(options);
 
-            // configure MeterFactory
-            if (configureMeterProvider != null)
-            {
-                var meterFactoryOption = new MagicOnionOpenTelemetryMeterFactoryOption();
-                configureMeterProvider(options, meterFactoryOption);
-
-                MeterProvider.SetDefault(Sdk.CreateMeterProviderBuilder()
-                    .SetProcessor(meterFactoryOption.MetricProcessor)
-                    .SetExporter(meterFactoryOption.MetricExporter)
-                    .SetPushInterval(meterFactoryOption.MetricPushInterval)
-                    .Build());
-
-                builder.Services.AddSingleton(meterFactoryOption.MetricExporter);
-                if (meterFactoryOption.MeterLogger != null)
-                {
-                    builder.Services.AddSingleton<IMagicOnionLogger>(meterFactoryOption.MeterLogger.Invoke(MeterProvider.Default));
-                }
-            }
+            var serviceProvider = builder.Services.BuildServiceProvider();
 
             // configure TracerFactory
             if (configureTracerProvider != null)
