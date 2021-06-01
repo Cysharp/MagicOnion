@@ -61,8 +61,24 @@ jobs:
           name: moc.${{ env.MAGICONION_VERSION }}.zip
           path: ./moc.${{ env.MAGICONION_VERSION }}.zip
 
+  canary-build-experimental:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "MAGICONION_VERSION=ci-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+      - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
+      # build
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      # test
+      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nuget-experimental
+          path: ./publish/
+
   canary-push:
-    needs: [canary-build]
+    needs: [canary-build, canary-build-experimental]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
