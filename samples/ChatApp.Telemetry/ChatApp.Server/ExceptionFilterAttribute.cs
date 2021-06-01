@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>
-    /// Collect OpenTelemetry Tracer with Unary filter.
+    /// Application Exception Filter to set gRPC Status as app wants
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
     public class ExceptionFilterFactoryAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>
@@ -29,17 +27,23 @@ namespace MagicOnion.Server.OpenTelemetry
             }
             catch (Exception ex)
             {
-                switch (ex)
-                {
-                    case NotImplementedException:
-                        SetStatusCode(context, Grpc.Core.StatusCode.Unimplemented, ex.Message);
-                        break;
-                    default:
-                        SetStatusCode(context, Grpc.Core.StatusCode.Internal, ex.Message);
-                        break;
-                }
+                SetStatusCode(context, ConvertToGrpcStatus(ex), ex.Message);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Your Exception -> gRPC Status Converter
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        private Grpc.Core.StatusCode ConvertToGrpcStatus(Exception ex)
+        {
+            return ex switch
+            {
+                NotImplementedException => Grpc.Core.StatusCode.Unimplemented,
+                _ => Grpc.Core.StatusCode.Internal,
+            };
         }
     }
 }
