@@ -54,13 +54,14 @@ namespace MagicOnion.Server.OpenTelemetry
             try
             {
                 // request
-                activity.SetTag("grpc.method", context.MethodType.ToString());
+                activity.SetTag("rpc.grpc.method", context.MethodType.ToString());
                 activity.SetTag("rpc.system", "grpc");
                 activity.SetTag("rpc.service", context.ServiceType.Name);
                 activity.SetTag("rpc.method", context.CallContext.Method);
                 activity.SetTag("net.peer.name", context.CallContext.Peer);
                 activity.SetTag("http.host", context.CallContext.Host);
-                activity.SetTag("http.useragent", context.CallContext.RequestHeaders.GetValue("user-agent"));
+                activity.SetTag("http.url", context.CallContext.Host + context.CallContext.Method); 
+                activity.SetTag("http.user_agent", context.CallContext.RequestHeaders.GetValue("user-agent"));
                 activity.SetTag("message.type", "RECIEVED");
                 activity.SetTag("message.id", context.ContextId.ToString());
                 activity.SetTag("message.uncompressed_size", context.GetRawRequest()?.LongLength.ToString() ?? "0");
@@ -71,15 +72,15 @@ namespace MagicOnion.Server.OpenTelemetry
 
                 await next(context);
                 // response
-                activity.SetTag("grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
+                activity.SetTag("rpc.grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
                 activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.CallContext.Status.StatusCode));
             }
             catch (Exception ex)
             {
                 activity.SetTag("exception", ex.ToString());
-                activity.SetTag("grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
-                activity.SetTag("grpc.status_detail", context.CallContext.Status.Detail);
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.CallContext.Status.StatusCode));
+                activity.SetTag("rpc.grpc.status_code", ((long)context.CallContext.Status.StatusCode).ToString());
+                activity.SetTag("rpc.grpc.status_detail", context.CallContext.Status.Detail);
+                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(Grpc.Core.StatusCode.Internal));
                 throw;
             }
         }
@@ -131,13 +132,14 @@ namespace MagicOnion.Server.OpenTelemetry
             try
             {
                 // request
-                activity.SetTag("grpc.method", context.ServiceContext.MethodType.ToString());
+                activity.SetTag("rpc.grpc.method", context.ServiceContext.MethodType.ToString());
                 activity.SetTag("rpc.system", "grpc");
                 activity.SetTag("rpc.service", context.ServiceContext.ServiceType.Name);
                 activity.SetTag("rpc.method", $"/{context.Path}");
                 activity.SetTag("net.peer.ip", context.ServiceContext.CallContext.Peer);
                 activity.SetTag("http.host", context.ServiceContext.CallContext.Host);
-                activity.SetTag("http.useragent", context.ServiceContext.CallContext.RequestHeaders.GetValue("user-agent"));
+                activity.SetTag("http.url", context.ServiceContext.CallContext.Host + $"/{context.Path}");
+                activity.SetTag("http.user_agent", context.ServiceContext.CallContext.RequestHeaders.GetValue("user-agent"));
                 activity.SetTag("message.type", "RECIEVED");
                 activity.SetTag("message.id", context.ServiceContext.ContextId.ToString());
                 activity.SetTag("message.uncompressed_size", context.Request.Length.ToString());
@@ -148,15 +150,15 @@ namespace MagicOnion.Server.OpenTelemetry
 
                 await next(context);
                 // response
-                activity.SetTag("grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
+                activity.SetTag("rpc.grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
                 activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.ServiceContext.CallContext.Status.StatusCode));
             }
             catch (Exception ex)
             {
                 activity.SetTag("exception", ex.ToString());
-                activity.SetTag("grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
-                activity.SetTag("grpc.status_detail", context.ServiceContext.CallContext.Status.Detail);
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.ServiceContext.CallContext.Status.StatusCode));
+                activity.SetTag("rpc.grpc.status_code", ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
+                activity.SetTag("rpc.grpc.status_detail", context.ServiceContext.CallContext.Status.Detail);
+                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(Grpc.Core.StatusCode.Internal));
                 throw;
             }
         }
