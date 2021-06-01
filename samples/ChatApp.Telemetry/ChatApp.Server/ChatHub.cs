@@ -30,6 +30,7 @@ namespace ChatApp.Server
 
         public async Task JoinAsync(JoinRequest request)
         {
+            var random = new Random();
             this.room = await this.Group.AddAsync(request.RoomName);
             this.myName = request.UserName;
 
@@ -43,14 +44,14 @@ namespace ChatApp.Server
                 activity.SetTag("query", $"INSERT INTO rooms VALUES (0, '@room', '@username', '1');");
                 activity.SetTag("parameter.room", request.RoomName);
                 activity.SetTag("parameter.username", request.UserName);
-                await Task.Delay(TimeSpan.FromMilliseconds(2));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
             using (var activity = redisActivity.StartActivity($"redis:member/status", ActivityKind.Internal))
             {
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", this.myName);
                 activity.SetTag("parameter.value", "1");
-                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
             // use hub trace context to set your span on same level. Otherwise parent will automatically set.
@@ -64,6 +65,7 @@ namespace ChatApp.Server
 
         public async Task LeaveAsync()
         {
+            var random = new Random();
             await this.room.RemoveAsync(this.Context);
 
             this.Broadcast(this.room).OnLeave(this.myName);
@@ -76,7 +78,7 @@ namespace ChatApp.Server
                 activity.SetTag("query", $"UPDATE rooms SET status=0 WHERE id='room' AND name='@username';");
                 activity.SetTag("parameter.room", this.room.GroupName);
                 activity.SetTag("parameter.username", this.myName);
-                await Task.Delay(TimeSpan.FromMilliseconds(2));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
 
             using (var activity = redisActivity.StartActivity($"redis:member/status", ActivityKind.Internal))
@@ -84,12 +86,13 @@ namespace ChatApp.Server
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", this.myName);
                 activity.SetTag("parameter.value", "0");
-                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
         }
 
         public async Task SendMessageAsync(string message)
         {
+            var random = new Random();
             var response = new MessageResponse { UserName = this.myName, Message = message };
             this.Broadcast(this.room).OnSendMessage(response);
 
@@ -99,7 +102,7 @@ namespace ChatApp.Server
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", room.GroupName);
                 activity.SetTag("parameter.value", $"{myName}={message}");
-                await Task.Delay(TimeSpan.FromMilliseconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
             await Task.CompletedTask;
@@ -107,6 +110,7 @@ namespace ChatApp.Server
 
         public async Task GenerateException(string message)
         {
+            var random = new Random();
             var ex = new Exception(message);
 
             // dummy external operation.
@@ -115,7 +119,7 @@ namespace ChatApp.Server
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "errors");
                 activity.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
-                await Task.Delay(TimeSpan.FromMilliseconds(2));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
             throw ex;
         }
