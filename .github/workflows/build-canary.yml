@@ -71,10 +71,7 @@ jobs:
       NUGET_XMLDOC_MODE: skip
       NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: true
     steps:
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.101
-      - uses: actions/download-artifact@v2-preview
+      - uses: actions/download-artifact@v2
       # Upload to NuGet
       - run: echo "VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=${FEED_ENDPOINTS}" >> $GITHUB_ENV
         env:
