@@ -41,7 +41,12 @@ namespace MagicOnion.Server.OpenTelemetry
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             using var rpcScope = new ServerRpcScope(context.ServiceType.Name, context.CallContext.Method.TrimStart('/'), context.CallContext, source);
-            context.SetTraceScope(rpcScope);
+
+            if (options.ExposeRpcScope)
+            {
+                context.SetTraceScope(rpcScope);
+            }
+
             rpcScope.SetTags(options.TracingTags);
             rpcScope.SetTags(new Dictionary<string, string>
             {
@@ -110,7 +115,12 @@ namespace MagicOnion.Server.OpenTelemetry
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
             using var rpcScope = new ServerRpcScope(context.ServiceContext.ServiceType.Name, context.Path, context.ServiceContext.CallContext, source);
-            context.SetTraceScope(rpcScope);
+
+            if (options.ExposeRpcScope)
+            {
+                context.SetTraceScope(rpcScope);
+            }
+
             rpcScope.SetTags(options.TracingTags);
             rpcScope.SetTags(new Dictionary<string, string>
             {

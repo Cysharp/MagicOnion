@@ -54,7 +54,7 @@ namespace ChatApp.Server
 
             // add this time only tag
             var scope = this.Context.GetTraceScope(nameof(IChatHub) + "/" + nameof(JoinAsync));
-            scope.SetTags(new Dictionary<string, string> { { "my_key", Context.ContextId.ToString() } });
+            scope?.SetTags(new Dictionary<string, string> { { "my_key", Context.ContextId.ToString() } });
         }
 
         public async Task LeaveAsync()
@@ -128,7 +128,7 @@ namespace ChatApp.Server
         {
             // use hub trace context to set your span on same level. Otherwise parent will automatically set.
             var scope = this.Context.GetTraceScope();
-            scope.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "connected" } });
+            scope?.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "connected" } });
 
             // handle connection if needed.
             Console.WriteLine($"client connected {this.Context.ContextId}");
@@ -139,7 +139,7 @@ namespace ChatApp.Server
         {
             // use hub trace context to set your span on same level. Otherwise parent will automatically set.
             var scope = this.Context.GetTraceScope();
-            scope.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "disconnected" } });
+            scope?.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "disconnected" } });
 
             // handle disconnection if needed.
             // on disconnecting, if automatically removed this connection from group.

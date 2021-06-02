@@ -12,5 +12,10 @@ namespace MagicOnion.Server.OpenTelemetry
         /// Application specific OpenTelemetry Tracing tags
         /// </summary>
         public Dictionary<string, string> TracingTags { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Expose RpsScope to the ServiceContext.Items. RpsScope key begin with .TraceContext
+        /// </summary>
+        public bool ExposeRpcScope { get; set; } = true;
     }
 }
