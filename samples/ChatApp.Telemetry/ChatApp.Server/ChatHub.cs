@@ -17,15 +17,13 @@ namespace ChatApp.Server
     {
         private IGroup room;
         private string myName;
-        private readonly ActivitySource mysqlActivity;
-        private readonly ActivitySource redisActivity;
+        private readonly ActivitySource mysqlActivity = BackendActivitySources.MySQLActivitySource;
+        private readonly ActivitySource redisActivity = BackendActivitySources.RedisActivitySource;
         private readonly MagicOnionOpenTelemetryOptions options;
 
-        public ChatHub(BackendActivitySources backendActivity, MagicOnionOpenTelemetryOptions options)
+        public ChatHub(MagicOnionOpenTelemetryOptions options)
         {
             this.options = options;
-            mysqlActivity = backendActivity.Get("mysql");
-            redisActivity = backendActivity.Get("redis");
         }
 
         public async Task JoinAsync(JoinRequest request)
@@ -39,19 +37,19 @@ namespace ChatApp.Server
             using (var activity = mysqlActivity.StartActivity("room/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "rooms");
-                activity.SetTag("query", $"INSERT INTO rooms VALUES (0, '@room', '@username', '1');");
-                activity.SetTag("parameter.room", request.RoomName);
-                activity.SetTag("parameter.username", request.UserName);
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "rooms");
+                activity?.SetTag("query", $"INSERT INTO rooms VALUES (0, '@room', '@username', '1');");
+                activity?.SetTag("parameter.room", request.RoomName);
+                activity?.SetTag("parameter.username", request.UserName);
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
             using (var activity = redisActivity.StartActivity($"member/status", ActivityKind.Internal))
             {
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("command", "set");
-                activity.SetTag("parameter.key", this.myName);
-                activity.SetTag("parameter.value", "1");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("command", "set");
+                activity?.SetTag("parameter.key", this.myName);
+                activity?.SetTag("parameter.value", "1");
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
@@ -70,20 +68,20 @@ namespace ChatApp.Server
             using (var activity = mysqlActivity.StartActivity("room/update", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "rooms");
-                activity.SetTag("query", $"UPDATE rooms SET status=0 WHERE id='room' AND name='@username';");
-                activity.SetTag("parameter.room", this.room.GroupName);
-                activity.SetTag("parameter.username", this.myName);
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "rooms");
+                activity?.SetTag("query", $"UPDATE rooms SET status=0 WHERE id='room' AND name='@username';");
+                activity?.SetTag("parameter.room", this.room.GroupName);
+                activity?.SetTag("parameter.username", this.myName);
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
 
             using (var activity = redisActivity.StartActivity($"member/status", ActivityKind.Internal))
             {
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("command", "set");
-                activity.SetTag("parameter.key", this.myName);
-                activity.SetTag("parameter.value", "0");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("command", "set");
+                activity?.SetTag("parameter.key", this.myName);
+                activity?.SetTag("parameter.value", "0");
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
         }
@@ -97,10 +95,10 @@ namespace ChatApp.Server
             var random = new Random();
             using (var activity = redisActivity.StartActivity($"chat_latest_message", ActivityKind.Internal))
             {
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("command", "set");
-                activity.SetTag("parameter.key", room.GroupName);
-                activity.SetTag("parameter.value", $"{myName}={message}");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("command", "set");
+                activity?.SetTag("parameter.key", room.GroupName);
+                activity?.SetTag("parameter.value", $"{myName}={message}");
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
@@ -116,9 +114,9 @@ namespace ChatApp.Server
             using (var activity = mysqlActivity.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "errors");
-                activity.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "errors");
+                activity?.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
             throw ex;

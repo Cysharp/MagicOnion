@@ -106,6 +106,11 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public void SetTags(IDictionary<string, string> tags)
         {
+            if (activity == null)
+            {
+                return;
+            }
+
             foreach (var tag in tags)
             {
                 activity.SetTag(tag.Key, tag.Value);

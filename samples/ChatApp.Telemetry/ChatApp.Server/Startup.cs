@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Linq;
 using MagicOnion.Server;
 using MagicOnion.Server.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -44,7 +43,7 @@ namespace ChatApp.Server
                     {
                         case "jaeger":
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(options.ServiceName))
                                 .AddAspNetCoreInstrumentation()
                                 .AddJaegerExporter();
                             // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
@@ -52,7 +51,7 @@ namespace ChatApp.Server
                             break;
                         case "zipkin":
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .AddSource(BackendActivitySources.ExtraActivitySourceNames)
                                 .AddAspNetCoreInstrumentation()
                                 .AddZipkinExporter();
                             // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
@@ -61,7 +60,7 @@ namespace ChatApp.Server
                         default:
                             // ConsoleExporter will show current tracer activity
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .AddSource(BackendActivitySources.ExtraActivitySourceNames)
                                 .AddAspNetCoreInstrumentation()
                                 .AddConsoleExporter();
                             services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
@@ -106,25 +105,24 @@ namespace ChatApp.Server
         }
     }
 
-    public static class TelemetryExtensions
+    public static class ServiceCollectionExtentions
     {
         public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration)
         {
-            var serviceNames = new[] { "chatapp.server.s2s", "mysql", "redis" };
             var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-            foreach (var service in serviceNames)
+            foreach (var service in BackendActivitySources.ExtraActivitySourceNames)
             {
                 switch (exporter)
                 {
                     case "jaeger":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
                             .AddJaegerExporter()
                             .Build();
                         break;
                     case "zipkin":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
                             .AddZipkinExporter()
@@ -132,7 +130,7 @@ namespace ChatApp.Server
                         break;
                     default:
                         // ConsoleExporter will show current tracer activity
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
                             .AddConsoleExporter()
@@ -140,8 +138,7 @@ namespace ChatApp.Server
                         break;
                 }
             }
-
-            services.AddSingleton(new BackendActivitySources(serviceNames.Select(x => new ActivitySource(x)).ToArray()));
         }
+
     }
 }

@@ -15,16 +15,14 @@ namespace ChatApp.Server
 {
     public class ChatService : ServiceBase<IChatService>, IChatService
     {
-        private readonly ActivitySource mysqlSource;
-        private readonly ActivitySource s2sSource;
+        private readonly ActivitySource mysqlActivity = BackendActivitySources.MySQLActivitySource;
+        private readonly ActivitySource s2sActivity = BackendActivitySources.S2sActivitySource;
         private readonly MagicOnionOpenTelemetryOptions options;
         private readonly ILogger logger;
 
-        public ChatService(BackendActivitySources backendActivity, MagicOnionOpenTelemetryOptions options, ILogger<ChatService> logger)
+        public ChatService(MagicOnionOpenTelemetryOptions options, ILogger<ChatService> logger)
         {
             this.options = options;
-            this.mysqlSource = backendActivity.Get("mysql");
-            this.s2sSource = backendActivity.Get("chatapp.server.s2s");
             this.logger = logger;
         }
 
@@ -32,12 +30,12 @@ namespace ChatApp.Server
         {
             var ex = new System.NotImplementedException();
             // dummy external operation.
-            using (var activity = this.mysqlSource.StartActivity("errors/insert", ActivityKind.Internal))
+            using (var activity = this.mysqlActivity.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "errors");
-                activity.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "errors");
+                activity?.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
             }
             throw ex;
@@ -48,12 +46,12 @@ namespace ChatApp.Server
             logger.LogDebug($"{message}");
 
             // dummy external operation.
-            using (var activity = this.mysqlSource.StartActivity("report/insert", ActivityKind.Internal))
+            using (var activity = this.mysqlActivity.StartActivity("report/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "report");
-                activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "report");
+                activity?.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
             }
 
@@ -62,17 +60,17 @@ namespace ChatApp.Server
             var client = MagicOnionClient.Create<IMessageService>(channel, new[]
             {
                 // propagate trace context from ChatApp.Server to MicroServer
-                new MagicOnionOpenTelemetryClientFilter(s2sSource, options),
+                new MagicOnionOpenTelemetryClientFilter(s2sActivity, options),
             });
             await client.SendAsync("hello");
 
             // dummy external operation.
-            using (var activity = this.mysqlSource.StartActivity("report/get", ActivityKind.Internal))
+            using (var activity = this.mysqlActivity.StartActivity("report/get", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("service.name", options.ServiceName);
-                activity.SetTag("table", "report");
-                activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "report");
+                activity?.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
             }
 
