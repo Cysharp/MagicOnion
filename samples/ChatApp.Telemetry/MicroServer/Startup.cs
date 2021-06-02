@@ -1,19 +1,19 @@
-using System.Diagnostics;
-using System.Linq;
 using MagicOnion.Server;
 using MagicOnion.Server.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace ChatApp.Server
+namespace MicroServer
 {
     public class Startup
     {
@@ -25,9 +25,10 @@ namespace ChatApp.Server
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
+            services.AddGrpc();
             services.AddMagicOnion(options =>
                 {
                     options.GlobalFilters.Add(new MagicOnionOpenTelemetryTracerFilterFactoryAttribute());
@@ -44,7 +45,7 @@ namespace ChatApp.Server
                     {
                         case "jaeger":
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
                                 .AddAspNetCoreInstrumentation()
                                 .AddJaegerExporter();
                             // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
@@ -52,7 +53,7 @@ namespace ChatApp.Server
                             break;
                         case "zipkin":
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
                                 .AddAspNetCoreInstrumentation()
                                 .AddZipkinExporter();
                             // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
@@ -61,7 +62,7 @@ namespace ChatApp.Server
                         default:
                             // ConsoleExporter will show current tracer activity
                             tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
+                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
                                 .AddAspNetCoreInstrumentation()
                                 .AddConsoleExporter();
                             services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
@@ -72,9 +73,6 @@ namespace ChatApp.Server
                             break;
                     }
                 });
-
-            // additional Tracer for user's own service.
-            services.AddAdditionalTracer(Configuration, new[] { "chatapp.s2s", "mysql", "redis" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,62 +82,19 @@ namespace ChatApp.Server
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapMagicOnionService();
+                endpoints.MapGrpcService<GreeterService>();
 
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
                 });
             });
-        }
-    }
-
-    public static class TelemetryExtensions
-    {
-        public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration, string[] serviceNames)
-        {
-            var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-            foreach (var service in serviceNames)
-            {
-                switch (exporter)
-                {
-                    case "jaeger":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
-                            .AddSource(service)
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
-                            .AddJaegerExporter()
-                            .Build();
-                        break;
-                    case "zipkin":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
-                            .AddSource(service)
-                            .AddZipkinExporter()
-                            .Build();
-                        break;
-                    default:
-                        // ConsoleExporter will show current tracer activity
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
-                            .AddSource(service)
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
-                            .AddConsoleExporter()
-                            .Build();
-                        break;
-                }
-            }
-
-            services.AddSingleton(new BackendActivitySources(serviceNames.Select(x => new ActivitySource(x)).ToArray()));
         }
     }
 }

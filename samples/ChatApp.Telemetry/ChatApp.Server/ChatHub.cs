@@ -2,6 +2,8 @@ using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.OpenTelemetry;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,13 +56,15 @@ namespace ChatApp.Server
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
-            // use hub trace context to set your span on same level. Otherwise parent will automatically set.
-            var hubTraceContext = this.Context.GetTraceContext();
-            using (var activity = magiconionActivity.StartActivity("ChatHub:hub_context_relation", ActivityKind.Internal, hubTraceContext))
-            {
-                // this is sample. use orm or any safe way.
-                activity.SetTag("message", "this span has no relationship with this method but relate with hub context. This means no relation with parent method.");
-            }
+            //Propagators.DefaultTextMapPropagator.Inject(new PropagationContext(Activity.Current.Context, Baggage.Current), Context);
+
+            //// use hub trace context to set your span on same level. Otherwise parent will automatically set.
+            //var hubTraceContext = this.Context.GetTraceContext();
+            //using (var activity = magiconionActivity.StartActivity("ChatHub:hub_context_relation", ActivityKind.Internal, hubTraceContext))
+            //{
+            //    // this is sample. use orm or any safe way.
+            //    activity.SetTag("message", "this span has no relationship with this method but relate with hub context. This means no relation with parent method.");
+            //}
         }
 
         public async Task LeaveAsync()

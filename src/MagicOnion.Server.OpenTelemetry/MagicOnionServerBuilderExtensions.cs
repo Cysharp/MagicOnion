@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace MagicOnion.Server.OpenTelemetry
 {
     /// <summary>MagicOnion extensions for Microsoft.Extensions.Hosting classes</summary>
-    public static class OpenTelemetryServiceCollectionExtensions
+    public static class MagicOnionServerBuilderExtensions
     {
         /// <summary>Configures OpenTelemetry to listen for the Activities created by the MagicOnion Filter.</summary>
         public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder,
