@@ -1,7 +1,11 @@
-namespace MagicOnion.Server.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry.Internal
 {
+    /// <summary>
+    /// OpenTelemetry Tag Keys
+    /// </summary>
     internal static class SemanticConventions
     {
+        // tag spec: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
         public const string AttributeException = "exception";
 
         public const string AttributeHttpHost = "http.host";
@@ -15,7 +19,6 @@ namespace MagicOnion.Server.OpenTelemetry
         public const string AttributeRpcService = "rpc.service";
         public const string AttributeRpcMethod = "rpc.method";
 
-        public const string AttributeMessageType = "message.type";
         public const string AttributeMessageId = "message.id";
         public const string AttributeMessageCompressedSize = "message.compressed_size";
         public const string AttributeMessageUncompressedSize = "message.uncompressed_size";

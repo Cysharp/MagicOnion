@@ -1,5 +1,6 @@
 using Grpc.Core;
 using MagicOnion.Client;
+using MagicOnion.Server.OpenTelemetry.Internal;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using System;
@@ -25,13 +26,14 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
         {
-            using var rpcScope = new ClientRpcScope(context, source);
-            rpcScope.SetAdditionalTags(options.TracingTags);
+            var rpcService = context.MethodPath.Split('/')[0];
+            using var rpcScope = new ClientRpcScope(rpcService, context.MethodPath, context, source);
+            rpcScope.SetTags(options.TracingTags);
 
             try
             {
                 var response = await next(context);
-                
+
                 rpcScope.Complete();
                 return response;
             }
@@ -49,14 +51,8 @@ namespace MagicOnion.Server.OpenTelemetry
 
     internal class ClientRpcScope : RpcScope
     {
-        private readonly RequestContext context;
-        private readonly ActivitySource source;
-
-        public ClientRpcScope(RequestContext context, ActivitySource source) : base(context.MethodPath, context.MethodPath)
+        public ClientRpcScope(string rpcService, string rpcMethod, RequestContext context, ActivitySource source) : base(rpcService, rpcMethod)
         {
-            this.context = context;
-            this.source = source;
-
             // capture the current activity
             this.ParentActivity = Activity.Current;
 
@@ -64,7 +60,7 @@ namespace MagicOnion.Server.OpenTelemetry
                 return;
 
             var rpcActivity = source.StartActivity(
-                context.MethodPath,
+                context.MethodPath.TrimStart('/'),
                 ActivityKind.Client,
                 ParentActivity == default ? default : ParentActivity.Context);
 

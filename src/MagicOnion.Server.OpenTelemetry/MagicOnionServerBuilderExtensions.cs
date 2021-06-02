@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using MagicOnion.Server.OpenTelemetry.Internal;
 
 namespace MagicOnion.Server.OpenTelemetry
 {

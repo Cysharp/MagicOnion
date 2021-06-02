@@ -17,13 +17,11 @@ namespace ChatApp.Server
     {
         private readonly ActivitySource mysqlSource;
         private readonly ActivitySource s2sSource;
-        private readonly MagicOnionActivitySources magiconionActivity;
         private readonly MagicOnionOpenTelemetryOptions options;
         private readonly ILogger logger;
 
-        public ChatService(MagicOnionActivitySources magiconionActivity, BackendActivitySources backendActivity, MagicOnionOpenTelemetryOptions options, ILogger<ChatService> logger)
+        public ChatService(BackendActivitySources backendActivity, MagicOnionOpenTelemetryOptions options, ILogger<ChatService> logger)
         {
-            this.magiconionActivity = magiconionActivity;
             this.options = options;
             this.mysqlSource = backendActivity.Get("mysql");
             this.s2sSource = backendActivity.Get("chatapp.s2s");
@@ -34,7 +32,7 @@ namespace ChatApp.Server
         {
             var ex = new System.NotImplementedException();
             // dummy external operation.
-            using (var activity = this.mysqlSource.StartActivity("db:errors/insert", ActivityKind.Internal))
+            using (var activity = this.mysqlSource.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "errors");
@@ -47,6 +45,17 @@ namespace ChatApp.Server
         public async UnaryResult<Nil> SendReportAsync(string message)
         {
             logger.LogDebug($"{message}");
+
+            // dummy external operation.
+            using (var activity = this.mysqlSource.StartActivity("report/insert", ActivityKind.Internal))
+            {
+                // this is sample. use orm or any safe way.
+                activity.SetTag("table", "report");
+                activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                await Task.Delay(TimeSpan.FromMilliseconds(2));
+            }
+
+            // Server to Server operation
             var channel = GrpcChannel.ForAddress("http://localhost:4999");
             var client = MagicOnionClient.Create<IMessageService>(channel, new[]
             {
@@ -54,6 +63,15 @@ namespace ChatApp.Server
                 new MagicOnionOpenTelemetryClientFilter(s2sSource, options),
             });
             await client.SendAsync("hello");
+
+            // dummy external operation.
+            using (var activity = this.mysqlSource.StartActivity("report/get", ActivityKind.Internal))
+            {
+                // this is sample. use orm or any safe way.
+                activity.SetTag("table", "report");
+                activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+            }
 
             return Nil.Default;
         }

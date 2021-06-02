@@ -2,8 +2,6 @@ using ChatApp.Shared.Hubs;
 using ChatApp.Shared.MessagePackObjects;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.OpenTelemetry;
-using OpenTelemetry;
-using OpenTelemetry.Context.Propagation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,13 +17,11 @@ namespace ChatApp.Server
     {
         private IGroup room;
         private string myName;
-        private readonly ActivitySource magiconionActivity;
         private readonly ActivitySource mysqlActivity;
         private readonly ActivitySource redisActivity;
 
-        public ChatHub(MagicOnionActivitySources magiconionActivity, BackendActivitySources backendActivity)
+        public ChatHub(BackendActivitySources backendActivity)
         {
-            this.magiconionActivity = magiconionActivity.Current;
             this.mysqlActivity = backendActivity.Get("mysql");
             this.redisActivity = backendActivity.Get("redis");
         }
@@ -39,7 +35,7 @@ namespace ChatApp.Server
             this.Broadcast(this.room).OnJoin(request.UserName);
 
             // dummy external operation db.
-            using (var activity = mysqlActivity.StartActivity("db:room/insert", ActivityKind.Internal))
+            using (var activity = mysqlActivity.StartActivity("room/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "rooms");
@@ -48,7 +44,7 @@ namespace ChatApp.Server
                 activity.SetTag("parameter.username", request.UserName);
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
-            using (var activity = redisActivity.StartActivity($"redis:member/status", ActivityKind.Internal))
+            using (var activity = redisActivity.StartActivity($"member/status", ActivityKind.Internal))
             {
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", this.myName);
@@ -56,15 +52,9 @@ namespace ChatApp.Server
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1, 5)));
             }
 
-            //Propagators.DefaultTextMapPropagator.Inject(new PropagationContext(Activity.Current.Context, Baggage.Current), Context);
-
-            //// use hub trace context to set your span on same level. Otherwise parent will automatically set.
-            //var hubTraceContext = this.Context.GetTraceContext();
-            //using (var activity = magiconionActivity.StartActivity("ChatHub:hub_context_relation", ActivityKind.Internal, hubTraceContext))
-            //{
-            //    // this is sample. use orm or any safe way.
-            //    activity.SetTag("message", "this span has no relationship with this method but relate with hub context. This means no relation with parent method.");
-            //}
+            // add this time only tag
+            var scope = this.Context.GetTraceScope(nameof(IChatHub) + "/" + nameof(JoinAsync));
+            scope.SetTags(new Dictionary<string, string> { { "my_key", Context.ContextId.ToString() } });
         }
 
         public async Task LeaveAsync()
@@ -75,7 +65,7 @@ namespace ChatApp.Server
             this.Broadcast(this.room).OnLeave(this.myName);
 
             // dummy external operation.
-            using (var activity = mysqlActivity.StartActivity("db:room/update", ActivityKind.Internal))
+            using (var activity = mysqlActivity.StartActivity("room/update", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "rooms");
@@ -85,7 +75,7 @@ namespace ChatApp.Server
                 await Task.Delay(TimeSpan.FromMilliseconds(random.Next(2, 20)));
             }
 
-            using (var activity = redisActivity.StartActivity($"redis:member/status", ActivityKind.Internal))
+            using (var activity = redisActivity.StartActivity($"member/status", ActivityKind.Internal))
             {
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", this.myName);
@@ -101,7 +91,7 @@ namespace ChatApp.Server
             this.Broadcast(this.room).OnSendMessage(response);
 
             // dummy external operation.
-            using (var activity = redisActivity.StartActivity($"redis:chat_latest_message", ActivityKind.Internal))
+            using (var activity = redisActivity.StartActivity($"chat_latest_message", ActivityKind.Internal))
             {
                 activity.SetTag("command", "set");
                 activity.SetTag("parameter.key", room.GroupName);
@@ -118,7 +108,7 @@ namespace ChatApp.Server
             var ex = new Exception(message);
 
             // dummy external operation.
-            using (var activity = mysqlActivity.StartActivity("db:errors/insert", ActivityKind.Internal))
+            using (var activity = mysqlActivity.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
                 activity.SetTag("table", "errors");
@@ -136,6 +126,10 @@ namespace ChatApp.Server
 
         protected override ValueTask OnConnecting()
         {
+            // use hub trace context to set your span on same level. Otherwise parent will automatically set.
+            var scope = this.Context.GetTraceScope();
+            scope.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "connected" } });
+
             // handle connection if needed.
             Console.WriteLine($"client connected {this.Context.ContextId}");
             return CompletedTask;
@@ -143,6 +137,10 @@ namespace ChatApp.Server
 
         protected override ValueTask OnDisconnected()
         {
+            // use hub trace context to set your span on same level. Otherwise parent will automatically set.
+            var scope = this.Context.GetTraceScope();
+            scope.SetTags(new Dictionary<string, string> { { "magiconion.connect_status", "disconnected" } });
+
             // handle disconnection if needed.
             // on disconnecting, if automatically removed this connection from group.
             return CompletedTask;

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MagicOnion.Server.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry.Internal
 {
-    public static class MagicOnionTelemetry
+    internal static class MagicOnionTelemetryConstants
     {
         public const string ServiceContextItemKeyTrace = ".TraceContext";
     }

@@ -11,7 +11,7 @@ namespace MicroServer
     {
         public async UnaryResult<string> SendAsync(string message)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromMilliseconds(20));
             return $"echo {message}";
         }
     }

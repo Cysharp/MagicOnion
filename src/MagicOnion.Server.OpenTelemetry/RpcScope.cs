@@ -1,4 +1,5 @@
 using Grpc.Core;
+using MagicOnion.Server.OpenTelemetry.Internal;
 using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,18 @@ using System.Threading;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
-    internal abstract class RpcScope : IDisposable
+    /// <summary>
+    /// Manage trace activity scope for this Rpc
+    /// </summary>
+    public interface IRpcScope
+    {
+        /// <summary>
+        /// Set custom tag to the activity.
+        /// </summary>
+        /// <param name="tags"></param>
+        void SetTags(IDictionary<string, string> tags);
+    }
+    internal abstract class RpcScope : IDisposable, IRpcScope
     {
         private Activity activity;
         private long complete = 0;
@@ -18,8 +30,8 @@ namespace MagicOnion.Server.OpenTelemetry
 
         protected RpcScope(string rpcService, string rpcMethod)
         {
-            this.RpcService = rpcService;
-            this.RpcMethod = rpcMethod;
+            RpcService = rpcService;
+            RpcMethod = rpcMethod;
         }
 
         /// <summary>
@@ -37,10 +49,11 @@ namespace MagicOnion.Server.OpenTelemetry
             StopActivity((int)Grpc.Core.StatusCode.Cancelled);
         }
 
+
         /// <summary>
         /// Records a complete RPC
         /// </summary>
-        public void Complete()
+        public void Complete(Grpc.Core.StatusCode statusCode = Grpc.Core.StatusCode.OK)
         {
             if (activity == null)
             {
@@ -48,7 +61,7 @@ namespace MagicOnion.Server.OpenTelemetry
             }
 
             // The overall Span status should remain unset however the grpc status code attribute is required
-            StopActivity((int)Grpc.Core.StatusCode.OK);
+            StopActivity((int)statusCode);
         }
 
         /// <summary>
@@ -57,7 +70,7 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <param name="exception"></param>
         public void CompleteWithException(Exception exception)
         {
-            if (this.activity == null)
+            if (activity == null)
             {
                 return;
             }
@@ -71,7 +84,8 @@ namespace MagicOnion.Server.OpenTelemetry
                 description = rpcException.Message;
             }
 
-            this.StopActivity((int)grpcStatusCode, description);
+            activity.SetTag(SemanticConventions.AttributeException, exception.ToString());
+            StopActivity((int)grpcStatusCode, description);
         }
         protected void SetActivity(Activity activity)
         {
@@ -87,7 +101,7 @@ namespace MagicOnion.Server.OpenTelemetry
             this.activity.SetTag(SemanticConventions.AttributeRpcMethod, RpcMethod);
         }
 
-        public void SetAdditionalTags(IDictionary<string, string> tags)
+        public void SetTags(IDictionary<string, string> tags)
         {
             foreach (var tag in tags)
             {
@@ -99,13 +113,13 @@ namespace MagicOnion.Server.OpenTelemetry
         {
             if (Interlocked.CompareExchange(ref this.complete, 1, 0) == 0)
             {
-                this.activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, statusCode);
+                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, statusCode);
                 if (statusDescription != null)
                 {
-                    this.activity.SetStatus(global::OpenTelemetry.Trace.Status.Error.WithDescription(statusDescription));
+                    activity.SetStatus(global::OpenTelemetry.Trace.Status.Error.WithDescription(statusDescription));
                 }
 
-                this.activity.Stop();
+                activity.Stop();
             }
         }
     }

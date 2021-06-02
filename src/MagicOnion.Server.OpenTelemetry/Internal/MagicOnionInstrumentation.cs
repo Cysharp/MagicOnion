@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace MagicOnion.Server.OpenTelemetry
+namespace MagicOnion.Server.OpenTelemetry.Internal
 {
     internal static class MagicOnionInstrumentation
     {

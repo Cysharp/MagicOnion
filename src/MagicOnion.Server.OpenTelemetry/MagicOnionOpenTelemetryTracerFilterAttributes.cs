@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using MagicOnion.Server.Hubs;
+using MagicOnion.Server.OpenTelemetry.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
-using OpenTelemetry.Trace;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
@@ -41,81 +40,42 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
-            // short-circuit current activity
-            if (!source.HasListeners())
+            using var rpcScope = new ServerRpcScope(context.ServiceType.Name, context.CallContext.Method.TrimStart('/'), context.CallContext, source);
+            context.SetTraceScope(rpcScope);
+            rpcScope.SetTags(options.TracingTags);
+            rpcScope.SetTags(new Dictionary<string, string>
             {
-                await next(context);
-                return;
-            }
-
-            var currentContext = Activity.Current?.Context;
-            
-            // Extract the SpanContext, if any from the headers
-            var metadata = context.CallContext.RequestHeaders;
-            if (metadata != null)
-            {
-                var propagationContext = Propagators.DefaultTextMapPropagator.Extract(currentContext, metadata);
-                if (propagationContext.ActivityContext.IsValid())
-                {
-                    currentContext = propagationContext.ActivityContext;
-                }
-                if (propagationContext.Baggage != default)
-                {
-                    Baggage.Current = propagationContext.Baggage;
-                }
-            }
-
-            // span name must be `$package.$service/$method` but MagicOnion has no $package.
-            using var activity = source.StartActivity($"{context.MethodType}:{context.CallContext.Method}", ActivityKind.Server, currentContext ?? default);
-
-            // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
-            if (activity == null)
-            {
-                await next(context);
-                return;
-            }
-
-            // todo: propagate で消せるはず?
-            // add trace context to service context. 
-            context.SetTraceContext(activity.Context);
+                { SemanticConventions.AttributeRpcGrpcMethod, context.MethodType.ToString() },
+                { SemanticConventions.AttributeHttpHost, context.CallContext.Host},
+                { SemanticConventions.AttributeHttpUrl, context.CallContext.Host + context.CallContext.Method },
+                { SemanticConventions.AttributeHttpUserAgent, context.CallContext.RequestHeaders.GetValue("user-agent")},
+                { SemanticConventions.AttributeMessageId, context.ContextId.ToString()},
+                { SemanticConventions.AttributeMessageUncompressedSize, context.GetRawRequest()?.LongLength.ToString() ?? "0"},
+                { SemanticConventions.AttributeMagicOnionPeerName, context.CallContext.Peer},
+                { SemanticConventions.AttributeMagicOnionAuthEnabled, (!string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName)).ToString()},
+                { SemanticConventions.AttributeMagicOnionAuthPeerAuthenticated, context.CallContext.AuthContext.IsPeerAuthenticated.ToString()},
+            });
 
             try
             {
-                // tag spec: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
-
-                // application tags
-                foreach (var tag in options.TracingTags)
-                    activity.SetTag(tag.Key, tag.Value);
-
-                // request
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcMethod, context.MethodType.ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcSystem, "grpc");
-                activity.SetTag(SemanticConventions.AttributeRpcService, context.ServiceType.Name);
-                activity.SetTag(SemanticConventions.AttributeRpcMethod, context.CallContext.Method);
-                activity.SetTag(SemanticConventions.AttributeHttpHost, context.CallContext.Host);
-                activity.SetTag(SemanticConventions.AttributeHttpUrl, context.CallContext.Host + context.CallContext.Method); 
-                activity.SetTag(SemanticConventions.AttributeHttpUserAgent, context.CallContext.RequestHeaders.GetValue("user-agent"));
-                activity.SetTag(SemanticConventions.AttributeMessageType, "RECIEVED");
-                activity.SetTag(SemanticConventions.AttributeMessageId, context.ContextId.ToString());
-                activity.SetTag(SemanticConventions.AttributeMessageUncompressedSize, context.GetRawRequest()?.LongLength.ToString() ?? "0");
-
-                activity.SetTag(SemanticConventions.AttributeMagicOnionPeerName, context.CallContext.Peer);
-                activity.SetTag(SemanticConventions.AttributeMagicOnionAuthEnabled, (!string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName)).ToString());
-                activity.SetTag(SemanticConventions.AttributeMagicOnionAuthPeerAuthenticated, context.CallContext.AuthContext.IsPeerAuthenticated.ToString());
-
                 await next(context);
 
-                // response
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.CallContext.Status.StatusCode).ToString());
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.CallContext.Status.StatusCode));
+                OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.CallContext.Status.StatusCode);
+                rpcScope.Complete(context.CallContext.Status.StatusCode);
             }
             catch (Exception ex)
             {
-                activity.SetTag(SemanticConventions.AttributeException, ex.ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.CallContext.Status.StatusCode).ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusDetail, context.CallContext.Status.Detail);
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(Grpc.Core.StatusCode.Internal));
+                rpcScope.SetTags(new Dictionary<string, string>
+                {
+                    { SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.CallContext.Status.StatusCode).ToString()},
+                    { SemanticConventions.AttributeRpcGrpcStatusDetail, context.CallContext.Status.Detail},
+                });
+                rpcScope.CompleteWithException(ex);
                 throw;
+            }
+            finally
+            {
+                rpcScope.RestoreParentActivity();
             }
         }
     }
@@ -149,17 +109,59 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
-            // short-circuit current activity
-            if (!source.HasListeners())
+            using var rpcScope = new ServerRpcScope(context.ServiceContext.ServiceType.Name, context.Path, context.ServiceContext.CallContext, source);
+            context.SetTraceScope(rpcScope);
+            rpcScope.SetTags(options.TracingTags);
+            rpcScope.SetTags(new Dictionary<string, string>
+            {
+                { SemanticConventions.AttributeRpcGrpcMethod, context.ServiceContext.MethodType.ToString() },
+                { SemanticConventions.AttributeHttpHost, context.ServiceContext.CallContext.Host},
+                { SemanticConventions.AttributeHttpUrl, context.ServiceContext.CallContext.Host + "/" + context.Path },
+                { SemanticConventions.AttributeHttpUserAgent, context.ServiceContext.CallContext.RequestHeaders.GetValue("user-agent")},
+                { SemanticConventions.AttributeMessageId, context.ServiceContext.ContextId.ToString()},
+                { SemanticConventions.AttributeMessageUncompressedSize, context.Request.Length.ToString()},
+                { SemanticConventions.AttributeMagicOnionPeerName, context.ServiceContext.CallContext.Peer},
+                { SemanticConventions.AttributeMagicOnionAuthEnabled, (!string.IsNullOrEmpty(context.ServiceContext.CallContext.AuthContext.PeerIdentityPropertyName)).ToString()},
+                { SemanticConventions.AttributeMagicOnionAuthPeerAuthenticated, context.ServiceContext.CallContext.AuthContext.IsPeerAuthenticated.ToString()},
+            });
+
+            try
             {
                 await next(context);
-                return;
+
+                OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.ServiceContext.CallContext.Status.StatusCode);
+                rpcScope.Complete(context.ServiceContext.CallContext.Status.StatusCode);
             }
+            catch (Exception ex)
+            {
+                rpcScope.SetTags(new Dictionary<string, string>
+                    {
+                        { SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString()},
+                        { SemanticConventions.AttributeRpcGrpcStatusDetail, context.ServiceContext.CallContext.Status.Detail},
+                    });
+                rpcScope.CompleteWithException(ex);
+                throw;
+            }
+            finally
+            {
+                rpcScope.RestoreParentActivity();
+            }
+        }
+    }
+
+    internal class ServerRpcScope : RpcScope
+    {
+
+        public ServerRpcScope(string rpcService, string rpcMethod, ServerCallContext context, ActivitySource source) : base(rpcService, rpcMethod)
+        {
+            // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
+            if (!source.HasListeners())
+                return;
 
             var currentContext = Activity.Current?.Context;
 
             // Extract the SpanContext, if any from the headers
-            var metadata = context.ServiceContext.CallContext.RequestHeaders;
+            var metadata = context.RequestHeaders;
             if (metadata != null)
             {
                 var propagationContext = Propagators.DefaultTextMapPropagator.Extract(currentContext, metadata);
@@ -173,71 +175,21 @@ namespace MagicOnion.Server.OpenTelemetry
                 }
             }
 
-            using var activity = source.StartActivity($"{context.ServiceContext.MethodType}:/{context.Path}", ActivityKind.Server, currentContext ?? default);
+            // span name should be `$package.$service/$method` but MagicOnion has no $package.
+            var rpcActivity = source.StartActivity(
+                rpcMethod,
+                ActivityKind.Server,
+                currentContext ?? default);
 
-            // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
-            if (activity == null)
-            {
-                await next(context);
-                return;
-            }
-
-            // todo: propagate で消せるはず?
-            // add trace context to service context. 
-            context.SetTraceContext(activity.Context);
-
-            try
-            {
-                // tag spec: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
-
-                // application tags
-                foreach (var tag in options.TracingTags)
-                    activity.SetTag(tag.Key, tag.Value);
-
-                // request
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcMethod, context.ServiceContext.MethodType.ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcSystem, "grpc");
-                activity.SetTag(SemanticConventions.AttributeRpcService, context.ServiceContext.ServiceType.Name);
-                activity.SetTag(SemanticConventions.AttributeRpcMethod, $"/{context.Path}");
-                activity.SetTag(SemanticConventions.AttributeHttpHost, context.ServiceContext.CallContext.Host);
-                activity.SetTag(SemanticConventions.AttributeHttpUrl, context.ServiceContext.CallContext.Host + $"/{context.Path}");
-                activity.SetTag(SemanticConventions.AttributeHttpUserAgent, context.ServiceContext.CallContext.RequestHeaders.GetValue("user-agent"));
-                activity.SetTag(SemanticConventions.AttributeMessageType, "RECIEVED");
-                activity.SetTag(SemanticConventions.AttributeMessageId, context.ServiceContext.ContextId.ToString());
-                activity.SetTag(SemanticConventions.AttributeMessageUncompressedSize, context.Request.Length.ToString());
-
-                activity.SetTag(SemanticConventions.AttributeMagicOnionPeerName, context.ServiceContext.CallContext.Peer);
-                activity.SetTag(SemanticConventions.AttributeMagicOnionAuthEnabled, (!string.IsNullOrEmpty(context.ServiceContext.CallContext.AuthContext.PeerIdentityPropertyName)).ToString());
-                activity.SetTag(SemanticConventions.AttributeMagicOnionAuthPeerAuthenticated, context.ServiceContext.CallContext.AuthContext.IsPeerAuthenticated.ToString());
-
-                await next(context);
-
-                // response
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(context.ServiceContext.CallContext.Status.StatusCode));
-            }
-            catch (Exception ex)
-            {
-                activity.SetTag(SemanticConventions.AttributeException, ex.ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusCode, ((long)context.ServiceContext.CallContext.Status.StatusCode).ToString());
-                activity.SetTag(SemanticConventions.AttributeRpcGrpcStatusDetail, context.ServiceContext.CallContext.Status.Detail);
-                activity.SetStatus(OpenTelemetryHelper.GrpcToOpenTelemetryStatus(Grpc.Core.StatusCode.Internal));
-                throw;
-            }
+            SetActivity(rpcActivity);
         }
 
-        private static readonly Func<Metadata, string, IEnumerable<string>> MetadataGetter = (metadata, key) =>
+        /// <summary>
+        /// Restores the parent activity.
+        /// </summary>
+        public void RestoreParentActivity()
         {
-            for (var i = 0; i < metadata.Count; i++)
-            {
-                var entry = metadata[i];
-                if (entry.Key.Equals(key))
-                {
-                    return new string[1] { entry.Value };
-                }
-            }
-
-            return Enumerable.Empty<string>();
-        };
+            Activity.Current = this.ParentActivity;
+        }
     }
 }
