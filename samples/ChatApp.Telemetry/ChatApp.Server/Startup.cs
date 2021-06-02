@@ -74,7 +74,7 @@ namespace ChatApp.Server
                 });
 
             // additional Tracer for user's own service.
-            services.AddAdditionalTracer(Configuration, new[] { "chatapp.s2s", "mysql", "redis" });
+            services.AddAdditionalTracer(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -108,8 +108,9 @@ namespace ChatApp.Server
 
     public static class TelemetryExtensions
     {
-        public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration, string[] serviceNames)
+        public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration)
         {
+            var serviceNames = new[] { "chatapp.server.s2s", "mysql", "redis" };
             var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
             foreach (var service in serviceNames)
             {
@@ -125,6 +126,7 @@ namespace ChatApp.Server
                     case "zipkin":
                         OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
                             .AddZipkinExporter()
                             .Build();
                         break;

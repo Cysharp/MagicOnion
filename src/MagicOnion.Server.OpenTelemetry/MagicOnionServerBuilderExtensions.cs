@@ -42,7 +42,6 @@ namespace MagicOnion.Server.OpenTelemetry
             var serviceProvider = builder.Services.BuildServiceProvider();
             var activityName = MagicOnionInstrumentation.ActivitySourceName;
 
-
             // Configure OpenTelemetry Tracer
             if (configureTracerProvider != null)
             {

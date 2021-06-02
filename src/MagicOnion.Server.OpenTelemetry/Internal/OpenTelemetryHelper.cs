@@ -2,7 +2,7 @@ using Grpc.Core;
 
 namespace MagicOnion.Server.OpenTelemetry.Internal
 {
-    public static class OpenTelemetryHelper
+    internal static class OpenTelemetryHelper
     {
         /// <summary>
         /// Convert gRPC StatusCode to OpenTelemetry Status.

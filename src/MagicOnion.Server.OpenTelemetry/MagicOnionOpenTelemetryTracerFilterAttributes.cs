@@ -40,7 +40,7 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
-            using var rpcScope = new ServerRpcScope(context.ServiceType.Name, context.CallContext.Method.TrimStart('/'), context.CallContext, source);
+            using var rpcScope = new ServerRpcScope(context.ServiceType.Name, context.CallContext.Method.TrimStart('/'), context.CallContext, source, options);
 
             if (options.ExposeRpcScope)
             {
@@ -114,7 +114,7 @@ namespace MagicOnion.Server.OpenTelemetry
 
         public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
         {
-            using var rpcScope = new ServerRpcScope(context.ServiceContext.ServiceType.Name, context.Path, context.ServiceContext.CallContext, source);
+            using var rpcScope = new ServerRpcScope(context.ServiceContext.ServiceType.Name, context.Path, context.ServiceContext.CallContext, source, options);
 
             if (options.ExposeRpcScope)
             {
@@ -161,8 +161,8 @@ namespace MagicOnion.Server.OpenTelemetry
 
     internal class ServerRpcScope : RpcScope
     {
-
-        public ServerRpcScope(string rpcService, string rpcMethod, ServerCallContext context, ActivitySource source) : base(rpcService, rpcMethod)
+        public ServerRpcScope(string rpcService, string rpcMethod, ServerCallContext context, ActivitySource source, MagicOnionOpenTelemetryOptions options) 
+            : base(rpcService, rpcMethod, options.ServiceName)
         {
             // activity may be null if "no one is listening" or "all listener returns ActivitySamplingResult.None in Sample or SampleUsingParentId callback".
             if (!source.HasListeners())

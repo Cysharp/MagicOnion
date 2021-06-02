@@ -1,6 +1,5 @@
 using MagicOnion;
 using MagicOnion.Server;
-using MessagePack;
 using MicroServer.Shared;
 using System;
 using System.Threading.Tasks;

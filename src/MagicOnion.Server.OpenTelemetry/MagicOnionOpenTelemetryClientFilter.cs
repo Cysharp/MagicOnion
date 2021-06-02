@@ -27,7 +27,7 @@ namespace MagicOnion.Server.OpenTelemetry
         public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
         {
             var rpcService = context.MethodPath.Split('/')[0];
-            using var rpcScope = new ClientRpcScope(rpcService, context.MethodPath, context, source);
+            using var rpcScope = new ClientRpcScope(rpcService, context.MethodPath, context, source, options);
             rpcScope.SetTags(options.TracingTags);
 
             try
@@ -51,7 +51,8 @@ namespace MagicOnion.Server.OpenTelemetry
 
     internal class ClientRpcScope : RpcScope
     {
-        public ClientRpcScope(string rpcService, string rpcMethod, RequestContext context, ActivitySource source) : base(rpcService, rpcMethod)
+        public ClientRpcScope(string rpcService, string rpcMethod, RequestContext context, ActivitySource source, MagicOnionOpenTelemetryOptions options)
+            : base(rpcService, rpcMethod, options.ServiceName)
         {
             // capture the current activity
             this.ParentActivity = Activity.Current;

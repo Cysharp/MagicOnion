@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace MagicOnion.Server.OpenTelemetry
@@ -9,13 +8,19 @@ namespace MagicOnion.Server.OpenTelemetry
     public class MagicOnionOpenTelemetryOptions
     {
         /// <summary>
-        /// Application specific OpenTelemetry Tracing tags
+        /// ServiceName for Tracer. Especially Zipkin use service.name tag to identify service name.
         /// </summary>
-        public Dictionary<string, string> TracingTags { get; set; } = new Dictionary<string, string>();
+        /// <remarks>input to tag `service.name`</remarks>
+        public string ServiceName { get; set; }
 
         /// <summary>
         /// Expose RpsScope to the ServiceContext.Items. RpsScope key begin with .TraceContext
         /// </summary>
         public bool ExposeRpcScope { get; set; } = true;
+
+        /// <summary>
+        /// Application specific OpenTelemetry Tracing tags
+        /// </summary>
+        public Dictionary<string, string> TracingTags { get; set; } = new Dictionary<string, string>();
     }
 }

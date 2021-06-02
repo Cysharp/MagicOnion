@@ -6,6 +6,7 @@ namespace MagicOnion.Server.OpenTelemetry.Internal
     internal static class SemanticConventions
     {
         // tag spec: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md#grpc
+        public const string AttributeServiceName = "service.name";
         public const string AttributeException = "exception";
 
         public const string AttributeHttpHost = "http.host";

@@ -65,3 +65,14 @@ services:
     ports:
       - 6831:6831/udp # client post
       - 16686:16686 # web
+
+  # Server to Server
+  microserver:
+    image: cysharp/magiconion_sample_chatapp_microserver:4.3.1-1.0.0.rc4
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - UseExporter=jaeger
+      - Jaeger__AgentHost=jaeger
+      - Zipkin__Endpoint=http://zipkin:9411/api/v2/spans
+    ports:
+      - 4999:80

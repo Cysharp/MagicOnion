@@ -26,12 +26,14 @@ namespace MagicOnion.Server.OpenTelemetry
 
         protected string RpcService { get; }
         protected string RpcMethod { get; }
+        protected string ServiceName { get; }
         protected Activity ParentActivity { get; set; }
 
-        protected RpcScope(string rpcService, string rpcMethod)
+        protected RpcScope(string rpcService, string rpcMethod, string serviceName)
         {
             RpcService = rpcService;
             RpcMethod = rpcMethod;
+            ServiceName = serviceName;
         }
 
         /// <summary>
@@ -96,6 +98,7 @@ namespace MagicOnion.Server.OpenTelemetry
                 return;
             }
 
+            this.activity.SetTag(SemanticConventions.AttributeServiceName, ServiceName);
             this.activity.SetTag(SemanticConventions.AttributeRpcSystem, "grpc");
             this.activity.SetTag(SemanticConventions.AttributeRpcService, RpcService);
             this.activity.SetTag(SemanticConventions.AttributeRpcMethod, RpcMethod);

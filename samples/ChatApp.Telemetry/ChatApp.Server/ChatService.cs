@@ -24,7 +24,7 @@ namespace ChatApp.Server
         {
             this.options = options;
             this.mysqlSource = backendActivity.Get("mysql");
-            this.s2sSource = backendActivity.Get("chatapp.s2s");
+            this.s2sSource = backendActivity.Get("chatapp.server.s2s");
             this.logger = logger;
         }
 
@@ -35,6 +35,7 @@ namespace ChatApp.Server
             using (var activity = this.mysqlSource.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
+                activity.SetTag("service.name", options.ServiceName);
                 activity.SetTag("table", "errors");
                 activity.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
@@ -50,13 +51,14 @@ namespace ChatApp.Server
             using (var activity = this.mysqlSource.StartActivity("report/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
+                activity.SetTag("service.name", options.ServiceName);
                 activity.SetTag("table", "report");
                 activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
             }
 
             // Server to Server operation
-            var channel = GrpcChannel.ForAddress("http://localhost:4999");
+            var channel = GrpcChannel.ForAddress(Environment.GetEnvironmentVariable("Server2ServerEndpoint", EnvironmentVariableTarget.Process) ??  "http://localhost:4999");
             var client = MagicOnionClient.Create<IMessageService>(channel, new[]
             {
                 // propagate trace context from ChatApp.Server to MicroServer
@@ -68,6 +70,7 @@ namespace ChatApp.Server
             using (var activity = this.mysqlSource.StartActivity("report/get", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
+                activity.SetTag("service.name", options.ServiceName);
                 activity.SetTag("table", "report");
                 activity.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
