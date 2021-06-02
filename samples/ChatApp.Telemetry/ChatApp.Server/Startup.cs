@@ -112,6 +112,12 @@ namespace ChatApp.Server
             var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
             foreach (var service in BackendActivitySources.ExtraActivitySourceNames)
             {
+                // TODO: Known issue for Linux
+                // - Windows work as expected.
+                // - Linux has issues.
+                //     - Linux could not identify ServiceName on Zipkin.
+                //     - Linux can not co-work with Sdk.CreateTracerProviderBuilder() and IServiceCollection.AddOpenTelemetryTracing(). Only AddOpenTelemetryTracing() work.
+                //          - work around, if you can accept same service name, IServiceCollection.AddOpenTelemetryTracing().AddSource(mysql, redis and other) instread of Sdk.CreateTracerProviderBuilder().
                 switch (exporter)
                 {
                     case "jaeger":
