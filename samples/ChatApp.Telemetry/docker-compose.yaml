@@ -7,7 +7,9 @@ services:
       - 5000:80
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - UseExporter=jaeger
+      #- UseExporter=jaeger
+      - UseExporter=zipkin
       - Jaeger__AgentHost=jaeger
       - Zipkin__Endpoint=http://zipkin:9411/api/v2/spans
       - Server2ServerEndpoint=http://microserver:80
+      - OTEL_LOG_LEVEL=debug

@@ -61,7 +61,8 @@ services:
       - 9411:9411
 
   jaeger:
-    image: jaegertracing/all-in-one:1.20
+    image: jaegertracing/all-in-one:1.22
+    command: --log-level=debug
     ports:
       - 6831:6831/udp # client post
       - 16686:16686 # web
