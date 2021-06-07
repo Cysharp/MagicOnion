@@ -16,10 +16,10 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <param name="builder"></param>
         /// <param name="overrideServiceName"></param>
         /// <returns></returns>
-        public static IMagicOnionServerBuilder UseOpenTelemetry(this IMagicOnionServerBuilder builder, string overrideServiceName = "")
+        public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder, string overrideServiceName = "")
         {
             var options = CreateDefaultOptions(builder, overrideServiceName);
-            return UseOpenTelemetry(builder, options);
+            return AddOpenTelemetry(builder, options);
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace MagicOnion.Server.OpenTelemetry
         /// <param name="builder"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IMagicOnionServerBuilder UseOpenTelemetry(this IMagicOnionServerBuilder builder, MagicOnionOpenTelemetryOptions options)
+        public static IMagicOnionServerBuilder AddOpenTelemetry(this IMagicOnionServerBuilder builder, MagicOnionOpenTelemetryOptions options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
             if (builder == null) throw new ArgumentNullException(nameof(builder));

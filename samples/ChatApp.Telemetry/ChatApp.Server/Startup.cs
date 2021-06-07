@@ -38,7 +38,7 @@ namespace ChatApp.Server
                     // Exception Filter enable Telemetry to know which gRPC Error happen.
                     options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
-                .UseOpenTelemetry(); // Listen OpenTelemetry Activity
+                .AddOpenTelemetry(); // Listen OpenTelemetry Activity
 
             // Configure OpenTelemetry as usual.
             services.AddOpenTelemetryTracing(configure =>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OpenTelemetry.Trace;
 using MagicOnion.Server.OpenTelemetry.Internal;
 
@@ -6,8 +6,7 @@ namespace MagicOnion.Server.OpenTelemetry
 {
     public static class TracerProviderBuilderExtensions
     {
-        public static TracerProviderBuilder AddMagicOnionInstrumentation(
-            this TracerProviderBuilder builder)
+        public static TracerProviderBuilder AddMagicOnionInstrumentation(this TracerProviderBuilder builder)
         {
             if (builder == null)
             {

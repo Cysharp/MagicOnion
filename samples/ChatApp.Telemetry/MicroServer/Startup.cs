@@ -32,7 +32,7 @@ namespace MicroServer
 
                     options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
-                .UseOpenTelemetry();
+                .AddOpenTelemetry();
 
             services.AddOpenTelemetryTracing(configure => 
             { 
