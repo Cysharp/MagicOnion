@@ -35,42 +35,49 @@ namespace ChatApp.Server
                     // Exception Filter is inside telemetry
                     options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
-                .AddOpenTelemetry((options, provider, tracerBuilder) =>
+                .AddOpenTelemetry(); // Listen OpenTelemetry Activity
+
+            // Configure OpenTelemetry as usual.
+            services.AddOpenTelemetryTracing(configure =>
+            {
+                // Switch between Jaeger/Zipkin by setting UseExporter in appsettings.json.
+                var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
+                switch (exporter)
                 {
-                    // Switch between Jaeger/Zipkin by setting UseExporter in appsettings.json.
-                    var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-                    switch (exporter)
-                    {
-                        case "jaeger":
-                            tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(options.ServiceName))
-                                .AddAspNetCoreInstrumentation()
-                                .AddJaegerExporter();
-                            // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
-                            services.Configure<OpenTelemetry.Exporter.JaegerExporterOptions>(Configuration.GetSection("Jaeger"));
-                            break;
-                        case "zipkin":
-                            tracerBuilder
-                                .AddSource(BackendActivitySources.ExtraActivitySourceNames)
-                                .AddAspNetCoreInstrumentation()
-                                .AddZipkinExporter();
-                            // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
-                            services.Configure<OpenTelemetry.Exporter.ZipkinExporterOptions>(this.Configuration.GetSection("Zipkin"));
-                            break;
-                        default:
-                            // ConsoleExporter will show current tracer activity
-                            tracerBuilder
-                                .AddSource(BackendActivitySources.ExtraActivitySourceNames)
-                                .AddAspNetCoreInstrumentation()
-                                .AddConsoleExporter();
-                            services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
-                            services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(options =>
-                            {
-                                options.Filter = (req) => req.Request?.Host != null;
-                            });
-                            break;
-                    }
-                });
+                    case "jaeger":
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
+                            .AddJaegerExporter();
+                        // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
+                        services.Configure<OpenTelemetry.Exporter.JaegerExporterOptions>(Configuration.GetSection("Jaeger"));
+                        break;
+                    case "zipkin":
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            //.AddSource(BackendActivitySources.ExtraActivitySourceNames)
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
+                            .AddZipkinExporter();
+                        // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
+                        services.Configure<OpenTelemetry.Exporter.ZipkinExporterOptions>(this.Configuration.GetSection("Zipkin"));
+                        break;
+                    default:
+                        // ConsoleExporter will show current tracer activity
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
+                            .AddConsoleExporter();
+                        services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
+                        services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(options =>
+                        {
+                            options.Filter = (req) => req.Request?.Host != null;
+                        });
+                        break;
+                }
+            });
 
             // additional Tracer for user's own service.
             services.AddAdditionalTracer(Configuration);
