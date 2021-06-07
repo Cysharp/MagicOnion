@@ -26,13 +26,16 @@ namespace ChatApp.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // OpenTelemetry Require set of Listener + Instrumentation.
+            // - Listener will add via services.AddMagicOnion().UseOpenTelemetry()
+            // - Instrumentation will add via TraceProviderBuilder.AddMagicOnionInstrumentation()
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
             services.AddMagicOnion(options =>
                 {
                     options.GlobalFilters.Add(new MagicOnionOpenTelemetryTracerFilterFactoryAttribute());
                     options.GlobalStreamingHubFilters.Add(new MagicOnionOpenTelemetryStreamingTracerFilterFactoryAttribute());
 
-                    // Exception Filter is inside telemetry
+                    // Exception Filter enable Telemetry to know which gRPC Error happen.
                     options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
                 .UseOpenTelemetry(); // Listen OpenTelemetry Activity
@@ -50,7 +53,7 @@ namespace ChatApp.Server
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
                             .AddAspNetCoreInstrumentation()
-                            .AddMagicOnionInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
                             .AddJaegerExporter();
                         services.Configure<OpenTelemetry.Exporter.JaegerExporterOptions>(Configuration.GetSection("Jaeger"));
                         break;
@@ -60,7 +63,7 @@ namespace ChatApp.Server
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
                             .AddAspNetCoreInstrumentation()
-                            .AddMagicOnionInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
                             .AddZipkinExporter();
                         services.Configure<OpenTelemetry.Exporter.ZipkinExporterOptions>(this.Configuration.GetSection("Zipkin"));
                         break;
@@ -69,7 +72,7 @@ namespace ChatApp.Server
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
                             .AddAspNetCoreInstrumentation()
-                            .AddMagicOnionInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
                             .AddConsoleExporter();
                         services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
                         services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(options =>

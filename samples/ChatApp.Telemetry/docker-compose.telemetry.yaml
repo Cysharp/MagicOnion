@@ -56,7 +56,7 @@ services:
 
   # TRACING
   zipkin:
-    image: openzipkin/zipkin:2.22
+    image: openzipkin/zipkin:2.23
     ports:
       - 9411:9411
 

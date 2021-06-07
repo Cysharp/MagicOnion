@@ -30,15 +30,12 @@ namespace MicroServer
                     options.GlobalFilters.Add(new MagicOnionOpenTelemetryTracerFilterFactoryAttribute());
                     options.GlobalStreamingHubFilters.Add(new MagicOnionOpenTelemetryStreamingTracerFilterFactoryAttribute());
 
-                    // Exception Filter is inside telemetry
                     options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
                 .UseOpenTelemetry();
 
-            // Configure OpenTelemetry as usual.
             services.AddOpenTelemetryTracing(configure => 
             { 
-                // Switch between Jaeger/Zipkin by setting UseExporter in appsettings.json.
                 var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
                 switch (exporter)
                 {
@@ -46,23 +43,23 @@ namespace MicroServer
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
                             .AddJaegerExporter();
-                        // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
                         services.Configure<OpenTelemetry.Exporter.JaegerExporterOptions>(Configuration.GetSection("Jaeger"));
                         break;
                     case "zipkin":
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
                             .AddZipkinExporter();
-                        // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
                         services.Configure<OpenTelemetry.Exporter.ZipkinExporterOptions>(this.Configuration.GetSection("Zipkin"));
                         break;
                     default:
-                        // ConsoleExporter will show current tracer activity
                         configure
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation()
                             .AddConsoleExporter();
                         services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
                         services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(options =>
