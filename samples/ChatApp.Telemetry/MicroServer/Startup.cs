@@ -44,7 +44,7 @@ namespace MicroServer
                 {
                     case "jaeger":
                         configure
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
                             .AddJaegerExporter();
                         // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Jaeger/JaegerExporterOptions.cs
@@ -52,7 +52,7 @@ namespace MicroServer
                         break;
                     case "zipkin":
                         configure
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
                             .AddZipkinExporter();
                         // https://github.com/open-telemetry/opentelemetry-dotnet/blob/21c1791e8e2bdb292ff87b044d2b92e9851dbab9/src/OpenTelemetry.Exporter.Zipkin/ZipkinExporterOptions.cs
@@ -61,7 +61,7 @@ namespace MicroServer
                     default:
                         // ConsoleExporter will show current tracer activity
                         configure
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("microserver"))
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("MicroServer"))
                             .AddAspNetCoreInstrumentation()
                             .AddConsoleExporter();
                         services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));

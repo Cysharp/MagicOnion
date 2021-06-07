@@ -27,7 +27,6 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
       <PackageReference Include="OpenTelemetry" Version="1.1.0-beta2" />
-      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc4" />
     </ItemGroup>
 
     <ItemGroup>
