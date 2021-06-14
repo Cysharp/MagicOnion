@@ -1,4 +1,5 @@
-﻿using Grpc.Core.Logging;
+#if !USE_GRPC_NET_CLIENT
+using Grpc.Core.Logging;
 using System;
 
 namespace MagicOnion
@@ -155,3 +156,4 @@ namespace MagicOnion
         }
     }
 }
+#endif

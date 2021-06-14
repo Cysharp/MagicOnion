@@ -7,6 +7,9 @@ using Cysharp.Threading.Tasks;
 using Channel = Grpc.Core.Channel;
 #endif
 using Grpc.Core;
+#if USE_GRPC_NET_CLIENT
+using Grpc.Net.Client;
+#endif
 using MagicOnion.Client;
 using UnityEditor;
 using UnityEngine;
@@ -70,7 +73,16 @@ namespace MagicOnion.Unity.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={channel.ChannelState})", EditorStyles.boldLabel);
+#if !USE_GRPC_NET_CLIENT_ONLY
+                        if (diagInfo.UnderlyingChannel is Channel grpcCCoreChannel)
+                        {
+                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={grpcCCoreChannel.State})", EditorStyles.boldLabel);
+                        }
+                        else
+#endif
+                        {
+                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target})", EditorStyles.boldLabel);
+                        }
                         if (GUILayout.Button("...", GUILayout.ExpandWidth(false)))
                         {
                             var menu = new GenericMenu();
@@ -129,18 +141,37 @@ namespace MagicOnion.Unity.Editor
                         {
                             var prevLabelWidth = EditorGUIUtility.labelWidth;
                             EditorGUIUtility.labelWidth = 350;
-                            foreach (var option in diagInfo.ChannelOptions)
+
+#if USE_GRPC_NET_CLIENT
                             {
-                                if (option.Type == ChannelOption.OptionType.Integer)
+                                if (diagInfo.ChannelOptions.TryGet<GrpcChannelOptions>(out var channelOptions))
                                 {
-                                    EditorGUILayout.IntField(option.Name, option.IntValue);
-                                }
-                                else
-                                {
-                                    EditorGUILayout.TextField(option.Name, option.StringValue);
+                                    EditorGUILayout.IntField(nameof(channelOptions.MaxReceiveMessageSize), channelOptions.MaxReceiveMessageSize ?? -1);
+                                    EditorGUILayout.IntField(nameof(channelOptions.MaxRetryAttempts), channelOptions.MaxRetryAttempts ?? -1);
+                                    EditorGUILayout.LongField(nameof(channelOptions.MaxRetryBufferPerCallSize), channelOptions.MaxRetryBufferPerCallSize ?? -1);
+                                    EditorGUILayout.LongField(nameof(channelOptions.MaxRetryBufferSize), channelOptions.MaxRetryBufferSize ?? -1);
+                                    EditorGUILayout.LongField(nameof(channelOptions.MaxSendMessageSize), channelOptions.MaxSendMessageSize ?? -1);
                                 }
                             }
-
+#endif
+#if !USE_GRPC_NET_CLIENT_ONLY
+                            {
+                                if (diagInfo.ChannelOptions.TryGet<IReadOnlyList<ChannelOption>>(out var channelOptions))
+                                {
+                                    foreach (var option in diagInfo.ChannelOptions.Get<IReadOnlyList<ChannelOption>>())
+                                    {
+                                        if (option.Type == ChannelOption.OptionType.Integer)
+                                        {
+                                            EditorGUILayout.IntField(option.Name, option.IntValue);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.TextField(option.Name, option.StringValue);
+                                        }
+                                    }
+                                }
+                            }
+#endif
                             EditorGUIUtility.labelWidth = prevLabelWidth;
                         }
                     }
