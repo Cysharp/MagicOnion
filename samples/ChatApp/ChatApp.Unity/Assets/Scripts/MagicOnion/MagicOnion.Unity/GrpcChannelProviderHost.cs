@@ -50,7 +50,7 @@ namespace MagicOnion.Unity
 
         private void InitializeCore(IGrpcChannelProvider provider)
         {
-            Provider = provider ?? new DefaultGrpcChannelProvider(Array.Empty<ChannelOption>());
+            Provider = provider ?? new DefaultGrpcChannelProvider();
             GrpcChannelProvider.SetDefaultProvider(Provider);
         }
 
