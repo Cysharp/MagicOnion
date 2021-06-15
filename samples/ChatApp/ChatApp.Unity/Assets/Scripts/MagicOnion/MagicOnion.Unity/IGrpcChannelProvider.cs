@@ -51,27 +51,11 @@ namespace MagicOnion.Unity
 
     public class GrpcChannelOptionsBag
     {
-#if USE_GRPC_NET_CLIENT
-        private readonly GrpcChannelOptions _grpcChannelOptions;
-#endif
-#if !USE_GRPC_NET_CLIENT_ONLY
-        private readonly IReadOnlyList<ChannelOption> _grpcCChanelOptions;
-#endif
+        private readonly object _options;
 
         public GrpcChannelOptionsBag(object options)
         {
-#if USE_GRPC_NET_CLIENT
-            if (options is GrpcChannelOptions)
-            {
-                _grpcChannelOptions = (GrpcChannelOptions)options;
-            }
-#endif
-#if !USE_GRPC_NET_CLIENT_ONLY
-            if (options is IReadOnlyList<ChannelOption>)
-            {
-                _grpcCChanelOptions = (IReadOnlyList<ChannelOption>)options;
-            }
-#endif
+            _options = options;
         }
 
         public T Get<T>()
@@ -81,22 +65,37 @@ namespace MagicOnion.Unity
 
         public bool TryGet<T>(out T value)
         {
-#if USE_GRPC_NET_CLIENT
-            if (typeof(T) == typeof(GrpcChannelOptions) && _grpcChannelOptions != null)
+            if (_options is T optionT)
             {
-                value = (T)(object)_grpcChannelOptions;
+                value = optionT;
                 return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public IEnumerable<KeyValuePair<string, object>> GetValues()
+        {
+#if USE_GRPC_NET_CLIENT
+            if (TryGet<GrpcChannelOptions>(out var grpcChannelOptions))
+            {
+                yield return new KeyValuePair<string, object>(nameof(grpcChannelOptions.MaxReceiveMessageSize), grpcChannelOptions.MaxReceiveMessageSize ?? -1);
+                yield return new KeyValuePair<string, object>(nameof(grpcChannelOptions.MaxRetryAttempts), grpcChannelOptions.MaxRetryAttempts ?? -1);
+                yield return new KeyValuePair<string, object>(nameof(grpcChannelOptions.MaxRetryBufferPerCallSize), grpcChannelOptions.MaxRetryBufferPerCallSize ?? -1);
+                yield return new KeyValuePair<string, object>(nameof(grpcChannelOptions.MaxRetryBufferSize), grpcChannelOptions.MaxRetryBufferSize ?? -1);
+                yield return new KeyValuePair<string, object>(nameof(grpcChannelOptions.MaxSendMessageSize), grpcChannelOptions.MaxSendMessageSize ?? -1);
             }
 #endif
 #if !USE_GRPC_NET_CLIENT_ONLY
-            if (typeof(T) == typeof(IReadOnlyList<ChannelOption>) && _grpcCChanelOptions != null)
+            if (TryGet<IReadOnlyList<ChannelOption>>(out var channelOptionsForCCore))
             {
-                value = (T)(object)_grpcCChanelOptions;
-                return true;
+                foreach (var channelOption in channelOptionsForCCore)
+                {
+                    yield return new KeyValuePair<string, object>(channelOption.Name, channelOption.Type == ChannelOption.OptionType.Integer ? (object)channelOption.IntValue : channelOption.StringValue);
+                }
             }
 #endif
-            value = default;
-            return false;
         }
     }
 }

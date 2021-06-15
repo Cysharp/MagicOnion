@@ -129,7 +129,7 @@ namespace MagicOnion.Unity
             return channelHolder;
         }
 
-        protected void RegisterChannel(GrpcChannelx channel)
+        private void RegisterChannel(GrpcChannelx channel)
         {
             lock (_channels)
             {
@@ -264,8 +264,6 @@ namespace MagicOnion.Unity
                 new Uri((context.Target.ChannelCredentials == ChannelCredentials.Insecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}"),
                 new GrpcChannelOptionsBag(channelOptions)
             );
-
-            RegisterChannel(channelHolder);
 
             return channelHolder;
         }

@@ -142,36 +142,22 @@ namespace MagicOnion.Unity.Editor
                             var prevLabelWidth = EditorGUIUtility.labelWidth;
                             EditorGUIUtility.labelWidth = 350;
 
-#if USE_GRPC_NET_CLIENT
+                            foreach (var keyValue in diagInfo.ChannelOptions.GetValues())
                             {
-                                if (diagInfo.ChannelOptions.TryGet<GrpcChannelOptions>(out var channelOptions))
+                                if (keyValue.Value is int intValue)
                                 {
-                                    EditorGUILayout.IntField(nameof(channelOptions.MaxReceiveMessageSize), channelOptions.MaxReceiveMessageSize ?? -1);
-                                    EditorGUILayout.IntField(nameof(channelOptions.MaxRetryAttempts), channelOptions.MaxRetryAttempts ?? -1);
-                                    EditorGUILayout.LongField(nameof(channelOptions.MaxRetryBufferPerCallSize), channelOptions.MaxRetryBufferPerCallSize ?? -1);
-                                    EditorGUILayout.LongField(nameof(channelOptions.MaxRetryBufferSize), channelOptions.MaxRetryBufferSize ?? -1);
-                                    EditorGUILayout.LongField(nameof(channelOptions.MaxSendMessageSize), channelOptions.MaxSendMessageSize ?? -1);
+                                    EditorGUILayout.IntField(keyValue.Key, intValue);
+                                }
+                                else if (keyValue.Value is long longValue)
+                                {
+                                    EditorGUILayout.LongField(keyValue.Key, longValue);
+                                }
+                                else
+                                {
+                                    EditorGUILayout.TextField(keyValue.Key, keyValue.Value?.ToString() ?? "");
                                 }
                             }
-#endif
-#if !USE_GRPC_NET_CLIENT_ONLY
-                            {
-                                if (diagInfo.ChannelOptions.TryGet<IReadOnlyList<ChannelOption>>(out var channelOptions))
-                                {
-                                    foreach (var option in diagInfo.ChannelOptions.Get<IReadOnlyList<ChannelOption>>())
-                                    {
-                                        if (option.Type == ChannelOption.OptionType.Integer)
-                                        {
-                                            EditorGUILayout.IntField(option.Name, option.IntValue);
-                                        }
-                                        else
-                                        {
-                                            EditorGUILayout.TextField(option.Name, option.StringValue);
-                                        }
-                                    }
-                                }
-                            }
-#endif
+
                             EditorGUIUtility.labelWidth = prevLabelWidth;
                         }
                     }
