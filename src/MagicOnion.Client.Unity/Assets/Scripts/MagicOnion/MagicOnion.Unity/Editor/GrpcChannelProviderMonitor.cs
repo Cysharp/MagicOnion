@@ -7,6 +7,9 @@ using Cysharp.Threading.Tasks;
 using Channel = Grpc.Core.Channel;
 #endif
 using Grpc.Core;
+#if USE_GRPC_NET_CLIENT
+using Grpc.Net.Client;
+#endif
 using MagicOnion.Client;
 using UnityEditor;
 using UnityEngine;
@@ -70,7 +73,16 @@ namespace MagicOnion.Unity.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={channel.ChannelState})", EditorStyles.boldLabel);
+#if !USE_GRPC_NET_CLIENT_ONLY
+                        if (diagInfo.UnderlyingChannel is Channel grpcCCoreChannel)
+                        {
+                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={grpcCCoreChannel.State})", EditorStyles.boldLabel);
+                        }
+                        else
+#endif
+                        {
+                            EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target})", EditorStyles.boldLabel);
+                        }
                         if (GUILayout.Button("...", GUILayout.ExpandWidth(false)))
                         {
                             var menu = new GenericMenu();
@@ -129,15 +141,20 @@ namespace MagicOnion.Unity.Editor
                         {
                             var prevLabelWidth = EditorGUIUtility.labelWidth;
                             EditorGUIUtility.labelWidth = 350;
-                            foreach (var option in diagInfo.ChannelOptions)
+
+                            foreach (var keyValue in diagInfo.ChannelOptions.GetValues())
                             {
-                                if (option.Type == ChannelOption.OptionType.Integer)
+                                if (keyValue.Value is int intValue)
                                 {
-                                    EditorGUILayout.IntField(option.Name, option.IntValue);
+                                    EditorGUILayout.IntField(keyValue.Key, intValue);
+                                }
+                                else if (keyValue.Value is long longValue)
+                                {
+                                    EditorGUILayout.LongField(keyValue.Key, longValue);
                                 }
                                 else
                                 {
-                                    EditorGUILayout.TextField(option.Name, option.StringValue);
+                                    EditorGUILayout.TextField(keyValue.Key, keyValue.Value?.ToString() ?? "");
                                 }
                             }
 
