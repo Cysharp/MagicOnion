@@ -88,9 +88,9 @@ namespace MagicOnion.Unity
             }
 #endif
 #if !USE_GRPC_NET_CLIENT_ONLY
-            if (TryGet<IReadOnlyList<ChannelOption>>(out var channelOptionsForCCore))
+            if (TryGet<GrpcCCoreChannelOptions>(out var channelOptionsForCCore))
             {
-                foreach (var channelOption in channelOptionsForCCore)
+                foreach (var channelOption in channelOptionsForCCore.ChannelOptions)
                 {
                     yield return new KeyValuePair<string, object>(channelOption.Name, channelOption.Type == ChannelOption.OptionType.Integer ? (object)channelOption.IntValue : channelOption.StringValue);
                 }

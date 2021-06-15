@@ -31,7 +31,13 @@ namespace Assets.Scripts
         public static void OnRuntimeInitialize()
         {
             // Initialize gRPC channel provider when the application is loaded.
-            GrpcChannelProviderHost.Initialize(new DefaultGrpcChannelProvider(new GrpcCCoreChannelOptions()));
+            GrpcChannelProviderHost.Initialize(new DefaultGrpcChannelProvider(new GrpcCCoreChannelOptions(new[]
+            {
+                // send keepalive ping every 5 second, default is 2 hours
+                new ChannelOption("grpc.keepalive_time_ms", 5000),
+                // keepalive ping time out after 5 seconds, default is 20 seconds
+                new ChannelOption("grpc.keepalive_timeout_ms", 5 * 1000),
+            })));
 
             // NOTE: If you want to use self-signed certificate for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
