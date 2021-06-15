@@ -168,7 +168,7 @@ namespace MagicOnion.Unity
     public class DefaultGrpcChannelProvider : GrpcNetClientGrpcChannelProvider
     {
         public DefaultGrpcChannelProvider() : base() {}
-        public DefaultGrpcChannelProvider(Func<GrpcChannelOptions> channelOptionsFactory) : base(channelOptions) {}
+        public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) {}
     }
 #else
     public class DefaultGrpcChannelProvider : GrpcCCoreGrpcChannelProvider

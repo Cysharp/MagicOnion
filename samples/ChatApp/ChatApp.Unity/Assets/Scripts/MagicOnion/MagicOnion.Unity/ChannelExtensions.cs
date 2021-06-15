@@ -1,4 +1,4 @@
-#if !USE_GRPC_NET_CLIENT
+#if !USE_GRPC_NET_CLIENT_ONLY
 using Grpc.Core;
 using System;
 using System.Collections.Generic;
