@@ -519,7 +519,7 @@ public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
 
 Register filters using attributes with constructor injection(you can use `[FromTypeFilter]` and `[FromServiceFilter]`).
 
-```
+```csharp
 [FromTypeFilter(typeof(MyFilterAttribute))]
 public class MyService : ServiceBase<IMyService>, IMyService
 {
