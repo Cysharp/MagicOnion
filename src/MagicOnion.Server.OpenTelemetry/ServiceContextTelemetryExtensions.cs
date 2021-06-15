@@ -1,54 +1,57 @@
-using MagicOnion.Server.OpenTelemetry;
 using MagicOnion.Server.Hubs;
-using System.Diagnostics;
-
-// ReSharper disable once CheckNamespace
+using MagicOnion.Server.OpenTelemetry.Internal;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
     public static class ServiceContextTelemetryExtensions
     {
         /// <summary>
-        /// Set the trace context with this service context
+        /// Set the trace scope with this service context.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="activityContext"></param>
-        internal static void SetTraceContext(this ServiceContext context, ActivityContext activityContext)
+        /// <param name="scope"></param>
+        internal static void SetTraceScope(this StreamingHubContext context, IRpcScope scope)
         {
-            context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace] = activityContext;
+            context.ServiceContext.Items[MagicOnionTelemetryConstants.ServiceContextItemKeyTrace + "." +  context.Path] = scope;
         }
 
         /// <summary>
-        /// Gets the trace context associated with this service context.
+        /// Set the trace scope with this service context. This allows user to add their tag directly to this activity.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="scope"></param>
+        internal static void SetTraceScope(this ServiceContext context, IRpcScope scope)
+        {
+            context.Items[MagicOnionTelemetryConstants.ServiceContextItemKeyTrace] = scope;
+        }
+
+        /// <summary>
+        /// Gets the trace scope associated with this service context.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static ActivityContext GetTraceContext(this ServiceContext context)
+        public static IRpcScope GetTraceScope(this ServiceContext context)
         {
-            return (ActivityContext)context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace];
+            if (context.Items.TryGetValue(MagicOnionTelemetryConstants.ServiceContextItemKeyTrace, out var scope))
+            {
+                return (IRpcScope)scope;
+            }
+            return default;
         }
-    }
-
-    public static class StreamingHubContextTelemetryExtensions
-    {
         /// <summary>
-        /// Set the trace context with this streaming hub context
+        /// Gets the trace scope associated with this service context.
         /// </summary>
+        /// <remarks>Add custom tag directly to this activity.</remarks>
         /// <param name="context"></param>
-        /// <param name="activityContext"></param>
-        internal static void SetTraceContext(this StreamingHubContext context, ActivityContext activityContext)
-        {
-            context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace] = activityContext;
-        }
-
-        /// <summary>
-        /// Gets the trace context associated with this streaming hub context.
-        /// </summary>
-        /// <param name="context"></param>
+        /// <param name="hubPath">IHubClass/MethodName</param>
         /// <returns></returns>
-        public static ActivityContext GetTraceContext(this StreamingHubContext context)
+        public static IRpcScope GetTraceScope(this ServiceContext context, string hubPath)
         {
-            return (ActivityContext)context.Items[MagicOnionTelemetry.ServiceContextItemKeyTrace];
+            if (context.Items.TryGetValue(MagicOnionTelemetryConstants.ServiceContextItemKeyTrace + "." + hubPath, out var scope))
+            {
+                return (IRpcScope)scope;
+            }
+            return default;
         }
     }
 }

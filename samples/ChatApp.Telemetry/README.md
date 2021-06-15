@@ -4,27 +4,24 @@ This is Sample to run MagicOnion with OpenTelemetry implementation.
 
 ## Getting started
 
-To run simple ChatApp.Server, 
+Option1. Run ChatApp.Server on VisualStudio, and run zipkin, jeager in docker.
 
 1. Run `docker-compose -f docker-compose.telemetry.yaml up`.
 1. Launch `ChatApp.Server.Telemetry` from VisualStudio.  
-1. Run `ChatScene` from UnityEditor.  
+1. Launch UnityEditor for `sample/ChatApp/ChatApp.Unity`, open `ChatScene` then do any operations.
 1. Access Telemery's Web UI.
 
-Server and Telemetries are fully containernized.
+Option2. Run all ChatApp.Server, zipkin and jeager in container
 
 1. Run `docker-compose -f docker-compose.yaml -f docker-compose.telemetry.yaml up`.
-1. Run `ChatScene` from UnityEditor. 
+1. Launch UnityEditor for `sample/ChatApp/ChatApp.Unity`, open `ChatScene` then do any operations.
 1. Access Telemery's Web UI.
 
-Telemetry's Web UI address.
+Telemetry's Web UI address. (default send to jeager)
 
 * [jaeger](http://localhost:16686/)
 * [zipkin](http://localhost:9411/)
-    * no data on default. you can switch with jaeger.
-* [prometheus](http://localhost:9090/)
-* [grafana](http://localhost:3000/)
-    * user/password is `admin/admin`.
+    * no data on default. you can switch by appsettings.json
 
 ## Projects
 
@@ -33,6 +30,8 @@ There are 3 projects for this sample.
 1. ChatApp.Server (samples/ChatApp.Telemetry/)
 1. ChatApp.Shared (samples/ChatApp.Telemetry/)
 1. ChatApp.Unity (samples/ChatApp/)
+
+and optional Server to Server 
 
 **ChatApp.Server** is Serverside MagicOnion implementation with OpenTelemetry. 
 

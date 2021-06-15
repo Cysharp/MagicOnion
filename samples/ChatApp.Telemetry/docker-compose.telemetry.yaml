@@ -1,23 +1,24 @@
 version: "3"
 
 services:
-  prometheus:
-    image: prom/prometheus:v2.22.2
-    volumes:
-      # persistent prometheus database
-      - ./docker/prometheus/data/:/prometheus
-      - ./docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./docker/prometheus/config/alert.rules:/etc/prometheus/alert.rules
-    ports:
-      - "9090:9090"
+  # METRICS: OpenTelemetry-Dotnet removed Metrics Codes from main branch. Let's comment out all untill publish.
+  # prometheus:
+  #   image: prom/prometheus:v2.22.2
+  #   volumes:
+  #     # persistent prometheus database
+  #     - ./docker/prometheus/data/:/prometheus
+  #     - ./docker/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./docker/prometheus/config/alert.rules:/etc/prometheus/alert.rules
+  #   ports:
+  #     - "9090:9090"
 
-  alertmanager:
-    image: prom/alertmanager:v0.21.0
-    volumes:
-      - ./docker/alertmanager/config.yml:/etc/alertmanager/config.yml
-    command: "--config.file=/etc/alertmanager/config.yml"
-    ports:
-      - 9093:9093
+  # alertmanager:
+  #   image: prom/alertmanager:v0.21.0
+  #   volumes:
+  #     - ./docker/alertmanager/config.yml:/etc/alertmanager/config.yml
+  #   command: "--config.file=/etc/alertmanager/config.yml"
+  #   ports:
+  #     - 9093:9093
 
   # # if you want monitor linux host machine, install node-exporter or use container.
   # # settings detail: https://qiita.com/kanga/items/21acb042237f8a27f437
@@ -31,35 +32,48 @@ services:
   #   pid: host
   #   command: quay.io/prometheus/node-exporter --path.rootfs /host
 
-  cAdvisor:
-    image: google/cadvisor:latest
-    volumes:
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
+  # cAdvisor:
+  #   image: google/cadvisor:latest
+  #   volumes:
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   ports:
+  #     - 8080:8080
 
-  grafana:
-    build:
-      context: .
-      dockerfile: ./docker/grafana/Dockerfile
-    depends_on:
-      - prometheus
-    volumes:
-      # persistent grafana database
-      - ./docker/grafana/data/:/var/lib/grafana
-      - ./docker/grafana/conf/provisioning/:/etc/grafana/provisioning/
-    ports:
-      - 3000:3000
+  # grafana:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/grafana/Dockerfile
+  #   depends_on:
+  #     - prometheus
+  #   volumes:
+  #     # persistent grafana database
+  #     - ./docker/grafana/data/:/var/lib/grafana
+  #     - ./docker/grafana/conf/provisioning/:/etc/grafana/provisioning/
+  #   ports:
+  #     - 3000:3000
 
+  # TRACING
   zipkin:
-    image: openzipkin/zipkin:2.22
+    image: openzipkin/zipkin:2.23
     ports:
       - 9411:9411
 
   jaeger:
-    image: jaegertracing/all-in-one:1.20
+    image: jaegertracing/all-in-one:1.22
+    command: --log-level=debug
     ports:
       - 6831:6831/udp # client post
       - 16686:16686 # web
+
+  # Server to Server
+  microserver:
+    image: cysharp/magiconion_sample_chatapp_microserver:4.3.1-1.0.0.rc4
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - UseExporter=jaeger
+      - Jaeger__AgentHost=jaeger
+      - Zipkin__Endpoint=http://zipkin:9411/api/v2/spans
+    ports:
+      - 4999:80

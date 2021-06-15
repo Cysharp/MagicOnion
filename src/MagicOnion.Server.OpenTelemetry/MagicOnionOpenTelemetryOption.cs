@@ -1,43 +1,26 @@
-using System;
-using System.Reflection;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Metrics.Export;
+using System.Collections.Generic;
 
 namespace MagicOnion.Server.OpenTelemetry
 {
+    /// <summary>
+    /// OpenTelemetry Options to inject Application Information
+    /// </summary>
     public class MagicOnionOpenTelemetryOptions
     {
         /// <summary>
-        /// Metrics Exporter Endpoint. Default Prometheus endpoint.
+        /// ServiceName for Tracer. Especially Zipkin use service.name tag to identify service name.
         /// </summary>
-        public string MetricsExporterEndpoint { get; set; } = "http://127.0.0.1:9184/metrics/";
-        /// <summary>
-        /// Metrics Exporter Hosting Endpoint.
-        /// </summary>
-        public string MetricsExporterHostingEndpoint { get; set; } = "http://+:9184/metrics/";
-        /// <summary>
-        /// Tracer ServiceName use as ActivitySource
-        /// </summary>
-        public string MagicOnionActivityName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
-    }
+        /// <remarks>input to tag `service.name`</remarks>
+        public string ServiceName { get; set; }
 
-    public class MagicOnionOpenTelemetryMeterFactoryOption
-    {
         /// <summary>
-        /// OpenTelemetry MetricsProcessor. default is <see cref="UngroupedBatcher"/>
+        /// Expose RpsScope to the ServiceContext.Items. RpsScope key begin with .TraceContext
         /// </summary>
-        public MetricProcessor MetricProcessor { get; set; } = new UngroupedBatcher();
+        public bool ExposeRpcScope { get; set; } = true;
+
         /// <summary>
-        /// OpenTelemetry MetricsExporter Implementation to use.
+        /// Application specific OpenTelemetry Tracing tags
         /// </summary>
-        public MetricExporter MetricExporter { get; set; }
-        /// <summary>
-        /// OpenTelemetry Metric Push Interval.
-        /// </summary>
-        public TimeSpan MetricPushInterval { get; set; } = TimeSpan.FromSeconds(10);
-        /// <summary>
-        /// MagicOnionLogger to collect OpenTelemetry metrics.
-        /// </summary>
-        public Func<MeterProvider, IMagicOnionLogger> MeterLogger { get; set; }
+        public Dictionary<string, string> TracingTags { get; set; } = new Dictionary<string, string>();
     }
 }

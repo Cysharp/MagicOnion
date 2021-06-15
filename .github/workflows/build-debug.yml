@@ -36,6 +36,17 @@ jobs:
       - run: dotnet test ./tests/MagicOnion.Server.Tests/ -c Debug
       - run: dotnet test ./tests/MagicOnion.Generator.Tests/ -c Debug
 
+  build-dotnet-experimental:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
+
   build-unity:
     if: "((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"
     strategy:

@@ -125,6 +125,23 @@ jobs:
           name: moc.${{ env.GIT_TAG }}.zip
           path: ./moc.${{ env.GIT_TAG }}.zip
 
+  build-dotnet-experimental:
+    needs: [update-packagejson]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+      - run: echo ${{ needs.update-packagejson.outputs.sha }}
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release
+      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --no-build -o ./publish
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nuget-experimental
+          path: ./publish/
+
   build-unity:
     needs: [update-packagejson]
     strategy:
@@ -171,7 +188,8 @@ jobs:
 
   create-release:
     if: github.event.inputs.dry_run == 'false'
-    needs: [update-packagejson, build-dotnet, build-unity]
+    needs:
+      [update-packagejson, build-dotnet, build-dotnet-experimental, build-unity]
     runs-on: ubuntu-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -192,6 +210,7 @@ jobs:
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push "./nuget-experimental/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
       # Upload to Releases(generator)
       - uses: actions/upload-release-asset@v1
         env:

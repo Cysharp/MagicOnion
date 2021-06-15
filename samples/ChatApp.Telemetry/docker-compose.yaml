@@ -2,14 +2,14 @@ version: "3"
 
 services:
   magiconion:
-    image: cysharp/magiconion_sample_chatapp_telemetry:4.0.1-1.0.0.rc2
+    image: cysharp/magiconion_sample_chatapp_telemetry:4.3.1-1.0.0.rc4
     ports:
       - 5000:80
-      - 9184:9184
     environment:
       - DOTNET_ENVIRONMENT=Development
-      - MagicOnion__OpenTelemetry__MetricsExporterEndpoint=http://127.0.0.1:9184/metrics/
-      - MagicOnion__OpenTelemetry__MetricsExporterHostingEndpoint=http://+:9184/metrics/
       - UseExporter=jaeger
-      - Jaeger__Host=jaeger
+      #- UseExporter=zipkin
+      - Jaeger__AgentHost=jaeger
       - Zipkin__Endpoint=http://zipkin:9411/api/v2/spans
+      - Server2ServerEndpoint=http://microserver:80
+      - OTEL_LOG_LEVEL=debug
