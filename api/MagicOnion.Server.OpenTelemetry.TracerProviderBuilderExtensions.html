@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>OpenTelemetryHelper Class
+    <title>TracerProviderBuilderExtensions Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="OpenTelemetryHelper Class
+    <meta name="title" content="TracerProviderBuilderExtensions Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.51.0.0">
     
@@ -71,9 +71,9 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions">
   
-  <h1 id="MagicOnion_Server_OpenTelemetry_OpenTelemetryHelper" data-uid="MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper" class="text-break">OpenTelemetryHelper Class
+  <h1 id="MagicOnion_Server_OpenTelemetry_TracerProviderBuilderExtensions" data-uid="MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions" class="text-break">TracerProviderBuilderExtensions Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.OpenTelemetry.html">MagicOnion.Server.OpenTelemetry</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.OpenTelemetry.dll</h6>
@@ -82,13 +82,13 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class OpenTelemetryHelper : object</code></pre>
+    <pre><code class="lang-csharp hljs">public static class TracerProviderBuilderExtensions : object</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">OpenTelemetryHelper</span>
+    <span class="xref">TracerProviderBuilderExtensions</span>
   </div>
   
   
@@ -110,10 +110,9 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper.html#MagicOnion_Server_OpenTelemetry_OpenTelemetryHelper_GrpcToOpenTelemetryStatus_StatusCode_">GrpcToOpenTelemetryStatus(StatusCode)</a>
+          <a class="xref" href="MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions.html#MagicOnion_Server_OpenTelemetry_TracerProviderBuilderExtensions_AddMagicOnionInstrumentation_TracerProviderBuilder_">AddMagicOnionInstrumentation(TracerProviderBuilder)</a>
         </td>
-        <td class="markdown level1 summary"><p>Convert gRPC StatusCode to OpenTelemetry Status.</p>
-</td>
+        <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
@@ -121,20 +120,19 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Server_OpenTelemetry_OpenTelemetryHelper_GrpcToOpenTelemetryStatus_" data-uid="MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper.GrpcToOpenTelemetryStatus*"></a>
-  <h4 id="MagicOnion_Server_OpenTelemetry_OpenTelemetryHelper_GrpcToOpenTelemetryStatus_StatusCode_" data-uid="MagicOnion.Server.OpenTelemetry.OpenTelemetryHelper.GrpcToOpenTelemetryStatus(StatusCode)">GrpcToOpenTelemetryStatus(StatusCode)</h4>
-  <div class="markdown level1 summary"><p>Convert gRPC StatusCode to OpenTelemetry Status.</p>
-</div>
+  <a id="MagicOnion_Server_OpenTelemetry_TracerProviderBuilderExtensions_AddMagicOnionInstrumentation_" data-uid="MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions.AddMagicOnionInstrumentation*"></a>
+  <h4 id="MagicOnion_Server_OpenTelemetry_TracerProviderBuilderExtensions_AddMagicOnionInstrumentation_TracerProviderBuilder_" data-uid="MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions.AddMagicOnionInstrumentation(TracerProviderBuilder)">AddMagicOnionInstrumentation(TracerProviderBuilder)</h4>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static OpenTelemetry.Trace.Status GrpcToOpenTelemetryStatus(StatusCode code)</code></pre>
+    <pre><code class="lang-csharp hljs">public static TracerProviderBuilder AddMagicOnionInstrumentation(this TracerProviderBuilder builder)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>code</code></span> <span class="xref">StatusCode</span></dt>
+    <dt><span class="parametername"><code>builder</code></span> <span class="xref">TracerProviderBuilder</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -142,7 +140,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">OpenTelemetry.Trace.Status</span></dt>
+    <dt><span class="xref">TracerProviderBuilder</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -153,9 +151,6 @@
   
   
   
-  <h5 id="MagicOnion_Server_OpenTelemetry_OpenTelemetryHelper_GrpcToOpenTelemetryStatus_StatusCode__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>spec: <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#set-status">https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#set-status</a></p>
-</div>
   
   
   

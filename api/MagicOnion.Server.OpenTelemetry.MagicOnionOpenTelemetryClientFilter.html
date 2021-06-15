@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>MagicOnionOpenTelemetryOptions Class
+    <title>MagicOnionOpenTelemetryClientFilter Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="MagicOnionOpenTelemetryOptions Class
+    <meta name="title" content="MagicOnionOpenTelemetryClientFilter Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.51.0.0">
     
@@ -71,27 +71,31 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter">
   
-  <h1 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions" class="text-break">MagicOnionOpenTelemetryOptions Class
+  <h1 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter" class="text-break">MagicOnionOpenTelemetryClientFilter Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.OpenTelemetry.html">MagicOnion.Server.OpenTelemetry</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.OpenTelemetry.dll</h6>
   
-  <div class="markdown level0 summary"><p>OpenTelemetry Options to inject Application Information</p>
+  <div class="markdown level0 summary"><p>Collect OpenTelemetry Tracer with Client filter (Unary).</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MagicOnionOpenTelemetryOptions : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionOpenTelemetryClientFilter : object, IClientFilter</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">MagicOnionOpenTelemetryOptions</span>
+    <span class="xref">MagicOnionOpenTelemetryClientFilter</span>
   </div>
   
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a></div>
+  </div>
   
   
   
@@ -99,7 +103,7 @@
   
   
   <h3 id="members">Members</h3>
-  <h4>Properties
+  <h4>Constructors
   </h4>
   <table class="table table-condensed">
     <thead>
@@ -111,49 +115,49 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ExposeRpcScope">ExposeRpcScope</a>
+          <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.html#MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter__ctor_ActivitySource_MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_">MagicOnionOpenTelemetryClientFilter(ActivitySource, MagicOnionOpenTelemetryOptions)</a>
         </td>
-        <td class="markdown level1 summary"><p>Expose RpsScope to the ServiceContext.Items. RpsScope key begin with .TraceContext</p>
-</td>
+        <td class="markdown level1 summary"></td>
       </tr>
+    </tbody>
+  </table>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName">ServiceName</a>
+          <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.html#MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter_SendAsync_MagicOnion_Client_RequestContext_Func_MagicOnion_Client_RequestContext_ValueTask_MagicOnion_Client_ResponseContext___">SendAsync(RequestContext, Func&lt;RequestContext, ValueTask&lt;ResponseContext&gt;&gt;)</a>
         </td>
-        <td class="markdown level1 summary"><p>ServiceName for Tracer. Especially Zipkin use service.name tag to identify service name.</p>
-</td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html#MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracingTags">TracingTags</a>
-        </td>
-        <td class="markdown level1 summary"><p>Application specific OpenTelemetry Tracing tags</p>
-</td>
+        <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="properties">Properties
+  <h3 id="constructors">Constructors
   </h3>
   <section>
-  <a id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ExposeRpcScope_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.ExposeRpcScope*"></a>
-  <h4 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ExposeRpcScope" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.ExposeRpcScope">ExposeRpcScope</h4>
-  <div class="markdown level1 summary"><p>Expose RpsScope to the ServiceContext.Items. RpsScope key begin with .TraceContext</p>
-</div>
+  <a id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter__ctor_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.#ctor*"></a>
+  <h4 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter__ctor_ActivitySource_MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.#ctor(ActivitySource,MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions)">MagicOnionOpenTelemetryClientFilter(ActivitySource, MagicOnionOpenTelemetryOptions)</h4>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool ExposeRpcScope { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionOpenTelemetryClientFilter(ActivitySource activitySource, MagicOnionOpenTelemetryOptions options)</code></pre>
   </div>
 
-  
-  
-  
-  
   <section>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Boolean</span></dt>
+    <dt><span class="parametername"><code>activitySource</code></span> <span class="xref">ActivitySource</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html">MagicOnionOpenTelemetryOptions</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -165,60 +169,37 @@
   
   
   
+  
+  
+  
+  
   </section>
+  <h3 id="methods">Methods
+  </h3>
   <section>
-  <a id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName*"></a>
-  <h4 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.ServiceName">ServiceName</h4>
-  <div class="markdown level1 summary"><p>ServiceName for Tracer. Especially Zipkin use service.name tag to identify service name.</p>
-</div>
+  <a id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter_SendAsync_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.SendAsync*"></a>
+  <h4 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryClientFilter_SendAsync_MagicOnion_Client_RequestContext_Func_MagicOnion_Client_RequestContext_ValueTask_MagicOnion_Client_ResponseContext___" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.SendAsync(MagicOnion.Client.RequestContext,Func{MagicOnion.Client.RequestContext,ValueTask{MagicOnion.Client.ResponseContext}})">SendAsync(RequestContext, Func&lt;RequestContext, ValueTask&lt;ResponseContext&gt;&gt;)</h4>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string ServiceName { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public ValueTask&lt;ResponseContext&gt; SendAsync(RequestContext context, Func&lt;RequestContext, ValueTask&lt;ResponseContext&gt;&gt; next)</code></pre>
   </div>
 
-  
-  
-  
-  
   <section>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
+    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>next</code></span> <span class="xref">Func</span>&lt;<a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a>, <span class="xref">ValueTask</span>&lt;<a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
   
-  
-  
-  
-  <h5 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_ServiceName_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>input to tag <code>service.name</code></p>
-</div>
-  
-  
-  
-  
-  </section>
   <section>
-  <a id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracingTags_" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracingTags*"></a>
-  <h4 id="MagicOnion_Server_OpenTelemetry_MagicOnionOpenTelemetryOptions_TracingTags" data-uid="MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.TracingTags">TracingTags</h4>
-  <div class="markdown level1 summary"><p>Application specific OpenTelemetry Tracing tags</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Dictionary&lt;string, string&gt; TracingTags { get; set; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Dictionary</span>&lt;<span class="xref">System.String</span>, <span class="xref">System.String</span>&gt;</dt>
+    <dt><span class="xref">ValueTask</span>&lt;<a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -230,8 +211,15 @@
   
   
   
+  
+  
+  
   </section>
   
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>
+  </div>
   
   
 </article>
