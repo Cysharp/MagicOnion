@@ -84,7 +84,7 @@ namespace MagicOnion
         [Obsolete("Use ForAddress instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static GrpcChannelx FromAddress(Uri target)
-            => GrpcChannelProvider.Default.CreateChannel(target.Host, target.Port, (target.Scheme == "http" ? ChannelCredentials.Insecure : new SslCredentials()));
+            => GrpcChannelProvider.Default.CreateChannel(new GrpcChannelTarget(target.Host, target.Port, target.Scheme == "http"));
 
         /// <summary>
         /// Create a channel to the specified target.
@@ -108,7 +108,7 @@ namespace MagicOnion
         /// <param name="target"></param>
         /// <returns></returns>
         public static GrpcChannelx ForAddress(Uri target)
-            => GrpcChannelProvider.Default.CreateChannel(target.Host, target.Port, (target.Scheme == "http" ? ChannelCredentials.Insecure : new SslCredentials()));
+            => GrpcChannelProvider.Default.CreateChannel(new GrpcChannelTarget(target.Host, target.Port, target.Scheme == "http"));
 
         /// <summary>
         /// Create a <see cref="CallInvoker"/>.

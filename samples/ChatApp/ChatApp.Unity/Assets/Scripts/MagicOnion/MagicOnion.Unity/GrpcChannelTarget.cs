@@ -11,13 +11,13 @@ namespace MagicOnion.Unity
     {
         public string Host { get; }
         public int Port { get; }
-        public ChannelCredentials ChannelCredentials { get; }
+        public bool IsInsecure { get; }
 
-        public GrpcChannelTarget(string host, int port, ChannelCredentials channelCredentials)
+        public GrpcChannelTarget(string host, int port, bool isInsecure)
         {
             Host = host;
             Port = port;
-            ChannelCredentials = channelCredentials;
+            IsInsecure = isInsecure;
         }
     }
 }

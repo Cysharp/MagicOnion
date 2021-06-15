@@ -19,37 +19,19 @@ namespace MagicOnion.Unity
         public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, GrpcChannelTarget target)
             => provider.CreateChannel(new CreateGrpcChannelContext(provider, target));
 
-        /// <summary>
-        /// Create a channel to the target and register the channel under the management of the provider.
-        /// </summary>
-        public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, string host, int port, ChannelCredentials channelCredentials)
-            => provider.CreateChannel(new GrpcChannelTarget(host, port, channelCredentials));
-
 #if USE_GRPC_NET_CLIENT
         /// <summary>
         /// Create a channel to the target and register the channel under the management of the provider.
         /// </summary>
         public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, GrpcChannelTarget target, GrpcChannelOptions channelOptions)
             => provider.CreateChannel(new CreateGrpcChannelContext(provider, target, channelOptions));
-
-        /// <summary>
-        /// Create a channel to the target and register the channel under the management of the provider.
-        /// </summary>
-        public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, string host, int port, ChannelCredentials channelCredentials, GrpcChannelOptions channelOptions)
-            => provider.CreateChannel(new GrpcChannelTarget(host, port, channelCredentials), channelOptions);
 #endif
 #if !USE_GRPC_NET_CLIENT_ONLY
         /// <summary>
         /// Create a channel to the target and register the channel under the management of the provider.
         /// </summary>
-        public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, GrpcChannelTarget target, IReadOnlyList<ChannelOption> channelOptions)
-            => provider.CreateChannel(new CreateGrpcChannelContext(provider, target, channelOptions ?? Array.Empty<ChannelOption>()));
-
-        /// <summary>
-        /// Create a channel to the target and register the channel under the management of the provider.
-        /// </summary>
-        public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, string host, int port, ChannelCredentials channelCredentials, ChannelOption[] channelOptions)
-            => provider.CreateChannel(new GrpcChannelTarget(host, port, channelCredentials), channelOptions ?? Array.Empty<ChannelOption>());
+        public static GrpcChannelx CreateChannel(this IGrpcChannelProvider provider, GrpcChannelTarget target, ChannelCredentials channelCredentials, IReadOnlyList<ChannelOption> channelOptions)
+            => provider.CreateChannel(new CreateGrpcChannelContext(provider, target, new GrpcCCoreChannelOptions(channelOptions, channelCredentials)));
 #endif
     }
 
@@ -87,7 +69,7 @@ namespace MagicOnion.Unity
         public GrpcChannelx CreateChannel(CreateGrpcChannelContext context)
         {
             var channel = _baseProvider.CreateChannel(context);
-            Debug.Log($"Channel Created: {context.Target.Host}:{context.Target.Port} ({context.Target.ChannelCredentials}) [{channel.Id}]");
+            Debug.Log($"Channel Created: {context.Target.Host}:{context.Target.Port} ({(context.Target.IsInsecure ? "Insecure" : "Secure")}) [{channel.Id}]");
             return channel;
         }
 
@@ -186,13 +168,14 @@ namespace MagicOnion.Unity
     public class DefaultGrpcChannelProvider : GrpcNetClientGrpcChannelProvider
     {
         public DefaultGrpcChannelProvider() : base() {}
-        public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) {}
+        public DefaultGrpcChannelProvider(Func<GrpcChannelOptions> channelOptionsFactory) : base(channelOptions) {}
     }
 #else
     public class DefaultGrpcChannelProvider : GrpcCCoreGrpcChannelProvider
     {
         public DefaultGrpcChannelProvider() : base() { }
-        public DefaultGrpcChannelProvider(ChannelOption[] channelOptions) : base(channelOptions) { }
+        public DefaultGrpcChannelProvider(IReadOnlyList<ChannelOption> channelOptions) : base(channelOptions) { }
+        public DefaultGrpcChannelProvider(GrpcCCoreChannelOptions channelOptions) : base(channelOptions) { }
     }
 #endif
 
@@ -218,14 +201,15 @@ namespace MagicOnion.Unity
         /// </summary>
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
-            var address = new Uri((context.Target.ChannelCredentials == ChannelCredentials.Insecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}");
-            var channel = GrpcChannel.ForAddress(address, context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptions);
+            var address = new Uri((context.Target.IsInsecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}");
+            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptions;
+            var channel = GrpcChannel.ForAddress(address, channelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
                 context.Provider.UnregisterChannel /* Root provider may be wrapped outside this provider class. */,
                 channel,
                 address,
-                new GrpcChannelOptionsBag(context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptions)
+                new GrpcChannelOptionsBag(channelOptions)
             );
 
             return channelHolder;
@@ -239,13 +223,19 @@ namespace MagicOnion.Unity
     /// </summary>
     public class GrpcCCoreGrpcChannelProvider : GrpcChannelProviderBase
     {
-        private readonly ChannelOption[] _defaultChannelOptions;
+        private readonly GrpcCCoreChannelOptions _defaultChannelOptions;
+
         public GrpcCCoreGrpcChannelProvider()
-            : this(Array.Empty<ChannelOption>())
+            : this(new GrpcCCoreChannelOptions())
         {
         }
 
-        public GrpcCCoreGrpcChannelProvider(ChannelOption[] channelOptions)
+        public GrpcCCoreGrpcChannelProvider(IReadOnlyList<ChannelOption> channelOptions)
+            : this(new GrpcCCoreChannelOptions(channelOptions))
+        {
+        }
+
+        public GrpcCCoreGrpcChannelProvider(GrpcCCoreChannelOptions channelOptions)
         {
             _defaultChannelOptions = channelOptions ?? throw new ArgumentNullException(nameof(channelOptions));
         }
@@ -255,24 +245,29 @@ namespace MagicOnion.Unity
         /// </summary>
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
-            var channelOptions = CreateGrpcChannelOptions(context.ChannelOptions.Get<IReadOnlyList<ChannelOption>>());
-            var channel = new Channel(context.Target.Host, context.Target.Port, context.Target.ChannelCredentials, channelOptions);
+            var channelOptions = context.ChannelOptions.Get<GrpcCCoreChannelOptions>() ?? _defaultChannelOptions;
+            var channel = new Channel(context.Target.Host, context.Target.Port, context.Target.IsInsecure ? ChannelCredentials.Insecure : channelOptions.ChannelCredentials, channelOptions.ChannelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
                 context.Provider.UnregisterChannel /* Root provider may be wrapped outside this provider class. */,
                 channel,
-                new Uri((context.Target.ChannelCredentials == ChannelCredentials.Insecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}"),
+                new Uri((context.Target.IsInsecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}"),
                 new GrpcChannelOptionsBag(channelOptions)
             );
 
             return channelHolder;
         }
+    }
 
-        private ChannelOption[] CreateGrpcChannelOptions(IReadOnlyList<ChannelOption> channelOptions)
+    public sealed class GrpcCCoreChannelOptions
+    {
+        public IReadOnlyList<ChannelOption> ChannelOptions { get; set; }
+        public ChannelCredentials ChannelCredentials { get; set; }
+
+        public GrpcCCoreChannelOptions(IReadOnlyList<ChannelOption> channelOptions = null, ChannelCredentials channelCredentials = null)
         {
-            if (channelOptions == null || channelOptions.Count == 0) return _defaultChannelOptions;
-
-            return _defaultChannelOptions.Concat(channelOptions).ToArray();
+            ChannelOptions = channelOptions ?? Array.Empty<ChannelOption>();
+            ChannelCredentials = channelCredentials ?? new SslCredentials();
         }
     }
 #endif
