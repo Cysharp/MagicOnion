@@ -11,8 +11,6 @@ namespace MagicOnion.CodeAnalysis
 {
     public class ReferenceSymbols
     {
-        public static ReferenceSymbols Global;
-
         public readonly INamedTypeSymbol Void;
         public readonly INamedTypeSymbol Task;
         public readonly INamedTypeSymbol TaskOfT;
@@ -65,8 +63,6 @@ namespace MagicOnion.CodeAnalysis
             IStreamingHub = GetTypeSymbolOrThrow("MagicOnion.IStreamingHub`2");
             IService = GetTypeSymbolOrThrow("MagicOnion.IService`1");
             MethodIdAttribute = GetTypeSymbolOrThrow("MagicOnion.Server.Hubs.MethodIdAttribute");
-
-            Global = this;
         }
     }
 
@@ -203,7 +199,7 @@ namespace MagicOnion.CodeAnalysis
                 id = (int)idAttr.ConstructorArguments[0].Value;
             }
 
-            return new MethodDefinition
+            return new MethodDefinition(typeReferences)
             {
                 Name = y.Name,
                 MethodType = t,
