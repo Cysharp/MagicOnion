@@ -2132,6 +2132,19 @@ references:
   commentId: T:MagicOnion.CodeAnalysis.MethodDefinition
   fullName: MagicOnion.CodeAnalysis.MethodDefinition
   nameWithType: MethodDefinition
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.#ctor(MagicOnion.CodeAnalysis.ReferenceSymbols)
+  name: MethodDefinition(ReferenceSymbols)
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition__ctor_MagicOnion_CodeAnalysis_ReferenceSymbols_
+  commentId: M:MagicOnion.CodeAnalysis.MethodDefinition.#ctor(MagicOnion.CodeAnalysis.ReferenceSymbols)
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.MethodDefinition(MagicOnion.CodeAnalysis.ReferenceSymbols)
+  nameWithType: MethodDefinition.MethodDefinition(ReferenceSymbols)
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.#ctor*
+  name: MethodDefinition
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition__ctor_
+  commentId: Overload:MagicOnion.CodeAnalysis.MethodDefinition.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.MethodDefinition
+  nameWithType: MethodDefinition.MethodDefinition
 - uid: MagicOnion.CodeAnalysis.MethodDefinition.AsyncToString
   name: AsyncToString()
   href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_AsyncToString
@@ -2546,12 +2559,6 @@ references:
   commentId: F:MagicOnion.CodeAnalysis.ReferenceSymbols.DuplexStreamingResult
   fullName: MagicOnion.CodeAnalysis.ReferenceSymbols.DuplexStreamingResult
   nameWithType: ReferenceSymbols.DuplexStreamingResult
-- uid: MagicOnion.CodeAnalysis.ReferenceSymbols.Global
-  name: Global
-  href: api/MagicOnion.CodeAnalysis.ReferenceSymbols.html#MagicOnion_CodeAnalysis_ReferenceSymbols_Global
-  commentId: F:MagicOnion.CodeAnalysis.ReferenceSymbols.Global
-  fullName: MagicOnion.CodeAnalysis.ReferenceSymbols.Global
-  nameWithType: ReferenceSymbols.Global
 - uid: MagicOnion.CodeAnalysis.ReferenceSymbols.IService
   name: IService
   href: api/MagicOnion.CodeAnalysis.ReferenceSymbols.html#MagicOnion_CodeAnalysis_ReferenceSymbols_IService
