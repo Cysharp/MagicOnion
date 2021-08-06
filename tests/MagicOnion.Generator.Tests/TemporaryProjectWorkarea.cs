@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,9 +16,9 @@ namespace MagicOnion.Generator.Tests
     /// </summary>
     public class TemporaryProjectWorkarea : IDisposable
     {
-        private readonly string tempDirPath;
-        private readonly string csprojFileName = "TempProject.csproj";
-        private readonly bool cleanOnDisposing;
+        readonly TemporaryProjectWorkareaOptions options;
+        readonly string tempDirPath;
+        readonly string csprojFileName = "TempProject.csproj";
 
         public string CsProjectPath { get; }
 
@@ -25,14 +26,26 @@ namespace MagicOnion.Generator.Tests
 
         public string OutputDirectory { get; }
 
+        /// <summary>
+        /// Gets the identifier of the workarea.
+        /// </summary>
+        public Guid WorkareaId { get; }
+        
         public static TemporaryProjectWorkarea Create(bool cleanOnDisposing = true)
         {
-            return new TemporaryProjectWorkarea(cleanOnDisposing);
+            return new TemporaryProjectWorkarea(TemporaryProjectWorkareaOptions.Default with { CleanOnDisposing = cleanOnDisposing });
         }
 
-        private TemporaryProjectWorkarea(bool cleanOnDisposing)
+        public static TemporaryProjectWorkarea Create(TemporaryProjectWorkareaOptions options)
         {
-            this.cleanOnDisposing = cleanOnDisposing;
+            return new TemporaryProjectWorkarea(options ?? throw new ArgumentNullException(nameof(options)));
+        }
+
+        private TemporaryProjectWorkarea(TemporaryProjectWorkareaOptions options)
+        {
+            WorkareaId = Guid.NewGuid();
+
+            this.options = options ?? throw new ArgumentNullException(nameof(options));
             this.tempDirPath = Path.Combine(Path.GetTempPath(), $"MagicOnion.Generator.Tests-{Guid.NewGuid()}");
 
             ProjectDirectory = Path.Combine(tempDirPath, "Project");
@@ -41,19 +54,22 @@ namespace MagicOnion.Generator.Tests
             Directory.CreateDirectory(ProjectDirectory);
             Directory.CreateDirectory(OutputDirectory);
 
-            var solutionRootDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../../.."));
+            var solutionRootDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "../../../../.."));
             var abstractionsProjectDir = Path.Combine(solutionRootDir, "src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj");
 
             CsProjectPath = Path.Combine(ProjectDirectory, csprojFileName);
-            var csprojContents = @"
+            var csprojContents = $@"
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>{options.TargetFramework}</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include=""" + abstractionsProjectDir + @""" />
+    <ProjectReference Include=""{abstractionsProjectDir}"" />
+    {string.Join("", (options.AdditionalProjectReferences ?? Array.Empty<string>()).Select(x => $@"<ProjectReference Include=""{x}"" />"))}
+    {string.Join("", (options.AdditionalPackageReferences ?? Array.Empty<string>()).Select(x => $@"<PackageReference Include=""{x}"" />"))}
   </ItemGroup>
+  {options.AdditionalCsProjectContent}
 </Project>
 ";
             AddFileToProject(csprojFileName, csprojContents);
@@ -91,26 +107,43 @@ namespace MagicOnion.Generator.Tests
                     MetadataReference.CreateFromFile(typeof(MessagePack.IFormatterResolver).Assembly.Location), // MessagePack
                     MetadataReference.CreateFromFile(typeof(MessagePack.MessagePackObjectAttribute).Assembly.Location) // MessagePack.Annotations
                 )
+                .AddReferences((options.AdditionalReferences ?? Array.Empty<string>()).Select(x => MetadataReference.CreateFromFile(x)))
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-            return new OutputCompilation(compilation);
+            return new OutputCompilation(this, compilation);
         }
 
         public void Dispose()
         {
-            if (cleanOnDisposing)
+            if (options.CleanOnDisposing)
             {
                 Directory.Delete(tempDirPath, true);
             }
         }
     }
 
+    public record TemporaryProjectWorkareaOptions(
+        bool CleanOnDisposing = true,
+        string TargetFramework = "netstandard2.0",
+        string AdditionalCsProjectContent = "",
+        IEnumerable<string>? AdditionalReferences = default,
+        IEnumerable<string>? AdditionalPackageReferences = default,
+        IEnumerable<string>? AdditionalProjectReferences = default
+    )
+    {
+        public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();
+
+    }
+
     public class OutputCompilation
     {
+        readonly TemporaryProjectWorkarea workarea;
+
         public Compilation Compilation { get; }
 
-        public OutputCompilation(Compilation compilation)
+        public OutputCompilation(TemporaryProjectWorkarea workarea, Compilation compilation)
         {
+            this.workarea = workarea;
             this.Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
         }
 
@@ -151,6 +184,28 @@ namespace MagicOnion.Generator.Tests
         public IReadOnlyList<Diagnostic> GetCompilationErrors()
         {
             return Compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error).ToArray();
+        }
+
+        /// <summary>
+        /// Load the generated assembly and execute the code in that context.
+        /// </summary>
+        public void ExecuteWithGeneratedAssembly(Action<AssemblyLoadContext, Assembly> action)
+        {
+            var memoryStream = new MemoryStream();
+            Compilation.Emit(memoryStream);
+            memoryStream.Position = 0;
+
+            var assemblyLoadContext = new AssemblyLoadContext($"TempProject-{workarea.WorkareaId}", isCollectible: true);
+            try
+            {
+                assemblyLoadContext.LoadFromStream(memoryStream);
+                var assembly = assemblyLoadContext.Assemblies.First();
+                action(assemblyLoadContext, assembly);
+            }
+            finally
+            {
+                assemblyLoadContext.Unload();
+            }
         }
     }
 }
