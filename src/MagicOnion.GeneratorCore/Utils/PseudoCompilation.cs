@@ -298,7 +298,9 @@ namespace MagicOnion.GeneratorCore.Utils
                 foreach (var item in document.Descendants("PackageReference"))
                 {
                     var originalTargetFramework = document.Descendants("TargetFramework").FirstOrDefault()?.Value ?? document.Descendants("TargetFrameworks").First().Value.Split(';').First();
-                    var includePath = item.Attribute("Include").Value.Trim().ToLower(); // maybe lower
+                    var includePath = item.Attribute("Include")?.Value.Trim().ToLower(); // maybe lower
+                    if (includePath == null) continue;
+
                     var packageVersion = item.Attribute("Version").Value.Trim();
 
                     CollectNugetPackages(includePath, packageVersion, originalTargetFramework);
