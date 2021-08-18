@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using MagicOnion.Server;
 using MagicOnion.Server.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry;
-using OpenTelemetry.Exporter.Prometheus;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -32,59 +26,66 @@ namespace ChatApp.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // OpenTelemetry Require set of Listener + Instrumentation.
+            // - Listener will add via services.AddMagicOnion().UseOpenTelemetry()
+            // - Instrumentation will add via TraceProviderBuilder.AddMagicOnionInstrumentation()
             services.AddGrpc(); // MagicOnion depends on ASP.NET Core gRPC service.
             services.AddMagicOnion(options =>
                 {
-                    options.GlobalFilters.Add(new OpenTelemetryCollectorTracerFilterFactoryAttribute());
-                    options.GlobalStreamingHubFilters.Add(new OpenTelemetryHubCollectorTracerFilterFactoryAttribute());
+                    options.GlobalFilters.Add(new MagicOnionOpenTelemetryTracerFilterFactoryAttribute());
+                    options.GlobalStreamingHubFilters.Add(new MagicOnionOpenTelemetryStreamingTracerFilterFactoryAttribute());
+
+                    // Exception Filter enable Telemetry to know which gRPC Error happen.
+                    options.GlobalFilters.Add(new ExceptionFilterFactoryAttribute());
                 })
-                .AddOpenTelemetry((options, meterOptions) =>
-                {
-                    // open-telemetry with Prometheus exporter
-                    meterOptions.MetricExporter = new PrometheusExporter(new PrometheusExporterOptions() { Url = options.MetricsExporterEndpoint });
-                    meterOptions.MeterLogger = (mp) => new OpenTelemetryCollectorMeterLogger(mp, "1.0.0-rc.1");
-                },
-                (options, provider, tracerBuilder) =>
+                .AddOpenTelemetry(); // Listen OpenTelemetry Activity
+
+            // Configure OpenTelemetry as usual.
+            services.AddOpenTelemetryTracing(configure =>
+            {
+                var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
+                switch (exporter)
                 {
                     // Switch between Jaeger/Zipkin by setting UseExporter in appsettings.json.
-                    var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-                    switch (exporter)
-                    {
-                        case "jaeger":
-                            tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
-                                .AddAspNetCoreInstrumentation()
-                                .AddJaegerExporter(jaegerOptions =>
-                                {
-                                    jaegerOptions.AgentHost = this.Configuration.GetValue<string>("Jaeger:Host");
-                                    jaegerOptions.AgentPort = this.Configuration.GetValue<int>("Jaeger:Port");
-                                });
-                            break;
-                        case "zipkin":
-                            tracerBuilder
-                                .AddAspNetCoreInstrumentation()
-                                .AddZipkinExporter(zipkinOptions =>
-                                {
-                                    zipkinOptions.ServiceName = "chatapp.server"; // seems still old api.
-                                    zipkinOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Zipkin:Endpoint"));
-                                });
-                            break;
-                        default:
-                            // ConsoleExporter will show current tracer activity
-                            tracerBuilder
-                                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("chatapp.server"))
-                                .AddAspNetCoreInstrumentation()
-                                .AddConsoleExporter();
-                            break;
-                    }
-                });
+                    case "jaeger":
+                        var jo = new OpenTelemetry.Exporter.JaegerExporterOptions();
+                        Configuration.GetSection("Jaeger").Bind(jo);
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
+                            .AddJaegerExporter();
+                        services.Configure<OpenTelemetry.Exporter.JaegerExporterOptions>(Configuration.GetSection("Jaeger"));
+                        break;
+                    case "zipkin":
+                        var zo = new OpenTelemetry.Exporter.ZipkinExporterOptions();
+                        Configuration.GetSection("Zipkin").Bind(zo);
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
+                            .AddZipkinExporter();
+                        services.Configure<OpenTelemetry.Exporter.ZipkinExporterOptions>(this.Configuration.GetSection("Zipkin"));
+                        break;
+                    default:
+                        // ConsoleExporter will show current tracer activity
+                        configure
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ChatApp.Server"))
+                            .AddAspNetCoreInstrumentation()
+                            .AddMagicOnionInstrumentation() // enable MagicOnion instrumentation
+                            .AddConsoleExporter();
+                        services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(this.Configuration.GetSection("AspNetCoreInstrumentation"));
+                        services.Configure<OpenTelemetry.Instrumentation.AspNetCore.AspNetCoreInstrumentationOptions>(options =>
+                        {
+                            options.Filter = (req) => req.Request?.Host != null;
+                        });
+                        break;
+                }
+            });
 
             // additional Tracer for user's own service.
-            AddAdditionalTracer(new[] { "mysql", "redis" });
-            services.AddSingleton(new BackendActivitySources(new[] { new ActivitySource("mysql"), new ActivitySource("redis") }));
-
-            // host Prometheus Metrics Server
-            services.AddHostedService<PrometheusExporterMetricsService>();
+            // This means we cannot use AddOpenTelemetryTracing(), but require Sdk.CreateTracerProviderBuilder() instead.
+            services.AddAdditionalTracer(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,38 +115,44 @@ namespace ChatApp.Server
                 });
             });
         }
+    }
 
-        private void AddAdditionalTracer(string[] services)
+    public static class ServiceCollectionExtentions
+    {
+        // If you want use multiple trace service, Do not use AddOpenTelemetryTracing, but use multiple Sdk.CreateTracerProviderBuilder() instead.
+        // ref: https://github.com/open-telemetry/opentelemetry-dotnet/issues/2040
+        public static void AddAdditionalTracer(this IServiceCollection services, IConfiguration configuration)
         {
-            var exporter = this.Configuration.GetValue<string>("UseExporter").ToLowerInvariant();
-            foreach (var service in services)
+            var exporter = configuration.GetValue<string>("UseExporter").ToLowerInvariant();
+            foreach (var service in BackendActivitySources.ExtraActivitySourceNames)
             {
                 switch (exporter)
                 {
                     case "jaeger":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        var jo = new OpenTelemetry.Exporter.JaegerExporterOptions();
+                        configuration.GetSection("Jaeger").Bind(jo);
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
-                            .AddJaegerExporter(jaegerOptions =>
+                            .AddJaegerExporter(o =>
                             {
-                                jaegerOptions.AgentHost = this.Configuration.GetValue<string>("Jaeger:Host");
-                                jaegerOptions.AgentPort = this.Configuration.GetValue<int>("Jaeger:Port");
+                                o.AgentHost = jo.AgentHost;
+                                o.AgentPort = jo.AgentPort;
                             })
                             .Build();
                         break;
                     case "zipkin":
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        var zo = new OpenTelemetry.Exporter.ZipkinExporterOptions();
+                        configuration.GetSection("Zipkin").Bind(zo);
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
-                            .AddZipkinExporter(zipkinOptions =>
-                            {
-                                zipkinOptions.ServiceName = service;  // seems still old api.
-                                zipkinOptions.Endpoint = new Uri(this.Configuration.GetValue<string>("Zipkin:Endpoint"));
-                            })
+                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
+                            .AddZipkinExporter(o => o.Endpoint = zo.Endpoint)
                             .Build();
                         break;
                     default:
                         // ConsoleExporter will show current tracer activity
-                        OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+                        Sdk.CreateTracerProviderBuilder()
                             .AddSource(service)
                             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(service))
                             .AddConsoleExporter()

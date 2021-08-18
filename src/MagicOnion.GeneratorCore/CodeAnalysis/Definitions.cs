@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +43,8 @@ namespace MagicOnion.CodeAnalysis
 
     public class MethodDefinition
     {
+        readonly ReferenceSymbols referenceSymbols;
+
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
@@ -71,7 +73,7 @@ namespace MagicOnion.CodeAnalysis
         {
             get
             {
-                return (OriginalResponseTypeSymbol as INamedTypeSymbol)?.ConstructedFrom.ApproximatelyEqual(ReferenceSymbols.Global.TaskOfT) ?? false;
+                return (OriginalResponseTypeSymbol as INamedTypeSymbol)?.ConstructedFrom.ApproximatelyEqual(referenceSymbols.TaskOfT) ?? false;
             }
         }
 
@@ -134,6 +136,11 @@ namespace MagicOnion.CodeAnalysis
             }
         }
 
+        public MethodDefinition(ReferenceSymbols referenceSymbols)
+        {
+            this.referenceSymbols = referenceSymbols;
+        }
+
         public string RequestObject()
         {
             if (Parameters.Length == 0)
@@ -175,7 +182,7 @@ namespace MagicOnion.CodeAnalysis
                 requestObject = $"new DynamicArgumentTuple<{typeArgs}>({parameterNames})";
             }
 
-            if (OriginalResponseTypeSymbol.ApproximatelyEqual(ReferenceSymbols.Global.Task))
+            if (OriginalResponseTypeSymbol.ApproximatelyEqual(referenceSymbols.Task))
             {
                 return $"WriteMessageWithResponseAsync<{parameterType}, Nil>({HubId}, {requestObject})";
             }
@@ -208,7 +215,7 @@ namespace MagicOnion.CodeAnalysis
                 requestObject = $"new DynamicArgumentTuple<{typeArgs}>({parameterNames})";
             }
 
-            if (OriginalResponseTypeSymbol.ApproximatelyEqual(ReferenceSymbols.Global.Task))
+            if (OriginalResponseTypeSymbol.ApproximatelyEqual(referenceSymbols.Task))
             {
                 return $"WriteMessageAsync<{parameterType}>({HubId}, {requestObject})";
             }
@@ -251,7 +258,7 @@ namespace MagicOnion.CodeAnalysis
         public (string line1, string line2) ToHubOnResponseEvent()
         {
             string type;
-            if (OriginalResponseTypeSymbol.ApproximatelyEqual(ReferenceSymbols.Global.Task))
+            if (OriginalResponseTypeSymbol.ApproximatelyEqual(referenceSymbols.Task))
             {
                 type = "Nil";
             }

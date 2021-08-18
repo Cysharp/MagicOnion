@@ -1,0 +1,20 @@
+{
+    "name": "MagicOnion.Unity.Editor",
+    "references": [
+        "MagicOnion.Abstractions",
+        "MagicOnion.Client",
+        "MagicOnion.Unity",
+        "UniTask"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,4 +1,4 @@
-﻿using MagicOnion.GeneratorCore.Utils;
+using MagicOnion.GeneratorCore.Utils;
 using MagicOnion.Utils;
 using Microsoft.CodeAnalysis;
 using System;
@@ -11,8 +11,6 @@ namespace MagicOnion.CodeAnalysis
 {
     public class ReferenceSymbols
     {
-        public static ReferenceSymbols Global;
-
         public readonly INamedTypeSymbol Void;
         public readonly INamedTypeSymbol Task;
         public readonly INamedTypeSymbol TaskOfT;
@@ -65,8 +63,6 @@ namespace MagicOnion.CodeAnalysis
             IStreamingHub = GetTypeSymbolOrThrow("MagicOnion.IStreamingHub`2");
             IService = GetTypeSymbolOrThrow("MagicOnion.IService`1");
             MethodIdAttribute = GetTypeSymbolOrThrow("MagicOnion.Server.Hubs.MethodIdAttribute");
-
-            Global = this;
         }
     }
 
@@ -203,7 +199,7 @@ namespace MagicOnion.CodeAnalysis
                 id = (int)idAttr.ConstructorArguments[0].Value;
             }
 
-            return new MethodDefinition
+            return new MethodDefinition(typeReferences)
             {
                 Name = y.Name,
                 MethodType = t,
@@ -229,31 +225,87 @@ namespace MagicOnion.CodeAnalysis
 
         void ExtractRequestResponseType(IMethodSymbol method, out MethodType methodType, out string requestType, out string responseType, out ITypeSymbol unwrappedOriginalResponseType)
         {
+            // Acceptable ReturnTypes:
+            //   - Void
+            //   - UnaryResult<T>
+            //   - Task<ServerStreamingResult<TResponse>>
+            //   - Task<ClientStreamingResult<TRequest, TResponse>>
+            //   - Task<DuplexStreamingResult<TRequest, TResponse>> 
+            //   - Task (for StreamingHub)
+            //   - Task<T> (for StreamingHub)
             var retType = method.ReturnType as INamedTypeSymbol;
+            var isTaskResponse = false;
             ITypeSymbol retType2 = null;
             if (retType == null)
             {
                 goto EMPTY;
             }
 
+            if (!retType.IsGenericType && !retType.ApproximatelyEqual(typeReferences.Task) && !retType.ApproximatelyEqual(typeReferences.Void))
+            {
+                throw new InvalidOperationException($"A return type of a method must be 'void', 'UnaryResult<T>', 'Task<T>', 'Task'. (Method: {method.ToDisplayString()}, Return: {retType.ToDisplayString()})");
+            }
+
             var constructedFrom = retType.ConstructedFrom;
+
+            // Task<T>
             if (constructedFrom.ApproximatelyEqual(typeReferences.TaskOfT))
             {
+                isTaskResponse = true;
                 retType2 = retType.TypeArguments[0];
                 retType = retType2 as INamedTypeSymbol;
                 constructedFrom = retType?.ConstructedFrom;
+
+                if (constructedFrom.ApproximatelyEqual(typeReferences.UnaryResult) ||
+                    constructedFrom.ApproximatelyEqual(typeReferences.ServerStreamingResult) ||
+                    constructedFrom.ApproximatelyEqual(typeReferences.ClientStreamingResult) ||
+                    constructedFrom.ApproximatelyEqual(typeReferences.DuplexStreamingResult))
+                {
+                    // Unwrap T (No-op)
+                }
+                else
+                {
+                    // Task<T> (for StreamingHub method)
+                    methodType = MethodType.Other;
+                    requestType = null;
+                    responseType = null;
+                    unwrappedOriginalResponseType = retType2;
+                    return;
+                }
             }
 
+            // UnaryResult<T>
             if (constructedFrom.ApproximatelyEqual(typeReferences.UnaryResult))
             {
                 methodType = MethodType.Unary;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 unwrappedOriginalResponseType = retType.TypeArguments[0];
+
+                // Cannot allow to use StreamingResult as a type parameter of UnaryResult.
+                if (retType.TypeArguments[0] is INamedTypeSymbol retTypeTypeArg0 &&
+                    (
+                        retTypeTypeArg0.ConstructedFrom.ApproximatelyEqual(typeReferences.ServerStreamingResult) ||
+                        retTypeTypeArg0.ConstructedFrom.ApproximatelyEqual(typeReferences.ClientStreamingResult) ||
+                        retTypeTypeArg0.ConstructedFrom.ApproximatelyEqual(typeReferences.DuplexStreamingResult)
+                    )
+                )
+                {
+                    throw new InvalidOperationException($"Cannot allow to use StreamingResult as a type parameter of UnaryResult. (Method: {method.ToDisplayString()}, Return: {retType.ToDisplayString()})");
+                }
                 return;
             }
-            else if (constructedFrom.ApproximatelyEqual(typeReferences.ServerStreamingResult))
+
+            // ServerStreamingResult<TResponse>
+            // ClientStreamingResult<TRequest, TResponse>
+            // DuplexStreamingResult<TRequest, TResponse>
+            if (constructedFrom.ApproximatelyEqual(typeReferences.ServerStreamingResult))
             {
+                if (!isTaskResponse)
+                {
+                    throw new InvalidOperationException($"CodeGenerator doesn't support generating non-asynchronous StreamingResult call. (Method: {method.ToDisplayString()}, Return: {retType.ToDisplayString()})");
+                }
+
                 methodType = MethodType.ServerStreaming;
                 requestType = (method.Parameters.Length == 1) ? method.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
                 responseType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -262,6 +314,11 @@ namespace MagicOnion.CodeAnalysis
             }
             else if (constructedFrom.ApproximatelyEqual(typeReferences.ClientStreamingResult))
             {
+                if (!isTaskResponse)
+                {
+                    throw new InvalidOperationException($"CodeGenerator doesn't support generating non-asynchronous StreamingResult call. (Method: {method.ToDisplayString()}, Return: {retType.ToDisplayString()})");
+                }
+
                 methodType = MethodType.ClientStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -270,6 +327,11 @@ namespace MagicOnion.CodeAnalysis
             }
             else if (constructedFrom.ApproximatelyEqual(typeReferences.DuplexStreamingResult))
             {
+                if (!isTaskResponse)
+                {
+                    throw new InvalidOperationException($"CodeGenerator doesn't support generating non-asynchronous StreamingResult call. (Method: {method.ToDisplayString()}, Return: {retType.ToDisplayString()})");
+                }
+
                 methodType = MethodType.DuplexStreaming;
                 requestType = retType.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 responseType = retType.TypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

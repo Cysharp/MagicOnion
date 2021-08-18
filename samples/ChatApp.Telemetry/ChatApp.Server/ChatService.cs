@@ -6,17 +6,23 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Grpc.Net.Client;
+using MagicOnion.Client;
+using MicroServer.Shared;
+using MagicOnion.Server.OpenTelemetry;
 
 namespace ChatApp.Server
 {
     public class ChatService : ServiceBase<IChatService>, IChatService
     {
-        private ActivitySource mysqlActivitySource;
-        private ILogger logger;
+        private readonly ActivitySource mysqlActivity = BackendActivitySources.MySQLActivitySource;
+        private readonly ActivitySource s2sActivity = BackendActivitySources.S2sActivitySource;
+        private readonly MagicOnionOpenTelemetryOptions options;
+        private readonly ILogger logger;
 
-        public ChatService(ILogger<ChatService> logger, BackendActivitySources backendActivity)
+        public ChatService(MagicOnionOpenTelemetryOptions options, ILogger<ChatService> logger)
         {
-            this.mysqlActivitySource = backendActivity.Get("mysql");
+            this.options = options;
             this.logger = logger;
         }
 
@@ -24,21 +30,51 @@ namespace ChatApp.Server
         {
             var ex = new System.NotImplementedException();
             // dummy external operation.
-            using (var activity = mysqlActivitySource.StartActivity("db:errors/insert", ActivityKind.Internal))
+            using (var activity = this.mysqlActivity.StartActivity("errors/insert", ActivityKind.Internal))
             {
                 // this is sample. use orm or any safe way.
-                activity.SetTag("table", "errors");
-                activity.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "errors");
+                activity?.SetTag("query", $"INSERT INTO rooms VALUES ('{ex.Message}', '{ex.StackTrace}');");
                 await Task.Delay(TimeSpan.FromMilliseconds(2));
             }
             throw ex;
         }
 
-        public UnaryResult<Nil> SendReportAsync(string message)
+        public async UnaryResult<Nil> SendReportAsync(string message)
         {
             logger.LogDebug($"{message}");
 
-            return UnaryResult(Nil.Default);
+            // dummy external operation.
+            using (var activity = this.mysqlActivity.StartActivity("report/insert", ActivityKind.Internal))
+            {
+                // this is sample. use orm or any safe way.
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "report");
+                activity?.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                await Task.Delay(TimeSpan.FromMilliseconds(2));
+            }
+
+            // Server to Server operation
+            var channel = GrpcChannel.ForAddress(Environment.GetEnvironmentVariable("Server2ServerEndpoint", EnvironmentVariableTarget.Process) ??  "http://localhost:4999");
+            var client = MagicOnionClient.Create<IMessageService>(channel, new[]
+            {
+                // propagate trace context from ChatApp.Server to MicroServer
+                new MagicOnionOpenTelemetryClientFilter(s2sActivity, options),
+            });
+            await client.SendAsync("hello");
+
+            // dummy external operation.
+            using (var activity = this.mysqlActivity.StartActivity("report/get", ActivityKind.Internal))
+            {
+                // this is sample. use orm or any safe way.
+                activity?.SetTag("service.name", options.ServiceName);
+                activity?.SetTag("table", "report");
+                activity?.SetTag("query", $"INSERT INTO report VALUES ('foo', 'bar');");
+                await Task.Delay(TimeSpan.FromMilliseconds(1));
+            }
+
+            return Nil.Default;
         }
     }
 }

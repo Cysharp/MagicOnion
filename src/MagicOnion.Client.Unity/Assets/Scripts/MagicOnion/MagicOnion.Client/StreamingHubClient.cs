@@ -9,6 +9,31 @@ namespace MagicOnion.Client
     public static partial class StreamingHubClient
     {
         [Obsolete("Use ConnectAsync instead.")]
+        public static TStreamingHub Connect<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var hubClient = Connect<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, serializerOptions, logger);
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (channel is IMagicOnionAwareGrpcChannel magicOnionAwareGrpcChannel)
+            {
+                magicOnionAwareGrpcChannel.ManageStreamingHubClient(typeof(TStreamingHub), hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
+            }
+            return hubClient;
+        }
+
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var hubClient = await ConnectAsync<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, serializerOptions, logger, cancellationToken);
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (channel is IMagicOnionAwareGrpcChannel magicOnionAwareGrpcChannel)
+            {
+                magicOnionAwareGrpcChannel.ManageStreamingHubClient(typeof(TStreamingHub), hubClient, hubClient.DisposeAsync, hubClient.WaitForDisconnect());
+            }
+            return hubClient;
+        }
+
+        [Obsolete("Use ConnectAsync instead.")]
         public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), MessagePackSerializerOptions serializerOptions = null, IMagicOnionClientLogger logger = null)
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
@@ -19,7 +44,7 @@ namespace MagicOnion.Client
                 var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
                 try
                 {
-                    await task;
+                    await task.ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

@@ -7,6 +7,8 @@ using MagicOnion.Client;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using MagicOnion;
+using MagicOnion.Unity;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +17,7 @@ namespace Assets.Scripts
     public class ChatComponent : MonoBehaviour, IChatHubReceiver
     {
         private CancellationTokenSource shutdownCancellation = new CancellationTokenSource();
-        private Channel channel;
+        private ChannelBase channel;
         private IChatHub streamingClient;
         private IChatService client;
 
@@ -61,11 +63,8 @@ namespace Assets.Scripts
         private async Task InitializeClientAsync()
         {
             // Initialize the Hub
-            this.channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
-            // for SSL/TLS connection
-            //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
-            //this.channel = new Channel("dummy.example.com", 5000, cred); // local tls
-            //this.channel = new Channel("your-nlb-domain.com", 5000, new SslCredentials()); // aws nlb tls
+            // NOTE: If you want to use SSL/TLS connection, see InitialSettings.OnRuntimeInitialize method.
+            this.channel = GrpcChannelx.ForAddress("http://localhost:5000");
 
             while (!shutdownCancellation.IsCancellationRequested)
             {
@@ -117,7 +116,7 @@ namespace Assets.Scripts
             finally
             {
                 // try-to-reconnect? logging event? close? etc...
-                Debug.Log($"disconnected from the server.: {this.channel.State}");
+                Debug.Log($"disconnected from the server.");
 
                 if (this.isSelfDisConnected)
                 {

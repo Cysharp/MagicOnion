@@ -4,11 +4,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["ChatApp.Server/ChatApp.Server.csproj", "ChatApp.Server/"]
-COPY ["ChatApp.Shared/ChatApp.Shared.csproj", "ChatApp.Shared/"]
-RUN dotnet restore "ChatApp.Server/ChatApp.Server.csproj"
+COPY ["samples/ChatApp.Telemetry/ChatApp.Server/ChatApp.Server.csproj", "samples/ChatApp.Telemetry/ChatApp.Server/"]
+COPY ["samples/ChatApp.Telemetry/ChatApp.Shared/ChatApp.Shared.csproj", "samples/ChatApp.Telemetry/ChatApp.Shared/"]
+COPY ["src/MagicOnion/MagicOnion.csproj", "src/MagicOnion/"]
+COPY ["src/MagicOnion.Abstractions/MagicOnion.Abstractions.csproj", "src/MagicOnion.Abstractions/"]
+COPY ["src/MagicOnion.Server/MagicOnion.Server.csproj", "src/MagicOnion.Server/"]
+COPY ["src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj", "src/MagicOnion.Server.OpenTelemetry/"]
+COPY ["src/MagicOnion.Shared/MagicOnion.Shared.csproj", "src/MagicOnion.Shared/"]
+RUN dotnet restore "samples/ChatApp.Telemetry/ChatApp.Server/ChatApp.Server.csproj"
 COPY . .
-WORKDIR "/src/ChatApp.Server"
+WORKDIR "/src/samples/ChatApp.Telemetry/ChatApp.Server"
 RUN dotnet build "ChatApp.Server.csproj" -c Debug -o /app
 
 FROM build AS publish

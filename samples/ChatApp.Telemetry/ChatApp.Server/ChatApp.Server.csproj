@@ -7,17 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.0.0-rc1.1" />
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.0.0-rc1.1" />
-    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.0.0-rc1.1" />
-    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.0.0-rc1.1" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc1.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.1.0-beta2" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.1.0-beta2" />
+    <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.1.0-beta2" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc4" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
     <ProjectReference Include="..\..\..\src\MagicOnion.Server.OpenTelemetry\MagicOnion.Server.OpenTelemetry.csproj" />
     <ProjectReference Include="..\ChatApp.Shared\ChatApp.Shared.csproj" />
+    <ProjectReference Include="..\MicroServer.Shared\MicroServer.Shared.csproj" />
   </ItemGroup>
 
   <!-- FOR SSL/TLS SUPPORT -->

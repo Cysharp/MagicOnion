@@ -53,6 +53,7 @@ namespace TempProject
             );
 
             var compilation = tempWorkspace.GetOutputCompilation();
+            compilation.GetCompilationErrors().Should().BeEmpty();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
@@ -92,6 +93,7 @@ namespace TempProject
             );
 
             var compilation = tempWorkspace.GetOutputCompilation();
+            compilation.GetCompilationErrors().Should().BeEmpty();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
@@ -130,6 +132,7 @@ namespace TempProject
             );
 
             var compilation = tempWorkspace.GetOutputCompilation();
+            compilation.GetCompilationErrors().Should().BeEmpty();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }
@@ -168,6 +171,7 @@ namespace TempProject
             );
 
             var compilation = tempWorkspace.GetOutputCompilation();
+            compilation.GetCompilationErrors().Should().BeEmpty();
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
         }

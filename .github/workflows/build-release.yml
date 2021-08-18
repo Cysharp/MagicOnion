@@ -15,8 +15,6 @@ env:
   GIT_TAG: ${{ github.event.inputs.tag }}
   DRY_RUN: ${{ github.event.inputs.dry_run }}
   DRY_RUN_BRANCH_PREFIX: "test_release"
-  DOTNET_SDK_VERISON_3: 3.1.x
-  DOTNET_SDK_VERISON_5: 5.0.x
 
 jobs:
   update-packagejson:
@@ -27,40 +25,51 @@ jobs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
       - uses: actions/checkout@v2
-      - name: before
+      - name: Output package.json (Before)
         run: cat ${{ env.TARGET_FILE}}
-      - name: update package.json to version ${{ env.GIT_TAG }}
+
+      - name: Update package.json to version ${{ env.GIT_TAG }}
         run: sed -i -e "s/\(\"version\":\) \"\(.*\)\",/\1 \"${{ env.GIT_TAG }}\",/" ${{ env.TARGET_FILE }}
-      - name: after
-        run: cat ${{ env.TARGET_FILE}}
+
+      - name: Check update
+        id: check_update
+        run: |
+          cat ${{ env.TARGET_FILE}}
+          git diff --exit-code || echo "::set-output name=changed::1"
+
       - name: Commit files
         id: commit
+        if: steps.check_update.outputs.changed == '1'
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "feat: Update package.json to ${{ env.GIT_TAG }}" -a
           echo "::set-output name=sha::$(git rev-parse HEAD)"
-      - name: check sha
+
+      - name: Check sha
         run: echo "SHA ${SHA}"
         env:
           SHA: ${{ steps.commit.outputs.sha }}
-      - name: tag
+
+      - name: Create Tag
+        if: steps.check_update.outputs.changed == '1'
         run: git tag ${{ env.GIT_TAG }}
-        if: env.DRY_RUN == 'false'
+
       - name: Push changes
+        if: env.DRY_RUN == 'false' && steps.check_update.outputs.changed == '1'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
-        if: env.DRY_RUN == 'false'
+
       - name: Push changes (dry_run)
+        if: env.DRY_RUN == 'true' && steps.check_update.outputs.changed == '1'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.GIT_TAG }}
           tags: false
-        if: env.DRY_RUN == 'true'
 
   build-dotnet:
     needs: [update-packagejson]
@@ -75,12 +84,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
       # build
       - run: dotnet build ./src/MagicOnion/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Release -p:VersionPrefix=${{ env.GIT_TAG }}
@@ -122,6 +125,23 @@ jobs:
           name: moc.${{ env.GIT_TAG }}.zip
           path: ./moc.${{ env.GIT_TAG }}.zip
 
+  build-dotnet-experimental:
+    needs: [update-packagejson]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+      - run: echo ${{ needs.update-packagejson.outputs.sha }}
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release
+      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --no-build -o ./publish
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nuget-experimental
+          path: ./publish/
+
   build-unity:
     needs: [update-packagejson]
     strategy:
@@ -129,33 +149,26 @@ jobs:
         unity: ["2019.3.9f1"]
         include:
           - unity: 2019.3.9f1
-            license: UNITY_2019_3
+            license: UNITY_LICENSE_2019
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    container:
-      # https://hub.docker.com/r/gableroux/unity3d/tags
-      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
-      # Ubuntu 18.04 git is too old, use ppa latest git.
-      - run: |
-          apt-get update && apt-get install --no-install-recommends -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
-          apt-get update && apt-get install --no-install-recommends -y git
       - uses: actions/checkout@v2
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      # activate Unity from manual license file(ulf)
-      - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
+      # execute scripts/Export Package
+      # /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
+      - name: Export unitypackage
+        uses: game-ci/unity-builder@v2.0-alpha-6
         env:
           UNITY_LICENSE: ${{ secrets[matrix.license] }}
-      - name: Activate Unity, always returns a success. But if a subsequent run fails, the activation may have failed(if succeeded, shows `Next license update check is after` and not shows other message(like GUID != GUID). If fails not). In that case, upload the artifact's .alf file to https://license.unity3d.com/manual to get the .ulf file and set it to secrets.
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
-
-      # execute scripts/Export Package
-      - name: Export unitypackage
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
-        working-directory: src/MagicOnion.Client.Unity
-        env:
           UNITY_PACKAGE_VERSION: ${{ env.GIT_TAG }}
+        with:
+          projectPath: src/MagicOnion.Client.Unity
+          unityVersion: ${{ matrix.unity }}
+          targetPlatform: StandaloneLinux64
+          buildMethod: PackageExporter.Export
+          versioning: None
 
       - name: check all .meta is commited
         run: |
@@ -170,21 +183,19 @@ jobs:
       # Store artifacts.
       - uses: actions/upload-artifact@v1
         with:
-          name: MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
-          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
+          name: MagicOnion.Client.Unity.unitypackage
+          path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
 
   create-release:
     if: github.event.inputs.dry_run == 'false'
-    needs: [update-packagejson, build-dotnet, build-unity]
+    needs:
+      [update-packagejson, build-dotnet, build-dotnet-experimental, build-unity]
     runs-on: ubuntu-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
     steps:
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
       # Create Release
       - uses: actions/create-release@v1
         id: create_release
@@ -199,6 +210,7 @@ jobs:
       - uses: actions/download-artifact@v2-preview
       # Upload to NuGet
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
+      - run: dotnet nuget push "./nuget-experimental/*.nupkg" --skip-duplicate -s https://www.nuget.org/api/v2/package -k ${{ secrets.NUGET_KEY }}
       # Upload to Releases(generator)
       - uses: actions/upload-release-asset@v1
         env:
@@ -214,7 +226,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage/MagicOnion.Client.Unity.${{ env.GIT_TAG }}.unitypackage
+          asset_path: ./MagicOnion.Client.Unity.unitypackage/MagicOnion.Client.Unity.unitypackage
           asset_name: MagicOnion.Client.Unity.unitypackage
           asset_content_type: application/octet-stream
 

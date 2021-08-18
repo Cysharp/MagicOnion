@@ -12,23 +12,14 @@ on:
 
 jobs:
   build-dotnet:
-    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
     runs-on: ubuntu-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
-      DOTNET_SDK_VERSION_3: "3.1.x"
-      DOTNET_SDK_VERSION_5: "5.0.x"
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
       # build
       - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
@@ -45,33 +36,33 @@ jobs:
       - run: dotnet test ./tests/MagicOnion.Server.Tests/ -c Debug
       - run: dotnet test ./tests/MagicOnion.Generator.Tests/ -c Debug
 
+  build-dotnet-experimental:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
+
   build-unity:
-    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]')) && ((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"
+    if: "((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"
     strategy:
       matrix:
-        unity: ["2019.3.9f1", "2020.1.0b5"]
+        unity: ["2019.3.9f1", "2019.4.13f1", "2020.1.12f1"]
         include:
           - unity: 2019.3.9f1
-            license: UNITY_2019_3
-          - unity: 2020.1.0b5
-            license: UNITY_2020_1
+            license: UNITY_LICENSE_2019
+          - unity: 2019.4.13f1
+            license: UNITY_LICENSE_2019
+          - unity: 2020.1.12f1
+            license: UNITY_LICENSE_2020
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    container:
-      # https://hub.docker.com/r/gableroux/unity3d/tags
-      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     steps:
-      # Ubuntu 18.04 git is too old, use ppa latest git.
-      - run: |
-          apt-get update && apt-get install --no-install-recommends -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
-          apt-get update && apt-get install --no-install-recommends -y git
       - uses: actions/checkout@v2
-      # activate Unity from manual license file(ulf)
-      - run: echo -n "$UNITY_LICENSE" >> .Unity.ulf
-        env:
-          UNITY_LICENSE: ${{ secrets[matrix.license] }}
-      - name: Activate Unity, always returns a success. But if a subsequent run fails, the activation may have failed(if succeeded, shows `Next license update check is after` and not shows other message(like GUID != GUID). If fails not). In that case, upload the artifact's .alf file to https://license.unity3d.com/manual to get the .ulf file and set it to secrets.
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
 
       # todo: prepare runtime unit test
       # Execute scripts: RuntimeUnitTestToolkit
@@ -82,9 +73,17 @@ jobs:
       #   run: ./src/ZLogger.Unity/bin/UnitTest/StandaloneLinux64_Mono2x/test
 
       # execute scripts/Export Package
+      # /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
       - name: Export unitypackage
-        run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
-        working-directory: src/MagicOnion.Client.Unity
+        uses: game-ci/unity-builder@v2.0-alpha-6
+        env:
+          UNITY_LICENSE: ${{ secrets[matrix.license] }}
+        with:
+          projectPath: src/MagicOnion.Client.Unity
+          unityVersion: ${{ matrix.unity }}
+          targetPlatform: StandaloneLinux64
+          buildMethod: PackageExporter.Export
+          versioning: None
 
       - name: check all .meta is commited
         run: |

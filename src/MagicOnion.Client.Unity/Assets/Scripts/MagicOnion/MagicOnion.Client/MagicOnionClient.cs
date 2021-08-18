@@ -8,6 +8,24 @@ namespace MagicOnion.Client
     {
         static readonly IClientFilter[] emptyFilters = Array.Empty<IClientFilter>();
 
+        public static T Create<T>(ChannelBase channel)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, emptyFilters);
+        }
+
+        public static T Create<T>(ChannelBase channel, IClientFilter[] clientFilters)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, clientFilters);
+        }
+
+        public static T Create<T>(ChannelBase channel, MessagePackSerializerOptions serializerOptions)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), serializerOptions, emptyFilters);
+        }
+
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
@@ -35,7 +53,7 @@ namespace MagicOnion.Client
             if (ctor == null)
             {
 #if ((ENABLE_IL2CPP && !UNITY_EDITOR) || NET_STANDARD_2_0)
-                throw new InvalidOperationException("Does not registered client factory, dynamic code generation is not supported on IL2CPP. Please use code generator(moc).");
+                throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
 #else
                 var t = DynamicClientBuilder<T>.ClientType;
                 return (T)Activator.CreateInstance(t, invoker, serializerOptions, clientFilters);

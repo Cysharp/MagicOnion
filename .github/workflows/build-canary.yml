@@ -10,7 +10,6 @@ on:
 
 jobs:
   canary-build:
-    if: "!(contains(github.event.head_commit.message, '[skip ci]') || contains(github.event.head_commit.message, '[ci skip]'))"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -18,16 +17,8 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
       DISABLE_NETFX_TARGET_BUILD: 1
-      DOTNET_SDK_VERSION_3: "3.1.403"
-      DOTNET_SDK_VERSION_5: "5.0.100"
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_3 }}"
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "${{ env.DOTNET_SDK_VERSION_5 }}"
       - run: echo "MAGICONION_VERSION=ci-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
       - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
       # build
@@ -70,8 +61,24 @@ jobs:
           name: moc.${{ env.MAGICONION_VERSION }}.zip
           path: ./moc.${{ env.MAGICONION_VERSION }}.zip
 
+  canary-build-experimental:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "MAGICONION_VERSION=ci-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+      - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
+      # build
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release -p:VersionSuffix=${MAGICONION_VERSION}
+      # test
+      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - uses: actions/upload-artifact@v1
+        with:
+          name: nuget-experimental
+          path: ./publish/
+
   canary-push:
-    needs: [canary-build]
+    needs: [canary-build, canary-build-experimental]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -80,10 +87,7 @@ jobs:
       NUGET_XMLDOC_MODE: skip
       NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: true
     steps:
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.101
-      - uses: actions/download-artifact@v2-preview
+      - uses: actions/download-artifact@v2
       # Upload to NuGet
       - run: echo "VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=${FEED_ENDPOINTS}" >> $GITHUB_ENV
         env:
