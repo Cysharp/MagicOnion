@@ -4,6 +4,7 @@ using MagicOnion.CompilerServices; // require this using in AsyncMethodBuilder
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace MagicOnion
 {
@@ -16,17 +17,19 @@ namespace MagicOnion
         /// Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result.
         /// </summary>
         public static UnaryResult<T> FromResult<T>(T value)
-        {
-            return new UnaryResult<T>(value);
-        }
+            => new UnaryResult<T>(value);
 
         /// <summary>
         /// Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result task.
         /// </summary>
         public static UnaryResult<T> FromResult<T>(Task<T> task)
-        {
-            return new UnaryResult<T>(task);
-        }
+            => new UnaryResult<T>(task);
+
+        /// <summary>
+        /// Gets the result that contains <see cref="F:MessagePack.Nil.Default"/> as the result value.
+        /// </summary>
+        public static UnaryResult<Nil> Nil
+            => new UnaryResult<Nil>(MessagePack.Nil.Default);
     }
 
     /// <summary>
