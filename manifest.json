@@ -2469,7 +2469,19 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnaryResult-1.html",
-          "hash": "HQpNaIdPuPleJBAyrZyg6A=="
+          "hash": "RIeX9GganqfTqvCfVGWB1w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnaryResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnaryResult.html",
+          "hash": "dNYoeP7YlZ9fco25i8y4lw=="
         }
       },
       "is_incremental": false,
@@ -2577,7 +2589,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.html",
-          "hash": "1eXdrosPqGH/qoAVUvjbkw=="
+          "hash": "EL80MYT69RLfnyxySoQbQw=="
         }
       },
       "is_incremental": false,
@@ -2673,7 +2685,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "ZfZBQ/X7Qu+/xCo8q7iLJg=="
+          "hash": "hm84Evqo57lg8fbNR5u6og=="
         }
       },
       "is_incremental": false,
@@ -2760,7 +2772,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 222,
+          "total_file_count": 223,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

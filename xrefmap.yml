@@ -14911,6 +14911,50 @@ references:
   fullName.vb: MagicOnion.ServerStreamingResult(Of TResponse).ResponseStream
   nameWithType: ServerStreamingResult<TResponse>.ResponseStream
   nameWithType.vb: ServerStreamingResult(Of TResponse).ResponseStream
+- uid: MagicOnion.UnaryResult
+  name: UnaryResult
+  href: api/MagicOnion.UnaryResult.html
+  commentId: T:MagicOnion.UnaryResult
+  fullName: MagicOnion.UnaryResult
+  nameWithType: UnaryResult
+- uid: MagicOnion.UnaryResult.FromResult*
+  name: FromResult
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_FromResult_
+  commentId: Overload:MagicOnion.UnaryResult.FromResult
+  isSpec: "True"
+  fullName: MagicOnion.UnaryResult.FromResult
+  nameWithType: UnaryResult.FromResult
+- uid: MagicOnion.UnaryResult.FromResult``1(``0)
+  name: FromResult<T>(T)
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_FromResult__1___0_
+  commentId: M:MagicOnion.UnaryResult.FromResult``1(``0)
+  name.vb: FromResult(Of T)(T)
+  fullName: MagicOnion.UnaryResult.FromResult<T>(T)
+  fullName.vb: MagicOnion.UnaryResult.FromResult(Of T)(T)
+  nameWithType: UnaryResult.FromResult<T>(T)
+  nameWithType.vb: UnaryResult.FromResult(Of T)(T)
+- uid: MagicOnion.UnaryResult.FromResult``1(Task{``0})
+  name: FromResult<T>(Task<T>)
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_FromResult__1_Task___0__
+  commentId: M:MagicOnion.UnaryResult.FromResult``1(Task{``0})
+  name.vb: FromResult(Of T)(Task(Of T))
+  fullName: MagicOnion.UnaryResult.FromResult<T>(Task<T>)
+  fullName.vb: MagicOnion.UnaryResult.FromResult(Of T)(Task(Of T))
+  nameWithType: UnaryResult.FromResult<T>(Task<T>)
+  nameWithType.vb: UnaryResult.FromResult(Of T)(Task(Of T))
+- uid: MagicOnion.UnaryResult.Nil
+  name: Nil
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_Nil
+  commentId: P:MagicOnion.UnaryResult.Nil
+  fullName: MagicOnion.UnaryResult.Nil
+  nameWithType: UnaryResult.Nil
+- uid: MagicOnion.UnaryResult.Nil*
+  name: Nil
+  href: api/MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_Nil_
+  commentId: Overload:MagicOnion.UnaryResult.Nil
+  isSpec: "True"
+  fullName: MagicOnion.UnaryResult.Nil
+  nameWithType: UnaryResult.Nil
 - uid: MagicOnion.UnaryResult`1
   name: UnaryResult<TResponse>
   href: api/MagicOnion.UnaryResult-1.html
