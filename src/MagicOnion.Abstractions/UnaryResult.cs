@@ -1,19 +1,44 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.CompilerServices; // require this using in AsyncMethodBuilder
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace MagicOnion
 {
     /// <summary>
-    /// Wrapped AsyncUnaryCall.
+    /// Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.
+    /// </summary>
+    public static class UnaryResult
+    {
+        /// <summary>
+        /// Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result.
+        /// </summary>
+        public static UnaryResult<T> FromResult<T>(T value)
+            => new UnaryResult<T>(value);
+
+        /// <summary>
+        /// Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result task.
+        /// </summary>
+        public static UnaryResult<T> FromResult<T>(Task<T> task)
+            => new UnaryResult<T>(task);
+
+        /// <summary>
+        /// Gets the result that contains <see cref="F:MessagePack.Nil.Default"/> as the result value.
+        /// </summary>
+        public static UnaryResult<Nil> Nil
+            => new UnaryResult<Nil>(MessagePack.Nil.Default);
+    }
+
+    /// <summary>
+    /// Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.
     /// </summary>
 #if NON_UNITY || (CSHARP_7_OR_LATER || (UNITY_2018_3_OR_NEWER && (NET_STANDARD_2_0 || NET_4_6)))
     [AsyncMethodBuilder(typeof(AsyncUnaryResultMethodBuilder<>))]
 #endif
-    public struct UnaryResult<TResponse>
+    public readonly struct UnaryResult<TResponse>
     {
         internal readonly bool hasRawValue; // internal
         internal readonly TResponse rawValue; // internal
