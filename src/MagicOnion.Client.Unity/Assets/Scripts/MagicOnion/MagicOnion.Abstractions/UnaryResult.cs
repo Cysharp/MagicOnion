@@ -58,7 +58,7 @@ namespace MagicOnion
         {
             this.hasRawValue = true;
             this.rawValue = default(TResponse);
-            this.rawTaskValue = rawTaskValue;
+            this.rawTaskValue = rawTaskValue ?? throw new ArgumentNullException(nameof(rawTaskValue));
             this.response = null;
         }
 
@@ -67,7 +67,7 @@ namespace MagicOnion
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
             this.rawTaskValue = null;
-            this.response = response;
+            this.response = response ?? throw new ArgumentNullException(nameof(response));
         }
 
         /// <summary>
@@ -79,6 +79,13 @@ namespace MagicOnion
             {
                 if (!hasRawValue)
                 {
+                    // If the UnaryResult has no raw-value and no response, it is the default value of UnaryResult<TResponse>.
+                    // So, we will return the default value of TResponse as Task.
+                    if (response is null)
+                    {
+                        return Task.FromResult(default(TResponse));
+                    }
+
                     return UnwrapResponse();
                 }
                 else if (rawTaskValue != null)
