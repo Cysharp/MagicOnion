@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Grpc.Core;
+using MagicOnion.Client;
 using Xunit;
 
 namespace MagicOnion.Server.Tests
@@ -42,6 +44,43 @@ namespace MagicOnion.Server.Tests
             (await result2).Should().Be("foo");
 
             Assert.Throws<ArgumentNullException>(() => new UnaryResult<string>(default(Task<string>)));
+        }
+
+        [Fact]
+        public async Task Ctor_TaskOfResponseContext()
+        {
+            var result = new UnaryResult<int>(Task.FromResult(DummyResponseContext.Create(456)));
+            (await result).Should().Be(456);
+
+            var result2 = new UnaryResult<string>(Task.FromResult(DummyResponseContext.Create("foo")));
+            (await result2).Should().Be("foo");
+
+            Assert.Throws<ArgumentNullException>(() => new UnaryResult<string>(default(Task<IResponseContext<string>>)));
+        }
+
+        static class DummyResponseContext
+        {
+            public static IResponseContext<T> Create<T>(T value)
+                => new DummyResponseContext<T>(value);
+        }
+        class DummyResponseContext<T> : IResponseContext<T>
+        {
+            readonly T value;
+
+            public DummyResponseContext(T value)
+            {
+                this.value = value;
+            }
+
+            public Task<Metadata> ResponseHeadersAsync => Task.FromResult(Metadata.Empty);
+            public Status GetStatus() => Status.DefaultSuccess;
+            public Metadata GetTrailers() => Metadata.Empty;
+
+            public Type ResponseType => typeof(T);
+            public Task<T> ResponseAsync => Task.FromResult(value);
+
+            public void Dispose() { }
+
         }
 
         [Fact]
