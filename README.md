@@ -1467,10 +1467,10 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
         var waitTask = Task.Run(async () =>
         {
             // ForEachAsync(MoveNext, Current) can receive client streaming.
-            await stream.ForEachAsync(x =>
+            while (await stream.MoveNext())
             {
-                Logger.Debug($"Duplex Streaming Received:" + x);
-            });
+                Logger.Debug($"Duplex Streaming Received:" + stream.Current);
+            }
         });
 
         // WriteAsync is ServerStreaming.
