@@ -1528,8 +1528,9 @@ static async Task DuplexStreamRun(IMyFirstService client)
     var stream = await client.DuplexStreamingSampleAsync();
 
     var count = 0;
-    await stream.ResponseStream.ForEachAsync(async x =>
+    while (await stream.ResponseStream.MoveNext())
     {
+        var x = stream.Current; 
         Console.WriteLine("DuplexStream Response:" + x);
 
         await stream.RequestStream.WriteAsync(count++);
@@ -1537,7 +1538,7 @@ static async Task DuplexStreamRun(IMyFirstService client)
         {
             await stream.RequestStream.CompleteAsync();
         }
-    });
+    }
 }
 ```
 
