@@ -10,16 +10,22 @@ on:
     branches:
       - "master"
 
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  NUGET_XMLDOC_MODE: skip
+  DOTNET_VERSION: '6.0.x'
+
 jobs:
   build-dotnet:
     runs-on: ubuntu-latest
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      NUGET_XMLDOC_MODE: skip
+
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
       # build
       - run: dotnet build ./src/MagicOnion/ -c Debug
       - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
@@ -38,13 +44,12 @@ jobs:
 
   build-dotnet-experimental:
     runs-on: ubuntu-latest
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      NUGET_XMLDOC_MODE: skip
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
       - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
 
   build-unity:
