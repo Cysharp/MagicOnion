@@ -3,7 +3,7 @@
     <PropertyGroup>
         <!-- net471 can not ignore for DynamicCodeDumper(.NET Core lacks assembly save) but currently removed(for CI) -->
         <!--<TargetFrameworks>netcoreapp3.1;net471</TargetFrameworks>-->
-        <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
         <OutputType>Library</OutputType>
         <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
         <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
