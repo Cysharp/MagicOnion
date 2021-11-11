@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using System;
@@ -45,10 +45,10 @@ namespace MagicOnion.Server.Tests
             var streaming = GetClientStreamingContext<int, string>();
 
             var list = new List<int>();
-            await streaming.ForEachAsync(x =>
+            await foreach (var x in streaming.ReadAllAsync())
             {
                 list.Add(x);
-            });
+            }
 
             return streaming.Result("finished:" + string.Join(", ", list));
         }
@@ -65,9 +65,9 @@ namespace MagicOnion.Server.Tests
 
             var l = new List<int>();
 
-            while (await stream.MoveNext())
+            await foreach (var x in stream.ReadAllAsync())
             {
-                l.Add(stream.Current);
+                l.Add(x);
                 await stream.WriteAsync(string.Join(", ", l));
             }
 
@@ -138,7 +138,7 @@ namespace MagicOnion.Server.Tests
             r.Should().Be(30);
 
             var r0 = await client.Unary1Task(1000, 2000);
-            var r2 = await r0; 
+            var r2 = await r0;
             r2.Should().Be(3000);
         }
 

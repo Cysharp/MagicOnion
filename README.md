@@ -1432,10 +1432,10 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
         var stream = GetClientStreamingContext<int, string>();
 
         // receive from client asynchronously
-        await stream.ForEachAsync(x =>
+        await foreach (var x in stream.ReadAllAsync())
         {
             Logger.Debug("Client Stream Received:" + x);
-        });
+        }
 
         // StreamingContext.Result() for result value.
         return stream.Result("finished");
@@ -1467,9 +1467,9 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
         var waitTask = Task.Run(async () =>
         {
             // ForEachAsync(MoveNext, Current) can receive client streaming.
-            while (await stream.MoveNext())
+            await foreach (var x in stream.ReadAllAsync())
             {
-                Logger.Debug($"Duplex Streaming Received:" + stream.Current);
+                Logger.Debug($"Duplex Streaming Received:" + x);
             }
         });
 
@@ -1517,10 +1517,10 @@ static async Task ServerStreamRun(IMyFirstService client)
 {
     var stream = await client.ServerStreamingSampleAsync(10, 20, 3);
 
-    await stream.ResponseStream.ForEachAsync(x =>
+    await foreach (var x in stream.ResponseStream.ReadAllAsync())
     {
         Console.WriteLine("ServerStream Response:" + x);
-    });
+    }
 }
 
 static async Task DuplexStreamRun(IMyFirstService client)
