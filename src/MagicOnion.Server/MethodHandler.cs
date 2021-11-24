@@ -307,7 +307,6 @@ namespace MagicOnion.Server
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(UnaryServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
-
                         var handler = (UnaryServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this);
                         binder.AddMethod(method, handler);
                     }
@@ -346,10 +345,8 @@ namespace MagicOnion.Server
 
         async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
         {
-            using var serviceLocatorScope = serviceProvider.CreateScope();
-
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceProvider);
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices);
             serviceContext.SetRawRequest(request);
 
             byte[] response = emptyBytes;
@@ -414,10 +411,8 @@ namespace MagicOnion.Server
 
         async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
         {
-            using var serviceLocatorScope = serviceProvider.CreateScope();
-
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceProvider)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
             {
                 RequestStream = requestStream
             };
@@ -464,10 +459,8 @@ namespace MagicOnion.Server
 
         async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
-            using var serviceLocatorScope = serviceProvider.CreateScope();
-
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceProvider)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
             {
                 ResponseStream = responseStream,
             };
@@ -510,10 +503,8 @@ namespace MagicOnion.Server
 
         async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
         {
-            using var serviceLocatorScope = serviceProvider.CreateScope();
-
             var isErrorOrInterrupted = false;
-            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, serviceLocatorScope.ServiceProvider)
+            var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
             {
                 RequestStream = requestStream,
                 ResponseStream = responseStream
