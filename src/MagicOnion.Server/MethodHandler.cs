@@ -560,7 +560,7 @@ namespace MagicOnion.Server
 
         public override string ToString()
         {
-            return ServiceName + "/" + MethodInfo.Name;
+            return ServiceName + "/" + MethodName;
         }
 
         public override int GetHashCode()

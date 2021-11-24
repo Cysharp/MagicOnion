@@ -132,7 +132,7 @@ namespace MagicOnion.Server.HttpGateway
                 // JSON to C# Object to MessagePack
                 var requestObject = handler.BoxedSerialize(deserializedObject);
 
-                var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodInfo.Name, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+                var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
                 // create header
                 var metadata = new Metadata();
