@@ -5,6 +5,9 @@ using System.IO;
 using System.Threading.Tasks;
 using MagicOnion.Utils;
 using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -108,6 +111,17 @@ namespace MagicOnion.Server.Hubs
             {
                 // NOTE: If DuplexStreaming is disconnected by the client, IOException will be thrown.
                 //       However, such behavior is expected. the exception can be ignored.
+            }
+            catch (IOException ex)
+            {
+                // NOTE: If the connection closed with STREAM_RST, PipeReader throws an IOException.
+                //       However, such behavior is expected. the exception can be ignored.
+                //       https://github.com/dotnet/aspnetcore/blob/v6.0.0/src/Servers/Kestrel/Core/src/Internal/Http2/Http2Stream.cs#L516-L523
+                var httpRequestLifetimeFeature = this.Context.ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext.Features.Get<IHttpRequestLifetimeFeature>();
+                if (httpRequestLifetimeFeature is null || httpRequestLifetimeFeature.RequestAborted.IsCancellationRequested)
+                {
+                    throw;
+                }
             }
             finally
             {
