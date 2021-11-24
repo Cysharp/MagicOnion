@@ -201,7 +201,7 @@ namespace MagicOnion.Server
                         }
 
                         streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-                        StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers.ToArray());
+                        StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
                         IGroupRepositoryFactory factory;
                         var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                         if (attr != null)

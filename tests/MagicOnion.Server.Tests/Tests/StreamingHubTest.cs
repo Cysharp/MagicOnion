@@ -148,7 +148,7 @@ namespace MagicOnion.Server.Tests
         {
             try
             {
-                client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+                client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
                 await client.ZeroArgument();
                 await voidZeroTask.Task;
                 //await zeroTask.Task;
@@ -167,7 +167,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task OneArgument()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             await client.OneArgument(100);
             //var x = await oneTask.Task;
             var y = await voidoneTask.Task;
@@ -179,7 +179,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task MoreArgument()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             await client.MoreArgument(100, "foo", 10.3);
             //var x = await moreTask.Task;
             var y = await voidmoreTask.Task;
@@ -191,7 +191,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task RetrunZeroArgument()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             var v = await client.RetrunZeroArgument();
             v.Should().Be(1000);
             await client.DisposeAsync();
@@ -199,7 +199,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task RetrunOneArgument()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             var v = await client.RetrunZeroArgument();
             v.Should().Be(1000);
             await client.DisposeAsync();
@@ -207,7 +207,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task RetrunMoreArgument()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             var v = await client.RetrunMoreArgument(10, "foo", 30.4);
             v.Should().Be(30.4);
             await client.DisposeAsync();
@@ -216,7 +216,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task OneArgument2()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             await client.OneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
             {
                 //var v = await one2Task.Task;
@@ -235,7 +235,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task RetrunOneArgument2()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             var v = await client.RetrunOneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
             v.X.Should().Be(10);
             v.Y.Should().Be(99);
@@ -246,7 +246,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task OneArgument3()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             await client.OneArgument3(new[]
             {
                 new TestObject() { X = 10, Y = 99, Z = 100 },
@@ -288,7 +288,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task RetrunOneArgument3()
         {
-            var client = StreamingHubClient.Connect<ITestHub, IMessageReceiver>(channel, this);
+            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
             var v = await client.RetrunOneArgument3(new[]
             {
                 new TestObject() { X = 10, Y = 99, Z = 100 },
@@ -440,7 +440,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task ReceiveEx()
         {
-            client = StreamingHubClient.Connect<IMoreCheckHub, IEmptyReceiver>(channel, this);
+            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
 
             var ex = Assert.Throws<RpcException>(() =>
             {
@@ -456,7 +456,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task StatusCodeEx()
         {
-            client = StreamingHubClient.Connect<IMoreCheckHub, IEmptyReceiver>(channel, this);
+            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
 
             var ex = Assert.Throws<RpcException>(() =>
             {
@@ -473,7 +473,7 @@ namespace MagicOnion.Server.Tests
         [Fact]
         public async Task Filter()
         {
-            client = StreamingHubClient.Connect<IMoreCheckHub, IEmptyReceiver>(channel, this);
+            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
             await client.FilterCheckAsync();
         }
 
