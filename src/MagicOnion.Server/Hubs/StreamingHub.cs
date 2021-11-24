@@ -112,13 +112,15 @@ namespace MagicOnion.Server.Hubs
                 // NOTE: If DuplexStreaming is disconnected by the client, IOException will be thrown.
                 //       However, such behavior is expected. the exception can be ignored.
             }
-            catch (IOException)
+            catch (Exception ex) when (ex is IOException or InvalidOperationException)
             {
-                // NOTE: If the connection closed with STREAM_RST, PipeReader throws an IOException.
+                var httpRequestLifetimeFeature = this.Context.CallContext.GetHttpContext()?.Features.Get<IHttpRequestLifetimeFeature>();
+
+                // NOTE: If the connection is completed when a message is written, PipeWriter throws an InvalidOperationException.
+                // NOTE: If the connection is closed with STREAM_RST, PipeReader throws an IOException.
                 //       However, such behavior is expected. the exception can be ignored.
                 //       https://github.com/dotnet/aspnetcore/blob/v6.0.0/src/Servers/Kestrel/Core/src/Internal/Http2/Http2Stream.cs#L516-L523
-                var httpRequestLifetimeFeature = this.Context.ServiceProvider.GetService<IHttpContextAccessor>()?.HttpContext?.Features.Get<IHttpRequestLifetimeFeature>();
-                if (httpRequestLifetimeFeature is null || !httpRequestLifetimeFeature.RequestAborted.IsCancellationRequested)
+                if (httpRequestLifetimeFeature is null || httpRequestLifetimeFeature.RequestAborted.IsCancellationRequested is false)
                 {
                     throw;
                 }
