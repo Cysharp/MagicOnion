@@ -103,7 +103,7 @@ namespace MagicOnion.Client
                 await firstMoveNextTask.ConfigureAwait(false);
 
                 // NOTE: C-core: If the execution reaches here, Connect method returns without any error (StatusCode = OK). but MessageVersion isn't provided from the server.
-                throw new RpcException(new Status(StatusCode.Internal, $"The request completed successfully (StatusCode = OK), but the client has failed to negotiate with the server."));
+                throw new RpcException(new Status(StatusCode.Internal, $"The request completed successfully (StatusCode = OK), but the StreamingHub client has failed to negotiate with the server."));
             }
 
             this.subscription = StartSubscribe(syncContext, firstMoveNextTask);
