@@ -34,7 +34,6 @@ jobs:
       - run: dotnet build ./src/MagicOnion.Server/ -c Debug
       - run: dotnet build ./src/MagicOnion.Server.HttpGateway/ -c Debug
       - run: dotnet build ./src/MagicOnion.Server.Redis/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Server.Authentication/ -c Debug
       #- run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
       - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Debug
       - run: dotnet build ./src/MagicOnion.Generator/ -c Debug
