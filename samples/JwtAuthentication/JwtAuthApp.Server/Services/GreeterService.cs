@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
-using JwtAuthApp.Server.Authentication;
+using Grpc.Core;
 using JwtAuthApp.Shared;
 using MagicOnion;
 using MagicOnion.Server;
-using MagicOnion.Server.Authentication;
+using Microsoft.AspNetCore.Authorization;
+
+#pragma warning disable CS1998
 
 namespace JwtAuthApp.Server.Services
 {
@@ -14,8 +17,8 @@ namespace JwtAuthApp.Server.Services
     {
         public async UnaryResult<string> HelloAsync()
         {
-            var identity = (CustomJwtAuthUserIdentity) Context.GetPrincipal().Identity;
-            return $"Hello {identity.Name} (UserId:{identity.UserId})!";
+            var userPrincipal = Context.CallContext.GetHttpContext().User;
+            return $"Hello {userPrincipal.Identity?.Name} (UserId:{userPrincipal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value})!";
         }
     }
 }

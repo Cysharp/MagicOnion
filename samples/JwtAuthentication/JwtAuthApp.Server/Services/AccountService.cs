@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Grpc.Core;
 using JwtAuthApp.Server.Authentication;
 using JwtAuthApp.Shared;
 using MagicOnion;
 using MagicOnion.Server;
-using MagicOnion.Server.Authentication;
-using MagicOnion.Server.Authentication.Jwt;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JwtAuthApp.Server.Services
 {
@@ -21,11 +22,11 @@ namespace JwtAuthApp.Server.Services
             {"kyaru@example.com", ("P@ssword2", 1002, "Kiruya Momochi")},
         };
 
-        private readonly IJwtAuthenticationProvider _jwtAuthProvider;
+        private readonly JwtTokenService _jwtTokenService;
 
-        public AccountService(IJwtAuthenticationProvider jwtAuthProvider)
+        public AccountService(JwtTokenService jwtTokenService)
         {
-            _jwtAuthProvider = jwtAuthProvider ?? throw new ArgumentNullException(nameof(jwtAuthProvider));
+            _jwtTokenService = jwtTokenService ?? throw new ArgumentNullException(nameof(jwtTokenService));
         }
 
         [AllowAnonymous]
@@ -35,13 +36,13 @@ namespace JwtAuthApp.Server.Services
 
             if (DummyUsers.TryGetValue(signInId, out var userInfo) && userInfo.Password == password)
             {
-                var encodedPayload = _jwtAuthProvider.CreateTokenFromPayload(new CustomJwtAuthenticationPayload() {UserId = userInfo.UserId, DisplayName = userInfo.DisplayName});
+                var (token, expires) = _jwtTokenService.CreateToken(userInfo.UserId, userInfo.DisplayName);
 
                 return new SignInResponse(
                     userInfo.UserId,
                     userInfo.DisplayName,
-                    encodedPayload.Token,
-                    encodedPayload.Expiration
+                    token,
+                    expires
                 );
             }
 
@@ -53,25 +54,27 @@ namespace JwtAuthApp.Server.Services
         {
             await Task.Delay(1); // some workloads...
 
-            var identity = Context.GetPrincipal().Identity;
-            if (identity is CustomJwtAuthUserIdentity customIdentity)
+            var userPrincipal = Context.CallContext.GetHttpContext().User;
+            if (userPrincipal.Identity?.IsAuthenticated ?? false)
             {
-                if (customIdentity.IsAuthenticated)
+                if (!int.TryParse(userPrincipal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value, out var userId))
                 {
-                    var user = DummyUsers.SingleOrDefault(x => x.Value.UserId == customIdentity.UserId).Value;
-                    return new CurrentUserResponse()
-                    {
-                        IsAuthenticated = true,
-                        UserId = user.UserId,
-                        Name = user.DisplayName,
-                    };
+                    return CurrentUserResponse.Anonymous;
                 }
+
+                var user = DummyUsers.SingleOrDefault(x => x.Value.UserId == userId).Value;
+                return new CurrentUserResponse()
+                {
+                    IsAuthenticated = true,
+                    UserId = user.UserId,
+                    Name = user.DisplayName,
+                };
             }
 
             return CurrentUserResponse.Anonymous;
         }
 
-        [Authorize(Roles = new[] {"Administrators"})]
+        [Authorize(Roles = "Administrators")]
         public async UnaryResult<string> DangerousOperationAsync()
         {
             await Task.Delay(1); // some workloads...

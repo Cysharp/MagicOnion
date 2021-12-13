@@ -2,12 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
-    <ProjectReference Include="..\..\..\src\MagicOnion.Server.Authentication\MagicOnion.Server.Authentication.csproj" />
     <ProjectReference Include="..\JwtAuthApp.Shared\JwtAuthApp.Shared.csproj" />
   </ItemGroup>
 
