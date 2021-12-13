@@ -18,7 +18,7 @@ namespace JwtAuthApp.Shared
     {
         public long UserId { get; set; }
         public string Name { get; set; }
-        public byte[] Token { get; set; }
+        public string Token { get; set; }
         public DateTimeOffset Expiration { get; set; }
         public bool Success { get; set; }
 
@@ -26,7 +26,7 @@ namespace JwtAuthApp.Shared
 
         public SignInResponse() { }
 
-        public SignInResponse(long userId, string name, byte[] token, DateTimeOffset expiration)
+        public SignInResponse(long userId, string name, string token, DateTimeOffset expiration)
         {
             Success = true;
             UserId = userId;

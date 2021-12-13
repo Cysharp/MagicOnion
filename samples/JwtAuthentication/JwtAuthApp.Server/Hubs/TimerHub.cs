@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using JwtAuthApp.Server.Authentication;
+using Grpc.Core;
 using JwtAuthApp.Shared;
 using MagicOnion.Server;
-using MagicOnion.Server.Authentication;
 using MagicOnion.Server.Hubs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JwtAuthApp.Server.Hubs
 {
@@ -31,8 +32,8 @@ namespace JwtAuthApp.Server.Hubs
                 {
                     await Task.Delay(_interval, _cancellationTokenSource.Token);
 
-                    var identity = Context.GetPrincipal().Identity as CustomJwtAuthUserIdentity;
-                    BroadcastToSelf(_group).OnTick($"UserId={identity.UserId}; Name={identity.Name}");
+                    var userPrincipal = Context.CallContext.GetHttpContext().User;
+                    BroadcastToSelf(_group).OnTick($"UserId={userPrincipal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value}; Name={userPrincipal.Identity?.Name}");
                 }
             });
         }

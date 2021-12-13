@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -17,6 +18,7 @@ namespace JwtAuthApp.Client
         private async Task MainCore(string[] args)
         {
             var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            //var channel = new Channel("127.0.0.1", 5000, ChannelCredentials.Insecure);
 
             // 1. Call an API without an authentication token.
             {
@@ -56,7 +58,7 @@ namespace JwtAuthApp.Client
                     this,
                     option: new CallOptions().WithHeaders(new Metadata()
                     {
-                        { "auth-token-bin", AuthenticationTokenStorage.Current.Token }
+                        { "Authorization", "Bearer " + AuthenticationTokenStorage.Current.Token }
                     }));
                 await timerHubClient.SetAsync(TimeSpan.FromSeconds(5));
                 await Task.Yield(); // NOTE: Release the gRPC's worker thread here.
@@ -96,9 +98,9 @@ namespace JwtAuthApp.Client
     {
         private readonly string _signInId;
         private readonly string _password;
-        private readonly GrpcChannel _channel;
+        private readonly ChannelBase _channel;
 
-        public WithAuthenticationFilter(string signInId, string password, GrpcChannel channel)
+        public WithAuthenticationFilter(string signInId, string password, ChannelBase channel)
         {
             _signInId = signInId ?? throw new ArgumentNullException(nameof(signInId));
             _password = password ?? throw new ArgumentNullException(nameof(password));
@@ -121,12 +123,12 @@ namespace JwtAuthApp.Client
 
                 AuthenticationTokenStorage.Current.Update(authResult.Token, authResult.Expiration); // NOTE: You can also read the token expiration date from JWT.
 
-                context.CallOptions.Headers.Remove(new Metadata.Entry("auth-token-bin", Array.Empty<byte>()));
+                context.CallOptions.Headers.Remove(new Metadata.Entry("Authorization", string.Empty));
             }
 
-            if (!context.CallOptions.Headers.Contains(new Metadata.Entry("auth-token-bin", Array.Empty<byte>())))
+            if (!context.CallOptions.Headers.Contains(new Metadata.Entry("Authorization", string.Empty)))
             {
-                context.CallOptions.Headers.Add("auth-token-bin", AuthenticationTokenStorage.Current.Token);
+                context.CallOptions.Headers.Add("Authorization", "Bearer " + AuthenticationTokenStorage.Current.Token);
             }
 
             return await next(context);
@@ -141,12 +143,12 @@ namespace JwtAuthApp.Client
 
         private readonly object _syncObject = new object();
 
-        public byte[] Token { get; private set; }
+        public string Token { get; private set; }
         public DateTimeOffset Expiration { get; private set; }
 
         public bool IsExpired => Token == null || Expiration < DateTimeOffset.Now;
 
-        public void Update(byte[] token, DateTimeOffset expiration)
+        public void Update(string token, DateTimeOffset expiration)
         {
             lock (_syncObject)
             {

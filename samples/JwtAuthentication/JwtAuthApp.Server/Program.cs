@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace JwtAuthApp.Server
@@ -16,7 +17,17 @@ namespace JwtAuthApp.Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+
+                    webBuilder
+                        .UseKestrel(options =>
+                        {
+                            // WORKAROUND: Accept HTTP/2 only to allow insecure HTTP/2 connections during development.
+                            options.ConfigureEndpointDefaults(endpointOptions =>
+                            {
+                                endpointOptions.Protocols = HttpProtocols.Http2;
+                            });
+                        })
+                    .UseStartup<Startup>();
                 });
     }
 }
