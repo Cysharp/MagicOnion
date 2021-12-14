@@ -77,6 +77,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\build-release.yml = .github\workflows\build-release.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B5617CC1-55FD-4F77-BA75-9450474C6527}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthSample", "tests\samples\AuthSample\AuthSample.csproj", "{4D5E8486-9A0D-444A-922B-1D94FD8A820A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +163,10 @@ Global
 		{E3F88CE3-F892-42AB-9D92-178BC9AD46FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3F88CE3-F892-42AB-9D92-178BC9AD46FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3F88CE3-F892-42AB-9D92-178BC9AD46FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D5E8486-9A0D-444A-922B-1D94FD8A820A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D5E8486-9A0D-444A-922B-1D94FD8A820A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D5E8486-9A0D-444A-922B-1D94FD8A820A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D5E8486-9A0D-444A-922B-1D94FD8A820A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -186,6 +194,8 @@ Global
 		{34C724ED-7459-4F62-855D-90C276A6F5EA} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{E3F88CE3-F892-42AB-9D92-178BC9AD46FD} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{A8550C24-2486-49DA-8D1A-DB6BBB2E9905} = {42EBB7E4-52D7-4E57-80AD-79FDD4900E13}
+		{B5617CC1-55FD-4F77-BA75-9450474C6527} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{4D5E8486-9A0D-444A-922B-1D94FD8A820A} = {B5617CC1-55FD-4F77-BA75-9450474C6527}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
