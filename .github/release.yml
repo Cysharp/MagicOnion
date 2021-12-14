@@ -4,7 +4,6 @@ changelog:
       - ignore-for-release
     authors:
       - github-actions
-      - mayuki
   categories:
     - title: Breaking Changes
       labels:
