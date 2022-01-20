@@ -285,11 +285,6 @@ namespace MagicOnion
             {"System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter<TREPLACE>()"},
         };
 
-        static IReadOnlyList<string> MergeIfDirectiveConditions(IReadOnlyList<string> conditions)
-        {
-            return conditions.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-        }
-
         static void ExtractResolverInfo(InterfaceDefinition[] definitions, out GenericSerializationInfo[] genericInfoResults, out EnumSerializationInfo[] enumInfoResults, string messagePackGeneratedNamespace)
         {
             var genericInfos = new List<GenericSerializationInfo>();
@@ -301,7 +296,7 @@ namespace MagicOnion
                 {
                     if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
 
-                    var ifDirectiveConditions = MergeIfDirectiveConditions(new[] { interfaceDef.IfDirectiveCondition, method.IfDirectiveCondition });
+                    var ifDirectiveConditions = new[] { interfaceDef.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                     TraverseTypes(method.UnwrappedOriginalResposneTypeSymbol, genericInfos, enumInfos, messagePackGeneratedNamespace, ifDirectiveConditions);
 
                     // paramter type
@@ -392,7 +387,7 @@ namespace MagicOnion
                     var genericInfo = new GenericSerializationInfo(
                         namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         $"{formatterFullName}()",
-                        MergeIfDirectiveConditions(ifDirectiveConditions)
+                        ifDirectiveConditions
                     );
                     genericInfos.Add(genericInfo);
 
