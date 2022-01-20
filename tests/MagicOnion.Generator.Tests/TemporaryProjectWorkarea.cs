@@ -80,7 +80,7 @@ namespace MagicOnion.Generator.Tests
             File.WriteAllText(Path.Combine(ProjectDirectory, fileName), contents.Trim());
         }
 
-        public OutputCompilation GetOutputCompilation()
+        public OutputCompilation GetOutputCompilation(IReadOnlyList<string>? preprocessorSymbols = null)
         {
             var refAsmDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
@@ -88,7 +88,7 @@ namespace MagicOnion.Generator.Tests
                 .AddSyntaxTrees(
                     Directory.EnumerateFiles(ProjectDirectory, "*.cs", SearchOption.AllDirectories)
                         .Concat(Directory.EnumerateFiles(OutputDirectory, "*.cs", SearchOption.AllDirectories))
-                        .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), CSharpParseOptions.Default, x)))
+                        .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), CSharpParseOptions.Default.WithPreprocessorSymbols(preprocessorSymbols ?? Array.Empty<string>()), x)))
                 .AddReferences(
                     MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Private.CoreLib.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.Extensions.dll")),

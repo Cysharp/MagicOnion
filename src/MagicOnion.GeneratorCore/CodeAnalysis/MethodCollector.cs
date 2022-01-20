@@ -122,7 +122,7 @@ namespace MagicOnion.CodeAnalysis
                     FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
                     IsServiceDefinition = true,
-                    IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                    DefinedIfDirective = GetDefinedIfDirective(x),
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(CreateMethodDefinition)
@@ -142,7 +142,7 @@ namespace MagicOnion.CodeAnalysis
                         Name = x.ToDisplayString(shortTypeNameFormat),
                         FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                        IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                        DefinedIfDirective = GetDefinedIfDirective(x),
                         Methods = x.GetMembers()
                             .OfType<IMethodSymbol>()
                             .Select(CreateMethodDefinition)
@@ -156,7 +156,7 @@ namespace MagicOnion.CodeAnalysis
                         Name = receiver.ToDisplayString(shortTypeNameFormat),
                         FullName = receiver.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         Namespace = receiver.ContainingNamespace.IsGlobalNamespace ? null : receiver.ContainingNamespace.ToDisplayString(),
-                        IsIfDebug = receiver.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                        DefinedIfDirective = GetDefinedIfDirective(receiver),
                         Methods = receiver.GetMembers()
                             .OfType<IMethodSymbol>()
                             .Select(CreateMethodDefinition)
@@ -168,6 +168,23 @@ namespace MagicOnion.CodeAnalysis
                 .OrderBy(x => x.hubDefinition.FullName)
                 .ThenBy(x => x.receiverDefinition.FullName)
                 .ToArray();
+        }
+
+        private string GetDefinedIfDirective(ISymbol symbol)
+        {
+            var attrs = symbol.GetAttributes();
+            if (attrs.FindAttributeShortName("GenerateDefineDebugAttribute") != null)
+            {
+                return "DEBUG";
+            }
+
+            var defineIfAttr = attrs.FindAttributeShortName("GenerateIfDirectiveAttribute");
+            if (defineIfAttr != null)
+            {
+                return defineIfAttr.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
+            }
+
+            return string.Empty;
         }
 
         private class MethodNameComparer : IEqualityComparer<IMethodSymbol>
@@ -207,7 +224,7 @@ namespace MagicOnion.CodeAnalysis
                 ResponseType = responseType,
                 UnwrappedOriginalResposneTypeSymbol = unwrappedOriginalResponseType,
                 OriginalResponseTypeSymbol = y.ReturnType,
-                IsIfDebug = y.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                DefinedIfDirective = GetDefinedIfDirective(y),
                 HubId = id,
                 Parameters = y.Parameters.Select(p =>
                 {

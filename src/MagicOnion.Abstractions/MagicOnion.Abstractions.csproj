@@ -33,6 +33,7 @@ MagicOnion.IgnoreAttribute</Description>
      <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;InternalsVisibleTo.cs" />
    </ItemGroup>
    <ItemGroup>
+     <TargetFiles Remove="GenerateIfDirectiveAttribute.cs" />
      <TargetFiles Remove="InternalsVisibleTo.cs" />
    </ItemGroup>
    <Target Name="PostBuild" AfterTargets="PostBuildEvent">

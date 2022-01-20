@@ -23,7 +23,8 @@ namespace MagicOnion.CodeAnalysis
         public string FullName { get; set; }
         public string Namespace { get; set; }
         public bool IsServiceDefinition { get; set; }
-        public bool IsIfDebug { get; set; }
+        public string DefinedIfDirective { get; set; }
+        public bool HasIfDirective => !string.IsNullOrWhiteSpace(DefinedIfDirective);
         public MethodDefinition[] Methods { get; set; }
 
         // NOTE: A client name is derived from original interface name without 'I' prefix.
@@ -48,8 +49,10 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
-        public bool IsIfDebug { get; set; }
+        public string DefinedIfDirective { get; set; }
+        public bool HasIfDirective => !string.IsNullOrWhiteSpace(DefinedIfDirective);
         public int HubId { get; set; } // only use in Hub.
+
 
         string responseType;
         public string ResponseType
