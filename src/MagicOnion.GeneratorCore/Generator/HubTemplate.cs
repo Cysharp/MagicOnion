@@ -33,9 +33,9 @@ namespace MagicOnion.Generator
                     "using MessagePack;\r\n    using System;\r\n    using System.Threading.Tasks;\r\n");
   foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; 
             this.Write("\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
  var clientName = interfaceDef.ClientName; 
@@ -102,19 +102,19 @@ namespace MagicOnion.Generator
             this.Write("                default:\r\n                    break;\r\n            }\r\n        }\r\n " +
                     "  \r\n");
  foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
             this.Write("\r\n");
- } // end if(!string.IsNullOrWhiteSpace(DefinedIfDirective)) 
+ } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
             this.Write("        public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
             this.Write("\r\n        {\r\n            return ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubWriteMessage()));
             this.Write(";\r\n        }\r\n\r\n");
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
- } // end if(!string.IsNullOrWhiteSpace(DefinedIfDirective)) 
+ } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
  } // end foreach(interfaceDef.Methods) 
             this.Write("\r\n        class FireAndForgetClient : ");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
@@ -142,24 +142,24 @@ namespace MagicOnion.Generator
 
 ");
  foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
             this.Write("\r\n");
- } // end if(!string.IsNullOrWhiteSpace(DefinedIfDirective)) 
+ } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
             this.Write("            public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
             this.Write("\r\n            {\r\n                return __parent.");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubFireAndForgetWriteMessage()));
             this.Write(";\r\n            }\r\n\r\n");
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
- } // end if(item.HasIfDirective) 
+ } // end if(item.HasIfDirectiveCondition) 
  } // end foreach(interfaceDef.Methods) 
             this.Write("        }\r\n    }\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#endif \r\n");
- } // end if(!string.IsNullOrWhiteSpace(DefinedIfDirective)) 
+ } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
  } // end foreach(Interfaces) 
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? "}" : ""));
             this.Write("\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning res" +

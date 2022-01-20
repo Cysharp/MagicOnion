@@ -49,9 +49,9 @@ namespace MagicOnion.Generator
             this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
                     "turn;\r\n            isRegistered = true;\r\n\r\n");
  foreach(var interfaceDef in Interfaces) { 
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("            MagicOnionClientRegistry<");
@@ -59,15 +59,15 @@ namespace MagicOnion.Generator
             this.Write(">.Register((x, y, z) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
             this.Write("(x, y, z));\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 
             this.Write("\r\n");
  foreach(var (interfaceDef, receiverDef) in HubInterfaces) { 
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("            StreamingHubClientRegistry<");
@@ -77,7 +77,7 @@ namespace MagicOnion.Generator
             this.Write(">.Register((a, _, b, c, d, e) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
             this.Write("(a, b, c, d, e));\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 

@@ -31,21 +31,21 @@ namespace <#= Namespace #>
             isRegistered = true;
 
 <# foreach(var interfaceDef in Interfaces) { #>
-<# if(interfaceDef.HasIfDirective) { #>
-#if <#= interfaceDef.DefinedIfDirective #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
             MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y, z) => new <#= interfaceDef.ClientFullName #>(x, y, z));
-<# if(interfaceDef.HasIfDirective) { #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } // foreach #>
 
 <# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { #>
-<# if(interfaceDef.HasIfDirective) { #>
-#if <#= interfaceDef.DefinedIfDirective #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
             StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= interfaceDef.ClientFullName #>(a, b, c, d, e));
-<# if(interfaceDef.HasIfDirective) { #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } // foreach #>

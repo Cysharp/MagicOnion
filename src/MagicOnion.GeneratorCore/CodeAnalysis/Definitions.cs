@@ -23,8 +23,8 @@ namespace MagicOnion.CodeAnalysis
         public string FullName { get; set; }
         public string Namespace { get; set; }
         public bool IsServiceDefinition { get; set; }
-        public string DefinedIfDirective { get; set; }
-        public bool HasIfDirective => !string.IsNullOrWhiteSpace(DefinedIfDirective);
+        public string IfDirectiveCondition { get; set; }
+        public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
         public MethodDefinition[] Methods { get; set; }
 
         // NOTE: A client name is derived from original interface name without 'I' prefix.
@@ -49,8 +49,8 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
-        public string DefinedIfDirective { get; set; }
-        public bool HasIfDirective => !string.IsNullOrWhiteSpace(DefinedIfDirective);
+        public string IfDirectiveCondition { get; set; }
+        public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
         public int HubId { get; set; } // only use in Hub.
 
 
@@ -320,14 +320,27 @@ namespace MagicOnion.CodeAnalysis
     {
         string FullName { get; }
         string FormatterName { get; }
+
+        IReadOnlyList<string> IfDirectiveConditions { get; }
+        bool HasIfDirectiveConditions { get; }
     }
 
 
     public class GenericSerializationInfo : IResolverRegisterInfo, IEquatable<GenericSerializationInfo>
     {
-        public string FullName { get; set; }
+        public string FullName { get; }
 
-        public string FormatterName { get; set; }
+        public string FormatterName { get; }
+
+        public IReadOnlyList<string> IfDirectiveConditions { get; }
+        public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
+
+        public GenericSerializationInfo(string fullName, string formatterName, IReadOnlyList<string> ifDirectiveConditions)
+        {
+            FullName = fullName;
+            FormatterName = formatterName;
+            IfDirectiveConditions = ifDirectiveConditions;
+        }
 
         public bool Equals(GenericSerializationInfo other)
         {
@@ -347,12 +360,24 @@ namespace MagicOnion.CodeAnalysis
 
     public class EnumSerializationInfo : IResolverRegisterInfo, IEquatable<EnumSerializationInfo>
     {
-        public string Namespace { get; set; }
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string UnderlyingType { get; set; }
+        public string Namespace { get; }
+        public string Name { get;}
+        public string FullName { get; }
+        public string UnderlyingType { get; }
 
         public string FormatterName => Name + "Formatter()";
+
+        public IReadOnlyList<string> IfDirectiveConditions { get; }
+        public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
+
+        public EnumSerializationInfo(string @namespace, string name, string fullName, string underlyingType, IReadOnlyList<string> ifDirectiveConditions)
+        {
+            Namespace = @namespace;
+            Name = name;
+            FullName = fullName;
+            UnderlyingType = underlyingType;
+            IfDirectiveConditions = ifDirectiveConditions;
+        }
 
         public bool Equals(EnumSerializationInfo other)
         {

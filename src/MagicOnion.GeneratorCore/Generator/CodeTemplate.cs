@@ -33,9 +33,9 @@ namespace MagicOnion.Generator
                     "ng Grpc.Core;\r\n    using MessagePack;\r\n");
  foreach(var interfaceDef in Interfaces) { 
             this.Write("\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
  var clientName = interfaceDef.ClientName; 
@@ -47,9 +47,9 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
             this.Write("\r\n    {\r\n");
  foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("        static readonly Method<byte[], byte[]> ");
@@ -60,7 +60,7 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             this.Write("Delegate;\r\n");
  } 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } 
@@ -68,9 +68,9 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write("()\r\n        {\r\n");
  foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("            ");
@@ -90,7 +90,7 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             this.Write(";\r\n");
  } 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } 
@@ -131,9 +131,9 @@ namespace MagicOnion.Generator
             this.Write(" WithOptions(CallOptions option)\r\n        {\r\n            return base.WithOptions(" +
                     "option);\r\n        }\r\n   \r\n");
  foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.DefinedIfDirective));
+            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
             this.Write("\r\n");
  } 
  if(item.MethodType == MethodType.Unary) { 
@@ -228,12 +228,12 @@ namespace MagicOnion.Generator
                     "\r\n");
  } 
             this.Write("        }\r\n");
- if(item.HasIfDirective) { 
+ if(item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } 
             this.Write("    }\r\n");
- if(interfaceDef.HasIfDirective) { 
+ if(interfaceDef.HasIfDirectiveCondition) { 
             this.Write("#endif \r\n");
  } 
  } 

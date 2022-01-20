@@ -15,6 +15,9 @@ namespace <#= Namespace #>
     using MessagePack;
 
 <# foreach(var info in enumSerializationInfos) { #>
+<#   if (info.HasIfDirectiveConditions) { #>
+#if <#= string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})")) #>
+<#   } #>
     public sealed class <#= info.Name #>Formatter : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
     {
         public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, MessagePackSerializerOptions options)
@@ -27,7 +30,9 @@ namespace <#= Namespace #>
             return (<#= info.FullName #>)reader.Read<#= info.UnderlyingType #>();
         }
     }
-
+<#   if (info.HasIfDirectiveConditions) { #>
+#endif
+<#   } #>
 <# } #>
 
 }
