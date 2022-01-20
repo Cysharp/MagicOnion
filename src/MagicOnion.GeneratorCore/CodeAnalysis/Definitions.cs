@@ -326,7 +326,7 @@ namespace MagicOnion.CodeAnalysis
     }
 
 
-    public class GenericSerializationInfo : IResolverRegisterInfo, IEquatable<GenericSerializationInfo>
+    public class GenericSerializationInfo : IResolverRegisterInfo
     {
         public string FullName { get; }
 
@@ -341,24 +341,9 @@ namespace MagicOnion.CodeAnalysis
             FormatterName = formatterName;
             IfDirectiveConditions = ifDirectiveConditions;
         }
-
-        public bool Equals(GenericSerializationInfo other)
-        {
-            return FullName.Equals(other.FullName);
-        }
-
-        public override int GetHashCode()
-        {
-            return FullName.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return FullName;
-        }
     }
 
-    public class EnumSerializationInfo : IResolverRegisterInfo, IEquatable<EnumSerializationInfo>
+    public class EnumSerializationInfo : IResolverRegisterInfo
     {
         public string Namespace { get; }
         public string Name { get;}
@@ -378,23 +363,5 @@ namespace MagicOnion.CodeAnalysis
             UnderlyingType = underlyingType;
             IfDirectiveConditions = ifDirectiveConditions;
         }
-
-        public bool Equals(EnumSerializationInfo other)
-        {
-            return FullName.Equals(other.FullName);
-        }
-
-        public override int GetHashCode()
-        {
-            return FullName.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return FullName;
-        }
     }
-
-
-
 }

@@ -59,8 +59,8 @@ namespace MagicOnion
             ExtractResolverInfo(definitions, out genericInfos, out enumInfos, messagePackGeneratedNamespace);
             ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2, messagePackGeneratedNamespace);
             ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3, messagePackGeneratedNamespace);
-            enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
-            genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
+            enumInfos = MergeResolverRegisterInfo(enumInfos.Concat(enumInfos2).Concat(enumInfos3)).OrderBy(x => x.FullName).ToArray();
+            genericInfos = MergeResolverRegisterInfo(genericInfos.Concat(genericInfos2).Concat(genericInfos3)).OrderBy(x => x.FullName).ToArray();
 
             logger("Method Collect Complete:" + sw.Elapsed.ToString());
 
@@ -324,8 +324,57 @@ namespace MagicOnion
                 }
             }
 
-            genericInfoResults = genericInfos.Distinct().ToArray();
-            enumInfoResults = enumInfos.Distinct().ToArray();
+            genericInfoResults = MergeResolverRegisterInfo(genericInfos);
+            enumInfoResults = MergeResolverRegisterInfo(enumInfos);
+        }
+
+        static GenericSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<GenericSerializationInfo> serializationInfoSet)
+            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+                new GenericSerializationInfo(
+                    serializationInfo.FullName,
+                    serializationInfo.FormatterName,
+                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+                )
+            );
+
+        static EnumSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<EnumSerializationInfo> serializationInfoSet)
+            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+                new EnumSerializationInfo(
+                    serializationInfo.Namespace,
+                    serializationInfo.Name,
+                    serializationInfo.FullName,
+                    serializationInfo.UnderlyingType,
+                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+                )
+            );
+
+        static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
+            where T : IResolverRegisterInfo
+        {
+            // The priority of the generation depends on the `#if` directive
+            // If a serialization info has no `#if` conditions, we always use it. If there is more than one with the condition, it is merged.
+            var candidates = new Dictionary<string, T>();
+            foreach (var serializationInfo in serializationInfoSet)
+            {
+                if (serializationInfo.HasIfDirectiveConditions && candidates.TryGetValue(serializationInfo.FullName, out var serializationInfoCandidate))
+                {
+                    if (!serializationInfoCandidate.HasIfDirectiveConditions)
+                    {
+                        // If the candidate serialization info has no `#if` conditions, we keep to use it.
+                        continue;
+                    }
+
+                    // Merge `IfDirectiveConditions`
+                    candidates[serializationInfo.FullName] = mergeFunc(serializationInfo, serializationInfoCandidate);
+                }
+                else
+                {
+                    // The serialization info has no `#if` conditions, or is found first.
+                    candidates[serializationInfo.FullName] = serializationInfo;
+                }
+            }
+
+            return candidates.Values.ToArray();
         }
 
         static void TraverseTypes(ITypeSymbol typeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace, IReadOnlyList<string> ifDirectiveConditions)
