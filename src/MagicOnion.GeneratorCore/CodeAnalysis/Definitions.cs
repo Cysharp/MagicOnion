@@ -23,7 +23,8 @@ namespace MagicOnion.CodeAnalysis
         public string FullName { get; set; }
         public string Namespace { get; set; }
         public bool IsServiceDefinition { get; set; }
-        public bool IsIfDebug { get; set; }
+        public string IfDirectiveCondition { get; set; }
+        public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
         public MethodDefinition[] Methods { get; set; }
 
         // NOTE: A client name is derived from original interface name without 'I' prefix.
@@ -48,8 +49,10 @@ namespace MagicOnion.CodeAnalysis
         public string Name { get; set; }
         public MethodType MethodType { get; set; }
         public string RequestType { get; set; }
-        public bool IsIfDebug { get; set; }
+        public string IfDirectiveCondition { get; set; }
+        public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
         public int HubId { get; set; } // only use in Hub.
+
 
         string responseType;
         public string ResponseType
@@ -317,56 +320,48 @@ namespace MagicOnion.CodeAnalysis
     {
         string FullName { get; }
         string FormatterName { get; }
+
+        IReadOnlyList<string> IfDirectiveConditions { get; }
+        bool HasIfDirectiveConditions { get; }
     }
 
 
-    public class GenericSerializationInfo : IResolverRegisterInfo, IEquatable<GenericSerializationInfo>
+    public class GenericSerializationInfo : IResolverRegisterInfo
     {
-        public string FullName { get; set; }
+        public string FullName { get; }
 
-        public string FormatterName { get; set; }
+        public string FormatterName { get; }
 
-        public bool Equals(GenericSerializationInfo other)
+        public IReadOnlyList<string> IfDirectiveConditions { get; }
+        public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
+
+        public GenericSerializationInfo(string fullName, string formatterName, IReadOnlyList<string> ifDirectiveConditions)
         {
-            return FullName.Equals(other.FullName);
-        }
-
-        public override int GetHashCode()
-        {
-            return FullName.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return FullName;
+            FullName = fullName;
+            FormatterName = formatterName;
+            IfDirectiveConditions = ifDirectiveConditions;
         }
     }
 
-    public class EnumSerializationInfo : IResolverRegisterInfo, IEquatable<EnumSerializationInfo>
+    public class EnumSerializationInfo : IResolverRegisterInfo
     {
-        public string Namespace { get; set; }
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string UnderlyingType { get; set; }
+        public string Namespace { get; }
+        public string Name { get;}
+        public string FullName { get; }
+        public string UnderlyingType { get; }
 
         public string FormatterName => Name + "Formatter()";
 
-        public bool Equals(EnumSerializationInfo other)
-        {
-            return FullName.Equals(other.FullName);
-        }
+        public IReadOnlyList<string> IfDirectiveConditions { get; }
+        public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
 
-        public override int GetHashCode()
+        public EnumSerializationInfo(string @namespace, string name, string fullName, string underlyingType, IReadOnlyList<string> ifDirectiveConditions)
         {
-            return FullName.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return FullName;
+            Namespace = @namespace;
+            Name = name;
+            FullName = fullName;
+            UnderlyingType = underlyingType;
+            IfDirectiveConditions = ifDirectiveConditions;
         }
     }
-
-
-
 }

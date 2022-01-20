@@ -59,8 +59,8 @@ namespace MagicOnion
             ExtractResolverInfo(definitions, out genericInfos, out enumInfos, messagePackGeneratedNamespace);
             ExtractResolverInfo(hubDefinitions.Select(x => x.hubDefinition).ToArray(), out var genericInfos2, out var enumInfos2, messagePackGeneratedNamespace);
             ExtractResolverInfo(hubDefinitions.Select(x => x.receiverDefintion).ToArray(), out var genericInfos3, out var enumInfos3, messagePackGeneratedNamespace);
-            enumInfos = enumInfos.Concat(enumInfos2).Concat(enumInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
-            genericInfos = genericInfos.Concat(genericInfos2).Concat(genericInfos3).Distinct().OrderBy(x => x.FullName).ToArray();
+            enumInfos = MergeResolverRegisterInfo(enumInfos.Concat(enumInfos2).Concat(enumInfos3)).OrderBy(x => x.FullName).ToArray();
+            genericInfos = MergeResolverRegisterInfo(genericInfos.Concat(genericInfos2).Concat(genericInfos3)).OrderBy(x => x.FullName).ToArray();
 
             logger("Method Collect Complete:" + sw.Elapsed.ToString());
 
@@ -290,41 +290,94 @@ namespace MagicOnion
             var genericInfos = new List<GenericSerializationInfo>();
             var enumInfos = new List<EnumSerializationInfo>();
 
-            foreach (var method in definitions.SelectMany(x => x.Methods))
+            foreach (var interfaceDef in definitions)
             {
-                if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
-
-                TraverseTypes(method.UnwrappedOriginalResposneTypeSymbol, genericInfos, enumInfos, messagePackGeneratedNamespace);
-
-                // paramter type
-                foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type))
+                foreach (var method in interfaceDef.Methods)
                 {
-                    TraverseTypes(p, genericInfos, enumInfos, messagePackGeneratedNamespace);
-                }
+                    if (method.UnwrappedOriginalResposneTypeSymbol == null) continue;
 
-                if (method.Parameters.Length > 1)
-                {
-                    // create dynamicargumenttuple
-                    var parameterArguments = method.Parameters.Select(x => x.OriginalSymbol)
-                       .Select(x => $"default({x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})")
-                       .ToArray();
+                    var ifDirectiveConditions = new[] { interfaceDef.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                    TraverseTypes(method.UnwrappedOriginalResposneTypeSymbol, genericInfos, enumInfos, messagePackGeneratedNamespace, ifDirectiveConditions);
 
-                    var typeArguments = method.Parameters.Select(x => x.OriginalSymbol).Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-
-                    var tupleInfo = new GenericSerializationInfo
+                    // paramter type
+                    foreach (var p in method.Parameters.Select(x => x.OriginalSymbol.Type))
                     {
-                        FormatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{string.Join(", ", typeArguments)}>({string.Join(", ", parameterArguments)})",
-                        FullName = $"global::MagicOnion.DynamicArgumentTuple<{string.Join(", ", typeArguments)}>",
-                    };
-                    genericInfos.Add(tupleInfo);
+                        TraverseTypes(p, genericInfos, enumInfos, messagePackGeneratedNamespace, ifDirectiveConditions);
+                    }
+
+                    if (method.Parameters.Length > 1)
+                    {
+                        // create dynamicargumenttuple
+                        var parameterArguments = method.Parameters.Select(x => x.OriginalSymbol)
+                            .Select(x => $"default({x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)})")
+                            .ToArray();
+
+                        var typeArguments = method.Parameters.Select(x => x.OriginalSymbol).Select(x => x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+                        var tupleInfo = new GenericSerializationInfo(
+                            $"global::MagicOnion.DynamicArgumentTuple<{string.Join(", ", typeArguments)}>",
+                            $"global::MagicOnion.DynamicArgumentTupleFormatter<{string.Join(", ", typeArguments)}>({string.Join(", ", parameterArguments)})",
+                            ifDirectiveConditions
+                        );
+                        genericInfos.Add(tupleInfo);
+                    }
                 }
             }
 
-            genericInfoResults = genericInfos.Distinct().ToArray();
-            enumInfoResults = enumInfos.Distinct().ToArray();
+            genericInfoResults = MergeResolverRegisterInfo(genericInfos);
+            enumInfoResults = MergeResolverRegisterInfo(enumInfos);
         }
 
-        static void TraverseTypes(ITypeSymbol typeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace)
+        static GenericSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<GenericSerializationInfo> serializationInfoSet)
+            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+                new GenericSerializationInfo(
+                    serializationInfo.FullName,
+                    serializationInfo.FormatterName,
+                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+                )
+            );
+
+        static EnumSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<EnumSerializationInfo> serializationInfoSet)
+            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+                new EnumSerializationInfo(
+                    serializationInfo.Namespace,
+                    serializationInfo.Name,
+                    serializationInfo.FullName,
+                    serializationInfo.UnderlyingType,
+                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+                )
+            );
+
+        static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
+            where T : IResolverRegisterInfo
+        {
+            // The priority of the generation depends on the `#if` directive
+            // If a serialization info has no `#if` conditions, we always use it. If there is more than one with the condition, it is merged.
+            var candidates = new Dictionary<string, T>();
+            foreach (var serializationInfo in serializationInfoSet)
+            {
+                if (serializationInfo.HasIfDirectiveConditions && candidates.TryGetValue(serializationInfo.FullName, out var serializationInfoCandidate))
+                {
+                    if (!serializationInfoCandidate.HasIfDirectiveConditions)
+                    {
+                        // If the candidate serialization info has no `#if` conditions, we keep to use it.
+                        continue;
+                    }
+
+                    // Merge `IfDirectiveConditions`
+                    candidates[serializationInfo.FullName] = mergeFunc(serializationInfo, serializationInfoCandidate);
+                }
+                else
+                {
+                    // The serialization info has no `#if` conditions, or is found first.
+                    candidates[serializationInfo.FullName] = serializationInfo;
+                }
+            }
+
+            return candidates.Values.ToArray();
+        }
+
+        static void TraverseTypes(ITypeSymbol typeSymbol, List<GenericSerializationInfo> genericInfos, List<EnumSerializationInfo> enumInfos, string messagePackGeneratedNamespace, IReadOnlyList<string> ifDirectiveConditions)
         {
             var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
 
@@ -332,15 +385,15 @@ namespace MagicOnion
             {
                 var array = (IArrayTypeSymbol)typeSymbol;
                 if (embeddedTypes.Contains(array.ToString())) return;
-                MakeArray(array, genericInfos);
+                MakeArray(array, genericInfos, ifDirectiveConditions);
                 if (array.ElementType.TypeKind == TypeKind.Enum)
                 {
-                    MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos);
+                    MakeEnum(array.ElementType as INamedTypeSymbol, enumInfos, ifDirectiveConditions);
                 }
             }
             else if (typeSymbol.TypeKind == TypeKind.Enum)
             {
-                MakeEnum(namedTypeSymbol, enumInfos);
+                MakeEnum(namedTypeSymbol, enumInfos, ifDirectiveConditions);
             }
             else if (namedTypeSymbol != null && namedTypeSymbol.IsGenericType)
             {
@@ -353,16 +406,16 @@ namespace MagicOnion
                     var more = namedTypeSymbol.TypeArguments[0];
                     if (more.TypeKind == TypeKind.Enum)
                     {
-                        MakeEnum(more as INamedTypeSymbol, enumInfos);
+                        MakeEnum(more as INamedTypeSymbol, enumInfos, ifDirectiveConditions);
                     }
 
-                    MakeNullable(namedTypeSymbol, genericInfos);
+                    MakeNullable(namedTypeSymbol, genericInfos, ifDirectiveConditions);
                 }
                 else if (additionalSupportGenericFormatter.TryGetValue(genericTypeString, out var formatterString))
                 {
                     // Well-known generic type.
                     // System.Collections.Generic.List<T> ...
-                    MakeGenericWellKnown(namedTypeSymbol, formatterString, genericInfos);
+                    MakeGenericWellKnown(namedTypeSymbol, formatterString, genericInfos, ifDirectiveConditions);
                 }
                 else
                 {
@@ -380,64 +433,60 @@ namespace MagicOnion
                     var typeArgs = string.Join(", ", namedTypeSymbol.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)).ToArray());
                     var formatterFullName =
                         $"global::{(string.IsNullOrWhiteSpace(messagePackGeneratedNamespace) ? "" : messagePackGeneratedNamespace + ".")}{(string.IsNullOrWhiteSpace(typeNamespace) ? "" : typeNamespace + ".")}{typeName}Formatter<{typeArgs}>";
-                    var genericInfo = new GenericSerializationInfo
-                    {
-                        FormatterName = $"{formatterFullName}()",
-                        FullName = namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                    };
+                    var genericInfo = new GenericSerializationInfo(
+                        namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        $"{formatterFullName}()",
+                        ifDirectiveConditions
+                    );
                     genericInfos.Add(genericInfo);
 
                     // Recursively scan generic-types
                     foreach (var typeArg in namedTypeSymbol.TypeArguments)
                     {
-                        TraverseTypes(typeArg, genericInfos, enumInfos, messagePackGeneratedNamespace);
+                        TraverseTypes(typeArg, genericInfos, enumInfos, messagePackGeneratedNamespace, ifDirectiveConditions);
                     }
                 }
             }
         }
 
-        static void MakeArray(IArrayTypeSymbol array, List<GenericSerializationInfo> list)
+        static void MakeArray(IArrayTypeSymbol array, List<GenericSerializationInfo> list, IReadOnlyList<string> ifDirectiveConditions)
         {
-            var arrayInfo = new GenericSerializationInfo
-            {
-                FormatterName = $"global::MessagePack.Formatters.ArrayFormatter<{array.ElementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
-                FullName = array.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            };
+            var arrayInfo = new GenericSerializationInfo(
+                array.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                $"global::MessagePack.Formatters.ArrayFormatter<{array.ElementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
+                ifDirectiveConditions
+            );
             list.Add(arrayInfo);
         }
 
-        static void MakeEnum(INamedTypeSymbol enumType, List<EnumSerializationInfo> list)
+        static void MakeEnum(INamedTypeSymbol enumType, List<EnumSerializationInfo> list, IReadOnlyList<string> ifDirectiveConditions)
         {
-            var enumInfo = new EnumSerializationInfo
-            {
-                Name = enumType.Name,
-                Namespace = enumType.ContainingNamespace.IsGlobalNamespace ? null : enumType.ContainingNamespace.ToDisplayString(),
-                FullName = enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                UnderlyingType = enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat)
-            };
+            var enumInfo = new EnumSerializationInfo(
+                enumType.ContainingNamespace.IsGlobalNamespace ? null : enumType.ContainingNamespace.ToDisplayString(),
+                enumType.Name,
+                enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                enumType.EnumUnderlyingType.ToDisplayString(binaryWriteFormat),
+                ifDirectiveConditions
+            );
             list.Add(enumInfo);
         }
 
-        static void MakeNullable(INamedTypeSymbol type, List<GenericSerializationInfo> list)
+        static void MakeNullable(INamedTypeSymbol type, List<GenericSerializationInfo> list, IReadOnlyList<string> ifDirectiveConditions)
         {
-            var info = new GenericSerializationInfo
-            {
-                FormatterName = $"global::MessagePack.Formatters.NullableFormatter<{type.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
-                FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            };
+            var info = new GenericSerializationInfo(
+                type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                $"global::MessagePack.Formatters.NullableFormatter<{type.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>()",
+                ifDirectiveConditions
+            );
             list.Add(info);
         }
 
-        static void MakeGenericWellKnown(INamedTypeSymbol type, string formatterTemplate, List<GenericSerializationInfo> list)
+        static void MakeGenericWellKnown(INamedTypeSymbol type, string formatterTemplate, List<GenericSerializationInfo> list, IReadOnlyList<string> ifDirectiveConditions)
         {
             var typeArgs = string.Join(", ", type.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
             var f = formatterTemplate.Replace("TREPLACE", typeArgs);
 
-            var info = new GenericSerializationInfo
-            {
-                FormatterName = f,
-                FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            };
+            var info = new GenericSerializationInfo(type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), f, ifDirectiveConditions);
             list.Add(info);
         }
     }

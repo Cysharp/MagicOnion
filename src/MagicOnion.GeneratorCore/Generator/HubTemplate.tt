@@ -19,8 +19,8 @@
     using System.Threading.Tasks;
 <#  foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; #>
 
-<# if(interfaceDef.IsIfDebug) { #>
-#if DEBUG
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
 <# var clientName = interfaceDef.ClientName; #>
     [Ignore]
@@ -77,17 +77,17 @@
         }
    
 <# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.IsIfDebug) { #>
-#if DEBUG
-<# } // end if(IsIfDebug) #>
+<# if(item.HasIfDirectiveCondition) { #>
+#if <#= item.IfDirectiveCondition #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
         public <#= item.ToString() #>
         {
             return <#= item.ToHubWriteMessage() #>;
         }
 
-<# if(item.IsIfDebug) { #>
+<# if(item.HasIfDirectiveCondition) { #>
 #endif
-<# } // end if(IsIfDebug) #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(interfaceDef.Methods) #>
 
         class FireAndForgetClient : <#= interfaceDef.FullName #>
@@ -115,23 +115,23 @@
             }
 
 <# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.IsIfDebug) { #>
-#if DEBUG
-<# } // end if(IsIfDebug) #>
+<# if(item.HasIfDirectiveCondition) { #>
+#if <#= item.IfDirectiveCondition #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
             public <#= item.ToString() #>
             {
                 return __parent.<#= item.ToHubFireAndForgetWriteMessage() #>;
             }
 
-<# if(item.IsIfDebug) { #>
+<# if(item.HasIfDirectiveCondition) { #>
 #endif
-<# } // end if(IsIfDebug) #>
+<# } // end if(item.HasIfDirectiveCondition) #>
 <# } // end foreach(interfaceDef.Methods) #>
         }
     }
-<# if(interfaceDef.IsIfDebug) { #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
 #endif 
-<# } // end if(IsIfDebug) #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(Interfaces) #>
 <#= Namespace != null ? "}" : "" #>
 

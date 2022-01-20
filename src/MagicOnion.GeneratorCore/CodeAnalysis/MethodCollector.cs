@@ -122,7 +122,7 @@ namespace MagicOnion.CodeAnalysis
                     FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
                     IsServiceDefinition = true,
-                    IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                    IfDirectiveCondition = x.GetDefinedGenerateIfCondition(),
                     Methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(CreateMethodDefinition)
@@ -142,7 +142,7 @@ namespace MagicOnion.CodeAnalysis
                         Name = x.ToDisplayString(shortTypeNameFormat),
                         FullName = x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         Namespace = x.ContainingNamespace.IsGlobalNamespace ? null : x.ContainingNamespace.ToDisplayString(),
-                        IsIfDebug = x.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                        IfDirectiveCondition = x.GetDefinedGenerateIfCondition(),
                         Methods = x.GetMembers()
                             .OfType<IMethodSymbol>()
                             .Select(CreateMethodDefinition)
@@ -156,7 +156,7 @@ namespace MagicOnion.CodeAnalysis
                         Name = receiver.ToDisplayString(shortTypeNameFormat),
                         FullName = receiver.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         Namespace = receiver.ContainingNamespace.IsGlobalNamespace ? null : receiver.ContainingNamespace.ToDisplayString(),
-                        IsIfDebug = receiver.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                        IfDirectiveCondition = receiver.GetDefinedGenerateIfCondition(),
                         Methods = receiver.GetMembers()
                             .OfType<IMethodSymbol>()
                             .Select(CreateMethodDefinition)
@@ -207,7 +207,7 @@ namespace MagicOnion.CodeAnalysis
                 ResponseType = responseType,
                 UnwrappedOriginalResposneTypeSymbol = unwrappedOriginalResponseType,
                 OriginalResponseTypeSymbol = y.ReturnType,
-                IsIfDebug = y.GetAttributes().FindAttributeShortName("GenerateDefineDebugAttribute") != null,
+                IfDirectiveCondition = y.GetDefinedGenerateIfCondition(),
                 HubId = id,
                 Parameters = y.Parameters.Select(p =>
                 {

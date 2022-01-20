@@ -18,22 +18,22 @@
     using MessagePack;
 <# foreach(var interfaceDef in Interfaces) { #>
 
-<# if(interfaceDef.IsIfDebug) { #>
-#if DEBUG
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
 <# var clientName = interfaceDef.ClientName; #>
     [Ignore]
     public class <#= clientName #> : MagicOnionClientBase<<#= interfaceDef.FullName #>>, <#= interfaceDef.FullName #>
     {
 <# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.IsIfDebug) { #>
-#if DEBUG
+<# if(item.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
         static readonly Method<byte[], byte[]> <#= item.Name #>Method;
 <# if(item.MethodType == MethodType.Unary) { #>
         static readonly Func<RequestContext, ResponseContext> <#= item.Name #>Delegate;
 <# } #>
-<# if(item.IsIfDebug) { #>
+<# if(item.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } #>
@@ -41,14 +41,14 @@
         static <#= clientName #>()
         {
 <# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.IsIfDebug) { #>
-#if DEBUG
+<# if(item.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
             <#= item.Name #>Method = new Method<byte[], byte[]>(MethodType.<#= item.MethodType.ToString() #>, "<#= interfaceDef.Name #>", "<#= item.Name #>", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 <# if(item.MethodType == MethodType.Unary) { #>
             <#= item.Name #>Delegate = _<#= item.Name #>;
 <# } #>
-<# if(item.IsIfDebug) { #>
+<# if(item.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } #>
@@ -100,8 +100,8 @@
         }
    
 <# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.IsIfDebug) { #>
-#if DEBUG
+<# if(item.HasIfDirectiveCondition) { #>
+#if <#= interfaceDef.IfDirectiveCondition #>
 <# } #>
 <# if(item.MethodType == MethodType.Unary) { #>
         static ResponseContext _<#= item.Name #>(RequestContext __context)
@@ -134,12 +134,12 @@
             return System.Threading.Tasks.Task.FromResult(new DuplexStreamingResult<<#= item.RequestType #>, <#= item.ResponseType #>>(__callResult, new MarshallingClientStreamWriter<<#= item.RequestType #>>(__callResult.RequestStream, serializerOptions), new MarshallingAsyncStreamReader<<#= item.ResponseType #>>(__callResult.ResponseStream, base.serializerOptions), base.serializerOptions));
 <# } #>
         }
-<# if(item.IsIfDebug) { #>
+<# if(item.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } #>
     }
-<# if(interfaceDef.IsIfDebug) { #>
+<# if(interfaceDef.HasIfDirectiveCondition) { #>
 #endif 
 <# } #>
 <# } #>
