@@ -1748,19 +1748,22 @@ references:
   commentId: T:MagicOnion.CodeAnalysis.EnumSerializationInfo
   fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo
   nameWithType: EnumSerializationInfo
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals(MagicOnion.CodeAnalysis.EnumSerializationInfo)
-  name: Equals(EnumSerializationInfo)
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_Equals_MagicOnion_CodeAnalysis_EnumSerializationInfo_
-  commentId: M:MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals(MagicOnion.CodeAnalysis.EnumSerializationInfo)
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals(MagicOnion.CodeAnalysis.EnumSerializationInfo)
-  nameWithType: EnumSerializationInfo.Equals(EnumSerializationInfo)
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals*
-  name: Equals
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_Equals_
-  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor(System.String,System.String,System.String,System.String,IReadOnlyList{System.String})
+  name: EnumSerializationInfo(String, String, String, String, IReadOnlyList<String>)
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo__ctor_System_String_System_String_System_String_System_String_IReadOnlyList_System_String__
+  commentId: M:MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor(System.String,System.String,System.String,System.String,IReadOnlyList{System.String})
+  name.vb: EnumSerializationInfo(String, String, String, String, IReadOnlyList(Of String))
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.EnumSerializationInfo(System.String, System.String, System.String, System.String, IReadOnlyList<System.String>)
+  fullName.vb: MagicOnion.CodeAnalysis.EnumSerializationInfo.EnumSerializationInfo(System.String, System.String, System.String, System.String, IReadOnlyList(Of System.String))
+  nameWithType: EnumSerializationInfo.EnumSerializationInfo(String, String, String, String, IReadOnlyList<String>)
+  nameWithType.vb: EnumSerializationInfo.EnumSerializationInfo(String, String, String, String, IReadOnlyList(Of String))
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor*
+  name: EnumSerializationInfo
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo__ctor_
+  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals
-  nameWithType: EnumSerializationInfo.Equals
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.EnumSerializationInfo
+  nameWithType: EnumSerializationInfo.EnumSerializationInfo
 - uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.FormatterName
   name: FormatterName
   href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_FormatterName
@@ -1787,19 +1790,32 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.FullName
   nameWithType: EnumSerializationInfo.FullName
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode
-  name: GetHashCode()
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_GetHashCode
-  commentId: M:MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode()
-  nameWithType: EnumSerializationInfo.GetHashCode()
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode*
-  name: GetHashCode
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_GetHashCode_
-  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_HasIfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions
+  nameWithType: EnumSerializationInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions*
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_HasIfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode
-  nameWithType: EnumSerializationInfo.GetHashCode
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions
+  nameWithType: EnumSerializationInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_IfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions
+  nameWithType: EnumSerializationInfo.IfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions*
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_IfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions
+  nameWithType: EnumSerializationInfo.IfDirectiveConditions
 - uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.Name
   name: Name
   href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_Name
@@ -1826,19 +1842,6 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.Namespace
   nameWithType: EnumSerializationInfo.Namespace
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString
-  name: ToString()
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_ToString
-  commentId: M:MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString()
-  nameWithType: EnumSerializationInfo.ToString()
-- uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString*
-  name: ToString
-  href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_ToString_
-  commentId: Overload:MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString
-  isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString
-  nameWithType: EnumSerializationInfo.ToString
 - uid: MagicOnion.CodeAnalysis.EnumSerializationInfo.UnderlyingType
   name: UnderlyingType
   href: api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_UnderlyingType
@@ -1858,19 +1861,22 @@ references:
   commentId: T:MagicOnion.CodeAnalysis.GenericSerializationInfo
   fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo
   nameWithType: GenericSerializationInfo
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals(MagicOnion.CodeAnalysis.GenericSerializationInfo)
-  name: Equals(GenericSerializationInfo)
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_Equals_MagicOnion_CodeAnalysis_GenericSerializationInfo_
-  commentId: M:MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals(MagicOnion.CodeAnalysis.GenericSerializationInfo)
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals(MagicOnion.CodeAnalysis.GenericSerializationInfo)
-  nameWithType: GenericSerializationInfo.Equals(GenericSerializationInfo)
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals*
-  name: Equals
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_Equals_
-  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,IReadOnlyList{System.String})
+  name: GenericSerializationInfo(String, String, IReadOnlyList<String>)
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_IReadOnlyList_System_String__
+  commentId: M:MagicOnion.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,IReadOnlyList{System.String})
+  name.vb: GenericSerializationInfo(String, String, IReadOnlyList(Of String))
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, IReadOnlyList<System.String>)
+  fullName.vb: MagicOnion.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, IReadOnlyList(Of System.String))
+  nameWithType: GenericSerializationInfo.GenericSerializationInfo(String, String, IReadOnlyList<String>)
+  nameWithType.vb: GenericSerializationInfo.GenericSerializationInfo(String, String, IReadOnlyList(Of String))
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.#ctor*
+  name: GenericSerializationInfo
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo__ctor_
+  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.#ctor
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.Equals
-  nameWithType: GenericSerializationInfo.Equals
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo
+  nameWithType: GenericSerializationInfo.GenericSerializationInfo
 - uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.FormatterName
   name: FormatterName
   href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_FormatterName
@@ -1897,32 +1903,32 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.FullName
   nameWithType: GenericSerializationInfo.FullName
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode
-  name: GetHashCode()
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_GetHashCode
-  commentId: M:MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode()
-  nameWithType: GenericSerializationInfo.GetHashCode()
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode*
-  name: GetHashCode
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_GetHashCode_
-  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_HasIfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions
+  nameWithType: GenericSerializationInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions*
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_HasIfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.GetHashCode
-  nameWithType: GenericSerializationInfo.GetHashCode
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString
-  name: ToString()
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_ToString
-  commentId: M:MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString()
-  nameWithType: GenericSerializationInfo.ToString()
-- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString*
-  name: ToString
-  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_ToString_
-  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.HasIfDirectiveConditions
+  nameWithType: GenericSerializationInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_IfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions
+  nameWithType: GenericSerializationInfo.IfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions*
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_CodeAnalysis_GenericSerializationInfo_IfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.ToString
-  nameWithType: GenericSerializationInfo.ToString
+  fullName: MagicOnion.CodeAnalysis.GenericSerializationInfo.IfDirectiveConditions
+  nameWithType: GenericSerializationInfo.IfDirectiveConditions
 - uid: MagicOnion.CodeAnalysis.InterfaceDefinition
   name: InterfaceDefinition
   href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html
@@ -1968,19 +1974,32 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.FullName
   nameWithType: InterfaceDefinition.FullName
-- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug
-  name: IsIfDebug
-  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_IsIfDebug
-  commentId: P:MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug
-  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug
-  nameWithType: InterfaceDefinition.IsIfDebug
-- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug*
-  name: IsIfDebug
-  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_IsIfDebug_
-  commentId: Overload:MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug
+- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition
+  name: HasIfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_HasIfDirectiveCondition
+  commentId: P:MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition
+  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition
+  nameWithType: InterfaceDefinition.HasIfDirectiveCondition
+- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition*
+  name: HasIfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_HasIfDirectiveCondition_
+  commentId: Overload:MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.IsIfDebug
-  nameWithType: InterfaceDefinition.IsIfDebug
+  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.HasIfDirectiveCondition
+  nameWithType: InterfaceDefinition.HasIfDirectiveCondition
+- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition
+  name: IfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_IfDirectiveCondition
+  commentId: P:MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition
+  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition
+  nameWithType: InterfaceDefinition.IfDirectiveCondition
+- uid: MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition*
+  name: IfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_IfDirectiveCondition_
+  commentId: Overload:MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.InterfaceDefinition.IfDirectiveCondition
+  nameWithType: InterfaceDefinition.IfDirectiveCondition
 - uid: MagicOnion.CodeAnalysis.InterfaceDefinition.IsServiceDefinition
   name: IsServiceDefinition
   href: api/MagicOnion.CodeAnalysis.InterfaceDefinition.html#MagicOnion_CodeAnalysis_InterfaceDefinition_IsServiceDefinition
@@ -2078,6 +2097,32 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.IResolverRegisterInfo.FullName
   nameWithType: IResolverRegisterInfo.FullName
+- uid: MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html#MagicOnion_CodeAnalysis_IResolverRegisterInfo_HasIfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions
+  nameWithType: IResolverRegisterInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions*
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html#MagicOnion_CodeAnalysis_IResolverRegisterInfo_HasIfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.IResolverRegisterInfo.HasIfDirectiveConditions
+  nameWithType: IResolverRegisterInfo.HasIfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html#MagicOnion_CodeAnalysis_IResolverRegisterInfo_IfDirectiveConditions
+  commentId: P:MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions
+  fullName: MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions
+  nameWithType: IResolverRegisterInfo.IfDirectiveConditions
+- uid: MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions*
+  name: IfDirectiveConditions
+  href: api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html#MagicOnion_CodeAnalysis_IResolverRegisterInfo_IfDirectiveConditions_
+  commentId: Overload:MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.IResolverRegisterInfo.IfDirectiveConditions
+  nameWithType: IResolverRegisterInfo.IfDirectiveConditions
 - uid: MagicOnion.CodeAnalysis.MethodCollector
   name: MethodCollector
   href: api/MagicOnion.CodeAnalysis.MethodCollector.html
@@ -2158,6 +2203,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.MethodDefinition.AsyncToString
   nameWithType: MethodDefinition.AsyncToString
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition
+  name: HasIfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_HasIfDirectiveCondition
+  commentId: P:MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition
+  nameWithType: MethodDefinition.HasIfDirectiveCondition
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition*
+  name: HasIfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_HasIfDirectiveCondition_
+  commentId: Overload:MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition
+  isSpec: "True"
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.HasIfDirectiveCondition
+  nameWithType: MethodDefinition.HasIfDirectiveCondition
 - uid: MagicOnion.CodeAnalysis.MethodDefinition.HubId
   name: HubId
   href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_HubId
@@ -2171,19 +2229,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.CodeAnalysis.MethodDefinition.HubId
   nameWithType: MethodDefinition.HubId
-- uid: MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug
-  name: IsIfDebug
-  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_IsIfDebug
-  commentId: P:MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug
-  fullName: MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug
-  nameWithType: MethodDefinition.IsIfDebug
-- uid: MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug*
-  name: IsIfDebug
-  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_IsIfDebug_
-  commentId: Overload:MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition
+  name: IfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_IfDirectiveCondition
+  commentId: P:MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition
+  nameWithType: MethodDefinition.IfDirectiveCondition
+- uid: MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition*
+  name: IfDirectiveCondition
+  href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_IfDirectiveCondition_
+  commentId: Overload:MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition
   isSpec: "True"
-  fullName: MagicOnion.CodeAnalysis.MethodDefinition.IsIfDebug
-  nameWithType: MethodDefinition.IsIfDebug
+  fullName: MagicOnion.CodeAnalysis.MethodDefinition.IfDirectiveCondition
+  nameWithType: MethodDefinition.IfDirectiveCondition
 - uid: MagicOnion.CodeAnalysis.MethodDefinition.IsResponseTypeTaskOfT
   name: IsResponseTypeTaskOfT
   href: api/MagicOnion.CodeAnalysis.MethodDefinition.html#MagicOnion_CodeAnalysis_MethodDefinition_IsResponseTypeTaskOfT
@@ -6282,6 +6340,25 @@ references:
   isSpec: "True"
   fullName: MagicOnion.GenerateDefineDebugAttribute.GenerateDefineDebugAttribute
   nameWithType: GenerateDefineDebugAttribute.GenerateDefineDebugAttribute
+- uid: MagicOnion.GenerateIfDirectiveAttribute
+  name: GenerateIfDirectiveAttribute
+  href: api/MagicOnion.GenerateIfDirectiveAttribute.html
+  commentId: T:MagicOnion.GenerateIfDirectiveAttribute
+  fullName: MagicOnion.GenerateIfDirectiveAttribute
+  nameWithType: GenerateIfDirectiveAttribute
+- uid: MagicOnion.GenerateIfDirectiveAttribute.#ctor(System.String)
+  name: GenerateIfDirectiveAttribute(String)
+  href: api/MagicOnion.GenerateIfDirectiveAttribute.html#MagicOnion_GenerateIfDirectiveAttribute__ctor_System_String_
+  commentId: M:MagicOnion.GenerateIfDirectiveAttribute.#ctor(System.String)
+  fullName: MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute(System.String)
+  nameWithType: GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute(String)
+- uid: MagicOnion.GenerateIfDirectiveAttribute.#ctor*
+  name: GenerateIfDirectiveAttribute
+  href: api/MagicOnion.GenerateIfDirectiveAttribute.html#MagicOnion_GenerateIfDirectiveAttribute__ctor_
+  commentId: Overload:MagicOnion.GenerateIfDirectiveAttribute.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute
+  nameWithType: GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute
 - uid: MagicOnion.Generator
   name: MagicOnion.Generator
   href: api/MagicOnion.Generator.html

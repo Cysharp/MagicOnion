@@ -273,7 +273,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html",
-          "hash": "MU0r/bmcrpyMurCmepJBPg=="
+          "hash": "GZtXrDPYY57Vif7/CTDFAQ=="
         }
       },
       "is_incremental": false,
@@ -285,7 +285,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html",
-          "hash": "L5dMbYiLoo+HMNMhzEvmSA=="
+          "hash": "4826VhtZv+TbQ307nyqmHA=="
         }
       },
       "is_incremental": false,
@@ -297,7 +297,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html",
-          "hash": "avvMnF2iChRpviZXWgmvPA=="
+          "hash": "FjIkX7mVgb1ylSn3tyGeiQ=="
         }
       },
       "is_incremental": false,
@@ -309,7 +309,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.InterfaceDefinition.html",
-          "hash": "NM3IzYfQkWZPNw2WNLoQ3A=="
+          "hash": "eiiu64imZ5LFgkHJHdC+EA=="
         }
       },
       "is_incremental": false,
@@ -333,7 +333,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.CodeAnalysis.MethodDefinition.html",
-          "hash": "D3iEo+Kyk2mBWXRItCe2yA=="
+          "hash": "npOPG9a6Y0ML0YbaBev8ZA=="
         }
       },
       "is_incremental": false,
@@ -886,6 +886,18 @@
         ".html": {
           "relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.html",
           "hash": "+EAiXpuTkNgU7mytfjEhHQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.html",
+          "hash": "4NRwFfd3WrU6CuInfnk3ow=="
         }
       },
       "is_incremental": false,
@@ -2457,7 +2469,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.html",
-          "hash": "EL80MYT69RLfnyxySoQbQw=="
+          "hash": "X2to3Mx/JZKkAvi9vytvpg=="
         }
       },
       "is_incremental": false,
@@ -2541,7 +2553,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "YiQ0O9S7joxFIoh/EQniZg=="
+          "hash": "mVVMnRX3DI0zglngGEXo6A=="
         }
       },
       "is_incremental": false,
@@ -2628,7 +2640,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 211,
+          "total_file_count": 212,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

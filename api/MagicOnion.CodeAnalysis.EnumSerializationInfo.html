@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class EnumSerializationInfo : object, IResolverRegisterInfo, IEquatable&lt;EnumSerializationInfo&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class EnumSerializationInfo : object, IResolverRegisterInfo</code></pre>
   </div>
 
   <div class="inheritance">
@@ -94,7 +94,6 @@
   <div classs="implements">
     <h5>Implements</h5>
     <div><a class="xref" href="MagicOnion.CodeAnalysis.IResolverRegisterInfo.html">IResolverRegisterInfo</a></div>
-    <div><span class="xref">IEquatable</span>&lt;<a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html">EnumSerializationInfo</a>&gt;</div>
   </div>
   
   
@@ -103,6 +102,24 @@
   
   
   <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo__ctor_System_String_System_String_System_String_System_String_IReadOnlyList_System_String__">EnumSerializationInfo(String, String, String, String, IReadOnlyList&lt;String&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
   <h4>Properties
   </h4>
   <table class="table table-condensed">
@@ -127,6 +144,18 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_HasIfDirectiveConditions">HasIfDirectiveConditions</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_IfDirectiveConditions">IfDirectiveConditions</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_Name">Name</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -145,37 +174,47 @@
       </tr>
     </tbody>
   </table>
-  <h4>Methods
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_Equals_MagicOnion_CodeAnalysis_EnumSerializationInfo_">Equals(EnumSerializationInfo)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_GetHashCode">GetHashCode()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_CodeAnalysis_EnumSerializationInfo_ToString">ToString()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
   
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo__ctor_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor*"></a>
+  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo__ctor_System_String_System_String_System_String_System_String_IReadOnlyList_System_String__" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.#ctor(System.String,System.String,System.String,System.String,IReadOnlyList{System.String})">EnumSerializationInfo(String, String, String, String, IReadOnlyList&lt;String&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public EnumSerializationInfo(string namespace, string name, string fullName, string underlyingType, IReadOnlyList&lt;string&gt; ifDirectiveConditions)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>namespace</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>name</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fullName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>underlyingType</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>ifDirectiveConditions</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <h3 id="properties">Properties
   </h3>
   <section>
@@ -215,7 +254,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string FullName { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string FullName { get; }</code></pre>
   </div>
 
   
@@ -239,13 +278,73 @@
   
   </section>
   <section>
+  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_HasIfDirectiveConditions_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions*"></a>
+  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_HasIfDirectiveConditions" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.HasIfDirectiveConditions">HasIfDirectiveConditions</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool HasIfDirectiveConditions { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_IfDirectiveConditions_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions*"></a>
+  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_IfDirectiveConditions" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.IfDirectiveConditions">IfDirectiveConditions</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;string&gt; IfDirectiveConditions { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_Name_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.Name*"></a>
   <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_Name" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.Name">Name</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Name { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string Name { get; }</code></pre>
   </div>
 
   
@@ -275,7 +374,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Namespace { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string Namespace { get; }</code></pre>
   </div>
 
   
@@ -305,7 +404,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string UnderlyingType { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string UnderlyingType { get; }</code></pre>
   </div>
 
   
@@ -328,112 +427,10 @@
   
   
   </section>
-  <h3 id="methods">Methods
-  </h3>
-  <section>
-  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_Equals_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals*"></a>
-  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_Equals_MagicOnion_CodeAnalysis_EnumSerializationInfo_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.Equals(MagicOnion.CodeAnalysis.EnumSerializationInfo)">Equals(EnumSerializationInfo)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool Equals(EnumSerializationInfo other)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>other</code></span> <a class="xref" href="MagicOnion.CodeAnalysis.EnumSerializationInfo.html">EnumSerializationInfo</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Boolean</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_GetHashCode_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode*"></a>
-  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_GetHashCode" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.GetHashCode">GetHashCode()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Int32</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_CodeAnalysis_EnumSerializationInfo_ToString_" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString*"></a>
-  <h4 id="MagicOnion_CodeAnalysis_EnumSerializationInfo_ToString" data-uid="MagicOnion.CodeAnalysis.EnumSerializationInfo.ToString">ToString()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="MagicOnion.CodeAnalysis.IResolverRegisterInfo.html">IResolverRegisterInfo</a>
-  </div>
-  <div>
-      <span class="xref">IEquatable&lt;&gt;</span>
   </div>
   
   
