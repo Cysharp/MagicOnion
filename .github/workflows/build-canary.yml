@@ -96,4 +96,4 @@ jobs:
         env:
           FEED_ENDPOINTS: ${{ secrets.VSS_NUGET_EXTERNAL_FEED_ENDPOINTS }}
       - run: wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
-      - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/MagicOnion/_packaging/Canary/nuget/v2 -k AzureDevOps
+      - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://pkgs.dev.azure.com/cysharp/Public/_packaging/Canary-Build/nuget/v2 -k AzureDevOps
