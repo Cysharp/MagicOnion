@@ -55,7 +55,6 @@ namespace MagicOnion.Server.OpenTelemetry
                 { SemanticConventions.AttributeHttpUrl, context.CallContext.Host + context.CallContext.Method },
                 { SemanticConventions.AttributeHttpUserAgent, context.CallContext.RequestHeaders.GetValue("user-agent")},
                 { SemanticConventions.AttributeMessageId, context.ContextId.ToString()},
-                { SemanticConventions.AttributeMessageUncompressedSize, context.GetRawRequest()?.LongLength.ToString() ?? "0"},
                 { SemanticConventions.AttributeMagicOnionPeerName, context.CallContext.Peer},
                 { SemanticConventions.AttributeMagicOnionAuthEnabled, (!string.IsNullOrEmpty(context.CallContext.AuthContext.PeerIdentityPropertyName)).ToString()},
                 { SemanticConventions.AttributeMagicOnionAuthPeerAuthenticated, context.CallContext.AuthContext.IsPeerAuthenticated.ToString()},

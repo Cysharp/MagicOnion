@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,6 +104,51 @@ namespace MagicOnion.Server
             switch (MethodType)
             {
                 case MethodType.Unary:
+                    // (ServiceContext context) =>
+                    // {
+                    //      var request = (TRequest)context.Request;
+                    //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
+                    //      return MethodHandlerResultHelper.SetUnaryResult(result, context);
+                    // };
+                    try
+                    {
+                        var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+                        var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+                        var requestArg = Expression.Parameter(RequestType, "request");
+                        var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)!);
+                        var assignRequest = Expression.Assign(requestArg, Expression.Convert(contextRequest, RequestType));
+
+                        Expression[] arguments = new Expression[parameters.Length];
+                        if (parameters.Length == 1)
+                        {
+                            arguments[0] = requestArg;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < parameters.Length; i++)
+                            {
+                                arguments[i] = Expression.Field(requestArg, "Item" + (i + 1));
+                            }
+                        }
+
+                        var callBody = Expression.Call(instance, methodInfo, arguments);
+
+                        var finalMethod = (responseIsTask)
+                            ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType)
+                            : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType);
+                        callBody = Expression.Call(finalMethod, callBody, contextArg);
+
+                        var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
+                        var compiledBody = Expression.Lambda(body, contextArg).Compile();
+
+                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
+                    }
+                    break;
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
@@ -139,27 +185,17 @@ namespace MagicOnion.Server
 
                         var callBody = Expression.Call(instance, methodInfo, arguments);
 
-                        if (MethodType == MethodType.Unary)
+                        if (!responseIsTask)
                         {
-                            var finalMethod = (responseIsTask)
-                                ? typeof(MethodHandlerResultHelper).GetMethod("SerializeTaskUnaryResult", staticFlags)!.MakeGenericMethod(UnwrappedResponseType)
-                                : typeof(MethodHandlerResultHelper).GetMethod("SerializeUnaryResult", staticFlags)!.MakeGenericMethod(UnwrappedResponseType);
-                            callBody = Expression.Call(finalMethod, callBody, contextArg);
+                            callBody = Expression.Call(typeof(MethodHandlerResultHelper)
+                                .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!
+                                .MakeGenericMethod(MethodInfo.ReturnType), callBody);
                         }
                         else
                         {
-                            if (!responseIsTask)
-                            {
-                                callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                                    .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!
-                                    .MakeGenericMethod(MethodInfo.ReturnType), callBody);
-                            }
-                            else
-                            {
-                                callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                                    .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!
-                                    .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), callBody);
-                            }
+                            callBody = Expression.Call(typeof(MethodHandlerResultHelper)
+                                .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!
+                                .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), callBody);
                         }
 
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
@@ -188,8 +224,8 @@ namespace MagicOnion.Server
                         if (MethodType == MethodType.ClientStreaming)
                         {
                             var finalMethod = (responseIsTask)
-                                ? typeof(MethodHandlerResultHelper).GetMethod("SerializeTaskClientStreamingResult", staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType)
-                                : typeof(MethodHandlerResultHelper).GetMethod("SerializeClientStreamingResult", staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType);
+                                ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeTaskClientStreamingResult), staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType)
+                                : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType);
                             body = Expression.Call(finalMethod, body, contextArg);
                         }
                         else
@@ -296,6 +332,150 @@ namespace MagicOnion.Server
             return next;
         }
 
+        internal void BindUnaryHandler(ServiceBinderBase binder)
+        {
+            var isRequestTypeValueType = RequestType.IsValueType;
+            var isResponseTypeValueType = UnwrappedResponseType.IsValueType;
+
+            Action<ServiceBinderBase> bind;
+            if (isRequestTypeValueType && isResponseTypeValueType)
+            {
+                var methodBindUnaryHandler_Box_Box = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_Box_Box), BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Box.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+            }
+            else if (isRequestTypeValueType)
+            {
+                var methodBindUnaryHandler_Box_Class = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_Box_Class), BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Class.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+            }
+            else if (isResponseTypeValueType)
+            {
+                var methodBindUnaryHandler_Class_Box = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_Class_Box), BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Class_Box.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+            }
+            else
+            {
+                var methodBindUnaryHandler_Class_Class = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_Class_Class), BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Class_Class.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+            }
+
+            bind(binder);
+        }
+
+        internal void BindUnaryHandler_Box_Box<TRequest, TResponse>(ServiceBinderBase binder)
+        {
+            var requestMarshaller = new Marshaller<Box<TRequest>>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => new Box<TRequest>(MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
+            );
+            var responseMarshaller = new Marshaller<Box<TResponse>>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => new Box<TResponse>(MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
+            );
+            var method = new Method<Box<TRequest>, Box<TResponse>>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
+            binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request.Value!, context)));
+        }
+
+        internal void BindUnaryHandler_Class_Box<TRequest, TResponse>(ServiceBinderBase binder)
+            where TRequest : class
+        {
+            var requestMarshaller = new Marshaller<TRequest>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
+            );
+            var responseMarshaller = new Marshaller<Box<TResponse>>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => new Box<TResponse>(MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
+            );
+            var method = new Method<TRequest, Box<TResponse>>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
+            binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request, context)));
+        }
+
+        internal void BindUnaryHandler_Box_Class<TRequest, TResponse>(ServiceBinderBase binder)
+            where TResponse : class
+        {
+            var requestMarshaller = new Marshaller<Box<TRequest>>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => new Box<TRequest>(MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
+            );
+            var responseMarshaller = new Marshaller<TResponse>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
+            );
+            var method = new Method<Box<TRequest>, TResponse>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
+#pragma warning disable CS8603
+            binder.AddMethod(method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
+#pragma warning restore CS8603
+        }
+
+        internal void BindUnaryHandler_Class_Class<TRequest, TResponse>(ServiceBinderBase binder)
+            where TRequest : class
+            where TResponse : class
+        {
+            var requestMarshaller = new Marshaller<TRequest>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
+            );
+            var responseMarshaller = new Marshaller<TResponse>(
+                serializer: (obj, ctx) =>
+                {
+                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
+            );
+            var method = new Method<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
+#pragma warning disable CS8603
+            binder.AddMethod(method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request, context));
+#pragma warning restore CS8603
+        }
+
+        private class Box<T>
+        {
+            public T? Value { get; }
+
+            public Box(T? value)
+            {
+                Value = value;
+            }
+        }
+
         internal void BindHandler(ServiceBinderBase binder)
         {
             var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -304,11 +484,7 @@ namespace MagicOnion.Server
             {
                 case MethodType.Unary:
                     {
-                        var genericMethod = this.GetType()
-                            .GetMethod(nameof(UnaryServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
-                            .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        var handler = (UnaryServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(UnaryServerMethod<byte[], byte[]>), this);
-                        binder.AddMethod(method, handler);
+                        BindUnaryHandler(binder);
                     }
                     break;
                 case MethodType.ClientStreaming:
@@ -343,28 +519,28 @@ namespace MagicOnion.Server
             }
         }
 
-        async Task<byte[]> UnaryServerMethod<TRequest, TResponse>(byte[] request, ServerCallContext context)
+        async Task<TResponse?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
         {
             var isErrorOrInterrupted = false;
             var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices);
             serviceContext.SetRawRequest(request);
 
-            byte[] response = emptyBytes;
+            TResponse? response = default;
             try
             {
-                logger.BeginInvokeMethod(serviceContext, request, typeof(TRequest));
+                logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
                 if (enableCurrentContext)
                 {
                     ServiceContext.currentServiceContext.Value = serviceContext;
                 }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
-                response = serviceContext.Result ?? emptyBytes;
+                response = (TResponse?)serviceContext.Result;
             }
             catch (ReturnStatusException ex)
             {
                 isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
-                response = emptyBytes;
+                response = default;
             }
             catch (Exception ex)
             {
@@ -394,7 +570,7 @@ namespace MagicOnion.Server
 
                     context.Status = new Status(StatusCode.Unknown, str);
                     logger.Error(ex, context);
-                    response = emptyBytes;
+                    response = default;
                 }
                 else
                 {
@@ -403,7 +579,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
 
             return response;
@@ -421,13 +597,12 @@ namespace MagicOnion.Server
             {
                 using (requestStream as IDisposable)
                 {
-                    logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
+                    logger.BeginInvokeMethod(serviceContext, typeof(Nil));
                     if (enableCurrentContext)
                     {
                         ServiceContext.currentServiceContext.Value = serviceContext;
                     }
                     await this.methodBody(serviceContext).ConfigureAwait(false);
-                    response = serviceContext.Result ?? emptyBytes;
                 }
             }
             catch (ReturnStatusException ex)
@@ -452,7 +627,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                logger.EndInvokeMethod(serviceContext, response, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
             return response;
         }
@@ -467,7 +642,7 @@ namespace MagicOnion.Server
             serviceContext.SetRawRequest(request);
             try
             {
-                logger.BeginInvokeMethod(serviceContext, request, typeof(TRequest));
+                logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
                 if (enableCurrentContext)
                 {
                     ServiceContext.currentServiceContext.Value = serviceContext;
@@ -497,7 +672,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -511,7 +686,7 @@ namespace MagicOnion.Server
             };
             try
             {
-                logger.BeginInvokeMethod(serviceContext, emptyBytes, typeof(Nil));
+                logger.BeginInvokeMethod(serviceContext, typeof(Nil));
                 using (requestStream as IDisposable)
                 {
                     if (enableCurrentContext)
@@ -545,7 +720,7 @@ namespace MagicOnion.Server
             }
             finally
             {
-                logger.EndInvokeMethod(serviceContext, emptyBytes, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
             }
         }
 
@@ -616,26 +791,20 @@ namespace MagicOnion.Server
             await result;
         }
 
-        public static async ValueTask SerializeUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
+        public static async ValueTask SetUnaryResult<T>(UnaryResult<T> result, ServiceContext context)
         {
-            if (result.hasRawValue && !context.IsIgnoreSerialization)
+            if (result.hasRawValue)
             {
-                var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
-
-                var bytes = MessagePackSerializer.Serialize<T>(value, context.SerializerOptions);
-                context.Result = bytes;
+                context.Result = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
             }
         }
 
-        public static async ValueTask SerializeTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
+        public static async ValueTask SetTaskUnaryResult<T>(Task<UnaryResult<T>> taskResult, ServiceContext context)
         {
             var result = await taskResult.ConfigureAwait(false);
-            if (result.hasRawValue && !context.IsIgnoreSerialization)
+            if (result.hasRawValue)
             {
-                var value = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
-
-                var bytes = MessagePackSerializer.Serialize<T>(value, context.SerializerOptions);
-                context.Result = bytes;
+                context.Result = (result.rawTaskValue != null) ? await result.rawTaskValue.ConfigureAwait(false) : result.rawValue;
             }
         }
 

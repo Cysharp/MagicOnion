@@ -59,13 +59,11 @@ namespace MagicOnion.Server
 
         public IServiceProvider ServiceProvider { get; private set; }
 
-        // internal, used from there methods.
-        internal bool IsIgnoreSerialization { get; set; }
-        byte[]? request;
-        internal ReadOnlyMemory<byte> Request => request;
+        object? request;
+        internal object? Request => request;
         internal IAsyncStreamReader<byte[]>? RequestStream { get; set; }
         internal IAsyncStreamWriter<byte[]>? ResponseStream { get; set; }
-        internal byte[]? Result { get; set; }
+        internal object? Result { get; set; }
         internal IMagicOnionLogger MagicOnionLogger { get; private set; }
         internal MethodHandler MethodHandler { get; private set; }
 
@@ -90,25 +88,25 @@ namespace MagicOnion.Server
         }
 
         /// <summary>Get Raw Request.</summary>
-        public byte[]? GetRawRequest()
+        public object? GetRawRequest()
         {
             return request;
         }
 
         /// <summary>Set Raw Request, you can set before method body was called.</summary>
-        public void SetRawRequest(byte[] request)
+        public void SetRawRequest(object? request)
         {
             this.request = request;
         }
 
         /// <summary>Can get after method body was finished.</summary>
-        public byte[]? GetRawResponse()
+        public object? GetRawResponse()
         {
             return Result;
         }
 
         /// <summary>Can set after method body was finished.</summary>
-        public void SetRawResponse(byte[] response)
+        public void SetRawResponse(object? response)
         {
             Result = response;
         }
@@ -154,15 +152,6 @@ namespace MagicOnion.Server
         public void ChangeSerializerOptions(MessagePackSerializerOptions serializerOptions)
         {
             this.SerializerOptions = serializerOptions;
-        }
-
-        /// <summary>
-        /// Unsafe optimize option, ignore serialization process of MessagePackSerializer. This is useful for cache result.
-        /// </summary>
-        public void ForceSetRawUnaryResult(byte[] result)
-        {
-            this.IsIgnoreSerialization = true;
-            this.Result = result;
         }
     }
 
