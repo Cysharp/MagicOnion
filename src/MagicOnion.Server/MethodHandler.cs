@@ -345,14 +345,14 @@ namespace MagicOnion.Server
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
                 bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Box.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
-            else if (isRequestTypeValueType)
+            else if (isRequestTypeValueType && !isResponseTypeValueType)
             {
                 var methodBindUnaryHandler_Box_Class = this.GetType()
                     .GetMethod(nameof(BindUnaryHandler_Box_Class), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
                 bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Class.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
-            else if (isResponseTypeValueType)
+            else if (!isRequestTypeValueType && isResponseTypeValueType)
             {
                 var methodBindUnaryHandler_Class_Box = this.GetType()
                     .GetMethod(nameof(BindUnaryHandler_Class_Box), BindingFlags.Instance | BindingFlags.NonPublic)!
