@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - "master"
-      - "hotfix/WriteEmptyResponse"
     tags:
       - "!*" # not a tag push
+  workflow_dispatch:
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
