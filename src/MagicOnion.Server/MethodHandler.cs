@@ -334,43 +334,45 @@ namespace MagicOnion.Server
 
         internal void BindUnaryHandler(ServiceBinderBase binder)
         {
+            // NOTE: ServiceBinderBase.AddMethod has `class` generic constraint.
+            //       We need to box an instance of the value type.
             var isRequestTypeValueType = RequestType.IsValueType;
             var isResponseTypeValueType = UnwrappedResponseType.IsValueType;
 
             Action<ServiceBinderBase> bind;
             if (isRequestTypeValueType && isResponseTypeValueType)
             {
-                var methodBindUnaryHandler_Box_Box = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_Box_Box), BindingFlags.Instance | BindingFlags.NonPublic)!
+                var methodBindUnaryHandler_ValueType_ValueType = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_ValueType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Box.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_ValueType_ValueType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
             else if (isRequestTypeValueType && !isResponseTypeValueType)
             {
-                var methodBindUnaryHandler_Box_Class = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_Box_Class), BindingFlags.Instance | BindingFlags.NonPublic)!
+                var methodBindUnaryHandler_ValueType_RefType = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Box_Class.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_ValueType_RefType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
             else if (!isRequestTypeValueType && isResponseTypeValueType)
             {
-                var methodBindUnaryHandler_Class_Box = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_Class_Box), BindingFlags.Instance | BindingFlags.NonPublic)!
+                var methodBindUnaryHandler_RefType_ValueType = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Class_Box.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_RefType_ValueType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
             else
             {
-                var methodBindUnaryHandler_Class_Class = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_Class_Class), BindingFlags.Instance | BindingFlags.NonPublic)!
+                var methodBindUnaryHandler_RefType_RefType = this.GetType()
+                    .GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!
                     .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_Class_Class.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
+                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_RefType_RefType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
             }
 
             bind(binder);
         }
 
-        internal void BindUnaryHandler_Box_Box<TRequest, TResponse>(ServiceBinderBase binder)
+        internal void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
             var requestMarshaller = new Marshaller<Box<TRequest>>(
                 serializer: (obj, ctx) =>
@@ -392,7 +394,7 @@ namespace MagicOnion.Server
             binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request.Value!, context)));
         }
 
-        internal void BindUnaryHandler_Class_Box<TRequest, TResponse>(ServiceBinderBase binder)
+        internal void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
         {
             var requestMarshaller = new Marshaller<TRequest>(
@@ -415,7 +417,7 @@ namespace MagicOnion.Server
             binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request, context)));
         }
 
-        internal void BindUnaryHandler_Box_Class<TRequest, TResponse>(ServiceBinderBase binder)
+        internal void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TResponse : class
         {
             var requestMarshaller = new Marshaller<Box<TRequest>>(
@@ -440,7 +442,7 @@ namespace MagicOnion.Server
 #pragma warning restore CS8603
         }
 
-        internal void BindUnaryHandler_Class_Class<TRequest, TResponse>(ServiceBinderBase binder)
+        internal void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
             where TResponse : class
         {
