@@ -332,7 +332,7 @@ namespace MagicOnion.Server
             return next;
         }
 
-        internal void BindUnaryHandler(ServiceBinderBase binder)
+        void BindUnaryHandler(ServiceBinderBase binder)
         {
             // NOTE: ServiceBinderBase.AddMethod has `class` generic constraint.
             //       We need to box an instance of the value type.
@@ -372,7 +372,7 @@ namespace MagicOnion.Server
             bind(binder);
         }
 
-        internal void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
+        void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
             var requestMarshaller = new Marshaller<Box<TRequest>>(
                 serializer: (obj, ctx) =>
@@ -394,7 +394,7 @@ namespace MagicOnion.Server
             binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request.Value!, context)));
         }
 
-        internal void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
+        void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
         {
             var requestMarshaller = new Marshaller<TRequest>(
@@ -417,7 +417,7 @@ namespace MagicOnion.Server
             binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request, context)));
         }
 
-        internal void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
+        void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TResponse : class
         {
             var requestMarshaller = new Marshaller<Box<TRequest>>(
@@ -442,7 +442,7 @@ namespace MagicOnion.Server
 #pragma warning restore CS8603
         }
 
-        internal void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
+        void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
             where TResponse : class
         {
