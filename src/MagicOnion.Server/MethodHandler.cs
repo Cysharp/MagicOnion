@@ -608,6 +608,7 @@ namespace MagicOnion.Server
                         ServiceContext.currentServiceContext.Value = serviceContext;
                     }
                     await this.methodBody(serviceContext).ConfigureAwait(false);
+                    response = serviceContext.Result as byte[] ?? emptyBytes;
                 }
             }
             catch (ReturnStatusException ex)
