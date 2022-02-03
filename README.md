@@ -387,9 +387,9 @@ public class GamingHubClient : IGamingHubReceiver
  
     IGamingHub client;
  
-    public async Task<GameObject> ConnectAsync(Channel grpcChannel, string roomName, string playerName)
+    public async Task<GameObject> ConnectAsync(ChannelBase grpcChannel, string roomName, string playerName)
     {
-        var client = StreamingHubClient.Connect<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
+        this.client = await StreamingHubClient.ConnectAsync<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
  
         var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
         foreach (var player in roomPlayers)
