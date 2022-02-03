@@ -152,7 +152,7 @@ namespace MagicOnion.Server
                 case MethodType.ServerStreaming:
                     // (ServiceContext context) =>
                     // {
-                    //      var request = MessagePackSerializer.Deserialize<T>(context.Request, context.SerializerOptions, default);
+                    //      var request = MessagePackSerializer.Deserialize<T>(new ReadOnlyMemory<byte>((byte[])context.Request), context.SerializerOptions, default);
                     //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
                     //      return MethodHandlerResultHelper.SerializeUnaryResult(result, context);
                     // };
@@ -160,14 +160,16 @@ namespace MagicOnion.Server
                     {
                         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
                         var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-                        
+
                         var requestArg = Expression.Parameter(RequestType, "request");
                         var getSerializerOptions = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("SerializerOptions", flags)!);
                         var defaultToken = Expression.Default(typeof(CancellationToken));
 
                         var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)!);
+                        var requestContent = Expression.Convert(contextRequest, typeof(byte[]));
+                        var requestContentRom = Expression.New(typeof(ReadOnlyMemory<byte>).GetConstructor(new[] { typeof(byte[]) })!, requestContent);
 
-                        var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getSerializerOptions, defaultToken);
+                        var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), requestContentRom, getSerializerOptions, defaultToken);
                         var assignRequest = Expression.Assign(requestArg, callDeserialize);
 
                         Expression[] arguments = new Expression[parameters.Length];
