@@ -536,7 +536,10 @@ namespace MagicOnion.Server
                     ServiceContext.currentServiceContext.Value = serviceContext;
                 }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
-                response = (TResponse?)serviceContext.Result;
+                if (serviceContext.Result is not null)
+                {
+                    response = (TResponse?)serviceContext.Result;
+                }
             }
             catch (ReturnStatusException ex)
             {
