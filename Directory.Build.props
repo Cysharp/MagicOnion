@@ -17,6 +17,9 @@
     <PackageIcon>Icon.png</PackageIcon>
 
     <MagicOnionPackageDescription>Unified Realtime/API framework for .NET platform and Unity.</MagicOnionPackageDescription>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
