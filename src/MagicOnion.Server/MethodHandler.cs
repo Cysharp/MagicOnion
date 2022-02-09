@@ -340,16 +340,25 @@ namespace MagicOnion.Server
             //       We need to box an instance of the value type.
             var isRequestTypeValueType = RequestType.IsValueType;
             var isResponseTypeValueType = UnwrappedResponseType.IsValueType;
+            var hasParameter = MethodInfo.GetParameters().Any();
 
-            var bindMethod = (isRequestTypeValueType, isResponseTypeValueType) switch
+            var bindMethod = (hasParameter, isRequestTypeValueType, isResponseTypeValueType) switch
             {
-                // (Class, Class)
-                (false, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (Boxed, Class)
-                (true, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (Class, Boxed)
-                (false, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (Boxed, Boxed)
+                // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
+                //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
+                //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
+                // (NoParameter, _, Class)
+                (false, _, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (NoParameter, _, Boxed)
+                (false, _, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+
+                // (HasParameter, Class, Class)
+                (true, false, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Boxed, Class)
+                (true, true, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Class, Boxed)
+                (true, false, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Boxed, Boxed)
                 _ => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
             };
             
@@ -357,6 +366,19 @@ namespace MagicOnion.Server
         }
 
 #pragma warning disable CS8603
+        void BindUnaryHandler_Ignore_ValueType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
+        {
+            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, GrpcMethodHelper.Box<TResponse>>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
+        }
+
+        void BindUnaryHandler_Ignore_RefType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
+            where TResponse : class
+        {
+            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, TResponse>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => await UnaryServerMethod<Nil, TResponse>(Nil.Default, context)!);
+        }
+
         void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
@@ -388,8 +410,6 @@ namespace MagicOnion.Server
 
         internal void BindHandler(ServiceBinderBase binder)
         {
-            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-
             switch (this.MethodType)
             {
                 case MethodType.Unary:
@@ -399,6 +419,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.ClientStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
@@ -408,6 +429,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.ServerStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
@@ -417,6 +439,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.DuplexStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
