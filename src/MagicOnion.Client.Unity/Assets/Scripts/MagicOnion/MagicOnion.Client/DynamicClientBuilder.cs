@@ -1,4 +1,4 @@
-﻿#if NON_UNITY || !NET_STANDARD_2_0
+#if NON_UNITY || !NET_STANDARD_2_0
 
 using Grpc.Core;
 using MagicOnion.Utils;
@@ -50,7 +50,7 @@ namespace MagicOnion.Client
         public static readonly Type ClientType;
         static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
         static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-        static readonly FieldInfo nilBytes = typeof(MagicOnionMarshallers).GetField("UnsafeNilBytes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+        static readonly FieldInfo nilField = typeof(Nil).GetField(nameof(Nil.Default), BindingFlags.Public | BindingFlags.Static);
         static readonly MethodInfo callMessagePackSerialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
             .First(x => x.Name == "Serialize" && x.GetParameters().Length == 3 && x.ReturnType == typeof(byte[]));
         static readonly MethodInfo callCancellationTokenNone = typeof(CancellationToken).GetProperty("None", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetGetMethod();
@@ -361,8 +361,8 @@ namespace MagicOnion.Client
                             }
                             if (parameters.Length == 0)
                             {
-                                // use empty byte[0]
-                                il.Emit(OpCodes.Ldsfld, nilBytes);
+                                // Nil
+                                il.Emit(OpCodes.Ldsfld, nilField);
                             }
                             else if (parameters.Length == 1)
                             {
@@ -398,8 +398,8 @@ namespace MagicOnion.Client
                             }
                             if (parameters.Length == 0)
                             {
-                                // use empty byte[0]
-                                il.Emit(OpCodes.Ldsfld, nilBytes);
+                                // Nil
+                                il.Emit(OpCodes.Ldsfld, nilField);
                             }
                             else if (parameters.Length == 1)
                             {

@@ -32,7 +32,7 @@ namespace MagicOnion
         {
             if (parameters.Length == 0)
             {
-                return typeof(byte[]);
+                return typeof(Nil);
             }
             else if (parameters.Length == 1)
             {
@@ -56,7 +56,7 @@ namespace MagicOnion
         {
             if (parameters.Length == 0)
             {
-                return typeof(byte[]);
+                return typeof(Nil);
             }
             else if (parameters.Length == 1)
             {
