@@ -18,5 +18,11 @@
 
     <MagicOnionPackageDescription>Unified Realtime/API framework for .NET platform and Unity.</MagicOnionPackageDescription>
 
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all"/>
+  </ItemGroup>
 </Project>
