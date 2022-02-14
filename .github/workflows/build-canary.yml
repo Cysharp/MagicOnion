@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "5.0"
     tags:
       - "!*" # not a tag push
   workflow_dispatch:
