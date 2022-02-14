@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
+      - "5.0"
     tags:
       - "!*" # not a tag push
   pull_request:
     branches:
       - "master"
+      - "5.0"
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
