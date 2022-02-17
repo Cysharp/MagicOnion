@@ -340,150 +340,76 @@ namespace MagicOnion.Server
             //       We need to box an instance of the value type.
             var isRequestTypeValueType = RequestType.IsValueType;
             var isResponseTypeValueType = UnwrappedResponseType.IsValueType;
+            var hasParameter = MethodInfo.GetParameters().Any();
 
-            Action<ServiceBinderBase> bind;
-            if (isRequestTypeValueType && isResponseTypeValueType)
+            var bindMethod = (hasParameter, isRequestTypeValueType, isResponseTypeValueType) switch
             {
-                var methodBindUnaryHandler_ValueType_ValueType = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_ValueType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_ValueType_ValueType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
-            }
-            else if (isRequestTypeValueType && !isResponseTypeValueType)
-            {
-                var methodBindUnaryHandler_ValueType_RefType = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_ValueType_RefType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
-            }
-            else if (!isRequestTypeValueType && isResponseTypeValueType)
-            {
-                var methodBindUnaryHandler_RefType_ValueType = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_RefType_ValueType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
-            }
-            else
-            {
-                var methodBindUnaryHandler_RefType_RefType = this.GetType()
-                    .GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                bind = (Action<ServiceBinderBase>)methodBindUnaryHandler_RefType_RefType.CreateDelegate(typeof(Action<ServiceBinderBase>), this);
-            }
+                // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
+                //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
+                //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
+                // (NoParameter, _, Class)
+                (false, _, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (NoParameter, _, Boxed)
+                (false, _, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
 
-            bind(binder);
+                // (HasParameter, Class, Class)
+                (true, false, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Boxed, Class)
+                (true, true, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Class, Boxed)
+                (true, false, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+                // (HasParameter, Boxed, Boxed)
+                _ => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
+            };
+            
+            ((Action<ServiceBinderBase>)bindMethod.MakeGenericMethod(RequestType, UnwrappedResponseType).CreateDelegate(typeof(Action<ServiceBinderBase>), this))(binder);
+        }
+
+#pragma warning disable CS8603
+        void BindUnaryHandler_Ignore_ValueType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
+        {
+            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, GrpcMethodHelper.Box<TResponse>>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
+        }
+
+        void BindUnaryHandler_Ignore_RefType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
+            where TResponse : class
+        {
+            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, TResponse>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => await UnaryServerMethod<Nil, TResponse>(Nil.Default, context)!);
         }
 
         void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
-            var requestMarshaller = new Marshaller<Box<TRequest>>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => new Box<TRequest>(MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
-            );
-            var responseMarshaller = new Marshaller<Box<TResponse>>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => new Box<TResponse>(MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
-            );
-            var method = new Method<Box<TRequest>, Box<TResponse>>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
-            binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request.Value!, context)));
+            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
         }
 
         void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
         {
-            var requestMarshaller = new Marshaller<TRequest>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
-            );
-            var responseMarshaller = new Marshaller<Box<TResponse>>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => new Box<TResponse>(MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
-            );
-            var method = new Method<TRequest, Box<TResponse>>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
-            binder.AddMethod(method, async (request, context) => new Box<TResponse>(await UnaryServerMethod<TRequest, TResponse>(request, context)));
+            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<TRequest, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
         }
 
         void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TResponse : class
         {
-            var requestMarshaller = new Marshaller<Box<TRequest>>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => new Box<TRequest>(MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
-            );
-            var responseMarshaller = new Marshaller<TResponse>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
-            );
-            var method = new Method<Box<TRequest>, TResponse>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
-#pragma warning disable CS8603
-            binder.AddMethod(method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
-#pragma warning restore CS8603
+            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
         }
 
         void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
             where TResponse : class
         {
-            var requestMarshaller = new Marshaller<TRequest>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => MessagePackSerializer.Deserialize<TRequest>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
-            );
-            var responseMarshaller = new Marshaller<TResponse>(
-                serializer: (obj, ctx) =>
-                {
-                    MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj, serializerOptions);
-                    ctx.Complete();
-                },
-                deserializer: (ctx) => MessagePackSerializer.Deserialize<TResponse>(ctx.PayloadAsReadOnlySequence(), serializerOptions)
-            );
-            var method = new Method<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, requestMarshaller, responseMarshaller);
-#pragma warning disable CS8603
-            binder.AddMethod(method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request, context));
+            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+            binder.AddMethod((Method<TRequest, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request, context));
+        }
 #pragma warning restore CS8603
-        }
-
-        private class Box<T>
-        {
-            public T? Value { get; }
-
-            public Box(T? value)
-            {
-                Value = value;
-            }
-        }
 
         internal void BindHandler(ServiceBinderBase binder)
         {
-            var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-
             switch (this.MethodType)
             {
                 case MethodType.Unary:
@@ -493,6 +419,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.ClientStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
@@ -502,6 +429,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.ServerStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
@@ -511,6 +439,7 @@ namespace MagicOnion.Server
                     break;
                 case MethodType.DuplexStreaming:
                     {
+                        var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
                         var genericMethod = this.GetType()
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
