@@ -404,20 +404,18 @@ namespace MagicOnion.Client
                             else if (parameters.Length == 1)
                             {
                                 // already loaded parameter.
-                                il.Emit(OpCodes.Ldarg_0);
-                                il.Emit(OpCodes.Ldfld, serializerOptionsField);
-                                il.Emit(OpCodes.Call, callCancellationTokenNone);
-                                il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                             }
                             else
                             {
                                 // call new DynamicArgumentTuple<T>
                                 il.Emit(OpCodes.Newobj, def.RequestType.GetConstructors()[0]);
-                                il.Emit(OpCodes.Ldarg_0);
-                                il.Emit(OpCodes.Ldfld, serializerOptionsField);
-                                il.Emit(OpCodes.Call, callCancellationTokenNone);
-                                il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
                             }
+                            // MessagePackSerializer.Serialize<RequestType>(<on-stack>, <arg0>, serializerOptions, CancellationToken.None);
+                            il.Emit(OpCodes.Ldarg_0);
+                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
+                            il.Emit(OpCodes.Call, callCancellationTokenNone);
+                            il.Emit(OpCodes.Call, callMessagePackSerialize.MakeGenericMethod(def.RequestType));
+
                             il.Emit(OpCodes.Stloc_0);
 
                             // create ***Result
