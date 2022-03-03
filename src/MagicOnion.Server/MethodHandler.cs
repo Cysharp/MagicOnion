@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -477,6 +478,18 @@ namespace MagicOnion.Server
                 isErrorOrInterrupted = true;
                 context.Status = ex.ToStatus();
                 response = default;
+
+                // WORKAROUND: Grpc.AspNetCore.Server throws a `Cancelled` status exception when it receives `null` response.
+                //             To return the status code correctly, we needs to rethrow the exception here.
+                //             https://github.com/grpc/grpc-dotnet/blob/d4ee8babcd90666fc0727163a06527ab9fd7366a/src/Grpc.AspNetCore.Server/Internal/CallHandlers/UnaryServerCallHandler.cs#L50-L56
+                var rpcException = new RpcException(ex.ToStatus());
+#if NET6_0_OR_GREATER
+                if (ex.StackTrace is not null)
+                {
+                    ExceptionDispatchInfo.SetRemoteStackTrace(rpcException, ex.StackTrace);
+                }
+#endif
+                throw rpcException;
             }
             catch (Exception ex)
             {
