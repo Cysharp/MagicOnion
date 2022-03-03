@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
     <ProjectReference Include="..\samples\AuthSample\AuthSample.csproj" />
+    <ProjectReference Include="..\samples\BasicServerSample\BasicServerSample.csproj" />
   </ItemGroup>
 
   <ItemGroup>
