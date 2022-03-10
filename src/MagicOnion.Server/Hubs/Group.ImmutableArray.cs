@@ -111,17 +111,20 @@ namespace MagicOnion.Server.Hubs
         {
             lock (gate)
             {
-                members = members.Remove(context);
-                if (inmemoryStorage != null)
+                if (!members.IsEmpty)
                 {
-                    inmemoryStorage.Remove(context.ContextId);
-                }
-
-                if (members.Length == 0)
-                {
-                    if (parent.TryRemove(GroupName))
+                    members = members.Remove(context);
+                    if (inmemoryStorage != null)
                     {
-                        return new ValueTask<bool>(true);
+                        inmemoryStorage.Remove(context.ContextId);
+                    }
+
+                    if (members.Length == 0)
+                    {
+                        if (parent.TryRemove(GroupName))
+                        {
+                            return new ValueTask<bool>(true);
+                        }
                     }
                 }
 
