@@ -1163,6 +1163,34 @@ $ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
 
 Make sure you can build app with iOS and works fine.
 
+### Workaround for il2cpp + Windows Build failure
+If you do a Windows il2cpp build with the gRPC daily build, the build may fail with following error messages.
+
+```
+20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlopen referenced in function Mono_dlopen_m7F2DE2CD0870AB15EEA4E0A0BA6C47044E74BB67
+20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlerror referenced in function Mono_dlerror_m359ABCFD23D0EB5314DE2DFF8AB58CFE949BBABD
+20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlsym referenced in function Mono_dlsym_m31A00C09F598C9D552A94628C2C28B3C7B04C2DD
+C:\Path\To\MyProject\Library\il2cpp_cache\linkresult_C1E926E002526A4D380E4B12B6BD0522\GameAssembly.dll : fatal error LNK1120: 3 unresolved externals
+```
+
+The reason is because some native function (but not nessessary at the runtime) not found on Windows il2cpp build.
+You can avoid this problem by adding the following code to `grpc_csharp_ext_dummy_stubs.c`.
+
+```c
+void* dlopen(const char* filename, int flags) {
+  fprintf(stderr, "Should never reach here");
+  abort();
+}
+char* dlerror(void) {
+  fprintf(stderr, "Should never reach here");
+  abort();
+}
+void* dlsym(void* handle, const char* symbol) {
+  fprintf(stderr, "Should never reach here");
+  abort();
+}
+```
+
 ## gRPC Keepalive
 When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
 
