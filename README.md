@@ -234,6 +234,8 @@ dotnet add package MagicOnion
     - [Support for Unity client](#support-for-unity-client)
         - [iOS build with gRPC](#ios-build-with-grpc)
         - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
+        - [Stripping debug symbols from libgrpc_csharp_ext.so](#stripping-debug-symbols-from-libgrpccsharpextso)
+        - [Workaround for il2cpp + Windows Build failure](#workaround-for-il2cpp--windows-build-failure)
     - [gRPC Keepalive](#grpc-keepalive)
 - [HTTPS (TLS)](#https-tls)
 - [Deployment](#deployment)
@@ -1163,7 +1165,17 @@ $ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
 
 Make sure you can build app with iOS and works fine.
 
-### Workaround for il2cpp + Windows Build failure
+## Stripping debug symbols from libgrpc_csharp_ext.so
+Plugins/Grpc.Core/runtime/android/[arch]/libgrpc_csharp_ext.so file size is big because its includes debug symbols.
+
+You can reduce its size using strip (this command is includes in the NDK).
+
+```shell
+$ cd ${UNITY_PATH}/Plugins/Grpc.Core/runtime/android/${TARGET_ARCH}
+$ strip.exe libgrpc_csharp_ext.so
+```
+
+## Workaround for il2cpp + Windows Build failure
 If you do a Windows il2cpp build with the gRPC daily build, the build may fail with following error messages.
 
 ```
