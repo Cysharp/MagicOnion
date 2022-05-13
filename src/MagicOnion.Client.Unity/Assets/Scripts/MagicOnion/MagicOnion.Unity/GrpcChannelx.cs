@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 #if MAGICONION_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
+#if !USE_GRPC_NET_CLIENT_ONLY
 using Channel = Grpc.Core.Channel;
+#endif
 #endif
 using Grpc.Core;
 #if USE_GRPC_NET_CLIENT
