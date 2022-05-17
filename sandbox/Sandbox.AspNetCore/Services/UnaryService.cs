@@ -72,7 +72,7 @@ namespace Sandbox.AspNetCore.Services
         /// <param name="x">多分X。</param>
         /// <param name="y">多分Y。</param>
         /// <returns>何故かString。</returns>
-        UnaryResult<string> SumAsync(int x, int y);
+        UnaryResult<string> SumAsync(int x, int? y);
     }
 
     public class UnaryService : ServiceBase<ICalcSerivce>, ICalcSerivce
@@ -98,9 +98,9 @@ namespace Sandbox.AspNetCore.Services
         }
 
         [MyFirstFilter]
-        public async UnaryResult<string> SumAsync(int x, int y)
+        public async UnaryResult<string> SumAsync(int x, int? y)
         {
-            return (x + y).ToString();
+            return (x + (y ?? 0)).ToString();
         }
     }
 

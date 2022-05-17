@@ -182,7 +182,7 @@ namespace MagicOnion.Server.HttpGateway.Swagger
                         @in = "formData",
                         type = swaggerDataType,
                         description = parameterXmlComment,
-                        required = !x.IsOptional,
+                        required = !x.IsOptional && !x.ParameterType.IsNullable(), // OpenAPI 3 has a separate definition for nullable, but for OpenAPI 2, there is only required.
                         @default = defaultObjectExample ?? ((x.IsOptional) ? defaultValue : null),
                         items = items,
                         @enum = enums,
