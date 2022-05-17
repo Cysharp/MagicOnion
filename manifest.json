@@ -497,71 +497,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-16.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTuple-16.html",
-          "hash": "r/XH63GvUBHfnek/1p3iBw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-17.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTuple-17.html",
-          "hash": "HDgMjxO6OmSx/qx4CEXxlA=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-18.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTuple-18.html",
-          "hash": "zNXyFAnG5ts5BNXT7oUrjg=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-19.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTuple-19.html",
-          "hash": "3p6CVEb2wQXZm7kyPOgyiw=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-2.yml",
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTuple-2.html",
           "hash": "/LvQPvbBXEXJde15QYzNvg=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-20.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTuple-20.html",
-          "hash": "V74R4TJD0sIxq3TLoTSd7w=="
         }
       },
       "is_incremental": false,
@@ -725,71 +665,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-16.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-16.html",
-          "hash": "BzGWfXlLyoD9MYGIOBGJiQ=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-17.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-17.html",
-          "hash": "1aWb7o3j/ej1j9blLQiW1Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-18.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-18.html",
-          "hash": "faw0dsLzzFwnIyFmO+uY+A=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-19.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-19.html",
-          "hash": "Ket2VRFAzKSKu3LjHLBN1Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-2.yml",
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-2.html",
           "hash": "YRObPlZpCdqtHOhocpzS4Q=="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-20.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-20.html",
-          "hash": "vgSfTTUzIIKG2JxyZKWftg=="
         }
       },
       "is_incremental": false,
@@ -2469,7 +2349,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.html",
-          "hash": "X2to3Mx/JZKkAvi9vytvpg=="
+          "hash": "Kw9s9gB/LlBQLPC3kj8fnQ=="
         }
       },
       "is_incremental": false,
@@ -2553,7 +2433,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "mVVMnRX3DI0zglngGEXo6A=="
+          "hash": "Gn0SFhn3f5fcJaiINpQOtQ=="
         }
       },
       "is_incremental": false,
@@ -2640,7 +2520,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 212,
+          "total_file_count": 202,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
