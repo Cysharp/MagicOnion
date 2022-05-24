@@ -12,9 +12,10 @@ using MessagePack.Formatters;
 
 namespace MagicOnion
 {
-    // T2 ~ T20
+    // T2 ~ T15
+    // NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.
 
-<# for(var i = 2; i <= 20; i++) {
+<# for(var i = 2; i <= 15; i++) {
     var typeArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0}", x)));
     var methodArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} item{0}", x)));
     var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} default{0}", x)));
