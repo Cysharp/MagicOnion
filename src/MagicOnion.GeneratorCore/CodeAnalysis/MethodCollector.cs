@@ -26,7 +26,7 @@ namespace MagicOnion.CodeAnalysis
 
         public ReferenceSymbols(Compilation compilation, Action<string> logger)
         {
-            Void = compilation.GetTypeByMetadataName("System.Void");
+            Void = compilation.GetSpecialType(SpecialType.System_Void);
             if (Void == null)
             {
                 logger("failed to get metadata of System.Void.");
