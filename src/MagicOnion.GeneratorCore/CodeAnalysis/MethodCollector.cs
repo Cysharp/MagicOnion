@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -32,13 +33,13 @@ namespace MagicOnion.CodeAnalysis
                 logger("failed to get metadata of System.Void.");
             }
 
-            TaskOfT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+            TaskOfT = GetWellKnownType(94);
             if (TaskOfT == null)
             {
                 logger("failed to get metadata of System.Threading.Tasks.Task`1.");
             }
 
-            Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+            Task = GetWellKnownType(93);
             if (Task == null)
             {
                 logger("failed to get metadata of System.Threading.Tasks.Task.");
@@ -52,6 +53,12 @@ namespace MagicOnion.CodeAnalysis
                     throw new InvalidOperationException("failed to get metadata of " + name);
                 }
                 return symbol;
+            }
+
+            INamedTypeSymbol GetWellKnownType(int id)
+            {
+                var method = compilation.GetType().GetMethod("CommonGetWellKnownType", BindingFlags.Instance | BindingFlags.NonPublic);
+                return (INamedTypeSymbol)method.Invoke(compilation, new object[] { id });
             }
 
             UnaryResult = GetTypeSymbolOrThrow("MagicOnion.UnaryResult`1");
