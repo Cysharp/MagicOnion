@@ -27,19 +27,19 @@ namespace MagicOnion.CodeAnalysis
 
         public ReferenceSymbols(Compilation compilation, Action<string> logger)
         {
-            Void = compilation.GetSpecialType(SpecialType.System_Void);
+            Void = compilation.GetTypeByMetadataName("System.Void") ?? compilation.GetSpecialType(SpecialType.System_Void);
             if (Void == null)
             {
                 logger("failed to get metadata of System.Void.");
             }
 
-            TaskOfT = GetWellKnownType(94);
+            TaskOfT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1") ?? GetWellKnownType(94);
             if (TaskOfT == null)
             {
                 logger("failed to get metadata of System.Threading.Tasks.Task`1.");
             }
 
-            Task = GetWellKnownType(93);
+            Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task") ?? GetWellKnownType(93);
             if (Task == null)
             {
                 logger("failed to get metadata of System.Threading.Tasks.Task.");
