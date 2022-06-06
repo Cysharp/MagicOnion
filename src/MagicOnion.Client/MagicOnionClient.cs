@@ -1,6 +1,7 @@
 using Grpc.Core;
 using MessagePack;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Client
 {
@@ -63,6 +64,13 @@ namespace MagicOnion.Client
             {
                 return ctor(invoker, serializerOptions, clientFilters);
             }
+        }
+        
+        public static IServiceCollection AddMagicOnionClient<T>(this IServiceCollection serviceCollection, ChannelBase channel) 
+            where T : IService<T>
+        {
+            Create<T>(channel.CreateCallInvoker(), MessagePackSerializer.DefaultOptions, emptyFilters);
+            return serviceCollection;
         }
     }
 
