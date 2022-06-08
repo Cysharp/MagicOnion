@@ -27,40 +27,51 @@ namespace MagicOnion.CodeAnalysis
 
         public ReferenceSymbols(Compilation compilation, Action<string> logger)
         {
-            Void = compilation.GetTypeByMetadataName("System.Void") ?? compilation.GetSpecialType(SpecialType.System_Void);
-            if (Void == null)
+            INamedTypeSymbol GetTypeSymbolOrThrow(string name, SpecialType type = SpecialType.None, bool required = true)
             {
-                logger("failed to get metadata of System.Void.");
-            }
+                var symbol = compilation.GetTypeByMetadataName(name)
+                             ?? GetWellKnownType(name)
+                             ?? GetSpecialType(type);
 
-            TaskOfT = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1") ?? GetWellKnownType(94);
-            if (TaskOfT == null)
-            {
-                logger("failed to get metadata of System.Threading.Tasks.Task`1.");
-            }
-
-            Task = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task") ?? GetWellKnownType(93);
-            if (Task == null)
-            {
-                logger("failed to get metadata of System.Threading.Tasks.Task.");
-            }
-
-            INamedTypeSymbol GetTypeSymbolOrThrow(string name)
-            {
-                var symbol = compilation.GetTypeByMetadataName(name);
                 if (symbol == null)
                 {
-                    throw new InvalidOperationException("failed to get metadata of " + name);
+                    var message = "failed to get metadata of " + name;
+                    if (required) throw new InvalidOperationException(message);
+                    logger(message);
                 }
+
                 return symbol;
             }
 
-            INamedTypeSymbol GetWellKnownType(int id)
+            var getTypeFromMetadataName = typeof(Compilation).Assembly
+                .GetType("Microsoft.CodeAnalysis.WellKnownTypes")
+                .GetMethod("GetTypeFromMetadataName", BindingFlags.Static | BindingFlags.Public);
+
+            var getWellKnownType = compilation.GetType()
+                .GetMethod("CommonGetWellKnownType", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            INamedTypeSymbol GetWellKnownType(string name)
             {
-                var method = compilation.GetType().GetMethod("CommonGetWellKnownType", BindingFlags.Instance | BindingFlags.NonPublic);
-                return (INamedTypeSymbol)method.Invoke(compilation, new object[] { id });
+                var wellKnownType = getTypeFromMetadataName?.Invoke(null, new object[] { name });
+                var instance = wellKnownType != null && (int)wellKnownType > 0
+                    ? getWellKnownType?.Invoke(compilation, new[] { wellKnownType })
+                    : null;
+
+                // Roslyn returns PENamedTypeSymbol which is not convertable to INamedTypeSymbol
+                // https://github.com/dotnet/roslyn/blob/main/src/Compilers/CSharp/Portable/Symbols/Metadata/PE/PENamedTypeSymbol.cs#L2408
+                return instance as INamedTypeSymbol;
             }
 
+            INamedTypeSymbol GetSpecialType(SpecialType type)
+            {
+                return type != SpecialType.None
+                    ? compilation.GetSpecialType(type)
+                    : null;
+            }
+
+            Void = GetTypeSymbolOrThrow("System.Void", SpecialType.System_Void);
+            Task = GetTypeSymbolOrThrow("System.Threading.Tasks.Task", required: false);
+            TaskOfT = GetTypeSymbolOrThrow("System.Threading.Tasks.Task`1", required: false);
             UnaryResult = GetTypeSymbolOrThrow("MagicOnion.UnaryResult`1");
             ClientStreamingResult = GetTypeSymbolOrThrow("MagicOnion.ClientStreamingResult`2");
             DuplexStreamingResult = GetTypeSymbolOrThrow("MagicOnion.DuplexStreamingResult`2");
