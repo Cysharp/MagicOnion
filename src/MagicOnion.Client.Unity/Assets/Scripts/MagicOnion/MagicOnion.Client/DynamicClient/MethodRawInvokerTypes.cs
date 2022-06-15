@@ -1,22 +1,23 @@
 using System;
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client.DynamicClient
 {
     internal static class MethodRawInvokerTypes
     {
-        static readonly MethodInfo unaryMethodRawInvoker_Create_RefType_RefType = typeof(MagicOnionMethodInvoker.UnaryMethodRawInvoker).GetMethod(nameof(MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_RefType_RefType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo unaryMethodRawInvoker_Create_RefType_ValueType = typeof(MagicOnionMethodInvoker.UnaryMethodRawInvoker).GetMethod(nameof(MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_RefType_ValueType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo unaryMethodRawInvoker_Create_ValueType_RefType = typeof(MagicOnionMethodInvoker.UnaryMethodRawInvoker).GetMethod(nameof(MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_ValueType_RefType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo unaryMethodRawInvoker_Create_ValueType_ValueType = typeof(MagicOnionMethodInvoker.UnaryMethodRawInvoker).GetMethod(nameof(MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_ValueType_ValueType), BindingFlags.Static | BindingFlags.Public);
+        static readonly MethodInfo unaryMethodRawInvoker_Create_RefType_RefType = typeof(UnaryMethodRawInvoker).GetMethod(nameof(UnaryMethodRawInvoker.Create_RefType_RefType), BindingFlags.Static | BindingFlags.Public);
+        static readonly MethodInfo unaryMethodRawInvoker_Create_RefType_ValueType = typeof(UnaryMethodRawInvoker).GetMethod(nameof(UnaryMethodRawInvoker.Create_RefType_ValueType), BindingFlags.Static | BindingFlags.Public);
+        static readonly MethodInfo unaryMethodRawInvoker_Create_ValueType_RefType = typeof(UnaryMethodRawInvoker).GetMethod(nameof(UnaryMethodRawInvoker.Create_ValueType_RefType), BindingFlags.Static | BindingFlags.Public);
+        static readonly MethodInfo unaryMethodRawInvoker_Create_ValueType_ValueType = typeof(UnaryMethodRawInvoker).GetMethod(nameof(UnaryMethodRawInvoker.Create_ValueType_ValueType), BindingFlags.Static | BindingFlags.Public);
 
         public static Type GetMethodRawInvokerType(MethodType methodType, Type requestType, Type responseType)
         {
             switch (methodType)
             {
                 case MethodType.Unary:
-                    return typeof(MagicOnionMethodInvoker.UnaryMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
+                    return typeof(UnaryMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
                     break;
                 case MethodType.ServerStreaming:
                     throw new NotSupportedException($"DynamicClientBuilder does not support MethodType '{methodType}'.");

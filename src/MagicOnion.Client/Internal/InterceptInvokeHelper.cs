@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace MagicOnion.Client
+namespace MagicOnion.Client.Client.Internal
 {
     internal static class InterceptInvokeHelper
     {

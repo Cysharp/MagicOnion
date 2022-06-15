@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MagicOnion
+namespace MagicOnion.Client.Internal
 {
-    public class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
+    internal class MarshallingAsyncStreamReader<T> : IAsyncStreamReader<T>, IDisposable
     {
         readonly IAsyncStreamReader<byte[]> inner;
         readonly MessagePackSerializerOptions options;

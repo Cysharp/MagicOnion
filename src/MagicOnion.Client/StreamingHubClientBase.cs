@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MagicOnion.Server;
 using System.Buffers;
 using System.Linq;
+using MagicOnion.Client.Internal;
 
 namespace MagicOnion.Client
 {
