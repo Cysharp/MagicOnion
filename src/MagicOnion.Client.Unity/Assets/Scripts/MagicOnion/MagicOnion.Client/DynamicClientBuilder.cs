@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if FALSE
 namespace MagicOnion.Client
 {
 #if ENABLE_SAVE_ASSEMBLY
@@ -623,4 +624,5 @@ namespace MagicOnion.Client
     }
 }
 
+#endif
 #endif

@@ -1,9 +1,10 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if FALSE
 namespace MagicOnion.Client
 {
     public abstract class MagicOnionClientBase
@@ -128,3 +129,4 @@ namespace MagicOnion.Client
         }
     }
 }
+#endif

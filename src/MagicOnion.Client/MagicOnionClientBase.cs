@@ -1,54 +1,50 @@
-﻿using Grpc.Core;
-using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Grpc.Core;
 
 namespace MagicOnion.Client
 {
-    public abstract class MagicOnionClientBase
+    public readonly struct MagicOnionClientOptions
     {
-        protected string host;
-        protected CallOptions option;
-        protected CallInvoker callInvoker;
-        protected MessagePackSerializerOptions serializerOptions;
-        protected IClientFilter[] filters;
+        public string Host { get; }
+        public CallInvoker CallInvoker { get; }
+        public IReadOnlyList<IClientFilter> Filters { get; }
+        public CallOptions CallOptions { get; }
 
-        static protected ResponseContext CreateResponseContext<TResponse>(RequestContext context, Method<byte[], byte[]> method)
+        public MagicOnionClientOptions(CallInvoker callInvoker, string host, CallOptions callOptions, IReadOnlyList<IClientFilter> filters)
         {
-            var self = context.Client;
-            var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(MagicOnionMarshallers.UnsafeNilBytes));
-            var response = new ResponseContext<TResponse>(callResult, self.serializerOptions);
-            response.SetResponseMutator(context.ResponseMutator);
-            return response;
+            Host = host;
+            CallOptions = callOptions;
+            CallInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
+            Filters = filters ?? Array.Empty<IClientFilter>();
         }
 
-        static protected ResponseContext CreateResponseContext<TRequest, TResponse>(RequestContext context, Method<byte[], byte[]> method)
-        {
-            var self = context.Client;
-            var message = MessagePackSerializer.Serialize<TRequest>(((RequestContext<TRequest>)context).Request, self.serializerOptions);
-            var callResult = self.callInvoker.AsyncUnaryCall(method, self.host, context.CallOptions, context.RequestMutator(message));
-            var response = new ResponseContext<TResponse>(callResult, self.serializerOptions);
-            response.SetResponseMutator(context.ResponseMutator);
-            return response;
-        }
+        public MagicOnionClientOptions WithCallOptions(CallOptions callOptions)
+            => new MagicOnionClientOptions(CallInvoker, Host, callOptions, Filters);
+        public MagicOnionClientOptions WithHost(string host)
+            => new MagicOnionClientOptions(CallInvoker, host, CallOptions, Filters);
+        public MagicOnionClientOptions WithFilters(IReadOnlyList<IClientFilter> filters)
+            => new MagicOnionClientOptions(CallInvoker, Host, CallOptions, filters);
     }
 
-    public abstract class MagicOnionClientBase<T> : MagicOnionClientBase
-        where T : IService<T>
+    public class MagicOnionClientBase
     {
-        protected MagicOnionClientBase()
+        protected internal MagicOnionClientOptions Options { get; }
+
+        protected MagicOnionClientBase(MagicOnionClientOptions options)
         {
+            if (options.CallOptions.Headers == null && options.Filters.Count != 0)
+            {
+                // always creating new Metadata is bad manner for performance
+                options = options.WithCallOptions(options.CallOptions.WithHeaders(new Metadata()));
+            }
+
+            Options = options;
         }
 
-        protected MagicOnionClientBase(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] filters)
-        {
-            this.callInvoker = callInvoker;
-            this.serializerOptions = serializerOptions;
-            this.filters = filters;
-        }
-
-        protected UnaryResult<TResponse> InvokeAsync<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
+        protected internal UnaryResult<TResponse> InvokeAsync<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
         {
             var future = InvokeAsyncCore<TRequest, TResponse>(path, request, requestMethod);
             return new UnaryResult<TResponse>(future);
@@ -56,13 +52,7 @@ namespace MagicOnion.Client
 
         async Task<IResponseContext<TResponse>> InvokeAsyncCore<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
         {
-            if (this.option.Headers == null && filters.Length != 0)
-            {
-                // always creating new Metadata is bad manner for performance
-                this.option = this.option.WithHeaders(new Metadata());
-            }
-
-            var requestContext = new RequestContext<TRequest>(request, this, path, option, typeof(TResponse), filters, requestMethod);
+            var requestContext = new RequestContext<TRequest>(request, this, path, Options.CallOptions, typeof(TResponse), Options.Filters, requestMethod);
             var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
             var result = response as IResponseContext<TResponse>;
             if (result != null)
@@ -75,56 +65,31 @@ namespace MagicOnion.Client
             }
         }
 
-        protected async Task<UnaryResult<TResponse>> InvokeTaskAsync<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
-        {
-            if (this.option.Headers == null && filters.Length != 0)
-            {
-                // always creating new Metadata is bad manner for performance
-                this.option = this.option.WithHeaders(new Metadata());
-            }
+    }
 
-            var requestContext = new RequestContext<TRequest>(request, this, path, option, typeof(TResponse), filters, requestMethod);
-            var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
-            var result = response as IResponseContext<TResponse>;
-            if (result != null)
-            {
-                return new UnaryResult<TResponse>(Task.FromResult(result));
-            }
-            else
-            {
-                throw new InvalidOperationException("ResponseContext is null.");
-            }
+    public abstract class MagicOnionClientBase<T> : MagicOnionClientBase
+        where T : IService<T>
+    {
+        protected MagicOnionClientBase(MagicOnionClientOptions options)
+            : base(options)
+        {
         }
 
-        protected abstract MagicOnionClientBase<T> Clone();
+        protected abstract MagicOnionClientBase<T> Clone(MagicOnionClientOptions options);
 
         public virtual T WithCancellationToken(CancellationToken cancellationToken)
-        {
-            return WithOptions(this.option.WithCancellationToken(cancellationToken));
-        }
+            => WithOptions(Options.CallOptions.WithCancellationToken(cancellationToken));
 
         public virtual T WithDeadline(DateTime deadline)
-        {
-            return WithOptions(this.option.WithDeadline(deadline));
-        }
+            => WithOptions(Options.CallOptions.WithDeadline(deadline));
 
         public virtual T WithHeaders(Metadata headers)
-        {
-            return WithOptions(this.option.WithHeaders(headers));
-        }
+            => WithOptions(Options.CallOptions.WithHeaders(headers));
 
         public virtual T WithHost(string host)
-        {
-            var newInstance = Clone();
-            newInstance.host = host;
-            return (T)(object)newInstance;
-        }
+            => (T)(object)Clone(Options.WithHost(host));
 
-        public virtual T WithOptions(CallOptions option)
-        {
-            var newInstance = Clone();
-            newInstance.option = option;
-            return (T)(object)newInstance;
-        }
+        public virtual T WithOptions(CallOptions options)
+            => (T)(object)Clone(Options.WithCallOptions(options));
     }
 }

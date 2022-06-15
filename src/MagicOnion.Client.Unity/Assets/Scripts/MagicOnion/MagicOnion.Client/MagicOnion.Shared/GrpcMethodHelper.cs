@@ -18,7 +18,7 @@ namespace MagicOnion
             }
         }
 
-                public static IMethod CreateMethod<TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
+        public static IMethod CreateMethod<TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
         {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
             //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
@@ -62,7 +62,7 @@ namespace MagicOnion
                     CreateBoxedMarshaller<TResponse>(serializerOptions)
                 );
             }
-            else if (isMethodRequestTypeBoxed && !isMethodResponseTypeBoxed)
+            else if (isMethodRequestTypeBoxed)
             {
                 return new Method<Box<TRequest>, TResponse>(
                     methodType,
@@ -72,7 +72,7 @@ namespace MagicOnion
                     CreateMarshaller<TResponse>(serializerOptions)
                 );
             }
-            else if (!isMethodRequestTypeBoxed && isMethodResponseTypeBoxed)
+            else if (isMethodResponseTypeBoxed)
             {
                 return new Method<TRequest, Box<TResponse>>(
                     methodType,

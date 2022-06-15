@@ -12,7 +12,7 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Client
+namespace MagicOnion.Client.DynamicClient
 {
 #if ENABLE_SAVE_ASSEMBLY
     public

@@ -55,8 +55,8 @@ namespace MagicOnion.Client
 #if ((ENABLE_IL2CPP && !UNITY_EDITOR) || NET_STANDARD_2_0)
                 throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
 #else
-                var t = DynamicClientBuilder<T>.ClientType;
-                return (T)Activator.CreateInstance(t, invoker, serializerOptions, clientFilters);
+                var t = MagicOnion.Client.DynamicClient.DynamicClientBuilder<T>.ClientType;
+                return (T)Activator.CreateInstance(t, new MagicOnionClientOptions(invoker, default, default, clientFilters), serializerOptions);
 #endif
             }
             else
