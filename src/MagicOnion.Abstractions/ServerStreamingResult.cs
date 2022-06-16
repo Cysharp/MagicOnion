@@ -1,7 +1,9 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 
 namespace MagicOnion
 {
@@ -10,54 +12,50 @@ namespace MagicOnion
     /// </summary>
     public struct ServerStreamingResult<TResponse> : IDisposable
     {
-        readonly AsyncServerStreamingCall<byte[]> inner;
-        readonly IAsyncStreamReader<TResponse> responseStream;
+        readonly IDisposable inner; // AsyncServerStreamingCall<TResponse> or AsyncServerStreamingCall<Box<TResponse>>
 
-        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IAsyncStreamReader<TResponse> responseStream, MessagePackSerializerOptions serializerOptions)
+        public ServerStreamingResult(AsyncServerStreamingCall<TResponse> inner)
         {
             this.inner = inner;
-            this.responseStream = responseStream;
+        }
+        public ServerStreamingResult(AsyncServerStreamingCall<Box<TResponse>> inner)
+        {
+            this.inner = inner;
         }
 
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>
         public IAsyncStreamReader<TResponse> ResponseStream
-        {
-            get
-            {
-                return responseStream;
-            }
-        }
+            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
+                ? new UnboxAsyncStreamReader<TResponse>(boxedStreamingCall.ResponseStream)
+                : ((AsyncServerStreamingCall<TResponse>)inner).ResponseStream;
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-        {
-            get
-            {
-                return this.inner.ResponseHeadersAsync;
-            }
-        }
+            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
+                ? boxedStreamingCall.ResponseHeadersAsync
+                : ((AsyncServerStreamingCall<TResponse>)inner).ResponseHeadersAsync;
 
         /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-        {
-            return this.inner.GetStatus();
-        }
+            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
+                ? boxedStreamingCall.GetStatus()
+                : ((AsyncServerStreamingCall<TResponse>)inner).GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-        {
-            return this.inner.GetTrailers();
-        }
+            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
+                ? boxedStreamingCall.GetTrailers()
+                : ((AsyncServerStreamingCall<TResponse>)inner).GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.

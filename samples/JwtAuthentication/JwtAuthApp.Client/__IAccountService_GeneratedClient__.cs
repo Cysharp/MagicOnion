@@ -5,6 +5,7 @@ using Grpc.Core;
 using JwtAuthApp.Shared;
 using MagicOnion;
 using MagicOnion.Client;
+using MagicOnion.Client.Internal;
 using MessagePack;
 
 namespace JwtAuthApp.Client
@@ -50,15 +51,15 @@ namespace JwtAuthApp.Client
 
         class ClientCore
         {
-            public readonly MagicOnionMethodInvoker.UnaryMethodRawInvoker<DynamicArgumentTuple<string, string>, SignInResponse> SignInAsync;
-            public readonly MagicOnionMethodInvoker.UnaryMethodRawInvoker<MessagePack.Nil, CurrentUserResponse> GetCurrentUserNameAsync;
-            public readonly MagicOnionMethodInvoker.UnaryMethodRawInvoker<MessagePack.Nil, string> DangerousOperationAsync;
+            public readonly UnaryMethodRawInvoker<DynamicArgumentTuple<string, string>, SignInResponse> SignInAsync;
+            public readonly UnaryMethodRawInvoker<MessagePack.Nil, CurrentUserResponse> GetCurrentUserNameAsync;
+            public readonly UnaryMethodRawInvoker<MessagePack.Nil, string> DangerousOperationAsync;
 
             public ClientCore(MessagePackSerializerOptions serializerOptions)
             {
-                SignInAsync = MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, string>, SignInResponse>(nameof(IAccountService), nameof(SignInAsync), serializerOptions);
-                GetCurrentUserNameAsync = MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_ValueType_RefType<MessagePack.Nil, CurrentUserResponse>(nameof(IAccountService), nameof(GetCurrentUserNameAsync), serializerOptions);
-                DangerousOperationAsync = MagicOnionMethodInvoker.UnaryMethodRawInvoker.Create_ValueType_RefType<MessagePack.Nil, string>(nameof(IAccountService), nameof(DangerousOperationAsync), serializerOptions);
+                SignInAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, string>, SignInResponse>(nameof(IAccountService), nameof(SignInAsync), serializerOptions);
+                GetCurrentUserNameAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<MessagePack.Nil, CurrentUserResponse>(nameof(IAccountService), nameof(GetCurrentUserNameAsync), serializerOptions);
+                DangerousOperationAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<MessagePack.Nil, string>(nameof(IAccountService), nameof(DangerousOperationAsync), serializerOptions);
             }
         }
     }

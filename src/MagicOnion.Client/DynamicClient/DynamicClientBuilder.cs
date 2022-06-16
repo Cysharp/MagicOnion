@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Grpc.Core;
 using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient
@@ -132,6 +133,12 @@ namespace MagicOnion.Client.DynamicClient
             //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", request);
             // public UnaryResult<TResponse> MethodName()
             //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", Nil.Default);
+            // public ServerStreamingResult<TRequest, TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
+            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
+            // public ClientStreamingResult<TRequest, TResponse> MethodName()
+            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName");
+            // public DuplexStreamingResult<TRequest, TResponse> MethodName()
+            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName");
             foreach (var method in ctx.Definition.Methods)
             {
                 var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod("Invoke");
@@ -147,41 +154,48 @@ namespace MagicOnion.Client.DynamicClient
                 //     method.Path,
                 il.Emit(OpCodes.Ldstr, method.Path);
 
-                if (method.ParameterTypes.Count > 0)
+                if (method.MethodType == MethodType.Unary || method.MethodType == MethodType.ServerStreaming)
                 {
-                    if (method.ParameterTypes.Count == 1)
+                    if (method.ParameterTypes.Count > 0)
                     {
-                        // arg1
-                        il.Emit(OpCodes.Ldarg_1);
-                    }
-                    else
-                    {
-                        // new DynamicArgumentTuple(arg1, arg2, ...)
-                        for (var i = 0; i < method.ParameterTypes.Count; i++)
+                        if (method.ParameterTypes.Count == 1)
                         {
-                            switch (i)
-                            {
-                                case 0:
-                                    il.Emit(OpCodes.Ldarg_1);
-                                    break;
-                                case 1:
-                                    il.Emit(OpCodes.Ldarg_2);
-                                    break;
-                                case 2:
-                                    il.Emit(OpCodes.Ldarg_3);
-                                    break;
-                                default:
-                                    il.Emit(OpCodes.Ldarg, i + 1);
-                                    break;
-                            }
+                            // arg1
+                            il.Emit(OpCodes.Ldarg_1);
                         }
-                        il.Emit(OpCodes.Newobj, method.RequestType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, method.ParameterTypes.ToArray(), Array.Empty<ParameterModifier>()));
+                        else
+                        {
+                            // new DynamicArgumentTuple(arg1, arg2, ...)
+                            for (var i = 0; i < method.ParameterTypes.Count; i++)
+                            {
+                                switch (i)
+                                {
+                                    case 0:
+                                        il.Emit(OpCodes.Ldarg_1);
+                                        break;
+                                    case 1:
+                                        il.Emit(OpCodes.Ldarg_2);
+                                        break;
+                                    case 2:
+                                        il.Emit(OpCodes.Ldarg_3);
+                                        break;
+                                    default:
+                                        il.Emit(OpCodes.Ldarg, i + 1);
+                                        break;
+                                }
+                            }
+                            il.Emit(OpCodes.Newobj, method.RequestType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, method.ParameterTypes.ToArray(), Array.Empty<ParameterModifier>()));
+                        }
+                    }
+                    else if (method.ParameterTypes.Count == 0)
+                    {
+                        // Nil.Default
+                        il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default", BindingFlags.Public | BindingFlags.Static));
                     }
                 }
-                else if (method.ParameterTypes.Count == 0)
+                else
                 {
-                    // Nil.Default
-                    il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default", BindingFlags.Public | BindingFlags.Static));
+                    // Invoker for ClientStreaming, DuplexStreaming has no request parameter.
                 }
 
                 // );

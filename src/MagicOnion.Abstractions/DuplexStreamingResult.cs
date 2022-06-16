@@ -2,6 +2,7 @@ using Grpc.Core;
 using MessagePack;
 using System;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 
 namespace MagicOnion
 {
@@ -10,69 +11,89 @@ namespace MagicOnion
     /// </summary>
     public struct DuplexStreamingResult<TRequest, TResponse> : IDisposable
     {
-        readonly AsyncDuplexStreamingCall<byte[], byte[]> inner;
-        readonly IClientStreamWriter<TRequest> requestStream;
-        readonly IAsyncStreamReader<TResponse> responseStream;
+        readonly IDisposable inner; // AsyncDuplexStreamingCall<TRequest, TResponse> or AsyncDuplexStreamingCall<Box<TRequest>, TResponse> or AsyncDuplexStreamingCall<TRequest, Box<TResponse>> or AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>>
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, IAsyncStreamReader<TResponse> responseStream, MessagePackSerializerOptions serializerOptions)
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<TRequest, TResponse> inner)
+            : this((IDisposable)inner)
+        { }
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<Box<TRequest>, TResponse> inner)
+            : this((IDisposable)inner)
+        { }
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<TRequest, Box<TResponse>> inner)
+            : this((IDisposable)inner)
+        { }
+        public DuplexStreamingResult(AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> inner)
+            : this((IDisposable)inner)
+        { }
+
+        private DuplexStreamingResult(IDisposable inner)
         {
             this.inner = inner;
-            this.requestStream = requestStream;
-            this.responseStream = responseStream;
         }
-
-        public AsyncDuplexStreamingCall<byte[], byte[]> RawStreamingCall => inner;
 
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>
         public IAsyncStreamReader<TResponse> ResponseStream
-        {
-            get
-            {
-                return responseStream;
-            }
-        }
+            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.ResponseStream
+                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? new UnboxAsyncStreamReader<TResponse>(responseBoxed.ResponseStream)
+                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? new UnboxAsyncStreamReader<TResponse>(requestAndResponseBoxed.ResponseStream)
+                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).ResponseStream;
+
 
         /// <summary>
         /// Async stream to send streaming requests.
         /// </summary>
         public IClientStreamWriter<TRequest> RequestStream
-        {
-            get
-            {
-                return requestStream;
-            }
-        }
+            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? new BoxClientStreamWriter<TRequest>(requestBoxed.RequestStream)
+                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.RequestStream
+                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? new BoxClientStreamWriter<TRequest>(requestAndResponseBoxed.RequestStream)
+                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).RequestStream;
+
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-        {
-            get
-            {
-                return this.inner.ResponseHeadersAsync;
-            }
-        }
+            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.ResponseHeadersAsync
+                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.ResponseHeadersAsync
+                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.ResponseHeadersAsync
+                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).ResponseHeadersAsync;
 
         /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-        {
-            return this.inner.GetStatus();
-        }
+            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.GetStatus()
+                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.GetStatus()
+                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.GetStatus()
+                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-        {
-            return this.inner.GetTrailers();
-        }
+            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.GetTrailers()
+                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.GetTrailers()
+                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.GetTrailers()
+                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.

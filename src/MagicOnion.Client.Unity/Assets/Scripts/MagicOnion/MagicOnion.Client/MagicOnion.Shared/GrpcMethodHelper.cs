@@ -2,22 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Grpc.Core;
+using MagicOnion.Internal;
 using MessagePack;
 
 namespace MagicOnion
 {
     public static class GrpcMethodHelper
     {
-        public class Box<T>
-        {
-            public readonly T Value;
-
-            public Box(T value)
-            {
-                Value = value;
-            }
-        }
-
         public static IMethod CreateMethod<TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
         {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].

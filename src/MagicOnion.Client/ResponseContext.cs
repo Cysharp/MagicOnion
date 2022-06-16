@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Grpc.Core;
-using MessagePack;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Client
 {
@@ -20,13 +20,13 @@ namespace MagicOnion.Client
         public ResponseContext(AsyncUnaryCall<T> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
-        public ResponseContext(AsyncUnaryCall<GrpcMethodHelper.Box<T>> inner)
+        public ResponseContext(AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
         public ResponseContext(T value, AsyncUnaryCall<T> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
-        public ResponseContext(T value, AsyncUnaryCall<GrpcMethodHelper.Box<T>> inner)
+        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
         public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)
@@ -61,27 +61,27 @@ namespace MagicOnion.Client
         public override Status GetStatus()
             => hasMetadataAndStatus
                 ? status
-                : (inner is AsyncUnaryCall<GrpcMethodHelper.Box<T>> boxed)
+                : (inner is AsyncUnaryCall<Box<T>> boxed)
                     ? boxed.GetStatus()
                     : ((AsyncUnaryCall<T>)inner).GetStatus();
         
         public override Task<Metadata> ResponseHeadersAsync
             => hasMetadataAndStatus
                 ? Task.FromResult(responseHeaders)
-                : (inner is AsyncUnaryCall<GrpcMethodHelper.Box<T>> boxed)
+                : (inner is AsyncUnaryCall<Box<T>> boxed)
                     ? boxed.ResponseHeadersAsync
                     : ((AsyncUnaryCall<T>)inner).ResponseHeadersAsync;
         public override  Metadata GetTrailers()
             => hasMetadataAndStatus
                 ? trailers
-                : (inner is AsyncUnaryCall<GrpcMethodHelper.Box<T>> boxed)
+                : (inner is AsyncUnaryCall<Box<T>> boxed)
                     ? boxed.GetTrailers()
                     : ((AsyncUnaryCall<T>)inner).GetTrailers();
         
         public Task<T> ResponseAsync
             => hasValue
                 ? Task.FromResult(value)
-                : (inner is AsyncUnaryCall<GrpcMethodHelper.Box<T>> boxed)
+                : (inner is AsyncUnaryCall<Box<T>> boxed)
                     ? boxed.ResponseAsync.ContinueWith(x => x.Result.Value)
                     : ((AsyncUnaryCall<T>)inner).ResponseAsync;
 

@@ -9,6 +9,7 @@ using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server
@@ -370,34 +371,34 @@ namespace MagicOnion.Server
         void BindUnaryHandler_Ignore_ValueType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
         {
             var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, GrpcMethodHelper.Box<TResponse>>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
+            binder.AddMethod((Method<Box<Nil>, Box<TResponse>>)method, async (Box<Nil> request, ServerCallContext context) => new Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
         }
 
         void BindUnaryHandler_Ignore_RefType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
             where TResponse : class
         {
             var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, TResponse>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => await UnaryServerMethod<Nil, TResponse>(Nil.Default, context)!);
+            binder.AddMethod((Method<Box<Nil>, TResponse>)method, async (Box<Nil> request, ServerCallContext context) => await UnaryServerMethod<Nil, TResponse>(Nil.Default, context)!);
         }
 
         void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
+            binder.AddMethod((Method<Box<TRequest>, Box<TResponse>>)method, async (request, context) => new Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
         }
 
         void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<TRequest, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
+            binder.AddMethod((Method<TRequest, Box<TResponse>>)method, async (request, context) => new Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
         }
 
         void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
             where TResponse : class
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
+            binder.AddMethod((Method<Box<TRequest>, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
         }
 
         void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)

@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 
 namespace MagicOnion
 {
@@ -16,32 +17,33 @@ namespace MagicOnion
     {
         internal readonly TResponse rawValue;
         internal readonly bool hasRawValue;
-        readonly AsyncClientStreamingCall<byte[], byte[]> inner;
-        readonly IClientStreamWriter<TRequest> requestStream;
-        readonly MessagePackSerializerOptions serializerOptions;
+        readonly IDisposable inner; // AsyncClientStreamingCall<TRequest, TResponse> or AsyncClientStreamingCall<Box<TRequest>, TResponse> or AsyncClientStreamingCall<TRequest, Box<TResponse>> or AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>>
 
         public ClientStreamingResult(TResponse rawValue)
         {
             this.hasRawValue = true;
             this.rawValue = rawValue;
             this.inner = null;
-            this.requestStream = null;
-            this.serializerOptions = null;
         }
 
-        public ClientStreamingResult(AsyncClientStreamingCall<byte[], byte[]> inner, IClientStreamWriter<TRequest> requestStream, MessagePackSerializerOptions serializerOptions)
+        public ClientStreamingResult(AsyncClientStreamingCall<TRequest, TResponse> inner)
+            : this((IDisposable)inner)
+        { }
+        public ClientStreamingResult(AsyncClientStreamingCall<Box<TRequest>, TResponse> inner)
+            : this((IDisposable)inner)
+        { }
+        public ClientStreamingResult(AsyncClientStreamingCall<TRequest, Box<TResponse>> inner)
+            : this((IDisposable)inner)
+        { }
+        public ClientStreamingResult(AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> inner)
+            : this((IDisposable)inner)
+        { }
+
+        private ClientStreamingResult(IDisposable inner)
         {
             this.hasRawValue = false;
             this.rawValue = default(TResponse);
             this.inner = inner;
-            this.requestStream = requestStream;
-            this.serializerOptions = serializerOptions;
-        }
-
-        async Task<TResponse> Deserialize()
-        {
-            var bytes = await inner.ResponseAsync.ConfigureAwait(false);
-            return MessagePackSerializer.Deserialize<TResponse>(bytes, serializerOptions);
         }
 
         /// <summary>
@@ -57,7 +59,13 @@ namespace MagicOnion
                 }
                 else
                 {
-                    return Deserialize();
+                    return (inner is AsyncClientStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                        ? requestBoxed.ResponseAsync
+                        : (inner is AsyncClientStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                            ? responseBoxed.ResponseAsync.ContinueWith(x => x.Result.Value)
+                            : (inner is AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                                ? requestAndResponseBoxed.ResponseAsync.ContinueWith(x => x.Result.Value)
+                                : ((AsyncClientStreamingCall<TRequest, TResponse>)inner).ResponseAsync;
                 }
             }
         }
@@ -66,12 +74,13 @@ namespace MagicOnion
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-        {
-            get
-            {
-                return this.inner.ResponseHeadersAsync;
-            }
-        }
+            => (inner is AsyncClientStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.ResponseHeadersAsync
+                : (inner is AsyncClientStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.ResponseHeadersAsync
+                    : (inner is AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.ResponseHeadersAsync
+                        : ((AsyncClientStreamingCall<TRequest, TResponse>)inner).ResponseHeadersAsync;
 
         /// <summary>
         /// Async stream to send streaming requests.
@@ -80,9 +89,18 @@ namespace MagicOnion
         {
             get
             {
-                return this.requestStream;
+                if (inner == null) return null;
+                
+                return (inner is AsyncClientStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                    ? new BoxClientStreamWriter<TRequest>(requestBoxed.RequestStream)
+                    : (inner is AsyncClientStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                        ? responseBoxed.RequestStream
+                        : (inner is AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                            ? new BoxClientStreamWriter<TRequest>(requestAndResponseBoxed.RequestStream)
+                            : ((AsyncClientStreamingCall<TRequest, TResponse>)inner).RequestStream;
             }
         }
+
 
         /// <summary>
         /// Allows awaiting this object directly.
@@ -98,18 +116,26 @@ namespace MagicOnion
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-        {
-            return this.inner.GetStatus();
-        }
+            => (inner is AsyncClientStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.GetStatus()
+                : (inner is AsyncClientStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.GetStatus()
+                    : (inner is AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.GetStatus()
+                        : ((AsyncClientStreamingCall<TRequest, TResponse>)inner).GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-        {
-            return this.inner.GetTrailers();
-        }
+            => (inner is AsyncClientStreamingCall<Box<TRequest>, TResponse> requestBoxed)
+                ? requestBoxed.GetTrailers()
+                : (inner is AsyncClientStreamingCall<TRequest, Box<TResponse>> responseBoxed)
+                    ? responseBoxed.GetTrailers()
+                    : (inner is AsyncClientStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
+                        ? requestAndResponseBoxed.GetTrailers()
+                        : ((AsyncClientStreamingCall<TRequest, TResponse>)inner).GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.
