@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using MagicOnion.Client.Client.Internal;
 
 namespace MagicOnion.Client
 {
@@ -44,28 +43,6 @@ namespace MagicOnion.Client
 
             Options = options;
         }
-
-        protected internal UnaryResult<TResponse> InvokeAsync<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
-        {
-            var future = InvokeAsyncCore<TRequest, TResponse>(path, request, requestMethod);
-            return new UnaryResult<TResponse>(future);
-        }
-
-        async Task<IResponseContext<TResponse>> InvokeAsyncCore<TRequest, TResponse>(string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
-        {
-            var requestContext = new RequestContext<TRequest>(request, this, path, Options.CallOptions, typeof(TResponse), Options.Filters, requestMethod);
-            var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
-            var result = response as IResponseContext<TResponse>;
-            if (result != null)
-            {
-                return result;
-            }
-            else
-            {
-                throw new InvalidOperationException("ResponseContext is null.");
-            }
-        }
-
     }
 
     public abstract class MagicOnionClientBase<T> : MagicOnionClientBase

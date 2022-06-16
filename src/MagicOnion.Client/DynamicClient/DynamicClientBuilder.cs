@@ -214,7 +214,7 @@ namespace MagicOnion.Client.DynamicClient
              *
              *     public ClientCore(MessagePackSerializer options)
              *     {
-             *         this.HelloAsync = MethodInvoker.UnaryMethodRawInvoker<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", options);
+             *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", options);
              *     }
              * }
              */
