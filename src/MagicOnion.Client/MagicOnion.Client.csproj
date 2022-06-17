@@ -38,12 +38,6 @@
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
   </ItemGroup>
-  <ItemGroup>
-    <TargetFiles Remove="DynamicClientAssemblyHolder.cs" />
-    <TargetFiles Remove="DynamicClientBuilder.cs" />
-    <TargetFiles Remove="MagicOnionClientBase.cs" />
-    <TargetFiles Remove="RequestContext.cs" />
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
   </Target>

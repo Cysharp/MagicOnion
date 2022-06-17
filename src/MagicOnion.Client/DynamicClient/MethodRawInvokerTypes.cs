@@ -30,16 +30,12 @@ namespace MagicOnion.Client.DynamicClient
             {
                 case MethodType.Unary:
                     return typeof(UnaryMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
-                    break;
                 case MethodType.ServerStreaming:
                     return typeof(ServerStreamingMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
-                    break;
                 case MethodType.ClientStreaming:
                     return typeof(ClientStreamingMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
-                    break;
                 case MethodType.DuplexStreaming:
                     return typeof(DuplexStreamingMethodRawInvoker<,>).MakeGenericType(requestType, responseType);
-                    break;
                 default:
                     throw new NotSupportedException($"DynamicClientBuilder does not support MethodType '{methodType}'.");
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
+using MagicOnion.Client.Internal;
 using MagicOnion.Internal;
 using MessagePack;
 
@@ -24,7 +25,25 @@ namespace MagicOnion.Client.Internal
         }
 
         public UnaryResult<TResponse> Invoke(MagicOnionClientBase client, string path, TRequest request)
-            => client.InvokeAsync<TRequest, TResponse>(path, request, createResponseContext);
+        {
+            var future = InvokeAsyncCore(client, path, request, createResponseContext);
+            return new UnaryResult<TResponse>(future);
+
+        }
+        private async Task<IResponseContext<TResponse>> InvokeAsyncCore(MagicOnionClientBase client, string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
+        {
+            var requestContext = new RequestContext<TRequest>(request, client, path, client.Options.CallOptions, typeof(TResponse), client.Options.Filters, requestMethod);
+            var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
+            var result = response as IResponseContext<TResponse>;
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                throw new InvalidOperationException("ResponseContext is null.");
+            }
+        }
     }
 
     public static class UnaryMethodRawInvoker
@@ -121,7 +140,7 @@ namespace MagicOnion.Client.Internal
             createResult = client => new ClientStreamingResult<TRequest, TResponse>(grpcCall(client, method));
         }
 
-        public Task<ClientStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client)
+        public Task<ClientStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client, string path)
         {
             return Task.FromResult(createResult(client));
         }
@@ -176,7 +195,7 @@ namespace MagicOnion.Client.Internal
             createResult = client => new DuplexStreamingResult<TRequest, TResponse>(grpcCall(client, method));
         }
 
-        public Task<DuplexStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client)
+        public Task<DuplexStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client, string path)
         {
             return Task.FromResult(createResult(client));
         }
