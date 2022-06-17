@@ -9,24 +9,11 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncDuplexStreamingCall.
     /// </summary>
-    public struct DuplexStreamingResult<TRequest, TResponse> : IDisposable
+    public readonly struct DuplexStreamingResult<TRequest, TResponse> : IDisposable
     {
-        readonly IDisposable inner; // AsyncDuplexStreamingCall<TRequest, TResponse> or AsyncDuplexStreamingCall<Box<TRequest>, TResponse> or AsyncDuplexStreamingCall<TRequest, Box<TResponse>> or AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>>
+        readonly IAsyncDuplexStreamingCallWrapper<TRequest, TResponse> inner;
 
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<TRequest, TResponse> inner)
-            : this((IDisposable)inner)
-        { }
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<Box<TRequest>, TResponse> inner)
-            : this((IDisposable)inner)
-        { }
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<TRequest, Box<TResponse>> inner)
-            : this((IDisposable)inner)
-        { }
-        public DuplexStreamingResult(AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> inner)
-            : this((IDisposable)inner)
-        { }
-
-        private DuplexStreamingResult(IDisposable inner)
+        public DuplexStreamingResult(IAsyncDuplexStreamingCallWrapper<TRequest, TResponse> inner)
         {
             this.inner = inner;
         }
@@ -35,65 +22,33 @@ namespace MagicOnion
         /// Async stream to read streaming responses.
         /// </summary>
         public IAsyncStreamReader<TResponse> ResponseStream
-            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
-                ? requestBoxed.ResponseStream
-                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
-                    ? new UnboxAsyncStreamReader<TResponse>(responseBoxed.ResponseStream)
-                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
-                        ? new UnboxAsyncStreamReader<TResponse>(requestAndResponseBoxed.ResponseStream)
-                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).ResponseStream;
-
+            => inner.ResponseStream;
 
         /// <summary>
         /// Async stream to send streaming requests.
         /// </summary>
         public IClientStreamWriter<TRequest> RequestStream
-            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
-                ? new BoxClientStreamWriter<TRequest>(requestBoxed.RequestStream)
-                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
-                    ? responseBoxed.RequestStream
-                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
-                        ? new BoxClientStreamWriter<TRequest>(requestAndResponseBoxed.RequestStream)
-                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).RequestStream;
-
+            => inner.RequestStream;
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
-                ? requestBoxed.ResponseHeadersAsync
-                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
-                    ? responseBoxed.ResponseHeadersAsync
-                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
-                        ? requestAndResponseBoxed.ResponseHeadersAsync
-                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).ResponseHeadersAsync;
+            => inner.ResponseHeadersAsync;
 
         /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
-                ? requestBoxed.GetStatus()
-                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
-                    ? responseBoxed.GetStatus()
-                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
-                        ? requestAndResponseBoxed.GetStatus()
-                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).GetStatus();
+            => inner.GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-            => (inner is AsyncDuplexStreamingCall<Box<TRequest>, TResponse> requestBoxed)
-                ? requestBoxed.GetTrailers()
-                : (inner is AsyncDuplexStreamingCall<TRequest, Box<TResponse>> responseBoxed)
-                    ? responseBoxed.GetTrailers()
-                    : (inner is AsyncDuplexStreamingCall<Box<TRequest>, Box<TResponse>> requestAndResponseBoxed)
-                        ? requestAndResponseBoxed.GetTrailers()
-                        : ((AsyncDuplexStreamingCall<TRequest, TResponse>)inner).GetTrailers();
+            => inner.GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.
@@ -107,10 +62,7 @@ namespace MagicOnion
         /// </remarks>
         public void Dispose()
         {
-            if (this.inner != null)
-            {
-                this.inner.Dispose();
-            }
+            inner?.Dispose();
         }
     }
 }

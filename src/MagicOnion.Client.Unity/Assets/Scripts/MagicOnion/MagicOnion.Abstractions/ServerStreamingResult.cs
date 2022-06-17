@@ -12,13 +12,9 @@ namespace MagicOnion
     /// </summary>
     public struct ServerStreamingResult<TResponse> : IDisposable
     {
-        readonly IDisposable inner; // AsyncServerStreamingCall<TResponse> or AsyncServerStreamingCall<Box<TResponse>>
+        readonly IAsyncServerStreamingCallWrapper<TResponse> inner;
 
-        public ServerStreamingResult(AsyncServerStreamingCall<TResponse> inner)
-        {
-            this.inner = inner;
-        }
-        public ServerStreamingResult(AsyncServerStreamingCall<Box<TResponse>> inner)
+        public ServerStreamingResult(IAsyncServerStreamingCallWrapper<TResponse> inner)
         {
             this.inner = inner;
         }
@@ -27,35 +23,27 @@ namespace MagicOnion
         /// Async stream to read streaming responses.
         /// </summary>
         public IAsyncStreamReader<TResponse> ResponseStream
-            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
-                ? new UnboxAsyncStreamReader<TResponse>(boxedStreamingCall.ResponseStream)
-                : ((AsyncServerStreamingCall<TResponse>)inner).ResponseStream;
+            => inner.ResponseStream;
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
-                ? boxedStreamingCall.ResponseHeadersAsync
-                : ((AsyncServerStreamingCall<TResponse>)inner).ResponseHeadersAsync;
+            => inner.ResponseHeadersAsync;
 
         /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
-                ? boxedStreamingCall.GetStatus()
-                : ((AsyncServerStreamingCall<TResponse>)inner).GetStatus();
+            => inner.GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-            => inner is AsyncServerStreamingCall<Box<TResponse>> boxedStreamingCall
-                ? boxedStreamingCall.GetTrailers()
-                : ((AsyncServerStreamingCall<TResponse>)inner).GetTrailers();
+            => inner.GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.
@@ -68,11 +56,6 @@ namespace MagicOnion
         /// "Cancel" semantics of invoking <c>Dispose</c>.
         /// </remarks>
         public void Dispose()
-        {
-            if (this.inner != null)
-            {
-                this.inner.Dispose();
-            }
-        }
+            => inner?.Dispose();
     }
 }

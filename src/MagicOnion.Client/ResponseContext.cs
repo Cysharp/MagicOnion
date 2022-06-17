@@ -17,16 +17,16 @@ namespace MagicOnion.Client
         readonly Metadata responseHeaders;
         readonly Metadata trailers;
 
-        public ResponseContext(AsyncUnaryCall<T> inner)
+        internal ResponseContext(AsyncUnaryCall<T> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
-        public ResponseContext(AsyncUnaryCall<Box<T>> inner)
+        internal ResponseContext(AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
-        public ResponseContext(T value, AsyncUnaryCall<T> inner)
+        internal ResponseContext(T value, AsyncUnaryCall<T> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
-        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
+        internal ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
         public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)
