@@ -10,7 +10,7 @@ namespace MagicOnion
     /// <summary>
     /// Wrapped AsyncServerStreamingCall.
     /// </summary>
-    public struct ServerStreamingResult<TResponse> : IDisposable
+    public readonly struct ServerStreamingResult<TResponse> : IDisposable
     {
         readonly IAsyncServerStreamingCallWrapper<TResponse> inner;
 
