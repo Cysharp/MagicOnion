@@ -60,10 +60,10 @@ namespace MagicOnion.Client.Internal
 
         public static UnaryMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
             where TResponse : class
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, TResponse>)method, context.Client.Options.Host, context.CallOptions, new Box<TRequest>(((RequestContext<TRequest>)context).Request)));
+            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, TResponse>)method, context.Client.Options.Host, context.CallOptions, Box.Create(((RequestContext<TRequest>)context).Request)));
 
         public static UnaryMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, Box<TResponse>>)method, context.Client.Options.Host, context.CallOptions, new Box<TRequest>(((RequestContext<TRequest>)context).Request)));
+            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, Box<TResponse>>)method, context.Client.Options.Host, context.CallOptions, Box.Create(((RequestContext<TRequest>)context).Request)));
     }
 
     public class ServerStreamingMethodRawInvoker<TRequest, TResponse>
@@ -97,11 +97,11 @@ namespace MagicOnion.Client.Internal
         public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
             where TResponse : class
             => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<TResponse, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, TResponse>)method, client.Options.Host, client.Options.CallOptions, new Box<TRequest>(request))));
+                (client, request, method) => new AsyncServerStreamingCallWrapper<TResponse, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, TResponse>)method, client.Options.Host, client.Options.CallOptions, Box.Create(request))));
 
         public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
             => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<Box<TResponse>, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions, new Box<TRequest>(request))));
+                (client, request, method) => new AsyncServerStreamingCallWrapper<Box<TResponse>, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions, Box.Create(request))));
 
         class AsyncServerStreamingCallWrapper<TResponseRaw, TResponse> : IAsyncServerStreamingCallWrapper<TResponse>
         {

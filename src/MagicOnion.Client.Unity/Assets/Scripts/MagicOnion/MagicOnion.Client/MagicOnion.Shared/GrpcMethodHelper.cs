@@ -85,8 +85,6 @@ namespace MagicOnion
             }
         }
 
-        private static readonly Box<Nil> BoxedNil = new Box<Nil>(Nil.Default);
-
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
         //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
         //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
@@ -94,13 +92,13 @@ namespace MagicOnion
                 serializer: (obj, ctx) =>
                 {
                     var writer = ctx.GetBufferWriter();
-                    var buffer = writer.GetSpan(MagicOnionMarshallers.UnsafeNilBytes.Length);
+                    var buffer = writer.GetSpan(MagicOnionMarshallers.UnsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.
                     MagicOnionMarshallers.UnsafeNilBytes.CopyTo(buffer);
                     writer.Advance(buffer.Length);
 
                     ctx.Complete();
                 },
-                deserializer: (ctx) => BoxedNil
+                deserializer: (ctx) => Box.Create(Nil.Default) /* Box.Create always returns cached Box<Nil> */
             );
 
         private static Marshaller<T> CreateMarshaller<T>(MessagePackSerializerOptions serializerOptions)
@@ -120,7 +118,7 @@ namespace MagicOnion
                     MessagePackSerializer.Serialize(ctx.GetBufferWriter(), obj.Value, serializerOptions);
                     ctx.Complete();
                 },
-                deserializer: (ctx) => new Box<T>(MessagePackSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
+                deserializer: (ctx) => Box.Create(MessagePackSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence(), serializerOptions))
             );
     }
 }

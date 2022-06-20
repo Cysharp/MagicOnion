@@ -13,7 +13,7 @@ namespace MagicOnion.Internal
         }
 
         public Task WriteAsync(T message)
-            => inner.WriteAsync(new Box<T>(message));
+            => inner.WriteAsync(Box.Create(message));
 
         public WriteOptions WriteOptions
         {
