@@ -17,16 +17,16 @@ namespace MagicOnion.Client
         readonly Metadata responseHeaders;
         readonly Metadata trailers;
 
-        internal ResponseContext(AsyncUnaryCall<T> inner)
+        public ResponseContext(AsyncUnaryCall<T> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
-        internal ResponseContext(AsyncUnaryCall<Box<T>> inner)
+        public ResponseContext(AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
-        internal ResponseContext(T value, AsyncUnaryCall<T> inner)
+        public ResponseContext(T value, AsyncUnaryCall<T> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
-        internal ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
+        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
             : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
         { }
         public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)
@@ -88,7 +88,7 @@ namespace MagicOnion.Client
         public override void Dispose()
             => inner?.Dispose();
 
-        public ResponseContext<T> WithNewValue(T newValue)
+        public ResponseContext<T> WithNewResult(T newValue)
             => new ResponseContext<T>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers);
     }
 
