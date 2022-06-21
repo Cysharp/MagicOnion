@@ -72,7 +72,7 @@ namespace MagicOnion.Client.DynamicClient
                 EmitConstructor(ctx);
                 // protected override ClientBase<{ServiceName}> Clone(ClientOptions options) => new {ServiceName}Client(options, core);
                 EmitClone(ctx, constructedBaseClientType);
-                // public UnaryResult<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...) => this.core.MethodName.Invoke(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...)); ...
+                // public {MethodType}Result<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...) => this.core.MethodName.Invoke{MethodType}(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...)); ...
                 EmitServiceMethods(ctx);
             }
             // }
@@ -129,17 +129,17 @@ namespace MagicOnion.Client.DynamicClient
         {
             // Implements
             // public UnaryResult<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
+            //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
             // public UnaryResult<TResponse> MethodName(TRequest request)
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", request);
+            //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", request);
             // public UnaryResult<TResponse> MethodName()
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", Nil.Default);
+            //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", Nil.Default);
             // public ServerStreamingResult<TRequest, TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
+            //     => this.core.MethodName.InvokeServerStreaming(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
             // public ClientStreamingResult<TRequest, TResponse> MethodName()
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName");
+            //     => this.core.MethodName.InvokeClientStreaming(this, "ServiceName/MethodName");
             // public DuplexStreamingResult<TRequest, TResponse> MethodName()
-            //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName");
+            //     => this.core.MethodName.InvokeDuplexStreaming(this, "ServiceName/MethodName");
             foreach (var method in ctx.Definition.Methods)
             {
                 var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}");

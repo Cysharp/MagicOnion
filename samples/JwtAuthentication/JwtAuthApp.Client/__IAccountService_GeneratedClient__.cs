@@ -11,7 +11,7 @@ using MessagePack;
 namespace JwtAuthApp.Client
 {
     [Ignore]
-    class __IAccountService_GeneratedClient__ : MagicOnionClientBase<IAccountService>
+    class __IAccountService_GeneratedClient__ : MagicOnionClientBase<IAccountService>, IAccountService
     {
         readonly ClientCore core;
 
@@ -24,7 +24,7 @@ namespace JwtAuthApp.Client
         public __IAccountService_GeneratedClient__(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions)
             : base(options)
         {
-            //this.core = new ClientCore(serializerOptions);
+            this.core = new ClientCore(serializerOptions);
         }
         private __IAccountService_GeneratedClient__(MagicOnionClientOptions options, ClientCore core)
             : base(options)
@@ -43,7 +43,7 @@ namespace JwtAuthApp.Client
             => core.DangerousOperationAsync.InvokeUnary(this, "IAccountService/DangerousOperationAsync", MessagePack.Nil.Default);
 
 
-        public static Func<MagicOnionClientOptions, MagicOnionClientBase<IAccountService>> CreateFactory(MessagePackSerializerOptions serializerOptions)
+        public static Func<MagicOnionClientOptions, IAccountService> CreateFactory(MessagePackSerializerOptions serializerOptions)
         {
             var core = new ClientCore(serializerOptions);
             return (options) => new __IAccountService_GeneratedClient__(options, core);

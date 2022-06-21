@@ -43,7 +43,7 @@ namespace JwtAuthApp.Client
 
         public Task<DuplexStreamingResult<int, string>> DuplexAsync() => core.DuplexAsync.InvokeDuplexStreaming(this, "IGreeterService/DuplexAsync");
 
-        public static Func<MagicOnionClientOptions, MagicOnionClientBase<IGreeterService>> CreateFactory(MessagePackSerializerOptions serializerOptions)
+        public static Func<MagicOnionClientOptions, IGreeterService> CreateFactory(MessagePackSerializerOptions serializerOptions)
         {
             var core = new ClientCore(serializerOptions);
             return (options) => new __IGreeterService_GeneratedClient__(options, core);
