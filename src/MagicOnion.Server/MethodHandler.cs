@@ -371,7 +371,7 @@ namespace MagicOnion.Server
         void BindUnaryHandler_Ignore_ValueType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
         {
             var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<Box<Nil>, Box<TResponse>>)method, async (Box<Nil> request, ServerCallContext context) => new Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
+            binder.AddMethod((Method<Box<Nil>, Box<TResponse>>)method, async (Box<Nil> request, ServerCallContext context) => Box.Create((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
         }
 
         void BindUnaryHandler_Ignore_RefType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
@@ -384,14 +384,14 @@ namespace MagicOnion.Server
         void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<Box<TRequest>, Box<TResponse>>)method, async (request, context) => new Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
+            binder.AddMethod((Method<Box<TRequest>, Box<TResponse>>)method, async (request, context) => Box.Create((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
         }
 
         void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
             where TRequest : class
         {
             var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<TRequest, Box<TResponse>>)method, async (request, context) => new Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
+            binder.AddMethod((Method<TRequest, Box<TResponse>>)method, async (request, context) => Box.Create((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
         }
 
         void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
