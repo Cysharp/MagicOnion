@@ -10,28 +10,54 @@ using MessagePack;
 namespace MagicOnion.Client.Internal
 {
     // Pubternal API: This class is used from generated clients and is therefore `public` but internal API.
-    public class UnaryMethodRawInvoker<TRequest, TResponse>
+    public static class RawMethodInvoker
     {
-        readonly Func<RequestContext, ResponseContext> createResponseContext;
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
+            where TRequest : class
+            where TResponse : class
+            => new RawMethodInvoker<TRequest, TResponse, TRequest, TResponse>(methodType, serviceName, name, serializerOptions);
 
-        public UnaryMethodRawInvoker(string serviceName, string name, MessagePackSerializerOptions serializerOptions, Func<RequestContext, IMethod, AsyncUnaryCall<TResponse>> grpcCall)
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
+            where TRequest : class
+            => new RawMethodInvoker<TRequest, TResponse, TRequest, Box<TResponse>>(methodType, serviceName, name, serializerOptions);
+
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
+            where TResponse : class
+            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, TResponse>(methodType, serviceName, name, serializerOptions);
+
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
+            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, Box<TResponse>>(methodType, serviceName, name, serializerOptions);
+    }
+
+    public abstract class RawMethodInvoker<TRequest, TResponse>
+    {
+        public abstract UnaryResult<TResponse> InvokeUnary(MagicOnionClientBase client, string path, TRequest request);
+        public abstract Task<ServerStreamingResult<TResponse>> InvokeServerStreaming(MagicOnionClientBase client, string path, TRequest request);
+        public abstract Task<ClientStreamingResult<TRequest, TResponse>> InvokeClientStreaming(MagicOnionClientBase client, string path);
+        public abstract Task<DuplexStreamingResult<TRequest, TResponse>> InvokeDuplexStreaming(MagicOnionClientBase client, string path);
+    }
+
+    public sealed class RawMethodInvoker<TRequest, TResponse, TRawRequest, TRawResponse> : RawMethodInvoker<TRequest, TResponse>
+        where TRawRequest : class
+        where TRawResponse : class
+    {
+        readonly GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> method;
+        readonly Func<RequestContext, ResponseContext> createUnaryResponseContext;
+
+        public RawMethodInvoker(MethodType methodType, string serviceName, string name, MessagePackSerializerOptions serializerOptions)
         {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(MethodType.Unary, serviceName, name, serializerOptions);
-            createResponseContext = context => new ResponseContext<TResponse>(grpcCall(context, method));
-        }
-        public UnaryMethodRawInvoker(string serviceName, string name, MessagePackSerializerOptions serializerOptions, Func<RequestContext, IMethod, AsyncUnaryCall<Box<TResponse>>> grpcCall)
-        {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(MethodType.Unary, serviceName, name, serializerOptions);
-            createResponseContext = context => new ResponseContext<TResponse>(grpcCall(context, method));
+            this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, serializerOptions);
+            this.createUnaryResponseContext = context => ResponseContext<TResponse>.Create<TRawResponse>(
+                context.Client.Options.CallInvoker.AsyncUnaryCall(method.Method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)));
         }
 
-        public UnaryResult<TResponse> Invoke(MagicOnionClientBase client, string path, TRequest request)
+        public override UnaryResult<TResponse> InvokeUnary(MagicOnionClientBase client, string path, TRequest request)
         {
-            var future = InvokeAsyncCore(client, path, request, createResponseContext);
+            var future = InvokeUnaryCore(client, path, request, createUnaryResponseContext);
             return new UnaryResult<TResponse>(future);
 
         }
-        private async Task<IResponseContext<TResponse>> InvokeAsyncCore(MagicOnionClientBase client, string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
+        private async Task<IResponseContext<TResponse>> InvokeUnaryCore(MagicOnionClientBase client, string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
         {
             var requestContext = new RequestContext<TRequest>(request, client, path, client.Options.CallOptions, typeof(TResponse), client.Options.Filters, requestMethod);
             var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);
@@ -45,70 +71,31 @@ namespace MagicOnion.Client.Internal
                 throw new InvalidOperationException("ResponseContext is null.");
             }
         }
-    }
+        
+        public override Task<ServerStreamingResult<TResponse>> InvokeServerStreaming(MagicOnionClientBase client, string path, TRequest request)
+            => Task.FromResult(
+                new ServerStreamingResult<TResponse>(
+                    new AsyncServerStreamingCallWrapper(
+                        client.Options.CallInvoker.AsyncServerStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions, method.ToRawRequest(request)))));
 
-    public static class UnaryMethodRawInvoker
-    {
-        public static UnaryMethodRawInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            where TResponse : class
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<TRequest, TResponse>)method, context.Client.Options.Host, context.CallOptions, ((RequestContext<TRequest>)context).Request));
+        public override Task<ClientStreamingResult<TRequest, TResponse>> InvokeClientStreaming(MagicOnionClientBase client, string path)
+            => Task.FromResult(
+                new ClientStreamingResult<TRequest, TResponse>(
+                    new AsyncClientStreamingCallWrapper(
+                        client.Options.CallInvoker.AsyncClientStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions))));
 
-        public static UnaryMethodRawInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<TRequest, Box<TResponse>>)method, context.Client.Options.Host, context.CallOptions, ((RequestContext<TRequest>)context).Request));
-
-        public static UnaryMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TResponse : class
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, TResponse>)method, context.Client.Options.Host, context.CallOptions, Box.Create(((RequestContext<TRequest>)context).Request)));
-
-        public static UnaryMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            => new UnaryMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, (context, method) => context.Client.Options.CallInvoker.AsyncUnaryCall((Method<Box<TRequest>, Box<TResponse>>)method, context.Client.Options.Host, context.CallOptions, Box.Create(((RequestContext<TRequest>)context).Request)));
-    }
-
-    public class ServerStreamingMethodRawInvoker<TRequest, TResponse>
-    {
-        readonly Func<MagicOnionClientBase, TRequest, IMethod, IAsyncServerStreamingCallWrapper<TResponse>> grpcCall;
-        readonly IMethod method;
-
-        public ServerStreamingMethodRawInvoker(string serviceName, string name, MessagePackSerializerOptions serializerOptions, Func<MagicOnionClientBase, TRequest, IMethod, IAsyncServerStreamingCallWrapper<TResponse>> grpcCall)
+        public override Task<DuplexStreamingResult<TRequest, TResponse>> InvokeDuplexStreaming(MagicOnionClientBase client, string path)
+            => Task.FromResult(
+                new DuplexStreamingResult<TRequest, TResponse>(
+                    new AsyncDuplexStreamingCallWrapper(
+                        client.Options.CallInvoker.AsyncDuplexStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions))));
+    
+        class AsyncServerStreamingCallWrapper : IAsyncServerStreamingCallWrapper<TResponse>
         {
-            this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(MethodType.ServerStreaming, serviceName, name, serializerOptions);
-            this.grpcCall = grpcCall;
-        }
-
-        public Task<ServerStreamingResult<TResponse>> Invoke(MagicOnionClientBase client, string path, TRequest request)
-            => Task.FromResult(new ServerStreamingResult<TResponse>(grpcCall(client, request, method)));
-    }
-
-    public static class ServerStreamingMethodRawInvoker
-    {
-        public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            where TResponse : class
-            => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<TResponse, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<TRequest, TResponse>)method, client.Options.Host, client.Options.CallOptions, request)));
-
-        public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<Box<TResponse>, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<TRequest, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions, request)));
-
-        public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TResponse : class
-            => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<TResponse, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, TResponse>)method, client.Options.Host, client.Options.CallOptions, Box.Create(request))));
-
-        public static ServerStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            => new ServerStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, request, method) => new AsyncServerStreamingCallWrapper<Box<TResponse>, TResponse>(client.Options.CallInvoker.AsyncServerStreamingCall((Method<Box<TRequest>, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions, Box.Create(request))));
-
-        class AsyncServerStreamingCallWrapper<TResponseRaw, TResponse> : IAsyncServerStreamingCallWrapper<TResponse>
-        {
-            readonly AsyncServerStreamingCall<TResponseRaw> inner;
+            readonly AsyncServerStreamingCall<TRawResponse> inner;
             IAsyncStreamReader<TResponse> responseStream;
 
-            public AsyncServerStreamingCallWrapper(AsyncServerStreamingCall<TResponseRaw> inner)
+            public AsyncServerStreamingCallWrapper(AsyncServerStreamingCall<TRawResponse> inner)
             {
                 this.inner = inner;
             }
@@ -121,56 +108,18 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IAsyncStreamReader<TResponse> ResponseStream
-                => responseStream ?? (responseStream = (typeof(TResponseRaw) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
+                => responseStream ?? (responseStream = (typeof(TRawResponse) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
 
             public void Dispose()
                 => inner.Dispose();
         }
-    }
 
-    public class ClientStreamingMethodRawInvoker<TRequest, TResponse>
-    {
-        readonly Func<MagicOnionClientBase, IMethod, IAsyncClientStreamingCallWrapper<TRequest, TResponse>> grpcCall;
-        readonly IMethod method;
-
-        public ClientStreamingMethodRawInvoker(string serviceName, string name, MessagePackSerializerOptions serializerOptions, Func<MagicOnionClientBase, IMethod, IAsyncClientStreamingCallWrapper<TRequest, TResponse>> grpcCall)
+        class AsyncClientStreamingCallWrapper : IAsyncClientStreamingCallWrapper<TRequest, TResponse>
         {
-            this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(MethodType.ClientStreaming, serviceName, name, serializerOptions);
-            this.grpcCall = grpcCall;
-        }
-
-        public Task<ClientStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client, string path)
-            => Task.FromResult(new ClientStreamingResult<TRequest, TResponse>(grpcCall(client, method)));
-    }
-
-    public static class ClientStreamingMethodRawInvoker
-    {
-        public static ClientStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            where TResponse : class
-            => new ClientStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncClientStreamingCallWrapper<TRequest, TResponse, TRequest, TResponse>(client.Options.CallInvoker.AsyncClientStreamingCall((Method<TRequest, TResponse>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static ClientStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            => new ClientStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncClientStreamingCallWrapper<TRequest, Box<TResponse>, TRequest, TResponse>(client.Options.CallInvoker.AsyncClientStreamingCall((Method<TRequest, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static ClientStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TResponse : class
-            => new ClientStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncClientStreamingCallWrapper<Box<TRequest>, TResponse, TRequest, TResponse>(client.Options.CallInvoker.AsyncClientStreamingCall((Method<Box<TRequest>, TResponse>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static ClientStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            => new ClientStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncClientStreamingCallWrapper<Box<TRequest>, Box<TResponse>, TRequest, TResponse>(client.Options.CallInvoker.AsyncClientStreamingCall((Method<Box<TRequest>, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions)));
-
-        class AsyncClientStreamingCallWrapper<TRequestRaw, TResponseRaw, TRequest, TResponse> : IAsyncClientStreamingCallWrapper<TRequest, TResponse>
-        {
-            readonly AsyncClientStreamingCall<TRequestRaw, TResponseRaw> inner;
+            readonly AsyncClientStreamingCall<TRawRequest, TRawResponse> inner;
             IClientStreamWriter<TRequest> requestStream;
 
-            public AsyncClientStreamingCallWrapper(AsyncClientStreamingCall<TRequestRaw, TResponseRaw> inner)
+            public AsyncClientStreamingCallWrapper(AsyncClientStreamingCall<TRawRequest, TRawResponse> inner)
             {
                 this.inner = inner;
             }
@@ -183,61 +132,23 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IClientStreamWriter<TRequest> RequestStream
-                => requestStream ?? (requestStream = (typeof(TRequestRaw) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
+                => requestStream ?? (requestStream = (typeof(TRawRequest) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
             public Task<TResponse> ResponseAsync
-                => (typeof(TResponseRaw) == typeof(Box<TResponse>))
+                => (typeof(TRawRequest) == typeof(Box<TResponse>))
                     ? inner.ResponseAsync.ContinueWith(x => ((Box<TResponse>)(object)x.Result).Value)
                     : inner.ResponseAsync.ContinueWith(x => (TResponse)(object)x.Result);
 
             public void Dispose()
                 => inner.Dispose();
         }
-    }
-    
-    public class DuplexStreamingMethodRawInvoker<TRequest, TResponse>
-    {
-        readonly Func<MagicOnionClientBase, IMethod, IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>> grpcCall;
-        readonly IMethod method;
 
-        public DuplexStreamingMethodRawInvoker(string serviceName, string name, MessagePackSerializerOptions serializerOptions, Func<MagicOnionClientBase, IMethod, IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>> grpcCall)
+        class AsyncDuplexStreamingCallWrapper : IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>
         {
-            this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(MethodType.DuplexStreaming, serviceName, name, serializerOptions);
-            this.grpcCall = grpcCall;
-        }
-
-        public Task<DuplexStreamingResult<TRequest, TResponse>> Invoke(MagicOnionClientBase client, string path)
-            => Task.FromResult(new DuplexStreamingResult<TRequest, TResponse>(grpcCall(client, method)));
-    }
-
-    public static class DuplexStreamingMethodRawInvoker
-    {
-        public static DuplexStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            where TResponse : class
-            => new DuplexStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions, 
-                (client, method) => new AsyncDuplexStreamingCallWrapper<TRequest, TResponse, TRequest, TResponse>(client.Options.CallInvoker.AsyncDuplexStreamingCall((Method<TRequest, TResponse>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static DuplexStreamingMethodRawInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TRequest : class
-            => new DuplexStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncDuplexStreamingCallWrapper<TRequest, Box<TResponse>, TRequest, TResponse>(client.Options.CallInvoker.AsyncDuplexStreamingCall((Method<TRequest, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static DuplexStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            where TResponse : class
-            => new DuplexStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncDuplexStreamingCallWrapper<Box<TRequest>, TResponse, TRequest, TResponse>(client.Options.CallInvoker.AsyncDuplexStreamingCall((Method<Box<TRequest>, TResponse>)method, client.Options.Host, client.Options.CallOptions)));
-
-        public static DuplexStreamingMethodRawInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(string serviceName, string name, MessagePackSerializerOptions serializerOptions)
-            => new DuplexStreamingMethodRawInvoker<TRequest, TResponse>(serviceName, name, serializerOptions,
-                (client, method) => new AsyncDuplexStreamingCallWrapper<Box<TRequest>, Box<TResponse>, TRequest, TResponse>(client.Options.CallInvoker.AsyncDuplexStreamingCall((Method<Box<TRequest>, Box<TResponse>>)method, client.Options.Host, client.Options.CallOptions)));
-
-        class AsyncDuplexStreamingCallWrapper<TRequestRaw, TResponseRaw, TRequest, TResponse> : IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>
-        {
-            readonly AsyncDuplexStreamingCall<TRequestRaw, TResponseRaw> inner;
+            readonly AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner;
             IClientStreamWriter<TRequest> requestStream;
             IAsyncStreamReader<TResponse> responseStream;
 
-            public AsyncDuplexStreamingCallWrapper(AsyncDuplexStreamingCall<TRequestRaw, TResponseRaw> inner)
+            public AsyncDuplexStreamingCallWrapper(AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner)
             {
                 this.inner = inner;
             }
@@ -250,9 +161,9 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IClientStreamWriter<TRequest> RequestStream
-                => requestStream ?? (requestStream = (typeof(TRequestRaw) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
+                => requestStream ?? (requestStream = (typeof(TRawRequest) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
             public IAsyncStreamReader<TResponse> ResponseStream
-                => responseStream ?? (responseStream = (typeof(TResponseRaw) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
+                => responseStream ?? (responseStream = (typeof(TRawResponse) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
 
             public void Dispose()
                 => inner.Dispose();

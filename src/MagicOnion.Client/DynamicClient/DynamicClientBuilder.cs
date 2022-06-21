@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Grpc.Core;
+using MagicOnion.Client.Internal;
 using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient
@@ -141,7 +142,7 @@ namespace MagicOnion.Client.DynamicClient
             //     => this.core.MethodName.Invoke(this, "ServiceName/MethodName");
             foreach (var method in ctx.Definition.Methods)
             {
-                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod("Invoke");
+                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}");
                 var methodBuilder = ctx.ServiceClientType.DefineMethod(method.MethodName, MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, methodInvokerInvokeMethod.ReturnType, method.ParameterTypes.ToArray());
                 var il = methodBuilder.GetILGenerator();
 
@@ -222,10 +223,10 @@ namespace MagicOnion.Client.DynamicClient
             // class ClientCore {
             ctx.ClientCoreType = ctx.ServiceClientType.DefineNestedType("ClientCore");
             {
-                // public {Unary,ServerStreaming,ClientStreaming,DuplexStreaming}MethodRawInvoker<TRequest, TResponse> MethodName;
+                // public RawMethodInvoker<TRequest, TResponse> MethodName;
                 foreach (var method in ctx.Definition.Methods)
                 {
-                    var methodInvokerType = MethodRawInvokerTypes.GetMethodRawInvokerType(method.MethodType, method.RequestType, method.ResponseType);
+                    var methodInvokerType = typeof(RawMethodInvoker<,>).MakeGenericType(method.RequestType, method.ResponseType);
                     var field = ctx.ClientCoreType.DefineField(method.MethodName, methodInvokerType, FieldAttributes.Public);
                     ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName] = (field, methodInvokerType);
                 }
@@ -235,14 +236,15 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     var il = ctx.ClientCoreConstructor.GetILGenerator();
 
-                    // MethodName = MethodRawInvoker.Create_XXXType_XXXType<TRequest, TResponse>(ServiceName, MethodName, serializerOptions);
+                    // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerOptions);
                     foreach (var method in ctx.Definition.Methods)
                     {
                         il.Emit(OpCodes.Ldarg_0);
 
                         var (field, _) = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName];
-                        var methodInvokerType = MethodRawInvokerTypes.GetMethodRawInvokerCreateMethod(method.MethodType, method.RequestType, method.ResponseType);
-                        // UnaryMethodRawInvoker<TRequest..., TResponse>.Create_XXXType_XXXType(
+                        var methodInvokerType = RawMethodInvokerTypes.GetMethodRawInvokerCreateMethod(method.RequestType, method.ResponseType);
+                        // RawMethodInvoker<TRequest, TResponse>.Create_XXXType_XXXType(
+                        il.Emit(OpCodes.Ldc_I4, (int)method.MethodType); // methodType,
                         il.Emit(OpCodes.Ldstr, method.ServiceName); // serviceName,
                         il.Emit(OpCodes.Ldstr, method.MethodName); // methodName,
                         il.Emit(OpCodes.Ldarg_1); // serializerOptions

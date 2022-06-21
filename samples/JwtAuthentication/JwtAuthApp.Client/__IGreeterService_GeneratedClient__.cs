@@ -35,13 +35,13 @@ namespace JwtAuthApp.Client
         protected override MagicOnionClientBase<IGreeterService> Clone(MagicOnionClientOptions options)
             => new __IGreeterService_GeneratedClient__(options, core);
 
-        public UnaryResult<string> HelloAsync() => core.HelloAsync.Invoke(this, "IGreeterService/HelloAsync", Nil.Default);
+        public UnaryResult<string> HelloAsync() => core.HelloAsync.InvokeUnary(this, "IGreeterService/HelloAsync", Nil.Default);
 
-        public Task<ServerStreamingResult<string>> ServerAsync(string name, int age) => core.ServerAsync.Invoke(this, "IGreeterService/ServerAsync", new DynamicArgumentTuple<string, int>(name, age));
+        public Task<ServerStreamingResult<string>> ServerAsync(string name, int age) => core.ServerAsync.InvokeServerStreaming(this, "IGreeterService/ServerAsync", new DynamicArgumentTuple<string, int>(name, age));
 
-        public Task<ClientStreamingResult<int, string>> ClientAsync() => core.ClientAsync.Invoke(this, "IGreeterService/ClientAsync");
+        public Task<ClientStreamingResult<int, string>> ClientAsync() => core.ClientAsync.InvokeClientStreaming(this, "IGreeterService/ClientAsync");
 
-        public Task<DuplexStreamingResult<int, string>> DuplexAsync() => core.DuplexAsync.Invoke(this, "IGreeterService/DuplexAsync");
+        public Task<DuplexStreamingResult<int, string>> DuplexAsync() => core.DuplexAsync.InvokeDuplexStreaming(this, "IGreeterService/DuplexAsync");
 
         public static Func<MagicOnionClientOptions, MagicOnionClientBase<IGreeterService>> CreateFactory(MessagePackSerializerOptions serializerOptions)
         {
@@ -51,17 +51,17 @@ namespace JwtAuthApp.Client
 
         class ClientCore
         {
-            public readonly UnaryMethodRawInvoker<Nil, string> HelloAsync;
-            public readonly ServerStreamingMethodRawInvoker<DynamicArgumentTuple<string, int>, string> ServerAsync;
-            public readonly ClientStreamingMethodRawInvoker<int, string> ClientAsync;
-            public readonly DuplexStreamingMethodRawInvoker<int, string> DuplexAsync;
+            public readonly RawMethodInvoker<Nil, string> HelloAsync;
+            public readonly RawMethodInvoker<DynamicArgumentTuple<string, int>, string> ServerAsync;
+            public readonly RawMethodInvoker<int, string> ClientAsync;
+            public readonly RawMethodInvoker<int, string> DuplexAsync;
 
             public ClientCore(MessagePackSerializerOptions serializerOptions)
             {
-                HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<Nil, string>(nameof(IGreeterService), nameof(HelloAsync), serializerOptions);
-                ServerAsync = ServerStreamingMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>(nameof(IGreeterService), nameof(ServerAsync), serializerOptions);
-                ClientAsync = ClientStreamingMethodRawInvoker.Create_ValueType_RefType<int, string>(nameof(IGreeterService), nameof(ClientAsync), serializerOptions);
-                DuplexAsync = DuplexStreamingMethodRawInvoker.Create_ValueType_RefType<int, string>(nameof(IGreeterService), nameof(DuplexAsync), serializerOptions);
+                HelloAsync = RawMethodInvoker.Create_ValueType_RefType<Nil, string>(MethodType.Unary, nameof(IGreeterService), nameof(HelloAsync), serializerOptions);
+                ServerAsync = RawMethodInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>(MethodType.ServerStreaming, nameof(IGreeterService), nameof(ServerAsync), serializerOptions);
+                ClientAsync = RawMethodInvoker.Create_ValueType_RefType<int, string>(MethodType.ClientStreaming, nameof(IGreeterService), nameof(ClientAsync), serializerOptions);
+                DuplexAsync = RawMethodInvoker.Create_ValueType_RefType<int, string>(MethodType.DuplexStreaming, nameof(IGreeterService), nameof(DuplexAsync), serializerOptions);
             }
         }
 

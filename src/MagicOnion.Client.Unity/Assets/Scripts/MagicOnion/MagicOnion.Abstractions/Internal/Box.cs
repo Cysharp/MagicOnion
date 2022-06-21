@@ -42,14 +42,15 @@ namespace MagicOnion.Internal
             => !(valueA == valueB);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Box
     {
-        private static readonly Box<Nil> NilBox = new Box<Nil>(Nil.Default);
+        private static readonly Box<MessagePack.Nil> Nil = new Box<MessagePack.Nil>(MessagePack.Nil.Default);
         private static readonly Box<bool> BoolTrue = new Box<bool>(true);
         private static readonly Box<bool> BoolFalse = new Box<bool>(false);
 
         public static Box<T> Create<T>(T value)
-            => (value is Nil) ? (Box<T>)(object)NilBox
+            => (value is MessagePack.Nil) ? (Box<T>)(object)Nil
                 : (value is bool b) ? (Box<T>)(object)(b ? BoolTrue : BoolFalse)
                 : new Box<T>(value);
     }

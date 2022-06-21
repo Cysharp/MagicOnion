@@ -84,21 +84,21 @@ namespace MagicOnion.Client.DynamicClient
                 .Where(x => !x.IsSpecialName)
                 .Select(x =>
                 {
-                    var (methodType, responseType) = GetMethodTypeAndResponseTypeFromMethod(x);
+                    var (methodType, requestType, responseType) = GetMethodTypeAndResponseTypeFromMethod(x);
                     return new ServiceClientMethod(
                         methodType,
                         serviceType.Name,
                         x.Name,
-                        $"{serviceType}/{x.Name}",
+                        $"{serviceType.Name}/{x.Name}",
                         x.GetParameters().Select(y => y.ParameterType).ToArray(),
-                        GetRequestParameterTypeFromMethod(x),
+                        requestType ?? GetRequestTypeFromMethod(x),
                         responseType
                     );
                 })
                 .ToArray();
         }
 
-        private static (MethodType MethodType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
+        private static (MethodType MethodType, Type RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
         {
             var returnType = methodInfo.ReturnType;
             if (!returnType.IsGenericType)
@@ -119,19 +119,19 @@ namespace MagicOnion.Client.DynamicClient
 
             if (returnTypeOpen == typeof(UnaryResult<>))
             {
-                return (MethodType.Unary, returnType.GetGenericArguments()[0]);
+                return (MethodType.Unary, null, returnType.GetGenericArguments()[0]);
             }
             else if (returnTypeOpen == typeof(ClientStreamingResult<,>))
             {
-                return (MethodType.ClientStreaming, returnType.GetGenericArguments()[1]);
+                return (MethodType.ClientStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
             }
             else if (returnTypeOpen == typeof(ServerStreamingResult<>))
             {
-                return (MethodType.ServerStreaming, returnType.GetGenericArguments()[0]);
+                return (MethodType.ServerStreaming, null, returnType.GetGenericArguments()[0]); // Use method parameters as response type
             }
             else if (returnTypeOpen == typeof(DuplexStreamingResult<,>))
             {
-                return (MethodType.DuplexStreaming, returnType.GetGenericArguments()[1]);
+                return (MethodType.DuplexStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
             }
             else
             {
@@ -144,7 +144,7 @@ namespace MagicOnion.Client.DynamicClient
         /// </summary>
         /// <param name="methodInfo"></param>
         /// <returns></returns>
-        private static Type GetRequestParameterTypeFromMethod(MethodInfo methodInfo)
+        private static Type GetRequestTypeFromMethod(MethodInfo methodInfo)
         {
             var parameterTypes = methodInfo.GetParameters().Select(x => x.ParameterType).ToArray();
             switch (parameterTypes.Length)

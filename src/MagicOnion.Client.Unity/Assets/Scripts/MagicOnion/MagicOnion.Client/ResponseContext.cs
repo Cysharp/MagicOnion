@@ -17,6 +17,13 @@ namespace MagicOnion.Client
         readonly Metadata responseHeaders;
         readonly Metadata trailers;
 
+        public static ResponseContext Create<TRaw>(AsyncUnaryCall<TRaw> inner)
+        {
+            return (typeof(TRaw) == typeof(Box<T>))
+                ? new ResponseContext<T>((AsyncUnaryCall<Box<T>>)(object)inner)
+                : new ResponseContext<T>((AsyncUnaryCall<T>)(object)inner);
+        }
+
         public ResponseContext(AsyncUnaryCall<T> inner)
             : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
         { }
