@@ -16,6 +16,32 @@ public class UnaryTest
         // Assert
         client.Should().NotBeNull();
     }
+    
+    [Fact]
+    public async Task ParameterlessRequestsNil()
+    {
+        // Arrange
+        var serializedResponse = new ReadOnlyMemory<byte>();
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
+            {
+                var serializationContext = new FakeSerializationContext();
+                method.RequestMarshaller.ContextualSerializer(Box.Create(Nil.Default), serializationContext);
+                serializedResponse = serializationContext.ToMemory();
+            })
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await client.ParameterlessReturnNil();
+
+        // Assert
+        result.Should().Be(Nil.Default);
+        callInvokerMock.Verify();
+        serializedResponse.ToArray().Should().BeEquivalentTo(new [] { MessagePackCode.Nil });
+    }
 
     [Fact]
     public async Task ParameterlessReturnNil()
