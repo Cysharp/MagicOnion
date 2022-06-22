@@ -136,6 +136,52 @@ public class UnaryTest
         result.Should().Be(456);
         callInvokerMock.Verify();
     }
+            
+    [Fact]
+    public async Task OneRefTypeParameterReturnRefType()
+    {
+        // Arrange
+        var request = "RequestValue";
+        var response = "Ok";
+        var sentRequest = default(string);
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), request))
+            .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Callback<Method<string, string>, string, CallOptions, string>((method, host, options, request) => sentRequest = request)
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await client.OneRefTypeParameterReturnRefType(request);
+
+        // Assert
+        result.Should().Be("Ok");
+        callInvokerMock.Verify();
+        sentRequest.Should().Be("RequestValue");
+    }
+            
+    [Fact]
+    public async Task OneValueTypeParameterReturnRefType()
+    {
+        // Arrange
+        var request = 123;
+        var response = "OK";
+        var sentRequest = default(Box<int>);
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<int>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), Box.Create(request)))
+            .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Callback<Method<Box<int>, string>, string, CallOptions, Box<int>>((method, host, options, request) => sentRequest = request)
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await client.OneValueTypeParameterReturnRefType(request);
+
+        // Assert
+        result.Should().Be("OK");
+        callInvokerMock.Verify();
+        sentRequest.Value.Should().Be(123);
+    }
 
     public interface IUnaryTestService : IService<IUnaryTestService>
     {
@@ -144,6 +190,8 @@ public class UnaryTest
         UnaryResult<string> ParameterlessReturnRefType();
         UnaryResult<int> OneRefTypeParameterReturnValueType(string arg0);
         UnaryResult<int> OneValueTypeParameterReturnValueType(int arg0);
+        UnaryResult<string> OneRefTypeParameterReturnRefType(string arg0);
+        UnaryResult<string> OneValueTypeParameterReturnRefType(int arg0);
         UnaryResult<int> ManyParameterReturnValueType(string arg1, bool arg2, long arg3, uint arg4, char arg5, byte arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15);
     }
 
