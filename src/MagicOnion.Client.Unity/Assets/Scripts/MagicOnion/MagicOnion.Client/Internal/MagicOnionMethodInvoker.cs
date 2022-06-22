@@ -134,9 +134,12 @@ namespace MagicOnion.Client.Internal
             public IClientStreamWriter<TRequest> RequestStream
                 => requestStream ?? (requestStream = (typeof(TRawRequest) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
             public Task<TResponse> ResponseAsync
+                => UnboxResponseAsync();
+
+            private async Task<TResponse> UnboxResponseAsync()
                 => (typeof(TRawResponse) == typeof(Box<TResponse>))
-                    ? inner.ResponseAsync.ContinueWith(x => ((Box<TResponse>)(object)x.Result).Value)
-                    : inner.ResponseAsync.ContinueWith(x => (TResponse)(object)x.Result);
+                    ? ((Box<TResponse>)(object)(await inner.ResponseAsync)).Value
+                    : (TResponse)(object)await inner.ResponseAsync;
 
             public void Dispose()
                 => inner.Dispose();

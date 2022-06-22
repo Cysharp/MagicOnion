@@ -84,13 +84,16 @@ namespace MagicOnion.Client
                 : (inner is AsyncUnaryCall<Box<T>> boxed)
                     ? boxed.GetTrailers()
                     : ((AsyncUnaryCall<T>)inner).GetTrailers();
-        
+
         public Task<T> ResponseAsync
             => hasValue
                 ? Task.FromResult(value)
                 : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? boxed.ResponseAsync.ContinueWith(x => x.Result.Value)
+                    ? UnboxResponseAsync(boxed)
                     : ((AsyncUnaryCall<T>)inner).ResponseAsync;
+
+        private static async Task<T> UnboxResponseAsync(AsyncUnaryCall<Box<T>> boxed)
+            => (await boxed.ResponseAsync.ConfigureAwait(false)).Value;
 
         public override void Dispose()
             => inner?.Dispose();
@@ -98,6 +101,7 @@ namespace MagicOnion.Client
         public ResponseContext<T> WithNewResult(T newValue)
             => new ResponseContext<T>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers);
     }
+
 
     public abstract class ResponseContext : IResponseContext
     {
