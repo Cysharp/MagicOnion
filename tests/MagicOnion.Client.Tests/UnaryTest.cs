@@ -183,6 +183,48 @@ public class UnaryTest
         sentRequest.Value.Should().Be(123);
     }
 
+    [Fact]
+    public async Task ThrowsResponseHeaders()
+    {
+        // Arrange
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
+            .Returns(new AsyncUnaryCall<Box<int>>(
+                Task.FromException<Box<int>>(new RpcException(new Status(StatusCode.Unknown, "Faulted"), "Faulted")),
+                Task.FromException<Metadata>(new RpcException(new Status(StatusCode.Unknown, "FaultedOnResponseHeaders"), "FaultedOnResponseHeaders")),
+                () => Status.DefaultSuccess,
+                () => Metadata.Empty,
+                () => { }))
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType().ResponseHeadersAsync);
+
+        // Assert
+        result.StatusCode.Should().Be(StatusCode.Unknown);
+        result.Message.Should().Be("FaultedOnResponseHeaders");
+        callInvokerMock.Verify();
+    }
+    [Fact]
+    public async Task ThrowsResponse()
+    {
+        // Arrange
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromException<Box<int>>(new RpcException(new Status(StatusCode.Unknown, "Faulted"), "Faulted")), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType());
+
+        // Assert
+        result.StatusCode.Should().Be(StatusCode.Unknown);
+        result.Message.Should().Be("Faulted");
+        callInvokerMock.Verify();
+    }
+
     public interface IUnaryTestService : IService<IUnaryTestService>
     {
         UnaryResult<Nil> ParameterlessReturnNil();

@@ -27,9 +27,11 @@ namespace MagicOnion.Client.DynamicClient
             public string MethodName { get; }
             public string Path { get; }
             public IReadOnlyList<Type> ParameterTypes { get; }
+            public Type MethodReturnType { get; }
             public Type RequestType { get; }
             public Type ResponseType { get; }
-            public ServiceClientMethod(MethodType methodType, string serviceName, string methodName, string path, IReadOnlyList<Type> parameterTypes, Type requestType, Type responseType)
+
+            public ServiceClientMethod(MethodType methodType, string serviceName, string methodName, string path, IReadOnlyList<Type> parameterTypes, Type methodReturnType, Type requestType, Type responseType)
             {
                 Debug.Assert(requestType != typeof(void));
                 Debug.Assert(responseType != typeof(void));
@@ -43,8 +45,111 @@ namespace MagicOnion.Client.DynamicClient
                 MethodName = methodName;
                 Path = path;
                 ParameterTypes = parameterTypes;
+                MethodReturnType = methodReturnType;
                 RequestType = requestType;
                 ResponseType = responseType;
+            }
+
+            public static ServiceClientMethod Create(Type serviceType, MethodInfo methodInfo)
+            {
+                var (methodType, requestType, responseType) = GetMethodTypeAndResponseTypeFromMethod(methodInfo);
+
+                var method = new ServiceClientMethod(
+                    methodType,
+                    serviceType.Name,
+                    methodInfo.Name,
+                    $"{serviceType.Name}/{methodInfo.Name}",
+                    methodInfo.GetParameters().Select(y => y.ParameterType).ToArray(),
+                    methodInfo.ReturnType,
+                    requestType ?? GetRequestTypeFromMethod(methodInfo),
+                    responseType
+                );
+                method.Verify();
+
+                return method;
+            }
+
+            private void Verify()
+            {
+                switch (MethodType)
+                {
+                    case MethodType.Unary:
+                        if (!MethodReturnType.IsGenericType || MethodReturnType.GetGenericTypeDefinition() != typeof(UnaryResult<>))
+                        {
+                            throw new InvalidOperationException($"The return type of Unary method must be UnaryResult<T>. (Service: {ServiceName}, Method: {MethodName})");
+                        }
+                        break;
+                    case MethodType.ClientStreaming:
+                        break;
+                    case MethodType.DuplexStreaming:
+                        break;
+                    case MethodType.ServerStreaming:
+                        break;
+                    default:
+                        throw new NotSupportedException(); // Unreachable
+                }
+            }
+
+            private static (MethodType MethodType, Type RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
+            {
+                const string UnsupportedReturnTypeErrorMessage =
+                    "The method of a service must return 'UnaryResult<T>', 'Task<ClientStreamingResult<TRequest, TResponse>>', 'Task<ServerStreamingResult<T>>' or 'DuplexStreamingResult<TRequest, TResponse>'.";
+
+                var returnType = methodInfo.ReturnType;
+                if (!returnType.IsGenericType)
+                {
+                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                }
+
+                var isTaskOfT = false;
+                var returnTypeOpen = returnType.GetGenericTypeDefinition();
+                if (returnTypeOpen == typeof(Task<>))
+                {
+                    isTaskOfT = true;
+                    returnType = returnType.GetGenericArguments()[0];
+                    if (!returnType.IsGenericType)
+                    {
+                        throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    returnTypeOpen = returnType.GetGenericTypeDefinition();
+                }
+
+                if (returnTypeOpen == typeof(UnaryResult<>))
+                {
+                    if (isTaskOfT)
+                    {
+                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    return (MethodType.Unary, null, returnType.GetGenericArguments()[0]);
+                }
+                else if (returnTypeOpen == typeof(ClientStreamingResult<,>))
+                {
+                    if (!isTaskOfT)
+                    {
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    return (MethodType.ClientStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
+                }
+                else if (returnTypeOpen == typeof(ServerStreamingResult<>))
+                {
+                    if (!isTaskOfT)
+                    {
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    return (MethodType.ServerStreaming, null, returnType.GetGenericArguments()[0]); // Use method parameters as response type
+                }
+                else if (returnTypeOpen == typeof(DuplexStreamingResult<,>))
+                {
+                    if (!isTaskOfT)
+                    {
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    return (MethodType.DuplexStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                }
             }
         }
 
@@ -82,61 +187,8 @@ namespace MagicOnion.Client.DynamicClient
                     return true;
                 })
                 .Where(x => !x.IsSpecialName)
-                .Select(x =>
-                {
-                    var (methodType, requestType, responseType) = GetMethodTypeAndResponseTypeFromMethod(x);
-                    return new ServiceClientMethod(
-                        methodType,
-                        serviceType.Name,
-                        x.Name,
-                        $"{serviceType.Name}/{x.Name}",
-                        x.GetParameters().Select(y => y.ParameterType).ToArray(),
-                        requestType ?? GetRequestTypeFromMethod(x),
-                        responseType
-                    );
-                })
+                .Select(x => ServiceClientMethod.Create(serviceType, x))
                 .ToArray();
-        }
-
-        private static (MethodType MethodType, Type RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
-        {
-            var returnType = methodInfo.ReturnType;
-            if (!returnType.IsGenericType)
-            {
-                throw new InvalidOperationException($"A method '{methodInfo.DeclaringType.Name}.{methodInfo.Name}' returns not supported type.");
-            }
-
-            var returnTypeOpen = returnType.GetGenericTypeDefinition();
-            if (returnTypeOpen == typeof(Task<>))
-            {
-                returnType = returnType.GetGenericArguments()[0];
-                if (!returnType.IsGenericType)
-                {
-                    throw new InvalidOperationException($"A method '{methodInfo.DeclaringType.Name}.{methodInfo.Name}' returns not supported type.");
-                }
-                returnTypeOpen = returnType.GetGenericTypeDefinition();
-            }
-
-            if (returnTypeOpen == typeof(UnaryResult<>))
-            {
-                return (MethodType.Unary, null, returnType.GetGenericArguments()[0]);
-            }
-            else if (returnTypeOpen == typeof(ClientStreamingResult<,>))
-            {
-                return (MethodType.ClientStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
-            }
-            else if (returnTypeOpen == typeof(ServerStreamingResult<>))
-            {
-                return (MethodType.ServerStreaming, null, returnType.GetGenericArguments()[0]); // Use method parameters as response type
-            }
-            else if (returnTypeOpen == typeof(DuplexStreamingResult<,>))
-            {
-                return (MethodType.DuplexStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
-            }
-            else
-            {
-                throw new InvalidOperationException($"A method '{methodInfo.DeclaringType.Name}.{methodInfo.Name}' returns not supported type.");
-            }
         }
 
         /// <summary>

@@ -320,10 +320,10 @@ namespace MagicOnion.Server.Tests
             {
                 var tuple = new DynamicArgumentTuple<int, int>(x, y);
 
-                var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MessagePackSerializerOptions.Standard);
+                var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MessagePackSerializerOptions.Standard);
                 var request = Box.Create(tuple);
 
-                var callResult = invoker.AsyncUnaryCall((Method<Box<DynamicArgumentTuple<int, int>>, MyResponse>)method, null, default(CallOptions), request);
+                var callResult = invoker.AsyncUnaryCall(method.Method, null, default(CallOptions), request);
 
                 var response = new ResponseContext<MyResponse>(callResult);
                 return new UnaryResult<MyResponse>(Task.FromResult<IResponseContext<MyResponse>>(response));
