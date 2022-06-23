@@ -2,7 +2,7 @@ using System.Buffers;
 
 namespace MagicOnion.Client.Tests;
 
-public class FakeSerializationContext : SerializationContext
+public class MockSerializationContext : SerializationContext
 {
     readonly ArrayBufferWriter<byte> _writer = new ArrayBufferWriter<byte>();
 

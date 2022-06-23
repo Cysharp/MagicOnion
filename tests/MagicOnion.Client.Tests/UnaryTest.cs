@@ -27,7 +27,7 @@ public class UnaryTest
             .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
             .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
             {
-                var serializationContext = new FakeSerializationContext();
+                var serializationContext = new MockSerializationContext();
                 method.RequestMarshaller.ContextualSerializer(Box.Create(Nil.Default), serializationContext);
                 serializedResponse = serializationContext.ToMemory();
             })
