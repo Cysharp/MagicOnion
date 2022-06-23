@@ -182,6 +182,56 @@ public class UnaryTest
         callInvokerMock.Verify();
         sentRequest.Value.Should().Be(123);
     }
+                
+    [Fact]
+    public async Task TwoParametersReturnRefType()
+    {
+        // Arrange
+        var requestArg1 = 123;
+        var requestArg2 = "Foo";
+        var response = "OK";
+        var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
+            .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Callback<Method<Box<DynamicArgumentTuple<int, string>>, string>, string, CallOptions, Box<DynamicArgumentTuple<int, string>>>((method, host, options, request) => sentRequest = request)
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await client.TwoParametersReturnRefType(requestArg1, requestArg2);
+
+        // Assert
+        result.Should().Be("OK");
+        callInvokerMock.Verify();
+        sentRequest.Value.Item1.Should().Be(123);
+        sentRequest.Value.Item2.Should().Be("Foo");
+    }
+                    
+    [Fact]
+    public async Task TwoParametersReturnValueType()
+    {
+        // Arrange
+        var requestArg1 = 123;
+        var requestArg2 = "Foo";
+        var response = 987;
+        var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
+        var callInvokerMock = new Mock<CallInvoker>();
+        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
+            .Callback<Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>, string, CallOptions, Box<DynamicArgumentTuple<int, string>>>((method, host, options, request) => sentRequest = request)
+            .Verifiable();
+
+        // Act
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var result = await client.TwoParametersReturnValueType(requestArg1, requestArg2);
+
+        // Assert
+        result.Should().Be(987);
+        callInvokerMock.Verify();
+        sentRequest.Value.Item1.Should().Be(123);
+        sentRequest.Value.Item2.Should().Be("Foo");
+    }
 
     [Fact]
     public async Task ThrowsResponseHeaders()
@@ -206,6 +256,7 @@ public class UnaryTest
         result.Message.Should().Be("FaultedOnResponseHeaders");
         callInvokerMock.Verify();
     }
+
     [Fact]
     public async Task ThrowsResponse()
     {
@@ -230,10 +281,29 @@ public class UnaryTest
         UnaryResult<Nil> ParameterlessReturnNil();
         UnaryResult<int> ParameterlessReturnValueType();
         UnaryResult<string> ParameterlessReturnRefType();
-        UnaryResult<int> OneRefTypeParameterReturnValueType(string arg0);
-        UnaryResult<int> OneValueTypeParameterReturnValueType(int arg0);
-        UnaryResult<string> OneRefTypeParameterReturnRefType(string arg0);
-        UnaryResult<string> OneValueTypeParameterReturnRefType(int arg0);
+        UnaryResult<int> OneRefTypeParameterReturnValueType(string arg1);
+        UnaryResult<int> OneValueTypeParameterReturnValueType(int arg1);
+        UnaryResult<string> OneRefTypeParameterReturnRefType(string arg1);
+        UnaryResult<string> OneValueTypeParameterReturnRefType(int arg1);
+        UnaryResult<int> TwoParametersReturnValueType(int arg1, string arg2);
+        UnaryResult<string> TwoParametersReturnRefType(int arg1, string arg2);
+    }
+    
+    [Fact]
+    public void MaxParameters()
+    {
+        // Arrange
+        var callInvokerMock = new Mock<CallInvoker>();
+
+        // Act
+        var client = MagicOnionClient.Create<IMaxParametersService>(callInvokerMock.Object);
+
+        // Assert
+        client.Should().NotBeNull();
+    }
+
+    public interface IMaxParametersService : IService<IMaxParametersService>
+    {
         UnaryResult<int> ManyParameterReturnValueType(string arg1, bool arg2, long arg3, uint arg4, char arg5, byte arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15);
     }
 
