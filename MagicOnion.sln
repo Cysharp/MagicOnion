@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
@@ -81,11 +81,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B561
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthSample", "tests\samples\AuthSample\AuthSample.csproj", "{4D5E8486-9A0D-444A-922B-1D94FD8A820A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicServerSample", "tests\samples\BasicServerSample\BasicServerSample.csproj", "{BC29EA94-6C52-4FAA-8F26-9346DB85C58F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicServerSample", "tests\samples\BasicServerSample\BasicServerSample.csproj", "{BC29EA94-6C52-4FAA-8F26-9346DB85C58F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.Tests", "tests\MagicOnion.Client.Tests\MagicOnion.Client.Tests.csproj", "{6DF31417-D091-4E27-963F-75E1D5AC0EA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.Tests", "tests\MagicOnion.Client.Tests\MagicOnion.Client.Tests.csproj", "{6DF31417-D091-4E27-963F-75E1D5AC0EA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Shared.Tests", "tests\MagicOnion.Shared.Tests\MagicOnion.Shared.Tests.csproj", "{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Shared.Tests", "tests\MagicOnion.Shared.Tests\MagicOnion.Shared.Tests.csproj", "{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Integration.Tests", "tests\MagicOnion.Integration.Tests\MagicOnion.Integration.Tests.csproj", "{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnionTestServer", "tests\samples\MagicOnionTestServer\MagicOnionTestServer.csproj", "{D0555A91-D817-4322-B8D0-16641069D17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +189,14 @@ Global
 		{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0555A91-D817-4322-B8D0-16641069D17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0555A91-D817-4322-B8D0-16641069D17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0555A91-D817-4322-B8D0-16641069D17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0555A91-D817-4322-B8D0-16641069D17B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -217,6 +229,8 @@ Global
 		{BC29EA94-6C52-4FAA-8F26-9346DB85C58F} = {B5617CC1-55FD-4F77-BA75-9450474C6527}
 		{6DF31417-D091-4E27-963F-75E1D5AC0EA0} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{A6DB6E90-711E-4832-B8F0-BEB14E31B77C} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{D0555A91-D817-4322-B8D0-16641069D17B} = {B5617CC1-55FD-4F77-BA75-9450474C6527}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
