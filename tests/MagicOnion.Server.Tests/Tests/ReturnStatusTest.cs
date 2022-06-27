@@ -14,17 +14,17 @@ namespace MagicOnion.Server.Tests
 {
     public interface IReturnStatus : IService<IReturnStatus>
     {
-        // 1 is exception
-        UnaryResult<int> Unary1();
-        ClientStreamingResult<int, string> ClientStreaming1();
-        ServerStreamingResult<string> Serverstreaming1();
-        DuplexStreamingResult<int, string> DuplexStreaming1();
+        //// 1 is exception
+        //UnaryResult<int> Unary1();
+        //ClientStreamingResult<int, string> ClientStreaming1();
+        //ServerStreamingResult<string> Serverstreaming1();
+        //DuplexStreamingResult<int, string> DuplexStreaming1();
 
-        // 2 is direct return
-        UnaryResult<int> Unary2();
-        ClientStreamingResult<int, string> ClientStreaming2();
-        ServerStreamingResult<string> Serverstreaming2();
-        DuplexStreamingResult<int, string> DuplexStreaming2();
+        //// 2 is direct return
+        //UnaryResult<int> Unary2();
+        //ClientStreamingResult<int, string> ClientStreaming2();
+        //ServerStreamingResult<string> Serverstreaming2();
+        //DuplexStreamingResult<int, string> DuplexStreaming2();
         
         // others
         UnaryResult<int> CustomThrow(int code);
@@ -32,35 +32,35 @@ namespace MagicOnion.Server.Tests
 
     public class ReturnStatus : ServiceBase<IReturnStatus>, IReturnStatus
     {
-        public ClientStreamingResult<int, string> ClientStreaming1()
-        {
-            throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
-        }
+        //public ClientStreamingResult<int, string> ClientStreaming1()
+        //{
+        //    throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
+        //}
 
-        public ClientStreamingResult<int, string> ClientStreaming2()
-        {
-            return GetClientStreamingContext<int, string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
-        }
+        //public ClientStreamingResult<int, string> ClientStreaming2()
+        //{
+        //    return GetClientStreamingContext<int, string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
+        //}
 
-        public DuplexStreamingResult<int, string> DuplexStreaming1()
-        {
-            throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
-        }
+        //public DuplexStreamingResult<int, string> DuplexStreaming1()
+        //{
+        //    throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
+        //}
 
-        public DuplexStreamingResult<int, string> DuplexStreaming2()
-        {
-            return GetDuplexStreamingContext<int, string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
-        }
+        //public DuplexStreamingResult<int, string> DuplexStreaming2()
+        //{
+        //    return GetDuplexStreamingContext<int, string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
+        //}
 
-        public ServerStreamingResult<string> Serverstreaming1()
-        {
-            throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
-        }
+        //public ServerStreamingResult<string> Serverstreaming1()
+        //{
+        //    throw new ReturnStatusException(Grpc.Core.StatusCode.Aborted, "a");
+        //}
 
-        public ServerStreamingResult<string> Serverstreaming2()
-        {
-            return GetServerStreamingContext<string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
-        }
+        //public ServerStreamingResult<string> Serverstreaming2()
+        //{
+        //    return GetServerStreamingContext<string>().ReturnStatus(Grpc.Core.StatusCode.InvalidArgument, "b");
+        //}
 
         public UnaryResult<int> Unary1()
         {
