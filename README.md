@@ -306,7 +306,7 @@ This sample is for Unity(use Vector3, GameObject, etc) but StreamingHub supports
 // Server -> Client definition
 public interface IGamingHubReceiver
 {
-    // return type should be `void` or `Task`, parameters are free.
+    // The method must have a return type of `void` and can have up to 15 parameters of any type.
     void OnJoin(Player player);
     void OnLeave(Player player);
     void OnMove(Player player);
@@ -316,7 +316,7 @@ public interface IGamingHubReceiver
 // implements `IStreamingHub<TSelf, TReceiver>`  and share this type between server and client.
 public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
 {
-    // return type should be `Task` or `Task<T>`, parameters are free.
+    // The method must return `Task` or `Task<T>` and can have up to 15 parameters of any type.
     Task<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
     Task LeaveAsync();
     Task MoveAsync(Vector3 position, Quaternion rotation);
