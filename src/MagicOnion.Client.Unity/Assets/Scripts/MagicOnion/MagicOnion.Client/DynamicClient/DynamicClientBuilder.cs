@@ -68,9 +68,9 @@ namespace MagicOnion.Client.DynamicClient
                 EmitClientCore(ctx);
                 // private readonly ClientCore core; ...
                 EmitFields(ctx);
-                // public {ServiceName}Client(ClientOptions options, MessagePackSerializerOptions serializerOptions) { ... } 
+                // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) { ... } 
                 EmitConstructor(ctx);
-                // protected override ClientBase<{ServiceName}> Clone(ClientOptions options) => new {ServiceName}Client(options, core);
+                // protected override ClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
                 EmitClone(ctx, constructedBaseClientType);
                 // public {MethodType}Result<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...) => this.core.MethodName.Invoke{MethodType}(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...)); ...
                 EmitServiceMethods(ctx);
@@ -80,7 +80,7 @@ namespace MagicOnion.Client.DynamicClient
 
         private static void EmitClone(ServiceClientBuildContext ctx, Type constructedBaseClientType)
         {
-            // protected override ClientBase<{ServiceName}> Clone(ClientOptions options) => new {ServiceName}Client(options, core);
+            // protected override MagicOnionClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
             var cloneMethodBuilder = ctx.ServiceClientType.DefineMethod("Clone", MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final, constructedBaseClientType, new[] { typeof(MagicOnionClientOptions) });
             {
                 var il = cloneMethodBuilder.GetILGenerator();
@@ -134,11 +134,11 @@ namespace MagicOnion.Client.DynamicClient
             //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", request);
             // public UnaryResult<TResponse> MethodName()
             //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", Nil.Default);
-            // public ServerStreamingResult<TRequest, TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
+            // public Task<ServerStreamingResult<TRequest, TResponse>> MethodName(TArg1 arg1, TArg2 arg2, ...)
             //     => this.core.MethodName.InvokeServerStreaming(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
-            // public ClientStreamingResult<TRequest, TResponse> MethodName()
+            // public Task<ClientStreamingResult<TRequest, TResponse>> MethodName()
             //     => this.core.MethodName.InvokeClientStreaming(this, "ServiceName/MethodName");
-            // public DuplexStreamingResult<TRequest, TResponse> MethodName()
+            // public Task<DuplexStreamingResult<TRequest, TResponse>> MethodName()
             //     => this.core.MethodName.InvokeDuplexStreaming(this, "ServiceName/MethodName");
             foreach (var method in ctx.Definition.Methods)
             {

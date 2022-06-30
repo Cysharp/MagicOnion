@@ -12,15 +12,15 @@ namespace MagicOnion.Client.DynamicClient
     internal class ServiceClientDefinition
     {
         public Type ServiceInterfaceType { get; }
-        public IReadOnlyList<ServiceClientMethod> Methods { get; }
+        public IReadOnlyList<MagicOnionServiceMethodInfo> Methods { get; }
 
-        public ServiceClientDefinition(Type serviceInterfaceType, IReadOnlyList<ServiceClientMethod> methods)
+        public ServiceClientDefinition(Type serviceInterfaceType, IReadOnlyList<MagicOnionServiceMethodInfo> methods)
         {
             ServiceInterfaceType = serviceInterfaceType;
             Methods = methods;
         }
 
-        public class ServiceClientMethod
+        public class MagicOnionServiceMethodInfo
         {
             public MethodType MethodType { get; }
             public string ServiceName { get; }
@@ -31,7 +31,7 @@ namespace MagicOnion.Client.DynamicClient
             public Type RequestType { get; }
             public Type ResponseType { get; }
 
-            public ServiceClientMethod(MethodType methodType, string serviceName, string methodName, string path, IReadOnlyList<Type> parameterTypes, Type methodReturnType, Type requestType, Type responseType)
+            public MagicOnionServiceMethodInfo(MethodType methodType, string serviceName, string methodName, string path, IReadOnlyList<Type> parameterTypes, Type methodReturnType, Type requestType, Type responseType)
             {
                 Debug.Assert(requestType != typeof(void));
                 Debug.Assert(responseType != typeof(void));
@@ -50,11 +50,11 @@ namespace MagicOnion.Client.DynamicClient
                 ResponseType = responseType;
             }
 
-            public static ServiceClientMethod Create(Type serviceType, MethodInfo methodInfo)
+            public static MagicOnionServiceMethodInfo Create(Type serviceType, MethodInfo methodInfo)
             {
                 var (methodType, requestType, responseType) = GetMethodTypeAndResponseTypeFromMethod(methodInfo);
 
-                var method = new ServiceClientMethod(
+                var method = new MagicOnionServiceMethodInfo(
                     methodType,
                     serviceType.Name,
                     methodInfo.Name,
@@ -158,7 +158,7 @@ namespace MagicOnion.Client.DynamicClient
             return new ServiceClientDefinition(typeof(T), GetServiceMethods(typeof(T)));
         }
         
-        private static IReadOnlyList<ServiceClientMethod> GetServiceMethods(Type serviceType)
+        private static IReadOnlyList<MagicOnionServiceMethodInfo> GetServiceMethods(Type serviceType)
         {
             return serviceType
                 .GetInterfaces()
@@ -187,7 +187,7 @@ namespace MagicOnion.Client.DynamicClient
                     return true;
                 })
                 .Where(x => !x.IsSpecialName)
-                .Select(x => ServiceClientMethod.Create(serviceType, x))
+                .Select(x => MagicOnionServiceMethodInfo.Create(serviceType, x))
                 .ToArray();
         }
 
