@@ -8,16 +8,17 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
     {
         public MagicOnionTypeInfo ServiceType { get; }
         public IReadOnlyList<MagicOnionHubMethodInfo> Methods { get; }
+        public MagicOnionTypeInfo ReceiverType { get; }
 
         public string IfDirectiveCondition { get; }
         public bool HasIfDirectiveCondition => !string.IsNullOrEmpty(IfDirectiveCondition);
 
-        [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; ParameterTypes={ParameterTypes.Count,nq}")]
+        [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}")]
         public class MagicOnionHubMethodInfo : IMagicOnionCompileDirectiveTarget
         {
             public int HubId { get; }
             public string MethodName { get; }
-            public IReadOnlyList<MagicOnionTypeInfo> ParameterTypes { get; }
+            public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; }
             public MagicOnionTypeInfo MethodReturnType { get; }
             public MagicOnionTypeInfo RequestType { get; }
             public MagicOnionTypeInfo ResponseType { get; }

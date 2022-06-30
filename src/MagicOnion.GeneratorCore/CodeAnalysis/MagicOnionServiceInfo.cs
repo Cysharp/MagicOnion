@@ -20,14 +20,14 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
             IfDirectiveCondition = ifDirectiveCondition;
         }
 
-        [DebuggerDisplay("ServiceMethod: {MethodName,nq} ({MethodType,nq} {Path,nq}); MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; ParameterTypes={ParameterTypes.Count,nq}")]
+        [DebuggerDisplay("ServiceMethod: {MethodName,nq} ({MethodType,nq} {Path,nq}); MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}")]
         public class MagicOnionServiceMethodInfo : IMagicOnionCompileDirectiveTarget
         {
             public MethodType MethodType { get; }
             public string ServiceName { get; }
             public string MethodName { get; }
             public string Path { get; }
-            public IReadOnlyList<MagicOnionTypeInfo> ParameterTypes { get; } // T1, T2 ...
+            public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; } // T1, T2 ...
             public MagicOnionTypeInfo MethodReturnType { get; } // UnaryResult<T> or Task<{Server,Client,Duplex}Streaming<>>
             public MagicOnionTypeInfo RequestType { get; } // TArg or DynamicArgumentTuple<T1, T2 ...>
             public MagicOnionTypeInfo ResponseType { get; } // TResponse
@@ -40,7 +40,7 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 string serviceName,
                 string methodName,
                 string path,
-                IReadOnlyList<MagicOnionTypeInfo> parameterTypes,
+                IReadOnlyList<MagicOnionMethodParameterInfo> parameters,
                 MagicOnionTypeInfo methodReturnType,
                 MagicOnionTypeInfo requestType,
                 MagicOnionTypeInfo responseType,
@@ -50,7 +50,7 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 ServiceName = serviceName;
                 MethodName = methodName;
                 Path = path;
-                ParameterTypes = parameterTypes;
+                Parameters = parameters;
                 MethodReturnType = methodReturnType;
                 RequestType = requestType;
                 ResponseType = responseType;

@@ -20,29 +20,17 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
         {
             var ctx = MethodCollectorContext.CreateFromCompilation(compilation, logger);
 
-            var serviceInterfaces = ctx.ServiceAndHubInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(ctx.ReferenceSymbols.IServiceMarker)) && x.AllInterfaces.All(y => !y.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHubMarker)))
-                .Where(x => !x.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IService))
-                .Distinct()
-                .ToArray();
-
-            var hubInterfaces = ctx.ServiceAndHubInterfaces
-                .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHubMarker)))
-                .Where(x => !x.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub))
-                .Distinct()
-                .ToArray();
-
-            return new MagicOnionServiceCollection(GetStreamingHubs(ctx, hubInterfaces), GetServices(ctx, serviceInterfaces));
+            return new MagicOnionServiceCollection(GetStreamingHubs(ctx), GetServices(ctx));
         }
 
-        private IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx, IReadOnlyList<INamedTypeSymbol> serviceInterfaces)
+        private IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx)
         {
             return Array.Empty<MagicOnionStreamingHubInfo>();
         }
 
-        private IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx, IReadOnlyList<INamedTypeSymbol> serviceInterfaces)
+        private IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx)
         {
-            return serviceInterfaces
+            return ctx.ServiceInterfaces
                 .Select(x =>
                 {
                     var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
@@ -57,16 +45,16 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 .ToArray();
         }
         
-        private MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
+        MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
         {
             var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
-            var methodParameters = methodSymbol.Parameters.Select(y => MagicOnionTypeInfo.CreateFromSymbol(y.Type)).ToArray();
+            var methodParameters = methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
             var requestType = (methodSymbol.Parameters.Length == 0)
                 ? MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
                 : (methodSymbol.Parameters.Length == 1)
-                    ? methodParameters[0]
-                    : MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", methodParameters);
+                    ? methodParameters[0].Type
+                    : MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", methodParameters.Select(x => x.Type).ToArray());
             var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
             var methodType = MethodType.Other;
             switch (methodReturnType.FullNameOpenType)
@@ -126,6 +114,8 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
         {
             public ReferenceSymbols ReferenceSymbols { get; }
             public IReadOnlyList<INamedTypeSymbol> ServiceAndHubInterfaces { get; }
+            public IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; }
+            public IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; }
             public Action<string> Logger { get; }
 
             public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces, Action<string> logger)
@@ -133,6 +123,18 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 ReferenceSymbols = referenceSymbols;
                 ServiceAndHubInterfaces = serviceAndHubInterfaces;
                 Logger = logger ?? (_ => { });
+
+                ServiceInterfaces = serviceAndHubInterfaces
+                    .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) && x.AllInterfaces.All(y => !y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
+                    .Where(x => !x.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IService))
+                    .Distinct()
+                    .ToArray();
+
+                HubInterfaces = serviceAndHubInterfaces
+                    .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
+                    .Where(x => !x.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
+                    .Distinct()
+                    .ToArray();
             }
 
             public static MethodCollectorContext CreateFromCompilation(Compilation compilation, Action<string> logger = null)
