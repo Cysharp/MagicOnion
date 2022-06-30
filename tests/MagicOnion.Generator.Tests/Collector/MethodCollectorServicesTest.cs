@@ -47,6 +47,47 @@ public interface IMyService : IService<IMyService>
     }
 
     [Fact]
+    public void IfDirectives()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+[GenerateIfDirective(""DEBUG || CONST_1 || CONST_2"")]
+public interface IMyService : IService<IMyService>
+{
+    [GenerateDefineDebug]
+    UnaryResult<Nil> MethodA();
+
+    UnaryResult<Nil> MethodB();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector2();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().BeEmpty();
+        serviceCollection.Services.Should().HaveCount(1);
+        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
+        serviceCollection.Services[0].HasIfDirectiveCondition.Should().BeTrue();
+        serviceCollection.Services[0].IfDirectiveCondition.Should().Be("DEBUG || CONST_1 || CONST_2");
+        serviceCollection.Services[0].Methods[0].HasIfDirectiveCondition.Should().BeTrue();
+        serviceCollection.Services[0].Methods[0].IfDirectiveCondition.Should().Be("DEBUG");
+        serviceCollection.Services[0].Methods[1].HasIfDirectiveCondition.Should().BeFalse();
+    }
+
+    [Fact]
     public void Unary_NoArg_ReturnNil()
     {
         // Arrange
