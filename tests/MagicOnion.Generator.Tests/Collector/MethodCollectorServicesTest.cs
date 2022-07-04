@@ -1,5 +1,5 @@
 using System;
-using MagicOnion.GeneratorCore.CodeAnalysis;
+using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator.Tests.Collector;
 

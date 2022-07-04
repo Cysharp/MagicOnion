@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace MagicOnion.GeneratorCore.Internal
+namespace MagicOnion.Generator.Internal
 {
     internal static class FNV1A32
     {

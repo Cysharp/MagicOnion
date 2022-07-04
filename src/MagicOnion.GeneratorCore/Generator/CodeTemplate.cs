@@ -12,7 +12,7 @@ namespace MagicOnion.Generator
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using MagicOnion.CodeAnalysis;
+    using MagicOnion.Generator.CodeAnalysis;
     using System;
     
     /// <summary>

@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MagicOnion.CodeAnalysis;
-using MagicOnion.GeneratorCore.Internal;
+using MagicOnion.Generator.Internal;
+using MagicOnion.Generator.Utils;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     public class MethodCollector2
     {

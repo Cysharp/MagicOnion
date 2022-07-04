@@ -1,6 +1,5 @@
 #pragma warning disable CS1998
 
-using MagicOnion.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using System;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
 using MagicOnion.Generator;
+using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion
 {

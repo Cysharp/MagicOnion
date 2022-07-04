@@ -1,15 +1,13 @@
-using MagicOnion.GeneratorCore.Utils;
-using MagicOnion.Utils;
-using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using MagicOnion.GeneratorCore.Internal;
+using MagicOnion.Generator.Internal;
+using MagicOnion.Generator.Utils;
+using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     public class ReferenceSymbols
     {

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     [DebuggerDisplay("{ToDisplayName(DisplayNameFormat.Short),nq}")]
     public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>

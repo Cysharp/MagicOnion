@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 
-namespace MagicOnion.GeneratorCore.Utils
+namespace MagicOnion.Generator.Utils
 {
     internal static class PseudoCompilation
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     [DebuggerDisplay("StreamingHub: {ServiceType,nq}; Methods={Methods.Count,nq}")]
     public class MagicOnionStreamingHubInfo : IMagicOnionCompileDirectiveTarget

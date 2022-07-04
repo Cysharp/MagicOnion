@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using MagicOnion.GeneratorCore.CodeAnalysis;
+using MagicOnion.Generator.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 

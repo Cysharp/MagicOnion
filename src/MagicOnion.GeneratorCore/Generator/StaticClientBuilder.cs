@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using MagicOnion.CodeAnalysis;
 
-namespace MagicOnion.GeneratorCore.Generator
+namespace MagicOnion.Generator.Generator
 {
     internal class StaticClientBuilder
     {

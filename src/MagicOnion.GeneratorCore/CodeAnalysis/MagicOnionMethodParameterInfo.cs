@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     [DebuggerDisplay("Parameter: {Name,nq} ({Type,nq})")]
     public class MagicOnionMethodParameterInfo

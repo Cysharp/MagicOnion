@@ -1,16 +1,16 @@
-﻿using MagicOnion.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator
 {
     public partial class CodeTemplate
     {
         public string Namespace { get; set; }
-        public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
+        public InterfaceDefinition[] Interfaces { get; set; }
     }
 
     public partial class HubTemplate
@@ -23,7 +23,7 @@ namespace MagicOnion.Generator
     {
         public string Namespace { get; set; }
         public bool UnuseUnityAttribute { get; set; }
-        public MagicOnion.CodeAnalysis.InterfaceDefinition[] Interfaces { get; set; }
+        public InterfaceDefinition[] Interfaces { get; set; }
         public (InterfaceDefinition hubDef, InterfaceDefinition receiverDef)[] HubInterfaces { get; set; }
     }
 

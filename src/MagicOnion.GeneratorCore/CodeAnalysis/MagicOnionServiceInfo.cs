@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using MagicOnion.CodeAnalysis;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     [DebuggerDisplay("MagicOnionService: {ServiceType,nq}; Methods={Methods.Count,nq}")]
     public class MagicOnionServiceInfo : IMagicOnionCompileDirectiveTarget

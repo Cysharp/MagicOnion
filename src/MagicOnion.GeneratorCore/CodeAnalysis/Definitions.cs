@@ -1,12 +1,10 @@
-using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using MagicOnion.Generator.Utils;
+using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     public enum MethodType
     {

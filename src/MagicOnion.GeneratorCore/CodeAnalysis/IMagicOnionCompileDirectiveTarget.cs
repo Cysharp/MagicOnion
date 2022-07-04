@@ -1,4 +1,4 @@
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     public interface IMagicOnionCompileDirectiveTarget
     {

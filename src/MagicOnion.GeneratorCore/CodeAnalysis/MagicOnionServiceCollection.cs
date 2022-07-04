@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MagicOnion.GeneratorCore.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis
 {
     public class MagicOnionServiceCollection
     {
