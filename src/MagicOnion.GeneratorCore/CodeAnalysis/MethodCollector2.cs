@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MagicOnion.CodeAnalysis;
+using MagicOnion.GeneratorCore.Internal;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.GeneratorCore.CodeAnalysis
@@ -25,7 +26,82 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
 
         private IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx)
         {
-            return Array.Empty<MagicOnionStreamingHubInfo>();
+            return ctx.HubInterfaces
+                .Select(x =>
+                {
+                    var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
+                    var methods = x.GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Select(y => CreateHubMethodInfoFromMethodSymbol(serviceType, y))
+                        .ToArray();
+
+                    var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
+                    var receiverType = MagicOnionTypeInfo.CreateFromSymbol(receiverInterfaceSymbol);
+                    var receiverMethods = receiverInterfaceSymbol.GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, y))
+                        .ToArray();
+
+                    var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods, receiverInterfaceSymbol.GetDefinedGenerateIfCondition());
+                    return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, x.GetDefinedGenerateIfCondition());
+                })
+                .OrderBy(x => x.ServiceType.FullName)
+                .ToArray();
+        }
+
+        private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+        {
+            var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
+            var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+            var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
+            var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
+            var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+            switch (methodReturnType.FullNameOpenType)
+            {
+                case "global::System.Threading.Tasks.Task":
+                    //responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+                    break;
+                case "global::System.Threading.Tasks.Task<>":
+                    responseType = methodReturnType.GenericArguments[0];
+                    break;
+                default:
+                    throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
+            }
+            var hubId = (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
+
+            return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
+                hubId,
+                methodSymbol.Name,
+                methodParameters,
+                methodReturnType,
+                requestType,
+                responseType,
+                ifDirective
+            );
+        }
+        private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+        {
+            var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
+            var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+            var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
+            var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
+            var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+            if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
+            {
+                throw new InvalidOperationException($"StreamingHub receiver method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
+
+            }
+            var hubId = (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
+
+            return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
+                hubId,
+                methodSymbol.Name,
+                methodParameters,
+                methodReturnType,
+                requestType,
+                responseType,
+                ifDirective
+            );
         }
 
         private IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx)
@@ -45,18 +121,14 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 .ToArray();
         }
         
-        MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
+        private MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
         {
-            var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
-            var methodParameters = methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
-            var requestType = (methodSymbol.Parameters.Length == 0)
-                ? MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
-                : (methodSymbol.Parameters.Length == 1)
-                    ? methodParameters[0].Type
-                    : MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", methodParameters.Select(x => x.Type).ToArray());
-            var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
+            var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+            var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
             var methodType = MethodType.Other;
+            var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
+            var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
             switch (methodReturnType.FullNameOpenType)
             {
                 case "global::MagicOnion.UnaryResult<>":
@@ -109,6 +181,16 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 ifDirective
             );
         }
+        
+        private static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
+            => methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
+
+        private static MagicOnionTypeInfo CreateRequestTypeFromMethodParameters(IReadOnlyList<MagicOnionMethodParameterInfo> parameters)
+            => (parameters.Count == 0)
+                ? MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
+                : (parameters.Count == 1)
+                    ? parameters[0].Type
+                    : MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", parameters.Select(x => x.Type).ToArray());
 
         public class MethodCollectorContext
         {

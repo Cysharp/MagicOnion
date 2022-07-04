@@ -64,7 +64,10 @@ public interface IMyService : IService<IMyService>
     [GenerateDefineDebug]
     UnaryResult<Nil> MethodA();
 
+    [GenerateIfDirective(""CONST_3"")]
     UnaryResult<Nil> MethodB();
+
+    UnaryResult<Nil> MethodC();
 }
 ";
         using var tempWorkspace = TemporaryProjectWorkarea.Create();
@@ -84,11 +87,13 @@ public interface IMyService : IService<IMyService>
         serviceCollection.Services[0].IfDirectiveCondition.Should().Be("DEBUG || CONST_1 || CONST_2");
         serviceCollection.Services[0].Methods[0].HasIfDirectiveCondition.Should().BeTrue();
         serviceCollection.Services[0].Methods[0].IfDirectiveCondition.Should().Be("DEBUG");
-        serviceCollection.Services[0].Methods[1].HasIfDirectiveCondition.Should().BeFalse();
+        serviceCollection.Services[0].Methods[1].HasIfDirectiveCondition.Should().BeTrue();
+        serviceCollection.Services[0].Methods[1].IfDirectiveCondition.Should().Be("CONST_3");
+        serviceCollection.Services[0].Methods[2].HasIfDirectiveCondition.Should().BeFalse();
     }
 
     [Fact]
-    public void Unary_NoArg_ReturnNil()
+    public void Unary_Parameter_Zero_ReturnNil()
     {
         // Arrange
         var source = @"
@@ -131,7 +136,7 @@ namespace MyNamespace
 
     
     [Fact]
-    public void Unary_NoArg_ReturnValue()
+    public void Unary_Parameter_Zero_ReturnValue()
     {
         // Arrange
         var source = @"
@@ -173,7 +178,7 @@ namespace MyNamespace
    }
     
     [Fact]
-    public void Unary_OneArg_ReturnNil()
+    public void Unary_Parameter_One_ReturnNil()
     {
         // Arrange
         var source = @"
@@ -216,7 +221,7 @@ namespace MyNamespace
     }
     
     [Fact]
-    public void Unary_ManyArgs_ReturnNil()
+    public void Unary_Parameter_Many_ReturnNil()
     {
         // Arrange
         var source = @"
@@ -367,7 +372,7 @@ namespace MyNamespace
     }
 
     [Fact]
-    public void ServerStreaming_NoArg()
+    public void ServerStreaming_Parameter_Zero()
     {
         // Arrange
         var source = @"
@@ -408,7 +413,7 @@ public interface IMyService : IService<IMyService>
     }
         
     [Fact]
-    public void ServerStreaming_OneArg()
+    public void ServerStreaming_Parameter_One()
     {
         // Arrange
         var source = @"
@@ -450,7 +455,7 @@ public interface IMyService : IService<IMyService>
     }
             
     [Fact]
-    public void ServerStreaming_ManyArgs()
+    public void ServerStreaming_Parameter_Many()
     {
         // Arrange
         var source = @"

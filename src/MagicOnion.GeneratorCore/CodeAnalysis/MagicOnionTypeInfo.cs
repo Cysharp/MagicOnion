@@ -91,6 +91,9 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
             return Equals((MagicOnionTypeInfo)obj);
         }
 
+        public static bool operator ==(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => a?.Equals(b) ?? (b is null);
+        public static bool operator !=(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => !(a == b);
+
         public override int GetHashCode() => FullName.GetHashCode();
     }
 }
