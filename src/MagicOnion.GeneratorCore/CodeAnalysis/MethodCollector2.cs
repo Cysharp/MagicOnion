@@ -49,8 +49,12 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 .ToArray();
         }
 
+        private static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
+            => (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
+
         private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
         {
+            var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
             var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
             var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
@@ -67,7 +71,6 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 default:
                     throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
             }
-            var hubId = (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
 
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
                 hubId,
@@ -81,6 +84,7 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
         }
         private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
         {
+            var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
             var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
             var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
@@ -91,7 +95,6 @@ namespace MagicOnion.GeneratorCore.CodeAnalysis
                 throw new InvalidOperationException($"StreamingHub receiver method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
 
             }
-            var hubId = (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
 
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
                 hubId,
