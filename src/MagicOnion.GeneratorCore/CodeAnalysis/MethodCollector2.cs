@@ -23,7 +23,7 @@ namespace MagicOnion.Generator.CodeAnalysis
             return new MagicOnionServiceCollection(GetStreamingHubs(ctx), GetServices(ctx));
         }
 
-        private IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx)
+        IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx)
         {
             return ctx.HubInterfaces
                 .Select(x =>
@@ -48,10 +48,10 @@ namespace MagicOnion.Generator.CodeAnalysis
                 .ToArray();
         }
 
-        private static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
+        static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
             => (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
 
-        private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+        MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
         {
             var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -81,7 +81,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 ifDirective
             );
         }
-        private MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+        MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
         {
             var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -106,7 +106,7 @@ namespace MagicOnion.Generator.CodeAnalysis
             );
         }
 
-        private IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx)
+        IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx)
         {
             return ctx.ServiceInterfaces
                 .Select(x =>
@@ -123,7 +123,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 .ToArray();
         }
         
-        private MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
+        MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
         {
             var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
             var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
@@ -184,10 +184,10 @@ namespace MagicOnion.Generator.CodeAnalysis
             );
         }
         
-        private static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
+        static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
             => methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
 
-        private static MagicOnionTypeInfo CreateRequestTypeFromMethodParameters(IReadOnlyList<MagicOnionMethodParameterInfo> parameters)
+        static MagicOnionTypeInfo CreateRequestTypeFromMethodParameters(IReadOnlyList<MagicOnionMethodParameterInfo> parameters)
             => (parameters.Count == 0)
                 ? MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
                 : (parameters.Count == 1)
