@@ -20,19 +20,25 @@ namespace MagicOnion.Generator.CodeAnalysis
             // ReSharper restore InconsistentNaming
         }
 
+        readonly SubType _subType;
 
         public string Namespace { get; }
         public string Name { get; }
+
         public IReadOnlyList<MagicOnionTypeInfo> GenericArguments { get; }
         public bool HasGenericArguments => GenericArguments.Any();
-        public bool IsArray { get; }
+
+        public bool IsArray => _subType == SubType.Array;
         public int ArrayRank { get; }
-        public MagicOnionTypeInfo GetElementType() => IsArray ? Create(Namespace, Name, GenericArguments.ToArray()) : throw new ArgumentException($"The type '{FullName}' is not an array.");
+        public MagicOnionTypeInfo ElementType { get; }
 
         public string FullName
             => ToDisplayName(DisplayNameFormat.FullyQualified);
         public string FullNameOpenType
             => ToDisplayName(DisplayNameFormat.FullyQualified | DisplayNameFormat.OpenGenerics);
+
+        public bool IsEnum => _subType == SubType.Enum;
+        public MagicOnionTypeInfo UnderlyingType { get; }
 
         [Flags]
         public enum DisplayNameFormat
@@ -40,12 +46,66 @@ namespace MagicOnion.Generator.CodeAnalysis
             Short = 0,
             Global = 1,
             Namespace = 1 << 1,
-            OpenGenerics = 1 << 2,
+            WithoutGenericArguments = 1 << 2,
+            OpenGenerics = 1 << 3,
             FullyQualified = Namespace | Global,
         }
 
+        private enum SubType
+        {
+            None,
+            Enum,
+            Array,
+        }
+
+        private MagicOnionTypeInfo(string @namespace, string name, SubType subType = SubType.None, int arrayRank = 0, MagicOnionTypeInfo[] genericArguments = null, MagicOnionTypeInfo elementType = null, MagicOnionTypeInfo underlyingType = null)
+        {
+            _subType = subType;
+            Namespace = @namespace;
+            Name = name;
+            GenericArguments = genericArguments ?? Array.Empty<MagicOnionTypeInfo>();
+            ArrayRank = arrayRank;
+            ElementType = elementType;
+            UnderlyingType = underlyingType;
+        }
+
         public string ToDisplayName(DisplayNameFormat format = DisplayNameFormat.Short)
-            => $"{(format.HasFlag(DisplayNameFormat.Global) ? "global::" : "")}{(format.HasFlag(DisplayNameFormat.Namespace) && !string.IsNullOrWhiteSpace(Namespace) ? Namespace + "." : "")}{Name}{(GenericArguments.Any() ? "<" + (format.HasFlag(DisplayNameFormat.OpenGenerics) ? new string(',', GenericArguments.Count - 1) : string.Join(", ", GenericArguments.Select(x => x.ToDisplayName(format)))) + ">" : "")}{(IsArray ? $"[{(ArrayRank > 1 ? new string(',', ArrayRank - 1) : "")}]" : "")}";
+            => IsArray
+                ? $"{ElementType.ToDisplayName(format)}[{(ArrayRank > 1 ? new string(',', ArrayRank - 1) : "")}]"
+                : $"{(format.HasFlag(DisplayNameFormat.Global) ? "global::" : "")}{(format.HasFlag(DisplayNameFormat.Namespace) && !string.IsNullOrWhiteSpace(Namespace) ? Namespace + "." : "")}{Name}{((!format.HasFlag(DisplayNameFormat.WithoutGenericArguments) || format.HasFlag(DisplayNameFormat.OpenGenerics)) && GenericArguments.Any() ? "<" + (format.HasFlag(DisplayNameFormat.OpenGenerics) ? new string(',', GenericArguments.Count - 1) : string.Join(", ", GenericArguments.Select(x => x.ToDisplayName(format)))) + ">" : "")}";
+
+        public IEnumerable<MagicOnionTypeInfo> EnumerateDependentTypes(bool includesSelf = false)
+        {
+            if (includesSelf)
+            {
+                yield return this;
+            }
+
+            if (IsArray)
+            {
+                yield return ElementType;
+                foreach (var t in ElementType.EnumerateDependentTypes())
+                {
+                    yield return t;
+                }
+            }
+            if (IsEnum)
+            {
+                //yield return UnderlyingType;
+                //foreach (var t in UnderlyingType.EnumerateDependentTypes())
+                //{
+                //    yield return t;
+                //}
+            }
+            foreach (var genericArgument in GenericArguments)
+            {
+                yield return genericArgument;
+                foreach (var t in genericArgument.EnumerateDependentTypes())
+                {
+                    yield return t;
+                }
+            }
+        }
 
         public static MagicOnionTypeInfo Create(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
         {
@@ -54,16 +114,43 @@ namespace MagicOnion.Generator.CodeAnalysis
             if (@namespace == "System" && name == "Boolean") return KnownTypes.System_Boolean;
             if (@namespace == "System.Threading.Tasks" && name == "Task" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_Task;
 
-            return new MagicOnionTypeInfo(@namespace, name, isArray: false, arrayRank:0, genericArguments);
+            return new MagicOnionTypeInfo(@namespace, name, SubType.None, arrayRank:0, genericArguments);
         }
 
         public static MagicOnionTypeInfo CreateArray(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
             => CreateArray(@namespace, name, genericArguments, 1);
 
         public static MagicOnionTypeInfo CreateArray(string @namespace, string name, MagicOnionTypeInfo[] genericArguments, int arrayRank)
+            => CreateArray(Create(@namespace, name, genericArguments), arrayRank);
+
+        public static MagicOnionTypeInfo CreateArray(MagicOnionTypeInfo elementType, int arrayRank = 1)
         {
             if (arrayRank < 1) throw new ArgumentOutOfRangeException(nameof(arrayRank));
-            return new MagicOnionTypeInfo(@namespace, name, isArray: true, arrayRank:arrayRank, genericArguments);
+            return new MagicOnionTypeInfo(elementType.Namespace, elementType.Name, SubType.Array, arrayRank: arrayRank, elementType: elementType);
+        }
+
+        public static MagicOnionTypeInfo CreateEnum(string @namespace, string name, MagicOnionTypeInfo underlyingType)
+            => new MagicOnionTypeInfo(@namespace, name, SubType.Enum, arrayRank:0, genericArguments: Array.Empty<MagicOnionTypeInfo>(), underlyingType: underlyingType);
+
+        public static MagicOnionTypeInfo CreateFromType<T>()
+            => CreateFromType(typeof(T));
+        public static MagicOnionTypeInfo CreateFromType(Type type)
+        {
+            if (type.IsArray)
+            {
+                return CreateArray(CreateFromType(type.GetElementType()), type.GetArrayRank());
+            }
+            else if (type.IsGenericType)
+            {
+                if (type.IsGenericTypeDefinition) throw new InvalidOperationException("The type must be constructed generic type.");
+                return Create(type.Namespace, type.Name.Substring(0, type.Name.IndexOf('`')), type.GetGenericArguments().Select(x => CreateFromType(x)).ToArray());
+            }
+            else if (type.IsEnum)
+            {
+                return CreateEnum(type.Namespace, type.Name, CreateFromType(type.GetEnumUnderlyingType()));
+            }
+
+            return Create(type.Namespace, type.Name);
         }
 
         public static MagicOnionTypeInfo CreateFromSymbol(ITypeSymbol symbol)
@@ -85,7 +172,17 @@ namespace MagicOnion.Generator.CodeAnalysis
                 var name = finalSymbol.Name;
                 var typeArguments = namedTypeSymbol.TypeArguments.Select(MagicOnionTypeInfo.CreateFromSymbol).ToArray();
 
-                return isArray ? CreateArray(@namespace, name, typeArguments, arrayRank) : Create(@namespace, name, typeArguments);
+                MagicOnionTypeInfo type;
+                if (finalSymbol.TypeKind == TypeKind.Enum)
+                {
+                    type =  CreateEnum(@namespace, name, CreateFromSymbol(namedTypeSymbol.EnumUnderlyingType));
+                }
+                else
+                {
+                    type = Create(@namespace, name, typeArguments);
+                }
+
+                return isArray ? CreateArray(type, arrayRank) : type;
             }
             else if (isArray && finalSymbol is IArrayTypeSymbol)
             {
@@ -108,20 +205,14 @@ namespace MagicOnion.Generator.CodeAnalysis
             }
         }
 
-        protected MagicOnionTypeInfo(string @namespace, string name, bool isArray = false, int arrayRank = 0, MagicOnionTypeInfo[] genericArguments = null)
-        {
-            Namespace = @namespace;
-            Name = name;
-            IsArray = isArray;
-            GenericArguments = genericArguments ?? Array.Empty<MagicOnionTypeInfo>();
-            ArrayRank = arrayRank;
-        }
-
         public bool Equals(MagicOnionTypeInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return FullName == other.FullName;
+            return FullName == other.FullName && /* Namespace + Name + GenericArguments + ArrayRank + ElementType */
+                   _subType == other._subType &&
+                   ElementType == other.ElementType &&
+                   UnderlyingType == other.UnderlyingType;
         }
 
         public override bool Equals(object obj)
@@ -135,6 +226,6 @@ namespace MagicOnion.Generator.CodeAnalysis
         public static bool operator ==(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => a?.Equals(b) ?? (b is null);
         public static bool operator !=(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => !(a == b);
 
-        public override int GetHashCode() => FullName.GetHashCode();
+        public override int GetHashCode() => (FullName /* Namespace + Name + GenericArguments + ArrayRank + ElementType */, _subType, ElementType, UnderlyingType).GetHashCode();
     }
 }

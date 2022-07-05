@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
@@ -16,6 +18,10 @@ public class MagicOnionTypeInfoTest
         // Assert
         var fullName = typeInfo.FullName;
         fullName.Should().Be("global::System.String");
+        typeInfo.IsArray.Should().BeFalse();
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.ElementType.Should().BeNull();
+        typeInfo.UnderlyingType.Should().BeNull();
     }
 
     [Fact]
@@ -28,7 +34,7 @@ public class MagicOnionTypeInfoTest
         var fullName = typeInfo.FullName;
         fullName.Should().Be("global::System.String[]");
         typeInfo.IsArray.Should().BeTrue();
-        typeInfo.GetElementType().Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
     }
     
     [Fact]
@@ -55,7 +61,7 @@ public class MagicOnionTypeInfoTest
         var fullName = typeInfo.FullName;
         fullName.Should().Be("global::System.String[][]");
         typeInfo.IsArray.Should().BeTrue();
-        typeInfo.GetElementType().Should().Be(MagicOnionTypeInfo.Create("System", "String[]")); // NOTE: Currently, MOTypeInfo doesn't handle an element type for jagged array.
+        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "String[]")); // NOTE: Currently, MOTypeInfo doesn't handle an element type for jagged array.
     }
        
     [Fact]
@@ -69,6 +75,101 @@ public class MagicOnionTypeInfoTest
         fullName.Should().Be("global::System.String[,,]");
         typeInfo.ArrayRank.Should().Be(3);
         typeInfo.IsArray.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateFromType()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<byte>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.Byte");
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.IsArray.Should().BeFalse();
+    }
+
+    [Fact]
+    public void CreateFromType_Generics()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.Tuple<global::System.Int32, global::System.String>");
+        typeInfo.GenericArguments.Should().HaveCount(2);
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.IsArray.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void CreateFromType_Array()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<int[]>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.Int32[]");
+        typeInfo.GenericArguments.Should().BeEmpty();
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.IsArray.Should().BeTrue();
+        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        typeInfo.ArrayRank.Should().Be(1);
+    }
+
+    [Fact]
+    public void CreateFromType_Array_Rank()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<int[,,]>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.Int32[,,]");
+        typeInfo.GenericArguments.Should().BeEmpty();
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.IsArray.Should().BeTrue();
+        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        typeInfo.ArrayRank.Should().Be(3);
+    }
+
+    [Fact]
+    public void CreateFromType_Enum()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<DayOfWeek>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.DayOfWeek");
+        typeInfo.GenericArguments.Should().BeEmpty();
+        typeInfo.IsEnum.Should().BeTrue();
+        typeInfo.UnderlyingType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        typeInfo.IsArray.Should().BeFalse();
+        typeInfo.ElementType.Should().BeNull();
+    }
+    
+    [Fact]
+    public void CreateFromType_Enum_Array()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>();
+
+        // Assert
+        typeInfo.FullName.Should().Be("global::System.DayOfWeek[]");
+        typeInfo.GenericArguments.Should().BeEmpty();
+        typeInfo.IsEnum.Should().BeFalse();
+        typeInfo.UnderlyingType.Should().BeNull();
+        typeInfo.IsArray.Should().BeTrue();
+        typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.CreateEnum("System", "DayOfWeek", MagicOnionTypeInfo.Create("System", "Int32")));
+        typeInfo.ElementType.IsEnum.Should().BeTrue();
+        typeInfo.ElementType.IsArray.Should().BeFalse();
+        typeInfo.ElementType.UnderlyingType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+    }
+
+    [Fact]
+    public void CreateEnum()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<byte>());
     }
 
     [Fact]
@@ -168,6 +269,92 @@ public class MagicOnionTypeInfoTest
                 MagicOnionTypeInfo.Create("System", "Boolean")),
             MagicOnionTypeInfo.Create("System", "Nullable",
                 MagicOnionTypeInfo.Create("System", "Int64"))));
+    }
+    
+    [Fact]
+    public void FromSymbol_Enum()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public enum MyEnum : byte
+                {
+                    A, B, C
+                }
+                public class MyClass
+                {
+                    public MyEnum FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.Create("System", "Byte")));
+    }
+        
+    [Fact]
+    public void FromSymbol_Enum_Array()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public enum MyEnum : byte
+                {
+                    A, B, C
+                }
+                public class MyClass
+                {
+                    public MyEnum[] FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.Create("System", "Byte"))));
+    }
+           
+    [Fact]
+    public void FromSymbol_Enum_Generics()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public enum MyEnum : byte
+                {
+                    A, B, C
+                }
+                public class MyClass
+                {
+                    public System.Tuple<int, MyEnum> FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple", 
+            MagicOnionTypeInfo.Create("System", "Int32"),
+            MagicOnionTypeInfo.CreateEnum( "MyNamespace", "MyEnum", MagicOnionTypeInfo.Create("System", "Byte"))));
     }
     
     [Fact]
@@ -390,5 +577,77 @@ public class MagicOnionTypeInfoTest
         var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.OpenGenerics);
         // Assert
         formatted.Should().Be("Tuple<,>");
+    }
+    
+    [Fact]
+    public void ToDisplay_WithoutGenericArguments()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.Create("System", "Int32"));
+        // Act
+        var formatted = typeInfo.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments);
+        // Assert
+        formatted.Should().Be("Tuple");
+    }
+
+    [Fact]
+    public void EnumerateDependentTypes_Array()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<int[]>();
+        // Act
+        var types = typeInfo.EnumerateDependentTypes().ToArray();
+        // Assert
+        types.Should().BeEquivalentTo(MagicOnionTypeInfo.CreateFromType<int>());
+    }
+    
+    [Fact]
+    public void EnumerateDependentTypes_Enum_Array()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>();
+        // Act
+        var types = typeInfo.EnumerateDependentTypes().ToArray();
+        // Assert
+        types.Should().BeEquivalentTo(MagicOnionTypeInfo.CreateFromType<DayOfWeek>());
+    }    
+
+    [Fact]
+    public void EnumerateDependentTypes_Enum_Generics()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<Task<DayOfWeek[]>>();
+        // Act
+        var types = typeInfo.EnumerateDependentTypes().ToArray();
+        // Assert
+        types.Should().BeEquivalentTo(MagicOnionTypeInfo.CreateFromType<DayOfWeek[]>(), MagicOnionTypeInfo.CreateFromType<DayOfWeek>());
+    }
+
+    [Fact]
+    public void EnumerateDependentTypes_Generics()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>();
+        // Act
+        var types = typeInfo.EnumerateDependentTypes().ToArray();
+        // Assert
+        types.Should().BeEquivalentTo(MagicOnionTypeInfo.CreateFromType<int>(), MagicOnionTypeInfo.CreateFromType<string>());
+    }
+    
+    [Fact]
+    public void EnumerateDependentTypes_Generics_Nested()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<Tuple<int, Dictionary<string, Task<byte[]>>>>();
+        // Act
+        var types = typeInfo.EnumerateDependentTypes().ToArray();
+        // Assert
+        types.Should().BeEquivalentTo(
+            MagicOnionTypeInfo.CreateFromType<int>(),
+            MagicOnionTypeInfo.CreateFromType<Dictionary<string, Task<byte[]>>>(),
+            MagicOnionTypeInfo.CreateFromType<string>(),
+            MagicOnionTypeInfo.CreateFromType<Task<byte[]>>(),
+            MagicOnionTypeInfo.CreateFromType<byte[]>(),
+            MagicOnionTypeInfo.CreateFromType<byte>());
     }
 }
