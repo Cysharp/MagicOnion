@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using System.Linq;
 using MagicOnion.Generator.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace MagicOnion.Generator.Tests.Collector;
 
@@ -18,6 +16,59 @@ public class MagicOnionTypeInfoTest
         // Assert
         var fullName = typeInfo.FullName;
         fullName.Should().Be("global::System.String");
+    }
+
+    [Fact]
+    public void CreateArray()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateArray("System", "String");
+
+        // Assert
+        var fullName = typeInfo.FullName;
+        fullName.Should().Be("global::System.String[]");
+        typeInfo.IsArray.Should().BeTrue();
+        typeInfo.GetElementType().Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+    }
+    
+    [Fact]
+    public void CreateArray_Generics()
+    {
+        // Arrange & Act
+        // Tuple<int[], string>[]
+        var typeInfo = MagicOnionTypeInfo.CreateArray("System", "Tuple",
+            MagicOnionTypeInfo.CreateArray("System", "Int32"), MagicOnionTypeInfo.Create("System", "String"));
+
+        // Assert
+        var fullName = typeInfo.FullName;
+        fullName.Should().Be("global::System.Tuple<global::System.Int32[], global::System.String>[]");
+        typeInfo.IsArray.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void CreateArray_JaggedArray()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateArray("System", "String[]");
+
+        // Assert
+        var fullName = typeInfo.FullName;
+        fullName.Should().Be("global::System.String[][]");
+        typeInfo.IsArray.Should().BeTrue();
+        typeInfo.GetElementType().Should().Be(MagicOnionTypeInfo.Create("System", "String[]")); // NOTE: Currently, MOTypeInfo doesn't handle an element type for jagged array.
+    }
+       
+    [Fact]
+    public void CreateArray_Rank()
+    {
+        // Arrange & Act
+        var typeInfo = MagicOnionTypeInfo.CreateArray("System", "String", Array.Empty<MagicOnionTypeInfo>(), 3);
+
+        // Assert
+        var fullName = typeInfo.FullName;
+        fullName.Should().Be("global::System.String[,,]");
+        typeInfo.ArrayRank.Should().Be(3);
+        typeInfo.IsArray.Should().BeTrue();
     }
 
     [Fact]
@@ -92,6 +143,132 @@ public class MagicOnionTypeInfoTest
     }
 
     [Fact]
+    public void FromSymbol_Nullable()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public class MyClass
+                {
+                    public System.Tuple<bool?, long?> FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple",
+            MagicOnionTypeInfo.Create("System", "Nullable", 
+                MagicOnionTypeInfo.Create("System", "Boolean")),
+            MagicOnionTypeInfo.Create("System", "Nullable",
+                MagicOnionTypeInfo.Create("System", "Int64"))));
+    }
+    
+    [Fact]
+    public void FromSymbol_Array()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public class MyClass
+                {
+                    public int[] FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Int32"));
+    }
+        
+    [Fact]
+    public void FromSymbol_JaggedArray()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public class MyClass
+                {
+                    public int[][] FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Int32[]"));
+    }
+
+    [Fact]
+    public void FromSymbol_ArrayGenerics()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public class MyClass
+                {
+                    public System.Tuple<int, string>[] FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", 
+            MagicOnionTypeInfo.Create("System", "Int32"),
+            MagicOnionTypeInfo.Create("System", "String")));
+    }
+    
+    [Fact]
+    public void FromSymbol_ArrayRank()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                public class MyClass
+                {
+                    public string[,,] FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Should().Be(MagicOnionTypeInfo.CreateArray("System", "String", Array.Empty<MagicOnionTypeInfo>(), 3));
+    }
+
+    [Fact]
     public void FromSymbol_Generics()
     {
         // Arrange
@@ -109,7 +286,7 @@ public class MagicOnionTypeInfoTest
             .ToArray();
 
         // Act
-        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol((INamedTypeSymbol)symbols[0].Type);
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
         typeInfo.Namespace.Should().Be("System.Collections.Generic");
@@ -139,7 +316,7 @@ public class MagicOnionTypeInfoTest
             .ToArray();
 
         // Act
-        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol((INamedTypeSymbol)symbols[0].Type);
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
 
         // Assert
         typeInfo.Namespace.Should().Be("System.Collections.Generic");

@@ -93,6 +93,70 @@ public interface IMyService : IService<IMyService>
     }
 
     [Fact]
+    public void Unary_Array()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<Tuple<int, string>[]> MethodA(Tuple<bool, long>[] arg1);
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector2();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Boolean"), MagicOnionTypeInfo.Create("System", "Int64")));
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String"))));
+    }
+
+    [Fact]
+    public void Unary_Nullable()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<int?> MethodA(Tuple<bool?, long?> arg1);
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector2();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Boolean")), MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int64"))));
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int32")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int32"))));
+    }
+
+    [Fact]
     public void Unary_Parameter_Zero_ReturnNil()
     {
         // Arrange

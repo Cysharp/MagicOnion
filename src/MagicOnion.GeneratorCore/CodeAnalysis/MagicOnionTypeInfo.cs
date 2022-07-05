@@ -20,10 +20,14 @@ namespace MagicOnion.Generator.CodeAnalysis
             // ReSharper restore InconsistentNaming
         }
 
+
         public string Namespace { get; }
         public string Name { get; }
         public IReadOnlyList<MagicOnionTypeInfo> GenericArguments { get; }
         public bool HasGenericArguments => GenericArguments.Any();
+        public bool IsArray { get; }
+        public int ArrayRank { get; }
+        public MagicOnionTypeInfo GetElementType() => IsArray ? Create(Namespace, Name, GenericArguments.ToArray()) : throw new ArgumentException($"The type '{FullName}' is not an array.");
 
         public string FullName
             => ToDisplayName(DisplayNameFormat.FullyQualified);
@@ -41,7 +45,7 @@ namespace MagicOnion.Generator.CodeAnalysis
         }
 
         public string ToDisplayName(DisplayNameFormat format = DisplayNameFormat.Short)
-            => $"{(format.HasFlag(DisplayNameFormat.Global) ? "global::" : "")}{(format.HasFlag(DisplayNameFormat.Namespace) && !string.IsNullOrWhiteSpace(Namespace) ? Namespace + "." : "")}{Name}{(GenericArguments.Any() ? "<" + (format.HasFlag(DisplayNameFormat.OpenGenerics) ? new string(',', GenericArguments.Count - 1) : string.Join(", ", GenericArguments.Select(x => x.ToDisplayName(format)))) + ">" : "")}";
+            => $"{(format.HasFlag(DisplayNameFormat.Global) ? "global::" : "")}{(format.HasFlag(DisplayNameFormat.Namespace) && !string.IsNullOrWhiteSpace(Namespace) ? Namespace + "." : "")}{Name}{(GenericArguments.Any() ? "<" + (format.HasFlag(DisplayNameFormat.OpenGenerics) ? new string(',', GenericArguments.Count - 1) : string.Join(", ", GenericArguments.Select(x => x.ToDisplayName(format)))) + ">" : "")}{(IsArray ? $"[{(ArrayRank > 1 ? new string(',', ArrayRank - 1) : "")}]" : "")}";
 
         public static MagicOnionTypeInfo Create(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
         {
@@ -50,18 +54,53 @@ namespace MagicOnion.Generator.CodeAnalysis
             if (@namespace == "System" && name == "Boolean") return KnownTypes.System_Boolean;
             if (@namespace == "System.Threading.Tasks" && name == "Task" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_Task;
 
-            return new MagicOnionTypeInfo(@namespace, name, genericArguments);
+            return new MagicOnionTypeInfo(@namespace, name, isArray: false, arrayRank:0, genericArguments);
+        }
+
+        public static MagicOnionTypeInfo CreateArray(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
+            => CreateArray(@namespace, name, genericArguments, 1);
+
+        public static MagicOnionTypeInfo CreateArray(string @namespace, string name, MagicOnionTypeInfo[] genericArguments, int arrayRank)
+        {
+            if (arrayRank < 1) throw new ArgumentOutOfRangeException(nameof(arrayRank));
+            return new MagicOnionTypeInfo(@namespace, name, isArray: true, arrayRank:arrayRank, genericArguments);
         }
 
         public static MagicOnionTypeInfo CreateFromSymbol(ITypeSymbol symbol)
         {
-            if (symbol is INamedTypeSymbol namedTypeSymbol)
-            {
-                var @namespace = symbol.ContainingNamespace.IsGlobalNamespace ? string.Empty : symbol.ContainingNamespace.ToDisplayString();
-                var name = symbol.Name;
-                var typeArguments = namedTypeSymbol.TypeArguments.OfType<INamedTypeSymbol>().Select(MagicOnionTypeInfo.CreateFromSymbol).ToArray();
+            var isArray = false;
+            var arrayRank = 0;
 
-                return Create(@namespace, name, typeArguments);
+            var finalSymbol = symbol;
+            if (symbol is IArrayTypeSymbol arrayTypeSymbol)
+            {
+                finalSymbol = arrayTypeSymbol.ElementType;
+                arrayRank = arrayTypeSymbol.Rank;
+                isArray = true;
+            }
+
+            if (finalSymbol is INamedTypeSymbol namedTypeSymbol)
+            {
+                var @namespace = finalSymbol.ContainingNamespace.IsGlobalNamespace ? string.Empty : finalSymbol.ContainingNamespace.ToDisplayString();
+                var name = finalSymbol.Name;
+                var typeArguments = namedTypeSymbol.TypeArguments.Select(MagicOnionTypeInfo.CreateFromSymbol).ToArray();
+
+                return isArray ? CreateArray(@namespace, name, typeArguments, arrayRank) : Create(@namespace, name, typeArguments);
+            }
+            else if (isArray && finalSymbol is IArrayTypeSymbol)
+            {
+                // T[][]
+                // NOTE: MagicOnionTypeInfo has limited support for a jagged array.
+                var jaggedCount = 0;
+                while (finalSymbol is IArrayTypeSymbol jaggedArrayTypeSymbol)
+                {
+                    finalSymbol = jaggedArrayTypeSymbol.ElementType;
+                    jaggedCount++;
+                }
+
+                var @namespace = finalSymbol.ContainingNamespace.IsGlobalNamespace ? string.Empty : finalSymbol.ContainingNamespace.ToDisplayString();
+                var name = finalSymbol.Name + string.Concat(Enumerable.Repeat("[]", jaggedCount));
+                return CreateArray(@namespace, name, Array.Empty<MagicOnionTypeInfo>(), arrayRank);
             }
             else
             {
@@ -69,11 +108,13 @@ namespace MagicOnion.Generator.CodeAnalysis
             }
         }
 
-        protected MagicOnionTypeInfo(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
+        protected MagicOnionTypeInfo(string @namespace, string name, bool isArray = false, int arrayRank = 0, MagicOnionTypeInfo[] genericArguments = null)
         {
             Namespace = @namespace;
             Name = name;
+            IsArray = isArray;
             GenericArguments = genericArguments ?? Array.Empty<MagicOnionTypeInfo>();
+            ArrayRank = arrayRank;
         }
 
         public bool Equals(MagicOnionTypeInfo other)
