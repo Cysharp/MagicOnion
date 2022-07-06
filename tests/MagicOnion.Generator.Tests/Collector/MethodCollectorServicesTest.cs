@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator.Tests.Collector;
@@ -40,10 +41,10 @@ public interface IMyService : IService<IMyService>
         // UnaryResult<Nil> NilAsync();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("NilAsync");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("MessagePack", "Nil")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
     }
 
     [Fact]
@@ -119,9 +120,9 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Boolean"), MagicOnionTypeInfo.Create("System", "Int64")));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")));
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.CreateArray("System", "Tuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String"))));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool, long>[]>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>[]>());
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Tuple<int, string>[]>>());
     }
 
     [Fact]
@@ -151,9 +152,9 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "Tuple", MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Boolean")), MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int64"))));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int32")));
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("System", "Int32"))));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool?, long?>>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int?>());
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<int?>>());
     }
 
     [Fact]
@@ -192,10 +193,10 @@ namespace MyNamespace
         // UnaryResult<Nil> MethodA();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("MessagePack", "Nil")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
     }
 
     
@@ -235,10 +236,10 @@ namespace MyNamespace
         // UnaryResult<string> MethodA();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("System", "String")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<string>>());
    }
     
     [Fact]
@@ -277,11 +278,11 @@ namespace MyNamespace
         // UnaryResult<Nil> MethodA(string arg1);
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("MessagePack", "Nil")));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
     }
     
     [Fact]
@@ -320,11 +321,11 @@ namespace MyNamespace
         // UnaryResult<Nil> MethodA(string arg1, int arg2);
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.Create("System", "Int32")));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be( MagicOnionTypeInfo.Create("System", "Int32"));
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "UnaryResult", MagicOnionTypeInfo.Create("MessagePack", "Nil")));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
+        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be( MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Nil>>());
     }
 
         
@@ -355,16 +356,16 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeTrue();
         serviceCollection.Services[0].Methods[0].Parameters[0].DefaultValue.Should().Be("\"Hello\"");
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be( MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be( MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Services[0].Methods[0].Parameters[1].DefaultValue.Should().Be("1234");
         serviceCollection.Services[0].Methods[0].Parameters[1].HasExplicitDefaultValue.Should().BeTrue();
-        serviceCollection.Services[0].Methods[0].Parameters[2].Type.Should().Be( MagicOnionTypeInfo.Create("System", "Int64"));
+        serviceCollection.Services[0].Methods[0].Parameters[2].Type.Should().Be( MagicOnionTypeInfo.CreateFromType<long>());
         serviceCollection.Services[0].Methods[0].Parameters[2].DefaultValue.Should().Be("0");
         serviceCollection.Services[0].Methods[0].Parameters[2].HasExplicitDefaultValue.Should().BeTrue();
-        serviceCollection.Services[0].Methods[0].Parameters[3].Type.Should().Be( MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].Parameters[3].Type.Should().Be( MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[3].DefaultValue.Should().Be("null");
         serviceCollection.Services[0].Methods[0].Parameters[3].HasExplicitDefaultValue.Should().BeTrue();
     }
@@ -470,10 +471,10 @@ public interface IMyService : IService<IMyService>
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task", MagicOnionTypeInfo.Create("MagicOnion", "ServerStreamingResult", MagicOnionTypeInfo.Create("System", "Int32"))));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
     }
         
     [Fact]
@@ -511,11 +512,11 @@ public interface IMyService : IService<IMyService>
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task", MagicOnionTypeInfo.Create("MagicOnion", "ServerStreamingResult", MagicOnionTypeInfo.Create("System", "Int32"))));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
     }
             
     [Fact]
@@ -553,13 +554,13 @@ public interface IMyService : IService<IMyService>
         // Task<ServerStreamingResult<int>> ServerStreamingNoArg();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("ServerStreaming");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.Create("System", "Int32")));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
-        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Services[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Services[0].Methods[0].Parameters[1].Name.Should().Be("arg2");
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task", MagicOnionTypeInfo.Create("MagicOnion", "ServerStreamingResult", MagicOnionTypeInfo.Create("System", "Int32"))));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ServerStreamingResult<int>>>());
     }
               
     [Fact]
@@ -624,12 +625,10 @@ public interface IMyService : IService<IMyService>
         // Task<DuplexStreamingResult<int, string>> MethodA();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task",
-            MagicOnionTypeInfo.Create("MagicOnion", "DuplexStreamingResult", 
-                MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String"))));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<DuplexStreamingResult<int, string>>>());
     }
         
     [Fact]
@@ -693,12 +692,10 @@ public interface IMyService : IService<IMyService>
         // Task<DuplexStreamingResult<int, string>> MethodA();
         serviceCollection.Services[0].Methods[0].ServiceName.Should().Be("IMyService");
         serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
-        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task",
-            MagicOnionTypeInfo.Create("MagicOnion", "ClientStreamingResult", 
-                MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String"))));
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<ClientStreamingResult<int, string>>>());
     }
         
     [Fact]

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator.Tests.Collector;
@@ -44,10 +45,10 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods.Should().HaveCount(1);
         // Task MethodA();
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
-        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
+        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task"));
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task>());
     }
 
     [Fact]
@@ -83,7 +84,7 @@ public interface IMyHubReceiver
         // Assert
         // Task MethodA();
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MessagePack", "Nil"));
+        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().BeEmpty();
     }
     
@@ -120,10 +121,10 @@ public interface IMyHubReceiver
         // Assert
         // Task MethodA();
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().HaveCount(1);
         serviceCollection.Hubs[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Hubs[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeFalse();
         serviceCollection.Hubs[0].Methods[0].Parameters[0].DefaultValue.Should().Be("default(int)");
     }
@@ -161,14 +162,14 @@ public interface IMyHubReceiver
         // Assert
         // Task MethodA();
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")));
+        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<int, string>>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().HaveCount(2);
         serviceCollection.Hubs[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Hubs[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeFalse();
         serviceCollection.Hubs[0].Methods[0].Parameters[0].DefaultValue.Should().Be("default(int)");
         serviceCollection.Hubs[0].Methods[0].Parameters[1].Name.Should().Be("arg2");
-        serviceCollection.Hubs[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Hubs[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Hubs[0].Methods[0].Parameters[1].HasExplicitDefaultValue.Should().BeFalse();
         serviceCollection.Hubs[0].Methods[0].Parameters[1].DefaultValue.Should().Be("default(string)");
     }
@@ -207,14 +208,14 @@ public interface IMyHubReceiver
         // Assert
         // Task MethodA();
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.Create("System", "Int32"), MagicOnionTypeInfo.Create("System", "String")));
+        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<int, string>>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().HaveCount(2);
         serviceCollection.Hubs[0].Methods[0].Parameters[0].Name.Should().Be("arg1");
-        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.Create("System", "Int32"));
+        serviceCollection.Hubs[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
         serviceCollection.Hubs[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeFalse();
         serviceCollection.Hubs[0].Methods[0].Parameters[0].DefaultValue.Should().Be("default(int)");
         serviceCollection.Hubs[0].Methods[0].Parameters[1].Name.Should().Be("arg2");
-        serviceCollection.Hubs[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        serviceCollection.Hubs[0].Methods[0].Parameters[1].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Hubs[0].Methods[0].Parameters[1].HasExplicitDefaultValue.Should().BeTrue();
         serviceCollection.Hubs[0].Methods[0].Parameters[1].DefaultValue.Should().Be("\"DEFAULT\"");
     }
@@ -438,7 +439,7 @@ public interface IMyHubReceiver
         // Assert
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
         serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_String);
-        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.Create("System.Threading.Tasks", "Task", MagicOnionTypeInfo.KnownTypes.System_String));
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<string>>());
     }
 
     [Fact]
@@ -494,7 +495,7 @@ public interface IMyHubReceiver
         // void EventB(Nil nil);
         serviceCollection.Hubs[0].Receiver.Methods[2].MethodName.Should().Be("EventC");
         serviceCollection.Hubs[0].Receiver.Methods[2].Parameters.Should().HaveCount(2);
-        serviceCollection.Hubs[0].Receiver.Methods[2].RequestType.Should().Be(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.Create("System", "String"), MagicOnionTypeInfo.Create("System", "Int32")));
+        serviceCollection.Hubs[0].Receiver.Methods[2].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
         serviceCollection.Hubs[0].Receiver.Methods[2].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[2].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
     }

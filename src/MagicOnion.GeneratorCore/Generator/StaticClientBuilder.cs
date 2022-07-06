@@ -175,7 +175,7 @@ namespace MagicOnion.Generator
                         if (method.Parameters.Count == 1)
                         {
                             // arg1
-                            ctx.TextWriter.Write(", arg0");
+                            ctx.TextWriter.Write($", {method.Parameters[0].Name}");
                         }
                         else
                         {
@@ -234,7 +234,7 @@ namespace MagicOnion.Generator
                     // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerOptions);
                     foreach (var method in ctx.Service.Methods)
                     {
-                        var createMethodVariant = "ValueType_ValueType";
+                        var createMethodVariant = $"{(method.RequestType.IsValueType ? "Value" : "Ref")}Type_{(method.ResponseType.IsValueType ? "Value" : "Ref")}Type";
                         ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", serializerOptions);");
                     }
                 }

@@ -12,10 +12,10 @@ namespace MagicOnion.Generator.CodeAnalysis
         public static class KnownTypes
         {
             // ReSharper disable InconsistentNaming
-            public static MagicOnionTypeInfo System_Void { get; } = new MagicOnionTypeInfo("System", "Void");
+            public static MagicOnionTypeInfo System_Void { get; } = new MagicOnionTypeInfo("System", "Void", SubType.ValueType);
             public static MagicOnionTypeInfo System_String { get; } = new MagicOnionTypeInfo("System", "String");
-            public static MagicOnionTypeInfo System_Boolean { get; } = new MagicOnionTypeInfo("System", "Boolean");
-            public static MagicOnionTypeInfo MessagePack_Nil { get; } = new MagicOnionTypeInfo("MessagePack", "Nil");
+            public static MagicOnionTypeInfo System_Boolean { get; } = new MagicOnionTypeInfo("System", "Boolean", SubType.ValueType);
+            public static MagicOnionTypeInfo MessagePack_Nil { get; } = new MagicOnionTypeInfo("MessagePack", "Nil", SubType.ValueType);
             public static MagicOnionTypeInfo System_Threading_Tasks_Task { get; } = new MagicOnionTypeInfo("System.Threading.Tasks", "Task");
             // ReSharper restore InconsistentNaming
         }
@@ -37,6 +37,8 @@ namespace MagicOnion.Generator.CodeAnalysis
         public string FullNameOpenType
             => ToDisplayName(DisplayNameFormat.FullyQualified | DisplayNameFormat.OpenGenerics);
 
+        public bool IsValueType => _subType == SubType.ValueType || _subType == SubType.Enum;
+
         public bool IsEnum => _subType == SubType.Enum;
         public MagicOnionTypeInfo UnderlyingType { get; }
 
@@ -54,6 +56,7 @@ namespace MagicOnion.Generator.CodeAnalysis
         private enum SubType
         {
             None,
+            ValueType,
             Enum,
             Array,
         }
@@ -108,13 +111,19 @@ namespace MagicOnion.Generator.CodeAnalysis
         }
 
         public static MagicOnionTypeInfo Create(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
+            => Create(@namespace, name, genericArguments, isValueType: false);
+
+        public static MagicOnionTypeInfo CreateValueType(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
+            => Create(@namespace, name, genericArguments, isValueType: true);
+
+        public static MagicOnionTypeInfo Create(string @namespace, string name, MagicOnionTypeInfo[] genericArguments, bool isValueType)
         {
             if (@namespace == "MessagePack" && name == "Nil") return KnownTypes.MessagePack_Nil;
             if (@namespace == "System" && name == "String") return KnownTypes.System_String;
             if (@namespace == "System" && name == "Boolean") return KnownTypes.System_Boolean;
             if (@namespace == "System.Threading.Tasks" && name == "Task" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_Task;
 
-            return new MagicOnionTypeInfo(@namespace, name, SubType.None, arrayRank:0, genericArguments);
+            return new MagicOnionTypeInfo(@namespace, name, isValueType ? SubType.ValueType : SubType.None, arrayRank:0, genericArguments);
         }
 
         public static MagicOnionTypeInfo CreateArray(string @namespace, string name, params MagicOnionTypeInfo[] genericArguments)
@@ -143,14 +152,14 @@ namespace MagicOnion.Generator.CodeAnalysis
             else if (type.IsGenericType)
             {
                 if (type.IsGenericTypeDefinition) throw new InvalidOperationException("The type must be constructed generic type.");
-                return Create(type.Namespace, type.Name.Substring(0, type.Name.IndexOf('`')), type.GetGenericArguments().Select(x => CreateFromType(x)).ToArray());
+                return Create(type.Namespace, type.Name.Substring(0, type.Name.IndexOf('`')), type.GetGenericArguments().Select(x => CreateFromType(x)).ToArray(), type.IsValueType);
             }
             else if (type.IsEnum)
             {
                 return CreateEnum(type.Namespace, type.Name, CreateFromType(type.GetEnumUnderlyingType()));
             }
 
-            return Create(type.Namespace, type.Name);
+            return Create(type.Namespace, type.Name, Array.Empty<MagicOnionTypeInfo>(), type.IsValueType);
         }
 
         public static MagicOnionTypeInfo CreateFromSymbol(ITypeSymbol symbol)
@@ -179,7 +188,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 }
                 else
                 {
-                    type = Create(@namespace, name, typeArguments);
+                    type = Create(@namespace, name, typeArguments, finalSymbol.IsValueType);
                 }
 
                 return isArray ? CreateArray(type, arrayRank) : type;

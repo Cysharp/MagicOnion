@@ -92,7 +92,6 @@ namespace MagicOnion.Generator.CodeAnalysis
             if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
             {
                 throw new InvalidOperationException($"StreamingHub receiver method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
-
             }
 
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
@@ -192,7 +191,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 ? MagicOnionTypeInfo.KnownTypes.MessagePack_Nil
                 : (parameters.Count == 1)
                     ? parameters[0].Type
-                    : MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", parameters.Select(x => x.Type).ToArray());
+                    : MagicOnionTypeInfo.CreateValueType("MagicOnion", "DynamicArgumentTuple", parameters.Select(x => x.Type).ToArray());
 
         public class MethodCollectorContext
         {
