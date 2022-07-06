@@ -8,8 +8,8 @@ namespace MagicOnion.Generator.CodeAnalysis
 {
     public class SerializationInfoCollector
     {
-        public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection)
-            => Collect(EnumerateTypes(serviceCollection));
+        public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string messagePackFormatterNamespace = null)
+            => Collect(EnumerateTypes(serviceCollection), messagePackFormatterNamespace);
 
         static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
         {
@@ -64,12 +64,12 @@ namespace MagicOnion.Generator.CodeAnalysis
             }
         }
 
-        public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types)
+        public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types, string messagePackFormatterNamespace = null)
         {
             var context = new SerializationInfoCollectorContext();
             var flattened = types.SelectMany(x => x.Type.EnumerateDependentTypes(includesSelf: true).Select(y => new TypeWithIfDirectives(y, x.IfDirectives)));
 
-            var messagePackFormatterNamespace = "global::MessagePack.Formatters.";
+            messagePackFormatterNamespace = messagePackFormatterNamespace ?? "global::MessagePack.Formatters";
             foreach (var typeWithDirectives in flattened)
             {
                 var type = typeWithDirectives.Type;
@@ -137,7 +137,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                     else
                     {
                         // User-defined generic types
-                        formatterName = $"{messagePackFormatterNamespace}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
+                        formatterName = $"{messagePackFormatterNamespace}{(string.IsNullOrWhiteSpace(messagePackFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
                     }
 
                     context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, typeWithDirectives.IfDirectives));

@@ -313,4 +313,30 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32))");
     }
+
+    
+    [Fact]
+    public void MessagePackSerializerFormatterNamespace()
+    {
+        // Arrange
+        var collector = new SerializationInfoCollector();
+        var types = new[]
+        {
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { }),
+        };
+        var messagePackFormatterNamespace = "global::MyFormatters";
+
+        // Act
+        var serializationInfoCollection = collector.Collect(types, messagePackFormatterNamespace);
+
+        // Assert
+        serializationInfoCollection.Should().NotBeNull();
+        serializationInfoCollection.Enums.Should().BeEmpty();
+        serializationInfoCollection.Generics.Should().HaveCount(3);
+        serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()");
+        serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
+        serializationInfoCollection.Generics[2].FormatterName.Should().Be("global::MyFormatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()");
+    }
 }
