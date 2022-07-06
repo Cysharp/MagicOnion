@@ -17,13 +17,13 @@ namespace MagicOnion.Generator.CodeAnalysis
 
     public class InterfaceDefinition
     {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string Namespace { get; set; }
-        public bool IsServiceDefinition { get; set; }
-        public string IfDirectiveCondition { get; set; }
+        public string Name { get; }
+        public string FullName { get; }
+        public string Namespace { get; }
+        public bool IsServiceDefinition { get; }
+        public string IfDirectiveCondition { get; }
         public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
-        public MethodDefinition[] Methods { get; set; }
+        public MethodDefinition[] Methods { get; }
 
         // NOTE: A client name is derived from original interface name without 'I' prefix.
         // - ImportantService  --> ImportantServiceClient
@@ -31,6 +31,16 @@ namespace MagicOnion.Generator.CodeAnalysis
         // - I0123Service      --> I0123ServiceClient
         public string ClientName => (Regex.IsMatch(Name, "I[^a-z0-9]") ? Name.Substring(1) : Name) + "Client";
         public string ClientFullName => (Namespace != null ? Namespace + "." : "") + ClientName;
+
+        public InterfaceDefinition(string @namespace, string name, string fullName, bool isServiceDefinition, string ifDirectiveCondition, MethodDefinition[] methods)
+        {
+            Namespace = @namespace;
+            Name = name;
+            FullName = fullName;
+            IsServiceDefinition = isServiceDefinition;
+            IfDirectiveCondition = ifDirectiveCondition;
+            Methods = methods;
+        }
 
         public override string ToString()
         {
@@ -44,26 +54,16 @@ namespace MagicOnion.Generator.CodeAnalysis
     {
         readonly ReferenceSymbols referenceSymbols;
 
-        public string Name { get; set; }
-        public MethodType MethodType { get; set; }
-        public string RequestType { get; set; }
-        public string IfDirectiveCondition { get; set; }
+        public string Name { get; }
+        public MethodType MethodType { get; }
+        public string RequestType { get; }
+        public string IfDirectiveCondition { get; }
         public bool HasIfDirectiveCondition => !string.IsNullOrWhiteSpace(IfDirectiveCondition);
-        public int HubId { get; set; } // only use in Hub.
+        public int HubId { get; } // only use in Hub.
 
 
         string responseType;
-        public string ResponseType
-        {
-            get
-            {
-                return responseType;
-            }
-            set
-            {
-                responseType = value;
-            }
-        }
+        public string ResponseType { get; }
         public ParameterDefinition[] Parameters { get; set; }
 
         public ITypeSymbol UnwrappedOriginalResposneTypeSymbol { get; set; }

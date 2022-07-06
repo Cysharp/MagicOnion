@@ -69,9 +69,9 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
             this.Write("GetFormatterHelper()\r\n        {\r\n            lookup = new global::System.Collecti" +
                     "ons.Generic.Dictionary<Type, int>(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(registerInfos.Length));
+            this.Write(this.ToStringHelper.ToStringWithCulture(RegisterInfos.Count));
             this.Write(")\r\n            {\r\n");
- for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
+ for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; 
      if (x.HasIfDirectiveConditions) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})"))));
@@ -100,7 +100,7 @@ namespace MagicOnion.Generator
             switch (key)
             {
 ");
- for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; 
+ for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; 
      if (x.HasIfDirectiveConditions) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})"))));
@@ -109,7 +109,7 @@ namespace MagicOnion.Generator
             this.Write("                case ");
             this.Write(this.ToStringHelper.ToStringWithCulture(i));
             this.Write(": return new ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName:  FormatterNamespace + "." + x.FormatterName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName : (string.IsNullOrWhiteSpace(FormatterNamespace) ? "" : FormatterNamespace + ".") + x.FormatterName));
             this.Write(";\r\n");
      if (x.HasIfDirectiveConditions) { 
             this.Write("#endif\r\n");

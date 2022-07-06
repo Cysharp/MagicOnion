@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace MagicOnion.Generator.CodeAnalysis
 {
     [DebuggerDisplay("MagicOnionService: {ServiceType,nq}; Methods={Methods.Count,nq}")]
-    public class MagicOnionServiceInfo : IMagicOnionCompileDirectiveTarget
+    public class MagicOnionServiceInfo : IMagicOnionServiceInfo
     {
         public MagicOnionTypeInfo ServiceType { get; }
         public IReadOnlyList<MagicOnionServiceMethodInfo> Methods { get; }

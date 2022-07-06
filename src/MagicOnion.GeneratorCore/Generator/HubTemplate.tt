@@ -17,20 +17,20 @@
     using MessagePack;
     using System;
     using System.Threading.Tasks;
-<#  foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; #>
+<#  foreach(var hubInfo in Hubs) { #>
 
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
-#if <#= interfaceDef.IfDirectiveCondition #>
+<# if (hubInfo.HasIfDirectiveCondition) { #>
+#if <#= hubInfo.IfDirectiveCondition #>
 <# } #>
-<# var clientName = interfaceDef.ClientName; #>
+<# var clientName = hubInfo.GetClientName(); #>
     [Ignore]
-    public class <#= clientName #> : StreamingHubClientBase<<#= interfaceDef.FullName #>, <#= receiverDef.FullName #>>, <#= interfaceDef.FullName #>
+    public class <#= clientName #> : StreamingHubClientBase<<#= hubInfo.ServiceType.FullName #>, <#= hubInfo.Receiver.ReceiverType.FullName #>>, <#= hubInfo.ServiceType.FullName #>
     {
-        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "<#= interfaceDef.Name #>", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "<#= hubInfo.ServiceType.Name #>", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
         protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
 
-        readonly <#= interfaceDef.FullName #> __fireAndForgetClient;
+        readonly <#= hubInfo.ServiceType.FullName #> __fireAndForgetClient;
 
         public <#= clientName #>(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
             : base(callInvoker, host, option, serializerOptions, logger)
@@ -38,7 +38,7 @@
             this.__fireAndForgetClient = new FireAndForgetClient(this);
         }
         
-        public <#= interfaceDef.FullName #> FireAndForget()
+        public <#= hubInfo.ServiceType.FullName #> FireAndForget()
         {
             return __fireAndForgetClient;
         }
@@ -47,8 +47,8 @@
         {
             switch (methodId)
             {
-<#  foreach(var item in receiverDef.Methods) { #>
-                case <#= item.HubId #>: // <#= item.Name #>
+<#  foreach(var item in hubInfo.Receiver.Methods) { #>
+                case <#= item.HubId #>: // <#= item.MethodName #>
                 {
                     <#= item.ToHubOnBroadcastMessage().line1 #>
                     <#= item.ToHubOnBroadcastMessage().line2 #>
@@ -63,8 +63,8 @@
         {
             switch (methodId)
             {
-<#  foreach(var item in interfaceDef.Methods) { #>
-                case <#= item.HubId #>: // <#= item.Name #>
+<#  foreach(var item in hubInfo.Methods) { #>
+                case <#= item.HubId #>: // <#= item.MethodName #>
                 {
                     <#= item.ToHubOnResponseEvent().line1 #>
                     <#= item.ToHubOnResponseEvent().line2 #>
@@ -76,11 +76,11 @@
             }
         }
    
-<# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.HasIfDirectiveCondition) { #>
+<# foreach(var item in hubInfo.Methods) { #>
+<# if (item.HasIfDirectiveCondition) { #>
 #if <#= item.IfDirectiveCondition #>
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
-        public <#= item.ToString() #>
+        <#= item.ToMethodSignature() #>
         {
             return <#= item.ToHubWriteMessage() #>;
         }
@@ -90,7 +90,7 @@
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(interfaceDef.Methods) #>
 
-        class FireAndForgetClient : <#= interfaceDef.FullName #>
+        class FireAndForgetClient : <#= hubInfo.ServiceType.FullName #>
         {
             readonly <#= clientName #> __parent;
 
@@ -99,7 +99,7 @@
                 this.__parent = parentClient;
             }
 
-            public <#= interfaceDef.FullName #> FireAndForget()
+            public <#= hubInfo.ServiceType.FullName #> FireAndForget()
             {
                 throw new NotSupportedException();
             }
@@ -114,22 +114,22 @@
                 throw new NotSupportedException();
             }
 
-<# foreach(var item in interfaceDef.Methods) { #>
-<# if(item.HasIfDirectiveCondition) { #>
+<# foreach(var item in hubInfo.Methods) { #>
+<# if (item.HasIfDirectiveCondition) { #>
 #if <#= item.IfDirectiveCondition #>
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
-            public <#= item.ToString() #>
+            <#= item.ToMethodSignature() #>
             {
                 return __parent.<#= item.ToHubFireAndForgetWriteMessage() #>;
             }
 
-<# if(item.HasIfDirectiveCondition) { #>
+<# if (item.HasIfDirectiveCondition) { #>
 #endif
 <# } // end if(item.HasIfDirectiveCondition) #>
 <# } // end foreach(interfaceDef.Methods) #>
         }
     }
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
+<# if (hubInfo.HasIfDirectiveCondition) { #>
 #endif 
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(Interfaces) #>

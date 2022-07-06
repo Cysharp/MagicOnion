@@ -22,7 +22,7 @@ namespace <#= Namespace #>
     {
         static bool isRegistered = false;
 
-<# if( !UnuseUnityAttribute) { #>
+<# if (!OmitUnityAttribute) { #>
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
 <# } #>
         public static void Register()
@@ -30,22 +30,22 @@ namespace <#= Namespace #>
             if(isRegistered) return;
             isRegistered = true;
 
-<# foreach(var interfaceDef in Interfaces) { #>
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
-#if <#= interfaceDef.IfDirectiveCondition #>
+<# foreach(var serviceInfo in Services) { #>
+<# if(serviceInfo.HasIfDirectiveCondition) { #>
+#if <#= serviceInfo.IfDirectiveCondition #>
 <# } #>
-            MagicOnionClientRegistry<<#= interfaceDef.ToString() #>>.Register((x, y, z) => new <#= interfaceDef.ClientFullName #>(x, y, z));
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
+            MagicOnionClientRegistry<<#= serviceInfo.ServiceType.FullName #>>.Register((x, y) => new <#= serviceInfo.GetClientFullName() #>(x, y));
+<# if(serviceInfo.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } // foreach #>
 
-<# foreach(var (interfaceDef, receiverDef) in HubInterfaces) { #>
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
-#if <#= interfaceDef.IfDirectiveCondition #>
+<# foreach(var hubInfo in Hubs) { #>
+<# if(hubInfo.HasIfDirectiveCondition) { #>
+#if <#= hubInfo.IfDirectiveCondition #>
 <# } #>
-            StreamingHubClientRegistry<<#= interfaceDef.ToString() #>, <#= receiverDef.ToString() #>>.Register((a, _, b, c, d, e) => new <#= interfaceDef.ClientFullName #>(a, b, c, d, e));
-<# if(interfaceDef.HasIfDirectiveCondition) { #>
+            StreamingHubClientRegistry<<#= hubInfo.ServiceType.FullName #>, <#= hubInfo.Receiver.ReceiverType.FullName #>>.Register((a, _, b, c, d, e) => new <#= hubInfo.GetClientFullName() #>(a, b, c, d, e));
+<# if(hubInfo.HasIfDirectiveCondition) { #>
 #endif
 <# } #>
 <# } // foreach #>

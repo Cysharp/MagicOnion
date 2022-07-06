@@ -845,7 +845,7 @@ namespace MessagePack.Formatters.TempProject
                 true,
                 "TempProject.Generated",
                 "",
-                "MessagePack.Formatters"
+                "global::MessagePack.Formatters"
             );
 
             var compilation = tempWorkspace.GetOutputCompilation();
@@ -895,8 +895,8 @@ namespace TempProject
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.ListFormatter<string>",
-                "global::MessagePack.Formatters.ListFormatter<int>"
+                "global::MessagePack.Formatters.ListFormatter<global::System.String>",
+                "global::MessagePack.Formatters.ListFormatter<global::System.Int32>"
             });
         }
 

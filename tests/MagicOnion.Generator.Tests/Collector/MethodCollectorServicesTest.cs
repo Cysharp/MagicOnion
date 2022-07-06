@@ -27,7 +27,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -75,7 +75,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -115,7 +115,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -147,7 +147,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -179,7 +179,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -222,7 +222,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -264,7 +264,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -307,7 +307,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -351,7 +351,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -395,7 +395,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -431,7 +431,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -457,7 +457,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -498,7 +498,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -540,7 +540,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -584,7 +584,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -611,7 +611,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -654,7 +654,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -680,7 +680,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -723,7 +723,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 

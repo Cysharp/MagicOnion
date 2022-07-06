@@ -49,6 +49,7 @@ namespace MagicOnion.Client
         {
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
 
+            var clientOptions = new MagicOnionClientOptions(invoker, default, default, clientFilters);
             var ctor = MagicOnionClientRegistry<T>.constructor;
             if (ctor == null)
             {
@@ -56,12 +57,12 @@ namespace MagicOnion.Client
                 throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
 #else
                 var t = MagicOnion.Client.DynamicClient.DynamicClientBuilder<T>.ClientType;
-                return (T)Activator.CreateInstance(t, new MagicOnionClientOptions(invoker, default, default, clientFilters), serializerOptions);
+                return (T)Activator.CreateInstance(t, clientOptions, serializerOptions);
 #endif
             }
             else
             {
-                return ctor(invoker, serializerOptions, clientFilters);
+                return ctor(clientOptions, serializerOptions);
             }
         }
     }
@@ -69,9 +70,9 @@ namespace MagicOnion.Client
     public static class MagicOnionClientRegistry<T>
         where T : IService<T>
     {
-        internal static Func<CallInvoker, MessagePackSerializerOptions, IClientFilter[], T> constructor;
+        internal static Func<MagicOnionClientOptions, MessagePackSerializerOptions, T> constructor;
 
-        public static void Register(Func<CallInvoker, MessagePackSerializerOptions, IClientFilter[], T> ctor)
+        public static void Register(Func<MagicOnionClientOptions, MessagePackSerializerOptions, T> ctor)
         {
             constructor = ctor;
         }

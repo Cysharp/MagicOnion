@@ -84,7 +84,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                         type.Namespace,
                         type.Name,
                         type.FullName,
-                        type.UnderlyingType.FullName,
+                        type.UnderlyingType.Name,
                         typeWithDirectives.IfDirectives
                     ));
                 }
@@ -221,11 +221,13 @@ namespace MagicOnion.Generator.CodeAnalysis
     {
         public IReadOnlyList<EnumSerializationInfo> Enums { get; }
         public IReadOnlyList<GenericSerializationInfo> Generics { get; }
+        public IReadOnlyList<IResolverRegisterInfo> RequireRegistrationFormatters { get; }
 
         public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics)
         {
             Enums = enums;
             Generics = generics;
+            RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
         }
     }
 

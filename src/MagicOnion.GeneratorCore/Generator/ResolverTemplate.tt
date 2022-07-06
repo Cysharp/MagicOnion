@@ -49,9 +49,9 @@ namespace <#= Namespace #>
 
         static <#= ResolverName #>GetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(<#= registerInfos.Length #>)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(<#= RegisterInfos.Count #>)
             {
-<# for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; #>
+<# for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; #>
 <#     if (x.HasIfDirectiveConditions) { #>
 #if <#= string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})")) #>
 <#     } #>
@@ -73,11 +73,11 @@ namespace <#= Namespace #>
 
             switch (key)
             {
-<# for(var i = 0; i < registerInfos.Length; i++) { var x = registerInfos[i]; #>
+<# for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; #>
 <#     if (x.HasIfDirectiveConditions) { #>
 #if <#= string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})")) #>
 <#     } #>
-                case <#= i #>: return new <#= x.FormatterName.StartsWith("global::") ? x.FormatterName:  FormatterNamespace + "." + x.FormatterName#>;
+                case <#= i #>: return new <#= x.FormatterName.StartsWith("global::") ? x.FormatterName : (string.IsNullOrWhiteSpace(FormatterNamespace) ? "" : FormatterNamespace + ".") + x.FormatterName #>;
 <#     if (x.HasIfDirectiveConditions) { #>
 #endif
 <#     } #>

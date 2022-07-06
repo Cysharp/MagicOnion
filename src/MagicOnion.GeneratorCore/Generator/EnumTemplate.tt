@@ -14,7 +14,7 @@ namespace <#= Namespace #>
     using System;
     using MessagePack;
 
-<# foreach(var info in enumSerializationInfos) { #>
+<# foreach (var info in EnumSerializationInfos) { #>
 <#   if (info.HasIfDirectiveConditions) { #>
 #if <#= string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})")) #>
 <#   } #>

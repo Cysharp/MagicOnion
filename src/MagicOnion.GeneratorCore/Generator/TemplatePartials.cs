@@ -10,21 +10,21 @@ namespace MagicOnion.Generator
     public partial class CodeTemplate
     {
         public string Namespace { get; set; }
-        public InterfaceDefinition[] Interfaces { get; set; }
+        public IReadOnlyList<InterfaceDefinition> Interfaces { get; set; }
     }
 
     public partial class HubTemplate
     {
         public string Namespace { get; set; }
-        public (InterfaceDefinition hubDef, InterfaceDefinition receiverDef)[] Interfaces { get; set; }
+        public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; set; }
     }
 
     public partial class RegisterTemplate
     {
         public string Namespace { get; set; }
-        public bool UnuseUnityAttribute { get; set; }
-        public InterfaceDefinition[] Interfaces { get; set; }
-        public (InterfaceDefinition hubDef, InterfaceDefinition receiverDef)[] HubInterfaces { get; set; }
+        public bool OmitUnityAttribute { get; set; }
+        public IReadOnlyList<MagicOnionServiceInfo> Services { get; set; }
+        public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; set; }
     }
 
     public partial class ResolverTemplate
@@ -32,11 +32,12 @@ namespace MagicOnion.Generator
         public string Namespace;
         public string FormatterNamespace { get; set; }
         public string ResolverName = "GeneratedResolver";
-        public IResolverRegisterInfo[] registerInfos;
+        public IReadOnlyList<IResolverRegisterInfo> RegisterInfos;
     }
+
     public partial class EnumTemplate
     {
         public string Namespace;
-        public EnumSerializationInfo[] enumSerializationInfos;
+        public IReadOnlyList<EnumSerializationInfo> EnumSerializationInfos;
     }
 }

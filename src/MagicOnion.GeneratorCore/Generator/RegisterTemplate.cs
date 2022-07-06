@@ -42,42 +42,42 @@ namespace MagicOnion.Generator
         static bool isRegistered = false;
 
 ");
- if( !UnuseUnityAttribute) { 
+ if (!OmitUnityAttribute) { 
             this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
                     "oadType.BeforeSceneLoad)]\r\n");
  } 
             this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
                     "turn;\r\n            isRegistered = true;\r\n\r\n");
- foreach(var interfaceDef in Interfaces) { 
- if(interfaceDef.HasIfDirectiveCondition) { 
+ foreach(var serviceInfo in Services) { 
+ if(serviceInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("            MagicOnionClientRegistry<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
-            this.Write(">.Register((x, y, z) => new ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
-            this.Write("(x, y, z));\r\n");
- if(interfaceDef.HasIfDirectiveCondition) { 
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
+            this.Write(">.Register((x, y) => new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.GetClientFullName()));
+            this.Write("(x, y));\r\n");
+ if(serviceInfo.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 
             this.Write("\r\n");
- foreach(var (interfaceDef, receiverDef) in HubInterfaces) { 
- if(interfaceDef.HasIfDirectiveCondition) { 
+ foreach(var hubInfo in Hubs) { 
+ if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
             this.Write("            StreamingHubClientRegistry<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(receiverDef.ToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
             this.Write(">.Register((a, _, b, c, d, e) => new ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.ClientFullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.GetClientFullName()));
             this.Write("(a, b, c, d, e));\r\n");
- if(interfaceDef.HasIfDirectiveCondition) { 
+ if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 

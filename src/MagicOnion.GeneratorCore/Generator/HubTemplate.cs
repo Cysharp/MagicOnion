@@ -31,29 +31,29 @@ namespace MagicOnion.Generator
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? ("namespace " + Namespace + " {") : ""));
             this.Write("\r\n    using Grpc.Core;\r\n    using MagicOnion;\r\n    using MagicOnion.Client;\r\n    " +
                     "using MessagePack;\r\n    using System;\r\n    using System.Threading.Tasks;\r\n");
-  foreach(var def in Interfaces) { var interfaceDef= def.hubDef; var receiverDef= def.receiverDef; 
+  foreach(var hubInfo in Hubs) { 
             this.Write("\r\n");
- if(interfaceDef.HasIfDirectiveCondition) { 
+ if (hubInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.IfDirectiveCondition));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
- var clientName = interfaceDef.ClientName; 
+ var clientName = hubInfo.GetClientName(); 
             this.Write("    [Ignore]\r\n    public class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write(" : StreamingHubClientBase<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(receiverDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
             this.Write(">, ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write("\r\n    {\r\n        static readonly Method<byte[], byte[]> method = new Method<byte[" +
                     "], byte[]>(MethodType.DuplexStreaming, \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.Name));
             this.Write("\", \"Connect\", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.Thro" +
                     "ughMarshaller);\r\n\r\n        protected override Method<byte[], byte[]> DuplexStrea" +
                     "mingAsyncMethod { get { return method; } }\r\n\r\n        readonly ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(" __fireAndForgetClient;\r\n\r\n        public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write(@"(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
@@ -63,15 +63,15 @@ namespace MagicOnion.Generator
         }
         
         public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(" FireAndForget()\r\n        {\r\n            return __fireAndForgetClient;\r\n        }" +
                     "\r\n\r\n        protected override void OnBroadcastEvent(int methodId, ArraySegment<" +
                     "byte> data)\r\n        {\r\n            switch (methodId)\r\n            {\r\n");
-  foreach(var item in receiverDef.Methods) { 
+  foreach(var item in hubInfo.Receiver.Methods) { 
             this.Write("                case ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
             this.Write(": // ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.MethodName));
             this.Write("\r\n                {\r\n                    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnBroadcastMessage().line1));
             this.Write("\r\n                    ");
@@ -88,11 +88,11 @@ namespace MagicOnion.Generator
             switch (methodId)
             {
 ");
-  foreach(var item in interfaceDef.Methods) { 
+  foreach(var item in hubInfo.Methods) { 
             this.Write("                case ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
             this.Write(": // ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.MethodName));
             this.Write("\r\n                {\r\n                    ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnResponseEvent().line1));
             this.Write("\r\n                    ");
@@ -101,14 +101,14 @@ namespace MagicOnion.Generator
   } // end foreach(interfaceDef.Methods) 
             this.Write("                default:\r\n                    break;\r\n            }\r\n        }\r\n " +
                     "  \r\n");
- foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirectiveCondition) { 
+ foreach(var item in hubInfo.Methods) { 
+ if (item.HasIfDirectiveCondition) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
             this.Write("\r\n");
  } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
-            this.Write("        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
+            this.Write("        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToMethodSignature()));
             this.Write("\r\n        {\r\n            return ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubWriteMessage()));
             this.Write(";\r\n        }\r\n\r\n");
@@ -117,14 +117,14 @@ namespace MagicOnion.Generator
  } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
  } // end foreach(interfaceDef.Methods) 
             this.Write("\r\n        class FireAndForgetClient : ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write("\r\n        {\r\n            readonly ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write(" __parent;\r\n\r\n            public FireAndForgetClient(");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             this.Write(" parentClient)\r\n            {\r\n                this.__parent = parentClient;\r\n   " +
                     "         }\r\n\r\n            public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(@" FireAndForget()
             {
                 throw new NotSupportedException();
@@ -141,23 +141,23 @@ namespace MagicOnion.Generator
             }
 
 ");
- foreach(var item in interfaceDef.Methods) { 
- if(item.HasIfDirectiveCondition) { 
+ foreach(var item in hubInfo.Methods) { 
+ if (item.HasIfDirectiveCondition) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
             this.Write("\r\n");
  } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
-            this.Write("            public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToString()));
+            this.Write("            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToMethodSignature()));
             this.Write("\r\n            {\r\n                return __parent.");
             this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubFireAndForgetWriteMessage()));
             this.Write(";\r\n            }\r\n\r\n");
- if(item.HasIfDirectiveCondition) { 
+ if (item.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } // end if(item.HasIfDirectiveCondition) 
  } // end foreach(interfaceDef.Methods) 
             this.Write("        }\r\n    }\r\n");
- if(interfaceDef.HasIfDirectiveCondition) { 
+ if (hubInfo.HasIfDirectiveCondition) { 
             this.Write("#endif \r\n");
  } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
  } // end foreach(Interfaces) 

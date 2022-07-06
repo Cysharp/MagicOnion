@@ -32,7 +32,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -77,7 +77,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -114,7 +114,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -155,7 +155,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -201,7 +201,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -246,7 +246,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -292,7 +292,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -334,7 +334,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
                
@@ -365,7 +365,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
            
@@ -396,7 +396,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -432,7 +432,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -470,7 +470,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -526,7 +526,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
     
@@ -564,7 +564,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -611,7 +611,7 @@ public interface IMyHubReceiver
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector2();
+        var collector = new MethodCollector();
         var serviceCollection = collector.Collect(compilation);
 
         // Assert

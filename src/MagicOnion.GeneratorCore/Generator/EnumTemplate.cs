@@ -29,7 +29,7 @@ namespace MagicOnion.Generator
                     " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n");
- foreach(var info in enumSerializationInfos) { 
+ foreach (var info in EnumSerializationInfos) { 
    if (info.HasIfDirectiveConditions) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})"))));
