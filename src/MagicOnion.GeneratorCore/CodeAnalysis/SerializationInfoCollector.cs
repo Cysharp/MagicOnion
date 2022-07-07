@@ -173,7 +173,7 @@ namespace MagicOnion.Generator.CodeAnalysis
             );
 
         static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
-            where T : IResolverRegisterInfo
+            where T : IMessagePackFormatterResolverRegisterInfo
         {
             // The priority of the generation depends on the `#if` directive
             // If a serialization info has no `#if` conditions, we always use it. If there is more than one with the condition, it is merged.
@@ -226,13 +226,13 @@ namespace MagicOnion.Generator.CodeAnalysis
     {
         public IReadOnlyList<EnumSerializationInfo> Enums { get; }
         public IReadOnlyList<GenericSerializationInfo> Generics { get; }
-        public IReadOnlyList<IResolverRegisterInfo> RequireRegistrationFormatters { get; }
+        public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> RequireRegistrationFormatters { get; }
 
         public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics)
         {
             Enums = enums;
             Generics = generics;
-            RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<IResolverRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
+            RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<IMessagePackFormatterResolverRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
         }
     }
 

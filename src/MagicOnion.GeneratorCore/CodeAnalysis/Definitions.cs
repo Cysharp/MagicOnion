@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using MagicOnion.Generator.Utils;
-using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeAnalysis
 {
@@ -16,7 +13,7 @@ namespace MagicOnion.Generator.CodeAnalysis
     }
 
     // MessagePack Definitions
-    public interface IResolverRegisterInfo
+    public interface IMessagePackFormatterResolverRegisterInfo
     {
         string FullName { get; }
         string FormatterName { get; }
@@ -25,7 +22,7 @@ namespace MagicOnion.Generator.CodeAnalysis
         bool HasIfDirectiveConditions { get; }
     }
 
-    public class GenericSerializationInfo : IResolverRegisterInfo
+    public class GenericSerializationInfo : IMessagePackFormatterResolverRegisterInfo
     {
         public string FullName { get; }
 
@@ -42,7 +39,7 @@ namespace MagicOnion.Generator.CodeAnalysis
         }
     }
 
-    public class EnumSerializationInfo : IResolverRegisterInfo
+    public class EnumSerializationInfo : IMessagePackFormatterResolverRegisterInfo
     {
         public string Namespace { get; }
         public string Name { get;}

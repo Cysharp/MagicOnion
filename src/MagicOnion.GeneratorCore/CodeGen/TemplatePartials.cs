@@ -26,7 +26,7 @@ namespace MagicOnion.Generator.CodeGen
         public string Namespace { get; set; }
         public string FormatterNamespace { get; set; }
         public string ResolverName  { get; set; } = "GeneratedResolver";
-        public IReadOnlyList<IResolverRegisterInfo> RegisterInfos { get; set; }
+        public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> RegisterInfos { get; set; }
     }
 
     public partial class EnumTemplate
