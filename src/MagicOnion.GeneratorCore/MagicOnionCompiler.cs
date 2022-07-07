@@ -33,7 +33,7 @@ namespace MagicOnion.Generator
             bool omitUnityAttribute,
             string @namespace,
             string conditionalSymbol,
-            string messagePackGeneratedNamespace)
+            string userDefinedMessagePackFormattersNamespace)
         {
             // Prepare args
             var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
@@ -55,7 +55,7 @@ namespace MagicOnion.Generator
             sw.Restart();
             logger("Collect serialization information Start");
             var serializationInfoCollector = new SerializationInfoCollector();
-            var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection, messagePackGeneratedNamespace);
+            var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection, userDefinedMessagePackFormattersNamespace);
             logger("Collect serialization information Complete:" + sw.Elapsed.ToString());
 
             logger("Output Generation Start");

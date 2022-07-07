@@ -8,8 +8,8 @@ namespace MagicOnion.Generator.CodeAnalysis
 {
     public class SerializationInfoCollector
     {
-        public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string messagePackFormatterNamespace = null)
-            => Collect(EnumerateTypes(serviceCollection), messagePackFormatterNamespace);
+        public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string userDefinedMessagePackFormattersNamespace = null)
+            => Collect(EnumerateTypes(serviceCollection), userDefinedMessagePackFormattersNamespace);
 
         static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
         {
@@ -64,12 +64,14 @@ namespace MagicOnion.Generator.CodeAnalysis
             }
         }
 
-        public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types, string messagePackFormatterNamespace = null)
+        public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types, string userDefinedMessagePackFormattersNamespace = null)
         {
             var context = new SerializationInfoCollectorContext();
             var flattened = types.SelectMany(x => x.Type.EnumerateDependentTypes(includesSelf: true).Select(y => new TypeWithIfDirectives(y, x.IfDirectives)));
 
-            messagePackFormatterNamespace = messagePackFormatterNamespace ?? "global::MessagePack.Formatters";
+            userDefinedMessagePackFormattersNamespace = userDefinedMessagePackFormattersNamespace ?? "MessagePack.Formatters";
+            if (!userDefinedMessagePackFormattersNamespace.StartsWith("global::")) userDefinedMessagePackFormattersNamespace = "global::" + userDefinedMessagePackFormattersNamespace;
+
             foreach (var typeWithDirectives in flattened)
             {
                 var type = typeWithDirectives.Type;
@@ -137,7 +139,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                     else
                     {
                         // User-defined generic types
-                        formatterName = $"{messagePackFormatterNamespace}{(string.IsNullOrWhiteSpace(messagePackFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
+                        formatterName = $"{userDefinedMessagePackFormattersNamespace}{(string.IsNullOrWhiteSpace(userDefinedMessagePackFormattersNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
                     }
 
                     context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, typeWithDirectives.IfDirectives));
