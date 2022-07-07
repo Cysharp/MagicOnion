@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeAnalysis
 {
+    /// <summary>
+    /// Provides logic to collect MagicOnion Services and StreamingHubs from a compilation.
+    /// </summary>
     public class MethodCollector
     {
         readonly Action<string> logger;

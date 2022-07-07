@@ -6,6 +6,9 @@ using System.Text;
 
 namespace MagicOnion.Generator.CodeAnalysis
 {
+    /// <summary>
+    /// Provides logic for gathering information to determine required formatters (for enums, collections and user-defined generic types).
+    /// </summary>
     public class SerializationInfoCollector
     {
         public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string userDefinedMessagePackFormattersNamespace = null)
