@@ -63,7 +63,7 @@ namespace TempProject
             var compilation = tempWorkspace.GetOutputCompilation();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
             });
         }
@@ -110,8 +110,8 @@ namespace TempProject
             var compilation = tempWorkspace.GetOutputCompilation();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int, global::TempProject.MyObject>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32, global::TempProject.MyObject>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, global::System.Int32>",
             });
         }
 
@@ -160,8 +160,8 @@ namespace TempProject
             {
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<int>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
             });
         }
@@ -297,8 +297,8 @@ namespace TempProject
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.ListFormatter<string>",
-                "global::MessagePack.Formatters.ListFormatter<int>"
+                "global::MessagePack.Formatters.ListFormatter<global::System.String>",
+                "global::MessagePack.Formatters.ListFormatter<global::System.Int32>"
             });
         }
 
@@ -477,7 +477,7 @@ namespace MessagePack.Formatters.TempProject
             compilation.GetCompilationErrors().Should().BeEmpty();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
             });
         }
@@ -538,8 +538,8 @@ namespace MessagePack.Formatters.TempProject
             {
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<int>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
             });
         }
@@ -597,8 +597,8 @@ namespace MessagePack.Formatters.TempProject
             compilation.GetCompilationErrors().Should().BeEmpty();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int, global::TempProject.MyObject>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, int>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32, global::TempProject.MyObject>",
+                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, global::System.Int32>",
             });
         }
 
@@ -814,8 +814,8 @@ namespace TempProject
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.ListFormatter<string>",
-                "global::MessagePack.Formatters.ListFormatter<int>"
+                "global::MessagePack.Formatters.ListFormatter<global::System.String>",
+                "global::MessagePack.Formatters.ListFormatter<global::System.Int32>"
             });
         }
 
@@ -995,21 +995,21 @@ namespace TempProject
             var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
             compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
             {
-                "global::MessagePack.Formatters.ListFormatter<int>",
+                "global::MessagePack.Formatters.ListFormatter<global::System.Int32>",
                 "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
                 "global::MessagePack.Formatters.InterfaceListFormatter2<global::TempProject.MyResponse>",
                 "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::TempProject.MyResponse>",
 
-                "global::MessagePack.Formatters.DictionaryFormatter<string, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceDictionaryFormatter<string, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<string, global::TempProject.MyResponse>",
+                "global::MessagePack.Formatters.DictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
+                "global::MessagePack.Formatters.InterfaceDictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
+                "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
 
                 "global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::TempProject.MyResponse>",
                 "global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::TempProject.MyResponse>",
                 "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::TempProject.MyResponse>",
 
-                "global::MessagePack.Formatters.InterfaceLookupFormatter<int, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceGroupingFormatter<int, global::TempProject.MyResponse>",
+                "global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.Int32, global::TempProject.MyResponse>",
+                "global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.Int32, global::TempProject.MyResponse>",
 
             });
         }
