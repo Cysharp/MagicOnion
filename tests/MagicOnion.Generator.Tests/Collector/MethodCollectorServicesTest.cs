@@ -408,6 +408,86 @@ namespace MyNamespace
         serviceCollection.Services[0].Methods.Should().HaveCount(4);
     }
 
+    [Fact]
+    public void Unary_InvalidReturnType_ServerStreamingResult()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<ServerStreamingResult<int>> MethodA();
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act & Assert
+        var collector = new MethodCollector();
+        Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
+    }
+    
+    [Fact]
+    public void Unary_InvalidReturnType_ClientStreamingResult()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<ClientStreamingResult<int, string>> MethodA();
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act & Assert
+        var collector = new MethodCollector();
+        Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
+    }
+        
+    [Fact]
+    public void Unary_InvalidReturnType_DuplexStreamingResult()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<DuplexStreamingResult<int, string>> MethodA();
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act & Assert
+        var collector = new MethodCollector();
+        Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
+    }
            
     [Fact]
     public void UnsupportedType()

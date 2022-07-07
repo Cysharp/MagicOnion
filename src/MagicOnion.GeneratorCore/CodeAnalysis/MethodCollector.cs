@@ -168,6 +168,10 @@ namespace MagicOnion.Generator.CodeAnalysis
             {
                 throw new InvalidOperationException($"Unsupported return type '{methodReturnType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
             }
+            if (methodType == MethodType.Unary && responseType.Namespace == "MagicOnion" && (responseType.Name == "ClientStreamingResult" || responseType.Name == "ServerStreamingResult" || responseType.Name == "DuplexStreamingResult"))
+            {
+                throw new InvalidOperationException($"Unary methods can not return '{responseType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
+            }
             if ((methodType == MethodType.ClientStreaming || methodType == MethodType.DuplexStreaming) && methodParameters.Any())
             {
                 throw new InvalidOperationException($"ClientStreaming and DuplexStreaming must have no parameters. ({serviceType.FullName}.{methodSymbol.Name})");
