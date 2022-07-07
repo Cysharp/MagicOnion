@@ -19,14 +19,14 @@ namespace MagicOnion.Client.DynamicClient
 #else
     internal
 #endif
-        static class StreamingHubClientAssemblyHolder
+        static class DynamicStreamingHubClientAssemblyHolder
     {
         public const string ModuleName = "MagicOnion.Client.StreamingHubClient";
 
         readonly static DynamicAssembly assembly;
         internal static DynamicAssembly Assembly { get { return assembly; } }
 
-        static StreamingHubClientAssemblyHolder()
+        static DynamicStreamingHubClientAssemblyHolder()
         {
             assembly = new DynamicAssembly(ModuleName);
         }
@@ -46,7 +46,7 @@ namespace MagicOnion.Client.DynamicClient
 #else
     internal
 #endif
-        static class StreamingHubClientBuilder<TStreamingHub, TReceiver>
+        static class DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>
     {
         public static readonly Type ClientType;
         // static readonly Type ClientFireAndForgetType;
@@ -61,12 +61,12 @@ namespace MagicOnion.Client.DynamicClient
         static readonly MethodInfo callCancellationTokenNone = typeof(CancellationToken).GetProperty("None", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetGetMethod();
         static readonly PropertyInfo completedTask = typeof(Task).GetProperty("CompletedTask", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
-        static StreamingHubClientBuilder()
+        static DynamicStreamingHubClientBuilder()
         {
             var t = typeof(TStreamingHub);
             var ti = t.GetTypeInfo();
             if (!ti.IsInterface) throw new Exception("Client Proxy only allows interface. Type:" + ti.Name);
-            var asm = StreamingHubClientAssemblyHolder.Assembly;
+            var asm = DynamicStreamingHubClientAssemblyHolder.Assembly;
             var methodDefinitions = SearchDefinitions(t);
 
             var parentType = typeof(StreamingHubClientBase<,>).MakeGenericType(typeof(TStreamingHub), typeof(TReceiver));
