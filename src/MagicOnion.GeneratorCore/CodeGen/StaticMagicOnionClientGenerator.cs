@@ -8,9 +8,9 @@ using MagicOnion.Generator.Internal;
 
 namespace MagicOnion.Generator.CodeGen
 {
-    public class StaticClientBuilder
+    public class StaticMagicOnionClientGenerator
     {
-        private class ServiceClientBuildContext
+        class ServiceClientBuildContext
         {
             public ServiceClientBuildContext(MagicOnionServiceInfo service, IndentedTextWriter textWriter)
             {
@@ -45,7 +45,7 @@ namespace MagicOnion.Generator.CodeGen
             return baseWriter.ToString();
         }
 
-        private static void EmitHeader(IndentedTextWriter textWriter)
+        static void EmitHeader(IndentedTextWriter textWriter)
         {
             textWriter.WriteLine("#pragma warning disable 618");
             textWriter.WriteLine("#pragma warning disable 612");
@@ -55,7 +55,7 @@ namespace MagicOnion.Generator.CodeGen
             textWriter.WriteLine();
         }
         
-        private static void EmitPreamble(ServiceClientBuildContext ctx)
+        static void EmitPreamble(ServiceClientBuildContext ctx)
         {
             ctx.TextWriter.WriteLine($"namespace {ctx.Service.ServiceType.Namespace}");
             ctx.TextWriter.WriteLine("{");
@@ -68,14 +68,14 @@ namespace MagicOnion.Generator.CodeGen
             ctx.TextWriter.WriteLine();
         }
 
-        private static void EmitPostscript(ServiceClientBuildContext ctx)
+        static void EmitPostscript(ServiceClientBuildContext ctx)
         {
             ctx.TextWriter.Indent--;
             ctx.TextWriter.WriteLine("}");
             ctx.TextWriter.WriteLine();
         }
 
-        private static void EmitServiceClientClass(ServiceClientBuildContext ctx)
+        static void EmitServiceClientClass(ServiceClientBuildContext ctx)
         {
             // [Ignore]
             // public class {ServiceName}Client : MagicOnionClientBase<{ServiceName}>, {ServiceName}
@@ -102,7 +102,7 @@ namespace MagicOnion.Generator.CodeGen
             // }
         }
 
-        private static void EmitClone(ServiceClientBuildContext ctx)
+        static void EmitClone(ServiceClientBuildContext ctx)
         {
             // protected override MagicOnionClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
             ctx.TextWriter.WriteLine($"protected override global::MagicOnion.Client.MagicOnionClientBase<{ctx.Service.ServiceType.Name}> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)");
@@ -113,7 +113,7 @@ namespace MagicOnion.Generator.CodeGen
             ctx.TextWriter.WriteLine();
         }
 
-        private static void EmitConstructor(ServiceClientBuildContext ctx)
+        static void EmitConstructor(ServiceClientBuildContext ctx)
         {
             // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) : base(options)
             // {
@@ -142,14 +142,14 @@ namespace MagicOnion.Generator.CodeGen
             ctx.TextWriter.WriteLine();
         }
 
-        private static void EmitFields(ServiceClientBuildContext ctx)
+        static void EmitFields(ServiceClientBuildContext ctx)
         {
             // private readonly ClientCore core;
             ctx.TextWriter.WriteLine("readonly ClientCore core;");
             ctx.TextWriter.WriteLine();
         }
 
-        private static void EmitServiceMethods(ServiceClientBuildContext ctx)
+        static void EmitServiceMethods(ServiceClientBuildContext ctx)
         {
             // Implements
             // public UnaryResult<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
@@ -205,7 +205,7 @@ namespace MagicOnion.Generator.CodeGen
             }
         }
 
-        private static void EmitClientCore(ServiceClientBuildContext ctx)
+        static void EmitClientCore(ServiceClientBuildContext ctx)
         {
             /*
              * class ClientCore
