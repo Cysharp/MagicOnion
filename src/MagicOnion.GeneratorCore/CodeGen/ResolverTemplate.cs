@@ -7,19 +7,18 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace MagicOnion.Generator
+namespace MagicOnion.Generator.CodeGen
 {
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using MagicOnion.Generator.CodeAnalysis;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public partial class RegisterTemplate : RegisterTemplateBase
+    public partial class ResolverTemplate : ResolverTemplateBase
     {
         /// <summary>
         /// Create the template output
@@ -29,61 +28,96 @@ namespace MagicOnion.Generator
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
                     " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
-            this.Write(@"
-{
-    using global::System;
-    using global::System.Collections.Generic;
-    using global::System.Linq;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
+            this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n    public class ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write(" : global::MessagePack.IFormatterResolver\r\n    {\r\n        public static readonly " +
+                    "global::MessagePack.IFormatterResolver Instance = new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write("();\r\n\r\n        ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write(@"()
+        {
 
-    public static partial class MagicOnionInitializer
-    {
-        static bool isRegistered = false;
+        }
 
+        public global::MessagePack.Formatters.IMessagePackFormatter<T> GetFormatter<T>()
+        {
+            return FormatterCache<T>.formatter;
+        }
+
+        static class FormatterCache<T>
+        {
+            public static readonly global::MessagePack.Formatters.IMessagePackFormatter<T> formatter;
+
+            static FormatterCache()
+            {
+                var f = ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write(@"GetFormatterHelper.GetFormatter(typeof(T));
+                if (f != null)
+                {
+                    formatter = (global::MessagePack.Formatters.IMessagePackFormatter<T>)f;
+                }
+            }
+        }
+    }
+
+    internal static class ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write("GetFormatterHelper\r\n    {\r\n        static readonly global::System.Collections.Gen" +
+                    "eric.Dictionary<Type, int> lookup;\r\n\r\n        static ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
+            this.Write("GetFormatterHelper()\r\n        {\r\n            lookup = new global::System.Collecti" +
+                    "ons.Generic.Dictionary<Type, int>(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(RegisterInfos.Count));
+            this.Write(")\r\n            {\r\n");
+ for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; 
+     if (x.HasIfDirectiveConditions) { 
+            this.Write("#if ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})"))));
+            this.Write("\r\n");
+     } 
+            this.Write("                {typeof(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(x.FullName));
+            this.Write("), ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(i));
+            this.Write(" },\r\n");
+     if (x.HasIfDirectiveConditions) { 
+            this.Write("#endif\r\n");
+     } 
+ } 
+            this.Write(@"            };
+        }
+
+        internal static object GetFormatter(Type t)
+        {
+            int key;
+            if (!lookup.TryGetValue(t, out key))
+            {
+                return null;
+            }
+
+            switch (key)
+            {
 ");
- if (!OmitUnityAttribute) { 
-            this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
-                    "oadType.BeforeSceneLoad)]\r\n");
- } 
-            this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
-                    "turn;\r\n            isRegistered = true;\r\n\r\n");
- foreach(var serviceInfo in Services) { 
- if(serviceInfo.HasIfDirectiveCondition) { 
+ for(var i = 0; i < RegisterInfos.Count; i++) { var x = RegisterInfos[i]; 
+     if (x.HasIfDirectiveConditions) { 
             this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.IfDirectiveCondition));
+            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", x.IfDirectiveConditions.Select(y => $"({y})"))));
             this.Write("\r\n");
- } 
-            this.Write("            MagicOnionClientRegistry<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
-            this.Write(">.Register((x, y) => new ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.GetClientFullName()));
-            this.Write("(x, y));\r\n");
- if(serviceInfo.HasIfDirectiveCondition) { 
+     } 
+            this.Write("                case ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(i));
+            this.Write(": return new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(x.FormatterName.StartsWith("global::") ? x.FormatterName : (string.IsNullOrWhiteSpace(FormatterNamespace) ? "" : FormatterNamespace + ".") + x.FormatterName));
+            this.Write(";\r\n");
+     if (x.HasIfDirectiveConditions) { 
             this.Write("#endif\r\n");
+     } 
  } 
- } // foreach 
-            this.Write("\r\n");
- foreach(var hubInfo in Hubs) { 
- if(hubInfo.HasIfDirectiveCondition) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
-            this.Write("\r\n");
- } 
-            this.Write("            StreamingHubClientRegistry<");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write(", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
-            this.Write(">.Register((a, _, b, c, d, e) => new ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.GetClientFullName()));
-            this.Write("(a, b, c, d, e));\r\n");
- if(hubInfo.HasIfDirectiveCondition) { 
-            this.Write("#endif\r\n");
- } 
- } // foreach 
-            this.Write("        }\r\n    }\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n" +
-                    "#pragma warning restore 414\r\n#pragma warning restore 612\r\n#pragma warning restor" +
-                    "e 618");
+            this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n#pra" +
+                    "gma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning restore 41" +
+                    "4\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -92,7 +126,7 @@ namespace MagicOnion.Generator
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public class RegisterTemplateBase
+    public class ResolverTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

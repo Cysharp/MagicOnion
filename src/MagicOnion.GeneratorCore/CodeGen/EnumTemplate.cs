@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace MagicOnion.Generator
+namespace MagicOnion.Generator.CodeGen
 {
     using System.Linq;
     using System.Text;

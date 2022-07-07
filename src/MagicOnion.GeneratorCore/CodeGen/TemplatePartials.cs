@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 
-namespace MagicOnion.Generator
+namespace MagicOnion.Generator.CodeGen
 {
     public partial class CodeTemplate
     {

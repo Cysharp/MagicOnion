@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace MagicOnion.Generator
+namespace MagicOnion.Generator.CodeGen
 {
     using System.Linq;
     using System.Text;
@@ -19,7 +19,7 @@ namespace MagicOnion.Generator
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public partial class HubTemplate : HubTemplateBase
+    public partial class RegisterTemplate : RegisterTemplateBase
     {
         /// <summary>
         /// Create the template output
@@ -27,143 +27,63 @@ namespace MagicOnion.Generator
         public virtual string TransformText()
         {
             this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\n");
-            this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? ("namespace " + Namespace + " {") : ""));
-            this.Write("\r\n    using Grpc.Core;\r\n    using MagicOnion;\r\n    using MagicOnion.Client;\r\n    " +
-                    "using MessagePack;\r\n    using System;\r\n    using System.Threading.Tasks;\r\n");
-  foreach(var hubInfo in Hubs) { 
+                    " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
+            this.Write(@"
+{
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+
+    public static partial class MagicOnionInitializer
+    {
+        static bool isRegistered = false;
+
+");
+ if (!OmitUnityAttribute) { 
+            this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
+                    "oadType.BeforeSceneLoad)]\r\n");
+ } 
+            this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
+                    "turn;\r\n            isRegistered = true;\r\n\r\n");
+ foreach(var serviceInfo in Services) { 
+ if(serviceInfo.HasIfDirectiveCondition) { 
+            this.Write("#if ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.IfDirectiveCondition));
             this.Write("\r\n");
- if (hubInfo.HasIfDirectiveCondition) { 
+ } 
+            this.Write("            MagicOnionClientRegistry<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
+            this.Write(">.Register((x, y) => new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.GetClientFullName()));
+            this.Write("(x, y));\r\n");
+ if(serviceInfo.HasIfDirectiveCondition) { 
+            this.Write("#endif\r\n");
+ } 
+ } // foreach 
+            this.Write("\r\n");
+ foreach(var hubInfo in Hubs) { 
+ if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
- var clientName = hubInfo.GetClientName(); 
-            this.Write("    [Ignore]\r\n    public class ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            this.Write(" : StreamingHubClientBase<");
+            this.Write("            StreamingHubClientRegistry<");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
-            this.Write(">, ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write("\r\n    {\r\n        static readonly Method<byte[], byte[]> method = new Method<byte[" +
-                    "], byte[]>(MethodType.DuplexStreaming, \"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.Name));
-            this.Write("\", \"Connect\", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.Thro" +
-                    "ughMarshaller);\r\n\r\n        protected override Method<byte[], byte[]> DuplexStrea" +
-                    "mingAsyncMethod { get { return method; } }\r\n\r\n        readonly ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write(" __fireAndForgetClient;\r\n\r\n        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            this.Write(@"(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
-            : base(callInvoker, host, option, serializerOptions, logger)
-        {
-            this.__fireAndForgetClient = new FireAndForgetClient(this);
-        }
-        
-        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write(" FireAndForget()\r\n        {\r\n            return __fireAndForgetClient;\r\n        }" +
-                    "\r\n\r\n        protected override void OnBroadcastEvent(int methodId, ArraySegment<" +
-                    "byte> data)\r\n        {\r\n            switch (methodId)\r\n            {\r\n");
-  foreach(var item in hubInfo.Receiver.Methods) { 
-            this.Write("                case ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
-            this.Write(": // ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.MethodName));
-            this.Write("\r\n                {\r\n                    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnBroadcastMessage().line1));
-            this.Write("\r\n                    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnBroadcastMessage().line2));
-            this.Write("\r\n                }\r\n");
-  } // end foreach(receiverDef.Methods) 
-            this.Write(@"                default:
-                    break;
-            }
-        }
-
-        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
-        {
-            switch (methodId)
-            {
-");
-  foreach(var item in hubInfo.Methods) { 
-            this.Write("                case ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.HubId));
-            this.Write(": // ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.MethodName));
-            this.Write("\r\n                {\r\n                    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnResponseEvent().line1));
-            this.Write("\r\n                    ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubOnResponseEvent().line2));
-            this.Write("\r\n                    break;\r\n                }\r\n");
-  } // end foreach(interfaceDef.Methods) 
-            this.Write("                default:\r\n                    break;\r\n            }\r\n        }\r\n " +
-                    "  \r\n");
- foreach(var item in hubInfo.Methods) { 
- if (item.HasIfDirectiveCondition) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
-            this.Write("\r\n");
- } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
-            this.Write("        ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToMethodSignature()));
-            this.Write("\r\n        {\r\n            return ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubWriteMessage()));
-            this.Write(";\r\n        }\r\n\r\n");
- if(item.HasIfDirectiveCondition) { 
+            this.Write(">.Register((a, _, b, c, d, e) => new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.GetClientFullName()));
+            this.Write("(a, b, c, d, e));\r\n");
+ if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
- } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
- } // end foreach(interfaceDef.Methods) 
-            this.Write("\r\n        class FireAndForgetClient : ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write("\r\n        {\r\n            readonly ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            this.Write(" __parent;\r\n\r\n            public FireAndForgetClient(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
-            this.Write(" parentClient)\r\n            {\r\n                this.__parent = parentClient;\r\n   " +
-                    "         }\r\n\r\n            public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
-            this.Write(@" FireAndForget()
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task DisposeAsync()
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-");
- foreach(var item in hubInfo.Methods) { 
- if (item.HasIfDirectiveCondition) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.IfDirectiveCondition));
-            this.Write("\r\n");
- } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
-            this.Write("            ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToMethodSignature()));
-            this.Write("\r\n            {\r\n                return __parent.");
-            this.Write(this.ToStringHelper.ToStringWithCulture(item.ToHubFireAndForgetWriteMessage()));
-            this.Write(";\r\n            }\r\n\r\n");
- if (item.HasIfDirectiveCondition) { 
-            this.Write("#endif\r\n");
- } // end if(item.HasIfDirectiveCondition) 
- } // end foreach(interfaceDef.Methods) 
-            this.Write("        }\r\n    }\r\n");
- if (hubInfo.HasIfDirectiveCondition) { 
-            this.Write("#endif \r\n");
- } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
- } // end foreach(Interfaces) 
-            this.Write(this.ToStringHelper.ToStringWithCulture(Namespace != null ? "}" : ""));
-            this.Write("\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning res" +
-                    "tore 414\r\n#pragma warning restore 618\r\n#pragma warning restore 612");
+ } 
+ } // foreach 
+            this.Write("        }\r\n    }\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n" +
+                    "#pragma warning restore 414\r\n#pragma warning restore 612\r\n#pragma warning restor" +
+                    "e 618");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -172,7 +92,7 @@ namespace MagicOnion.Generator
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
-    public class HubTemplateBase
+    public class RegisterTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
