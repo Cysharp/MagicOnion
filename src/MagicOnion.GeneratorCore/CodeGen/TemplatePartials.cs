@@ -7,12 +7,6 @@ using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeGen
 {
-    public partial class CodeTemplate
-    {
-        public string Namespace { get; set; }
-        public IReadOnlyList<InterfaceDefinition> Interfaces { get; set; }
-    }
-
     public partial class HubTemplate
     {
         public string Namespace { get; set; }
@@ -29,15 +23,15 @@ namespace MagicOnion.Generator.CodeGen
 
     public partial class ResolverTemplate
     {
-        public string Namespace;
+        public string Namespace { get; set; }
         public string FormatterNamespace { get; set; }
-        public string ResolverName = "GeneratedResolver";
-        public IReadOnlyList<IResolverRegisterInfo> RegisterInfos;
+        public string ResolverName  { get; set; } = "GeneratedResolver";
+        public IReadOnlyList<IResolverRegisterInfo> RegisterInfos { get; set; }
     }
 
     public partial class EnumTemplate
     {
-        public string Namespace;
-        public IReadOnlyList<EnumSerializationInfo> EnumSerializationInfos;
+        public string Namespace { get; set; }
+        public IReadOnlyList<EnumSerializationInfo> EnumSerializationInfos { get; set; }
     }
 }
