@@ -10,6 +10,7 @@ using System.IO;
 using MagicOnion.Generator.CodeAnalysis;
 using MagicOnion.Generator.CodeGen;
 using MagicOnion.Generator.Utils;
+using MagicOnion.Generator.CodeGen.Extensions;
 
 namespace MagicOnion.Generator
 {

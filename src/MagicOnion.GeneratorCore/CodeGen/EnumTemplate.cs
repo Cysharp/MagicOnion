@@ -12,6 +12,7 @@ namespace MagicOnion.Generator.CodeGen
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
+    using MagicOnion.Generator.CodeGen.Extensions;
     using System;
     
     /// <summary>
