@@ -80,7 +80,7 @@ namespace MagicOnion.Generator.Tests
             File.WriteAllText(Path.Combine(ProjectDirectory, fileName), contents.Trim());
         }
 
-        public OutputCompilation GetOutputCompilation(IReadOnlyList<string>? preprocessorSymbols = null)
+        public OutputCompilation GetOutputCompilation(IReadOnlyList<string> preprocessorSymbols = null)
         {
             var refAsmDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
@@ -126,9 +126,9 @@ namespace MagicOnion.Generator.Tests
         bool CleanOnDisposing = true,
         string TargetFramework = "netstandard2.0",
         string AdditionalCsProjectContent = "",
-        IEnumerable<string>? AdditionalReferences = default,
-        IEnumerable<string>? AdditionalPackageReferences = default,
-        IEnumerable<string>? AdditionalProjectReferences = default
+        IEnumerable<string> AdditionalReferences = default,
+        IEnumerable<string> AdditionalPackageReferences = default,
+        IEnumerable<string> AdditionalProjectReferences = default
     )
     {
         public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();
