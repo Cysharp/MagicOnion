@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<BaseIntermediateOutputPath>.output\obj\</BaseIntermediateOutputPath>
+		<BaseOutputPath>.output\bin\</BaseOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Remove=".output\**\**.*" />
+		<None Remove="obj\**\*.*;bin\**\*.*" />
+		<Compile Remove=".output\**\**.*" />
+		<Compile Remove="bin\**\*.*;obj\**\*.*" />
+		<EmbeddedResource Remove=".output\**\**.*" />
+		<EmbeddedResource Remove="bin\**\*.*;obj\**\*.*" />
+	</ItemGroup>
+</Project>
