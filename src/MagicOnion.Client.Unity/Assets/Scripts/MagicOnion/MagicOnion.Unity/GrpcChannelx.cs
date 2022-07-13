@@ -36,7 +36,9 @@ namespace MagicOnion
         private readonly Action<GrpcChannelx> _onDispose;
         private readonly Dictionary<IStreamingHubMarker, (Func<Task> DisposeAsync, ManagedStreamingHubInfo StreamingHubInfo)> _streamingHubs = new Dictionary<IStreamingHubMarker, (Func<Task>, ManagedStreamingHubInfo)>();
         private readonly ChannelBase _channel;
+
         private bool _disposed;
+        private bool _shutdownRequested;
 
         public Uri TargetUri { get; }
         public int Id { get; }
@@ -273,6 +275,9 @@ namespace MagicOnion
         private async Task ShutdownInternalAsync()
 #endif
         {
+            if (_shutdownRequested) return;
+            _shutdownRequested = true;
+            
             await _channel.ShutdownAsync().ConfigureAwait(false);
         }
 
