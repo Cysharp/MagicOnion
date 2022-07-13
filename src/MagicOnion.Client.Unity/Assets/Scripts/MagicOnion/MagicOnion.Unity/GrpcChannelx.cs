@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -417,21 +418,61 @@ namespace MagicOnion
                         method.Type,
                         method.ServiceName,
                         method.Name,
-                        new Marshaller<TRequest>(x =>
+                        new Marshaller<TRequest>((request, context) =>
                         {
-                            var bytes = method.RequestMarshaller.Serializer(x);
-                            _channelStats.AddSentBytes(bytes.Length);
-                            return bytes;
-                        }, x => method.RequestMarshaller.Deserializer(x)),
-                        new Marshaller<TResponse>(x => method.ResponseMarshaller.Serializer(x), x =>
+                            var wrapper = new SerializationContextWrapper(context);
+                            method.RequestMarshaller.ContextualSerializer(request, context);
+                            _channelStats.AddSentBytes(wrapper.Written);
+                        }, (context) => method.RequestMarshaller.ContextualDeserializer(context)),
+                        new Marshaller<TResponse>((request, context) => method.ResponseMarshaller.ContextualSerializer(request, context), x =>
                         {
-                            _channelStats.AddReceivedBytes(x.Length);
-                            return method.ResponseMarshaller.Deserializer(x);
+                            _channelStats.AddReceivedBytes(x.PayloadLength);
+                            return method.ResponseMarshaller.ContextualDeserializer(x);
                         })
                     );
 
                     return wrappedMethod;
                 }
+            }
+
+            private class SerializationContextWrapper : SerializationContext, IBufferWriter<byte>
+            {
+                private readonly SerializationContext _inner;
+                private IBufferWriter<byte> _bufferWriter;
+                public int Written { get; private set; }
+
+                public SerializationContextWrapper(SerializationContext inner)
+                {
+                    _inner = inner;
+                }
+
+                public override IBufferWriter<byte> GetBufferWriter()
+                    => _bufferWriter ??= _inner.GetBufferWriter();
+
+                public override void Complete(byte[] payload)
+                {
+                    Written = payload.Length;
+                    _inner.Complete(payload);
+                }
+
+                public override void Complete()
+                    => _inner.Complete();
+
+                public override void SetPayloadLength(int payloadLength)
+                {
+                    Written = payloadLength;
+                    _inner.SetPayloadLength(payloadLength);
+                }
+
+                public void Advance(int count)
+                {
+                    Written += count;
+                    GetBufferWriter().Advance(count);
+                }
+
+                public Memory<byte> GetMemory(int sizeHint = 0) => GetBufferWriter().GetMemory(sizeHint);
+
+                public Span<byte> GetSpan(int sizeHint = 0) => GetBufferWriter().GetSpan(sizeHint);
             }
         }
 #endif
