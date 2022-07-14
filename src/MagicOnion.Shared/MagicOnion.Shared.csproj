@@ -9,6 +9,7 @@
 
     <RootNamespace>MagicOnion</RootNamespace>
     <Description>Provides shared classes and interfaces used by MagicOnion server and client. $(MagicOnionPackageDescription)</Description>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

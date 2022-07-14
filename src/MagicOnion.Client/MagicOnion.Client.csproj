@@ -5,7 +5,7 @@
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <!--<nullable>enable</nullable>-->
 
     <DefineConstants>TRACE;NON_UNITY</DefineConstants>

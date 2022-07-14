@@ -37,7 +37,7 @@ MagicOnion client supports a wide range of platforms, including .NET Framework 4
 - Client-side (MagicOnion.Client)
     - .NET Standard 2.1 (.NET Core 3.x+, .NET 5.0+, Xamarin)
     - .NET Standard 2.0 (.NET Framework 4.6.1+, Universal Windows Platform, .NET Core 2.x)
-    - Unity 2018.4.13f1+
+    - Unity 2020.3 (LTS) or newer
 
 ## Quick Start
 ### Server-side project
