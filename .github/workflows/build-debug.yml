@@ -79,15 +79,9 @@ jobs:
           buildMethod: PackageExporter.Export
           versioning: None
 
-      - name: check all .meta is commited
-        run: |
-          if git ls-files --others --exclude-standard -t | grep --regexp='[.]meta$'; then
-            echo "Detected .meta file generated. Do you forgot commit a .meta file?"
-            exit 1
-          else
-            echo "Great, all .meta files are commited."
-          fi
-        working-directory: src/MagicOnion.Client.Unity
+      - uses: ./.github/actions/check-metas
+        with:
+          directory: src/MagicOnion.Client.Unity
 
       # Store artifacts.
       - uses: actions/upload-artifact@v1
