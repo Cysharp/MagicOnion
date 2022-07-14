@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -51,7 +50,7 @@ namespace TempProject
             using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
             tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
                 Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -79,7 +78,7 @@ namespace TempProject
             using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
             tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
                 Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -107,7 +106,7 @@ namespace TempProject
             using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
             tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
                 Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -131,7 +130,7 @@ namespace TempProject
             using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
             tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
+            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
             await compiler.GenerateFileAsync(
                 tempWorkspace.CsProjectPath,
                 Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),

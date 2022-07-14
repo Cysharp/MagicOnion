@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeAnalysis
@@ -19,19 +20,30 @@ namespace MagicOnion.Generator.CodeAnalysis
         public readonly INamedTypeSymbol IStreamingHub;
         public readonly INamedTypeSymbol MethodIdAttribute;
 
-        public ReferenceSymbols(Compilation compilation, Action<string> logger)
+        public ReferenceSymbols(Compilation compilation, IMagicOnionGeneratorLogger logger)
         {
             INamedTypeSymbol GetTypeSymbolOrThrow(string name, SpecialType type = SpecialType.None, bool required = true)
             {
-                var symbol = compilation.GetTypeByMetadataName(name)
-                             ?? GetWellKnownType(name)
-                             ?? GetSpecialType(type);
+                logger.Trace($"[{nameof(ReferenceSymbols)}] GetTypeSymbolOrThrow: {name}; type={type}; required={required}");
+                var symbol = compilation.GetTypeByMetadataName(name);
+                logger.Trace($"[{nameof(ReferenceSymbols)}] GetTypeByMetadataName: {name}; Symbol={symbol}");
 
                 if (symbol == null)
                 {
-                    var message = "failed to get metadata of " + name;
+                    symbol = GetWellKnownType(name);
+                    logger.Trace($"[{nameof(ReferenceSymbols)}] GetWellKnownType: {name}; Symbol={symbol}");
+                }
+                if (symbol == null)
+                {
+                    symbol = GetSpecialType(type);
+                    logger.Trace($"[{nameof(ReferenceSymbols)}] GetSpecialType: {name}; Symbol={symbol}");
+                }
+
+                if (symbol == null)
+                {
+                    var message = $"Unable to get metadata of {name}. Please check that there is a reference to MagicOnion.Abstractions or try to run `dotnet restore`.";
+                    logger.Error(message);
                     if (required) throw new InvalidOperationException(message);
-                    logger(message);
                 }
 
                 return symbol;
@@ -63,6 +75,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                     : null;
             }
 
+            logger.Trace($"[{nameof(ReferenceSymbols)}] Resolving well-known reference symbols...");
             Void = GetTypeSymbolOrThrow("System.Void", SpecialType.System_Void);
             Task = GetTypeSymbolOrThrow("System.Threading.Tasks.Task", required: false);
             TaskOfT = GetTypeSymbolOrThrow("System.Threading.Tasks.Task`1", required: false);

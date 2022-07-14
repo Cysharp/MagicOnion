@@ -7,10 +7,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using MagicOnion.Generator.CodeAnalysis;
 using MagicOnion.Generator.CodeGen;
 using MagicOnion.Generator.Utils;
 using MagicOnion.Generator.CodeGen.Extensions;
+using MagicOnion.Generator.Internal;
 
 namespace MagicOnion.Generator
 {
@@ -18,10 +21,10 @@ namespace MagicOnion.Generator
     {
         static readonly Encoding NoBomUtf8 = new UTF8Encoding(false);
 
-        readonly Action<string> logger;
+        readonly IMagicOnionGeneratorLogger logger;
         readonly CancellationToken cancellationToken;
 
-        public MagicOnionCompiler(Action<string> logger, CancellationToken cancellationToken)
+        public MagicOnionCompiler(IMagicOnionGeneratorLogger logger, CancellationToken cancellationToken)
         {
             this.logger = logger;
             this.cancellationToken = cancellationToken;
@@ -40,25 +43,29 @@ namespace MagicOnion.Generator
             var conditionalSymbols = conditionalSymbol?.Split(',') ?? Array.Empty<string>();
 
             // Generator Start...
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Assembly version: {typeof(MagicOnionCompiler).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.OSDescription: {RuntimeInformation.OSDescription}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.FrameworkDescription: {RuntimeInformation.FrameworkDescription}");
 
             var sw = Stopwatch.StartNew();
-            logger("Project Compilation Start:" + input);
-            var compilation = await PseudoCompilation.CreateFromProjectAsync(new[] { input }, conditionalSymbols, cancellationToken);
-            logger("Project Compilation Complete:" + sw.Elapsed.ToString());
+            logger.Information("Project Compilation Start:" + input);
+            var compilation = await PseudoCompilation.CreateFromProjectAsync(new[] { input }, conditionalSymbols, logger, cancellationToken);
+            logger.Information("Project Compilation Complete:" + sw.Elapsed.ToString());
 
             sw.Restart();
-            logger("Collect services and methods Start");
+            logger.Information("Collect services and methods Start");
             var collector = new MethodCollector(logger);
             var serviceCollection = collector.Collect(compilation);
-            logger("Collect services and methods Complete:" + sw.Elapsed.ToString());
+            logger.Information("Collect services and methods Complete:" + sw.Elapsed.ToString());
             
             sw.Restart();
-            logger("Collect serialization information Start");
-            var serializationInfoCollector = new SerializationInfoCollector();
+            logger.Information("Collect serialization information Start");
+            var serializationInfoCollector = new SerializationInfoCollector(logger);
             var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection, userDefinedMessagePackFormattersNamespace);
-            logger("Collect serialization information Complete:" + sw.Elapsed.ToString());
+            logger.Information("Collect serialization information Complete:" + sw.Elapsed.ToString());
 
-            logger("Output Generation Start");
+            logger.Information("Output Generation Start");
             sw.Restart();
 
             var resolverTemplate = new ResolverTemplate()
@@ -155,10 +162,10 @@ namespace MagicOnion.Generator
 
             if (serviceCollection.Services.Count == 0 && serviceCollection.Hubs.Count == 0)
             {
-                logger("Generated result is empty, unexpected result?");
+                logger.Information("Generated result is empty, unexpected result?");
             }
 
-            logger("Output Generation Complete:" + sw.Elapsed.ToString());
+            logger.Information("Output Generation Complete:" + sw.Elapsed.ToString());
         }
 
         static string NormalizePath(string dir, string ns, string className)
@@ -181,12 +188,11 @@ namespace MagicOnion.Generator
             return content.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
         }
 
-        static void Output(string path, string text)
+        void Output(string path, string text)
         {
             path = path.Replace("global::", "");
 
-            const string prefix = "[Out]";
-            Console.WriteLine(prefix + path);
+            logger.Information($"Write to {path}");
 
             var fi = new FileInfo(path);
             if (!fi.Directory.Exists)

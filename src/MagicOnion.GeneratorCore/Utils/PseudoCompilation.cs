@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.FileSystemGlobbing;
@@ -16,22 +17,26 @@ namespace MagicOnion.Generator.Utils
 {
     internal static class PseudoCompilation
     {
-        public static Task<CSharpCompilation> CreateFromProjectAsync(string[] csprojs, string[] preprocessorSymbols, CancellationToken cancellationToken)
+        public static Task<CSharpCompilation> CreateFromProjectAsync(string[] csprojs, string[] preprocessorSymbols, IMagicOnionGeneratorLogger logger, CancellationToken cancellationToken)
         {
             var parseOption = new CSharpParseOptions(LanguageVersion.Latest, DocumentationMode.Parse, SourceCodeKind.Regular, CleanPreprocessorSymbols(preprocessorSymbols));
             var syntaxTrees = new List<SyntaxTree>();
+
+            logger.Trace($"[{nameof(PseudoCompilation)}] Creating compilation from project(s). (PreprocessorSymbolNames={string.Join(";", parseOption.PreprocessorSymbolNames)})");
 
             var sources = new HashSet<string>();
             var locations = new List<string>();
             foreach (var csproj in csprojs)
             {
-                CollectDocument(csproj, sources, locations);
+                CollectDocument(csproj, sources, locations, logger);
             }
 
             foreach (var file in sources.Select(Path.GetFullPath).Distinct())
             {
+                var path = NormalizeDirectorySeparators(file);
+                logger.Trace($"[{nameof(PseudoCompilation)}] Source '{path}'");
                 var text = File.ReadAllText(NormalizeDirectorySeparators(file), Encoding.UTF8);
-                var syntax = CSharpSyntaxTree.ParseText(text, parseOption);
+                var syntax = CSharpSyntaxTree.ParseText(text, parseOption, path);
                 syntaxTrees.Add(syntax);
             }
 
@@ -44,7 +49,12 @@ namespace MagicOnion.Generator.Utils
             {
                 if (File.Exists(item))
                 {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}'");
                     metadata.Add(MetadataReference.CreateFromFile(item));
+                }
+                else
+                {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}'. But it could not be found.");
                 }
             }
 
@@ -56,6 +66,15 @@ namespace MagicOnion.Generator.Utils
                     OutputKind.DynamicallyLinkedLibrary,
                     allowUnsafe: true,
                     metadataImportOptions: MetadataImportOptions.All));
+
+            var diagnostics = compilation.GetDiagnostics(cancellationToken);
+            if (diagnostics.Any())
+            {
+                foreach (var diagnostic in diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error))
+                {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] {diagnostic.ToString()}");
+                }
+            }
 
             return Task.FromResult(compilation);
         }
@@ -144,8 +163,10 @@ namespace MagicOnion.Generator.Utils
             return preprocessorSymbols.Where(x => !string.IsNullOrWhiteSpace(x));
         }
 
-        private static void CollectDocument(string csproj, HashSet<string> source, List<string> metadataLocations)
+        private static void CollectDocument(string csproj, HashSet<string> source, List<string> metadataLocations, IMagicOnionGeneratorLogger logger)
         {
+            logger.Trace($"[{nameof(PseudoCompilation)}] Open project '{csproj}'");
+
             XDocument document;
             using (var sr = new StreamReader(csproj, true))
             {
@@ -226,6 +247,7 @@ namespace MagicOnion.Generator.Utils
                     if (item.Attribute("Label")?.Value == "Shared")
                     {
                         var sharedRoot = Path.GetDirectoryName(Path.Combine(csProjRoot, item.Attribute("Project").Value));
+                        logger.Trace($"[{nameof(PseudoCompilation)}] Import project '{sharedRoot}'");
                         foreach (var file in IterateCsFileWithoutBinObj(Path.GetDirectoryName(sharedRoot)))
                         {
                             source.Add(file);
@@ -239,7 +261,8 @@ namespace MagicOnion.Generator.Utils
                     var refCsProjPath = item.Attribute("Include")?.Value;
                     if (refCsProjPath != null)
                     {
-                        CollectDocument(Path.Combine(csProjRoot, NormalizeDirectorySeparators(refCsProjPath)), source, metadataLocations);
+                        logger.Trace($"[{nameof(PseudoCompilation)}] Resolve ProjectReference '{refCsProjPath}'");
+                        CollectDocument(Path.Combine(csProjRoot, NormalizeDirectorySeparators(refCsProjPath)), source, metadataLocations, logger);
                     }
                 }
 
@@ -250,11 +273,13 @@ namespace MagicOnion.Generator.Utils
                     if (hintPath == null)
                     {
                         var path = Path.Combine(framworkRoot, item.Attribute("Include").Value + ".dll");
+                        logger.Trace($"[{nameof(PseudoCompilation)}] Assembly Reference '{path}'");
                         metadataLocations.Add(path);
                     }
                     else
                     {
                         var path = Path.Combine(csProjRoot, NormalizeDirectorySeparators(hintPath));
+                        logger.Trace($"[{nameof(PseudoCompilation)}] Assembly Reference '{path}' (from HintPath)");
                         metadataLocations.Add(path);
                     }
                 }
@@ -272,6 +297,7 @@ namespace MagicOnion.Generator.Utils
                 var resolvedDllPaths = new HashSet<string>();
                 void CollectNugetPackages(string id, string packageVersion, string originalTargetFramework)
                 {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] NuGet Package '{id} {packageVersion}'");
                     foreach (var targetFramework in NetstandardFallBack(originalTargetFramework).Distinct())
                     {
                         var pathpath = Path.Combine(nugetPackagesPath, id, packageVersion, "lib", targetFramework);
@@ -284,6 +310,7 @@ namespace MagicOnion.Generator.Utils
                         {
                             if (resolvedDllPaths.Add(pathpath))
                             {
+                                logger.Trace($"[{nameof(PseudoCompilation)}] Resolved assembly '{pathpath}' (targetFramework={targetFramework})");
                                 foreach (var dependency in ResolveNuGetDependency(nugetPackagesPath, id, packageVersion, targetFramework))
                                 {
                                     CollectNugetPackages(dependency.id, dependency.version, originalTargetFramework);

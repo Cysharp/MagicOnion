@@ -2,6 +2,7 @@ using MagicOnion.Generator;
 using System;
 using System.Threading.Tasks;
 using ConsoleAppFramework;
+using MagicOnion.Generator.Internal;
 using Microsoft.Extensions.Hosting;
 
 namespace MagicOnion.Generator
@@ -25,9 +26,10 @@ namespace MagicOnion.Generator
             [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
             [Option("n", "Set namespace root name.")]string @namespace = "MagicOnion",
             [Option("m", "Set generated MessagePackFormatter namespace.")]string messagePackGeneratedNamespace = "MessagePack.Formatters",
-            [Option("c", "Conditional compiler symbols, split with ','.")]string conditionalSymbol = null)
+            [Option("c", "Conditional compiler symbols, split with ','.")]string conditionalSymbol = null,
+            [Option("v", "Enable verbose logging")]bool verbose = false)
         {
-            await new MagicOnionCompiler(x => Console.WriteLine(x), this.Context.CancellationToken)
+            await new MagicOnionCompiler(new MagicOnionGeneratorConsoleLogger(verbose), this.Context.CancellationToken)
                 .GenerateFileAsync(
                     input,
                     output,

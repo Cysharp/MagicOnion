@@ -1,11 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
+using Xunit.Abstractions;
 
 namespace MagicOnion.Generator.Tests.Collector;
 
 public class MethodCollectorServicesTest
 {
+    readonly ITestOutputHelper _testOutputHelper;
+
+    public MethodCollectorServicesTest(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     public void FileScopedNamespace()
     {
@@ -28,7 +36,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -76,7 +84,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -116,7 +124,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -148,7 +156,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -180,7 +188,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -223,7 +231,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -265,7 +273,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -308,7 +316,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -352,7 +360,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -396,7 +404,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -431,7 +439,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
     
@@ -458,7 +466,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
         
@@ -485,7 +493,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
            
@@ -512,7 +520,7 @@ namespace MyNamespace
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -538,7 +546,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -579,7 +587,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -621,7 +629,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -665,7 +673,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -692,7 +700,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -733,7 +741,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
@@ -759,7 +767,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
@@ -800,7 +808,7 @@ public interface IMyService : IService<IMyService>
         var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
         // Act & Assert
-        var collector = new MethodCollector();
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper));
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
