@@ -11,10 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sandbox", "sandbox", "{7682
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion", "src\MagicOnion\MagicOnion.csproj", "{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src_unity", "src_unity", "{5C86A5C9-ECE1-4FB9-B48C-A9DCF9C3FECC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "src\MagicOnion.Client.Unity\Assembly-CSharp.csproj", "{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5A3F5158-7B17-4586-9885-9E60C1393185}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Server", "samples\ChatApp\ChatApp.Server\ChatApp.Server.csproj", "{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}"
@@ -87,9 +83,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Shared.Tests", "tests\MagicOnion.Shared.Tests\MagicOnion.Shared.Tests.csproj", "{A6DB6E90-711E-4832-B8F0-BEB14E31B77C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Integration.Tests", "tests\MagicOnion.Integration.Tests\MagicOnion.Integration.Tests.csproj", "{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Integration.Tests", "tests\MagicOnion.Integration.Tests\MagicOnion.Integration.Tests.csproj", "{EC4E0789-6A32-42FA-ABD7-7ED3A5004CFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnionTestServer", "tests\samples\MagicOnionTestServer\MagicOnionTestServer.csproj", "{D0555A91-D817-4322-B8D0-16641069D17B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnionTestServer", "tests\samples\MagicOnionTestServer\MagicOnionTestServer.csproj", "{D0555A91-D817-4322-B8D0-16641069D17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,10 +97,6 @@ Global
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -203,7 +195,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C79CE0BF-ED4C-47BE-822E-E82CF83FC68A} = {1987061F-8970-4018-8D58-6932961C9EB4}
-		{A1DB4A40-10FE-61E7-9ADF-1D16330A9BF3} = {5C86A5C9-ECE1-4FB9-B48C-A9DCF9C3FECC}
 		{7B7CFF27-CB38-4661-9CFC-473B4E38F0DE} = {FEE2B9AB-A1D0-41BA-A172-FC95935542DF}
 		{2AD48C05-ED44-4E4F-B86B-A746E7F968A9} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{963FD601-3CE6-42DE-9FAC-C70D5494FA9B} = {1987061F-8970-4018-8D58-6932961C9EB4}
