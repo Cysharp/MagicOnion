@@ -43,6 +43,12 @@ namespace MagicOnion.Generator
             var conditionalSymbols = conditionalSymbol?.Split(',') ?? Array.Empty<string>();
 
             // Generator Start...
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Input: {input}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Output: {output}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:OmitUnityAttribute: {omitUnityAttribute}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {@namespace}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
+            logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedMessagePackFormattersNamespace: {userDefinedMessagePackFormattersNamespace}");
             logger.Trace($"[{nameof(MagicOnionCompiler)}] Assembly version: {typeof(MagicOnionCompiler).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
             logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.OSDescription: {RuntimeInformation.OSDescription}");
             logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");

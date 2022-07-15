@@ -79,7 +79,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                     throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
             }
 
-            logger.Trace($"[{nameof(MethodCollectorContext)}] Found StreamingHub method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
+            logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
                 hubId,
                 methodSymbol.Name,

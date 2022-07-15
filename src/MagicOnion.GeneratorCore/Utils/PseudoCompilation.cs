@@ -72,7 +72,7 @@ namespace MagicOnion.Generator.Utils
             {
                 foreach (var diagnostic in diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error))
                 {
-                    logger.Trace($"[{nameof(PseudoCompilation)}] {diagnostic.ToString()}");
+                    logger.Trace($"[{nameof(PseudoCompilation)}] CompilationDiagnostic: {diagnostic.ToString()}");
                 }
             }
 
@@ -298,6 +298,7 @@ namespace MagicOnion.Generator.Utils
                 void CollectNugetPackages(string id, string packageVersion, string originalTargetFramework)
                 {
                     logger.Trace($"[{nameof(PseudoCompilation)}] NuGet Package '{id} {packageVersion}'");
+                    var packageAssemblyResolved = false;
                     foreach (var targetFramework in NetstandardFallBack(originalTargetFramework).Distinct())
                     {
                         var pathpath = Path.Combine(nugetPackagesPath, id, packageVersion, "lib", targetFramework);
@@ -317,8 +318,14 @@ namespace MagicOnion.Generator.Utils
                                 }
                             }
 
+                            packageAssemblyResolved = true;
                             break;
                         }
+                    }
+
+                    if (!packageAssemblyResolved)
+                    {
+                        logger.Trace($"[{nameof(PseudoCompilation)}] Could not find package assembly for '{id} {packageVersion}'");
                     }
                 }
 
