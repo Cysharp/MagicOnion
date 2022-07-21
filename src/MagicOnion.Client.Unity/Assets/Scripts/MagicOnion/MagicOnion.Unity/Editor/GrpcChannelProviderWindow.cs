@@ -36,7 +36,7 @@ namespace MagicOnion.Unity.Editor
                 _monitor = new GrpcChannelProviderMonitor(providerHost.Provider);
             }
 
-            using (var scope = new EditorGUILayout.ScrollViewScope(_scrollPosition, false, false, new[] { GUILayout.Width(Screen.width) }))
+            using (var scope = new EditorGUILayout.ScrollViewScope(_scrollPosition, false, false, new GUILayoutOption[] { }))
             using (new EditorGUILayout.VerticalScope(new GUIStyle()
             {
                 padding =
