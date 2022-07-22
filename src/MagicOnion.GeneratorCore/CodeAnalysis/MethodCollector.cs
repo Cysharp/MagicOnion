@@ -12,11 +12,11 @@ namespace MagicOnion.Generator.CodeAnalysis
     /// </summary>
     public class MethodCollector
     {
-        readonly Action<string> logger;
+        readonly IMagicOnionGeneratorLogger logger;
 
-        public MethodCollector(Action<string> logger = null)
+        public MethodCollector(IMagicOnionGeneratorLogger logger = null)
         {
-            this.logger = logger ?? (_ => {});
+            this.logger = logger ?? MagicOnionGeneratorNullLogger.Instance;
         }
 
         public MagicOnionServiceCollection Collect(Compilation compilation)
@@ -32,6 +32,9 @@ namespace MagicOnion.Generator.CodeAnalysis
                 .Select(x =>
                 {
                     var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
+                    var ifDirective = x.GetDefinedGenerateIfCondition();
+                    logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub type '{serviceType.FullName}' (IfDirective={ifDirective})");
+
                     var methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(y => CreateHubMethodInfoFromMethodSymbol(serviceType, y))
@@ -44,8 +47,10 @@ namespace MagicOnion.Generator.CodeAnalysis
                         .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, y))
                         .ToArray();
 
+                    logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub Receiver type '{receiverType.FullName}'");
                     var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods, receiverInterfaceSymbol.GetDefinedGenerateIfCondition());
-                    return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, x.GetDefinedGenerateIfCondition());
+
+                    return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, ifDirective);
                 })
                 .OrderBy(x => x.ServiceType.FullName)
                 .ToArray();
@@ -74,6 +79,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                     throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
             }
 
+            logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
                 hubId,
                 methodSymbol.Name,
@@ -97,6 +103,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 throw new InvalidOperationException($"StreamingHub receiver method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
             }
 
+            logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub receiver method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
             return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
                 hubId,
                 methodSymbol.Name,
@@ -114,12 +121,15 @@ namespace MagicOnion.Generator.CodeAnalysis
                 .Select(x =>
                 {
                     var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
+                    var ifDirective = x.GetDefinedGenerateIfCondition();
+                    logger.Trace($"[{nameof(MethodCollectorContext)}] Service type '{serviceType.FullName}' (IfDirective={ifDirective})");
+
                     var methods = x.GetMembers()
                         .OfType<IMethodSymbol>()
                         .Select(y => CreateServiceMethodInfoFromMethodSymbol(serviceType, y))
                         .ToArray();
 
-                    return new MagicOnionServiceInfo(serviceType, methods, x.GetDefinedGenerateIfCondition());
+                    return new MagicOnionServiceInfo(serviceType, methods, ifDirective);
                 })
                 .OrderBy(x => x.ServiceType.FullName)
                 .ToArray();
@@ -177,6 +187,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 throw new InvalidOperationException($"ClientStreaming and DuplexStreaming must have no parameters. ({serviceType.FullName}.{methodSymbol.Name})");
             }
 
+            logger.Trace($"[{nameof(MethodCollectorContext)}] Service method '{methodSymbol.Name}' ({methodType}) in type '{serviceType.FullName}' (IfDirective={ifDirective})");
             return new MagicOnionServiceInfo.MagicOnionServiceMethodInfo(
                 methodType,
                 serviceType.Name,
@@ -200,34 +211,47 @@ namespace MagicOnion.Generator.CodeAnalysis
                     ? parameters[0].Type
                     : MagicOnionTypeInfo.CreateValueType("MagicOnion", "DynamicArgumentTuple", parameters.Select(x => x.Type).ToArray());
 
-        public class MethodCollectorContext
+        class MethodCollectorContext
         {
             public ReferenceSymbols ReferenceSymbols { get; }
             public IReadOnlyList<INamedTypeSymbol> ServiceAndHubInterfaces { get; }
             public IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; }
             public IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; }
-            public Action<string> Logger { get; }
+            public IMagicOnionGeneratorLogger Logger { get; }
 
-            public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces, Action<string> logger)
+            public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces, IMagicOnionGeneratorLogger logger)
             {
                 ReferenceSymbols = referenceSymbols;
                 ServiceAndHubInterfaces = serviceAndHubInterfaces;
-                Logger = logger ?? (_ => { });
+                Logger = logger;
 
-                ServiceInterfaces = serviceAndHubInterfaces
-                    .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) && x.AllInterfaces.All(y => !y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
-                    .Where(x => !x.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IService))
-                    .Distinct()
-                    .ToArray();
+                var serviceInterfaces = new HashSet<INamedTypeSymbol>();
+                var hubInterfaces = new HashSet<INamedTypeSymbol>();
+                foreach (var type in serviceAndHubInterfaces)
+                {
+                    if (type.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
+                    {
+                        // StreamingHub
+                        if (!type.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
+                        {
+                            hubInterfaces.Add(type);
+                        }
+                    }
+                    else if (type.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)))
+                    {
+                        // Service
+                        if (!type.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IService))
+                        {
+                            serviceInterfaces.Add(type);
+                        }
+                    }
+                }
 
-                HubInterfaces = serviceAndHubInterfaces
-                    .Where(x => x.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
-                    .Where(x => !x.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
-                    .Distinct()
-                    .ToArray();
+                ServiceInterfaces = serviceInterfaces.ToArray();
+                HubInterfaces = hubInterfaces.ToArray();
             }
 
-            public static MethodCollectorContext CreateFromCompilation(Compilation compilation, Action<string> logger = null)
+            public static MethodCollectorContext CreateFromCompilation(Compilation compilation, IMagicOnionGeneratorLogger logger)
             {
                 var typeReferences = new ReferenceSymbols(compilation, logger);
                 var serviceAndHubInterfaces = compilation.GetNamedTypeSymbols()

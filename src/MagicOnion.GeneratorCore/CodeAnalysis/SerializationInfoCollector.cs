@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using MagicOnion.Generator.Internal;
 
 namespace MagicOnion.Generator.CodeAnalysis
 {
@@ -11,6 +12,13 @@ namespace MagicOnion.Generator.CodeAnalysis
     /// </summary>
     public class SerializationInfoCollector
     {
+        readonly IMagicOnionGeneratorLogger logger;
+
+        public SerializationInfoCollector(IMagicOnionGeneratorLogger logger)
+        {
+            this.logger = logger;
+        }
+
         public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string userDefinedMessagePackFormattersNamespace = null)
             => Collect(EnumerateTypes(serviceCollection), userDefinedMessagePackFormattersNamespace);
 
@@ -80,11 +88,13 @@ namespace MagicOnion.Generator.CodeAnalysis
                 var type = typeWithDirectives.Type;
                 if (WellKnownSerializationTypes.BuiltInTypes.Contains(type.FullName))
                 {
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Array type '{type.FullName}'. Skip this because the type is supported by built-in resolver.");
                     continue;
                 }
 
                 if (type.IsEnum)
                 {
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Enum type '{type.FullName}'");
                     context.Enums.Add(new EnumSerializationInfo(
                         type.Namespace,
                         type.Name,
@@ -97,9 +107,11 @@ namespace MagicOnion.Generator.CodeAnalysis
                 {
                     if (WellKnownSerializationTypes.BuiltInArrayElementTypes.Contains(type.ElementType.FullName))
                     {
+                        logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'. Skip this because an array element type is supported by built-in resolver.");
                         continue;
                     }
 
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'");
                     switch (type.ArrayRank)
                     {
                         case 1:
@@ -122,6 +134,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                 {
                     if (type.FullNameOpenType == "global::System.Nullable<>" && WellKnownSerializationTypes.BuiltInNullableTypes.Contains(type.GenericArguments[0].FullName))
                     {
+                        logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}'. Skip this because it is nullable.");
                         continue;
                     }
 
@@ -145,6 +158,7 @@ namespace MagicOnion.Generator.CodeAnalysis
                         formatterName = $"{userDefinedMessagePackFormattersNamespace}{(string.IsNullOrWhiteSpace(userDefinedMessagePackFormattersNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
                     }
 
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}' (IfDirectives={string.Join(", ", typeWithDirectives.IfDirectives)})");
                     context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, typeWithDirectives.IfDirectives));
                 }
             }
