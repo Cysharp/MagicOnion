@@ -70,7 +70,8 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
         });
 
         ex.RetryCount.Should().Be(3);
-        logger.WriteLine(ex.LastException.ToString());
+        ex.LastException.Should().NotBeNull();
+        logger.WriteLine(ex.LastException?.ToString());
     }
 }
 public interface IClientFilterTestService : IService<IClientFilterTestService>
