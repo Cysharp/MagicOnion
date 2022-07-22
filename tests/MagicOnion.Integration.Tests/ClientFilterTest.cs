@@ -186,7 +186,7 @@ public class RetryFilter : IClientFilter
 {
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
-        Exception lastException = null;
+        Exception? lastException = null;
         var retryCount = 0;
         while (retryCount != 3)
         {
@@ -210,9 +210,9 @@ public class RetryFilter : IClientFilter
 public class RetryFailedException : Exception
 {
     public int RetryCount { get; }
-    public Exception LastException { get; }
+    public Exception? LastException { get; }
 
-    public RetryFailedException(int retryCount, Exception lastException)
+    public RetryFailedException(int retryCount, Exception? lastException)
     {
         this.RetryCount = retryCount;
         this.LastException = lastException;

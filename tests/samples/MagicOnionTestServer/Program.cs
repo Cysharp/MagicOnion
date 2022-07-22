@@ -1,7 +1,7 @@
 namespace MagicOnionTestServer;
 
 /// <summary>
-/// This project exists to be used by test projects that uses <see cref="Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory{TEntryPoint}" />.
+/// This project exists to be used by test projects that uses WebApplicationFactory.
 /// </summary>
 /// <example>
 /// <code>

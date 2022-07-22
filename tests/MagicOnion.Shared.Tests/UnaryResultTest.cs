@@ -9,7 +9,7 @@ public class UnaryResultTest
     {
         (await UnaryResult.FromResult(123)).Should().Be(123);
         (await UnaryResult.FromResult("foo")).Should().Be("foo");
-        (await UnaryResult.FromResult<string>(default(string))).Should().BeNull();
+        (await UnaryResult.FromResult<string?>(default(string))).Should().BeNull();
 
         Assert.Throws<ArgumentNullException>(() => UnaryResult.FromResult(default(Task<string>)));
     }
@@ -23,7 +23,7 @@ public class UnaryResultTest
         var result2 = new UnaryResult<string>("foo");
         (await result2).Should().Be("foo");
 
-        var result3 = new UnaryResult<string>(default(string));
+        var result3 = new UnaryResult<string?>(default(string));
         (await result3).Should().BeNull();
     }
 

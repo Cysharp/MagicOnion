@@ -180,7 +180,7 @@ public class UnaryTest
         // Assert
         result.Should().Be("OK");
         callInvokerMock.Verify();
-        sentRequest.Value.Should().Be(123);
+        (sentRequest?.Value).Should().Be(123);
     }
                 
     [Fact]
@@ -204,8 +204,8 @@ public class UnaryTest
         // Assert
         result.Should().Be("OK");
         callInvokerMock.Verify();
-        sentRequest.Value.Item1.Should().Be(123);
-        sentRequest.Value.Item2.Should().Be("Foo");
+        (sentRequest?.Value.Item1).Should().Be(123);
+        (sentRequest?.Value.Item2).Should().Be("Foo");
     }
                     
     [Fact]
@@ -229,8 +229,8 @@ public class UnaryTest
         // Assert
         result.Should().Be(987);
         callInvokerMock.Verify();
-        sentRequest.Value.Item1.Should().Be(123);
-        sentRequest.Value.Item2.Should().Be("Foo");
+        (sentRequest?.Value.Item1).Should().Be(123);
+        (sentRequest?.Value.Item2).Should().Be("Foo");
     }
 
     [Fact]
