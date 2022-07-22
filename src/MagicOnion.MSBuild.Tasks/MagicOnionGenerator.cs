@@ -26,7 +26,7 @@ namespace MagicOnion.MSBuild.Tasks
         {
             try
             {
-                new MagicOnionCompiler(x => this.Log.LogMessage(x), CancellationToken.None)
+                new MagicOnionCompiler(new MSBuildMagicOnionGeneratorLogger(this.Log), CancellationToken.None)
                     .GenerateFileAsync(
                         Input,
                         Output,
