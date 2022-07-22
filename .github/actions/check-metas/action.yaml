@@ -1,0 +1,16 @@
+name: Check all .meta is commited
+inputs:
+  directory:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        if git ls-files --others --exclude-standard -t | grep --regexp='[.]meta$'; then
+          echo "Detected .meta file generated. Do you forgot commit a .meta file?"
+          exit 1
+        else
+          echo "Great, all .meta files are commited."
+        fi

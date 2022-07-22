@@ -1,0 +1,18 @@
+name: Setup .NET SDKs
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+    - name: "Prepare Environment Variables (.NET SDK)"
+      shell: bash
+      run: |
+          echo "MSBUILDDISABLENODEREUSE=1" | tee -a "$GITHUB_ENV"
+          echo "DOTNET_CLI_TELEMETRY_OPTOUT=1" | tee -a "$GITHUB_ENV"
+          echo "DOTNET_NOLOGO=1" | tee -a "$GITHUB_ENV"
+          echo "COMPlus_EnableDiagnostics=0" | tee -a "$GITHUB_ENV"
+          echo "NUGET_XMLDOC_MODE=skip" | tee -a "$GITHUB_ENV"

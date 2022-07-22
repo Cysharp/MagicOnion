@@ -1,4 +1,4 @@
-using MagicOnion.GeneratorCore;
+using MagicOnion.Generator;
 using System;
 using System.Threading.Tasks;
 using ConsoleAppFramework;

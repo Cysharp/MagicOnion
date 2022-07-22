@@ -1,0 +1,7 @@
+{
+  "name": "com.cysharp.magiconion.samples.chatapp.shared.unity",
+  "version": "1.0.0",
+  "displayName": "ChatApp.Shared.Unity",
+  "description": "ChatApp.Shared.Unity",
+  "unity": "2019.1"
+}

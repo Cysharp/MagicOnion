@@ -1,0 +1,17 @@
+{
+  "solution": {
+    "path": "MagicOnion.sln",
+    "projects": [
+      "src\\MagicOnion.Abstractions\\MagicOnion.Abstractions.csproj",
+      "src\\MagicOnion.Client\\MagicOnion.Client.csproj",
+      "src\\MagicOnion.GeneratorCore\\MagicOnion.GeneratorCore.csproj",
+      "src\\MagicOnion.Generator\\MagicOnion.Generator.csproj",
+      "src\\MagicOnion.MSBuild.Tasks\\MagicOnion.MSBuild.Tasks.csproj",
+      "src\\MagicOnion.Server.HttpGateway\\MagicOnion.Server.HttpGateway.csproj",
+      "src\\MagicOnion.Server.Redis\\MagicOnion.Server.Redis.csproj",
+      "src\\MagicOnion.Server\\MagicOnion.Server.csproj",
+      "src\\MagicOnion.Shared\\MagicOnion.Shared.csproj",
+      "src\\MagicOnion\\MagicOnion.csproj"
+    ]
+  }
+}

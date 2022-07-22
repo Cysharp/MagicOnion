@@ -6,15 +6,13 @@
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
+#pragma warning disable CS1591 // document public APIs
 
-#pragma warning disable SA1200 // Using directives should be placed correctly
 #pragma warning disable SA1312 // Variable names should begin with lower-case letter
 #pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack.Resolvers
 {
-    using System;
-
     public class GeneratedResolver : global::MessagePack.IFormatterResolver
     {
         public static readonly global::MessagePack.IFormatterResolver Instance = new GeneratedResolver();
@@ -45,18 +43,18 @@ namespace MessagePack.Resolvers
 
     internal static class GeneratedResolverGetFormatterHelper
     {
-        private static readonly global::System.Collections.Generic.Dictionary<Type, int> lookup;
+        private static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> lookup;
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(2)
             {
                 { typeof(global::ChatApp.Shared.MessagePackObjects.JoinRequest), 0 },
                 { typeof(global::ChatApp.Shared.MessagePackObjects.MessageResponse), 1 },
             };
         }
 
-        internal static object GetFormatter(Type t)
+        internal static object GetFormatter(global::System.Type t)
         {
             int key;
             if (!lookup.TryGetValue(t, out key))
@@ -80,7 +78,6 @@ namespace MessagePack.Resolvers
 #pragma warning restore 612
 
 #pragma warning restore SA1312 // Variable names should begin with lower-case letter
-#pragma warning restore SA1200 // Using directives should be placed correctly
 #pragma warning restore SA1649 // File name should match first type name
 
 
@@ -94,9 +91,9 @@ namespace MessagePack.Resolvers
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 168
+#pragma warning disable CS1591 // document public APIs
 
 #pragma warning disable SA1129 // Do not use default value type constructor
-#pragma warning disable SA1200 // Using directives should be placed correctly
 #pragma warning disable SA1309 // Field names should not begin with underscore
 #pragma warning disable SA1312 // Variable names should begin with lower-case letter
 #pragma warning disable SA1403 // File may only contain a single namespace
@@ -104,46 +101,38 @@ namespace MessagePack.Resolvers
 
 namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
 {
-    using System;
-    using System.Buffers;
-    using MessagePack;
-
     public sealed class JoinRequestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.JoinRequest>
     {
 
-
-        public void Serialize(ref MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.JoinRequest value, global::MessagePack.MessagePackSerializerOptions options)
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.JoinRequest value, global::MessagePack.MessagePackSerializerOptions options)
         {
-            IFormatterResolver formatterResolver = options.Resolver;
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
             writer.WriteArrayHeader(2);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.RoomName, options);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.UserName, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.RoomName, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.UserName, options);
         }
 
-        public global::ChatApp.Shared.MessagePackObjects.JoinRequest Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        public global::ChatApp.Shared.MessagePackObjects.JoinRequest Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
-                throw new InvalidOperationException("typecode is null, struct not supported");
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
             }
 
             options.Security.DepthStep(ref reader);
-            IFormatterResolver formatterResolver = options.Resolver;
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
             var length = reader.ReadArrayHeader();
-            var __RoomName__ = default(string);
-            var __UserName__ = default(string);
+            var ____result = new global::ChatApp.Shared.MessagePackObjects.JoinRequest();
 
             for (int i = 0; i < length; i++)
             {
-                var key = i;
-
-                switch (key)
+                switch (i)
                 {
                     case 0:
-                        __RoomName__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        ____result.RoomName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 1:
-                        __UserName__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        ____result.UserName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:
                         reader.Skip();
@@ -151,9 +140,6 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
                 }
             }
 
-            var ____result = new global::ChatApp.Shared.MessagePackObjects.JoinRequest();
-            ____result.RoomName = __RoomName__;
-            ____result.UserName = __UserName__;
             reader.Depth--;
             return ____result;
         }
@@ -162,39 +148,35 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
     public sealed class MessageResponseFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ChatApp.Shared.MessagePackObjects.MessageResponse>
     {
 
-
-        public void Serialize(ref MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.MessageResponse value, global::MessagePack.MessagePackSerializerOptions options)
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::ChatApp.Shared.MessagePackObjects.MessageResponse value, global::MessagePack.MessagePackSerializerOptions options)
         {
-            IFormatterResolver formatterResolver = options.Resolver;
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
             writer.WriteArrayHeader(2);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.UserName, options);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Message, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.UserName, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Serialize(ref writer, value.Message, options);
         }
 
-        public global::ChatApp.Shared.MessagePackObjects.MessageResponse Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        public global::ChatApp.Shared.MessagePackObjects.MessageResponse Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
-                throw new InvalidOperationException("typecode is null, struct not supported");
+                throw new global::System.InvalidOperationException("typecode is null, struct not supported");
             }
 
             options.Security.DepthStep(ref reader);
-            IFormatterResolver formatterResolver = options.Resolver;
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
             var length = reader.ReadArrayHeader();
-            var __UserName__ = default(string);
-            var __Message__ = default(string);
+            var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
 
             for (int i = 0; i < length; i++)
             {
-                var key = i;
-
-                switch (key)
+                switch (i)
                 {
                     case 0:
-                        __UserName__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        ____result.UserName = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 1:
-                        __Message__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        ____result.Message = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<string>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:
                         reader.Skip();
@@ -202,13 +184,11 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
                 }
             }
 
-            var ____result = new global::ChatApp.Shared.MessagePackObjects.MessageResponse();
-            ____result.UserName = __UserName__;
-            ____result.Message = __Message__;
             reader.Depth--;
             return ____result;
         }
     }
+
 }
 
 #pragma warning restore 168
@@ -217,7 +197,6 @@ namespace MessagePack.Formatters.ChatApp.Shared.MessagePackObjects
 #pragma warning restore 612
 
 #pragma warning restore SA1129 // Do not use default value type constructor
-#pragma warning restore SA1200 // Using directives should be placed correctly
 #pragma warning restore SA1309 // Field names should not begin with underscore
 #pragma warning restore SA1312 // Variable names should begin with lower-case letter
 #pragma warning restore SA1403 // File may only contain a single namespace

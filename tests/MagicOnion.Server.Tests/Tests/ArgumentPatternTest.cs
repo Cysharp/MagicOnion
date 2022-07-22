@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
+using MagicOnion.Internal;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -319,12 +320,12 @@ namespace MagicOnion.Server.Tests
             {
                 var tuple = new DynamicArgumentTuple<int, int>(x, y);
 
-                var method = new Method<byte[], byte[]>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-                var request = MessagePackSerializer.Serialize(tuple);
+                var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MessagePackSerializerOptions.Standard);
+                var request = Box.Create(tuple);
 
-                var callResult = invoker.AsyncUnaryCall(method, null, default(CallOptions), request);
+                var callResult = invoker.AsyncUnaryCall(method.Method, null, default(CallOptions), request);
 
-                var response = new ResponseContext<MyResponse>(callResult, MessagePackSerializer.DefaultOptions);
+                var response = new ResponseContext<MyResponse>(callResult);
                 return new UnaryResult<MyResponse>(Task.FromResult<IResponseContext<MyResponse>>(response));
             }
 

@@ -1,6 +1,7 @@
 using Microsoft.Build.Framework;
 using System;
 using System.Threading;
+using MagicOnion.Generator;
 
 // MagicOnion.MSBuild.Tasks.MagicOnionGenerator
 namespace MagicOnion.MSBuild.Tasks

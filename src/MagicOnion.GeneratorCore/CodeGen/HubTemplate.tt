@@ -1,0 +1,142 @@
+﻿<#@ template language="C#" linePragmas="false" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.Generator.CodeGen.Extensions" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+<#= Namespace != null ? ("namespace " + Namespace + " {") : "" #>
+    using Grpc.Core;
+    using MagicOnion;
+    using MagicOnion.Client;
+    using MessagePack;
+    using System;
+    using System.Threading.Tasks;
+<#  foreach(var hubInfo in Hubs) { #>
+
+<# if (hubInfo.HasIfDirectiveCondition) { #>
+#if <#= hubInfo.IfDirectiveCondition #>
+<# } #>
+<# var clientName = hubInfo.GetClientName(); #>
+    [Ignore]
+    public class <#= clientName #> : StreamingHubClientBase<<#= hubInfo.ServiceType.FullName #>, <#= hubInfo.Receiver.ReceiverType.FullName #>>, <#= hubInfo.ServiceType.FullName #>
+    {
+        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "<#= hubInfo.ServiceType.Name #>", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+
+        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
+
+        readonly <#= hubInfo.ServiceType.FullName #> __fireAndForgetClient;
+
+        public <#= clientName #>(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
+            : base(callInvoker, host, option, serializerOptions, logger)
+        {
+            this.__fireAndForgetClient = new FireAndForgetClient(this);
+        }
+        
+        public <#= hubInfo.ServiceType.FullName #> FireAndForget()
+        {
+            return __fireAndForgetClient;
+        }
+
+        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+<#  foreach(var item in hubInfo.Receiver.Methods) { #>
+                case <#= item.HubId #>: // <#= item.MethodName #>
+                {
+                    <#= item.ToHubOnBroadcastMessage().line1 #>
+                    <#= item.ToHubOnBroadcastMessage().line2 #>
+                }
+<#  } // end foreach(receiverDef.Methods) #>
+                default:
+                    break;
+            }
+        }
+
+        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+        {
+            switch (methodId)
+            {
+<#  foreach(var item in hubInfo.Methods) { #>
+                case <#= item.HubId #>: // <#= item.MethodName #>
+                {
+                    <#= item.ToHubOnResponseEvent().line1 #>
+                    <#= item.ToHubOnResponseEvent().line2 #>
+                    break;
+                }
+<#  } // end foreach(interfaceDef.Methods) #>
+                default:
+                    break;
+            }
+        }
+   
+<# foreach(var item in hubInfo.Methods) { #>
+<# if (item.HasIfDirectiveCondition) { #>
+#if <#= item.IfDirectiveCondition #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
+        <#= item.ToMethodSignature() #>
+        {
+            return <#= item.ToHubWriteMessage() #>;
+        }
+
+<# if(item.HasIfDirectiveCondition) { #>
+#endif
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
+<# } // end foreach(interfaceDef.Methods) #>
+
+        class FireAndForgetClient : <#= hubInfo.ServiceType.FullName #>
+        {
+            readonly <#= clientName #> __parent;
+
+            public FireAndForgetClient(<#= clientName #> parentClient)
+            {
+                this.__parent = parentClient;
+            }
+
+            public <#= hubInfo.ServiceType.FullName #> FireAndForget()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task DisposeAsync()
+            {
+                throw new NotSupportedException();
+            }
+
+            public Task WaitForDisconnect()
+            {
+                throw new NotSupportedException();
+            }
+
+<# foreach(var item in hubInfo.Methods) { #>
+<# if (item.HasIfDirectiveCondition) { #>
+#if <#= item.IfDirectiveCondition #>
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
+            <#= item.ToMethodSignature() #>
+            {
+                return __parent.<#= item.ToHubFireAndForgetWriteMessage() #>;
+            }
+
+<# if (item.HasIfDirectiveCondition) { #>
+#endif
+<# } // end if(item.HasIfDirectiveCondition) #>
+<# } // end foreach(interfaceDef.Methods) #>
+        }
+    }
+<# if (hubInfo.HasIfDirectiveCondition) { #>
+#endif 
+<# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
+<# } // end foreach(Interfaces) #>
+<#= Namespace != null ? "}" : "" #>
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 618
+#pragma warning restore 612

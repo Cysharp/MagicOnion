@@ -9,6 +9,7 @@ using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server
@@ -339,75 +340,42 @@ namespace MagicOnion.Server
         {
             // NOTE: ServiceBinderBase.AddMethod has `class` generic constraint.
             //       We need to box an instance of the value type.
-            var isRequestTypeValueType = RequestType.IsValueType;
-            var isResponseTypeValueType = UnwrappedResponseType.IsValueType;
-            var hasParameter = MethodInfo.GetParameters().Any();
+            var rawRequestType = RequestType.IsValueType ? typeof(Box<>).MakeGenericType(RequestType) : RequestType;
+            var rawResponseType = UnwrappedResponseType.IsValueType ? typeof(Box<>).MakeGenericType(UnwrappedResponseType) : UnwrappedResponseType;
 
-            var bindMethod = (hasParameter, isRequestTypeValueType, isResponseTypeValueType) switch
+            MethodInfo bindMethod;
+            if (MethodInfo.GetParameters().Any())
+            {
+                bindMethod = this.GetType().GetMethod(nameof(BindUnaryHandler_Raw), BindingFlags.Instance | BindingFlags.NonPublic)!;
+            }
+            else
             {
                 // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
                 //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
                 //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
-                // (NoParameter, _, Class)
-                (false, _, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (NoParameter, _, Boxed)
-                (false, _, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-
-                // (HasParameter, Class, Class)
-                (true, false, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (HasParameter, Boxed, Class)
-                (true, true, false) => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_RefType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (HasParameter, Class, Boxed)
-                (true, false, true) => this.GetType().GetMethod(nameof(BindUnaryHandler_RefType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-                // (HasParameter, Boxed, Boxed)
-                _ => this.GetType().GetMethod(nameof(BindUnaryHandler_ValueType_ValueType), BindingFlags.Instance | BindingFlags.NonPublic)!,
-            };
-            
-            ((Action<ServiceBinderBase>)bindMethod.MakeGenericMethod(RequestType, UnwrappedResponseType).CreateDelegate(typeof(Action<ServiceBinderBase>), this))(binder);
+                bindMethod = this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore), BindingFlags.Instance | BindingFlags.NonPublic)!;
+            }
+            ((Action<ServiceBinderBase>)bindMethod.MakeGenericMethod(RequestType, UnwrappedResponseType, rawRequestType, rawResponseType).CreateDelegate(typeof(Action<ServiceBinderBase>), this))(binder);
         }
 
-#pragma warning disable CS8603
-        void BindUnaryHandler_Ignore_ValueType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
+        void BindUnaryHandler_Ignore<TRequest /* Ignore */, TResponse, TRawRequest /* Ignore */, TRawResponse>(ServiceBinderBase binder)
+            where TRawResponse : class
         {
-            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, GrpcMethodHelper.Box<TResponse>>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<Nil, TResponse>(Nil.Default, context))!));
+            var method = GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+#pragma warning disable CS8604
+            binder.AddMethod(new MagicOnionServerMethod<Box<Nil>, TRawResponse>(method.Method, this), async (request, context) => method.ToRawResponse(await UnaryServerMethod<Nil, TResponse>(method.FromRawRequest(request), context)));
+#pragma warning restore CS8604
         }
 
-        void BindUnaryHandler_Ignore_RefType<TRequestIgnore, TResponse>(ServiceBinderBase binder)
-            where TResponse : class
+        void BindUnaryHandler_Raw<TRequest, TResponse, TRawRequest, TRawResponse>(ServiceBinderBase binder)
+            where TRawRequest : class
+            where TRawResponse : class
         {
-            var method = GrpcMethodHelper.CreateMethod<TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<Nil>, TResponse>)method, async (GrpcMethodHelper.Box<Nil> request, ServerCallContext context) => await UnaryServerMethod<Nil, TResponse>(Nil.Default, context)!);
+            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
+#pragma warning disable CS8604
+            binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, this), async (request, context) => method.ToRawResponse(await UnaryServerMethod<TRequest, TResponse>(method.FromRawRequest(request), context)));
+#pragma warning restore CS8604
         }
-
-        void BindUnaryHandler_ValueType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
-        {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request.Value!, context))!));
-        }
-
-        void BindUnaryHandler_RefType_ValueType<TRequest, TResponse>(ServiceBinderBase binder)
-            where TRequest : class
-        {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<TRequest, GrpcMethodHelper.Box<TResponse>>)method, async (request, context) => new GrpcMethodHelper.Box<TResponse>((await UnaryServerMethod<TRequest, TResponse>(request, context))!));
-        }
-
-        void BindUnaryHandler_ValueType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
-            where TResponse : class
-        {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<GrpcMethodHelper.Box<TRequest>, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request.Value!, context));
-        }
-
-        void BindUnaryHandler_RefType_RefType<TRequest, TResponse>(ServiceBinderBase binder)
-            where TRequest : class
-            where TResponse : class
-        {
-            var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-            binder.AddMethod((Method<TRequest, TResponse>)method, async (request, context) => await UnaryServerMethod<TRequest, TResponse>(request, context));
-        }
-#pragma warning restore CS8603
 
         internal void BindHandler(ServiceBinderBase binder)
         {
@@ -425,7 +393,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ClientStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this);
-                        binder.AddMethod(method, handler);
+                        binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
                     }
                     break;
                 case MethodType.ServerStreaming:
@@ -435,7 +403,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (ServerStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this);
-                        binder.AddMethod(method, handler);
+                        binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
                     }
                     break;
                 case MethodType.DuplexStreaming:
@@ -445,7 +413,7 @@ namespace MagicOnion.Server
                             .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
                             .MakeGenericMethod(RequestType, UnwrappedResponseType);
                         var handler = (DuplexStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this);
-                        binder.AddMethod(method, handler);
+                        binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
                     }
                     break;
                 default:
@@ -779,4 +747,15 @@ namespace MagicOnion.Server
             }
         }
     }
+
+    internal class MagicOnionServerMethod<TRequest, TResponse> : Method<TRequest, TResponse>
+    {
+        public MethodHandler MagicOnionMethodHandler { get; }
+        public MagicOnionServerMethod(Method<TRequest, TResponse> method, MethodHandler magicOnionMethodHandler)
+            : base(method.Type, method.ServiceName, method.Name, method.RequestMarshaller, method.ResponseMarshaller)
+        {
+            MagicOnionMethodHandler = magicOnionMethodHandler;
+        }
+    }
+
 }

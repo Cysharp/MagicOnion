@@ -337,7 +337,7 @@ namespace TempProject
                 var compilation = tempWorkspace.GetOutputCompilation();
                 compilation.GetResolverKnownFormatterTypes().Should().NotContain(new[]
                 {
-                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                     "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
                 });
             }
@@ -345,7 +345,7 @@ namespace TempProject
                 var compilation = tempWorkspace.GetOutputCompilation(new [] { "MYDEBUG" });
                 compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
                 {
-                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                     "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
                 });
             }
@@ -394,21 +394,21 @@ namespace TempProject
                 var compilation = tempWorkspace.GetOutputCompilation();
                 compilation.GetResolverKnownFormatterTypes().Should().NotContain(new[]
                 {
-                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 });
             }
             {
                 var compilation = tempWorkspace.GetOutputCompilation(new[] { "MYDEBUG" });
                 compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
                 {
-                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 });
             }
             {
                 var compilation = tempWorkspace.GetOutputCompilation(new[] { "CUSTOM_DEBUG" });
                 compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
                 {
-                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                    "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
                 });
             }
         }
@@ -467,12 +467,12 @@ namespace TempProject
             {
                 var compilation = tempWorkspace.GetOutputCompilation();
                 var formatters = compilation.GetResolverKnownFormatterTypes();
-                formatters.Should().ContainSingle(x => x == "global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>");
+                formatters.Should().ContainSingle(x => x == "global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32, global::System.Int32>");
             }
             {
                 var compilation = tempWorkspace.GetOutputCompilation(new[] { "MYDEBUG" });
                 var formatters = compilation.GetResolverKnownFormatterTypes();
-                formatters.Should().ContainSingle(x => x == "global::MagicOnion.DynamicArgumentTupleFormatter<int, int, int>");
+                formatters.Should().ContainSingle(x => x == "global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32, global::System.Int32>");
             }
         }
     }
