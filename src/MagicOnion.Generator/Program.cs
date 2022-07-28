@@ -1,42 +1,35 @@
-using MagicOnion.Generator;
-using System;
 using System.Threading.Tasks;
 using ConsoleAppFramework;
 using MagicOnion.Generator.Internal;
-using Microsoft.Extensions.Hosting;
 
-namespace MagicOnion.Generator
+namespace MagicOnion.Generator;
+
+public class Program
 {
-    public class Program : ConsoleAppBase
-    {
-        static async Task Main(string[] args)
-        {
-            await Host.CreateDefaultBuilder()
-                .ConfigureLogging(logging =>
-                {
-                    logging.ReplaceToSimpleConsole();
-                })
-                .RunConsoleAppFrameworkAsync<Program>(args)
-                .ConfigureAwait(false);
-        }
+    static Task Main(string[] args)
+        => ConsoleApp.Create(args)
+            .AddRootCommand(RunAsync)
+            .RunAsync();
 
-        public async Task RunAsync(
-            [Option("i", "Input path of analyze csproj or directory.")]string input,
-            [Option("o", "Output path(file) or directory base(in separated mode).")]string output,
-            [Option("u", "Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool unuseUnityAttr = false,
-            [Option("n", "Set namespace root name.")]string @namespace = "MagicOnion",
-            [Option("m", "Set generated MessagePackFormatter namespace.")]string messagePackGeneratedNamespace = "MessagePack.Formatters",
-            [Option("c", "Conditional compiler symbols, split with ','.")]string conditionalSymbol = null,
-            [Option("v", "Enable verbose logging")]bool verbose = false)
-        {
-            await new MagicOnionCompiler(new MagicOnionGeneratorConsoleLogger(verbose), this.Context.CancellationToken)
-                .GenerateFileAsync(
-                    input,
-                    output,
-                    unuseUnityAttr,
-                    @namespace,
-                    conditionalSymbol,
-                    messagePackGeneratedNamespace);
-        }
+    [Command("", description: "MagicOnion Code Generator generates client codes for Ahead-of-Time compilation.")]
+    static async Task RunAsync(
+        ConsoleAppContext ctx,
+        [Option("i", "The path to the project (.csproj) to generate the client.")]string input,
+        [Option("o", "The generated file path (single file) or the directory path to generate the files (multiple files).")]string output,
+        [Option("u", "Do not use UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool noUseUnityAttr = false,
+        [Option("n", "The namespace of clients to generate.")]string @namespace = "MagicOnion",
+        [Option("m", "The namespace of pre-generated MessagePackFormatters.")]string messagepackFormatterNamespace = "MessagePack.Formatters",
+        [Option("c", "The conditional compiler symbols used during code analysis. The value is split by ','.")]string conditionalSymbol = null,
+        [Option("v", "Enable verbose logging")]bool verbose = false
+    )
+    {
+        await new MagicOnionCompiler(new MagicOnionGeneratorConsoleLogger(verbose), ctx.CancellationToken)
+            .GenerateFileAsync(
+                input,
+                output,
+                noUseUnityAttr,
+                @namespace,
+                conditionalSymbol,
+                messagepackFormatterNamespace);
     }
 }
