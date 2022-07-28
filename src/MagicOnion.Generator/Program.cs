@@ -17,9 +17,9 @@ public class Program
         [Option("i", "The path to the project (.csproj) to generate the client.")]string input,
         [Option("o", "The generated file path (single file) or the directory path to generate the files (multiple files).")]string output,
         [Option("u", "Do not use UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.")]bool noUseUnityAttr = false,
-        [Option("n", "The namespace of generated client.")]string @namespace = "MagicOnion",
-        [Option("m", "The namespace of generated MessagePackFormatters.")]string messagepackNamespace = "MessagePack.Formatters",
-        [Option("c", "The conditional compiler symbols used during analysis. The value is split by ','.")]string conditionalSymbol = null,
+        [Option("n", "The namespace of clients to generate.")]string @namespace = "MagicOnion",
+        [Option("m", "The namespace of pre-generated MessagePackFormatters.")]string messagepackFormatterNamespace = "MessagePack.Formatters",
+        [Option("c", "The conditional compiler symbols used during code analysis. The value is split by ','.")]string conditionalSymbol = null,
         [Option("v", "Enable verbose logging")]bool verbose = false
     )
     {
@@ -30,6 +30,6 @@ public class Program
                 noUseUnityAttr,
                 @namespace,
                 conditionalSymbol,
-                messagepackNamespace);
+                messagepackFormatterNamespace);
     }
 }
