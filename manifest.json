@@ -4,12 +4,2448 @@
   "xrefmap": "xrefmap.yml",
   "files": [
     {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.AsyncLock.LockReleaser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.AsyncLock.LockReleaser.html",
+          "hash": "3Y5k0ZOXM0TiMdQNwh2DfolWx9AkuKtj4ptS7zeMeGA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.AsyncLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.AsyncLock.html",
+          "hash": "kpXFXy1HSwDoZ5DCDHNJOoSfsYTVJBr5gtsIArwX4XA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.IClientFilter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.IClientFilter.html",
+          "hash": "aaain4mJsfr6qA5u6hd3ttD1nwMvbj0OsZcrF0byAYo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.IMagicOnionAwareGrpcChannel.html",
+          "hash": "Dia+v8KoEhG7D8ic6U9LFCxtoFfCvWr1PC+BHa2XX1g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.IMagicOnionClientLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.IMagicOnionClientLogger.html",
+          "hash": "b+GIm6a7NfcEkqrFXyVt8ebhSECugQ5cxvBWutBabqc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.IResponseContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.IResponseContext-1.html",
+          "hash": "fohAhsDfdPE/MmzcDj2znYZyK8p2Gdmcxu1+aEZmX8s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.IResponseContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.IResponseContext.html",
+          "hash": "MsdRu4PGc6S8UvxRtEYSlASU/ajOlZo5/TaJZGg3hDU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.MagicOnionClient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.MagicOnionClient.html",
+          "hash": "xwD9HQqhdePK04RNII7erz5LWFNm+RbeAUY4WP7y9Pk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.MagicOnionClientBase-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.MagicOnionClientBase-1.html",
+          "hash": "uCPsDyw5SQ5oshoxOnFQ/raAYr6IM1TUIizy4Xe8e/E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.MagicOnionClientBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.MagicOnionClientBase.html",
+          "hash": "XMDL/d5FqXb4Lcs5pVAVSLAtGBwLV2xawkbrN7k6RZk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.MagicOnionClientRegistry-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.MagicOnionClientRegistry-1.html",
+          "hash": "hU4+/7X8GIHskKfeQdrkJtVRTuKTLFGn57eXkBJ3cEo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.ManagedStreamingHubInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.ManagedStreamingHubInfo.html",
+          "hash": "4RWhPVOIRgSd/owLXlpVxq24tULUTyRjrF06uwHq+CA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.NullMagicOnionClientLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.NullMagicOnionClientLogger.html",
+          "hash": "5t5Xr10DJx1a/QndjWgGFmK4cMa4Z0+gtdK+5oTo5y4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.RequestContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.RequestContext-1.html",
+          "hash": "jsvzxmz1iiSIPsaPHq7K1oaDk5LBPS/XmXNmzT7uE/c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.RequestContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.RequestContext.html",
+          "hash": "1eUYAFVhQ5WL2rtVHyqo9AfRFAiMrNSAmSo1MktREQ0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.ResponseContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.ResponseContext-1.html",
+          "hash": "pCNn1p3iwnYyHF+WYW9AL5TZFWqp/Nxnn+sPmEGuxyU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.ResponseContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.ResponseContext.html",
+          "hash": "mkm2SA3cktedOoPBo71scSlfVsUrVaZlVmWSK3FaeTo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.StreamingHubClient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.StreamingHubClient.html",
+          "hash": "hC4j5Y2FleXNxpqIjDg6VHAz2cUhAUH7EdIzJ70t0ak="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.html",
+          "hash": "JiqxOoX9PEEIulcu8nbM/jnLn9n+Gu6CJCrKZ1Sj6Ss="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.StreamingHubClientRegistry-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.StreamingHubClientRegistry-2.html",
+          "hash": "xA/WJI/M/m0Xkjfgluomu3y1mWY9HAgWyV9Md6eU5xY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.html",
+          "hash": "WiASRoQfvJha+qFfJ90pPXUWNgvyJrgG0tvhilwCP4s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.ClientStreamingResult-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.ClientStreamingResult-2.html",
+          "hash": "/krY1ymO9AJqf84yshJDpxNJlTX6qgbvCVmH/kUoLHI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.EnumSerializationInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.EnumSerializationInfo.html",
+          "hash": "2ttxa4lHzYfipiJo/h0rSbPEmoKK6Rh64E1BuQ5Cics="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.GenericSerializationInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.GenericSerializationInfo.html",
+          "hash": "YQHUKDyMkFsdH0ovIlyH/ZrWR5B0gYym8xhil+iZo6c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.IResolverRegisterInfo.html",
+          "hash": "gf4iwWlpxJ5Dxf5r6A8M7tNlRgCKOeGM08pNZfo0Qx0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.InterfaceDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.InterfaceDefinition.html",
+          "hash": "79PLDkUI5OXSD7tW01XD5unnBmwJ5T7RJGUKnkTnIHc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.MethodCollector.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.MethodCollector.html",
+          "hash": "1P6zUUlnn1tGu8aSoom+73FZwwL0Hq93f1JpbizpFEU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.MethodDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.MethodDefinition.html",
+          "hash": "txgM48GotCiGqhTtu/ZqmZn35kIS/SY4fNfcQW5UqIA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.MethodType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.MethodType.html",
+          "hash": "WzB7yEyIwH1vXe/fLDGvqjRqrfpggvJo69nsp8I/R1s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.ParameterDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.ParameterDefinition.html",
+          "hash": "Tv1hC6noG5Pjw1qxA0hKxk8vVhfHAPGGNHkLYnbAWQ8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.ReferenceSymbols.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.ReferenceSymbols.html",
+          "hash": "DDINVE+kk9wuR4kwA+REttDD+bX8FvIvh/zaUp77Ofc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CodeAnalysis.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CodeAnalysis.html",
+          "hash": "ENe0c6roCf6fJp+gLEh7HqmXfs+NxJtQzfAxmBlwkO4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CompilerServices.AsyncUnaryResultMethodBuilder-1.html",
+          "hash": "AT7K8ZV6o0i9Mg5IkwPtRO02q0rfnuTyi3iqrnBXBkU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.CompilerServices.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.CompilerServices.html",
+          "hash": "On6cQjm1jkWkyuwRWg2p6ViPYUCqDlgshSgVVmbQ7IY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DuplexStreamingResult-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DuplexStreamingResult-2.html",
+          "hash": "HvrHStNK0vONSSftSeU+N5aUyJCqZrxKO1OzVSkynBk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-10.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-10.html",
+          "hash": "+HPOD7JuFqg5RsmB8KJQX8Dlv2f5hCqH4jv82Zwe8/Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-11.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-11.html",
+          "hash": "UVFgNrecPZNDjut+NvSh4GuVUhBdCXTWJUOpsp77c8M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-12.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-12.html",
+          "hash": "zDl+7IztO9aZtlZtVceYIbEpNDs6wMRV8ze1m5E/Xd4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-13.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-13.html",
+          "hash": "1uwsUjRvUM7Js2L9dblxpWH2Ov3iLPUhFZ22480+L3k="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-14.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-14.html",
+          "hash": "+QqZvFhpOkFyf8zNFnyPxAnhrEhdGb1kpqYPaylYi9M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-15.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-15.html",
+          "hash": "I2bop6SW/puEPTnZJ/xx9nQw6bhX+uhemEHlBjxTnkM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-2.html",
+          "hash": "JRkuBPoOMuM9O3m7M9cXAlUNzvHqEsRUGuSGtdghwJg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-3.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-3.html",
+          "hash": "q8ykRjeqbFwn/Z7ge9jC/cpbNlpJc0+bxJfuDuJHm8s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-4.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-4.html",
+          "hash": "bBuh1H7ooeD7fQfBbdKZtzMxCSH+WoK/TI5y66Zgy2I="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-5.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-5.html",
+          "hash": "CpBepOTek8QVVOV8Q/FnHwOPrpWDv+BLpNWVB5kxY6M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-6.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-6.html",
+          "hash": "H+1tHPFa9DWvMqt52N1yz7aQLp8BXemHmT52r0VRlLo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-7.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-7.html",
+          "hash": "7lJSCu4eOpNMLeuQO9lnzxrP5LA75f/8k+X43SMp1BE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-8.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-8.html",
+          "hash": "dKsVaGEpNlfGm5kYkk9di9nIY9T1hQnv4terp5jSqms="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTuple-9.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTuple-9.html",
+          "hash": "YfcVK0Ewzqec5XH5nWEMkXL5CZXSjnHOnDaNo5HyoV0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-10.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-10.html",
+          "hash": "/ReZFmcr5Q0+ckvKRwHmg9KtHf+kMwb8WsJloxKvmEY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-11.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-11.html",
+          "hash": "Ce1t0AqPL6EmemwcQDzCapOhamYkc7bq0A3hfUlKLnc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-12.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-12.html",
+          "hash": "qyAyezNVfEckPDZ/qtbvIMGCZOBx12tPmhI+h0rCsbk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-13.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-13.html",
+          "hash": "bwoiTFjbanJwupgvqBYWImW4sd2asfwa5ah8HLNFT4w="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-14.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-14.html",
+          "hash": "F/ZGUwAJUXR1zfkx+gDgk+fMPVQxZXv4YkJ+vDhxYaM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-15.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-15.html",
+          "hash": "fNppIb2eRb/w00gs+5F01OuXuiZx9Hqkh5eLIf1kESo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-2.html",
+          "hash": "XEqGQZ679dZYWEzdq73D/BM/yLYd2xy/igVD1Eu8pgk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-3.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-3.html",
+          "hash": "ap2EApKPizD7+apgOdBnrnRGdVqTu/WpqLYB0uuG3pc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-4.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-4.html",
+          "hash": "CVLswdVq+m1vqtjW2JwXCBgwyrmjB6gsNB6QhFVycJE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-5.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-5.html",
+          "hash": "0OzjOYG/1gLVtUUEQA3I3qMRcoc13XuutUIiwq5ZVNU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-6.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-6.html",
+          "hash": "h1wf/gSjD36Uw3HKNyahCdCAPP1xkk35ewx/QdpXPx4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-7.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-7.html",
+          "hash": "dsP/Zffj0V5T6dbmck9pLErdanKat5r1MM5j8MHyumg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-8.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-8.html",
+          "hash": "SQTaBnwleZXiUez76jwN279bJC4gFYv1zLlQzP56QQQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-9.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.DynamicArgumentTupleFormatter-9.html",
+          "hash": "s0i5WJFPUMuIggZEwoy4TlJIOtTGHnHUdOYS4vTRKos="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.html",
+          "hash": "QyCMHnX8I9wHZYrswpgqeXQ8GoSnFgHvgliQlMb7nFQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.html",
+          "hash": "pOz1RskQQf9SztgK0YIpI5pU/4C2s6sCsqXZYQzrQJE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.CodeTemplate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.CodeTemplate.html",
+          "hash": "YPx88bDQeEdWzIIs0lHZgilgWmm4uH0Q9ns2kr5Lz1o="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.CodeTemplateBase.ToStringInstanceHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.CodeTemplateBase.ToStringInstanceHelper.html",
+          "hash": "svB+PvNEr8+uG8AykMYTfXyb36wyF01QXW/EwFl+AF0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.CodeTemplateBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.CodeTemplateBase.html",
+          "hash": "MtJrt3fB82GKrysqukQKHrbmvlX9QK2N7h5OEC42l0c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.EnumTemplate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.EnumTemplate.html",
+          "hash": "b21EKkp8HB+s+tJ1aq5dik0e4MPpcD4yHpxBjLjFYJA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.EnumTemplateBase.ToStringInstanceHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.EnumTemplateBase.ToStringInstanceHelper.html",
+          "hash": "wvTC2cNNXYLtthUk6TJMU70aK4ML25klG5a5DbPcWLs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.EnumTemplateBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.EnumTemplateBase.html",
+          "hash": "YPB3BuCfjFf4w+g5b3ctyGCBZxH5N+bbVNiaDJ50MFs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.HubTemplate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.HubTemplate.html",
+          "hash": "KXd5pFqb4jNcskpe6Wtbktw9T48ru7sp1jOker0tfO4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.HubTemplateBase.ToStringInstanceHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.HubTemplateBase.ToStringInstanceHelper.html",
+          "hash": "fH2gB2ZjY5i+NwVcSC9I+bO6KRUwKaaZZNabIBYtbHI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.HubTemplateBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.HubTemplateBase.html",
+          "hash": "UxA//wf8b34vh17A6PRd714gHa3oIb6FlAMXB87YnbI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.Program.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.Program.html",
+          "hash": "0i9vaVkbqeB9lN4x38RqZobNA+BNMCYIXrwSr1Gz8DM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.RegisterTemplate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.RegisterTemplate.html",
+          "hash": "OR15G74jWMToeXEvfNds6GUJwNTbvZB8G7JVXUhSU0Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.ToStringInstanceHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.ToStringInstanceHelper.html",
+          "hash": "i/l1uWjt0LbyHlDFyXsIGb5kGpNM0kM3tXAbN7YJzE0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.RegisterTemplateBase.html",
+          "hash": "MBzFj6RUu+/eXjDLheOEUz534L6f5zWVKbCcwpamXYw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.ResolverTemplate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.ResolverTemplate.html",
+          "hash": "DLM+mPeclgPu1bkhYmCtHBwt0Z/yEW3AV6YPrfdiipM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.ToStringInstanceHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.ToStringInstanceHelper.html",
+          "hash": "D7dwhWOhFU/glmNT7jX3/8usoLoXc1sSgTcX8r3+lmY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.ResolverTemplateBase.html",
+          "hash": "HsyJG6IYfFzj3U97MKAVaGQcDMTWUIn7GBiWPUzNM2s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.html",
+          "hash": "cf9G7CPOnPcsFyTzpiKpQQvlcVtf82zo7sOlkjAFNsE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.IService-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.IService-1.html",
+          "hash": "sUgZ4GDv18DwyLqwG0eNJmXI37gmAjUouAMZMLmgbeY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.IServiceMarker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.IServiceMarker.html",
+          "hash": "twVkzXjxiUlkVV2fOk0RO7CG4hm4VBcSrGpSl9Nyzws="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.IStreamingHub-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.IStreamingHub-2.html",
+          "hash": "n9ggr61Zqym+KLAy9vM2ypRGnmMAgGk3aBAkGg3OtqY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.IStreamingHubMarker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.IStreamingHubMarker.html",
+          "hash": "nuIOIg0CLwvMgGBA3EBOczA+e+CI/OUVZQGV2eW8bz0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.IgnoreAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.IgnoreAttribute.html",
+          "hash": "Xokwy/aMg3CV4tYhgV2tui+gAaqrqBVnddqSNJ8AcGE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MSBuild.Tasks.MagicOnionGenerator.html",
+          "hash": "0FsTRb42I53TAQS6Eoe24qXqRSlnokZTamLgzLdWOg0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MSBuild.Tasks.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MSBuild.Tasks.html",
+          "hash": "fzlC5Q9dz8bYvV0nJC0HnfDU6d1m+qxE5w7F55wxPjA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MagicOnionCompiler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MagicOnionCompiler.html",
+          "hash": "hAjnSCxGgvS1stb2OODIZZnWfORdCzZefak8GjLN46c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MagicOnionMarshallers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MagicOnionMarshallers.html",
+          "hash": "zBJAKbyZJO6gxQm+5vyoiXF2C5lnOnrlsZHDA/cR/lM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MarshallingAsyncStreamReader-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MarshallingAsyncStreamReader-1.html",
+          "hash": "ookSZyMOsV6plUjo9gLPjPml0oWBl27XAMJbGBG0LhI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MarshallingClientStreamWriter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MarshallingClientStreamWriter-1.html",
+          "hash": "6SWH3qtNCUHxW9D6TXDQVUaiXSV3ywSjpXYf5/VYlao="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.MetadataExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.MetadataExtensions.html",
+          "hash": "c9h6zhSaalAj+QHkxKVPEGPz6a7lXWuRcoxAH4NU5dU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.ReturnStatusException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.ReturnStatusException.html",
+          "hash": "akuZG5C0UYx2HM0hbyQoZaoBZFeiMy3K0F3uDzmpSyI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.ClientStreamingContext-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.ClientStreamingContext-2.html",
+          "hash": "IwRQixg5ZCL5LesWhLHh6EYOuKHi5YOWPMs/52msMDY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.DuplexStreamingContext-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.DuplexStreamingContext-2.html",
+          "hash": "bOVNSivBS8rnwfeV7MDw/i8CZK9/6JkPKJ5CJkqeFVk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.FromServiceFilterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.FromServiceFilterAttribute.html",
+          "hash": "nxO3l5Sn30MMELWgW/50/UfP/sQY1CidY+Acb1YcCt8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.FromTypeFilterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.FromTypeFilterAttribute.html",
+          "hash": "fQaTPqeI2V+tEGmrBbIHcFwgCxusJq3mnfK90gcRDvE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Glue.MagicOnionServiceDefinitionGlueDescriptor.html",
+          "hash": "Y7X10SVYrso/aNnX4/vMPLAT8uhtM5drEPEZEitQVVg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Glue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Glue.html",
+          "hash": "75XsaaLa/u4wrLheOmvksCIQ5gF8lrvHNuJ9AgI/hmU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.MagicOnionHttpGatewayMiddleware.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.MagicOnionHttpGatewayMiddleware.html",
+          "hash": "zC5rKmszJvHpn5zjWA2nyuhf83hTypzmzWsPeeENdmQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.MagicOnionSwaggerMiddleware.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.MagicOnionSwaggerMiddleware.html",
+          "hash": "M8MifdlCXVgwIen1zqE+mo0iZ48LIcN9W11u5tXFp0I="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.IgnoreEmptyEnumerablesResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.IgnoreEmptyEnumerablesResolver.html",
+          "hash": "pYaUUM23AYIztVWDcIY1APVJrhJqYK/zHZxk5tyg/x4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Contact.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Contact.html",
+          "hash": "yJaUP+HesfmJurONH14eNOFzazKxcl83b3huNfTRSac="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.ExternalDocs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.ExternalDocs.html",
+          "hash": "2eNjYOuNFSScGvSXjPo1RBHUQ52GDWGdXkuy0Bgj3Lw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Header.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Header.html",
+          "hash": "t4fL87EqHOqfQITWUNvCmjM8b93ju+v8zVSiOBD5kvQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Info.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Info.html",
+          "hash": "/Bxl0oTiCUgCq5JeHOHARkxbpOXUQjx2NOJ1Po3R4mI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.License.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.License.html",
+          "hash": "94b4F8dVMudAr1SNub06j+FPlkqgjLXaYURfUx5guzc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Operation.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Operation.html",
+          "hash": "COgi4AQkrVGb+8ImUfFp9zNUwRJUSzcWnU2ADeK9vVs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Parameter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Parameter.html",
+          "hash": "+dn1Giet1ZbqG4efHTiKUwMsC7FyIqrIcOh2TURRKkc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.PartialSchema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.PartialSchema.html",
+          "hash": "sjywQbeNPxI4Yj/E03G4XQZA8omTx1Jw2vImeAXVueo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.PathItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.PathItem.html",
+          "hash": "igACHq/pEyJABqSlrzMwWsCHxXPScY8uhUTEQ72yWQc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Response.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Response.html",
+          "hash": "bkDfHzeS/VUkW42Fk3US21TMvlg4Ec17KoLnFzzqKAM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Schema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Schema.html",
+          "hash": "DccljziHjy8/h4P9ZG2L6y8/aBrRD1rcwn0NA/HpzBw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.SecurityScheme.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.SecurityScheme.html",
+          "hash": "8gvJ3roC77AezOURce8g1tIEFQU0mGLMgOuCWOPXL8Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.SwaggerDocument.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.SwaggerDocument.html",
+          "hash": "/tpZYNi4xbBi6q71/p61eFNyIUlqQGeDbZqjV1WROMg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Tag.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Tag.html",
+          "hash": "eSc9bCla5I4ASZazl9+FqUQI7Ce596k+Hq63OJlZ0Ik="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Xml.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.Xml.html",
+          "hash": "ygPXRhFFv73Pn7go20/FDegAeGY2IG1p25+3Oek0vAc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.Schemas.html",
+          "hash": "6dlXuedftLVkUTicHm63ZPxw697rpP+7U8pIVECt31g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.SwaggerDefinitionBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.SwaggerDefinitionBuilder.html",
+          "hash": "2SnRKxwWFIM/rOMLekpz/W9D3ozatWPZpQt+/XlezV0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.SwaggerOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.SwaggerOptions.html",
+          "hash": "CwzBxsKTc9has5amGw9C6JQXrsd+0SuZx6YXqhYv7M4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.Swagger.html",
+          "hash": "abreBn+DFQwTL1IcreaLr/15lC/cQ52uI5tzZSF8ldA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.HttpGateway.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.HttpGateway.html",
+          "hash": "Xfr5onTND5nsVySp+27ub6GMdRm43oGLkzo35OjNuhA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.BroadcasterHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.BroadcasterHelper.html",
+          "hash": "9LcM2Ak5Tj/OResjHJmnT8Xa0Zxb4AV6fMk2KgA/BBg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html",
+          "hash": "XB5zXpSftVkvfhtal9zsb+3FIBEia0b59ibi8oebdJQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.html",
+          "hash": "6fIoBUdk4E8VAWZXCgm68bj1YnM/X784CviXZ9mwQYE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html",
+          "hash": "0NMc3cTPzR7p23SbF4ihPJ6c8meXtB2NPqc9LXUvspc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.DefaultInMemoryStorage-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.DefaultInMemoryStorage-1.html",
+          "hash": "FVOopYVno+Gm7J+XAjWaWMaXHp91yqjiEnmjhkPoI9o="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.GroupBroadcastExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.GroupBroadcastExtensions.html",
+          "hash": "JrntrvZwo/OUaRtDLAW75JDrZ8+PoNW2gTpQQwlBO54="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.GroupConfigurationAttribute.html",
+          "hash": "G0iNqJIj405/f9lUD8YPx7rgJePUCzwRML93RIJl750="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.HubGroupRepository.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.HubGroupRepository.html",
+          "hash": "udEmOPMJOFqWXGYRdOeaMQX+7WyxF7I4Ep69tygY3zw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.IGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.IGroup.html",
+          "hash": "peoPXYbmDeWIzNxjLRexnGux9+XqbvfX5ef5WFBVlRM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.IGroupRepository.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.IGroupRepository.html",
+          "hash": "XYnYHZ1Z77O3m4DhXj8PcrTLb5YfPf5WU4NY7BVtvd4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.html",
+          "hash": "SENb0eP4aQPNiTJX16ATK67Mq+dQsFjT0RcJ/lzHGH0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage-1.html",
+          "hash": "s0UA1kFVuKvDgrPm7Ksq+y9PbFpnUXojIc6R1DgBEFw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.IInMemoryStorage.html",
+          "hash": "/ioHhBsQp379TihiQgWji9TzASGAXXuliWl+UOjsijw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroup.html",
+          "hash": "Riu+Ct9JqmaWkIbTkcBw52J3UfsrLZaJegciBaqN2zk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html",
+          "hash": "SkJ4jXoW2QFyJVHq7SS1WE7SWerN3f2xwYdz1e55jio="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html",
+          "hash": "Yh+b+aFxZlnsS7CHCWIMY9srdKfGPEyyO7iWKfj5exE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.MethodIdAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.MethodIdAttribute.html",
+          "hash": "aNC5wxli47eoUtCG0vYWMYoINdG0me+ddSdbnz+I7A0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubBase-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubBase-2.html",
+          "hash": "fmdRrjKk2UzFSO9SeHCbQ0D5wqJVwGMmMaC7hi1beIQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubContext.html",
+          "hash": "y6C/tC0lbzCSdwb6dFcojws4HiTeRkTc/Fas6LFiOXU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubFilterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubFilterAttribute.html",
+          "hash": "aqwVp0ADC1iDTJQ0Ad7+KqmfsxTrMddPilKEs/8NiyQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandler.html",
+          "hash": "by3Btb3fbT+z0sOvjdx2y/ykw9PEUtWgnZZK0r8sCo0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandlerOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.StreamingHubHandlerOptions.html",
+          "hash": "q60QrYbPxKtef+e6MMeMPYzXXNTotfP0xLXwFsQiHFg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Hubs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Hubs.html",
+          "hash": "lORgzXk+uLkcMMjIIjHICUoxacZENROUJjgpZwKDfZg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.IMagicOnionFilterFactory-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.IMagicOnionFilterFactory-1.html",
+          "hash": "uUqo2DQ647i6j9qZGI5azk+iXP8L8ojxbKTfANLPLWk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.IMagicOnionLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.IMagicOnionLogger.html",
+          "hash": "d2JS/0RlRefmFlXuFj9zaVhasIqQGJz3zEmA+2I13WA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.IMagicOnionServerBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.IMagicOnionServerBuilder.html",
+          "hash": "EElTjdMwwVBRdLX9/qmyrCtwOCcwRJM8ioXkmMI2D+Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionEngine.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionEngine.html",
+          "hash": "aSgtiHad0gcm8TWceH59kJc5g9yvUO1QvFe8aYzEFF0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionFilterAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionFilterAttribute.html",
+          "hash": "AmpiJOvLUx373K7FrxbaBEFPA6UYcJ1qf6wuHPlcBUM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptor-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptor-1.html",
+          "hash": "ObiHGuU4CdGlJ1eCfUTyKH5HJson5Bl/Vq6nmJqVn4U="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptorExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionFilterDescriptorExtensions.html",
+          "hash": "Pz2fBykisjpbSdDqxxsukgMbzE1nOK02VK1JLOpwFsE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionLogToLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionLogToLogger.html",
+          "hash": "SRjZ5vFx6190FPZvfsMs6lTtopScdcupTa1lOKfCcnw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionLogToLoggerWithDataDump.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionLogToLoggerWithDataDump.html",
+          "hash": "j3vXZpBLN2bhEQ6KugDct3daUVYaZb5Qcr7jkV/sWkM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionLogToLoggerWithNamedDataDump.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionLogToLoggerWithNamedDataDump.html",
+          "hash": "Bb7b8JQKhyj+THQRzpMkAL/SMpj09fwgwG2cqyM9dYM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionOptions.html",
+          "hash": "eawbMJ/SHr/Z5IHtMWzHnZkaYoizJjxegfl1QyWnpxo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionServiceDefinition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionServiceDefinition.html",
+          "hash": "7DL+663DYGrtKRZFOC6yjquenUFJlRxfll+0BaGJ5iA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MagicOnionServiceFilterDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MagicOnionServiceFilterDescriptor.html",
+          "hash": "nXd2n5BhQqsELRcVSSoaZm3D7tEcL4DafaxSJfqP1+g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MethodHandler.UniqueEqualityComparer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MethodHandler.UniqueEqualityComparer.html",
+          "hash": "h6f8hs7nHtuOnT9Kuvmu0GmCgja4RkroE+QlcqOeWOg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MethodHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MethodHandler.html",
+          "hash": "7YtIwl2ESuHn+Rks4YdseWBu9IzlKVT/s6VNcvEc+pw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.MethodHandlerOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.MethodHandlerOptions.html",
+          "hash": "vFHAMCG4A0dFDNn6coC6rqxkZ4FsaJnA+YZvOHRDv4Y="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.NullMagicOnionLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.NullMagicOnionLogger.html",
+          "hash": "hC8+jvTIQ8AJrg3hzsjOkNNT/K8bIo618JzDZxCPkZg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.IRpcScope.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.IRpcScope.html",
+          "hash": "/cfKpEJvFEV6E3ULy4RsE1EOeEbphsijjyYB4OostGc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionActivitySources.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionActivitySources.html",
+          "hash": "KvEMxHCC4yatOEP1VZ1IegRMKD6fAMVc9PNIDaMYaDg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryClientFilter.html",
+          "hash": "tMjiATJkvELzuQoEbN9MSlVU8vv2xqx1CghnmuIVszg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryOptions.html",
+          "hash": "5WyerWcEB4/AQvE785eaHmgmvGHouiw63rUr/1NJcGk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryStreamingTracerFilterFactoryAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryStreamingTracerFilterFactoryAttribute.html",
+          "hash": "F+AuHqedf2Y8n8fzlXVs3EOVDTRykd+npBSlg+qJzOk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryTracerFilterFactoryAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionOpenTelemetryTracerFilterFactoryAttribute.html",
+          "hash": "rx0bYW38cGh7FIfgNtbBpddXQ3P3FsLFrVNQ5fbczqo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionServerBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.MagicOnionServerBuilderExtensions.html",
+          "hash": "CAvlq3doAuofjgITmb/7bpcQgxwdcWbBSqmiEHvxKdE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.ServiceContextTelemetryExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.ServiceContextTelemetryExtensions.html",
+          "hash": "TJRWGoF6Tv/KqjxjG8plGJAiHneYI0puM1n2VXnSH8A="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.TracerProviderBuilderExtensions.html",
+          "hash": "4Ll/e6KzNOX2hE3OeBaoKSQ3n3d4VklDyByE25lx0zc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.OpenTelemetry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.OpenTelemetry.html",
+          "hash": "WHnDsQPz4/DuaZvGYvhOYfTAXpaIW3Ut8/QKP8jie1I="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Redis.RedisGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Redis.RedisGroup.html",
+          "hash": "E/OEH/uEo1qU1LQAuGRBbFAWkpO/EIMz254YHa+D7ew="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Redis.RedisGroupOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Redis.RedisGroupOptions.html",
+          "hash": "EACEmKlsNaBaQcQ5nkr9v1sD3lYJvneoHL85SCyWIJ0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Redis.RedisGroupRepository.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Redis.RedisGroupRepository.html",
+          "hash": "NLQ3hPzbX/CY1f4MdTT6YXIiUkbKdq1DyYHeA2sopDg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html",
+          "hash": "l+jtxVgKRk+qGvaaW+wXaD9Spf/qRtBMKQz26tH85vI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.Redis.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.Redis.html",
+          "hash": "qphLSojlBLPXjcFlYWDuTNDiySJ7A57FZIyfTbi/ATs="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.ServerStreamingContext-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.ServerStreamingContext-1.html",
+          "hash": "1GJKFJkYgyTGwo5FqGIj2AcsAbyffxUKPkwasukh1us="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.ServiceBase-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.ServiceBase-1.html",
+          "hash": "R0H+Ma+RPMK7LmnN+iE9dOXRuP+Gaa43v9LPjv/3snE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.ServiceContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.ServiceContext.html",
+          "hash": "wsQLIsq6qCdBkZKAV4ij3ZFZWgwKHDHH8u7OEei2pHI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.StreamingHubFilterDescriptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.StreamingHubFilterDescriptor.html",
+          "hash": "X4EjU2QU3gCPwL5vXsgDYUXvMZOR1ICcdEkrlI4XL90="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Server.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Server.html",
+          "hash": "Ac0jCjIp2VRt4iDgyfC3XMF5oVN0NR5KgdFX/KOEO8w="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.ServerStreamingResult-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.ServerStreamingResult-1.html",
+          "hash": "oiYtEpI8DWsNLxKmnKpzFLzuJ2YM+n2rQfMzio7EuvQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnaryResult-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnaryResult-1.html",
+          "hash": "OVAHiBHgVgF/SmNXxnjX+8hLlQkCGLWavCo8h4Iomxw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnaryResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnaryResult.html",
+          "hash": "qF8CzeBEprF4UcJpMGEaR2ZInhb7yeXmisqy4Uqknf0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnsafeDirectBlitArrayFormatter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnsafeDirectBlitArrayFormatter-1.html",
+          "hash": "H64sdDOIAoEByVfGZowgb7BRPjA1JeX/bTrQsZdP3hk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnsafeDirectBlitFormatter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnsafeDirectBlitFormatter-1.html",
+          "hash": "U+W902uv47WiRpO3rqG7nQFsU86698INdfEq8vVl01M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.UnsafeDirectBlitResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.UnsafeDirectBlitResolver.html",
+          "hash": "VoRMLdevI5dISsKsWUG67ZcglqiWvdk6Dof/629nDQM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Utils.DuplicateKeyException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Utils.DuplicateKeyException.html",
+          "hash": "8mTSaUvFm290xGc6F2cDEoTVs2vpka5KSK635bua+U0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Utils.FNV1A32.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Utils.FNV1A32.html",
+          "hash": "Ngh0EI/KxLY5n4biVahN2HSiEIk5rzxdRIUgRZeOFBo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Utils.ReservedWhenAllPromise.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Utils.ReservedWhenAllPromise.html",
+          "hash": "bzr5YMFOEeCfaKdSMC/MfNl4P+YVXHkvTn1qEJeOT20="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Utils.UniqueHashDictionary-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Utils.UniqueHashDictionary-1.html",
+          "hash": "xAVpCsEXyc5SCQ0I1nkUgsTDwRef7KVl7P5lnKkl+r8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Utils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Utils.html",
+          "hash": "foDw26IAclhz1KRQ/yLPENBHcwijibOMBsGroNYtbbw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.html",
+          "hash": "nE5B6g+wvabKXt9t6NKV9iDB54pGm2XhnkNitjGiiG0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionEndpointRouteBuilderExtensions.html",
+          "hash": "qBgyGJmBs1d1D6D3+8KAVgX9b+LGSKTAraSmK7HvXO0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.AspNetCore.Builder.MagicOnionMiddlewareExtensions.html",
+          "hash": "scn5T/eaXENH4vkdr/1j2PkOtzJflJaCLrUlQAbOCd8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.AspNetCore.Builder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.AspNetCore.Builder.html",
+          "hash": "BQtW3+JUqibPT1kHXo9X+s8otoRRR8Conr6eHE53hdU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServerBuilderRedisExtensions.html",
+          "hash": "2IX1xF0DQuK0NOmT98KXUNAg3onZfqOskpr41RQFweM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServicesExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.MagicOnionServicesExtensions.html",
+          "hash": "wJzO8mLLnV4GmsB9zuU4bOK3WbIVWrNRX1qrFZ0vqQ8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Microsoft.Extensions.DependencyInjection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Microsoft.Extensions.DependencyInjection.html",
+          "hash": "LIcZsenvBOD7FSdeviTthgN9N73wr12vUeBCT9O3tOM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "cap8oxZ8zdMGxxCcodEysxe1Z0dEeIZXOxO9PZAUKEc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "articles/deployment/guide.md",
       "output": {
         ".html": {
           "relative_path": "articles/deployment/guide.html",
-          "hash": "AYAc2xt3dcPps9X6sDsckA=="
+          "hash": "zquUnAvzcsJ29Z8jjoESGH/azDKgNw1RWLFlJCpglG4="
         }
       },
       "is_incremental": false,
@@ -21,7 +2457,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/deployment/https.html",
-          "hash": "M6ZcIJbplDQrpe4MIxydEA=="
+          "hash": "occ7c/UpML/kyG8TtpowuwrPx0sxN1lMcdCHP+W3N6Y="
         }
       },
       "is_incremental": false,
@@ -33,7 +2469,7 @@
       "output": {
         ".html": {
           "relative_path": "articles/deployment/toc.html",
-          "hash": "1wwmWA4egQAFdkCyB5luIg=="
+          "hash": "9Fuz6dIIQO0Rp+Xdq8VDoe2tmmZ0YItkxmbNGpePUus="
         }
       },
       "is_incremental": false,
@@ -45,22 +2481,19 @@
       "output": {
         ".html": {
           "relative_path": "index.html",
-          "hash": "y7i54R0A8m9Fj6t9l52aUg=="
+          "hash": "3dVeo81ha5njV/TwQ8qOdISLcKgK2T3iina6pj4w5+M="
         }
       },
       "is_incremental": false,
       "version": ""
     },
     {
-      "log_codes": [
-        "InvalidFileLink"
-      ],
       "type": "Toc",
       "source_relative_path": "toc.yml",
       "output": {
         ".html": {
           "relative_path": "toc.html",
-          "hash": "FYpC+ZvuG3d61K/WXNG7/g=="
+          "hash": "mHa5EVNhwyzks5teseYEji8Gv+LvLYU1lft+vfkPEPk="
         }
       },
       "is_incremental": false,
@@ -82,6 +2515,12 @@
           "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 3,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 202,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

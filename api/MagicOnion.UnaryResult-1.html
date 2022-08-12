@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>UnaryResult&lt;TResponse&gt; Struct
+   | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="UnaryResult&lt;TResponse&gt; Struct
+   | MagicOnion ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../">
+                  <img id="logo" src="../img/Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.UnaryResult`1">
+  
+  <h1 id="MagicOnion_UnaryResult_1" data-uid="MagicOnion.UnaryResult`1" class="text-break">UnaryResult&lt;TResponse&gt; Struct
+  </h1>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.html">MagicOnion</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Abstractions.dll</h6>
+  
+  <div class="markdown level0 summary"><p>Represents the result of a Unary call that wraps AsyncUnaryCall as Task-like.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly struct UnaryResult&lt;TResponse&gt;</code></pre>
+  </div>
+
+  
+  
+  
+  
+  
+  <section>
+  <h4 class="typeParameters">Type Parameters</h4>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1__ctor__0_">UnaryResult(TResponse)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1__ctor_Task__0__">UnaryResult(Task&lt;TResponse&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1__ctor_Task_MagicOnion_Client_IResponseContext__0___">UnaryResult(Task&lt;IResponseContext&lt;TResponse&gt;&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Properties
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_ResponseAsync">ResponseAsync</a>
+        </td>
+        <td class="markdown level1 summary"><p>Asynchronous call result.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_ResponseHeadersAsync">ResponseHeadersAsync</a>
+        </td>
+        <td class="markdown level1 summary"><p>Asynchronous access to response headers.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_Dispose">Dispose()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Provides means to cleanup after the call.
+If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+As a result, all resources being used by the call should be released eventually.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_GetAwaiter">GetAwaiter()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Allows awaiting this object directly.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_GetStatus">GetStatus()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets the call status if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult-1.html#MagicOnion_UnaryResult_1_GetTrailers">GetTrailers()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets the call trailing metadata if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult_1__ctor_" data-uid="MagicOnion.UnaryResult`1.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult_1__ctor__0_" data-uid="MagicOnion.UnaryResult`1.#ctor(`0)">UnaryResult(TResponse)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(TResponse rawValue)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>rawValue</code></span> <span class="xref">TResponse</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1__ctor_" data-uid="MagicOnion.UnaryResult`1.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult_1__ctor_Task__0__" data-uid="MagicOnion.UnaryResult`1.#ctor(Task{`0})">UnaryResult(Task&lt;TResponse&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(Task&lt;TResponse&gt; rawTaskValue)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>rawTaskValue</code></span> <span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1__ctor_" data-uid="MagicOnion.UnaryResult`1.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult_1__ctor_Task_MagicOnion_Client_IResponseContext__0___" data-uid="MagicOnion.UnaryResult`1.#ctor(Task{MagicOnion.Client.IResponseContext{`0}})">UnaryResult(Task&lt;IResponseContext&lt;TResponse&gt;&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(Task&lt;IResponseContext&lt;TResponse&gt;&gt; response)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>response</code></span> <span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.Client.IResponseContext-1.html">IResponseContext</a>&lt;TResponse&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="properties">Properties
+  </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_ResponseAsync_" data-uid="MagicOnion.UnaryResult`1.ResponseAsync*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_ResponseAsync" data-uid="MagicOnion.UnaryResult`1.ResponseAsync">ResponseAsync</h4>
+  <div class="markdown level1 summary"><p>Asynchronous call result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Task&lt;TResponse&gt; ResponseAsync { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_ResponseHeadersAsync_" data-uid="MagicOnion.UnaryResult`1.ResponseHeadersAsync*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_ResponseHeadersAsync" data-uid="MagicOnion.UnaryResult`1.ResponseHeadersAsync">ResponseHeadersAsync</h4>
+  <div class="markdown level1 summary"><p>Asynchronous access to response headers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Task&lt;Metadata&gt; ResponseHeadersAsync { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;<span class="xref">Metadata</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_Dispose_" data-uid="MagicOnion.UnaryResult`1.Dispose*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_Dispose" data-uid="MagicOnion.UnaryResult`1.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Provides means to cleanup after the call.
+If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+As a result, all resources being used by the call should be released eventually.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly void Dispose()</code></pre>
+  </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h5 id="MagicOnion_UnaryResult_1_Dispose_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Normally, there is no need for you to dispose the call unless you want to utilize the
+&quot;Cancel&quot; semantics of invoking <code>Dispose</code>.</p>
+</div>
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_GetAwaiter_" data-uid="MagicOnion.UnaryResult`1.GetAwaiter*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_GetAwaiter" data-uid="MagicOnion.UnaryResult`1.GetAwaiter">GetAwaiter()</h4>
+  <div class="markdown level1 summary"><p>Allows awaiting this object directly.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly TaskAwaiter&lt;TResponse&gt; GetAwaiter()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TaskAwaiter</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_GetStatus_" data-uid="MagicOnion.UnaryResult`1.GetStatus*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_GetStatus" data-uid="MagicOnion.UnaryResult`1.GetStatus">GetStatus()</h4>
+  <div class="markdown level1 summary"><p>Gets the call status if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Status GetStatus()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Status</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_1_GetTrailers_" data-uid="MagicOnion.UnaryResult`1.GetTrailers*"></a>
+  <h4 id="MagicOnion_UnaryResult_1_GetTrailers" data-uid="MagicOnion.UnaryResult`1.GetTrailers">GetTrailers()</h4>
+  <div class="markdown level1 summary"><p>Gets the call trailing metadata if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Metadata GetTrailers()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Metadata</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  
+  
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
