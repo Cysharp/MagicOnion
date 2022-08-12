@@ -1,4 +1,4 @@
-﻿using MessagePack;
+using MessagePack;
 using System.Buffers;
 using MessagePack.Formatters;
 using System;
@@ -117,6 +117,7 @@ namespace MagicOnion
             // extReader.read
             byte[] rentMemory = default;
             ReadOnlySpan<byte> span = default;
+            try
             {
                 var seqSlice = extReader.Sequence.Slice(extReader.Position);
                 if (isLittleEndian != BitConverter.IsLittleEndian)
@@ -139,11 +140,18 @@ namespace MagicOnion
                         span = rentMemory;
                     }
                 }
-            }
 
-            var result = new T[span.Length / StructLength];
-            Unsafe.CopyBlockUnaligned(ref Unsafe.As<T, byte>(ref result[0]), ref MemoryMarshal.GetReference(span), (uint)span.Length);
-            return result;
+                var result = new T[span.Length / StructLength];
+                Unsafe.CopyBlockUnaligned(ref Unsafe.As<T, byte>(ref result[0]), ref MemoryMarshal.GetReference(span), (uint)span.Length);
+                return result;
+            }
+            finally
+            {
+                if (rentMemory != null)
+                {
+                    ArrayPool<byte>.Shared.Return(rentMemory);
+                }
+            }
         }
     }
 
