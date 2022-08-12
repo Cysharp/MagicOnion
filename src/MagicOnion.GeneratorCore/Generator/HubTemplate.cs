@@ -116,7 +116,7 @@ namespace MagicOnion.Generator
             this.Write("#endif\r\n");
  } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) 
  } // end foreach(interfaceDef.Methods) 
-            this.Write("\r\n        class FireAndForgetClient : ");
+            this.Write("        [Ignore]\r\n        class FireAndForgetClient : ");
             this.Write(this.ToStringHelper.ToStringWithCulture(interfaceDef.FullName));
             this.Write("\r\n        {\r\n            readonly ");
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
