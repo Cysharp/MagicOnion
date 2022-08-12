@@ -89,7 +89,7 @@
 #endif
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(interfaceDef.Methods) #>
-
+        [Ignore]
         class FireAndForgetClient : <#= interfaceDef.FullName #>
         {
             readonly <#= clientName #> __parent;
