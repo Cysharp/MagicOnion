@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PerformanceTest.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "-u http://localhost:5000 -s streaminghub --channels 1 --streams 1"
+    }
+  }
+}
