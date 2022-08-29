@@ -9,12 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="4.2.2" />
+    <PackageReference Include="MagicOnion.Client" Version="4.5.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
-    <ProjectReference Include="..\..\..\src\MagicOnion.Shared\MagicOnion.Shared.csproj" />
-    <ProjectReference Include="..\PerformanceTest.Shared\PerformanceTest.Shared.csproj" />
+    <Compile Include="..\PerformanceTest.Shared\**\*.cs" Exclude="**\obj\**;**\bin\**" LinkBase="Shared" />
   </ItemGroup>
 
 </Project>
