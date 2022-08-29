@@ -9,4 +9,9 @@ public class PerfTestHub : StreamingHubBase<IPerfTestHub, IPerfTestHubReceiver>,
     {
         return Task.FromResult(0);
     }
+
+    public Task<(int StatusCode, byte[] Data)> CallMethodLargePayloadAsync(string arg1, int arg2, byte[] arg3)
+    {
+        return Task.FromResult((123, arg3));
+    }
 }

@@ -10,6 +10,7 @@ namespace PerformanceTest.Shared
     public interface IPerfTestHub : IStreamingHub<IPerfTestHub, IPerfTestHubReceiver>
     {
         Task<int> CallMethodAsync(string arg1, int arg2);
+        Task<(int StatusCode, byte[] Data)> CallMethodLargePayloadAsync(string arg1, int arg2, byte[] arg3);
     }
 
     public interface IPerfTestHubReceiver

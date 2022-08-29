@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
@@ -39,6 +40,7 @@ class StartupService : IHostedService
         Console.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {RuntimeInformation.ProcessArchitecture}");
         Console.WriteLine($"{nameof(GCSettings.IsServerGC)}: {GCSettings.IsServerGC}");
         Console.WriteLine($"{nameof(Environment.ProcessorCount)}: {Environment.ProcessorCount}");
+        Console.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {Debugger.IsAttached}");
         Console.WriteLine();
 
         Console.WriteLine("Application started.");

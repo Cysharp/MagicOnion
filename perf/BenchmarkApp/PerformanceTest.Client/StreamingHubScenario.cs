@@ -1,6 +1,7 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using PerformanceTest.Shared;
+
 public class StreamingHubScenario : IScenario, IPerfTestHubReceiver
 {
     IPerfTestHub client = default!;

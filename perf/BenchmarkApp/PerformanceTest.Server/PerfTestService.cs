@@ -26,4 +26,9 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
     {
         return new UnaryResult<int>(arg2);
     }
+
+    public UnaryResult<(int StatusCode, byte[] Data)> UnaryLargePayloadAsync(string arg1, int arg2, byte[] arg3)
+    {
+        return UnaryResult((123, arg3));
+    }
 }
