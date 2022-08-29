@@ -90,6 +90,7 @@
 <# } // end if(!string.IsNullOrWhiteSpace(IfDirectiveCondition)) #>
 <# } // end foreach(interfaceDef.Methods) #>
 
+        [Ignore]
         class FireAndForgetClient : <#= hubInfo.ServiceType.FullName #>
         {
             readonly <#= clientName #> __parent;
