@@ -1,5 +1,6 @@
 public enum ScenarioType
 {
+    All,
     Unary,
     UnaryLargePayload1K,
     UnaryLargePayload2K,
