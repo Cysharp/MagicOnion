@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 
@@ -17,6 +16,8 @@ async Task Main(
     [Option("d")]int duration = 10,
     [Option("t")]int streams = 10,
     [Option("c")]int channels = 10,
+    [Option("r")]string? report = null,
+    uint rounds = 1,
     [Option("v")]bool verbose = false
 )
 {
@@ -30,7 +31,62 @@ async Task Main(
     WriteLog($"Duration: {config.Duration} s");
     WriteLog($"Streams: {config.Streams}");
     WriteLog($"Channels: {config.Channels}");
+    WriteLog($"Rounds: {rounds}");
 
+    var resultsByScenario = new Dictionary<ScenarioType, List<PerformanceResult>>();
+    var runScenarios = Enum.GetValues<ScenarioType>().Where(x => (scenario == ScenarioType.All) ? x != ScenarioType.All : x == scenario);
+    for (var i = 1; i <= rounds; i++)
+    {
+        WriteLog($"Round: {i}");
+        foreach (var scenario2 in runScenarios)
+        {
+            if (!resultsByScenario.TryGetValue(scenario2, out var results))
+            {
+                results = new List<PerformanceResult>();
+                resultsByScenario[scenario2] = results;
+            }
+            results.Add(await RunScenarioAsync(scenario2, config));
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(report))
+    {
+        WriteLog($"Write report to '{report}'");
+        using var writer = File.CreateText(report);
+        writer.WriteLine($"Created at {DateTime.Now}");
+        writer.WriteLine($"========================================");
+        PrintStartupInformation(writer);
+        writer.WriteLine($"========================================");
+        writer.WriteLine($"Scenario: {scenario}");
+        writer.WriteLine($"Url     : {config.Url}");
+        writer.WriteLine($"Warmup  : {config.Warmup} s");
+        writer.WriteLine($"Duration: {config.Duration} s");
+        writer.WriteLine($"Streams : {config.Streams}");
+        writer.WriteLine($"Channels: {config.Channels}");
+        writer.WriteLine($"========================================");
+        foreach (var (s, results) in resultsByScenario)
+        {
+            writer.WriteLine($"Scenario           : {s}");
+            foreach (var (result, round) in results.Select((x, i) => (x, i)))
+            {
+                writer.WriteLine($"Round              : {round}");
+                writer.WriteLine($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
+                writer.WriteLine($"Duration           : {result.Duration.TotalSeconds} s");
+                writer.WriteLine($"Total Requests     : {result.TotalRequests} requests");
+                writer.WriteLine($"========================================");
+            }
+        }
+
+        writer.WriteLine($"Scenario\t{string.Join("\t", Enumerable.Range(1, (int)rounds).Select(x => $"Requests/s ({x})"))}\tRequests/s (Avg)");
+        foreach (var (s, results) in resultsByScenario)
+        {
+            writer.WriteLine($"{s}\t{string.Join("\t", results.Select(x => x.RequestsPerSecond.ToString("0.000")))}\t{results.Average(x => x.RequestsPerSecond):0.000}");
+        }
+    }
+}
+
+async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config)
+{
     Func<IScenario> scenarioFactory = scenario switch
     {
         ScenarioType.Unary => () => new UnaryScenario(),
@@ -49,13 +105,13 @@ async Task Main(
         ScenarioType.StreamingHubLargePayload16K => () => new StreamingHubLargePayload16KScenario(),
         ScenarioType.StreamingHubLargePayload32K => () => new StreamingHubLargePayload32KScenario(),
         ScenarioType.StreamingHubLargePayload64K => () => new StreamingHubLargePayload64KScenario(),
-        _ => throw new Exception("Unknown Scenario"),
+        _ => throw new Exception($"Unknown Scenario: {scenario}"),
     };
 
     var ctx = new PerformanceTestRunningContext();
     var cts = new CancellationTokenSource();
 
-    WriteLog("Starting scenario...");
+    WriteLog($"Starting scenario '{scenario}'...");
     var tasks = new List<Task>();
     for (var i = 0; i < config.Channels; i++)
     {
@@ -86,28 +142,32 @@ async Task Main(
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");
     WriteLog($"Duration: {result.Duration.TotalSeconds} s");
     WriteLog($"Total Requests: {result.TotalRequests} requests");
+
+    return result;
 }
 
-void PrintStartupInformation()
+void PrintStartupInformation(TextWriter? writer = null)
 {
-    Console.WriteLine($"MagicOnion {typeof(MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
-    Console.WriteLine($"grpc-dotnet {typeof(Grpc.Net.Client.GrpcChannel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
-    Console.WriteLine();
+    writer ??= Console.Out;
 
-    Console.WriteLine("Configurations:");
+    writer.WriteLine($"MagicOnion {typeof(MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
+    writer.WriteLine($"grpc-dotnet {typeof(Grpc.Net.Client.GrpcChannel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
+    writer.WriteLine();
+
+    writer.WriteLine("Configurations:");
 #if RELEASE
-        Console.WriteLine($"Build Configuration: Release");
+    writer.WriteLine($"Build Configuration: Release");
 #else
-    Console.WriteLine($"Build Configuration: Debug");
+    writer.WriteLine($"Build Configuration: Debug");
 #endif
-    Console.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {RuntimeInformation.FrameworkDescription}");
-    Console.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {RuntimeInformation.OSDescription}");
-    Console.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {RuntimeInformation.OSArchitecture}");
-    Console.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {RuntimeInformation.ProcessArchitecture}");
-    Console.WriteLine($"{nameof(GCSettings.IsServerGC)}: {GCSettings.IsServerGC}");
-    Console.WriteLine($"{nameof(Environment.ProcessorCount)}: {Environment.ProcessorCount}");
-    Console.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {Debugger.IsAttached}");
-    Console.WriteLine();
+    writer.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {RuntimeInformation.FrameworkDescription}");
+    writer.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {RuntimeInformation.OSDescription}");
+    writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {RuntimeInformation.OSArchitecture}");
+    writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {RuntimeInformation.ProcessArchitecture}");
+    writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {GCSettings.IsServerGC}");
+    writer.WriteLine($"{nameof(Environment.ProcessorCount)}: {Environment.ProcessorCount}");
+    writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {Debugger.IsAttached}");
+    writer.WriteLine();
 }
 
 void WriteLog(string value)

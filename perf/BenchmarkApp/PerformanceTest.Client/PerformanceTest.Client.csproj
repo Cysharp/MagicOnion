@@ -9,7 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="4.2.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseRepositoryClient)' == ''">
     <PackageReference Include="MagicOnion.Client" Version="4.5.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseRepositoryClient)' != ''">
+    <ProjectReference Include="..\..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

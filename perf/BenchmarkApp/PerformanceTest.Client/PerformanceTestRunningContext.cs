@@ -33,7 +33,7 @@ public class PerformanceTestRunningContext
 
     public PerformanceResult GetResult()
     {
-        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.Seconds, stopwatch.Elapsed);
+        return new PerformanceResult(count, count / (double)stopwatch.Elapsed.TotalSeconds, stopwatch.Elapsed);
     }
 }
 
