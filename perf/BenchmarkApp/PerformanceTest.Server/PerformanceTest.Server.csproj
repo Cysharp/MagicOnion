@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DefineConstants>SERVER;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,8 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\PerformanceTest.Shared\**\*.cs" Exclude="**\obj\**;**\bin\**" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
-    <ProjectReference Include="..\PerformanceTest.Shared\PerformanceTest.Shared.csproj" />
   </ItemGroup>
 
 </Project>
