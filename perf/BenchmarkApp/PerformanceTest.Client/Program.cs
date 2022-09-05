@@ -90,6 +90,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
     Func<IScenario> scenarioFactory = scenario switch
     {
         ScenarioType.Unary => () => new UnaryScenario(),
+        ScenarioType.UnaryComplex => () => new UnaryComplexScenario(),
         ScenarioType.UnaryLargePayload1K => () => new UnaryLargePayload1KScenario(),
         ScenarioType.UnaryLargePayload2K => () => new UnaryLargePayload2KScenario(),
         ScenarioType.UnaryLargePayload4K => () => new UnaryLargePayload4KScenario(),

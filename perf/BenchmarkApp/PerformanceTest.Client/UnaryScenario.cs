@@ -21,3 +21,23 @@ public class UnaryScenario : IScenario
         }
     }
 }
+
+public class UnaryComplexScenario : IScenario
+{
+    IPerfTestService client = default!;
+
+    public ValueTask PrepareAsync(GrpcChannel channel)
+    {
+        this.client = MagicOnionClient.Create<IPerfTestService>(channel);
+        return ValueTask.CompletedTask;
+    }
+
+    public async ValueTask RunAsync(PerformanceTestRunningContext ctx, CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await client.UnaryComplexAsync("Foo", 1234567);
+            ctx.Increment();
+        }
+    }
+}

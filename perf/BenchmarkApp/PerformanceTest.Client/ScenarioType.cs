@@ -2,6 +2,7 @@ public enum ScenarioType
 {
     All,
     Unary,
+    UnaryComplex,
     UnaryLargePayload1K,
     UnaryLargePayload2K,
     UnaryLargePayload4K,

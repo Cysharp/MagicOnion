@@ -31,4 +31,9 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
     {
         return UnaryResult((123, arg3));
     }
+
+    public UnaryResult<ComplexResponse> UnaryComplexAsync(string arg1, int arg2)
+    {
+        return UnaryResult(ComplexResponse.Cached);
+    }
 }
