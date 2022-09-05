@@ -4,6 +4,7 @@ using System.Runtime;
 using System.Runtime.InteropServices;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using PerformanceTest.Shared;
 
 var app = ConsoleApp.Create(args);
 app.AddRootCommand(Main);
@@ -33,6 +34,16 @@ async Task Main(
     WriteLog($"Channels: {config.Channels}");
     WriteLog($"Rounds: {rounds}");
 
+    ServerInformation serverInfo;
+    WriteLog("Gathering the server information...");
+    {
+        using var channel = GrpcChannel.ForAddress(config.Url);
+        serverInfo = await MagicOnionClient.Create<IPerfTestService>(channel).GetServerInformationAsync();
+        WriteLog($"MagicOnion {serverInfo.MagicOnionVersion}");
+        WriteLog($"grpc-dotnet {serverInfo.GrpcNetVersion}");
+        WriteLog($"{nameof(ApplicationInformation.OSDescription)}: {serverInfo.OSDescription}");
+    }
+
     var resultsByScenario = new Dictionary<ScenarioType, List<PerformanceResult>>();
     var runScenarios = Enum.GetValues<ScenarioType>().Where(x => (scenario == ScenarioType.All) ? x != ScenarioType.All : x == scenario);
     for (var i = 1; i <= rounds; i++)
@@ -56,6 +67,18 @@ async Task Main(
         writer.WriteLine($"Created at {DateTime.Now}");
         writer.WriteLine($"========================================");
         PrintStartupInformation(writer);
+        writer.WriteLine($"========================================");
+        writer.WriteLine($"Server Information:");
+        writer.WriteLine($"MagicOnion {serverInfo.MagicOnionVersion}");
+        writer.WriteLine($"grpc-dotnet {serverInfo.GrpcNetVersion}");
+        writer.WriteLine($"MessagePack {serverInfo.MessagePackVersion}");
+        writer.WriteLine($"Build Configuration: {(serverInfo.IsReleaseBuild ? "Release" : "Debug")}");
+        writer.WriteLine($"FrameworkDescription: {serverInfo.FrameworkDescription}");
+        writer.WriteLine($"OSDescription: {serverInfo.OSDescription}");
+        writer.WriteLine($"OSArchitecture: {serverInfo.OSArchitecture}");
+        writer.WriteLine($"ProcessArchitecture : {serverInfo.ProcessArchitecture}");
+        writer.WriteLine($"IsServerGC: {serverInfo.IsServerGC}");
+        writer.WriteLine($"ProcessorCount: {serverInfo.ProcessorCount}");
         writer.WriteLine($"========================================");
         writer.WriteLine($"Scenario: {scenario}");
         writer.WriteLine($"Url     : {config.Url}");
@@ -128,6 +151,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
             }));
         }
     }
+
     WriteLog("Warming up...");
     await Task.Delay(TimeSpan.FromSeconds(config.Warmup));
     ctx.Ready();
@@ -151,23 +175,20 @@ void PrintStartupInformation(TextWriter? writer = null)
 {
     writer ??= Console.Out;
 
-    writer.WriteLine($"MagicOnion {typeof(MagicOnionClient).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
-    writer.WriteLine($"grpc-dotnet {typeof(Grpc.Net.Client.GrpcChannel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
+    writer.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
+    writer.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
+    writer.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
     writer.WriteLine();
 
     writer.WriteLine("Configurations:");
-#if RELEASE
-    writer.WriteLine($"Build Configuration: Release");
-#else
-    writer.WriteLine($"Build Configuration: Debug");
-#endif
-    writer.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {RuntimeInformation.FrameworkDescription}");
-    writer.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {RuntimeInformation.OSDescription}");
-    writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {RuntimeInformation.OSArchitecture}");
-    writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {RuntimeInformation.ProcessArchitecture}");
-    writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {GCSettings.IsServerGC}");
-    writer.WriteLine($"{nameof(Environment.ProcessorCount)}: {Environment.ProcessorCount}");
-    writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {Debugger.IsAttached}");
+    writer.WriteLine($"Build Configuration: {(ApplicationInformation.Current.IsReleaseBuild ? "Release" : "Debug")}");
+    writer.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {ApplicationInformation.Current.FrameworkDescription}");
+    writer.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {ApplicationInformation.Current.OSDescription}");
+    writer.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {ApplicationInformation.Current.OSArchitecture}");
+    writer.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {ApplicationInformation.Current.ProcessArchitecture}");
+    writer.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
+    writer.WriteLine($"{nameof(Environment.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
+    writer.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
     writer.WriteLine();
 }
 

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using PerformanceTest.Shared;
 
 namespace PerformanceTest.Server;
 
@@ -20,8 +21,9 @@ class StartupService : IHostedService
 
     private void PrintStartupInformation()
     {
-        Console.WriteLine($"MagicOnion {typeof(MagicOnionEngine).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
-        Console.WriteLine($"grpc-dotnet {typeof(Grpc.AspNetCore.Server.GrpcServiceOptions).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}");
+        Console.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
+        Console.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
+        Console.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
         Console.WriteLine();
 
         Console.WriteLine($"Listening on:");
@@ -29,18 +31,14 @@ class StartupService : IHostedService
         Console.WriteLine();
 
         Console.WriteLine("Configurations:");
-        #if RELEASE
-        Console.WriteLine($"Build Configuration: Release");
-        #else
-        Console.WriteLine($"Build Configuration: Debug");
-        #endif
-        Console.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {RuntimeInformation.FrameworkDescription}");
-        Console.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {RuntimeInformation.OSDescription}");
-        Console.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {RuntimeInformation.OSArchitecture}");
-        Console.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {RuntimeInformation.ProcessArchitecture}");
-        Console.WriteLine($"{nameof(GCSettings.IsServerGC)}: {GCSettings.IsServerGC}");
-        Console.WriteLine($"{nameof(Environment.ProcessorCount)}: {Environment.ProcessorCount}");
-        Console.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {Debugger.IsAttached}");
+        Console.WriteLine($"Build Configuration: {(ApplicationInformation.Current.IsReleaseBuild ? "Release" : "Debug")}");
+        Console.WriteLine($"{nameof(RuntimeInformation.FrameworkDescription)}: {ApplicationInformation.Current.FrameworkDescription}");
+        Console.WriteLine($"{nameof(RuntimeInformation.OSDescription)}: {ApplicationInformation.Current.OSDescription}");
+        Console.WriteLine($"{nameof(RuntimeInformation.OSArchitecture)}: {ApplicationInformation.Current.OSArchitecture}");
+        Console.WriteLine($"{nameof(RuntimeInformation.ProcessArchitecture)}: {ApplicationInformation.Current.ProcessArchitecture}");
+        Console.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
+        Console.WriteLine($"{nameof(Environment.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
+        Console.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
         Console.WriteLine();
 
         Console.WriteLine("Application started.");
