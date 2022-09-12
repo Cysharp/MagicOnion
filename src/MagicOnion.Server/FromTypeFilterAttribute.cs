@@ -14,7 +14,7 @@ namespace MagicOnion.Server
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class FromTypeFilterAttribute : Attribute,
-        IMagicOnionFilterFactory<IMagicOnionFilter>,
+        IMagicOnionFilterFactory<IMagicOnionServiceFilter>,
         IMagicOnionFilterFactory<IStreamingHubFilter>
     {
         public Type Type { get; }
@@ -25,7 +25,7 @@ namespace MagicOnion.Server
 
         public FromTypeFilterAttribute(Type type)
         {
-            if (!typeof(IMagicOnionFilter).IsAssignableFrom(type) &&
+            if (!typeof(IMagicOnionServiceFilter).IsAssignableFrom(type) &&
                 !typeof(IStreamingHubFilter).IsAssignableFrom(type))
             {
                 throw new ArgumentException($"{type.FullName} doesn't inherit from MagicOnionFilterAttribute or StreamingHubFilterAttribute.", nameof(type));
@@ -34,10 +34,10 @@ namespace MagicOnion.Server
             Type = type;
         }
 
-        IMagicOnionFilter IMagicOnionFilterFactory<IMagicOnionFilter>.CreateInstance(IServiceProvider serviceProvider)
+        IMagicOnionServiceFilter IMagicOnionFilterFactory<IMagicOnionServiceFilter>.CreateInstance(IServiceProvider serviceProvider)
         {
-            if (!typeof(IMagicOnionFilter).IsAssignableFrom(Type)) return ThroughFilter.Instance;
-            return (IMagicOnionFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
+            if (!typeof(IMagicOnionServiceFilter).IsAssignableFrom(Type)) return ThroughFilter.Instance;
+            return (IMagicOnionServiceFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
         }
 
         IStreamingHubFilter IMagicOnionFilterFactory<IStreamingHubFilter>.CreateInstance(IServiceProvider serviceProvider)
@@ -46,7 +46,7 @@ namespace MagicOnion.Server
             return (IStreamingHubFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
         }
 
-        class ThroughFilter : IMagicOnionFilter, IStreamingHubFilter
+        class ThroughFilter : IMagicOnionServiceFilter, IStreamingHubFilter
         {
             public static ThroughFilter Instance { get; } = new ThroughFilter();
 

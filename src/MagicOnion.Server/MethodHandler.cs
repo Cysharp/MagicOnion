@@ -30,7 +30,7 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly IMagicOnionFilterFactory<IMagicOnionFilter>[] filters;
+        readonly IMagicOnionFilterFactory<IMagicOnionServiceFilter>[] filters;
 
         // options
 
@@ -86,9 +86,9 @@ namespace MagicOnion.Server
                 .ToLookup(x => x.GetType());
 
             this.filters = handlerOptions.GlobalFilters
-                .OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>()
-                .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+                .OfType<IMagicOnionFilterFactory<IMagicOnionServiceFilter>>()
+                .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionServiceFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionServiceFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
                 .OrderBy(x => x.Order)
                 .ToArray();
 

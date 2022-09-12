@@ -14,22 +14,22 @@ public static class MagicOnionFilterDescriptorExtensions
     /// <param name="descriptors"></param>
     public static void Add<T>(this IList<MagicOnionServiceFilterDescriptor> descriptors)
     {
-        if (typeof(IMagicOnionFilterFactory<IMagicOnionFilter>).IsAssignableFrom(typeof(T)))
+        if (typeof(IMagicOnionFilterFactory<IMagicOnionServiceFilter>).IsAssignableFrom(typeof(T)))
         {
             var ctor = typeof(T).GetConstructors().SingleOrDefault(x => x.GetParameters().Length == 0);
             if (ctor == null)
             {
                 throw new InvalidOperationException($"Type '{typeof(T).FullName}' has no parameter-less constructor. You can also use `Add(instance)` overload method.");
             }
-            descriptors.Add(new MagicOnionServiceFilterDescriptor((IMagicOnionFilterFactory<IMagicOnionFilter>)Activator.CreateInstance<T>()!));
+            descriptors.Add(new MagicOnionServiceFilterDescriptor((IMagicOnionFilterFactory<IMagicOnionServiceFilter>)Activator.CreateInstance<T>()!));
         }
-        else if (typeof(IMagicOnionFilter).IsAssignableFrom(typeof(T)))
+        else if (typeof(IMagicOnionServiceFilter).IsAssignableFrom(typeof(T)))
         {
             descriptors.Add(new MagicOnionServiceFilterDescriptor(typeof(T)));
         }
         else
         {
-            throw new InvalidOperationException($"Type '{typeof(T).FullName}' is not compatible with {nameof(IMagicOnionFilter)} or {nameof(IMagicOnionFilterFactory<IMagicOnionFilter>)}");
+            throw new InvalidOperationException($"Type '{typeof(T).FullName}' is not compatible with {nameof(IMagicOnionServiceFilter)} or {nameof(IMagicOnionFilterFactory<IMagicOnionServiceFilter>)}");
         }
     }
 
@@ -38,7 +38,7 @@ public static class MagicOnionFilterDescriptorExtensions
     /// </summary>
     /// <param name="descriptors"></param>
     /// <param name="filterInstance"></param>
-    public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, IMagicOnionFilter filterInstance)
+    public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, IMagicOnionServiceFilter filterInstance)
     {
         if (filterInstance == null) throw new ArgumentNullException(nameof(filterInstance));
 
@@ -50,7 +50,7 @@ public static class MagicOnionFilterDescriptorExtensions
     /// </summary>
     /// <param name="descriptors"></param>
     /// <param name="factory"></param>
-    public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, IMagicOnionFilterFactory<IMagicOnionFilter> factory)
+    public static void Add(this IList<MagicOnionServiceFilterDescriptor> descriptors, IMagicOnionFilterFactory<IMagicOnionServiceFilter> factory)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 

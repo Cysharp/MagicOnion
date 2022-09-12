@@ -63,19 +63,19 @@ namespace MagicOnion.Server.Filters
         }
     }
 
-    public class MagicOnionServiceFilterDescriptor : MagicOnionFilterDescriptor<IMagicOnionFilter>
+    public class MagicOnionServiceFilterDescriptor : MagicOnionFilterDescriptor<IMagicOnionServiceFilter>
     {
         public MagicOnionServiceFilterDescriptor(Type type, int order = 0)
             : base(type, order)
         {
         }
 
-        public MagicOnionServiceFilterDescriptor(IMagicOnionFilter instance, int order = 0)
+        public MagicOnionServiceFilterDescriptor(IMagicOnionServiceFilter instance, int order = 0)
             : base(instance, order)
         {
         }
 
-        public MagicOnionServiceFilterDescriptor(IMagicOnionFilterFactory<IMagicOnionFilter> factory, int order = 0)
+        public MagicOnionServiceFilterDescriptor(IMagicOnionFilterFactory<IMagicOnionServiceFilter> factory, int order = 0)
             : base(factory, order)
         {
         }

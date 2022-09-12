@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace MagicOnion.Server
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
-    public abstract class MagicOnionFilterAttribute : Attribute, IMagicOnionFilter, IMagicOnionFilterFactory<IMagicOnionFilter>
+    public abstract class MagicOnionFilterAttribute : Attribute, IMagicOnionServiceFilter, IMagicOnionFilterFactory<IMagicOnionServiceFilter>
     {
         public int Order { get; set; } = int.MaxValue;
 
@@ -24,9 +24,9 @@ namespace MagicOnion.Server
             context.CallContext.Status = new Grpc.Core.Status(statusCode, detail);
         }
         
-        IMagicOnionFilter IMagicOnionFilterFactory<IMagicOnionFilter>.CreateInstance(IServiceProvider serviceLocator)
+        IMagicOnionServiceFilter IMagicOnionFilterFactory<IMagicOnionServiceFilter>.CreateInstance(IServiceProvider serviceLocator)
         {
-            return (IMagicOnionFilter)ActivatorUtilities.CreateInstance(serviceLocator, this.GetType());
+            return (IMagicOnionServiceFilter)ActivatorUtilities.CreateInstance(serviceLocator, this.GetType());
         }
     }
 }
