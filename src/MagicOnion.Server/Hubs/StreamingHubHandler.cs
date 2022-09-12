@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading;
+using MagicOnion.Server.Filters;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -21,7 +22,7 @@ namespace MagicOnion.Server.Hubs
 
         readonly IServiceProvider serviceProvider;
 
-        readonly IMagicOnionFilterFactory<StreamingHubFilterAttribute>[] filters;
+        readonly IMagicOnionFilterFactory<IStreamingHubFilter>[] filters;
         internal readonly Type RequestType;
         readonly Type? UnwrappedResponseType;
         internal readonly MessagePackSerializerOptions serializerOptions;
@@ -73,19 +74,11 @@ namespace MagicOnion.Server.Hubs
                 .ToLookup(x => x.GetType());
 
             this.filters = handlerOptions.GlobalStreamingHubFilters
-                .OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>()
-                .Concat(classType.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>())
-                .Concat(methodInfo.GetCustomAttributes<StreamingHubFilterAttribute>(true).Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<StreamingHubFilterAttribute>>())
+                .OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>()
+                .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
                 .OrderBy(x => x.Order)
                 .ToArray();
-
-            // validation filter
-            if (methodInfo.GetCustomAttribute<MagicOnionFilterAttribute>(true) != null)
-            {
-                throw new InvalidOperationException($"StreamingHub method can not add [MagicOnionFilter], you should add [StreamingHubFilter]. {classType.Name}/{methodInfo.Name}");
-            }
 
             this.toStringCache = HubName + "/" + MethodInfo.Name;
             this.getHashCodeCache = HubName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;

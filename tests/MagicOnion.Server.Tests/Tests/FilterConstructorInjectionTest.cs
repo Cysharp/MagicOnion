@@ -1,11 +1,11 @@
 using FluentAssertions;
-using MagicOnion.Server;
 using Xunit;
 using Grpc.Core;
 using Xunit.Abstractions;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using MagicOnion.Server.Filters;
 
 namespace MagicOnion.Server.Tests
 {

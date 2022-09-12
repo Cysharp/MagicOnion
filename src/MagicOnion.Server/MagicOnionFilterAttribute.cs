@@ -1,17 +1,14 @@
-﻿using System;
+using MagicOnion.Server.Filters;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Server
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
-    public abstract class MagicOnionFilterAttribute : Attribute
+    public abstract class MagicOnionFilterAttribute : Attribute, IMagicOnionFilter, IMagicOnionFilterFactory<IMagicOnionFilter>
     {
-        int order = int.MaxValue;
-        public int Order
-        {
-            get { return order; }
-            set { order = value; }
-        }
+        public int Order { get; set; } = int.MaxValue;
 
         /// <summary>
         /// This constructor used by MagicOnionEngine when register handler.
@@ -25,6 +22,11 @@ namespace MagicOnion.Server
         protected static void SetStatusCode(ServiceContext context, Grpc.Core.StatusCode statusCode, string detail)
         {
             context.CallContext.Status = new Grpc.Core.Status(statusCode, detail);
+        }
+        
+        IMagicOnionFilter IMagicOnionFilterFactory<IMagicOnionFilter>.CreateInstance(IServiceProvider serviceLocator)
+        {
+            return (IMagicOnionFilter)ActivatorUtilities.CreateInstance(serviceLocator, this.GetType());
         }
     }
 }

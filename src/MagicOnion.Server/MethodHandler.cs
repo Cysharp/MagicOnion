@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using MagicOnion.Server.Filters;
 
 namespace MagicOnion.Server
 {
@@ -29,7 +30,7 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly IMagicOnionFilterFactory<MagicOnionFilterAttribute>[] filters;
+        readonly IMagicOnionFilterFactory<IMagicOnionFilter>[] filters;
 
         // options
 
@@ -85,11 +86,9 @@ namespace MagicOnion.Server
                 .ToLookup(x => x.GetType());
 
             this.filters = handlerOptions.GlobalFilters
-                .OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>()
-                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
-                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
+                .OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>()
+                .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+                .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
                 .OrderBy(x => x.Order)
                 .ToArray();
 
