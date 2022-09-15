@@ -8,6 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Filters
 {
+    /// <summary>
+    /// A descriptor of MagicOnion filter.
+    /// </summary>
+    /// <typeparam name="TFilter"></typeparam>
     public abstract class MagicOnionFilterDescriptor<TFilter> : IMagicOnionFilterFactory<TFilter>
         where TFilter : IMagicOnionFilterMetadata
     {

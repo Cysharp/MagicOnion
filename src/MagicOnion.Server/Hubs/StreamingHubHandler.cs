@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Threading;
 using MagicOnion.Server.Filters;
+using MagicOnion.Server.Filters.Internal;
 
 namespace MagicOnion.Server.Hubs
 {
@@ -20,9 +21,6 @@ namespace MagicOnion.Server.Hubs
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly IServiceProvider serviceProvider;
-
-        readonly IMagicOnionFilterFactory<IStreamingHubFilter>[] filters;
         internal readonly Type RequestType;
         readonly Type? UnwrappedResponseType;
         internal readonly MessagePackSerializerOptions serializerOptions;
@@ -48,8 +46,6 @@ namespace MagicOnion.Server.Hubs
             var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
             var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
 
-            this.serviceProvider = serviceProvider;
-
             this.HubType = classType;
             this.HubName = hubInterface.Name;
             this.MethodInfo = methodInfo;
@@ -72,13 +68,6 @@ namespace MagicOnion.Server.Hubs
                 .Concat(methodInfo.GetCustomAttributes(true))
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
-
-            this.filters = handlerOptions.GlobalStreamingHubFilters
-                .OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>()
-                .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-                .OrderBy(x => x.Order)
-                .ToArray();
 
             this.toStringCache = HubName + "/" + MethodInfo.Name;
             this.getHashCodeCache = HubName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
@@ -126,7 +115,8 @@ namespace MagicOnion.Server.Hubs
                 var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                 var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                this.MethodBody = BuildMethodBodyWithFilter((Func<StreamingHubContext, ValueTask>)compiledBody);
+                var filterFactories = FilterHelper.GetFilterFactories(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
+                this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filterFactories, (Func<StreamingHubContext, ValueTask>)compiledBody);
             }
             catch (Exception ex)
             {
@@ -149,19 +139,6 @@ namespace MagicOnion.Server.Hubs
                 // Task
                 return null;
             }
-        }
-
-        Func<StreamingHubContext, ValueTask> BuildMethodBodyWithFilter(Func<StreamingHubContext, ValueTask> methodBody)
-        {
-            Func<StreamingHubContext, ValueTask> next = methodBody;
-
-            foreach (var filterFactory in this.filters.Reverse())
-            {
-                var newFilter = filterFactory.CreateInstance(serviceProvider);
-                next = new InvokeHelper<StreamingHubContext, Func<StreamingHubContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
-            }
-
-            return next;
         }
 
         public override string ToString()
