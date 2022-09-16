@@ -12,49 +12,37 @@ namespace MagicOnion.Server.Filters
     /// A descriptor of MagicOnion filter.
     /// </summary>
     /// <typeparam name="TFilter"></typeparam>
-    public abstract class MagicOnionFilterDescriptor<TFilter> : IMagicOnionFilterFactory<TFilter>
+    public abstract class MagicOnionFilterDescriptor<TFilter>
         where TFilter : IMagicOnionFilterMetadata
     {
-        public IMagicOnionFilterFactory<TFilter>? Factory { get; }
-        public TFilter? Instance { get; }
+        public IMagicOnionFilterMetadata Filter { get; }
         public int Order { get; }
 
         protected MagicOnionFilterDescriptor(Type type, int order = 0)
         {
-            Factory = new MagicOnionFilterTypeFactory(type, order);
-            Instance = default;
+            Filter = new MagicOnionFilterFromTypeFactory(type, order);
             Order = order;
         }
 
         protected MagicOnionFilterDescriptor(TFilter instance, int order = 0)
         {
-            Factory = null;
-            Instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            Filter = instance ?? throw new ArgumentNullException(nameof(instance));
             Order = order;
         }
 
         protected MagicOnionFilterDescriptor(IMagicOnionFilterFactory<TFilter> factory, int order = 0)
         {
-            Factory = factory ?? throw new ArgumentNullException(nameof(factory));
-            Instance = default;
+            Filter = factory ?? throw new ArgumentNullException(nameof(factory));
             Order = order;
         }
 
-        public TFilter CreateInstance(IServiceProvider serviceProvider)
-        {
-            if (Instance != null) return Instance;
-            if (Factory != null) return Factory.CreateInstance(serviceProvider);
-
-            throw new InvalidOperationException("MagicOnionFilterDescriptor requires instance or factory");
-        }
-
         // Create a filter instance from specified type.
-        class MagicOnionFilterTypeFactory : IMagicOnionFilterFactory<TFilter>
+        internal class MagicOnionFilterFromTypeFactory : IMagicOnionFilterFactory<TFilter>
         {
             public Type Type { get; }
             public int Order { get; }
 
-            public MagicOnionFilterTypeFactory(Type type, int order)
+            public MagicOnionFilterFromTypeFactory(Type type, int order)
             {
                 Type = type;
                 Order = order;

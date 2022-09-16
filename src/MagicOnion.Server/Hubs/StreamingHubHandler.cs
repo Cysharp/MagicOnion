@@ -115,8 +115,8 @@ namespace MagicOnion.Server.Hubs
                 var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                 var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                var filterFactories = FilterHelper.GetFilterFactories(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
-                this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filterFactories, (Func<StreamingHubContext, ValueTask>)compiledBody);
+                var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
+                this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<StreamingHubContext, ValueTask>)compiledBody);
             }
             catch (Exception ex)
             {

@@ -82,7 +82,7 @@ namespace MagicOnion.Server
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            var filterFactories = FilterHelper.GetFilterFactories(handlerOptions.GlobalFilters, classType, methodInfo);
+            var filters = FilterHelper.GetFilters(handlerOptions.GlobalFilters, classType, methodInfo);
 
             // options
             this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
@@ -135,7 +135,7 @@ namespace MagicOnion.Server
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filterFactories, (Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -196,7 +196,7 @@ namespace MagicOnion.Server
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filterFactories, (Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -241,7 +241,7 @@ namespace MagicOnion.Server
 
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filterFactories, (Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {

@@ -10,47 +10,91 @@ namespace MagicOnion.Server.Filters.Internal;
 
 internal class FilterHelper
 {
-    public static IReadOnlyList<MagicOnionServiceFilterDescriptor> GetFilterFactories(IEnumerable<MagicOnionServiceFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
+    public static IReadOnlyList<MagicOnionServiceFilterDescriptor> GetFilters(IEnumerable<MagicOnionServiceFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
     {
+        var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
+            .OfType<IMagicOnionFilterMetadata>()
+            .Where(x => x is IMagicOnionServiceFilter or IMagicOnionFilterFactory<IMagicOnionServiceFilter>)
+            .Select(x =>
+            {
+                return x switch
+                {
+                    IMagicOnionServiceFilter filter
+                        => new MagicOnionServiceFilterDescriptor(filter, (filter is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                    IMagicOnionFilterFactory<IMagicOnionServiceFilter> filterFactory
+                        => new MagicOnionServiceFilterDescriptor(filterFactory, (filterFactory is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                    _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+                    // _ => throw new InvalidOperationException($"The '{x.GetType().FullName}' attribute must implement IMagicOnionFilterFactory<IMagicOnionServiceFilter> or IMagicOnionServiceFilter"),
+                };
+            });
+
         return globalFilters
-            .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionServiceFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-            .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IMagicOnionServiceFilter>>().Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
+            .Concat(attributedFilters)
             .OrderBy(x => x.Order)
             .ToArray();
     }
 
-    public static IReadOnlyList<StreamingHubFilterDescriptor> GetFilterFactories(IEnumerable<StreamingHubFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
+    public static IReadOnlyList<StreamingHubFilterDescriptor> GetFilters(IEnumerable<StreamingHubFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
     {
+        var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
+            .OfType<IMagicOnionFilterMetadata>()
+            .Where(x => x is IStreamingHubFilter or IMagicOnionFilterFactory<IStreamingHubFilter>)
+            .Select(x =>
+            {
+                return x switch
+                {
+                    IStreamingHubFilter filter
+                        => new StreamingHubFilterDescriptor(filter, (filter is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                    IMagicOnionFilterFactory<IStreamingHubFilter> filterFactory
+                        => new StreamingHubFilterDescriptor(filterFactory, (filterFactory is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                    _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
+                    // _ => throw new InvalidOperationException($"The '{x.GetType().FullName}' attribute must implement IMagicOnionFilterFactory<IMagicOnionServiceFilter> or IMagicOnionServiceFilter"),
+                };
+            });
+
         return globalFilters
-            .Concat(classType.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
-            .Concat(methodInfo.GetCustomAttributes(inherit: true).OfType<IMagicOnionFilterFactory<IStreamingHubFilter>>().Select(x => new StreamingHubFilterDescriptor(x, x.Order)))
+            .Concat(attributedFilters)
             .OrderBy(x => x.Order)
             .ToArray();
     }
 
-    public static Func<ServiceContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<IMagicOnionFilterFactory<IMagicOnionServiceFilter>> filters, Func<ServiceContext, ValueTask> methodBody)
+    public static Func<ServiceContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<MagicOnionServiceFilterDescriptor> filters, Func<ServiceContext, ValueTask> methodBody)
     {
         Func<ServiceContext, ValueTask> next = methodBody;
 
-        foreach (var filterFactory in filters.Reverse())
+        foreach (var filterDescriptor in filters.Reverse())
         {
-            var newFilter = filterFactory.CreateInstance(serviceProvider);
+            var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
             next = new InvokeHelper<ServiceContext, Func<ServiceContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
         }
 
         return next;
     }
 
-    public static Func<StreamingHubContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<IMagicOnionFilterFactory<IStreamingHubFilter>> filters, Func<StreamingHubContext, ValueTask> methodBody)
+    public static Func<StreamingHubContext, ValueTask> WrapMethodBodyWithFilter(IServiceProvider serviceProvider, IEnumerable<StreamingHubFilterDescriptor> filters, Func<StreamingHubContext, ValueTask> methodBody)
     {
         Func<StreamingHubContext, ValueTask> next = methodBody;
 
-        foreach (var filterFactory in filters.Reverse())
+        foreach (var filterDescriptor in filters.Reverse())
         {
-            var newFilter = filterFactory.CreateInstance(serviceProvider);
+            var newFilter = CreateOrGetInstance(serviceProvider, filterDescriptor);
             next = new InvokeHelper<StreamingHubContext, Func<StreamingHubContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
         }
 
         return next;
+    }
+
+    public static TFilter CreateOrGetInstance<TFilter>(IServiceProvider serviceProvider, MagicOnionFilterDescriptor<TFilter> descriptor)
+        where TFilter : IMagicOnionFilterMetadata
+    {
+        switch (descriptor.Filter)
+        {
+            case IMagicOnionFilterFactory<TFilter> factory:
+                return factory.CreateInstance(serviceProvider);
+            case TFilter filterInstance:
+                return filterInstance;
+            default:
+                throw new InvalidOperationException($"MagicOnionFilterDescriptor requires instance or factory. but the descriptor has '{descriptor.Filter.GetType()}'");
+        }
     }
 }
