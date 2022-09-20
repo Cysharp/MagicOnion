@@ -6,7 +6,7 @@ namespace MagicOnion.Server.Filters
     /// An interface for filter which can create an instance of executable filter.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IMagicOnionFilterFactory<out T> : IMagicOnionOrderedFilter, IMagicOnionFilterMetadata
+    public interface IMagicOnionFilterFactory<out T> : IMagicOnionFilterMetadata
         where T : IMagicOnionFilterMetadata
     {
         /// <summary>
