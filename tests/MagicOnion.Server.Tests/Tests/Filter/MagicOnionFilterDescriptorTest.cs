@@ -21,7 +21,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(0);
+        order.Should().Be(int.MaxValue);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class MagicOnionFilterDescriptorTest
         var order = desc.Order;
 
         // Assert
-        order.Should().Be(0);
+        order.Should().Be(int.MaxValue);
     }
 
     [Fact]

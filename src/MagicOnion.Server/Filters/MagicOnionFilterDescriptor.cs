@@ -33,7 +33,7 @@ namespace MagicOnion.Server.Filters
                 throw new InvalidOperationException($"Type '{type.FullName}' is not compatible with {typeof(TFilter).Name} or {typeof(IMagicOnionFilterFactory<TFilter>).Name}");
             }
 
-            Order = order ?? 0;
+            Order = order ?? int.MaxValue;
         }
 
         protected MagicOnionFilterDescriptor(TFilter instance, int? order = default)
@@ -49,7 +49,7 @@ namespace MagicOnion.Server.Filters
         }
 
         static int GetOrder(IMagicOnionFilterMetadata filter, int? order)
-            => order ?? (filter is IMagicOnionOrderedFilter ordered ? ordered.Order : 0);
+            => order ?? (filter is IMagicOnionOrderedFilter ordered ? ordered.Order : int.MaxValue);
 
         // Create a filter instance from specified type.
         internal class MagicOnionFilterFromTypeFactory : IMagicOnionFilterFactory<TFilter>

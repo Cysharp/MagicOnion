@@ -77,9 +77,11 @@ public class FilterHelperTest
     {
         // Arrange
         var globalFilters = new List<MagicOnionServiceFilterDescriptor>();
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("Unordered.1")));
         globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("1"), 1));
         globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("123"), 123));
         globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("-123"), -123));
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("Unordered.2")));
 
         var methodInfo = new TestServiceOrder().Method;
 
@@ -87,10 +89,11 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(3 + 4);
+        filters.Should().HaveCount(5 + 4 + 4);
         filters.Select(x => x.Filter).OfType<TestFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
         {
             "-256", "-123", "-64", "1", "64", "123", "256",
+            "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"
         });
     }
     
@@ -123,12 +126,16 @@ public class FilterHelperTest
         public UnaryResult<int> UnknownFilterMethod() => default;
     }
     
+    [TestFilter("Unordered.3")]
     [TestFilter("64", Order = 64)]
     [TestFilter("-256", Order = -256)]
+    [TestFilter("Unordered.4")]
     class TestServiceOrder
     {
+        [TestFilter("Unordered.5")]
         [TestFilter("-64", Order = -64)]
         [TestFilter("256", Order = 256)]
+        [TestFilter("Unordered.6")]
         public UnaryResult<int> Method() => default;
     }
 
@@ -255,9 +262,11 @@ public class FilterHelperTest
     {
         // Arrange
         var globalFilters = new List<StreamingHubFilterDescriptor>();
+        globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("Unordered.1")));
         globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("1"), 1));
         globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("123"), 123));
         globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("-123"), -123));
+        globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("Unordered.2")));
 
         var methodInfo = new TestHubOrder().Method;
 
@@ -265,10 +274,11 @@ public class FilterHelperTest
         var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
 
         // Assert
-        filters.Should().HaveCount(3 + 4);
+        filters.Should().HaveCount(5 + 4 + 4);
         filters.Select(x => x.Filter).OfType<TestHubFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
         {
             "-256", "-123", "-64", "1", "64", "123", "256",
+            "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"
         });
     }
 
@@ -311,12 +321,16 @@ public class FilterHelperTest
         public Task<int> NoFilteredMethod() => default;
     }
     
+    [TestHubFilter("Unordered.3")]
     [TestHubFilter("64", Order = 64)]
     [TestHubFilter("-256", Order = -256)]
+    [TestHubFilter("Unordered.4")]
     class TestHubOrder
     {
+        [TestHubFilter("Unordered.5")]
         [TestHubFilter("-64", Order = -64)]
         [TestHubFilter("256", Order = 256)]
+        [TestHubFilter("Unordered.6")]
         public Task<int> Method() => default;
     }
 

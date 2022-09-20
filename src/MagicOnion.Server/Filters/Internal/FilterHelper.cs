@@ -12,12 +12,15 @@ internal class FilterHelper
 {
     public static IReadOnlyList<MagicOnionServiceFilterDescriptor> GetFilters(IEnumerable<MagicOnionServiceFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
     {
+        // Filters are sorted in the following order:
+        // [Manually ordered filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
+        // The filters has `int.MaxValue` as order by default. If the user specifies an order, it will take precedence.
         var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
             .OfType<IMagicOnionFilterMetadata>()
             .Where(x => x is IMagicOnionServiceFilter or IMagicOnionFilterFactory<IMagicOnionServiceFilter>)
             .Select(x =>
             {
-                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0;
+                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : int.MaxValue;
                 return x switch
                 {
                     IMagicOnionServiceFilter filter
@@ -37,12 +40,15 @@ internal class FilterHelper
 
     public static IReadOnlyList<StreamingHubFilterDescriptor> GetFilters(IEnumerable<StreamingHubFilterDescriptor> globalFilters, Type classType, MethodInfo methodInfo)
     {
+        // Filters are sorted in the following order:
+        // [Manually ordered filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
+        // The filters has `int.MaxValue` as order by default. If the user specifies an order, it will take precedence.
         var attributedFilters = classType.GetCustomAttributes(inherit: true).Concat(methodInfo.GetCustomAttributes(inherit: true))
             .OfType<IMagicOnionFilterMetadata>()
             .Where(x => x is IStreamingHubFilter or IMagicOnionFilterFactory<IStreamingHubFilter>)
             .Select(x =>
             {
-                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0;
+                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : int.MaxValue;
                 return x switch
                 {
                     IStreamingHubFilter filter
