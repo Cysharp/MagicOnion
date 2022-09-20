@@ -18,34 +18,35 @@ namespace MagicOnion.Server.Filters
         public IMagicOnionFilterMetadata Filter { get; }
         public int Order { get; }
 
-        protected MagicOnionFilterDescriptor(Type type, int order = 0)
+        protected MagicOnionFilterDescriptor(Type type, int? order = default)
         {
-            Filter = new MagicOnionFilterFromTypeFactory(type, order);
-            Order = order;
+            Filter = new MagicOnionFilterFromTypeFactory(type);
+            Order = order ?? 0;
         }
 
-        protected MagicOnionFilterDescriptor(TFilter instance, int order = 0)
+        protected MagicOnionFilterDescriptor(TFilter instance, int? order = default)
         {
             Filter = instance ?? throw new ArgumentNullException(nameof(instance));
-            Order = order;
+            Order = GetOrder(Filter, order);
         }
 
-        protected MagicOnionFilterDescriptor(IMagicOnionFilterFactory<TFilter> factory, int order = 0)
+        protected MagicOnionFilterDescriptor(IMagicOnionFilterFactory<TFilter> factory, int? order = default)
         {
             Filter = factory ?? throw new ArgumentNullException(nameof(factory));
-            Order = order;
+            Order = GetOrder(Filter, order);
         }
+
+        static int GetOrder(IMagicOnionFilterMetadata filter, int? order)
+            => order ?? (filter is IMagicOnionOrderedFilter ordered ? ordered.Order : 0);
 
         // Create a filter instance from specified type.
         internal class MagicOnionFilterFromTypeFactory : IMagicOnionFilterFactory<TFilter>
         {
             public Type Type { get; }
-            public int Order { get; }
 
-            public MagicOnionFilterFromTypeFactory(Type type, int order)
+            public MagicOnionFilterFromTypeFactory(Type type)
             {
                 Type = type;
-                Order = order;
             }
 
             public TFilter CreateInstance(IServiceProvider serviceProvider)
@@ -57,17 +58,17 @@ namespace MagicOnion.Server.Filters
 
     public class MagicOnionServiceFilterDescriptor : MagicOnionFilterDescriptor<IMagicOnionServiceFilter>
     {
-        public MagicOnionServiceFilterDescriptor(Type type, int order = 0)
+        public MagicOnionServiceFilterDescriptor(Type type, int? order = default)
             : base(type, order)
         {
         }
 
-        public MagicOnionServiceFilterDescriptor(IMagicOnionServiceFilter instance, int order = 0)
+        public MagicOnionServiceFilterDescriptor(IMagicOnionServiceFilter instance, int? order = default)
             : base(instance, order)
         {
         }
 
-        public MagicOnionServiceFilterDescriptor(IMagicOnionFilterFactory<IMagicOnionServiceFilter> factory, int order = 0)
+        public MagicOnionServiceFilterDescriptor(IMagicOnionFilterFactory<IMagicOnionServiceFilter> factory, int? order = default)
             : base(factory, order)
         {
         }
@@ -75,17 +76,17 @@ namespace MagicOnion.Server.Filters
 
     public class StreamingHubFilterDescriptor : MagicOnionFilterDescriptor<IStreamingHubFilter>
     {
-        public StreamingHubFilterDescriptor(Type type, int order = 0)
+        public StreamingHubFilterDescriptor(Type type, int? order = default)
             : base(type, order)
         {
         }
 
-        public StreamingHubFilterDescriptor(IStreamingHubFilter instance, int order = 0)
+        public StreamingHubFilterDescriptor(IStreamingHubFilter instance, int? order = default)
             : base(instance, order)
         {
         }
 
-        public StreamingHubFilterDescriptor(IMagicOnionFilterFactory<IStreamingHubFilter> factory, int order = 0)
+        public StreamingHubFilterDescriptor(IMagicOnionFilterFactory<IStreamingHubFilter> factory, int? order = default)
             : base(factory, order)
         {
         }
