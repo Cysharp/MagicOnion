@@ -71,6 +71,44 @@ public class FilterHelperTest
         filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
     }
 
+    [Fact]
+    public void GetFilters_Service_Order()
+    {
+        // Arrange
+        var globalFilters = new List<MagicOnionServiceFilterDescriptor>();
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("1"), 1));
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("123"), 123));
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("-123"), -123));
+
+        var methodInfo = new TestServiceOrder().Method;
+
+        // Act
+        var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(3 + 4);
+        filters.Select(x => x.Filter).OfType<TestFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
+        {
+            "-256", "-123", "-64", "1", "64", "123", "256",
+        });
+    }
+    
+    [Fact]
+    public void GetFilters_Service_LegacyCompatAttributeFactory()
+    {
+        // Arrange
+        var globalFilters = new List<MagicOnionServiceFilterDescriptor>();
+        globalFilters.Add(new MagicOnionServiceFilterDescriptor(new LegacyFilterFactory()));
+        var methodInfo = new TestService().NoFilteredMethod;
+
+        // Act
+        var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(2);
+        filters[0].Filter.Should().BeOfType<LegacyFilterFactory>();
+        filters[1].Filter.Should().BeOfType<TestFilterAttribute>();
+    }
 
     [TestFilter("Attribute.Class")]
     class TestService
@@ -82,6 +120,15 @@ public class FilterHelperTest
 
         [MetadataOnlyFilter]
         public UnaryResult<int> UnknownFilterMethod() => default;
+    }
+    
+    [TestFilter("64", Order = 64)]
+    [TestFilter("-256", Order = -256)]
+    class TestServiceOrder
+    {
+        [TestFilter("-64", Order = -64)]
+        [TestFilter("256", Order = 256)]
+        public UnaryResult<int> Method() => default;
     }
 
     class MetadataOnlyFilterAttribute : Attribute, IMagicOnionFilterMetadata
@@ -101,6 +148,24 @@ public class FilterHelperTest
         }
 
         public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => default;
+    }
+
+    class LegacyFilterFactory : IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new FilterImpl();
+        }
+
+        public int Order { get; }
+
+        public class FilterImpl : MagicOnionFilterAttribute
+        {
+            public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            {
+                return next(context);
+            }
+        }
     }
 
     [Fact]
@@ -183,6 +248,45 @@ public class FilterHelperTest
         streamingHubFilters.Should().HaveCount(1);
         streamingHubFilters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
     }
+       
+    [Fact]
+    public void GetFilters_StreamingHub_Order()
+    {
+        // Arrange
+        var globalFilters = new List<StreamingHubFilterDescriptor>();
+        globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("1"), 1));
+        globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("123"), 123));
+        globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("-123"), -123));
+
+        var methodInfo = new TestHubOrder().Method;
+
+        // Act
+        var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(3 + 4);
+        filters.Select(x => x.Filter).OfType<TestHubFilterAttribute>().Select(x => x.Name).Should().Equal(new[]
+        {
+            "-256", "-123", "-64", "1", "64", "123", "256",
+        });
+    }
+
+    [Fact]
+    public void GetFilters_StreamingHub_LegacyCompatAttributeFactory()
+    {
+        // Arrange
+        var globalFilters = new List<StreamingHubFilterDescriptor>();
+        globalFilters.Add(new StreamingHubFilterDescriptor(new LegacyHubFilterFactory()));
+        var methodInfo = new TestHub().NoFilteredMethod;
+
+        // Act
+        var filters = FilterHelper.GetFilters(globalFilters, methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(2);
+        filters[0].Filter.Should().BeOfType<LegacyHubFilterFactory>();
+        filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>();
+    }
 
     [TestHubFilter("Attribute.Class")]
     class TestHub
@@ -205,9 +309,36 @@ public class FilterHelperTest
 
         public Task<int> NoFilteredMethod() => default;
     }
+    
+    [TestHubFilter("64", Order = 64)]
+    [TestHubFilter("-256", Order = -256)]
+    class TestHubOrder
+    {
+        [TestHubFilter("-64", Order = -64)]
+        [TestHubFilter("256", Order = 256)]
+        public Task<int> Method() => default;
+    }
 
     class MetadataOnlyHubFilterAttribute : Attribute, IMagicOnionFilterMetadata
     {}
+
+    class LegacyHubFilterFactory : IMagicOnionFilterFactory<StreamingHubFilterAttribute>
+    {
+        public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new FilterImpl();
+        }
+
+        public int Order { get; }
+
+        public class FilterImpl : StreamingHubFilterAttribute
+        {
+            public override ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+            {
+                return next(context);
+            }
+        }
+    }
 
     class TestHubFilterAttribute : StreamingHubFilterAttribute
     {
@@ -273,9 +404,36 @@ public class FilterHelperTest
         instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
     }
 
+    [Fact]
+    public void CreateOrGetInstance_Service_Factory_Legacy()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton("ValueFromServiceProvider");
+        var serviceProvider = services.BuildServiceProvider();
+        var filterDesc = new MagicOnionServiceFilterDescriptor(new TestServiceFilterLegacyFactory()); /* IMagicOnionFilterFactory<MagicOnionFilterAttribute> */
+
+        // Act
+        var instance = FilterHelper.CreateOrGetInstance<IMagicOnionServiceFilter>(serviceProvider, filterDesc);
+
+        // Assert
+        instance.Should().NotBeNull();
+        instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+    }
+
     class TestServiceFilterFactory : IMagicOnionFilterFactory<IMagicOnionServiceFilter>
     {
         public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new TestFilterAttribute(serviceLocator.GetService<string>());
+        }
+
+        public int Order { get; }
+    }
+
+    class TestServiceFilterLegacyFactory : IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceLocator)
         {
             return new TestFilterAttribute(serviceLocator.GetService<string>());
         }
@@ -330,10 +488,37 @@ public class FilterHelperTest
         instance.Should().NotBeNull();
         instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
     }
+       
+    [Fact]
+    public void CreateOrGetInstance_StreamingHub_Factory_Legacy()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton("ValueFromServiceProvider");
+        var serviceProvider = services.BuildServiceProvider();
+        var filterDesc = new StreamingHubFilterDescriptor(new TestStreamingHubLegacyFilterFactory()); /* IMagicOnionFilterFactory<StreamingHubFilterAttribute> */
+
+        // Act
+        var instance = FilterHelper.CreateOrGetInstance<IStreamingHubFilter>(serviceProvider, filterDesc);
+
+        // Assert
+        instance.Should().NotBeNull();
+        instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
+    }
 
     class TestStreamingHubFilterFactory : IMagicOnionFilterFactory<IStreamingHubFilter>
     {
         public IStreamingHubFilter CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new TestHubFilterAttribute(serviceLocator.GetService<string>());
+        }
+
+        public int Order { get; }
+    }
+    
+    class TestStreamingHubLegacyFilterFactory : IMagicOnionFilterFactory<StreamingHubFilterAttribute>
+    {
+        public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceLocator)
         {
             return new TestHubFilterAttribute(serviceLocator.GetService<string>());
         }

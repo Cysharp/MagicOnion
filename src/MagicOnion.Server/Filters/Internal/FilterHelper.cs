@@ -17,12 +17,13 @@ internal class FilterHelper
             .Where(x => x is IMagicOnionServiceFilter or IMagicOnionFilterFactory<IMagicOnionServiceFilter>)
             .Select(x =>
             {
+                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0;
                 return x switch
                 {
                     IMagicOnionServiceFilter filter
-                        => new MagicOnionServiceFilterDescriptor(filter, (filter is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                        => new MagicOnionServiceFilterDescriptor(filter, order),
                     IMagicOnionFilterFactory<IMagicOnionServiceFilter> filterFactory
-                        => new MagicOnionServiceFilterDescriptor(filterFactory, (filterFactory is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                        => new MagicOnionServiceFilterDescriptor(filterFactory, order),
                     _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
                     // _ => throw new InvalidOperationException($"The '{x.GetType().FullName}' attribute must implement IMagicOnionFilterFactory<IMagicOnionServiceFilter> or IMagicOnionServiceFilter"),
                 };
@@ -41,12 +42,13 @@ internal class FilterHelper
             .Where(x => x is IStreamingHubFilter or IMagicOnionFilterFactory<IStreamingHubFilter>)
             .Select(x =>
             {
+                var order = (x is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0;
                 return x switch
                 {
                     IStreamingHubFilter filter
-                        => new StreamingHubFilterDescriptor(filter, (filter is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                        => new StreamingHubFilterDescriptor(filter, order),
                     IMagicOnionFilterFactory<IStreamingHubFilter> filterFactory
-                        => new StreamingHubFilterDescriptor(filterFactory, (filterFactory is IMagicOnionOrderedFilter ordered) ? ordered.Order : 0),
+                        => new StreamingHubFilterDescriptor(filterFactory, order),
                     _ => throw new ArgumentOutOfRangeException(nameof(x), x, null)
                     // _ => throw new InvalidOperationException($"The '{x.GetType().FullName}' attribute must implement IMagicOnionFilterFactory<IMagicOnionServiceFilter> or IMagicOnionServiceFilter"),
                 };

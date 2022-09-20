@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MagicOnion.Server.Hubs
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
-    public abstract class StreamingHubFilterAttribute : Attribute, IStreamingHubFilter
+    public abstract class StreamingHubFilterAttribute : Attribute, IStreamingHubFilter, IMagicOnionOrderedFilter
     {
         public int Order { get; set; } = int.MaxValue;
 

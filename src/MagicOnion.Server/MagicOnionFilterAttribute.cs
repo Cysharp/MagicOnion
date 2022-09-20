@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace MagicOnion.Server
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
-    public abstract class MagicOnionFilterAttribute : Attribute, IMagicOnionServiceFilter
+    public abstract class MagicOnionFilterAttribute : Attribute, IMagicOnionServiceFilter, IMagicOnionOrderedFilter
     {
         public int Order { get; set; } = int.MaxValue;
 
