@@ -20,7 +20,19 @@ namespace MagicOnion.Server.Filters
 
         protected MagicOnionFilterDescriptor(Type type, int? order = default)
         {
-            Filter = new MagicOnionFilterFromTypeFactory(type);
+            if (typeof(TFilter).IsAssignableFrom(type))
+            {
+                Filter = new MagicOnionFilterFromTypeFactory(type);
+            }
+            else if (typeof(IMagicOnionFilterFactory<TFilter>).IsAssignableFrom(type))
+            {
+                Filter = new MagicOnionFilterFromTypeFactoryFactory(type);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Type '{type.FullName}' is not compatible with {typeof(TFilter).Name} or {typeof(IMagicOnionFilterFactory<TFilter>).Name}");
+            }
+
             Order = order ?? 0;
         }
 
@@ -50,9 +62,20 @@ namespace MagicOnion.Server.Filters
             }
 
             public TFilter CreateInstance(IServiceProvider serviceProvider)
+                => (TFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type);
+        }
+
+        internal class MagicOnionFilterFromTypeFactoryFactory : IMagicOnionFilterFactory<TFilter>
+        {
+            public Type Type { get; }
+
+            public MagicOnionFilterFromTypeFactoryFactory(Type type)
             {
-                return (TFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type);
+                Type = type;
             }
+
+            public TFilter CreateInstance(IServiceProvider serviceProvider)
+                => ((IMagicOnionFilterFactory<TFilter>)ActivatorUtilities.CreateInstance(serviceProvider, Type)).CreateInstance(serviceProvider);
         }
     }
 
