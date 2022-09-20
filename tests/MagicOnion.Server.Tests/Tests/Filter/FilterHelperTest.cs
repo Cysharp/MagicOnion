@@ -1,6 +1,7 @@
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Hubs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Tests.Tests.Filter;
@@ -524,5 +525,199 @@ public class FilterHelperTest
         }
 
         public int Order { get; }
+    }
+    
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Activate_Service()
+    {
+        // Arrange
+        var results = new List<int>();
+        var services = new ServiceCollection();
+        services.AddSingleton(results);
+        var serviceProvider = services.BuildServiceProvider();
+        var filters = new[]
+        {
+            new MagicOnionServiceFilterDescriptor(new ListIntInjectedServiceFilter(1)),
+            new MagicOnionServiceFilterDescriptor(new ListIntInjectedServiceFilter(2)),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            results.Add(0);
+            return default;
+        });
+        await body(default);
+
+        // Assert
+        results.Should().Equal(1, 2, 0, 200, 100);
+    }
+
+    class ListIntInjectedServiceFilter : IMagicOnionFilterFactory<IMagicOnionServiceFilter>
+    {
+        readonly int baseValue;
+
+        public ListIntInjectedServiceFilter(int baseValue)
+        {
+            this.baseValue = baseValue;
+        }
+
+        public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceLocator)
+        {
+            var results = serviceLocator.GetService<List<int>>();
+            return new DelegateServiceFilter(async (context, next) =>
+            {
+                results.Add(1 * baseValue);
+                await next(context);
+                results.Add(100 * baseValue);
+            });
+        }
+
+        public int Order { get; }
+    }
+    
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Activate_StreamingHub()
+    {
+        // Arrange
+        var results = new List<int>();
+        var services = new ServiceCollection();
+        services.AddSingleton(results);
+        var serviceProvider = services.BuildServiceProvider();
+        var filters = new[]
+        {
+            new StreamingHubFilterDescriptor(new ListIntInjectedStreamingHubFilter(1)),
+            new StreamingHubFilterDescriptor(new ListIntInjectedStreamingHubFilter(2)),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            results.Add(0);
+            return default;
+        });
+        await body(default);
+
+        // Assert
+        results.Should().Equal(1, 2, 0, 200, 100);
+    }
+
+    class ListIntInjectedStreamingHubFilter : IMagicOnionFilterFactory<IStreamingHubFilter>
+    {
+        readonly int baseValue;
+
+        public ListIntInjectedStreamingHubFilter(int baseValue)
+        {
+            this.baseValue = baseValue;
+        }
+
+        public IStreamingHubFilter CreateInstance(IServiceProvider serviceLocator)
+        {
+            var results = serviceLocator.GetService<List<int>>();
+            return new DelegateHubFilter(async (context, next) =>
+            {
+                results.Add(1 * baseValue);
+                await next(context);
+                results.Add(100 * baseValue);
+            });
+        }
+
+        public int Order { get; }
+    }
+
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Surround_Service()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var results = new List<int>();
+        var filters = new[]
+        {
+            new MagicOnionServiceFilterDescriptor(new DelegateServiceFilter(async (context, next) =>
+            {
+                results.Add(1);
+                await next(context);
+                results.Add(100);
+            })),
+            new MagicOnionServiceFilterDescriptor(new DelegateServiceFilter(async (context, next) =>
+            {
+                results.Add(2);
+                await next(context);
+                results.Add(200);
+            })),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            results.Add(0);
+            return default;
+        });
+        await body(default);
+
+        // Assert
+        results.Should().Equal(1, 2, 0, 200, 100);
+    }
+
+    class DelegateServiceFilter : IMagicOnionServiceFilter
+    {
+        readonly Func<ServiceContext, Func<ServiceContext, ValueTask>, ValueTask> func;
+
+        public DelegateServiceFilter(Func<ServiceContext, Func<ServiceContext, ValueTask>, ValueTask> func)
+        {
+            this.func = func;
+        }
+
+        public ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            => func(context, next);
+    }
+    
+    [Fact]
+    public async Task WrapMethodBodyWithFilter_Surround_StreamingHub()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var results = new List<int>();
+        var filters = new[]
+        {
+            new StreamingHubFilterDescriptor(new DelegateHubFilter(async (context, next) =>
+            {
+                results.Add(1);
+                await next(context);
+                results.Add(100);
+            })),
+            new StreamingHubFilterDescriptor(new DelegateHubFilter(async (context, next) =>
+            {
+                results.Add(2);
+                await next(context);
+                results.Add(200);
+            })),
+        };
+
+        // Act
+        var body = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (context) =>
+        {
+            results.Add(0);
+            return default;
+        });
+        await body(default);
+
+        // Assert
+        results.Should().Equal(1, 2, 0, 200, 100);
+    }
+
+    class DelegateHubFilter : IStreamingHubFilter
+    {
+        readonly Func<StreamingHubContext, Func<StreamingHubContext, ValueTask>, ValueTask> func;
+
+        public DelegateHubFilter(Func<StreamingHubContext, Func<StreamingHubContext, ValueTask>, ValueTask> func)
+        {
+            this.func = func;
+        }
+
+        public ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+            => func(context, next);
     }
 }

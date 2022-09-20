@@ -16,9 +16,4 @@ namespace MagicOnion.Server.Filters
         /// <returns></returns>
         T CreateInstance(IServiceProvider serviceLocator);
     }
-
-    public interface IMagicOnionOrderedFilter : IMagicOnionFilterMetadata
-    {
-        int Order { get; }
-    }
 }
