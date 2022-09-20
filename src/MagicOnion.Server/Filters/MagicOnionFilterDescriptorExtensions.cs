@@ -13,6 +13,7 @@ public static class MagicOnionFilterDescriptorExtensions
     /// </summary>
     /// <param name="descriptors"></param>
     public static void Add<T>(this IList<MagicOnionServiceFilterDescriptor> descriptors)
+        where T : IMagicOnionFilterMetadata
     {
         if (typeof(IMagicOnionFilterFactory<IMagicOnionServiceFilter>).IsAssignableFrom(typeof(T)))
         {
@@ -62,6 +63,7 @@ public static class MagicOnionFilterDescriptorExtensions
     /// </summary>
     /// <param name="descriptors"></param>
     public static void Add<T>(this IList<StreamingHubFilterDescriptor> descriptors)
+        where T : IMagicOnionFilterMetadata
     {
         if (typeof(IMagicOnionFilterFactory<IStreamingHubFilter>).IsAssignableFrom(typeof(T)))
         {
