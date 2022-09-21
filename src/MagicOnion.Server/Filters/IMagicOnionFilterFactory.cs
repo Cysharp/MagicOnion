@@ -12,8 +12,8 @@ namespace MagicOnion.Server.Filters
         /// <summary>
         /// Creates an instance of executable filter.
         /// </summary>
-        /// <param name="serviceLocator"></param>
+        /// <param name="serviceProvider"></param>
         /// <returns></returns>
-        T CreateInstance(IServiceProvider serviceLocator);
+        T CreateInstance(IServiceProvider serviceProvider);
     }
 }
