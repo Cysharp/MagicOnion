@@ -12,7 +12,7 @@ namespace MagicOnion.Server.Tests.Tests.Filter;
 public class MagicOnionFilterDescriptorTest
 {
     [Fact]
-    public void Service_Order_Default()
+    public void Order_Service_Default()
     {
         // Arrange
         var desc = new MagicOnionServiceFilterDescriptor(new ServiceFilter_Unordered());
@@ -25,7 +25,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void StreamingHub_Order_Default()
+    public void Order_StreamingHub_Default()
     {
         // Arrange
         var desc = new StreamingHubFilterDescriptor(new StreamingHubFilter_Unordered());
@@ -38,7 +38,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void Service_Order_Override()
+    public void Order_Service_Override()
     {
         // Arrange
         var desc = new MagicOnionServiceFilterDescriptor(new ServiceFilter() { Order = 123 }, order: 256);
@@ -51,7 +51,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void StreamingHub_Order_Override()
+    public void Order_StreamingHub_Override()
     {
         // Arrange
         var desc = new StreamingHubFilterDescriptor(new StreamingHubFilter() { Order = 123 }, order: 256);
@@ -64,7 +64,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void Service_Order_PreserveOrder()
+    public void Order_Service_PreserveOrder()
     {
         // Arrange
         var desc = new MagicOnionServiceFilterDescriptor(new ServiceFilter() { Order = 123 });
@@ -77,7 +77,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void StreamingHub_Order_PreserveOrder()
+    public void Order_StreamingHub_PreserveOrder()
     {
         // Arrange
         var desc = new StreamingHubFilterDescriptor(new StreamingHubFilter() { Order = 123 });
@@ -90,7 +90,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void Service_Type_Filter()
+    public void CreateInstanceFromType_Service_Filter()
     {
         // Arrange
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -106,7 +106,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void Service_Type_FilterFactory()
+    public void CreateInstanceFromType_Service_FilterFactory()
     {
         // Arrange
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -122,7 +122,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void StreamingHub_Type_Filter()
+    public void CreateInstanceFromType_StreamingHub_Filter()
     {
         // Arrange
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -138,7 +138,7 @@ public class MagicOnionFilterDescriptorTest
     }
 
     [Fact]
-    public void StreamingHub_Type_FilterFactory()
+    public void CreateInstanceFromType_StreamingHub_FilterFactory()
     {
         // Arrange
         var serviceProvider = new ServiceCollection().BuildServiceProvider();
