@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Grpc.Core;
+using MagicOnion.Server.Filters;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.OpenTelemetry.Internal;
 using Microsoft.Extensions.DependencyInjection;
