@@ -511,11 +511,12 @@ Filters that apply to the application globally can be added at `GlobalFilters` o
 services.AddMagicOnion(options =>
 {
     options.GlobalFilters.Add<MyServiceFilter>();
+    options.GlobalStreamingHubFilters.Add<MyHubFilter>();
 });
 ```
 
 #### Dependency Injections
-MagicOnion filters supports [DI](#dependency-injection). There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
+MagicOnion filters supports [Dependency Injection](#dependency-injection). There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
 
 The following is an example of how to use `FromTypeFilter`, `FromServiceFitler`.
 
@@ -573,9 +574,11 @@ The following is an example of how to use `IMagicOnionFilterFactory<T>`.
 This is a clean way of writing when using DI while still having parameters for the attributes.
 
 ```csharp
-public class MyServiceFilterAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>
+public class MyServiceFilterAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionOrderedFilter
 {
     private readonly string _label;
+
+    public int Order { get; set; } = int.MaxValue;
 
     public MyServiceFilterAttribute(string label)
     {
