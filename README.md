@@ -596,7 +596,7 @@ public class MyServiceFilterAttribute : Attribute, IMagicOnionFilterFactory<IMag
             _logger = logger;
         }
 
-        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        public async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
         {
             _logger.LogInformation($"[{_label}] MyServiceFilter Begin: {context.Path}");
             await next(context);
@@ -618,14 +618,14 @@ public class MyService : ServiceBase<IMyService>, IMyService
 ```
 
 #### Extension Interfaces
-The following interfaces are provided for filter extensions. These interfaces are similar to ASP.NET Core MVC filters.
+The following interfaces are provided for filter extensions. These interfaces are similar to ASP.NET Core MVC filter mechanism.
 
 - `IMagicOnionFilterFactory<T>`
 - `IMagicOnionOrderedFilter`
 - `IMagicOnionServiceFilter`
 - `IStreamingHubFilter`
 
-`MagicOnionFilterAttributes` and `StreamingHubFilterAttribute` implement these interfaces for easy use. ou can use these interfaces for more flexible implementation.
+`MagicOnionFilterAttributes` and `StreamingHubFilterAttribute` implement these interfaces for easy use. You can use these interfaces for more flexible implementation.
 
 
 ### ClientFilter
