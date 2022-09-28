@@ -5,25 +5,24 @@ using System.Text;
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
 
-namespace MagicOnion.Server.Glue
+namespace MagicOnion.Server.Glue;
+
+internal class MagicOnionGlueServiceMethodProvider<TService> : IServiceMethodProvider<TService>
+    where TService : class
 {
-    internal class MagicOnionGlueServiceMethodProvider<TService> : IServiceMethodProvider<TService>
-        where TService : class
+    private readonly MagicOnionServiceDefinition _magicOnionServiceDefinition;
+
+    public MagicOnionGlueServiceMethodProvider(MagicOnionServiceDefinition magicOnionServerServiceDefinition)
     {
-        private readonly MagicOnionServiceDefinition _magicOnionServiceDefinition;
+        _magicOnionServiceDefinition = magicOnionServerServiceDefinition ?? throw new ArgumentNullException(nameof(magicOnionServerServiceDefinition));
+    }
 
-        public MagicOnionGlueServiceMethodProvider(MagicOnionServiceDefinition magicOnionServerServiceDefinition)
+    public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TService> context)
+    {
+        var binder = new MagicOnionGlueServiceBinder<TService>(context);
+        foreach (var methodHandler in _magicOnionServiceDefinition.MethodHandlers)
         {
-            _magicOnionServiceDefinition = magicOnionServerServiceDefinition ?? throw new ArgumentNullException(nameof(magicOnionServerServiceDefinition));
-        }
-
-        public void OnServiceMethodDiscovery(ServiceMethodProviderContext<TService> context)
-        {
-            var binder = new MagicOnionGlueServiceBinder<TService>(context);
-            foreach (var methodHandler in _magicOnionServiceDefinition.MethodHandlers)
-            {
-                methodHandler.BindHandler(binder);
-            }
+            methodHandler.BindHandler(binder);
         }
     }
 }
