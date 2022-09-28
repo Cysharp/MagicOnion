@@ -4,11 +4,11 @@ namespace MagicOnion.Generator.Tests;
 
 public class GenerateWithIfDirectiveTest
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly ITestOutputHelper testOutputHelper;
 
     public GenerateWithIfDirectiveTest(ITestOutputHelper testOutputHelper)
     {
-        _testOutputHelper = testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
     }
 
     [Fact]
@@ -40,7 +40,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -91,7 +91,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -143,7 +143,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -230,7 +230,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -314,7 +314,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -371,7 +371,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -445,7 +445,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),

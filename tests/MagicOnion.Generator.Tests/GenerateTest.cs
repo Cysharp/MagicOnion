@@ -4,9 +4,9 @@ namespace MagicOnion.Generator.Tests;
 
 public class GenerateTest
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly ITestOutputHelper testOutputHelper;
 
-    private const string MyServiceSourceCode = @"
+    const string MyServiceSourceCode = @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -23,7 +23,7 @@ namespace TempProject
 
     public GenerateTest(ITestOutputHelper testOutputHelper)
     {
-        _testOutputHelper = testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
     }
 
     [Fact]
@@ -43,7 +43,7 @@ namespace TempProject
         using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
         tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -71,7 +71,7 @@ namespace TempProject
         using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
         tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -99,7 +99,7 @@ namespace TempProject
         using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
         tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
@@ -123,7 +123,7 @@ namespace TempProject
         using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
         tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),

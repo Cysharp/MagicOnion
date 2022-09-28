@@ -36,7 +36,7 @@ public class TemporaryProjectWorkarea : IDisposable
         return new TemporaryProjectWorkarea(options ?? throw new ArgumentNullException(nameof(options)));
     }
 
-    private TemporaryProjectWorkarea(TemporaryProjectWorkareaOptions options)
+    TemporaryProjectWorkarea(TemporaryProjectWorkareaOptions options)
     {
         WorkareaId = Guid.NewGuid();
 

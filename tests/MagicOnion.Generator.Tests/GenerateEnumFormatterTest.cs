@@ -4,11 +4,11 @@ namespace MagicOnion.Generator.Tests;
 
 public class GenerateEnumFormatterTest
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    readonly ITestOutputHelper testOutputHelper;
 
     public GenerateEnumFormatterTest(ITestOutputHelper testOutputHelper)
     {
-        _testOutputHelper = testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
     }
 
     [Fact]
@@ -34,7 +34,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             tempWorkspace.OutputDirectory,
@@ -74,7 +74,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             tempWorkspace.OutputDirectory,
@@ -113,7 +113,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             tempWorkspace.OutputDirectory,
@@ -152,7 +152,7 @@ namespace TempProject
 }
             ");
 
-        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
         await compiler.GenerateFileAsync(
             tempWorkspace.CsProjectPath,
             tempWorkspace.OutputDirectory,
