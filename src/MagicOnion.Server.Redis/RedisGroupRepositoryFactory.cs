@@ -6,15 +6,15 @@ namespace MagicOnion.Server.Redis;
 
 public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    private readonly RedisGroupOptions _options;
+    private readonly RedisGroupOptions options;
 
     public RedisGroupRepositoryFactory(IOptionsMonitor<RedisGroupOptions> options)
     {
-        _options = options.CurrentValue;
+        this.options = options.CurrentValue;
     }
 
     public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
     {
-        return new RedisGroupRepository(serializerOptions, _options, logger);
+        return new RedisGroupRepository(serializerOptions, options, logger);
     }
 }
