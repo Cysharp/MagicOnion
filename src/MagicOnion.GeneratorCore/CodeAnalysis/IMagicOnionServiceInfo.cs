@@ -1,7 +1,6 @@
-namespace MagicOnion.Generator.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis;
+
+public interface IMagicOnionServiceInfo : IMagicOnionCompileDirectiveTarget
 {
-    public interface IMagicOnionServiceInfo : IMagicOnionCompileDirectiveTarget
-    {
-        MagicOnionTypeInfo ServiceType { get; }
-    }
+    MagicOnionTypeInfo ServiceType { get; }
 }

@@ -5,332 +5,331 @@ using System.Linq;
 using System.Text;
 using MagicOnion.Generator.Internal;
 
-namespace MagicOnion.Generator.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis;
+
+/// <summary>
+/// Provides logic for gathering information to determine required formatters (for enums, collections and user-defined generic types).
+/// </summary>
+public class SerializationInfoCollector
 {
-    /// <summary>
-    /// Provides logic for gathering information to determine required formatters (for enums, collections and user-defined generic types).
-    /// </summary>
-    public class SerializationInfoCollector
+    readonly IMagicOnionGeneratorLogger logger;
+
+    public SerializationInfoCollector(IMagicOnionGeneratorLogger logger)
     {
-        readonly IMagicOnionGeneratorLogger logger;
+        this.logger = logger;
+    }
 
-        public SerializationInfoCollector(IMagicOnionGeneratorLogger logger)
-        {
-            this.logger = logger;
-        }
+    public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string userDefinedMessagePackFormattersNamespace = null)
+        => Collect(EnumerateTypes(serviceCollection), userDefinedMessagePackFormattersNamespace);
 
-        public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection, string userDefinedMessagePackFormattersNamespace = null)
-            => Collect(EnumerateTypes(serviceCollection), userDefinedMessagePackFormattersNamespace);
-
-        static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
-        {
-            return Enumerable.Concat(
-                serviceCollection.Services.SelectMany(service =>
+    static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
+    {
+        return Enumerable.Concat(
+            serviceCollection.Services.SelectMany(service =>
+            {
+                return service.Methods.SelectMany(method =>
                 {
-                    return service.Methods.SelectMany(method =>
+                    var ifDirectives = new[] { service.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                    return Enumerable.Concat(
+                        EnumerateTypes(method.ResponseType, ifDirectives),
+                        EnumerateTypes(method.RequestType, ifDirectives)
+                    );
+                });
+            }),
+            serviceCollection.Hubs.SelectMany(hub =>
+            {
+                return Enumerable.Concat(
+                    hub.Receiver.Methods.SelectMany(method =>
                     {
-                        var ifDirectives = new[] { service.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                        var ifDirectives = new[] { hub.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
                         return Enumerable.Concat(
                             EnumerateTypes(method.ResponseType, ifDirectives),
                             EnumerateTypes(method.RequestType, ifDirectives)
                         );
-                    });
-                }),
-                serviceCollection.Hubs.SelectMany(hub =>
-                {
-                    return Enumerable.Concat(
-                        hub.Receiver.Methods.SelectMany(method =>
-                        {
-                            var ifDirectives = new[] { hub.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-                            return Enumerable.Concat(
-                                EnumerateTypes(method.ResponseType, ifDirectives),
-                                EnumerateTypes(method.RequestType, ifDirectives)
-                            );
-                        }),
-                        hub.Methods.SelectMany(method =>
-                        {
-                            var ifDirectives = new[] { hub.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-                            return Enumerable.Concat(
-                                EnumerateTypes(method.ResponseType, ifDirectives),
-                                EnumerateTypes(method.RequestType, ifDirectives)
-                            );
-                        })
-                    );
-                })
-            );
-        }
-        static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionTypeInfo type, IReadOnlyList<string> ifDirectives)
-        {
-            yield return new TypeWithIfDirectives(type, ifDirectives);
-
-            if (type.HasGenericArguments)
-            {
-                foreach (var genericTypeArg in type.GenericArguments)
-                {
-                    foreach (var t in EnumerateTypes(genericTypeArg, ifDirectives))
+                    }),
+                    hub.Methods.SelectMany(method =>
                     {
-                        yield return t;
-                    }
+                        var ifDirectives = new[] { hub.IfDirectiveCondition, method.IfDirectiveCondition }.Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                        return Enumerable.Concat(
+                            EnumerateTypes(method.ResponseType, ifDirectives),
+                            EnumerateTypes(method.RequestType, ifDirectives)
+                        );
+                    })
+                );
+            })
+        );
+    }
+    static IEnumerable<TypeWithIfDirectives> EnumerateTypes(MagicOnionTypeInfo type, IReadOnlyList<string> ifDirectives)
+    {
+        yield return new TypeWithIfDirectives(type, ifDirectives);
+
+        if (type.HasGenericArguments)
+        {
+            foreach (var genericTypeArg in type.GenericArguments)
+            {
+                foreach (var t in EnumerateTypes(genericTypeArg, ifDirectives))
+                {
+                    yield return t;
                 }
             }
         }
+    }
 
-        public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types, string userDefinedMessagePackFormattersNamespace = null)
+    public MagicOnionSerializationInfoCollection Collect(IEnumerable<TypeWithIfDirectives> types, string userDefinedMessagePackFormattersNamespace = null)
+    {
+        var context = new SerializationInfoCollectorContext();
+        var flattened = types.SelectMany(x => x.Type.EnumerateDependentTypes(includesSelf: true).Select(y => new TypeWithIfDirectives(y, x.IfDirectives)));
+
+        userDefinedMessagePackFormattersNamespace = userDefinedMessagePackFormattersNamespace ?? "MessagePack.Formatters";
+        if (!userDefinedMessagePackFormattersNamespace.StartsWith("global::")) userDefinedMessagePackFormattersNamespace = "global::" + userDefinedMessagePackFormattersNamespace;
+
+        foreach (var typeWithDirectives in flattened)
         {
-            var context = new SerializationInfoCollectorContext();
-            var flattened = types.SelectMany(x => x.Type.EnumerateDependentTypes(includesSelf: true).Select(y => new TypeWithIfDirectives(y, x.IfDirectives)));
-
-            userDefinedMessagePackFormattersNamespace = userDefinedMessagePackFormattersNamespace ?? "MessagePack.Formatters";
-            if (!userDefinedMessagePackFormattersNamespace.StartsWith("global::")) userDefinedMessagePackFormattersNamespace = "global::" + userDefinedMessagePackFormattersNamespace;
-
-            foreach (var typeWithDirectives in flattened)
+            var type = typeWithDirectives.Type;
+            if (WellKnownSerializationTypes.BuiltInTypes.Contains(type.FullName))
             {
-                var type = typeWithDirectives.Type;
-                if (WellKnownSerializationTypes.BuiltInTypes.Contains(type.FullName))
+                logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Array type '{type.FullName}'. Skip this because the type is supported by built-in resolver.");
+                continue;
+            }
+
+            if (type.IsEnum)
+            {
+                logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Enum type '{type.FullName}'");
+                context.Enums.Add(new EnumSerializationInfo(
+                    type.Namespace,
+                    type.Name,
+                    type.FullName,
+                    type.UnderlyingType.Name,
+                    typeWithDirectives.IfDirectives
+                ));
+            }
+            else if (type.IsArray)
+            {
+                if (WellKnownSerializationTypes.BuiltInArrayElementTypes.Contains(type.ElementType.FullName))
                 {
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Array type '{type.FullName}'. Skip this because the type is supported by built-in resolver.");
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'. Skip this because an array element type is supported by built-in resolver.");
                     continue;
                 }
 
-                if (type.IsEnum)
+                logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'");
+                switch (type.ArrayRank)
                 {
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Enum type '{type.FullName}'");
-                    context.Enums.Add(new EnumSerializationInfo(
-                        type.Namespace,
-                        type.Name,
-                        type.FullName,
-                        type.UnderlyingType.Name,
-                        typeWithDirectives.IfDirectives
-                    ));
-                }
-                else if (type.IsArray)
-                {
-                    if (WellKnownSerializationTypes.BuiltInArrayElementTypes.Contains(type.ElementType.FullName))
-                    {
-                        logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'. Skip this because an array element type is supported by built-in resolver.");
-                        continue;
-                    }
-
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'");
-                    switch (type.ArrayRank)
-                    {
-                        case 1:
-                            context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
-                            break;
-                        case 2:
-                            context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
-                            break;
-                        case 3:
-                            context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
-                            break;
-                        case 4:
-                            context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
-                            break;
-                        default:
-                            throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})");
-                    }
-                }
-                else if (type.HasGenericArguments)
-                {
-                    if (type.FullNameOpenType == "global::System.Nullable<>" && WellKnownSerializationTypes.BuiltInNullableTypes.Contains(type.GenericArguments[0].FullName))
-                    {
-                        logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}'. Skip this because it is nullable.");
-                        continue;
-                    }
-
-                    var genericTypeArgs = string.Join(", ", type.GenericArguments.Select(x => x.FullName));
-
-                    string formatterName;
-                    if (type.Namespace == "MagicOnion" && type.Name == "DynamicArgumentTuple")
-                    {
-                        // MagicOnion.DynamicArgumentTuple
-                        var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
-                        formatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{genericTypeArgs}>({ctorArguments})";
-                    }
-                    else if (WellKnownSerializationTypes.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))
-                    {
-                        // Well-known generic types (Nullable<T>, IList<T>, List<T>, Dictionary<TKey, TValue> ...)
-                        formatterName = $"{mappedFormatterName}<{genericTypeArgs}>()";
-                    }
-                    else
-                    {
-                        // User-defined generic types
-                        formatterName = $"{userDefinedMessagePackFormattersNamespace}{(string.IsNullOrWhiteSpace(userDefinedMessagePackFormattersNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
-                    }
-
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}' (IfDirectives={string.Join(", ", typeWithDirectives.IfDirectives)})");
-                    context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, typeWithDirectives.IfDirectives));
+                    case 1:
+                        context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
+                        break;
+                    case 2:
+                        context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
+                        break;
+                    case 3:
+                        context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
+                        break;
+                    case 4:
+                        context.Generics.Add(new GenericSerializationInfo(type.FullName, $"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>()", typeWithDirectives.IfDirectives));
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})");
                 }
             }
-
-            return new MagicOnionSerializationInfoCollection(MergeResolverRegisterInfo(context.Enums), MergeResolverRegisterInfo(context.Generics));
-        }
-
-        static GenericSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<GenericSerializationInfo> serializationInfoSet)
-            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
-                new GenericSerializationInfo(
-                    serializationInfo.FullName,
-                    serializationInfo.FormatterName,
-                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
-                )
-            );
-
-        static EnumSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<EnumSerializationInfo> serializationInfoSet)
-            => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
-                new EnumSerializationInfo(
-                    serializationInfo.Namespace,
-                    serializationInfo.Name,
-                    serializationInfo.FullName,
-                    serializationInfo.UnderlyingType,
-                    serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
-                )
-            );
-
-        static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
-            where T : IMessagePackFormatterResolverRegisterInfo
-        {
-            // The priority of the generation depends on the `#if` directive
-            // If a serialization info has no `#if` conditions, we always use it. If there is more than one with the condition, it is merged.
-            var candidates = new Dictionary<string, T>();
-            foreach (var serializationInfo in serializationInfoSet)
+            else if (type.HasGenericArguments)
             {
-                if (serializationInfo.HasIfDirectiveConditions && candidates.TryGetValue(serializationInfo.FullName, out var serializationInfoCandidate))
+                if (type.FullNameOpenType == "global::System.Nullable<>" && WellKnownSerializationTypes.BuiltInNullableTypes.Contains(type.GenericArguments[0].FullName))
                 {
-                    if (!serializationInfoCandidate.HasIfDirectiveConditions)
-                    {
-                        // If the candidate serialization info has no `#if` conditions, we keep to use it.
-                        continue;
-                    }
+                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}'. Skip this because it is nullable.");
+                    continue;
+                }
 
-                    // Merge `IfDirectiveConditions`
-                    candidates[serializationInfo.FullName] = mergeFunc(serializationInfo, serializationInfoCandidate);
+                var genericTypeArgs = string.Join(", ", type.GenericArguments.Select(x => x.FullName));
+
+                string formatterName;
+                if (type.Namespace == "MagicOnion" && type.Name == "DynamicArgumentTuple")
+                {
+                    // MagicOnion.DynamicArgumentTuple
+                    var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
+                    formatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{genericTypeArgs}>({ctorArguments})";
+                }
+                else if (WellKnownSerializationTypes.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))
+                {
+                    // Well-known generic types (Nullable<T>, IList<T>, List<T>, Dictionary<TKey, TValue> ...)
+                    formatterName = $"{mappedFormatterName}<{genericTypeArgs}>()";
                 }
                 else
                 {
-                    // The serialization info has no `#if` conditions, or is found first.
-                    candidates[serializationInfo.FullName] = serializationInfo;
+                    // User-defined generic types
+                    formatterName = $"{userDefinedMessagePackFormattersNamespace}{(string.IsNullOrWhiteSpace(userDefinedMessagePackFormattersNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
                 }
+
+                logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}' (IfDirectives={string.Join(", ", typeWithDirectives.IfDirectives)})");
+                context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, typeWithDirectives.IfDirectives));
             }
-
-            return candidates.Values.ToArray();
         }
 
+        return new MagicOnionSerializationInfoCollection(MergeResolverRegisterInfo(context.Enums), MergeResolverRegisterInfo(context.Generics));
+    }
 
-        class SerializationInfoCollectorContext
+    static GenericSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<GenericSerializationInfo> serializationInfoSet)
+        => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+            new GenericSerializationInfo(
+                serializationInfo.FullName,
+                serializationInfo.FormatterName,
+                serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+            )
+        );
+
+    static EnumSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<EnumSerializationInfo> serializationInfoSet)
+        => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+            new EnumSerializationInfo(
+                serializationInfo.Namespace,
+                serializationInfo.Name,
+                serializationInfo.FullName,
+                serializationInfo.UnderlyingType,
+                serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+            )
+        );
+
+    static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
+        where T : IMessagePackFormatterResolverRegisterInfo
+    {
+        // The priority of the generation depends on the `#if` directive
+        // If a serialization info has no `#if` conditions, we always use it. If there is more than one with the condition, it is merged.
+        var candidates = new Dictionary<string, T>();
+        foreach (var serializationInfo in serializationInfoSet)
         {
-            public List<EnumSerializationInfo> Enums { get; } = new List<EnumSerializationInfo>();
-            public List<GenericSerializationInfo> Generics { get; } = new List<GenericSerializationInfo>();
-        }
-
-        [DebuggerDisplay("{Type,nq}")]
-        public class TypeWithIfDirectives
-        {
-            public MagicOnionTypeInfo Type { get; }
-            public IReadOnlyList<string> IfDirectives { get; }
-
-            public TypeWithIfDirectives(MagicOnionTypeInfo type, IReadOnlyList<string> ifDirectives)
+            if (serializationInfo.HasIfDirectiveConditions && candidates.TryGetValue(serializationInfo.FullName, out var serializationInfoCandidate))
             {
-                Type = type;
-                IfDirectives = ifDirectives;
+                if (!serializationInfoCandidate.HasIfDirectiveConditions)
+                {
+                    // If the candidate serialization info has no `#if` conditions, we keep to use it.
+                    continue;
+                }
+
+                // Merge `IfDirectiveConditions`
+                candidates[serializationInfo.FullName] = mergeFunc(serializationInfo, serializationInfoCandidate);
+            }
+            else
+            {
+                // The serialization info has no `#if` conditions, or is found first.
+                candidates[serializationInfo.FullName] = serializationInfo;
             }
         }
+
+        return candidates.Values.ToArray();
     }
 
-    public class MagicOnionSerializationInfoCollection
-    {
-        public IReadOnlyList<EnumSerializationInfo> Enums { get; }
-        public IReadOnlyList<GenericSerializationInfo> Generics { get; }
-        public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> RequireRegistrationFormatters { get; }
 
-        public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics)
+    class SerializationInfoCollectorContext
+    {
+        public List<EnumSerializationInfo> Enums { get; } = new List<EnumSerializationInfo>();
+        public List<GenericSerializationInfo> Generics { get; } = new List<GenericSerializationInfo>();
+    }
+
+    [DebuggerDisplay("{Type,nq}")]
+    public class TypeWithIfDirectives
+    {
+        public MagicOnionTypeInfo Type { get; }
+        public IReadOnlyList<string> IfDirectives { get; }
+
+        public TypeWithIfDirectives(MagicOnionTypeInfo type, IReadOnlyList<string> ifDirectives)
         {
-            Enums = enums;
-            Generics = generics;
-            RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<IMessagePackFormatterResolverRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
+            Type = type;
+            IfDirectives = ifDirectives;
         }
     }
+}
 
-    public static class WellKnownSerializationTypes
+public class MagicOnionSerializationInfoCollection
+{
+    public IReadOnlyList<EnumSerializationInfo> Enums { get; }
+    public IReadOnlyList<GenericSerializationInfo> Generics { get; }
+    public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> RequireRegistrationFormatters { get; }
+
+    public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics)
     {
-        public static readonly IReadOnlyDictionary<string, string> GenericFormattersMap = new Dictionary<string, string>
-        {
-            {"global::System.Nullable<>", "global::MessagePack.Formatters.NullableFormatter" },
-            {"global::System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatter" },
-            {"global::System.Collections.Generic.IList<>", "global::MessagePack.Formatters.InterfaceListFormatter2" },
-            {"global::System.Collections.Generic.IReadOnlyList<>", "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter" },
-            {"global::System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter"},
-            {"global::System.Collections.Generic.IDictionary<,>", "global::MessagePack.Formatters.InterfaceDictionaryFormatter"},
-            {"global::System.Collections.Generic.IReadOnlyDictionary<,>", "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter"},
-            {"global::System.Collections.Generic.ICollection<>", "global::MessagePack.Formatters.InterfaceCollectionFormatter2" },
-            {"global::System.Collections.Generic.IReadOnlyCollection<>", "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter" },
-            {"global::System.Collections.Generic.IEnumerable<>", "global::MessagePack.Formatters.InterfaceEnumerableFormatter" },
-            {"global::System.Linq.ILookup<,>", "global::MessagePack.Formatters.InterfaceLookupFormatter" },
-            {"global::System.Linq.IGrouping<,>", "global::MessagePack.Formatters.InterfaceGroupingFormatter" },
-        };
-
-        public static readonly HashSet<string> BuiltInTypes = new HashSet<string>(new string[]
-        {
-            "global::System.ArraySegment<global::System.Byte>",
-        });
-
-        public static readonly HashSet<string> BuiltInNullableTypes = new HashSet<string>(new string[]
-        {
-            // Nullable
-            // https://github.com/neuecc/MessagePack-CSharp/blob/master/src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Resolvers/BuiltinResolver.cs#L73
-            "global::System.ArraySegment<global::System.Byte>",
-            "global::System.Int16",
-            "global::System.Int32",
-            "global::System.Int64",
-            "global::System.UInt16",
-            "global::System.UInt32",
-            "global::System.UInt64",
-            "global::System.Single",
-            "global::System.Double",
-            "global::System.Boolean",
-            "global::System.Byte",
-            "global::System.SByte",
-            "global::System.DateTime",
-            "global::System.Char",
-
-            "global::System.Decimal",
-            "global::System.TimeSpan",
-            "global::System.DateTimeOffset",
-            "global::System.Guid",
-        });
-
-        public static readonly HashSet<string> BuiltInArrayElementTypes = new HashSet<string>(new string[]
-        {
-            "global::System.Int16",
-            "global::System.Int32",
-            "global::System.Int64",
-            "global::System.UInt16",
-            "global::System.UInt32",
-            "global::System.UInt64",
-            "global::System.Single",
-            "global::System.Double",
-            "global::System.Boolean",
-            "global::System.Byte",
-            "global::System.SByte",
-            "global::System.DateTime",
-            "global::System.Char",
-
-            "global::System.Decimal",
-            "global::System.String",
-            "global::System.Guid",
-            "global::System.TimeSpan",
-
-            "global::MessagePack.Nil",
-
-            // Unity extensions
-            "global::UnityEngine.Vector2",
-            "global::UnityEngine.Vector3",
-            "global::UnityEngine.Vector4",
-            "global::UnityEngine.Quaternion",
-            "global::UnityEngine.Color",
-            "global::UnityEngine.Bounds",
-            "global::UnityEngine.Rect",
-
-            "global::System.Reactive.Unit",
-        });
+        Enums = enums;
+        Generics = generics;
+        RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<IMessagePackFormatterResolverRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
     }
+}
+
+public static class WellKnownSerializationTypes
+{
+    public static readonly IReadOnlyDictionary<string, string> GenericFormattersMap = new Dictionary<string, string>
+    {
+        {"global::System.Nullable<>", "global::MessagePack.Formatters.NullableFormatter" },
+        {"global::System.Collections.Generic.List<>", "global::MessagePack.Formatters.ListFormatter" },
+        {"global::System.Collections.Generic.IList<>", "global::MessagePack.Formatters.InterfaceListFormatter2" },
+        {"global::System.Collections.Generic.IReadOnlyList<>", "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter" },
+        {"global::System.Collections.Generic.Dictionary<,>", "global::MessagePack.Formatters.DictionaryFormatter"},
+        {"global::System.Collections.Generic.IDictionary<,>", "global::MessagePack.Formatters.InterfaceDictionaryFormatter"},
+        {"global::System.Collections.Generic.IReadOnlyDictionary<,>", "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter"},
+        {"global::System.Collections.Generic.ICollection<>", "global::MessagePack.Formatters.InterfaceCollectionFormatter2" },
+        {"global::System.Collections.Generic.IReadOnlyCollection<>", "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter" },
+        {"global::System.Collections.Generic.IEnumerable<>", "global::MessagePack.Formatters.InterfaceEnumerableFormatter" },
+        {"global::System.Linq.ILookup<,>", "global::MessagePack.Formatters.InterfaceLookupFormatter" },
+        {"global::System.Linq.IGrouping<,>", "global::MessagePack.Formatters.InterfaceGroupingFormatter" },
+    };
+
+    public static readonly HashSet<string> BuiltInTypes = new HashSet<string>(new string[]
+    {
+        "global::System.ArraySegment<global::System.Byte>",
+    });
+
+    public static readonly HashSet<string> BuiltInNullableTypes = new HashSet<string>(new string[]
+    {
+        // Nullable
+        // https://github.com/neuecc/MessagePack-CSharp/blob/master/src/MessagePack.UnityClient/Assets/Scripts/MessagePack/Resolvers/BuiltinResolver.cs#L73
+        "global::System.ArraySegment<global::System.Byte>",
+        "global::System.Int16",
+        "global::System.Int32",
+        "global::System.Int64",
+        "global::System.UInt16",
+        "global::System.UInt32",
+        "global::System.UInt64",
+        "global::System.Single",
+        "global::System.Double",
+        "global::System.Boolean",
+        "global::System.Byte",
+        "global::System.SByte",
+        "global::System.DateTime",
+        "global::System.Char",
+
+        "global::System.Decimal",
+        "global::System.TimeSpan",
+        "global::System.DateTimeOffset",
+        "global::System.Guid",
+    });
+
+    public static readonly HashSet<string> BuiltInArrayElementTypes = new HashSet<string>(new string[]
+    {
+        "global::System.Int16",
+        "global::System.Int32",
+        "global::System.Int64",
+        "global::System.UInt16",
+        "global::System.UInt32",
+        "global::System.UInt64",
+        "global::System.Single",
+        "global::System.Double",
+        "global::System.Boolean",
+        "global::System.Byte",
+        "global::System.SByte",
+        "global::System.DateTime",
+        "global::System.Char",
+
+        "global::System.Decimal",
+        "global::System.String",
+        "global::System.Guid",
+        "global::System.TimeSpan",
+
+        "global::MessagePack.Nil",
+
+        // Unity extensions
+        "global::UnityEngine.Vector2",
+        "global::UnityEngine.Vector3",
+        "global::UnityEngine.Vector4",
+        "global::UnityEngine.Quaternion",
+        "global::UnityEngine.Color",
+        "global::UnityEngine.Bounds",
+        "global::UnityEngine.Rect",
+
+        "global::System.Reactive.Unit",
+    });
 }

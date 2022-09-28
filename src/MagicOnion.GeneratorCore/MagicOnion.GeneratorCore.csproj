@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>MagicOnion.Generator</RootNamespace>
+        <LangVersion>latestMajor</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <!-- Keep the same version with MessagePack, MasterMemory -->
