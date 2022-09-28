@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;

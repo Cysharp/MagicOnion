@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MagicOnion.Generator.CodeAnalysis;
 
 public class MagicOnionServiceCollection

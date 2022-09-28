@@ -1,4 +1,3 @@
-using System;
 using System.CodeDom.Compiler;
 
 namespace MagicOnion.Generator.Internal;

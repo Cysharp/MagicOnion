@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeAnalysis;

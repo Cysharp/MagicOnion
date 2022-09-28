@@ -4,6 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>MagicOnion.Generator</RootNamespace>
         <LangVersion>latestMajor</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
     <ItemGroup>
         <!-- Keep the same version with MessagePack, MasterMemory -->

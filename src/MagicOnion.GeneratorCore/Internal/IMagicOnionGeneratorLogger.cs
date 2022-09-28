@@ -1,5 +1,3 @@
-using System;
-
 namespace MagicOnion.Generator.Internal;
 
 public interface IMagicOnionGeneratorLogger
