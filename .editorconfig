@@ -1,7 +1,59 @@
+root = true
+
+[*]
+indent_style = space
+insert_final_newline = true
+indent_style = space
+trim_trailing_whitespace = true
+
 [*.cs]
 charset = utf-8
 indent_style = space
 indent_size = 4
+
+csharp_style_namespace_declarations = file_scoped:warning
+#dotnet_style_require_accessibility_modifiers = never:suggestion
+
+# ReSharper properties
+resharper_default_private_modifier = implicit
+
+# internal and private fields should be camelCase
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = warning
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style = camel_case_style
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+dotnet_naming_style.camel_case_style.required_prefix =
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# Nullable Reference Type
+# CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
+dotnet_diagnostic.cs8618.severity = error
+# CS8604: Possible null reference argument.
+dotnet_diagnostic.cs8604.severity = error
+# CS8629: Nullable value type may be null.
+dotnet_diagnostic.cs8629.severity = error
+# CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.cs8600.severity = error
+# CS8603: Possible null reference return.
+dotnet_diagnostic.cs8603.severity = error
+# CS8610: Nullability of reference types in type of parameter doesn't match overridden member.
+dotnet_diagnostic.cs8610.severity = error
+# CS8625: Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.cs8625.severity = error
+# CS8606: Possible null reference assignment to iteration variable
+dotnet_diagnostic.cs8606.severity = error
+# CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.cs8602.severity = error
+# CS8601: Possible null reference assignment.
+dotnet_diagnostic.cs8601.severity = error
+# CS8614: Nullability of reference types in type of parameter doesn't match implicitly implemented member.
+dotnet_diagnostic.cs8614.severity = error
+
+
+[{src/MagicOnion.Client/**.cs,src/MagicOnion.Shared/**.cs,src/MagicOnion.Abstractions/**.cs}]
+# Lower language support for code shared with code for Unity
+csharp_style_namespace_declarations = global
 
 [*.csproj]
 charset = utf-8

@@ -1,8 +1,7 @@
-namespace MagicOnion.Generator.CodeAnalysis
+namespace MagicOnion.Generator.CodeAnalysis;
+
+public interface IMagicOnionCompileDirectiveTarget
 {
-    public interface IMagicOnionCompileDirectiveTarget
-    {
-        string IfDirectiveCondition { get; }
-        bool HasIfDirectiveCondition { get; }
-    }
+    string IfDirectiveCondition { get; }
+    bool HasIfDirectiveCondition { get; }
 }

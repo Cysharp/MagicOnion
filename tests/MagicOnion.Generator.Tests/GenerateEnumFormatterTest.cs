@@ -1,29 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Generator.Tests
+namespace MagicOnion.Generator.Tests;
+
+public class GenerateEnumFormatterTest
 {
-    public class GenerateEnumFormatterTest
+    readonly ITestOutputHelper testOutputHelper;
+
+    public GenerateEnumFormatterTest(ITestOutputHelper testOutputHelper)
     {
-        private readonly ITestOutputHelper _testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
+    }
 
-        public GenerateEnumFormatterTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
-        [Fact]
-        public async Task GenerateEnumFormatter_Return()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task GenerateEnumFormatter_Return()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -42,28 +34,28 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+    }
 
 
-        [Fact]
-        public async Task GenerateEnumFormatter_Return_Nullable()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task GenerateEnumFormatter_Return_Nullable()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -82,27 +74,27 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+    }
 
-        [Fact]
-        public async Task GenerateEnumFormatter_Parameter()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task GenerateEnumFormatter_Parameter()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -121,27 +113,27 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+    }
 
-        [Fact]
-        public async Task GenerateEnumFormatter_Parameter_Nullable()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task GenerateEnumFormatter_Parameter_Nullable()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -160,20 +152,19 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
     }
 }

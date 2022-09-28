@@ -1,16 +1,13 @@
-using System.Collections.Generic;
+namespace MagicOnion.Generator.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis
+public class MagicOnionServiceCollection
 {
-    public class MagicOnionServiceCollection
-    {
-        public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; }
-        public IReadOnlyList<MagicOnionServiceInfo> Services { get; }
+    public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; }
+    public IReadOnlyList<MagicOnionServiceInfo> Services { get; }
 
-        public MagicOnionServiceCollection(IReadOnlyList<MagicOnionStreamingHubInfo> hubs, IReadOnlyList<MagicOnionServiceInfo> services)
-        {
-            Hubs = hubs;
-            Services = services;
-        }
+    public MagicOnionServiceCollection(IReadOnlyList<MagicOnionStreamingHubInfo> hubs, IReadOnlyList<MagicOnionServiceInfo> services)
+    {
+        Hubs = hubs;
+        Services = services;
     }
 }

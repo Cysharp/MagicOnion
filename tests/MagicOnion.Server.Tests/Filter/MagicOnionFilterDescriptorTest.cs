@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +10,7 @@ public class MagicOnionFilterDescriptorTest
     public void Order_Service_Default()
     {
         // Arrange
-        var desc = new MagicOnionServiceFilterDescriptor(new ServiceFilter_Unordered());
+        var desc = new MagicOnionServiceFilterDescriptor(new ServiceFilterUnordered());
 
         // Act
         var order = desc.Order;
@@ -28,7 +23,7 @@ public class MagicOnionFilterDescriptorTest
     public void Order_StreamingHub_Default()
     {
         // Arrange
-        var desc = new StreamingHubFilterDescriptor(new StreamingHubFilter_Unordered());
+        var desc = new StreamingHubFilterDescriptor(new StreamingHubFilterUnordered());
 
         // Act
         var order = desc.Order;
@@ -185,7 +180,7 @@ public class MagicOnionFilterDescriptorTest
         public int Order { get; set; }
     }
 
-    class ServiceFilter_Unordered : IMagicOnionServiceFilter
+    class ServiceFilterUnordered : IMagicOnionServiceFilter
     {
         public ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next) => next(context);
     }
@@ -202,7 +197,7 @@ public class MagicOnionFilterDescriptorTest
         public int Order { get; set; }
     }
 
-    class StreamingHubFilter_Unordered : IStreamingHubFilter
+    class StreamingHubFilterUnordered : IStreamingHubFilter
     {
         public ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next) => next(context);
     }

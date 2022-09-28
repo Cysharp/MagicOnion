@@ -1,4 +1,3 @@
-using System;
 using MagicOnion.Generator.Internal;
 using Xunit.Abstractions;
 

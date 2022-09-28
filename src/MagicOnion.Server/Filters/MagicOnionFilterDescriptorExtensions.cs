@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using MagicOnion.Server.Filters;
 
 // ReSharper disable once CheckNamespace
