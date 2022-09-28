@@ -10,175 +10,174 @@ using Grpc.Core;
 using MagicOnion.Client;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Server.Tests
+namespace MagicOnion.Server.Tests;
+
+[Flags]
+public enum FilterCalledStatus
 {
-    [Flags]
-    public enum FilterCalledStatus
-    {
-        Begin = 1,
-        Catch = 2,
-        Finally = 4
-    }
+    Begin = 1,
+    Catch = 2,
+    Finally = 4
+}
 
-    public class SimpleFilter1 : MagicOnionFilterAttribute
+public class SimpleFilter1 : MagicOnionFilterAttribute
+{
+    public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        try
         {
-            try
-            {
-                (context.Items["list"] as List<string>).Add(nameof(SimpleFilter1));
-                context.Items[nameof(SimpleFilter1)] = FilterCalledStatus.Begin;
-                await next(context);
-            }
-            catch
-            {
-                context.Items[nameof(SimpleFilter1)] = (FilterCalledStatus)context.Items[nameof(SimpleFilter1)] | FilterCalledStatus.Catch;
-                throw;
-            }
-            finally
-            {
-                context.Items[nameof(SimpleFilter1)] = (FilterCalledStatus)context.Items[nameof(SimpleFilter1)] | FilterCalledStatus.Finally;
-            }
+            (context.Items["list"] as List<string>).Add(nameof(SimpleFilter1));
+            context.Items[nameof(SimpleFilter1)] = FilterCalledStatus.Begin;
+            await next(context);
+        }
+        catch
+        {
+            context.Items[nameof(SimpleFilter1)] = (FilterCalledStatus)context.Items[nameof(SimpleFilter1)] | FilterCalledStatus.Catch;
+            throw;
+        }
+        finally
+        {
+            context.Items[nameof(SimpleFilter1)] = (FilterCalledStatus)context.Items[nameof(SimpleFilter1)] | FilterCalledStatus.Finally;
         }
     }
+}
 
-    public class MultiFilter2 : MagicOnionFilterAttribute
+public class MultiFilter2 : MagicOnionFilterAttribute
+{
+    public int X { get; private set; }
+    public int Y { get; private set; }
+    public int Z { get; set; }
+
+    public MultiFilter2(int x, int y)
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public int Z { get; set; }
-
-        public MultiFilter2(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-
-        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
-        {
-            try
-            {
-                (context.Items["list"] as List<string>).Add(nameof(MultiFilter2));
-                context.Items[nameof(MultiFilter2)] = FilterCalledStatus.Begin;
-                context.Items[nameof(MultiFilter2) + "xyz"] = Tuple.Create(X, Y, Z);
-                await next(context);
-            }
-            catch
-            {
-                context.Items[nameof(MultiFilter2)] = (FilterCalledStatus)context.Items[nameof(MultiFilter2)] | FilterCalledStatus.Catch;
-                throw;
-            }
-            finally
-            {
-                context.Items[nameof(MultiFilter2)] = (FilterCalledStatus)context.Items[nameof(MultiFilter2)] | FilterCalledStatus.Finally;
-            }
-        }
+        this.X = x;
+        this.Y = y;
     }
 
-    public class MoreThanFilter3 : MagicOnionFilterAttribute
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        readonly string msg;
-
-        public MoreThanFilter3(string msg)
+        try
         {
-            this.msg = msg;
+            (context.Items["list"] as List<string>).Add(nameof(MultiFilter2));
+            context.Items[nameof(MultiFilter2)] = FilterCalledStatus.Begin;
+            context.Items[nameof(MultiFilter2) + "xyz"] = Tuple.Create(X, Y, Z);
+            await next(context);
         }
-
-        public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        catch
         {
-            try
-            {
-                (context.Items["list"] as List<string>).Add(nameof(MoreThanFilter3));
-                context.Items[nameof(MoreThanFilter3)] = FilterCalledStatus.Begin;
-                context.Items[nameof(MoreThanFilter3) + "msg"] = msg;
-                await next(context);
-            }
-            catch
-            {
-                context.Items[nameof(MoreThanFilter3)] = (FilterCalledStatus)context.Items[nameof(MoreThanFilter3)] | FilterCalledStatus.Catch;
-                throw;
-            }
-            finally
-            {
-                context.Items[nameof(MoreThanFilter3)] = (FilterCalledStatus)context.Items[nameof(MoreThanFilter3)] | FilterCalledStatus.Finally;
-            }
+            context.Items[nameof(MultiFilter2)] = (FilterCalledStatus)context.Items[nameof(MultiFilter2)] | FilterCalledStatus.Catch;
+            throw;
+        }
+        finally
+        {
+            context.Items[nameof(MultiFilter2)] = (FilterCalledStatus)context.Items[nameof(MultiFilter2)] | FilterCalledStatus.Finally;
         }
     }
+}
 
-    public class DumpFilter : MagicOnionFilterAttribute
+public class MoreThanFilter3 : MagicOnionFilterAttribute
+{
+    readonly string msg;
+
+    public MoreThanFilter3(string msg)
     {
-        public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
-        {
-            try
-            {
-                context.Items["list"] = new List<string>();
-                (context.Items["list"] as List<string>).Add(nameof(DumpFilter));
-                await next(context);
-            }
-            catch
-            {
-            }
-            finally
-            {
-                var calls = string.Join(", ", (context.Items["list"] as List<string>));
-                var dict = string.Join(", ", context.Items.Where(x => x.Key != "list").OrderBy(x => x.Key).Select(x => x.Key + ", " + x.Value.ToString()));
-                SetStatusCode(context, (StatusCode)999, calls + " : " + dict);
-            }
-        }
+        this.msg = msg;
     }
 
-    public interface IFilterTester : IService<IFilterTester>
+    public async override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        UnaryResult<int> A();
-        UnaryResult<int> B();
-        UnaryResult<int> C();
-    }
-
-    [DumpFilter(Order = int.MinValue)]
-    [MoreThanFilter3("put-class", Order = 244)]
-    public class FilterTester : ServiceBase<IFilterTester>, IFilterTester
-    {
-        [SimpleFilter1(Order = 10)]
-        public UnaryResult<int> A()
+        try
         {
-            return UnaryResult(0);
+            (context.Items["list"] as List<string>).Add(nameof(MoreThanFilter3));
+            context.Items[nameof(MoreThanFilter3)] = FilterCalledStatus.Begin;
+            context.Items[nameof(MoreThanFilter3) + "msg"] = msg;
+            await next(context);
         }
-
-        [SimpleFilter1(Order = 300)]
-        [MultiFilter2(99, 30, Z = 4595, Order = 200)]
-        public UnaryResult<int> B()
+        catch
         {
-            return UnaryResult(999);
+            context.Items[nameof(MoreThanFilter3)] = (FilterCalledStatus)context.Items[nameof(MoreThanFilter3)] | FilterCalledStatus.Catch;
+            throw;
         }
-
-        [SimpleFilter1(Order = int.MinValue)]
-        public UnaryResult<int> C()
+        finally
         {
-            throw new Exception("C-Exception");
+            context.Items[nameof(MoreThanFilter3)] = (FilterCalledStatus)context.Items[nameof(MoreThanFilter3)] | FilterCalledStatus.Finally;
         }
     }
+}
+
+public class DumpFilter : MagicOnionFilterAttribute
+{
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+    {
+        try
+        {
+            context.Items["list"] = new List<string>();
+            (context.Items["list"] as List<string>).Add(nameof(DumpFilter));
+            await next(context);
+        }
+        catch
+        {
+        }
+        finally
+        {
+            var calls = string.Join(", ", (context.Items["list"] as List<string>));
+            var dict = string.Join(", ", context.Items.Where(x => x.Key != "list").OrderBy(x => x.Key).Select(x => x.Key + ", " + x.Value.ToString()));
+            SetStatusCode(context, (StatusCode)999, calls + " : " + dict);
+        }
+    }
+}
+
+public interface IFilterTester : IService<IFilterTester>
+{
+    UnaryResult<int> A();
+    UnaryResult<int> B();
+    UnaryResult<int> C();
+}
+
+[DumpFilter(Order = int.MinValue)]
+[MoreThanFilter3("put-class", Order = 244)]
+public class FilterTester : ServiceBase<IFilterTester>, IFilterTester
+{
+    [SimpleFilter1(Order = 10)]
+    public UnaryResult<int> A()
+    {
+        return UnaryResult(0);
+    }
+
+    [SimpleFilter1(Order = 300)]
+    [MultiFilter2(99, 30, Z = 4595, Order = 200)]
+    public UnaryResult<int> B()
+    {
+        return UnaryResult(999);
+    }
+
+    [SimpleFilter1(Order = int.MinValue)]
+    public UnaryResult<int> C()
+    {
+        throw new Exception("C-Exception");
+    }
+}
     
-    public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
+public class FilterTest : IClassFixture<ServerFixture<FilterTester>>
+{
+    IFilterTester client;
+
+    public FilterTest(ITestOutputHelper logger, ServerFixture<FilterTester> server)
     {
-        IFilterTester client;
-
-        public FilterTest(ITestOutputHelper logger, ServerFixture<FilterTester> server)
-        {
-            this.client = server.CreateClient<IFilterTester>();
-        }
+        this.client = server.CreateClient<IFilterTester>();
+    }
 
 
-        [Fact]
-        public void Filter()
-        {
-            Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult()).Status.Detail
-                .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Finally");
+    [Fact]
+    public void Filter()
+    {
+        Assert.Throws<RpcException>(() => client.A().GetAwaiter().GetResult()).Status.Detail
+            .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Finally");
 
-            Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult()).Status.Detail
-                .Should().Be("DumpFilter, MultiFilter2, MoreThanFilter3, SimpleFilter1 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, MultiFilter2, Begin, Finally, MultiFilter2xyz, (99, 30, 4595), SimpleFilter1, Begin, Finally");
+        Assert.Throws<RpcException>(() => client.B().GetAwaiter().GetResult()).Status.Detail
+            .Should().Be("DumpFilter, MultiFilter2, MoreThanFilter3, SimpleFilter1 : MoreThanFilter3, Begin, Finally, MoreThanFilter3msg, put-class, MultiFilter2, Begin, Finally, MultiFilter2xyz, (99, 30, 4595), SimpleFilter1, Begin, Finally");
 
-            Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult()).Status.Detail
-                .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Catch, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Catch, Finally");
-        }
+        Assert.Throws<RpcException>(() => client.C().GetAwaiter().GetResult()).Status.Detail
+            .Should().Be("DumpFilter, SimpleFilter1, MoreThanFilter3 : MoreThanFilter3, Begin, Catch, Finally, MoreThanFilter3msg, put-class, SimpleFilter1, Begin, Catch, Finally");
     }
 }

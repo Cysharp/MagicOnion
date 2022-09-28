@@ -7,56 +7,55 @@ using Xunit;
 using Xunit.Abstractions;
 using FluentAssertions;
 
-namespace MagicOnion.Server.Tests
-{
-    // note, do not allow partial definition.
+namespace MagicOnion.Server.Tests;
 
-    //public interface IPartialDefinition : IService<IPartialDefinition>, IPartialDefinition2
-    //{
-    //    UnaryResult<int> Unary1(int x, int y);
-    //}
+// note, do not allow partial definition.
 
-
-    //public interface IPartialDefinition2
-    //{
-    //    UnaryResult<int> Unary2();
-    //}
+//public interface IPartialDefinition : IService<IPartialDefinition>, IPartialDefinition2
+//{
+//    UnaryResult<int> Unary1(int x, int y);
+//}
 
 
-    //public class CombinedDefinition : ServiceBase<IPartialDefinition>, IPartialDefinition2
-    //{
-    //    public UnaryResult<int> Unary1(int x, int y)
-    //        => this.UnaryResult(x + y);
-
-    //    public UnaryResult<int> Unary2()
-    //        => this.UnaryResult(100);
-    //}
+//public interface IPartialDefinition2
+//{
+//    UnaryResult<int> Unary2();
+//}
 
 
-    //[Collection(nameof(AllAssemblyGrpcServerFixture))]
-    //public class PartialDefinitionTest
-    //{
-    //    ITestOutputHelper logger;
-    //    IPartialDefinition client;
+//public class CombinedDefinition : ServiceBase<IPartialDefinition>, IPartialDefinition2
+//{
+//    public UnaryResult<int> Unary1(int x, int y)
+//        => this.UnaryResult(x + y);
 
-    //    public PartialDefinitionTest(ITestOutputHelper logger, ServerFixture server)
-    //    {
-    //        this.logger = logger;
-    //        this.client = server.CreateClient<IPartialDefinition>();
-    //    }
+//    public UnaryResult<int> Unary2()
+//        => this.UnaryResult(100);
+//}
 
-    //    [Fact]
-    //    public async Task Unary1()
-    //    {
-    //        var r = await client.Unary1(10, 20);
-    //        r.Should().Be(30);
-    //    }
 
-    //    [Fact]
-    //    public async Task Unary2()
-    //    {
-    //        var r = await client.Unary2();
-    //        r.Should().Be(100);
-    //    }
-    //}
-}
+//[Collection(nameof(AllAssemblyGrpcServerFixture))]
+//public class PartialDefinitionTest
+//{
+//    ITestOutputHelper logger;
+//    IPartialDefinition client;
+
+//    public PartialDefinitionTest(ITestOutputHelper logger, ServerFixture server)
+//    {
+//        this.logger = logger;
+//        this.client = server.CreateClient<IPartialDefinition>();
+//    }
+
+//    [Fact]
+//    public async Task Unary1()
+//    {
+//        var r = await client.Unary1(10, 20);
+//        r.Should().Be(30);
+//    }
+
+//    [Fact]
+//    public async Task Unary2()
+//    {
+//        var r = await client.Unary2();
+//        r.Should().Be(100);
+//    }
+//}

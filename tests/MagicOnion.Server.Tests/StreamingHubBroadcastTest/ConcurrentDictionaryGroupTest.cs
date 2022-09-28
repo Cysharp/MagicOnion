@@ -7,22 +7,21 @@ using MagicOnion.Server.Hubs;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest
-{
-    [CollectionDefinition(nameof(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture))]
-    public class StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture : ICollectionFixture<StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture.CustomServerFixture>
-    {
-        public class CustomServerFixture : ServerFixture<StreamingHubBroadcastTestHub>
-        {
-        }
-    }
+namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest;
 
-    [Collection(nameof(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture))]
-    public class ConcurrentDictionaryGroupTest : GroupTestBase
+[CollectionDefinition(nameof(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture))]
+public class StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture : ICollectionFixture<StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture.CustomServerFixture>
+{
+    public class CustomServerFixture : ServerFixture<StreamingHubBroadcastTestHub>
     {
-        public ConcurrentDictionaryGroupTest(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture.CustomServerFixture server)
-            : base(server)
-        {
-        }
+    }
+}
+
+[Collection(nameof(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture))]
+public class ConcurrentDictionaryGroupTest : GroupTestBase
+{
+    public ConcurrentDictionaryGroupTest(StreamingHubBroadcastConcurrentDictionaryGroupTestGrpcServerFixture.CustomServerFixture server)
+        : base(server)
+    {
     }
 }

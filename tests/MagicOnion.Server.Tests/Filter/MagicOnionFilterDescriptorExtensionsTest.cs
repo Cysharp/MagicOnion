@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Hubs;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Tests.Filter;
 

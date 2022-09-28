@@ -16,285 +16,260 @@ using Xunit;
 using Xunit.Abstractions;
 using MagicOnion.Server;
 
-namespace MagicOnion.Server.Tests
+namespace MagicOnion.Server.Tests;
+
+public interface IMessageReceiver
 {
-    public interface IMessageReceiver
+    //Task ZeroArgument();
+    //Task OneArgument(int x);
+    //Task MoreArgument(int x, string y, double z);
+    void VoidZeroArgument();
+    void VoidOneArgument(int x);
+    void VoidMoreArgument(int x, string y, double z);
+    //Task OneArgument2(TestObject x);
+    void VoidOneArgument2(TestObject x);
+    //Task OneArgument3(TestObject[] x);
+    void VoidOneArgument3(TestObject[] x);
+}
+
+public interface ITestHub : IStreamingHub<ITestHub, IMessageReceiver>
+{
+    Task ZeroArgument();
+    Task OneArgument(int x);
+    Task MoreArgument(int x, string y, double z);
+
+    Task<int> RetrunZeroArgument();
+    Task<string> RetrunOneArgument(int x);
+    Task<double> RetrunMoreArgument(int x, string y, double z);
+
+    Task OneArgument2(TestObject x);
+    Task<TestObject> RetrunOneArgument2(TestObject x);
+
+    Task OneArgument3(TestObject[] x);
+    Task<TestObject[]> RetrunOneArgument3(TestObject[] x);
+}
+
+[MessagePackObject]
+public class TestObject
+{
+    [Key(0)]
+    public int X { get; set; }
+    [Key(1)]
+    public int Y { get; set; }
+    [Key(2)]
+    public int Z { get; set; }
+}
+
+public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
+{
+    IGroup group;
+
+    protected override async ValueTask OnConnecting()
     {
-        //Task ZeroArgument();
-        //Task OneArgument(int x);
-        //Task MoreArgument(int x, string y, double z);
-        void VoidZeroArgument();
-        void VoidOneArgument(int x);
-        void VoidMoreArgument(int x, string y, double z);
-        //Task OneArgument2(TestObject x);
-        void VoidOneArgument2(TestObject x);
-        //Task OneArgument3(TestObject[] x);
-        void VoidOneArgument3(TestObject[] x);
+        group = await Group.AddAsync("global");
     }
 
-    public interface ITestHub : IStreamingHub<ITestHub, IMessageReceiver>
+    protected override async ValueTask OnDisconnected()
     {
-        Task ZeroArgument();
-        Task OneArgument(int x);
-        Task MoreArgument(int x, string y, double z);
-
-        Task<int> RetrunZeroArgument();
-        Task<string> RetrunOneArgument(int x);
-        Task<double> RetrunMoreArgument(int x, string y, double z);
-
-        Task OneArgument2(TestObject x);
-        Task<TestObject> RetrunOneArgument2(TestObject x);
-
-        Task OneArgument3(TestObject[] x);
-        Task<TestObject[]> RetrunOneArgument3(TestObject[] x);
+        if (group != null) await group.RemoveAsync(Context);
     }
 
-    [MessagePackObject]
-    public class TestObject
+
+    public async Task MoreArgument(int x, string y, double z)
     {
-        [Key(0)]
-        public int X { get; set; }
-        [Key(1)]
-        public int Y { get; set; }
-        [Key(2)]
-        public int Z { get; set; }
+        BroadcastToSelf(group).VoidMoreArgument(x, y, z);
+        //await Broadcast(group).MoreArgument(x, y, z);
     }
 
-    public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
+    public async Task OneArgument(int x)
     {
-        IGroup group;
-
-        protected override async ValueTask OnConnecting()
-        {
-            group = await Group.AddAsync("global");
-        }
-
-        protected override async ValueTask OnDisconnected()
-        {
-            if (group != null) await group.RemoveAsync(Context);
-        }
-
-
-        public async Task MoreArgument(int x, string y, double z)
-        {
-            BroadcastToSelf(group).VoidMoreArgument(x, y, z);
-            //await Broadcast(group).MoreArgument(x, y, z);
-        }
-
-        public async Task OneArgument(int x)
-        {
-            Broadcast(group).VoidOneArgument(x);
-            //            await Broadcast(group).OneArgument(x);
-        }
-
-        public async Task OneArgument2(TestObject x)
-        {
-            Broadcast(group).VoidOneArgument2(x);
-            //await Broadcast(group).OneArgument2(x);
-        }
-
-        public async Task OneArgument3(TestObject[] x)
-        {
-            Broadcast(group).VoidOneArgument3(x);
-            //await Broadcast(group).OneArgument3(x);
-        }
-
-        public Task<double> RetrunMoreArgument(int x, string y, double z)
-        {
-            return Task.FromResult(z);
-        }
-
-        public async Task<string> RetrunOneArgument(int x)
-        {
-            return x.ToString();
-        }
-
-        public async Task<TestObject> RetrunOneArgument2(TestObject x)
-        {
-            return x;
-        }
-
-        public async Task<TestObject[]> RetrunOneArgument3(TestObject[] x)
-        {
-            return x;
-        }
-
-        public async Task<int> RetrunZeroArgument()
-        {
-            return 1000;
-        }
-
-        public async Task ZeroArgument()
-        {
-            Broadcast(group).VoidZeroArgument();
-            //await Broadcast(group).ZeroArgument();
-        }
+        Broadcast(group).VoidOneArgument(x);
+        //            await Broadcast(group).OneArgument(x);
     }
 
-    public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixture<ServerFixture<TestHub>>
+    public async Task OneArgument2(TestObject x)
     {
-        ITestOutputHelper logger;
-        GrpcChannel channel;
-        ITestHub client;
+        Broadcast(group).VoidOneArgument2(x);
+        //await Broadcast(group).OneArgument2(x);
+    }
 
-        public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture<TestHub> server)
+    public async Task OneArgument3(TestObject[] x)
+    {
+        Broadcast(group).VoidOneArgument3(x);
+        //await Broadcast(group).OneArgument3(x);
+    }
+
+    public Task<double> RetrunMoreArgument(int x, string y, double z)
+    {
+        return Task.FromResult(z);
+    }
+
+    public async Task<string> RetrunOneArgument(int x)
+    {
+        return x.ToString();
+    }
+
+    public async Task<TestObject> RetrunOneArgument2(TestObject x)
+    {
+        return x;
+    }
+
+    public async Task<TestObject[]> RetrunOneArgument3(TestObject[] x)
+    {
+        return x;
+    }
+
+    public async Task<int> RetrunZeroArgument()
+    {
+        return 1000;
+    }
+
+    public async Task ZeroArgument()
+    {
+        Broadcast(group).VoidZeroArgument();
+        //await Broadcast(group).ZeroArgument();
+    }
+}
+
+public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixture<ServerFixture<TestHub>>
+{
+    ITestOutputHelper logger;
+    GrpcChannel channel;
+    ITestHub client;
+
+    public BasicStreamingHubTest(ITestOutputHelper logger, ServerFixture<TestHub> server)
+    {
+        this.logger = logger;
+        this.channel = server.DefaultChannel;
+    }
+
+    [Fact]
+    public async Task ZeroArgument()
+    {
+        try
         {
-            this.logger = logger;
-            this.channel = server.DefaultChannel;
-        }
+            client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+            await client.ZeroArgument();
+            await voidZeroTask.Task;
+            //await zeroTask.Task;
+            // ok, pass.
 
-        [Fact]
-        public async Task ZeroArgument()
-        {
-            try
-            {
-                client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-                await client.ZeroArgument();
-                await voidZeroTask.Task;
-                //await zeroTask.Task;
-                // ok, pass.
-
-                await client.DisposeAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-        }
-
-        [Fact]
-        public async Task OneArgument()
-        {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            await client.OneArgument(100);
-            //var x = await oneTask.Task;
-            var y = await voidoneTask.Task;
-            //x.Should().Be(100);
-            y.Should().Be(100);
             await client.DisposeAsync();
         }
-
-        [Fact]
-        public async Task MoreArgument()
+        catch (Exception e)
         {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            await client.MoreArgument(100, "foo", 10.3);
-            //var x = await moreTask.Task;
-            var y = await voidmoreTask.Task;
-            //x.Should().Be((100, "foo", 10.3));
-            y.Should().Be((100, "foo", 10.3));
-            await client.DisposeAsync();
+            Console.WriteLine(e);
+            throw;
         }
 
-        [Fact]
-        public async Task RetrunZeroArgument()
-        {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            var v = await client.RetrunZeroArgument();
-            v.Should().Be(1000);
-            await client.DisposeAsync();
-        }
-        [Fact]
-        public async Task RetrunOneArgument()
-        {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            var v = await client.RetrunZeroArgument();
-            v.Should().Be(1000);
-            await client.DisposeAsync();
-        }
-        [Fact]
-        public async Task RetrunMoreArgument()
-        {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            var v = await client.RetrunMoreArgument(10, "foo", 30.4);
-            v.Should().Be(30.4);
-            await client.DisposeAsync();
-        }
+    }
 
-        [Fact]
-        public async Task OneArgument2()
+    [Fact]
+    public async Task OneArgument()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        await client.OneArgument(100);
+        //var x = await oneTask.Task;
+        var y = await voidoneTask.Task;
+        //x.Should().Be(100);
+        y.Should().Be(100);
+        await client.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task MoreArgument()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        await client.MoreArgument(100, "foo", 10.3);
+        //var x = await moreTask.Task;
+        var y = await voidmoreTask.Task;
+        //x.Should().Be((100, "foo", 10.3));
+        y.Should().Be((100, "foo", 10.3));
+        await client.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task RetrunZeroArgument()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var v = await client.RetrunZeroArgument();
+        v.Should().Be(1000);
+        await client.DisposeAsync();
+    }
+    [Fact]
+    public async Task RetrunOneArgument()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var v = await client.RetrunZeroArgument();
+        v.Should().Be(1000);
+        await client.DisposeAsync();
+    }
+    [Fact]
+    public async Task RetrunMoreArgument()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var v = await client.RetrunMoreArgument(10, "foo", 30.4);
+        v.Should().Be(30.4);
+        await client.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task OneArgument2()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        await client.OneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
         {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            await client.OneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
-            {
-                //var v = await one2Task.Task;
-                //v.X.Should().Be(10);
-                //v.Y.Should().Be(99);
-                //v.Z.Should().Be(100);
-            }
-            {
-                var v = await voidone2Task.Task;
-                v.X.Should().Be(10);
-                v.Y.Should().Be(99);
-                v.Z.Should().Be(100);
-            }
-            await client.DisposeAsync();
+            //var v = await one2Task.Task;
+            //v.X.Should().Be(10);
+            //v.Y.Should().Be(99);
+            //v.Z.Should().Be(100);
         }
-        [Fact]
-        public async Task RetrunOneArgument2()
         {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            var v = await client.RetrunOneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
+            var v = await voidone2Task.Task;
             v.X.Should().Be(10);
             v.Y.Should().Be(99);
             v.Z.Should().Be(100);
-            await client.DisposeAsync();
         }
+        await client.DisposeAsync();
+    }
+    [Fact]
+    public async Task RetrunOneArgument2()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var v = await client.RetrunOneArgument2(new TestObject() { X = 10, Y = 99, Z = 100 });
+        v.X.Should().Be(10);
+        v.Y.Should().Be(99);
+        v.Z.Should().Be(100);
+        await client.DisposeAsync();
+    }
 
-        [Fact]
-        public async Task OneArgument3()
+    [Fact]
+    public async Task OneArgument3()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        await client.OneArgument3(new[]
         {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            await client.OneArgument3(new[]
-            {
-                new TestObject() { X = 10, Y = 99, Z = 100 },
-                new TestObject() { X = 5, Y = 39, Z = 200 },
-                new TestObject() { X = 4, Y = 59, Z = 300 },
-            });
-            {
-                //var v = await one3Task.Task;
+            new TestObject() { X = 10, Y = 99, Z = 100 },
+            new TestObject() { X = 5, Y = 39, Z = 200 },
+            new TestObject() { X = 4, Y = 59, Z = 300 },
+        });
+        {
+            //var v = await one3Task.Task;
 
-                //v[0].X.Should().Be(10);
-                //v[0].Y.Should().Be(99);
-                //v[0].Z.Should().Be(100);
+            //v[0].X.Should().Be(10);
+            //v[0].Y.Should().Be(99);
+            //v[0].Z.Should().Be(100);
 
-                //v[1].X.Should().Be(5);
-                //v[1].Y.Should().Be(39);
-                //v[1].Z.Should().Be(200);
+            //v[1].X.Should().Be(5);
+            //v[1].Y.Should().Be(39);
+            //v[1].Z.Should().Be(200);
 
-                //v[2].X.Should().Be(4);
-                //v[2].Y.Should().Be(59);
-                //v[2].Z.Should().Be(300);
-            }
-            {
-                var v = await voidone3Task.Task;
-
-                v[0].X.Should().Be(10);
-                v[0].Y.Should().Be(99);
-                v[0].Z.Should().Be(100);
-
-                v[1].X.Should().Be(5);
-                v[1].Y.Should().Be(39);
-                v[1].Z.Should().Be(200);
-
-                v[2].X.Should().Be(4);
-                v[2].Y.Should().Be(59);
-                v[2].Z.Should().Be(300);
-            }
-            await client.DisposeAsync();
+            //v[2].X.Should().Be(4);
+            //v[2].Y.Should().Be(59);
+            //v[2].Z.Should().Be(300);
         }
-        [Fact]
-        public async Task RetrunOneArgument3()
         {
-            var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
-            var v = await client.RetrunOneArgument3(new[]
-            {
-                new TestObject() { X = 10, Y = 99, Z = 100 },
-                new TestObject() { X = 5, Y = 39, Z = 200 },
-                new TestObject() { X = 4, Y = 59, Z = 300 },
-            });
+            var v = await voidone3Task.Task;
 
             v[0].X.Should().Be(10);
             v[0].Y.Should().Be(99);
@@ -307,183 +282,207 @@ namespace MagicOnion.Server.Tests
             v[2].X.Should().Be(4);
             v[2].Y.Should().Be(59);
             v[2].Z.Should().Be(300);
-            await client.DisposeAsync();
         }
-
-
-
-        //TaskCompletionSource<(int, string, double)> moreTask = new TaskCompletionSource<(int, string, double)>();
-        //async Task IMessageReceiver.MoreArgument(int x, string y, double z)
-        //{
-        //    moreTask.TrySetResult((x, y, z));
-        //}
-
-        //TaskCompletionSource<int> oneTask = new TaskCompletionSource<int>();
-        //async Task IMessageReceiver.OneArgument(int x)
-        //{
-        //    oneTask.TrySetResult(x);
-        //}
-
-        //TaskCompletionSource<TestObject> one2Task = new TaskCompletionSource<TestObject>();
-        //async Task IMessageReceiver.OneArgument2(TestObject x)
-        //{
-        //    one2Task.TrySetResult(x);
-        //}
-
-        //TaskCompletionSource<TestObject[]> one3Task = new TaskCompletionSource<TestObject[]>();
-        //async Task IMessageReceiver.OneArgument3(TestObject[] x)
-        //{
-        //    one3Task.TrySetResult(x);
-        //}
-
-        TaskCompletionSource<(int, string, double)> voidmoreTask = new TaskCompletionSource<(int, string, double)>();
-        void IMessageReceiver.VoidMoreArgument(int x, string y, double z)
+        await client.DisposeAsync();
+    }
+    [Fact]
+    public async Task RetrunOneArgument3()
+    {
+        var client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var v = await client.RetrunOneArgument3(new[]
         {
-            voidmoreTask.TrySetResult((x, y, z));
-        }
+            new TestObject() { X = 10, Y = 99, Z = 100 },
+            new TestObject() { X = 5, Y = 39, Z = 200 },
+            new TestObject() { X = 4, Y = 59, Z = 300 },
+        });
 
-        TaskCompletionSource<int> voidoneTask = new TaskCompletionSource<int>();
-        void IMessageReceiver.VoidOneArgument(int x)
-        {
-            voidoneTask.TrySetResult(x);
-        }
+        v[0].X.Should().Be(10);
+        v[0].Y.Should().Be(99);
+        v[0].Z.Should().Be(100);
 
-        TaskCompletionSource<TestObject> voidone2Task = new TaskCompletionSource<TestObject>();
-        void IMessageReceiver.VoidOneArgument2(TestObject x)
-        {
-            voidone2Task.TrySetResult(x);
-        }
+        v[1].X.Should().Be(5);
+        v[1].Y.Should().Be(39);
+        v[1].Z.Should().Be(200);
 
-        TaskCompletionSource<TestObject[]> voidone3Task = new TaskCompletionSource<TestObject[]>();
-        void IMessageReceiver.VoidOneArgument3(TestObject[] x)
-        {
-            voidone3Task.TrySetResult(x);
-        }
-
-        TaskCompletionSource<object> voidZeroTask = new TaskCompletionSource<object>();
-        void IMessageReceiver.VoidZeroArgument()
-        {
-            voidZeroTask.TrySetResult(null);
-        }
-
-        //TaskCompletionSource<object> zeroTask = new TaskCompletionSource<object>();
-        //async Task IMessageReceiver.ZeroArgument()
-        //{
-        //    zeroTask.TrySetResult(null);
-        //}
-
-        public void Dispose()
-        {
-            if (client != null)
-            {
-                client.DisposeAsync().Wait();
-            }
-        }
+        v[2].X.Should().Be(4);
+        v[2].Y.Should().Be(59);
+        v[2].Z.Should().Be(300);
+        await client.DisposeAsync();
     }
 
 
-    public interface IEmptyReceiver
+
+    //TaskCompletionSource<(int, string, double)> moreTask = new TaskCompletionSource<(int, string, double)>();
+    //async Task IMessageReceiver.MoreArgument(int x, string y, double z)
+    //{
+    //    moreTask.TrySetResult((x, y, z));
+    //}
+
+    //TaskCompletionSource<int> oneTask = new TaskCompletionSource<int>();
+    //async Task IMessageReceiver.OneArgument(int x)
+    //{
+    //    oneTask.TrySetResult(x);
+    //}
+
+    //TaskCompletionSource<TestObject> one2Task = new TaskCompletionSource<TestObject>();
+    //async Task IMessageReceiver.OneArgument2(TestObject x)
+    //{
+    //    one2Task.TrySetResult(x);
+    //}
+
+    //TaskCompletionSource<TestObject[]> one3Task = new TaskCompletionSource<TestObject[]>();
+    //async Task IMessageReceiver.OneArgument3(TestObject[] x)
+    //{
+    //    one3Task.TrySetResult(x);
+    //}
+
+    TaskCompletionSource<(int, string, double)> voidmoreTask = new TaskCompletionSource<(int, string, double)>();
+    void IMessageReceiver.VoidMoreArgument(int x, string y, double z)
     {
+        voidmoreTask.TrySetResult((x, y, z));
     }
 
-    public interface IMoreCheckHub : IStreamingHub<IMoreCheckHub, IEmptyReceiver>
+    TaskCompletionSource<int> voidoneTask = new TaskCompletionSource<int>();
+    void IMessageReceiver.VoidOneArgument(int x)
     {
-        Task ReceiveExceptionAsync();
-        Task StatusCodeAsync();
-        Task FilterCheckAsync();
+        voidoneTask.TrySetResult(x);
     }
 
-    public class MoreCheckHub : StreamingHubBase<IMoreCheckHub, IEmptyReceiver>, IMoreCheckHub
+    TaskCompletionSource<TestObject> voidone2Task = new TaskCompletionSource<TestObject>();
+    void IMessageReceiver.VoidOneArgument2(TestObject x)
     {
-        public Task ReceiveExceptionAsync()
-        {
-            throw new Exception("foo");
-        }
+        voidone2Task.TrySetResult(x);
+    }
 
-        public async Task StatusCodeAsync()
-        {
-            throw new ReturnStatusException((StatusCode)99, "foo bar baz");
-        }
+    TaskCompletionSource<TestObject[]> voidone3Task = new TaskCompletionSource<TestObject[]>();
+    void IMessageReceiver.VoidOneArgument3(TestObject[] x)
+    {
+        voidone3Task.TrySetResult(x);
+    }
 
-        [StreamingHubTestFilter]
-        public async Task FilterCheckAsync()
+    TaskCompletionSource<object> voidZeroTask = new TaskCompletionSource<object>();
+    void IMessageReceiver.VoidZeroArgument()
+    {
+        voidZeroTask.TrySetResult(null);
+    }
+
+    //TaskCompletionSource<object> zeroTask = new TaskCompletionSource<object>();
+    //async Task IMessageReceiver.ZeroArgument()
+    //{
+    //    zeroTask.TrySetResult(null);
+    //}
+
+    public void Dispose()
+    {
+        if (client != null)
         {
+            client.DisposeAsync().Wait();
+        }
+    }
+}
+
+
+public interface IEmptyReceiver
+{
+}
+
+public interface IMoreCheckHub : IStreamingHub<IMoreCheckHub, IEmptyReceiver>
+{
+    Task ReceiveExceptionAsync();
+    Task StatusCodeAsync();
+    Task FilterCheckAsync();
+}
+
+public class MoreCheckHub : StreamingHubBase<IMoreCheckHub, IEmptyReceiver>, IMoreCheckHub
+{
+    public Task ReceiveExceptionAsync()
+    {
+        throw new Exception("foo");
+    }
+
+    public async Task StatusCodeAsync()
+    {
+        throw new ReturnStatusException((StatusCode)99, "foo bar baz");
+    }
+
+    [StreamingHubTestFilter]
+    public async Task FilterCheckAsync()
+    {
             
-        }
     }
+}
 
-    public class StreamingHubTestFilterAttribute : StreamingHubFilterAttribute
+public class StreamingHubTestFilterAttribute : StreamingHubFilterAttribute
+{
+    public static bool calledBefore;
+    public static bool calledAfter;
+
+    public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
     {
-        public static bool calledBefore;
-        public static bool calledAfter;
-
-        public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
-        {
-            context.Items["HubFilter1_AF"] = "BeforeOK";
-            await next.Invoke(context);
-            context.Items["HubFilter1_BF"] = "AfterOK";
-        }
+        context.Items["HubFilter1_AF"] = "BeforeOK";
+        await next.Invoke(context);
+        context.Items["HubFilter1_BF"] = "AfterOK";
     }
+}
     
-    public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
+public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
+{
+    ITestOutputHelper logger;
+    GrpcChannel channel;
+    IMoreCheckHub client;
+
+    public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture<MoreCheckHub> server)
     {
-        ITestOutputHelper logger;
-        GrpcChannel channel;
-        IMoreCheckHub client;
+        this.logger = logger;
+        this.channel = server.DefaultChannel;
+    }
 
-        public MoreCheckHubTest(ITestOutputHelper logger, ServerFixture<MoreCheckHub> server)
+    [Fact]
+    public async Task ReceiveEx()
+    {
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+
+        var ex = Assert.Throws<RpcException>(() =>
         {
-            this.logger = logger;
-            this.channel = server.DefaultChannel;
-        }
+            client.ReceiveExceptionAsync().GetAwaiter().GetResult();
+        });
 
-        [Fact]
-        public async Task ReceiveEx()
+        ex.StatusCode.Should().Be(StatusCode.Internal);
+        logger.WriteLine(ex.ToString());
+
+        await client.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task StatusCodeEx()
+    {
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+
+        var ex = Assert.Throws<RpcException>(() =>
         {
-            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+            client.StatusCodeAsync().GetAwaiter().GetResult();
+        });
 
-            var ex = Assert.Throws<RpcException>(() =>
-            {
-                client.ReceiveExceptionAsync().GetAwaiter().GetResult();
-            });
+        ex.StatusCode.Should().Be((StatusCode)99);
+        logger.WriteLine(ex.Status.Detail);
+        logger.WriteLine(ex.ToString());
 
-            ex.StatusCode.Should().Be(StatusCode.Internal);
-            logger.WriteLine(ex.ToString());
+        await client.DisposeAsync();
+    }
 
-            await client.DisposeAsync();
-        }
+    [Fact]
+    public async Task Filter()
+    {
+        client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
+        await client.FilterCheckAsync();
+    }
 
-        [Fact]
-        public async Task StatusCodeEx()
+
+    public void Dispose()
+    {
+        if (client != null)
         {
-            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
-
-            var ex = Assert.Throws<RpcException>(() =>
-            {
-                client.StatusCodeAsync().GetAwaiter().GetResult();
-            });
-
-            ex.StatusCode.Should().Be((StatusCode)99);
-            logger.WriteLine(ex.Status.Detail);
-            logger.WriteLine(ex.ToString());
-
-            await client.DisposeAsync();
-        }
-
-        [Fact]
-        public async Task Filter()
-        {
-            client = await StreamingHubClient.ConnectAsync<IMoreCheckHub, IEmptyReceiver>(channel, this);
-            await client.FilterCheckAsync();
-        }
-
-
-        public void Dispose()
-        {
-            if (client != null)
-            {
-                client.DisposeAsync().Wait();
-            }
+            client.DisposeAsync().Wait();
         }
     }
 }
