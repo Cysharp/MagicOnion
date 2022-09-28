@@ -495,26 +495,47 @@ Here is example of what kind of filter can be stacked.
 
 ![image](https://user-images.githubusercontent.com/46207/50969539-2bd59600-1522-11e9-84ab-15dd85e3dcac.png)
 
-GlobalFilter can attach to MagicOnionOptions.
+#### Ordering
+Filters can be ordered and they are executed in the following order:
 
-MagicOnion filters supports [DI](#dependency-injection).
+```
+[Ordered Filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
+```
+
+Unordered filters are treated as last (`int.MaxValue`) and executed in the order in which they are added.
+
+#### GlobalFilters
+Filters that apply to the application globally can be added at `GlobalFilters` of `MagicOnionOptions`.
 
 ```csharp
-public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
+services.AddMagicOnion(options =>
+{
+    options.GlobalFilters.Add<MyServiceFilter>();
+    options.GlobalStreamingHubFilters.Add<MyHubFilter>();
+});
+```
+
+#### Dependency Injections
+MagicOnion filters supports [Dependency Injection](#dependency-injection). There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
+
+The following is an example of how to use `FromTypeFilter`, `FromServiceFitler`.
+
+```csharp
+public class MyServiceFilterAttribute : MagicOnionFilterAttribute
 {
     private readonly ILogger _logger;
 
     // the `logger` parameter will be injected at instantiating.
-    public MyStreamingHubFilterAttribute(ILogger<MyStreamingHubFilterAttribute> logger)
+    public MyServiceFilterAttribute(ILogger<MyServiceFilterAttribute> logger)
     {
         _logger = logger;
     }
 
-    public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        _logger.LogInformation($"MyStreamingHubFilter Begin: {context.Path}");
+        _logger.LogInformation($"MyServiceFilter Begin: {context.Path}");
         await next(context);
-        _logger.LogInformation($"MyStreamingHubFilter End: {context.Path}");
+        _logger.LogInformation($"MyServiceFilter End: {context.Path}");
     }
 }
 ```
@@ -532,14 +553,14 @@ public class MyService : ServiceBase<IMyService>, IMyService
         return UnaryResult(0);
     }
 
-    // The filter will instantiate from type with some arguments. if the arguments are missing, it will be obtained from `IServiceLocator` 
+    // The filter will instantiate from type with some arguments. if the arguments are missing, it will be obtained from `IServiceProvider` 
     [FromTypeFilter(typeof(MyThirdFilterAttribute), Arguments = new object[] { "foo", 987654 })]
     public UnaryResult<int> Bar()
     {
         return UnaryResult(0);
     }
 
-    // The filter instance will be provided via `IServiceLocator`.
+    // The filter instance will be provided via `IServiceProvider`.
     [FromServiceFilter(typeof(MyFourthFilterAttribute))]
     public UnaryResult<int> Baz()
     {
@@ -547,6 +568,68 @@ public class MyService : ServiceBase<IMyService>, IMyService
     }
 }
 ```
+
+The following is an example of how to use `IMagicOnionFilterFactory<T>`.
+
+This is a clean way of writing when using DI while still having parameters for the attributes.
+
+```csharp
+public class MyServiceFilterAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionOrderedFilter
+{
+    private readonly string _label;
+
+    public int Order { get; set; } = int.MaxValue;
+
+    public MyServiceFilterAttribute(string label)
+    {
+        _label = label;
+    }
+
+    public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceProvider)
+        => new MyServiceFilter(serviceProvider.GetRequiredService<ILogger<MyServiceFilterAttribute>>());
+
+    class MyServiceFilter : IMagicOnionServiceFilter
+    {
+        private readonly string _label;
+        private readonly ILogger _logger;
+
+        public MyServiceFilter(string label, ILogger<MyServiceFilterAttribute> logger)
+        {
+            _label = label;
+            _logger = logger;
+        }
+
+        public async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            _logger.LogInformation($"[{_label}] MyServiceFilter Begin: {context.Path}");
+            await next(context);
+            _logger.LogInformation($"[{_label}] MyServiceFilter End: {context.Path}");
+        }
+    }
+}
+```
+```csharp
+[MyServiceFilter("Class")]
+public class MyService : ServiceBase<IMyService>, IMyService
+{
+    [MyServiceFilter("Method")]
+    public UnaryResult<int> Foo()
+    {
+        return UnaryResult(0);
+    }
+}
+```
+
+#### Extension Interfaces
+The following interfaces are provided for filter extensions. These interfaces are similar to ASP.NET Core MVC filter mechanism.
+
+- `IMagicOnionFilterFactory<T>`
+- `IMagicOnionOrderedFilter`
+- `IMagicOnionServiceFilter`
+- `IStreamingHubFilter`
+
+`MagicOnionFilterAttributes` and `StreamingHubFilterAttribute` implement these interfaces for easy use. You can use these interfaces for more flexible implementation.
+
 
 ### ClientFilter
 MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.

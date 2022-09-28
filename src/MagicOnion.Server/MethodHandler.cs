@@ -11,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using MagicOnion.Server.Filters;
+using MagicOnion.Server.Filters.Internal;
 
 namespace MagicOnion.Server
 {
@@ -29,14 +31,11 @@ namespace MagicOnion.Server
 
         public ILookup<Type, Attribute> AttributeLookup { get; private set; }
 
-        readonly IMagicOnionFilterFactory<MagicOnionFilterAttribute>[] filters;
-
         // options
 
         internal readonly bool isReturnExceptionStackTraceInErrorDetail;
         internal readonly IMagicOnionLogger logger;
         readonly bool enableCurrentContext;
-        readonly IServiceProvider serviceProvider;
 
         // use for request handling.
 
@@ -56,7 +55,6 @@ namespace MagicOnion.Server
         public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider)
         {
             this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
-            this.serviceProvider = serviceProvider;
 
             var serviceInterfaceType = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0];
 
@@ -84,14 +82,7 @@ namespace MagicOnion.Server
                 .Cast<Attribute>()
                 .ToLookup(x => x.GetType());
 
-            this.filters = handlerOptions.GlobalFilters
-                .OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>()
-                .Concat(classType.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(classType.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
-                .Concat(methodInfo.GetCustomAttributes<MagicOnionFilterAttribute>(true).Select(x => new MagicOnionServiceFilterDescriptor(x, x.Order)))
-                .Concat(methodInfo.GetCustomAttributes(true).OfType<IMagicOnionFilterFactory<MagicOnionFilterAttribute>>())
-                .OrderBy(x => x.Order)
-                .ToArray();
+            var filters = FilterHelper.GetFilters(handlerOptions.GlobalFilters, classType, methodInfo);
 
             // options
             this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
@@ -144,7 +135,7 @@ namespace MagicOnion.Server
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -205,7 +196,7 @@ namespace MagicOnion.Server
                         var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -250,7 +241,7 @@ namespace MagicOnion.Server
 
                         var compiledBody = Expression.Lambda(body, contextArg).Compile();
 
-                        this.methodBody = BuildMethodBodyWithFilter((Func<ServiceContext, ValueTask>)compiledBody);
+                        this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                     }
                     catch (Exception ex)
                     {
@@ -321,19 +312,6 @@ namespace MagicOnion.Server
             {
                 throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
             }
-        }
-
-        Func<ServiceContext, ValueTask> BuildMethodBodyWithFilter(Func<ServiceContext, ValueTask> methodBody)
-        {
-            Func<ServiceContext, ValueTask> next = methodBody;
-
-            foreach (var filterFactory in this.filters.Reverse())
-            {
-                var newFilter = filterFactory.CreateInstance(serviceProvider);
-                next = new InvokeHelper<ServiceContext, Func<ServiceContext, ValueTask>>(newFilter.Invoke, next).GetDelegate();
-            }
-
-            return next;
         }
 
         void BindUnaryHandler(ServiceBinderBase binder)

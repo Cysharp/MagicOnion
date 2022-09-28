@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using MagicOnion.Server.Filters;
 
 namespace MagicOnion.Server
 {
@@ -12,8 +14,8 @@ namespace MagicOnion.Server
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class FromTypeFilterAttribute : Attribute,
-        IMagicOnionFilterFactory<MagicOnionFilterAttribute>,
-        IMagicOnionFilterFactory<StreamingHubFilterAttribute>
+        IMagicOnionFilterFactory<IMagicOnionServiceFilter>,
+        IMagicOnionFilterFactory<IStreamingHubFilter>
     {
         public Type Type { get; }
 
@@ -23,8 +25,8 @@ namespace MagicOnion.Server
 
         public FromTypeFilterAttribute(Type type)
         {
-            if (!typeof(MagicOnionFilterAttribute).IsAssignableFrom(type) &&
-                !typeof(StreamingHubFilterAttribute).IsAssignableFrom(type))
+            if (!typeof(IMagicOnionServiceFilter).IsAssignableFrom(type) &&
+                !typeof(IStreamingHubFilter).IsAssignableFrom(type))
             {
                 throw new ArgumentException($"{type.FullName} doesn't inherit from MagicOnionFilterAttribute or StreamingHubFilterAttribute.", nameof(type));
             }
@@ -32,21 +34,29 @@ namespace MagicOnion.Server
             Type = type;
         }
 
-        MagicOnionFilterAttribute IMagicOnionFilterFactory<MagicOnionFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
+        IMagicOnionServiceFilter IMagicOnionFilterFactory<IMagicOnionServiceFilter>.CreateInstance(IServiceProvider serviceProvider)
         {
-            if (!typeof(MagicOnionFilterAttribute).IsAssignableFrom(Type)) throw new InvalidOperationException($"Type '{Type.FullName}' doesn't inherit from {nameof(MagicOnionFilterAttribute)}.");
-            return CreateInstance<MagicOnionFilterAttribute>(serviceProvider);
+            if (!typeof(IMagicOnionServiceFilter).IsAssignableFrom(Type)) return ThroughFilter.Instance;
+            return (IMagicOnionServiceFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
         }
 
-        StreamingHubFilterAttribute IMagicOnionFilterFactory<StreamingHubFilterAttribute>.CreateInstance(IServiceProvider serviceProvider)
+        IStreamingHubFilter IMagicOnionFilterFactory<IStreamingHubFilter>.CreateInstance(IServiceProvider serviceProvider)
         {
-            if (!typeof(StreamingHubFilterAttribute).IsAssignableFrom(Type)) throw new InvalidOperationException($"Type '{Type.FullName}' doesn't inherit from {nameof(StreamingHubFilterAttribute)}.");
-            return CreateInstance<StreamingHubFilterAttribute>(serviceProvider);
+            if (!typeof(IStreamingHubFilter).IsAssignableFrom(Type)) return ThroughFilter.Instance;
+            return (IStreamingHubFilter)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
         }
 
-        protected T CreateInstance<T>(IServiceProvider serviceProvider)
+        class ThroughFilter : IMagicOnionServiceFilter, IStreamingHubFilter
         {
-            return (T)ActivatorUtilities.CreateInstance(serviceProvider, Type, Arguments);
+            public static ThroughFilter Instance { get; } = new ThroughFilter();
+
+            private ThroughFilter() {}
+
+            public ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+                => next(context);
+
+            public ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+                => next(context);
         }
     }
 }

@@ -1,17 +1,14 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
+using MagicOnion.Server.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
-    public abstract class StreamingHubFilterAttribute : Attribute
+    public abstract class StreamingHubFilterAttribute : Attribute, IStreamingHubFilter, IMagicOnionOrderedFilter
     {
-        int order = int.MaxValue;
-        public int Order
-        {
-            get { return order; }
-            set { order = value; }
-        }
+        public int Order { get; set; } = int.MaxValue;
 
         /// <summary>
         /// This constructor used by MagicOnionEngine when register handler.

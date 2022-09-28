@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Server
+namespace MagicOnion.Server.Filters.Internal
 {
     internal class InvokeHelper<TArg1, TDelegate>
         where TDelegate : Delegate
