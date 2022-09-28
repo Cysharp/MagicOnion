@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 namespace MagicOnion.Server.HttpGateway.Swagger;

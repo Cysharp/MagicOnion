@@ -1,6 +1,5 @@
 using MagicOnion.Server.HttpGateway.Swagger.Schemas;
 using Microsoft.AspNetCore.Http;
-using System;
 
 namespace MagicOnion.Server.HttpGateway.Swagger;
 

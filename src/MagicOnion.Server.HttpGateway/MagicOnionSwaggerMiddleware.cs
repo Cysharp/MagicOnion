@@ -1,11 +1,6 @@
 using MagicOnion.Server.HttpGateway.Swagger;
-using MagicOnion.Server;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 
 namespace MagicOnion.Server.HttpGateway;

@@ -1,6 +1,5 @@
 // This definition is borrowed from Swashbuckle.
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace MagicOnion.Server.HttpGateway.Swagger.Schemas;
