@@ -7,13 +7,13 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Generator.Tests
-{
-    public class GenerateTest
-    {
-        private readonly ITestOutputHelper _testOutputHelper;
+namespace MagicOnion.Generator.Tests;
 
-        private const string MyServiceSourceCode = @"
+public class GenerateTest
+{
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    private const string MyServiceSourceCode = @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -28,17 +28,17 @@ namespace TempProject
 }
             ";
 
-        public GenerateTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
+    public GenerateTest(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
 
-        [Fact]
-        public async Task CsProjContainsAnalyzerReferenceUpdate()
+    [Fact]
+    public async Task CsProjContainsAnalyzerReferenceUpdate()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
         {
-            var options = TemporaryProjectWorkareaOptions.Default with
-            {
-                AdditionalCsProjectContent = @"
+            AdditionalCsProjectContent = @"
                    <ItemGroup>
                     <PackageReference Update=""MessagePackAnalyzer"" Version=""2.2.85"">
                       <PrivateAssets>all</PrivateAssets>
@@ -46,102 +46,101 @@ namespace TempProject
                     </PackageReference>
                   </ItemGroup>
                 ",
-            };
-            using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
-            tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task CsProjContainsAnalyzerReferenceExclude()
+    [Fact]
+    public async Task CsProjContainsAnalyzerReferenceExclude()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
         {
-            var options = TemporaryProjectWorkareaOptions.Default with
-            {
-                AdditionalCsProjectContent = @"
+            AdditionalCsProjectContent = @"
                    <ItemGroup>
                     <PackageReference Exclude=""MessagePackAnalyzer"" />
                   </ItemGroup>
                 ",
-            };
-            using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
-            tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task CsProjContainsAnalyzerReferenceRemove()
+    [Fact]
+    public async Task CsProjContainsAnalyzerReferenceRemove()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
         {
-            var options = TemporaryProjectWorkareaOptions.Default with
-            {
-                AdditionalCsProjectContent = @"
+            AdditionalCsProjectContent = @"
                    <ItemGroup>
                     <PackageReference Remove=""MessagePackAnalyzer"" />
                   </ItemGroup>
                 ",
-            };
-            using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
-            tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task CsProjTargetsNet5()
+    [Fact]
+    public async Task CsProjTargetsNet5()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
         {
-            var options = TemporaryProjectWorkareaOptions.Default with
-            {
-                TargetFramework = "net5.0",
-            };
-            using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
-            tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
+            TargetFramework = "net5.0",
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", MyServiceSourceCode);
 
-            var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(_testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
     }
 }
