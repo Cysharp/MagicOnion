@@ -9,17 +9,17 @@ namespace MagicOnion.Server.Tests;
 
 public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerSample.Program>>
 {
-    private readonly WebApplicationFactory<BasicServerSample.Program> _factory;
+    private readonly WebApplicationFactory<BasicServerSample.Program> factory;
 
     public UnaryServiceTest(WebApplicationFactory<BasicServerSample.Program> factory)
     {
-        _factory = factory;
+        this.factory = factory;
     }
 
     [Fact]
     public async Task Throw()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ThrowAsync());
@@ -29,7 +29,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task NoParameterReturnNil()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.NoParameterReturnNilAsync()).Should().Be(Nil.Default);
@@ -38,7 +38,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task NoParameterReturnValueType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.NoParameterReturnValueTypeAsync()).Should().Be(1234);
@@ -47,7 +47,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task NoParameterReturnRefType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.NoParameterReturnRefTypeAsync()).Value.Should().Be("1234");
@@ -56,7 +56,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneParameterReturnNil()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneValueTypeParameterReturnNilAsync(123)).Should().Be(Nil.Default);
@@ -65,7 +65,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneValueTypeParameterReturnValueType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneValueTypeParameterReturnValueTypeAsync(123)).Should().Be(123);
@@ -74,7 +74,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneValueTypeParameterReturnRefType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneValueTypeParameterReturnRefTypeAsync(123)).Value.Should().Be("123");
@@ -83,7 +83,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoValueTypeParametersReturnNil()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoValueTypeParametersReturnNilAsync(123, 456)).Should().Be(Nil.Default);
@@ -92,7 +92,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoValueTypeParametersReturnValueType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoValueTypeParametersReturnValueTypeAsync(123, 456)).Should().Be(123 + 456);
@@ -101,7 +101,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoValueTypeParametersReturnRefType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoValueTypeParametersReturnRefTypeAsync(123, 456)).Value.Should().Be((123 + 456).ToString());
@@ -110,7 +110,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task ReturnTypeIsNilAndNonSuccessResponse()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsNilAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
@@ -121,7 +121,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task ReturnTypeIsRefTypeAndNonSuccessResponse()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.ReturnTypeIsRefTypeAndNonSuccessResponseAsync(StatusCode.AlreadyExists));
@@ -132,7 +132,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneRefTypeParameterReturnNil()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneRefTypeParameterReturnNilAsync(new BasicServerSample.Services.MyRequest(123))).Should().Be(Nil.Default);
@@ -141,7 +141,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoRefTypeParametersReturnNil()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoRefTypeParametersReturnNilAsync(new BasicServerSample.Services.MyRequest(123), new BasicServerSample.Services.MyRequest(456))).Should().Be(Nil.Default);
@@ -150,7 +150,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneRefTypeParameterReturnValueType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneRefTypeParameterReturnValueTypeAsync(new BasicServerSample.Services.MyRequest(123))).Should().Be(123);
@@ -159,7 +159,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoRefTypeParametersReturnValueType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoRefTypeParametersReturnValueTypeAsync(new BasicServerSample.Services.MyRequest(123), new BasicServerSample.Services.MyRequest(456))).Should().Be(123 + 456);
@@ -168,7 +168,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task OneRefTypeParameterReturnRefType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.OneRefTypeParameterReturnRefTypeAsync(new BasicServerSample.Services.MyRequest(123))).Value.Should().Be("123");
@@ -177,7 +177,7 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
     [Fact]
     public async Task TwoRefTypeParametersReturnRefType()
     {
-        var httpClient = _factory.CreateDefaultClient();
+        var httpClient = factory.CreateDefaultClient();
         var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
 
         (await client.TwoRefTypeParametersReturnRefTypeAsync(new BasicServerSample.Services.MyRequest(123), new BasicServerSample.Services.MyRequest(456))).Value.Should().Be((123 + 456).ToString());

@@ -405,8 +405,8 @@ public class MoreCheckHub : StreamingHubBase<IMoreCheckHub, IEmptyReceiver>, IMo
 
 public class StreamingHubTestFilterAttribute : StreamingHubFilterAttribute
 {
-    public static bool calledBefore;
-    public static bool calledAfter;
+    public static bool CalledBefore;
+    public static bool CalledAfter;
 
     public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
     {

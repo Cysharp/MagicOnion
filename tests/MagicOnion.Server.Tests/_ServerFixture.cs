@@ -37,8 +37,8 @@ public static class RandomProvider
 
 public abstract class ServerFixture : IDisposable
 {
-    private Task _hostTask;
-    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+    private Task hostTask;
+    private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     public GrpcChannel DefaultChannel { get; private set; }
 
@@ -56,7 +56,7 @@ public abstract class ServerFixture : IDisposable
         // WORKAROUND: Use insecure HTTP/2 connections during testing.
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-        _hostTask = Host.CreateDefaultBuilder()
+        hostTask = Host.CreateDefaultBuilder()
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
@@ -81,7 +81,7 @@ public abstract class ServerFixture : IDisposable
             })
             .ConfigureServices(ConfigureServices)
             .Build()
-            .RunAsync(_cancellationTokenSource.Token);
+            .RunAsync(cancellationTokenSource.Token);
 
         DefaultChannel = GrpcChannel.ForAddress($"http://localhost:{port}");
     }
@@ -127,7 +127,7 @@ public abstract class ServerFixture : IDisposable
     {
         try { DefaultChannel.ShutdownAsync().Wait(1000); } catch { }
 
-        try { _cancellationTokenSource.Cancel(); _hostTask.Wait(); } catch { }
+        try { cancellationTokenSource.Cancel(); hostTask.Wait(); } catch { }
     }
 }
 
