@@ -5,13 +5,13 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace MagicOnion.Server.Tests.Tests
+namespace MagicOnion.Server.Tests
 {
-    public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<AuthSample.Startup>>
+    public class AuthorizeServiceTest : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<AuthSample.Startup> _factory;
+        private readonly WebApplicationFactory<Startup> _factory;
 
-        public AuthorizeServiceTest(WebApplicationFactory<AuthSample.Startup> factory)
+        public AuthorizeServiceTest(WebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
@@ -31,7 +31,7 @@ namespace MagicOnion.Server.Tests.Tests
         {
             var httpClient = _factory.CreateDefaultClient();
             var client = MagicOnionClient.Create<IAuthorizeClassService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-            var ex = (await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync()));
+            var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync());
             ex.StatusCode.Should().Be(StatusCode.Unauthenticated);
         }
 
@@ -58,7 +58,7 @@ namespace MagicOnion.Server.Tests.Tests
         {
             var httpClient = _factory.CreateDefaultClient();
             var client = MagicOnionClient.Create<IAuthorizeMethodService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
-            var ex = (await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync()));
+            var ex = await Assert.ThrowsAsync<RpcException>(async () => await client.GetUserNameAsync());
             ex.StatusCode.Should().Be(StatusCode.Unauthenticated);
         }
 

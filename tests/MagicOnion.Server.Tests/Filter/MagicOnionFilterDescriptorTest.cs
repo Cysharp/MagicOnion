@@ -7,7 +7,7 @@ using MagicOnion.Server.Filters;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicOnion.Server.Tests.Tests.Filter;
+namespace MagicOnion.Server.Tests.Filter;
 
 public class MagicOnionFilterDescriptorTest
 {
@@ -165,7 +165,7 @@ public class MagicOnionFilterDescriptorTest
         // Assert
         exception.Should().NotBeNull();
     }
-    
+
     [Fact]
     public void UnsupportedType_StreamingHub()
     {
@@ -195,13 +195,13 @@ public class MagicOnionFilterDescriptorTest
         public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceLocator) => new ServiceFilter();
         public int Order { get; set; }
     }
-    
+
     class StreamingHubFilter : IStreamingHubFilter, IMagicOnionOrderedFilter
     {
         public ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next) => next(context);
         public int Order { get; set; }
     }
-        
+
     class StreamingHubFilter_Unordered : IStreamingHubFilter
     {
         public ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next) => next(context);

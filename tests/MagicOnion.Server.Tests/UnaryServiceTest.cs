@@ -10,7 +10,7 @@ using MagicOnion.Client;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace MagicOnion.Server.Tests.Tests
+namespace MagicOnion.Server.Tests
 {
     public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerSample.Program>>
     {
