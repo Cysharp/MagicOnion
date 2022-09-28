@@ -35,33 +35,33 @@ public class ServiceContext
         }
     }
 
-    public Guid ContextId { get; private set; }
+    public Guid ContextId { get; }
 
-    public DateTime Timestamp { get; private set; }
+    public DateTime Timestamp { get; }
 
-    public Type ServiceType { get; private set; }
+    public Type ServiceType { get; }
 
-    public MethodInfo MethodInfo { get; private set; }
+    public MethodInfo MethodInfo { get; }
 
     /// <summary>Cached Attributes both service and method.</summary>
-    public ILookup<Type, Attribute> AttributeLookup { get; private set; }
+    public ILookup<Type, Attribute> AttributeLookup { get; }
 
-    public MethodType MethodType { get; private set; }
+    public MethodType MethodType { get; }
 
     /// <summary>Raw gRPC Context.</summary>
-    public ServerCallContext CallContext { get; private set; }
+    public ServerCallContext CallContext { get; }
 
     public MessagePackSerializerOptions SerializerOptions { get; private set; }
 
-    public IServiceProvider ServiceProvider { get; private set; }
+    public IServiceProvider ServiceProvider { get; }
 
     object? request;
     internal object? Request => request;
     internal IAsyncStreamReader<byte[]>? RequestStream { get; set; }
     internal IAsyncStreamWriter<byte[]>? ResponseStream { get; set; }
     internal object? Result { get; set; }
-    internal IMagicOnionLogger MagicOnionLogger { get; private set; }
-    internal MethodHandler MethodHandler { get; private set; }
+    internal IMagicOnionLogger MagicOnionLogger { get; }
+    internal MethodHandler MethodHandler { get; }
 
     // used in StreamingHub
     internal bool IsDisconnected { get; private set; }

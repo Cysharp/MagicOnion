@@ -9,12 +9,12 @@ namespace MagicOnion.Server.Hubs;
 
 public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 {
-    public string HubName { get; private set; }
-    public Type HubType { get; private set; }
-    public MethodInfo MethodInfo { get; private set; }
-    public int MethodId { get; private set; }
+    public string HubName { get; }
+    public Type HubType { get; }
+    public MethodInfo MethodInfo { get; }
+    public int MethodId { get; }
 
-    public ILookup<Type, Attribute> AttributeLookup { get; private set; }
+    public ILookup<Type, Attribute> AttributeLookup { get; }
 
     internal readonly Type RequestType;
     readonly Type? UnwrappedResponseType;

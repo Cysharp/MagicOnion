@@ -17,13 +17,13 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     int methodHandlerId = 0;
 
-    public string ServiceName { get; private set; }
-    public string MethodName { get; private set; }
-    public Type ServiceType { get; private set; }
-    public MethodInfo MethodInfo { get; private set; }
-    public MethodType MethodType { get; private set; }
+    public string ServiceName { get; }
+    public string MethodName { get; }
+    public Type ServiceType { get; }
+    public MethodInfo MethodInfo { get; }
+    public MethodType MethodType { get; }
 
-    public ILookup<Type, Attribute> AttributeLookup { get; private set; }
+    public ILookup<Type, Attribute> AttributeLookup { get; }
 
     // options
 
