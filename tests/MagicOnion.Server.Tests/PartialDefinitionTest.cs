@@ -1,12 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using Grpc.Core;
-using MagicOnion.Client;
-using MagicOnion.Server;
-using Xunit;
-using Xunit.Abstractions;
-using FluentAssertions;
-
 namespace MagicOnion.Server.Tests;
 
 // note, do not allow partial definition.

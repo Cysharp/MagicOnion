@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using MagicOnion.Server;
-using MagicOnion.Server.Hubs;
-using Xunit;
-
 namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest;
 
 public abstract class GroupTestBase

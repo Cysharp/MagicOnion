@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest;
 

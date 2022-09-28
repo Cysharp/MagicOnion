@@ -1,24 +1,12 @@
 using MagicOnion.Client;
-using MagicOnion.Server;
-using System;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using Xunit;
-using System.Linq.Expressions;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests;
 

@@ -1,14 +1,6 @@
 using Grpc.Core;
 using MagicOnion.Client;
-using MagicOnion.Server;
-using System;
-using System.Collections.Generic;
-using FluentAssertions;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Grpc.Net.Client;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Server.Tests;
