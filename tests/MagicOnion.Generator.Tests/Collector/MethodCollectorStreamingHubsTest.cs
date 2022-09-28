@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 
 namespace MagicOnion.Generator.Tests.Collector;

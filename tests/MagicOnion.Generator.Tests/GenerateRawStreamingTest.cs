@@ -1,10 +1,3 @@
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.CodeAnalysis;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Generator.Tests;

@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Generator.Tests;

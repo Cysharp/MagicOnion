@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using MagicOnion.Generator.CodeAnalysis;
 using Xunit.Abstractions;
 
