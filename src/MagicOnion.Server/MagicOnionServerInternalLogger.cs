@@ -5,14 +5,14 @@ namespace MagicOnion.Server;
 
 internal class MagicOnionServerInternalLogger
 {
-    public static ILogger Current => _logger;
+    public static ILogger Current => logger;
         
-    static ILogger _logger = NullLogger.Instance;
+    static ILogger logger = NullLogger.Instance;
 
     private MagicOnionServerInternalLogger() {}
 
     public static void SetUnderlyingLogger(ILogger? logger)
     {
-        _logger = logger ?? NullLogger.Instance;
+        MagicOnionServerInternalLogger.logger = logger ?? NullLogger.Instance;
     }
 }

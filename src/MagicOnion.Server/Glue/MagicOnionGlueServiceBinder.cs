@@ -7,11 +7,11 @@ namespace MagicOnion.Server.Glue;
 internal class MagicOnionGlueServiceBinder<TService> : ServiceBinderBase
     where TService : class
 {
-    private readonly ServiceMethodProviderContext<TService> _context;
+    private readonly ServiceMethodProviderContext<TService> context;
 
     public MagicOnionGlueServiceBinder(ServiceMethodProviderContext<TService> context)
     {
-        _context = context;
+        this.context = context;
     }
 
     private IList<object> GetMetadataFromHandler(MethodHandler methodHandler)
@@ -30,21 +30,21 @@ internal class MagicOnionGlueServiceBinder<TService> : ServiceBinderBase
 
     public override void AddMethod<TRequest, TResponse>(Method<TRequest, TResponse> method, UnaryServerMethod<TRequest, TResponse> handler)
     {
-        _context.AddUnaryMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, context) => handler(request, context));
+        context.AddUnaryMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, context) => handler(request, context));
     }
 
     public override void AddMethod<TRequest, TResponse>(Method<TRequest, TResponse> method, ClientStreamingServerMethod<TRequest, TResponse> handler)
     {
-        _context.AddClientStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, context) => handler(request, context));
+        context.AddClientStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, context) => handler(request, context));
     }
 
     public override void AddMethod<TRequest, TResponse>(Method<TRequest, TResponse> method, ServerStreamingServerMethod<TRequest, TResponse> handler)
     {
-        _context.AddServerStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, stream, context) => handler(request, stream, context));
+        context.AddServerStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, stream, context) => handler(request, stream, context));
     }
 
     public override void AddMethod<TRequest, TResponse>(Method<TRequest, TResponse> method, DuplexStreamingServerMethod<TRequest, TResponse> handler)
     {
-        _context.AddDuplexStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, stream, context) => handler(request, stream, context));
+        context.AddDuplexStreamingMethod(method, GetMetadataFromHandler(((MagicOnionServerMethod<TRequest, TResponse>)method).MagicOnionMethodHandler), (_, request, stream, context) => handler(request, stream, context));
     }
 }

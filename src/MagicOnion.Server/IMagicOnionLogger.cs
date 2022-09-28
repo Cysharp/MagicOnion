@@ -74,42 +74,42 @@ public class NullMagicOnionLogger : IMagicOnionLogger
 
 public class MagicOnionLogToLogger : IMagicOnionLogger
 {
-    readonly ILogger _logger;
+    readonly ILogger logger;
 
     public MagicOnionLogToLogger(ILogger<MagicOnionLogToLogger> logger)
     {
-        _logger = logger;
+        this.logger = logger;
     }
 
     public void BeginBuildServiceDefinition()
     {
-        _logger.LogDebug(nameof(BeginBuildServiceDefinition));
+        logger.LogDebug(nameof(BeginBuildServiceDefinition));
     }
 
     public void EndBuildServiceDefinition(double elapsed)
     {
-        _logger.LogDebug($"{nameof(EndBuildServiceDefinition)} elapsed:{elapsed}");
+        logger.LogDebug($"{nameof(EndBuildServiceDefinition)} elapsed:{elapsed}");
     }
 
     public void BeginInvokeMethod(ServiceContext context, Type type)
     {
-        _logger.LogDebug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method}");
+        logger.LogDebug($"{nameof(BeginInvokeMethod)} type:{MethodTypeToString(context.MethodType)} method:{context.CallContext.Method}");
     }
 
     public void EndInvokeMethod(ServiceContext context, Type type, double elapsed, bool isErrorOrInterrupted)
     {
         var msg = isErrorOrInterrupted ? "error" : "";
-        _logger.LogDebug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} elapsed:{elapsed} {msg}");
+        logger.LogDebug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} elapsed:{elapsed} {msg}");
     }
 
     public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
     {
-        _logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length}");
+        logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length}");
     }
 
     public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
     {
-        _logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete}");
+        logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete}");
     }
 
     // enum.ToString is slow.
@@ -132,28 +132,28 @@ public class MagicOnionLogToLogger : IMagicOnionLogger
 
     public void BeginInvokeHubMethod(StreamingHubContext context, ReadOnlyMemory<byte> request, Type type)
     {
-        _logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length}");
+        logger.LogDebug($"{nameof(BeginInvokeHubMethod)} method:{context.Path} size:{request.Length}");
 
     }
 
     public void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted)
     {
         var msg = isErrorOrInterrupted ? "error" : "";
-        _logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
+        logger.LogDebug($"{nameof(EndInvokeHubMethod)} method:{context.Path} size:{responseSize} elapsed:{elapsed} {msg}");
     }
 
     public void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount)
     {
-        _logger.LogDebug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
+        logger.LogDebug($"{nameof(InvokeHubBroadcast)} size:{responseSize} broadcastGroupCount:{broadcastGroupCount}");
     }
 
     public void Error(Exception ex, ServerCallContext context)
     {
-        _logger.LogError(ex, "MagicOnionHandler throws exception occured in " + context.Method);
+        logger.LogError(ex, "MagicOnionHandler throws exception occured in " + context.Method);
     }
     public void Error(Exception ex, StreamingHubContext context)
     {
-        _logger.LogError(ex, "Hub Method Handler throws exception occured in " + context.Path);
+        logger.LogError(ex, "Hub Method Handler throws exception occured in " + context.Path);
     }
 }
 
