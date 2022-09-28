@@ -1,6 +1,5 @@
 using MessagePack;
 using MessagePack.Formatters;
-using System;
 using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Server.Redis;

@@ -1,5 +1,4 @@
 using StackExchange.Redis;
-using System;
 
 namespace MagicOnion.Server.Redis;
 
