@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Server.Filters;

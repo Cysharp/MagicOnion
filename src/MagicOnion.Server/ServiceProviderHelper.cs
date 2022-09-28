@@ -1,5 +1,3 @@
-using System;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server;

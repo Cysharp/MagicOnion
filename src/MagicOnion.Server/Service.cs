@@ -1,8 +1,5 @@
 using Grpc.Core;
 using MessagePack;
-using System;
-using System.Threading;
-using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 

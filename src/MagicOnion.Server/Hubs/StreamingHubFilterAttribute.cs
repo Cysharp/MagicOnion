@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
 using MagicOnion.Server.Filters;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs;
 

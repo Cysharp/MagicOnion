@@ -1,12 +1,7 @@
 using Grpc.Core;
 using MessagePack;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using MagicOnion.Utils;
 using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http.Features;
 
 namespace MagicOnion.Server.Hubs;

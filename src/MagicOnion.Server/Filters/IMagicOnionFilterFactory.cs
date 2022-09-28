@@ -1,5 +1,3 @@
-using System;
-
 namespace MagicOnion.Server.Filters;
 
 /// <summary>

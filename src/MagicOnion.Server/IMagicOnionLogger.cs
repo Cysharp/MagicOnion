@@ -3,7 +3,6 @@ using MagicOnion.Server.Hubs;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using System;
 using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;

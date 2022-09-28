@@ -1,6 +1,4 @@
-using MagicOnion.Utils;
-using System;
-using System.Collections.Generic;
+﻿using MagicOnion.Utils;
 
 namespace MagicOnion.Server.Hubs;
 
