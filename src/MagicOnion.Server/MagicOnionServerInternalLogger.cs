@@ -9,7 +9,7 @@ internal class MagicOnionServerInternalLogger
         
     static ILogger logger = NullLogger.Instance;
 
-    private MagicOnionServerInternalLogger() {}
+    MagicOnionServerInternalLogger() {}
 
     public static void SetUnderlyingLogger(ILogger? logger)
     {

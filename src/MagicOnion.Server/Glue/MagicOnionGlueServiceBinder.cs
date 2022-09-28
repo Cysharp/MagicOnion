@@ -7,14 +7,14 @@ namespace MagicOnion.Server.Glue;
 internal class MagicOnionGlueServiceBinder<TService> : ServiceBinderBase
     where TService : class
 {
-    private readonly ServiceMethodProviderContext<TService> context;
+    readonly ServiceMethodProviderContext<TService> context;
 
     public MagicOnionGlueServiceBinder(ServiceMethodProviderContext<TService> context)
     {
         this.context = context;
     }
 
-    private IList<object> GetMetadataFromHandler(MethodHandler methodHandler)
+    IList<object> GetMetadataFromHandler(MethodHandler methodHandler)
     {
         var serviceType = methodHandler.ServiceType;
 

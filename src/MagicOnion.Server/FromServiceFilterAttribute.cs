@@ -43,7 +43,7 @@ public class FromServiceFilterAttribute : Attribute,
     {
         public static ThroughFilter Instance { get; } = new ThroughFilter();
 
-        private ThroughFilter() {}
+        ThroughFilter() {}
 
         public ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
             => next(context);

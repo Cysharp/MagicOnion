@@ -11,7 +11,7 @@ internal class InvokeHelper<TArg1, TDelegate>
     public Func<TArg1, TDelegate, ValueTask> Invoke;
     public TDelegate Next;
 
-    private static readonly Func<InvokeHelper<TArg1, TDelegate>, TDelegate> InvokeNextFactory;
+    static readonly Func<InvokeHelper<TArg1, TDelegate>, TDelegate> InvokeNextFactory;
 
     static InvokeHelper()
     {
@@ -62,7 +62,7 @@ internal class InvokeHelper<TArg1, TDelegate>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [DebuggerHidden]
-    private ValueTask InvokeNext(TArg1 arg1) => Invoke(arg1, Next);
+    ValueTask InvokeNext(TArg1 arg1) => Invoke(arg1, Next);
 
     public TDelegate GetDelegate() => InvokeNextFactory(this);
 }

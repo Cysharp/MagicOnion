@@ -29,7 +29,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
     static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
         .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
 
-    private static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
+    static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
     {
         var mapping = targetType.GetInterfaceMap(interfaceType);
         var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);

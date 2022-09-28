@@ -32,7 +32,7 @@ public static class MagicOnionServicesExtensions
         return services.AddMagicOnionCore(configureOptions);
     }
 
-    private static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
+    static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
     {
         var configName = Options.Options.DefaultName;
         var glueServiceType = MagicOnionGlueService.CreateType();

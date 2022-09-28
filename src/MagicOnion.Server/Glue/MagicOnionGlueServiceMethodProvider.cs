@@ -5,7 +5,7 @@ namespace MagicOnion.Server.Glue;
 internal class MagicOnionGlueServiceMethodProvider<TService> : IServiceMethodProvider<TService>
     where TService : class
 {
-    private readonly MagicOnionServiceDefinition magicOnionServiceDefinition;
+    readonly MagicOnionServiceDefinition magicOnionServiceDefinition;
 
     public MagicOnionGlueServiceMethodProvider(MagicOnionServiceDefinition magicOnionServerServiceDefinition)
     {
