@@ -10,13 +10,13 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace MagicOnion.Server.Tests.Tests
+namespace MagicOnion.Server.Tests
 {
-    public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<AuthSample.Startup>>, IAuthorizeHubReceiver
+    public class AuthorizeStreamingHubTest : IClassFixture<WebApplicationFactory<Startup>>, IAuthorizeHubReceiver
     {
-        private readonly WebApplicationFactory<AuthSample.Startup> _factory;
+        private readonly WebApplicationFactory<Startup> _factory;
 
-        public AuthorizeStreamingHubTest(WebApplicationFactory<AuthSample.Startup> factory)
+        public AuthorizeStreamingHubTest(WebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }

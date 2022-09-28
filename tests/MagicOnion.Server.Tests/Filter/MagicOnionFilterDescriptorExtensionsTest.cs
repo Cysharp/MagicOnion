@@ -7,7 +7,7 @@ using MagicOnion.Server.Filters;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicOnion.Server.Tests.Tests.Filter;
+namespace MagicOnion.Server.Tests.Filter;
 
 public class MagicOnionFilterDescriptorExtensionsTest
 {
@@ -120,7 +120,7 @@ public class MagicOnionFilterDescriptorExtensionsTest
 
         public int Order { get; }
     }
-    
+
     class StreamingHubFilterFactory : IMagicOnionFilterFactory<IStreamingHubFilter>
     {
         public IStreamingHubFilter CreateInstance(IServiceProvider serviceLocator)

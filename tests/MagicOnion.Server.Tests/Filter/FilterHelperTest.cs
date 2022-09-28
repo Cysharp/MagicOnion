@@ -4,7 +4,7 @@ using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicOnion.Server.Tests.Tests.Filter;
+namespace MagicOnion.Server.Tests.Filter;
 
 public class FilterHelperTest
 {
@@ -15,7 +15,7 @@ public class FilterHelperTest
         var globalFilters = new List<MagicOnionServiceFilterDescriptor>();
         globalFilters.Add(new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("Global.Instance")));
         globalFilters.Add(new MagicOnionServiceFilterDescriptor(typeof(TestFilterAttribute)));
-        
+
         var methodInfo = new TestService().Method;
 
         // Act
@@ -57,7 +57,7 @@ public class FilterHelperTest
         filters[0].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
         filters[1].Filter.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
     }
-    
+
     [Fact]
     public void GetFilters_Service_IgnoreUnknownFilter()
     {
@@ -96,7 +96,7 @@ public class FilterHelperTest
             "Unordered.1", "Unordered.2", "Unordered.3", "Unordered.4", "Unordered.5", "Unordered.6"
         });
     }
-    
+
     [Fact]
     public void GetFilters_Service_LegacyCompatAttributeFactory()
     {
@@ -125,7 +125,7 @@ public class FilterHelperTest
         [MetadataOnlyFilter]
         public UnaryResult<int> UnknownFilterMethod() => default;
     }
-    
+
     [TestFilter("Unordered.3")]
     [TestFilter("64", Order = 64)]
     [TestFilter("-256", Order = -256)]
@@ -140,7 +140,7 @@ public class FilterHelperTest
     }
 
     class MetadataOnlyFilterAttribute : Attribute, IMagicOnionFilterMetadata
-    {}
+    { }
 
     class TestFilterAttribute : MagicOnionFilterAttribute
     {
@@ -183,7 +183,7 @@ public class FilterHelperTest
         var globalFilters = new List<StreamingHubFilterDescriptor>();
         globalFilters.Add(new StreamingHubFilterDescriptor(new TestHubFilterAttribute("Global.Instance")));
         globalFilters.Add(new StreamingHubFilterDescriptor(typeof(TestHubFilterAttribute)));
-        
+
         var methodInfo = new TestHub().Method;
 
         // Act
@@ -225,7 +225,7 @@ public class FilterHelperTest
         filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
         filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Method");
     }
-    
+
     [Fact]
     public void GetFilters_StreamingHub_IgnoreUnknownFilter()
     {
@@ -239,7 +239,7 @@ public class FilterHelperTest
         filters.Should().HaveCount(1);
         filters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
     }
-    
+
     [Fact]
     public void GetFilters_StreamingHub_Dual()
     {
@@ -256,7 +256,7 @@ public class FilterHelperTest
         streamingHubFilters.Should().HaveCount(1);
         streamingHubFilters[0].Filter.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Attribute.Class");
     }
-       
+
     [Fact]
     public void GetFilters_StreamingHub_Order()
     {
@@ -320,7 +320,7 @@ public class FilterHelperTest
 
         public Task<int> NoFilteredMethod() => default;
     }
-    
+
     [TestHubFilter("Unordered.3")]
     [TestHubFilter("64", Order = 64)]
     [TestHubFilter("-256", Order = -256)]
@@ -335,7 +335,7 @@ public class FilterHelperTest
     }
 
     class MetadataOnlyHubFilterAttribute : Attribute, IMagicOnionFilterMetadata
-    {}
+    { }
 
     class LegacyHubFilterFactory : IMagicOnionFilterFactory<StreamingHubFilterAttribute>
     {
@@ -370,7 +370,7 @@ public class FilterHelperTest
 
         public override ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next) => default;
     }
-    
+
     [Fact]
     public void CreateOrGetInstance_Service_FromType()
     {
@@ -379,13 +379,13 @@ public class FilterHelperTest
         var filterDesc = new MagicOnionServiceFilterDescriptor(typeof(TestFilterAttribute));
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IMagicOnionServiceFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
         instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Unnamed");
     }
-    
+
     [Fact]
     public void CreateOrGetInstance_Service_SingletonInstance()
     {
@@ -394,14 +394,14 @@ public class FilterHelperTest
         var filterDesc = new MagicOnionServiceFilterDescriptor(new TestFilterAttribute("Instantiated"));
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IMagicOnionServiceFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
         instance.Should().Be(filterDesc.Filter);
         instance.Should().BeOfType<TestFilterAttribute>().Which.Name.Should().Be("Instantiated");
     }
-        
+
     [Fact]
     public void CreateOrGetInstance_Service_Factory()
     {
@@ -412,7 +412,7 @@ public class FilterHelperTest
         var filterDesc = new MagicOnionServiceFilterDescriptor(new TestServiceFilterFactory());
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IMagicOnionServiceFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
@@ -429,7 +429,7 @@ public class FilterHelperTest
         var filterDesc = new MagicOnionServiceFilterDescriptor(new TestServiceFilterLegacyFactory()); /* IMagicOnionFilterFactory<MagicOnionFilterAttribute> */
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IMagicOnionServiceFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
@@ -455,7 +455,7 @@ public class FilterHelperTest
 
         public int Order { get; }
     }
-        
+
     [Fact]
     public void CreateOrGetInstance_StreamingHub_FromType()
     {
@@ -464,13 +464,13 @@ public class FilterHelperTest
         var filterDesc = new StreamingHubFilterDescriptor(typeof(TestHubFilterAttribute));
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IStreamingHubFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
         instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Unnamed");
     }
-    
+
     [Fact]
     public void CreateOrGetInstance_StreamingHub_SingletonInstance()
     {
@@ -479,14 +479,14 @@ public class FilterHelperTest
         var filterDesc = new StreamingHubFilterDescriptor(new TestHubFilterAttribute("Instantiated"));
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IStreamingHubFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
         instance.Should().Be(filterDesc.Filter);
         instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("Instantiated");
     }
-        
+
     [Fact]
     public void CreateOrGetInstance_StreamingHub_Factory()
     {
@@ -497,13 +497,13 @@ public class FilterHelperTest
         var filterDesc = new StreamingHubFilterDescriptor(new TestStreamingHubFilterFactory());
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IStreamingHubFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
         instance.Should().BeOfType<TestHubFilterAttribute>().Which.Name.Should().Be("ValueFromServiceProvider");
     }
-       
+
     [Fact]
     public void CreateOrGetInstance_StreamingHub_Factory_Legacy()
     {
@@ -514,7 +514,7 @@ public class FilterHelperTest
         var filterDesc = new StreamingHubFilterDescriptor(new TestStreamingHubLegacyFilterFactory()); /* IMagicOnionFilterFactory<StreamingHubFilterAttribute> */
 
         // Act
-        var instance = FilterHelper.CreateOrGetInstance<IStreamingHubFilter>(serviceProvider, filterDesc);
+        var instance = FilterHelper.CreateOrGetInstance(serviceProvider, filterDesc);
 
         // Assert
         instance.Should().NotBeNull();
@@ -530,7 +530,7 @@ public class FilterHelperTest
 
         public int Order { get; }
     }
-    
+
     class TestStreamingHubLegacyFilterFactory : IMagicOnionFilterFactory<StreamingHubFilterAttribute>
     {
         public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceLocator)
@@ -540,7 +540,7 @@ public class FilterHelperTest
 
         public int Order { get; }
     }
-    
+
     [Fact]
     public async Task WrapMethodBodyWithFilter_Activate_Service()
     {
@@ -589,7 +589,7 @@ public class FilterHelperTest
 
         public int Order { get; }
     }
-    
+
     [Fact]
     public async Task WrapMethodBodyWithFilter_Activate_StreamingHub()
     {
@@ -686,7 +686,7 @@ public class FilterHelperTest
         public ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
             => func(context, next);
     }
-    
+
     [Fact]
     public async Task WrapMethodBodyWithFilter_Surround_StreamingHub()
     {
