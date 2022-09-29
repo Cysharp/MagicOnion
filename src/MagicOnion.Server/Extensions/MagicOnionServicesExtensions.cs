@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Glue;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;

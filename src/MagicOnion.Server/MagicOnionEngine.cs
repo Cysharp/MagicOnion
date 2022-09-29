@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Microsoft.Extensions.DependencyInjection;
+using MagicOnion.Server.Diagnostics;
 
 namespace MagicOnion.Server;
 

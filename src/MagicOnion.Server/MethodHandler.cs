@@ -7,6 +7,7 @@ using MagicOnion.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
+using MagicOnion.Server.Diagnostics;
 
 namespace MagicOnion.Server;
 
