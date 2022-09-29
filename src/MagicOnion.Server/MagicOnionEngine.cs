@@ -82,7 +82,11 @@ public static class MagicOnionEngine
             {
                 try
                 {
-                    return x.GetTypes();
+                    return x.GetTypes()
+                        .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
+                        .Where(x => !x.GetTypeInfo().IsAbstract)
+                        .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
+                        .Where(x => x.IsPublic);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
@@ -107,20 +111,15 @@ public static class MagicOnionEngine
         var handlers = new HashSet<MethodHandler>();
         var streamingHubHandlers = new List<StreamingHubHandler>();
 
-        var types = targetTypes
-            .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
-            .Where(x => !x.GetTypeInfo().IsAbstract)
-            .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
-            .Where(x => x.IsPublic)
-            .ToArray();
-
         logger.BeginBuildServiceDefinition();
         var sw = Stopwatch.StartNew();
 
         try
         {
-            foreach (var classType in types)
+            foreach (var classType in targetTypes)
             {
+                VerifyServiceType(classType);
+
                 var className = classType.Name;
                 if (!classType.GetConstructors().Any(x => x.GetParameters().Length == 0))
                 {
@@ -225,5 +224,29 @@ public static class MagicOnionEngine
         logger.EndBuildServiceDefinition(sw.Elapsed.TotalMilliseconds);
 
         return result;
+    }
+
+    internal static void VerifyServiceType(Type type)
+    {
+        if (!typeof(IServiceMarker).IsAssignableFrom(type))
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' is not marked as MagicOnion service or hub.");
+        }
+        if (!type.GetInterfaces().Any(x => x.IsGenericType && (x.GetGenericTypeDefinition() == typeof(IService<>) || x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>))))
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' has no implementation for Service or StreamingHub");
+        }
+        if (type.IsAbstract)
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' is abstract. A service type must be non-abstract class.");
+        }
+        if (type.IsInterface)
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' is interface. A service type must be class.");
+        }
+        if (type.IsGenericType && type.IsGenericTypeDefinition)
+        {
+            throw new InvalidOperationException($"Type '{type.FullName}' is generic type definition. A service type must be plain or constructed-generic class.");
+        }
     }
 }

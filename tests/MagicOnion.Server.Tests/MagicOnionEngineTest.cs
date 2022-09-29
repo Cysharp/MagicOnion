@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using MagicOnion.Server.Hubs;
 using MagicOnionEngineTest;
+using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Tests;
@@ -22,6 +23,23 @@ public class MagicOnionEngineTest
         // Assert
         def.MethodHandlers.Should().BeEmpty();
         def.StreamingHubHandlers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CollectFromTypes_NonService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var types = new Type[]{ typeof(NonService) };
+        var options = new MagicOnionOptions();
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
     }
 
     [Fact]
@@ -129,5 +147,95 @@ public class MagicOnionEngineTest
         // Assert
         def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Abstract"));
         def.StreamingHubHandlers.Should().NotContain(x => x.HubName.Contains("Abstract"));
+    }
+    
+    [Fact]
+    public void VerifyServiceType_Service()
+    {
+        // Arrange
+        var type = typeof(MyService);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().BeNull();
+    }
+
+    [Fact]
+    public void VerifyServiceType_Hub()
+    {
+        // Arrange
+        var type = typeof(MyHub);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().BeNull();
+    }
+
+    [Fact]
+    public void VerifyServiceType_Abstract()
+    {
+        // Arrange
+        var type = typeof(MyAbstractService);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void VerifyServiceType_Interface()
+    {
+        // Arrange
+        var type = typeof(IMyService);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void VerifyServiceType_NonService()
+    {
+        // Arrange
+        var type = typeof(NonService);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void VerifyServiceType_GenericDefinition()
+    {
+        // Arrange
+        var type = typeof(GenericService<>);
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.VerifyServiceType(type));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
+
+    class NonService : IServiceMarker {}
+
+    class GenericService<T> : ServiceBase<IMyService>, IMyService
+    {
+        public UnaryResult<Nil> MethodA() => default;
+        public UnaryResult<Nil> MethodB() => default;
     }
 }
