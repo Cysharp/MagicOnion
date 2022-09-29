@@ -91,8 +91,8 @@ public class MagicOnionEngineTest
         var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
 
         // Assert
-        def.MethodHandlers.Should().HaveCount(3); // MyHub.Connect, MyService.MethodA, MyService.MethodB
-        def.StreamingHubHandlers.Should().HaveCount(2); // MyHub.MethodA, MyHub.MethodB
+        def.MethodHandlers.Should().HaveCount(6); // IMyHub.Connect, IMyService.MethodA, IMyService.MethodB, IMyGenericsHub.Connect, IMyGenericsService.MethodA, IMyGenericsService.MethodB
+        def.StreamingHubHandlers.Should().HaveCount(4); // IMyHub.MethodA, IMyHub.MethodB, IMyGenericsHub.MethodA, IMyGenericsHub.MethodB
     }
     
     [Fact]
