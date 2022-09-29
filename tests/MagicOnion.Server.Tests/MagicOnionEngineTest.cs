@@ -148,6 +148,80 @@ public class MagicOnionEngineTest
         def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Abstract"));
         def.StreamingHubHandlers.Should().NotContain(x => x.HubName.Contains("Abstract"));
     }
+
+    [Fact]
+    public void CollectFromAssembly_Generic_Constructed()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
+        var serviceProvider = services.BuildServiceProvider();
+        var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
+        var options = new MagicOnionOptions();
+
+        // Act
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+
+        // Assert
+        def.MethodHandlers.Should().Contain(x => x.ServiceType == typeof(MyConstructedGenericsService));
+        def.StreamingHubHandlers.Should().Contain(x => x.HubType == typeof(MyConstructedGenericsHub));
+    }
+    
+    [Fact]
+    public void CollectFromAssembly_Generic_Definitions()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
+        var serviceProvider = services.BuildServiceProvider();
+        var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
+        var options = new MagicOnionOptions();
+
+        // Act
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+
+        // Assert
+        def.MethodHandlers.Should().NotContain(x => x.ServiceType.Name.Contains("GenericsDefinition"));
+        def.StreamingHubHandlers.Should().NotContain(x => x.HubType.Name.Contains("GenericsDefinition"));
+        def.MethodHandlers.Should().NotContain(x => x.ServiceType.IsGenericTypeDefinition);
+        def.StreamingHubHandlers.Should().NotContain(x => x.HubType.IsGenericTypeDefinition);
+    }
+    
+    [Fact]
+    public void CollectHandlers_Duplicated_Service()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
+        var serviceProvider = services.BuildServiceProvider();
+        var types = new Type[]{ typeof(MyService), typeof(MyService) };
+        var options = new MagicOnionOptions();
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void CollectHandlers_Duplicated_Hub()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
+        var serviceProvider = services.BuildServiceProvider();
+        var types = new Type[]{ typeof(MyHub), typeof(MyHub) };
+        var options = new MagicOnionOptions();
+
+        // Act
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex.Should().BeOfType<InvalidOperationException>();
+    }
     
     [Fact]
     public void VerifyServiceType_Service()
