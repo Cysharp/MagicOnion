@@ -1,3 +1,4 @@
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MessagePack;
 using Microsoft.Extensions.Options;

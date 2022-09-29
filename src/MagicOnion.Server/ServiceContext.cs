@@ -1,4 +1,5 @@
 using Grpc.Core;
+using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Reflection;

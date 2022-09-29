@@ -1,4 +1,5 @@
 using System.Reflection;
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MagicOnionEngineTest;
 using MessagePack;
