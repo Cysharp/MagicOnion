@@ -14,9 +14,10 @@ public static class MagicOnionEngine
     /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
     /// <param name="isReturnExceptionStackTraceInErrorDetail">If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</param>
     /// <returns></returns>
-    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, bool isReturnExceptionStackTraceInErrorDetail = false)
+    /// <param name="logger">The logger for MagicOnion server</param>
+    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isReturnExceptionStackTraceInErrorDetail = false)
     {
-        return BuildServerServiceDefinition(serviceProvider, new MagicOnionOptions() { IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail });
+        return BuildServerServiceDefinition(serviceProvider, new MagicOnionOptions() { IsReturnExceptionStackTraceInErrorDetail = isReturnExceptionStackTraceInErrorDetail }, logger);
     }
 
     /// <summary>
@@ -24,7 +25,8 @@ public static class MagicOnionEngine
     /// </summary>
     /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
     /// <param name="options">The options for MagicOnion server</param>
-    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options)
+    /// <param name="logger">The logger for MagicOnion server</param>
+    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options, IMagicOnionLogger logger)
     {
         // NOTE: Exclude well-known system assemblies from automatic discovery of services.
         var wellKnownIgnoreAssemblies = new[]
@@ -63,7 +65,7 @@ public static class MagicOnionEngine
             })
             .ToArray();
 
-        return BuildServerServiceDefinition(serviceProvider, assemblies, options);
+        return BuildServerServiceDefinition(serviceProvider, assemblies, options, logger);
     }
 
     /// <summary>
@@ -72,7 +74,8 @@ public static class MagicOnionEngine
     /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
     /// <param name="searchAssemblies">The assemblies to be search for services</param>
     /// <param name="options">The options for MagicOnion server</param>
-    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions options)
+    /// <param name="logger">The logger for MagicOnion server</param>
+    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions options, IMagicOnionLogger logger)
     {
         var types = searchAssemblies
             .SelectMany(x =>
@@ -88,7 +91,7 @@ public static class MagicOnionEngine
             });
 
 #pragma warning disable CS8620 // Argument of type cannot be used for parameter of type in due to differences in the nullability of reference types.
-        return BuildServerServiceDefinition(serviceProvider, types, options);
+        return BuildServerServiceDefinition(serviceProvider, types, options, logger);
 #pragma warning restore CS8620 // Argument of type cannot be used for parameter of type in due to differences in the nullability of reference types.
     }
 
@@ -98,7 +101,8 @@ public static class MagicOnionEngine
     /// <param name="serviceProvider">The service provider is used to resolve dependencies</param>
     /// <param name="targetTypes">The types to be search for services</param>
     /// <param name="options">The options for MagicOnion server</param>
-    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable<Type> targetTypes, MagicOnionOptions options)
+    /// <param name="logger">The logger for MagicOnion server</param>
+    public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable<Type> targetTypes, MagicOnionOptions options, IMagicOnionLogger logger)
     {
         var handlers = new HashSet<MethodHandler>();
         var streamingHubHandlers = new List<StreamingHubHandler>();
@@ -107,9 +111,9 @@ public static class MagicOnionEngine
             .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
             .Where(x => !x.GetTypeInfo().IsAbstract)
             .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
+            .Where(x => x.IsPublic)
             .ToArray();
 
-        var logger = serviceProvider.GetRequiredService<IMagicOnionLogger>();
         logger.BeginBuildServiceDefinition();
         var sw = Stopwatch.StartNew();
 
@@ -178,7 +182,7 @@ public static class MagicOnionEngine
                     else
                     {
                         // create handler
-                        var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(options), serviceProvider);
+                        var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(options), serviceProvider, logger);
                         if (!handlers.Add(handler))
                         {
                             throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
@@ -188,7 +192,7 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", new MethodHandlerOptions(options), serviceProvider);
+                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", new MethodHandlerOptions(options), serviceProvider, logger);
                     if (!handlers.Add(connectHandler))
                     {
                         throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
