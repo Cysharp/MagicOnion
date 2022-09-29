@@ -46,7 +46,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
     static readonly MethodInfo createService = typeof(ServiceProviderHelper).GetMethod(nameof(ServiceProviderHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
 
-    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider)
+    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger)
     {
         this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
 
@@ -80,7 +80,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
         // options
         this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
-        this.logger = serviceProvider.GetRequiredService<IMagicOnionLogger>();
+        this.logger = logger;
         this.enableCurrentContext = handlerOptions.EnableCurrentContext;
 
         // prepare lambda parameters
