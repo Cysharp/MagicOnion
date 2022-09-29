@@ -84,9 +84,8 @@ public static class MagicOnionEngine
                 {
                     return x.GetTypes()
                         .Where(x => typeof(IServiceMarker).IsAssignableFrom(x))
-                        .Where(x => !x.GetTypeInfo().IsAbstract)
                         .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
-                        .Where(x => x.IsPublic);
+                        .Where(x => x.IsPublic && !x.IsAbstract && !x.IsGenericTypeDefinition);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
