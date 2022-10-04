@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using MagicOnion.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Diagnostics;
@@ -14,10 +13,24 @@ namespace MagicOnion.Server;
 
 public class MethodHandler : IEquatable<MethodHandler>
 {
-    static int methodHandlerIdBuild = 0;
-    static readonly byte[] emptyBytes = new byte[0];
+    // reflection cache
+    static readonly MethodInfo createService = typeof(ServiceProviderHelper).GetMethod(nameof(ServiceProviderHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
 
-    int methodHandlerId = 0;
+    static int methodHandlerIdBuild = 0;
+
+    readonly int methodHandlerId = 0;
+
+    readonly bool isStreamingHub;
+    readonly MessagePackSerializerOptions serializerOptions;
+    readonly bool responseIsTask;
+
+    readonly Func<ServiceContext, ValueTask> methodBody;
+    
+    // options
+
+    internal readonly bool isReturnExceptionStackTraceInErrorDetail;
+    internal readonly IMagicOnionLogger logger;
+    readonly bool enableCurrentContext;
 
     public string ServiceName { get; }
     public string MethodName { get; }
@@ -27,27 +40,10 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     public ILookup<Type, Attribute> AttributeLookup { get; }
 
-    // options
-
-    internal readonly bool isReturnExceptionStackTraceInErrorDetail;
-    internal readonly IMagicOnionLogger logger;
-    readonly bool enableCurrentContext;
-
     // use for request handling.
 
     public readonly Type RequestType;
     public readonly Type UnwrappedResponseType;
-
-    readonly bool isStreamingHub;
-    readonly MessagePackSerializerOptions serializerOptions;
-    readonly bool responseIsTask;
-
-    readonly Func<ServiceContext, ValueTask> methodBody;
-
-    // reflection cache
-    static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
-        .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
-    static readonly MethodInfo createService = typeof(ServiceProviderHelper).GetMethod(nameof(ServiceProviderHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
 
     public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)
     {
@@ -95,6 +91,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         switch (MethodType)
         {
             case MethodType.Unary:
+            case MethodType.ServerStreaming:
                 // (ServiceContext context) =>
                 // {
                 //      var request = (TRequest)context.Request;
@@ -125,71 +122,19 @@ public class MethodHandler : IEquatable<MethodHandler>
 
                     var callBody = Expression.Call(instance, methodInfo, arguments);
 
-                    var finalMethod = (responseIsTask)
-                        ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType)
-                        : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType);
-                    callBody = Expression.Call(finalMethod, callBody, contextArg);
-
-                    var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
-                    var compiledBody = Expression.Lambda(body, contextArg).Compile();
-
-                    this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
-                }
-                break;
-            case MethodType.ServerStreaming:
-                // (ServiceContext context) =>
-                // {
-                //      var request = MessagePackSerializer.Deserialize<T>(new ReadOnlyMemory<byte>((byte[])context.Request), context.SerializerOptions, default);
-                //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
-                //      return MethodHandlerResultHelper.SetUnaryResult(result, context);
-                // };
-
-                try
-                {
-                    var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                    var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
-                    var requestArg = Expression.Parameter(RequestType, "request");
-                    var getSerializerOptions = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("SerializerOptions", flags)!);
-                    var defaultToken = Expression.Default(typeof(CancellationToken));
-
-                    var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)!);
-                    var requestContent = Expression.Convert(contextRequest, typeof(byte[]));
-                    var requestContentRom = Expression.New(typeof(ReadOnlyMemory<byte>).GetConstructor(new[] { typeof(byte[]) })!, requestContent);
-
-                    var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), requestContentRom, getSerializerOptions, defaultToken);
-                    var assignRequest = Expression.Assign(requestArg, callDeserialize);
-
-                    Expression[] arguments = new Expression[parameters.Length];
-                    if (parameters.Length == 1)
+                    if (MethodType == MethodType.ServerStreaming)
                     {
-                        arguments[0] = requestArg;
+                        var finalMethod = (responseIsTask)
+                            ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!.MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]) // Task<ServerStreamingResult<TResponse>>
+                            : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!.MakeGenericMethod(MethodInfo.ReturnType); // ServerStreamingResult<TResponse>
+                        callBody = Expression.Call(finalMethod, callBody);
                     }
                     else
                     {
-                        for (int i = 0; i < parameters.Length; i++)
-                        {
-                            arguments[i] = Expression.Field(requestArg, "Item" + (i + 1));
-                        }
-                    }
-
-                    var callBody = Expression.Call(instance, methodInfo, arguments);
-
-                    if (!responseIsTask)
-                    {
-                        callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                            .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!
-                            .MakeGenericMethod(MethodInfo.ReturnType), callBody);
-                    }
-                    else
-                    {
-                        callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                            .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!
-                            .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), callBody);
+                        var finalMethod = (responseIsTask)
+                            ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType)
+                            : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType);
+                        callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
 
                     var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
@@ -701,8 +646,7 @@ internal class MethodHandlerResultHelper
     {
         if (result.hasRawValue)
         {
-            var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
-            context.Result = bytes;
+            context.Result = result.rawValue;
         }
 
         return default(ValueTask);
@@ -713,8 +657,7 @@ internal class MethodHandlerResultHelper
         var result = await taskResult.ConfigureAwait(false);
         if (result.hasRawValue)
         {
-            var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
-            context.Result = bytes;
+            context.Result = result.rawValue;
         }
     }
 }
