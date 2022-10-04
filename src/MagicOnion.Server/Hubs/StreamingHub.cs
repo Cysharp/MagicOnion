@@ -19,7 +19,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
-    protected Guid ConnectionId { get { return Context.ContextId; } }
+    internal StreamingServiceContext<byte[], byte[]> StreamingServiceContext
+        => (StreamingServiceContext<byte[], byte[]>)Context;
+
+    protected Guid ConnectionId
+        => Context.ContextId;
 
     // Broadcast Commands
 
@@ -122,7 +126,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         finally
         {
-            Context.CompleteStreamingHub();
+            StreamingServiceContext.CompleteStreamingHub();
             await OnDisconnected();
             await this.Group.DisposeAsync();
         }
@@ -133,8 +137,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     async Task HandleMessageAsync()
     {
         var ct = Context.CallContext.CancellationToken;
-        var reader = Context.RequestStream!;
-        var writer = Context.ResponseStream!;
+        var reader = StreamingServiceContext.RequestStream!;
+        var writer = StreamingServiceContext.ResponseStream!;
 
         // Send a hint to the client to start sending messages.
         // The client can read the response headers before any StreamingHub's message.
@@ -204,7 +208,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     {
                         SerializerOptions = handler.serializerOptions,
                         HubInstance = this,
-                        ServiceContext = Context,
+                        ServiceContext = (IStreamingServiceContext<byte[], byte[]>)Context,
                         Request = new ArraySegment<byte>(data, offset, data.Length - offset),
                         Path = handler.ToString(),
                         MethodId = handler.MethodId,
@@ -241,7 +245,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     {
                         SerializerOptions = handler.serializerOptions,
                         HubInstance = this,
-                        ServiceContext = Context,
+                        ServiceContext = (IStreamingServiceContext<byte[], byte[]>)Context,
                         Request = new ArraySegment<byte>(data, offset, data.Length - offset),
                         Path = handler.ToString(),
                         MethodId = handler.MethodId,

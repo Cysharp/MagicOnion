@@ -34,14 +34,14 @@ public class MagicOnionLogToLogger : IMagicOnionLogger
         logger.LogDebug($"{nameof(EndInvokeMethod)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} elapsed:{elapsed} {msg}");
     }
 
-    public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
+    public void WriteToStream(ServiceContext context, Type type)
     {
-        logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{writeData.Length}");
+        logger.LogDebug($"{nameof(WriteToStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method}");
     }
 
-    public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
+    public void ReadFromStream(ServiceContext context, Type type, bool complete)
     {
-        logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} size:{readData.Length} complete:{complete}");
+        logger.LogDebug($"{nameof(ReadFromStream)} type:{MethodTypeToString(context.MethodType)}  method:{context.CallContext.Method} complete:{complete}");
     }
 
     // enum.ToString is slow.

@@ -46,21 +46,15 @@ public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterfac
 
     [Ignore]
     public ClientStreamingContext<TRequest, TResponse> GetClientStreamingContext<TRequest, TResponse>()
-    {
-        return new ClientStreamingContext<TRequest, TResponse>(Context);
-    }
+        => new ClientStreamingContext<TRequest, TResponse>((StreamingServiceContext<TRequest, Nil /* Dummy */>)Context);
 
     [Ignore]
     public ServerStreamingContext<TResponse> GetServerStreamingContext<TResponse>()
-    {
-        return new ServerStreamingContext<TResponse>(Context);
-    }
+        => new ServerStreamingContext<TResponse>((StreamingServiceContext<Nil /* Dummy */, TResponse>)Context);
 
     [Ignore]
     public DuplexStreamingContext<TRequest, TResponse> GetDuplexStreamingContext<TRequest, TResponse>()
-    {
-        return new DuplexStreamingContext<TRequest, TResponse>(Context);
-    }
+        => new DuplexStreamingContext<TRequest, TResponse>((StreamingServiceContext<TRequest, TResponse>)Context);
 
     // Interface methods for Client
 

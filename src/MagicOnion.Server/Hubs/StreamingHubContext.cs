@@ -22,7 +22,7 @@ public class StreamingHubContext
     }
 
     /// <summary>Raw gRPC Context.</summary>
-    public ServiceContext ServiceContext { get; internal set; } = default!; /* lateinit */
+    public IStreamingServiceContext<byte[], byte[]> ServiceContext { get; internal set; } = default!; /* lateinit */
     public object HubInstance { get; internal set; } = default!; /* lateinit */
 
     public ReadOnlyMemory<byte> Request { get; internal set; }

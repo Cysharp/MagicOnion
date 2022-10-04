@@ -3,6 +3,12 @@ using Grpc.Core;
 
 namespace MagicOnion.Internal
 {
+    internal static class BoxClientStreamWriter
+    {
+        public static IClientStreamWriter<T> Create<T, TRaw>(IClientStreamWriter<TRaw> rawStreamWriter)
+            => (typeof(TRaw) == typeof(Box<T>)) ? new BoxClientStreamWriter<T>((IClientStreamWriter<Box<T>>)rawStreamWriter) : (IClientStreamWriter<T>)rawStreamWriter;
+    }
+
     internal class BoxClientStreamWriter<T> : IClientStreamWriter<T>
     {
         readonly IClientStreamWriter<Box<T>> inner;

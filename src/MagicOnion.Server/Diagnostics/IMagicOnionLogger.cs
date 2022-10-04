@@ -15,8 +15,8 @@ public interface IMagicOnionLogger
     void EndInvokeHubMethod(StreamingHubContext context, int responseSize, Type? type, double elapsed, bool isErrorOrInterrupted);
     void InvokeHubBroadcast(string groupName, int responseSize, int broadcastGroupCount);
 
-    void WriteToStream(ServiceContext context, byte[] writeData, Type type);
-    void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete);
+    void WriteToStream(ServiceContext context, Type type);
+    void ReadFromStream(ServiceContext context, Type type, bool complete);
 
     void Error(Exception ex, ServerCallContext context);
     void Error(Exception ex, StreamingHubContext context);

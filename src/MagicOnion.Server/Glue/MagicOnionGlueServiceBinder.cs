@@ -1,5 +1,6 @@
 using Grpc.AspNetCore.Server.Model;
 using Grpc.Core;
+using MagicOnion.Server.Internal;
 using Microsoft.AspNetCore.Routing;
 
 namespace MagicOnion.Server.Glue;

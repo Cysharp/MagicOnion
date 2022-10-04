@@ -13,11 +13,11 @@ public class NullMagicOnionLogger : IMagicOnionLogger
     {
     }
 
-    public void ReadFromStream(ServiceContext context, byte[] readData, Type type, bool complete)
+    public void ReadFromStream(ServiceContext context, Type type, bool complete)
     {
     }
 
-    public void WriteToStream(ServiceContext context, byte[] writeData, Type type)
+    public void WriteToStream(ServiceContext context, Type type)
     {
     }
 
