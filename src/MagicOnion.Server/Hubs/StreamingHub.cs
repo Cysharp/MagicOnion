@@ -217,7 +217,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     };
 
                     var isErrorOrInterrupted = false;
-                    Context.MethodHandler.logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
+                    Context.MethodHandler.Logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
                     try
                     {
                         await handler.MethodBody.Invoke(context);
@@ -225,11 +225,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     catch (Exception ex)
                     {
                         isErrorOrInterrupted = true;
-                        Context.MethodHandler.logger.Error(ex, context);
+                        Context.MethodHandler.Logger.Error(ex, context);
                     }
                     finally
                     {
-                        Context.MethodHandler.logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                        Context.MethodHandler.Logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
                     }
                 }
                 else
@@ -254,7 +254,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     };
 
                     var isErrorOrInterrupted = false;
-                    Context.MethodHandler.logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
+                    Context.MethodHandler.Logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
                     try
                     {
                         await handler.MethodBody.Invoke(context);
@@ -266,12 +266,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     catch (Exception ex)
                     {
                         isErrorOrInterrupted = true;
-                        Context.MethodHandler.logger.Error(ex, context);
-                        await context.WriteErrorMessage((int)StatusCode.Internal, $"An error occurred while processing handler '{handler.ToString()}'.", ex, Context.MethodHandler.isReturnExceptionStackTraceInErrorDetail);
+                        Context.MethodHandler.Logger.Error(ex, context);
+                        await context.WriteErrorMessage((int)StatusCode.Internal, $"An error occurred while processing handler '{handler.ToString()}'.", ex, Context.MethodHandler.IsReturnExceptionStackTraceInErrorDetail);
                     }
                     finally
                     {
-                        Context.MethodHandler.logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                        Context.MethodHandler.Logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
                     }
                 }
                 else
