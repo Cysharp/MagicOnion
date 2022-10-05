@@ -4,19 +4,37 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using MagicOnion.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server;
 
 public class MethodHandler : IEquatable<MethodHandler>
 {
-    static int methodHandlerIdBuild = 0;
-    static readonly byte[] emptyBytes = new byte[0];
+    // reflection cache
+    static readonly MethodInfo Helper_CreateService = typeof(ServiceProviderHelper).GetMethod(nameof(ServiceProviderHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_TaskToEmptyValueTask = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_NewEmptyValueTask = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SetTaskUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SetUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SerializeTaskClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeTaskClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SerializeClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly PropertyInfo ServiceContext_Request = typeof(ServiceContext).GetProperty("Request", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
-    int methodHandlerId = 0;
+    static int methodHandlerIdBuild = 0;
+
+    readonly int methodHandlerId;
+    readonly bool isStreamingHub;
+    readonly MessagePackSerializerOptions serializerOptions;
+    readonly Func<ServiceContext, ValueTask> methodBody;
+    
+    // options
+    readonly bool enableCurrentContext;
+    
+    internal IMagicOnionLogger Logger { get; }
+    internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
 
     public string ServiceName { get; }
     public string MethodName { get; }
@@ -26,28 +44,11 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     public ILookup<Type, Attribute> AttributeLookup { get; }
 
-    // options
-
-    internal readonly bool isReturnExceptionStackTraceInErrorDetail;
-    internal readonly IMagicOnionLogger logger;
-    readonly bool enableCurrentContext;
-
     // use for request handling.
+    public Type RequestType { get; }
+    public Type UnwrappedResponseType { get; }
 
-    public readonly Type RequestType;
-    public readonly Type UnwrappedResponseType;
-
-    readonly MessagePackSerializerOptions serializerOptions;
-    readonly bool responseIsTask;
-
-    readonly Func<ServiceContext, ValueTask> methodBody;
-
-    // reflection cache
-    static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
-        .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
-    static readonly MethodInfo createService = typeof(ServiceProviderHelper).GetMethod(nameof(ServiceProviderHelper.CreateService), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
-
-    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger)
+    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)
     {
         this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
 
@@ -57,10 +58,11 @@ public class MethodHandler : IEquatable<MethodHandler>
         this.ServiceName = serviceInterfaceType.Name;
         this.MethodInfo = methodInfo;
         this.MethodName = methodName;
-        MethodType mt;
-        this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out mt, out responseIsTask, out var requestType);
+
+        this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out var mt, out var responseIsTask, out var requestType);
         this.MethodType = mt;
         this.serializerOptions = handlerOptions.SerializerOptions;
+        this.isStreamingHub = isStreamingHub;
 
         var parameters = methodInfo.GetParameters();
         if (requestType == null)
@@ -80,18 +82,19 @@ public class MethodHandler : IEquatable<MethodHandler>
         var filters = FilterHelper.GetFilters(handlerOptions.GlobalFilters, classType, methodInfo);
 
         // options
-        this.isReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
-        this.logger = logger;
+        this.IsReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
+        this.Logger = logger;
         this.enableCurrentContext = handlerOptions.EnableCurrentContext;
 
         // prepare lambda parameters
-        var createServiceMethodInfo = createService.MakeGenericMethod(classType, serviceInterfaceType);
+        var createServiceMethodInfo = Helper_CreateService.MakeGenericMethod(classType, serviceInterfaceType);
         var contextArg = Expression.Parameter(typeof(ServiceContext), "context");
         var instance = Expression.Call(createServiceMethodInfo, contextArg);
 
         switch (MethodType)
         {
             case MethodType.Unary:
+            case MethodType.ServerStreaming:
                 // (ServiceContext context) =>
                 // {
                 //      var request = (TRequest)context.Request;
@@ -100,11 +103,8 @@ public class MethodHandler : IEquatable<MethodHandler>
                 // };
                 try
                 {
-                    var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                    var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
                     var requestArg = Expression.Parameter(RequestType, "request");
-                    var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)!);
+                    var contextRequest = Expression.Property(contextArg, ServiceContext_Request);
                     var assignRequest = Expression.Assign(requestArg, Expression.Convert(contextRequest, RequestType));
 
                     Expression[] arguments = new Expression[parameters.Length];
@@ -122,70 +122,19 @@ public class MethodHandler : IEquatable<MethodHandler>
 
                     var callBody = Expression.Call(instance, methodInfo, arguments);
 
-                    var finalMethod = (responseIsTask)
-                        ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType)
-                        : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), staticFlags)!.MakeGenericMethod(UnwrappedResponseType);
-                    callBody = Expression.Call(finalMethod, callBody, contextArg);
-
-                    var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
-                    var compiledBody = Expression.Lambda(body, contextArg).Compile();
-
-                    this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
-                }
-                break;
-            case MethodType.ServerStreaming:
-                // (ServiceContext context) =>
-                // {
-                //      var request = MessagePackSerializer.Deserialize<T>(new ReadOnlyMemory<byte>((byte[])context.Request), context.SerializerOptions, default);
-                //      var result = new FooService() { Context = context }.Bar(request.Item1, request.Item2);
-                //      return MethodHandlerResultHelper.SerializeUnaryResult(result, context);
-                // };
-                try
-                {
-                    var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-                    var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
-                    var requestArg = Expression.Parameter(RequestType, "request");
-                    var getSerializerOptions = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("SerializerOptions", flags)!);
-                    var defaultToken = Expression.Default(typeof(CancellationToken));
-
-                    var contextRequest = Expression.Property(contextArg, typeof(ServiceContext).GetProperty("Request", flags)!);
-                    var requestContent = Expression.Convert(contextRequest, typeof(byte[]));
-                    var requestContentRom = Expression.New(typeof(ReadOnlyMemory<byte>).GetConstructor(new[] { typeof(byte[]) })!, requestContent);
-
-                    var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), requestContentRom, getSerializerOptions, defaultToken);
-                    var assignRequest = Expression.Assign(requestArg, callDeserialize);
-
-                    Expression[] arguments = new Expression[parameters.Length];
-                    if (parameters.Length == 1)
+                    if (MethodType == MethodType.ServerStreaming)
                     {
-                        arguments[0] = requestArg;
+                        var finalMethod = (responseIsTask)
+                            ? Helper_TaskToEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]) // Task<ServerStreamingResult<TResponse>>
+                            : Helper_NewEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType); // ServerStreamingResult<TResponse>
+                        callBody = Expression.Call(finalMethod, callBody);
                     }
                     else
                     {
-                        for (int i = 0; i < parameters.Length; i++)
-                        {
-                            arguments[i] = Expression.Field(requestArg, "Item" + (i + 1));
-                        }
-                    }
-
-                    var callBody = Expression.Call(instance, methodInfo, arguments);
-
-                    if (!responseIsTask)
-                    {
-                        callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                            .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!
-                            .MakeGenericMethod(MethodInfo.ReturnType), callBody);
-                    }
-                    else
-                    {
-                        callBody = Expression.Call(typeof(MethodHandlerResultHelper)
-                            .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!
-                            .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), callBody);
+                        var finalMethod = (responseIsTask)
+                            ? Helper_SetTaskUnaryResult.MakeGenericMethod(UnwrappedResponseType)
+                            : Helper_SetUnaryResult.MakeGenericMethod(UnwrappedResponseType);
+                        callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
 
                     var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
@@ -208,33 +157,24 @@ public class MethodHandler : IEquatable<MethodHandler>
                 // (ServiceContext context) => new FooService() { Context = context }.Bar();
                 try
                 {
-                    var body = Expression.Call(instance, methodInfo);
-                    var staticFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+                    var callBody = Expression.Call(instance, methodInfo);
 
                     if (MethodType == MethodType.ClientStreaming)
                     {
                         var finalMethod = (responseIsTask)
-                            ? typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeTaskClientStreamingResult), staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType)
-                            : typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), staticFlags)!.MakeGenericMethod(RequestType, UnwrappedResponseType);
-                        body = Expression.Call(finalMethod, body, contextArg);
+                            ? Helper_SerializeTaskClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType)
+                            : Helper_SerializeClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType);
+                        callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
                     else
                     {
-                        if (!responseIsTask)
-                        {
-                            body = Expression.Call(typeof(MethodHandlerResultHelper)
-                                .GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), staticFlags)!
-                                .MakeGenericMethod(MethodInfo.ReturnType), body);
-                        }
-                        else
-                        {
-                            body = Expression.Call(typeof(MethodHandlerResultHelper)
-                                .GetMethod(nameof(MethodHandlerResultHelper.TaskToEmptyValueTask), staticFlags)!
-                                .MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]), body);
-                        }
+                        var finalMethod = (responseIsTask)
+                            ? Helper_TaskToEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0])
+                            : Helper_NewEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType);
+                        callBody = Expression.Call(finalMethod, callBody);
                     }
 
-                    var compiledBody = Expression.Lambda(body, contextArg).Compile();
+                    var compiledBody = Expression.Lambda(callBody, contextArg).Compile();
 
                     this.methodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<ServiceContext, ValueTask>)compiledBody);
                 }
@@ -309,85 +249,51 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
     }
 
-    void BindUnaryHandler(ServiceBinderBase binder)
+    internal void BindHandler(ServiceBinderBase binder)
     {
         // NOTE: ServiceBinderBase.AddMethod has `class` generic constraint.
         //       We need to box an instance of the value type.
         var rawRequestType = RequestType.IsValueType ? typeof(Box<>).MakeGenericType(RequestType) : RequestType;
         var rawResponseType = UnwrappedResponseType.IsValueType ? typeof(Box<>).MakeGenericType(UnwrappedResponseType) : UnwrappedResponseType;
 
-        MethodInfo bindMethod;
-        if (MethodInfo.GetParameters().Any())
-        {
-            bindMethod = this.GetType().GetMethod(nameof(BindUnaryHandler_Raw), BindingFlags.Instance | BindingFlags.NonPublic)!;
-        }
-        else
-        {
-            // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
-            //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
-            //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
-            bindMethod = this.GetType().GetMethod(nameof(BindUnaryHandler_Ignore), BindingFlags.Instance | BindingFlags.NonPublic)!;
-        }
-        ((Action<ServiceBinderBase>)bindMethod.MakeGenericMethod(RequestType, UnwrappedResponseType, rawRequestType, rawResponseType).CreateDelegate(typeof(Action<ServiceBinderBase>), this))(binder);
+        typeof(MethodHandler)
+            .GetMethod(nameof(BindHandlerTyped), BindingFlags.Instance | BindingFlags.NonPublic)!
+            .MakeGenericMethod(RequestType, UnwrappedResponseType, rawRequestType, rawResponseType)
+            .Invoke(this, new [] { binder });
     }
 
-    void BindUnaryHandler_Ignore<TRequest /* Ignore */, TResponse, TRawRequest /* Ignore */, TRawResponse>(ServiceBinderBase binder)
-        where TRawResponse : class
-    {
-        var method = GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-#pragma warning disable CS8604
-        binder.AddMethod(new MagicOnionServerMethod<Box<Nil>, TRawResponse>(method.Method, this), async (request, context) => method.ToRawResponse(await UnaryServerMethod<Nil, TResponse>(method.FromRawRequest(request), context)));
-#pragma warning restore CS8604
-    }
-
-    void BindUnaryHandler_Raw<TRequest, TResponse, TRawRequest, TRawResponse>(ServiceBinderBase binder)
+    void BindHandlerTyped<TRequest, TResponse, TRawRequest, TRawResponse>(ServiceBinderBase binder)
         where TRawRequest : class
         where TRawResponse : class
     {
-        var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(this.MethodType, this.ServiceName, this.MethodName, serializerOptions);
-#pragma warning disable CS8604
-        binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, this), async (request, context) => method.ToRawResponse(await UnaryServerMethod<TRequest, TResponse>(method.FromRawRequest(request), context)));
-#pragma warning restore CS8604
-    }
-
-    internal void BindHandler(ServiceBinderBase binder)
-    {
+        var handlerBinder = MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse>.Instance;
         switch (this.MethodType)
         {
             case MethodType.Unary:
-            {
-                BindUnaryHandler(binder);
-            }
+                if (this.MethodInfo.GetParameters().Any())
+                {
+                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                }
+                else
+                {
+                    handlerBinder.BindUnaryPalameterless(binder, UnaryServerMethod<Nil, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                }
                 break;
             case MethodType.ClientStreaming:
-            {
-                var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-                var genericMethod = this.GetType()
-                    .GetMethod(nameof(ClientStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                var handler = (ClientStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ClientStreamingServerMethod<byte[], byte[]>), this);
-                binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
-            }
+                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
                 break;
             case MethodType.ServerStreaming:
-            {
-                var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-                var genericMethod = this.GetType()
-                    .GetMethod(nameof(ServerStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                var handler = (ServerStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(ServerStreamingServerMethod<byte[], byte[]>), this);
-                binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
-            }
+                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
                 break;
             case MethodType.DuplexStreaming:
-            {
-                var method = new Method<byte[], byte[]>(this.MethodType, this.ServiceName, this.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-                var genericMethod = this.GetType()
-                    .GetMethod(nameof(DuplexStreamingServerMethod), BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .MakeGenericMethod(RequestType, UnwrappedResponseType);
-                var handler = (DuplexStreamingServerMethod<byte[], byte[]>)genericMethod.CreateDelegate(typeof(DuplexStreamingServerMethod<byte[], byte[]>), this);
-                binder.AddMethod(new MagicOnionServerMethod<byte[], byte[]>(method, this), handler);
-            }
+                if (isStreamingHub)
+                {
+                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                }
+                else
+                {
+                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                }
                 break;
             default:
                 throw new InvalidOperationException("Unknown RegisterType:" + this.MethodType);
@@ -397,13 +303,13 @@ public class MethodHandler : IEquatable<MethodHandler>
     async Task<TResponse?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices);
+        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, Logger, this, context.GetHttpContext().RequestServices);
         serviceContext.SetRawRequest(request);
 
         TResponse? response = default;
         try
         {
-            logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
+            Logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
             if (enableCurrentContext)
             {
                 ServiceContext.currentServiceContext.Value = serviceContext;
@@ -425,17 +331,17 @@ public class MethodHandler : IEquatable<MethodHandler>
             //             https://github.com/grpc/grpc-dotnet/blob/d4ee8babcd90666fc0727163a06527ab9fd7366a/src/Grpc.AspNetCore.Server/Internal/CallHandlers/UnaryServerCallHandler.cs#L50-L56
             var rpcException = new RpcException(ex.ToStatus());
 #if NET6_0_OR_GREATER
-                if (ex.StackTrace is not null)
-                {
-                    ExceptionDispatchInfo.SetRemoteStackTrace(rpcException, ex.StackTrace);
-                }
+            if (ex.StackTrace is not null)
+            {
+                ExceptionDispatchInfo.SetRemoteStackTrace(rpcException, ex.StackTrace);
+            }
 #endif
             throw rpcException;
         }
         catch (Exception ex)
         {
             isErrorOrInterrupted = true;
-            if (isReturnExceptionStackTraceInErrorDetail)
+            if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 // Trim data.
                 var msg = ex.ToString();
@@ -459,7 +365,7 @@ public class MethodHandler : IEquatable<MethodHandler>
                 var str = sb.ToString();
 
                 context.Status = new Status(StatusCode.Unknown, str);
-                logger.Error(ex, context);
+                Logger.Error(ex, context);
                 response = default;
             }
             else
@@ -469,47 +375,57 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            Logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
 
         return response;
     }
 
-    async Task<byte[]> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, ServerCallContext context)
+    async Task<TResponse?> ClientStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
-        {
-            RequestStream = requestStream
-        };
-        byte[] response = emptyBytes;
+        var serviceContext = new StreamingServiceContext<TRequest, Nil /* Dummy */>(
+            ServiceType,
+            MethodInfo,
+            AttributeLookup,
+            this.MethodType,
+            context,
+            serializerOptions,
+            Logger,
+            this,
+            context.GetHttpContext().RequestServices,
+            requestStream,
+            default
+        );
+
+        TResponse? response;
         try
         {
             using (requestStream as IDisposable)
             {
-                logger.BeginInvokeMethod(serviceContext, typeof(Nil));
+                Logger.BeginInvokeMethod(serviceContext, typeof(Nil));
                 if (enableCurrentContext)
                 {
                     ServiceContext.currentServiceContext.Value = serviceContext;
                 }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
-                response = serviceContext.Result as byte[] ?? emptyBytes;
+                response = serviceContext.Result is TResponse r ? r : default;
             }
         }
         catch (ReturnStatusException ex)
         {
             isErrorOrInterrupted = true;
             context.Status = ex.ToStatus();
-            response = emptyBytes;
+            response = default;
         }
         catch (Exception ex)
         {
             isErrorOrInterrupted = true;
-            if (isReturnExceptionStackTraceInErrorDetail)
+            if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                logger.Error(ex, context);
-                response = emptyBytes;
+                Logger.Error(ex, context);
+                response = default;
             }
             else
             {
@@ -518,43 +434,53 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            Logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
+
         return response;
     }
 
-    async Task<byte[]> ServerStreamingServerMethod<TRequest, TResponse>(byte[] request, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
+    async Task ServerStreamingServerMethod<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
-        {
-            ResponseStream = responseStream,
-        };
+        var serviceContext = new StreamingServiceContext<Nil /* Dummy */, TResponse>(
+            ServiceType,
+            MethodInfo,
+            AttributeLookup,
+            this.MethodType,
+            context,
+            serializerOptions, 
+            Logger,
+            this,
+            context.GetHttpContext().RequestServices,
+            default,
+            responseStream
+        );
         serviceContext.SetRawRequest(request);
         try
         {
-            logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
+            Logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
             if (enableCurrentContext)
             {
                 ServiceContext.currentServiceContext.Value = serviceContext;
             }
             await this.methodBody(serviceContext).ConfigureAwait(false);
-            return emptyBytes;
+            return;
         }
         catch (ReturnStatusException ex)
         {
             isErrorOrInterrupted = true;
             context.Status = ex.ToStatus();
-            return emptyBytes;
+            return;
         }
         catch (Exception ex)
         {
             isErrorOrInterrupted = true;
-            if (isReturnExceptionStackTraceInErrorDetail)
+            if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                logger.Error(ex, context);
-                return emptyBytes;
+                Logger.Error(ex, context);
+                return;
             }
             else
             {
@@ -563,21 +489,29 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            Logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
     }
 
-    async Task<byte[]> DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<byte[]> requestStream, IServerStreamWriter<byte[]> responseStream, ServerCallContext context)
+    async Task DuplexStreamingServerMethod<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, logger, this, context.GetHttpContext().RequestServices)
-        {
-            RequestStream = requestStream,
-            ResponseStream = responseStream
-        };
+        var serviceContext = new StreamingServiceContext<TRequest, TResponse>(
+            ServiceType,
+            MethodInfo,
+            AttributeLookup,
+            this.MethodType,
+            context,
+            serializerOptions,
+            Logger,
+            this,
+            context.GetHttpContext().RequestServices,
+            requestStream,
+            responseStream
+        );
         try
         {
-            logger.BeginInvokeMethod(serviceContext, typeof(Nil));
+            Logger.BeginInvokeMethod(serviceContext, typeof(Nil));
             using (requestStream as IDisposable)
             {
                 if (enableCurrentContext)
@@ -586,23 +520,23 @@ public class MethodHandler : IEquatable<MethodHandler>
                 }
                 await this.methodBody(serviceContext).ConfigureAwait(false);
 
-                return emptyBytes;
+                return;
             }
         }
         catch (ReturnStatusException ex)
         {
             isErrorOrInterrupted = true;
             context.Status = ex.ToStatus();
-            return emptyBytes;
+            return;
         }
         catch (Exception ex)
         {
             isErrorOrInterrupted = true;
-            if (isReturnExceptionStackTraceInErrorDetail)
+            if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                logger.Error(ex, context);
-                return emptyBytes;
+                Logger.Error(ex, context);
+                return;
             }
             else
             {
@@ -611,7 +545,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            Logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
     }
 
@@ -703,8 +637,7 @@ internal class MethodHandlerResultHelper
     {
         if (result.hasRawValue)
         {
-            var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
-            context.Result = bytes;
+            context.Result = result.rawValue;
         }
 
         return default(ValueTask);
@@ -715,18 +648,7 @@ internal class MethodHandlerResultHelper
         var result = await taskResult.ConfigureAwait(false);
         if (result.hasRawValue)
         {
-            var bytes = MessagePackSerializer.Serialize<TResponse>(result.rawValue, context.SerializerOptions);
-            context.Result = bytes;
+            context.Result = result.rawValue;
         }
-    }
-}
-
-internal class MagicOnionServerMethod<TRequest, TResponse> : Method<TRequest, TResponse>
-{
-    public MethodHandler MagicOnionMethodHandler { get; }
-    public MagicOnionServerMethod(Method<TRequest, TResponse> method, MethodHandler magicOnionMethodHandler)
-        : base(method.Type, method.ServiceName, method.Name, method.RequestMarshaller, method.ResponseMarshaller)
-    {
-        MagicOnionMethodHandler = magicOnionMethodHandler;
     }
 }

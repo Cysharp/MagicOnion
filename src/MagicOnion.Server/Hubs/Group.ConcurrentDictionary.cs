@@ -62,7 +62,7 @@ public class ConcurrentDictionaryGroup : IGroup
     readonly MessagePackSerializerOptions serializerOptions;
     readonly IMagicOnionLogger logger;
 
-    ConcurrentDictionary<Guid, ServiceContext> members;
+    ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
@@ -73,7 +73,7 @@ public class ConcurrentDictionaryGroup : IGroup
         this.parent = parent;
         this.serializerOptions = serializerOptions;
         this.logger = logger;
-        this.members = new ConcurrentDictionary<Guid, ServiceContext>();
+        this.members = new ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>>();
     }
 
     public ValueTask<int> GetMemberCountAsync()
@@ -101,7 +101,7 @@ public class ConcurrentDictionaryGroup : IGroup
 
     public ValueTask AddAsync(ServiceContext context)
     {
-        if (members.TryAdd(context.ContextId, context))
+        if (members.TryAdd(context.ContextId, (IServiceContextWithResponseStream<byte[]>)context))
         {
             Interlocked.Increment(ref approximatelyLength);
         }

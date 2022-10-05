@@ -58,7 +58,7 @@ public class ImmutableArrayGroup : IGroup
     readonly MessagePackSerializerOptions serializerOptions;
     readonly IMagicOnionLogger logger;
 
-    ImmutableArray<ServiceContext> members;
+    ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
@@ -69,7 +69,7 @@ public class ImmutableArrayGroup : IGroup
         this.parent = parent;
         this.serializerOptions = serializerOptions;
         this.logger = logger;
-        this.members = ImmutableArray<ServiceContext>.Empty;
+        this.members = ImmutableArray<IServiceContextWithResponseStream<byte[]>>.Empty;
     }
 
     public ValueTask<int> GetMemberCountAsync()
@@ -99,7 +99,7 @@ public class ImmutableArrayGroup : IGroup
     {
         lock (gate)
         {
-            members = members.Add(context);
+            members = members.Add((IServiceContextWithResponseStream<byte[]>)context);
         }
         return default(ValueTask);
     }
@@ -110,7 +110,7 @@ public class ImmutableArrayGroup : IGroup
         {
             if (!members.IsEmpty)
             {
-                members = members.Remove(context);
+                members = members.Remove((IServiceContextWithResponseStream<byte[]>)context);
                 if (inmemoryStorage != null)
                 {
                     inmemoryStorage.Remove(context.ContextId);
