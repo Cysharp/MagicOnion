@@ -27,6 +27,8 @@ public interface IServiceContext
     MessagePackSerializerOptions SerializerOptions { get; }
 
     IServiceProvider ServiceProvider { get; }
+
+    ConcurrentDictionary<string, object> Items { get; }
 }
 
 public class ServiceContext : IServiceContext
