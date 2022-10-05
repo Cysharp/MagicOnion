@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
-namespace MagicOnion.Server;
+namespace MagicOnion.Server.Internal;
 
 // Grpc's ResponseStream(IAsyncStreamWriter) does not allow multithread call.
 // IGroup is sometimes called from many caller(multithread) and invoke ResponseStream.Write

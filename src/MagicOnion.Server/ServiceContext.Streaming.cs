@@ -1,6 +1,7 @@
 using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 using MessagePack;
 
 namespace MagicOnion.Server;
