@@ -20,7 +20,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     static readonly MethodInfo Helper_SetTaskUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SetUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SerializeTaskClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeTaskClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
-    static readonly MethodInfo HelperSerializeClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SerializeClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly PropertyInfo ServiceContext_Request = typeof(ServiceContext).GetProperty("Request", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
 
     static int methodHandlerIdBuild = 0;
@@ -163,7 +163,7 @@ public class MethodHandler : IEquatable<MethodHandler>
                     {
                         var finalMethod = (responseIsTask)
                             ? Helper_SerializeTaskClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType)
-                            : HelperSerializeClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType);
+                            : Helper_SerializeClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType);
                         callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
                     else
@@ -331,10 +331,10 @@ public class MethodHandler : IEquatable<MethodHandler>
             //             https://github.com/grpc/grpc-dotnet/blob/d4ee8babcd90666fc0727163a06527ab9fd7366a/src/Grpc.AspNetCore.Server/Internal/CallHandlers/UnaryServerCallHandler.cs#L50-L56
             var rpcException = new RpcException(ex.ToStatus());
 #if NET6_0_OR_GREATER
-                if (ex.StackTrace is not null)
-                {
-                    ExceptionDispatchInfo.SetRemoteStackTrace(rpcException, ex.StackTrace);
-                }
+            if (ex.StackTrace is not null)
+            {
+                ExceptionDispatchInfo.SetRemoteStackTrace(rpcException, ex.StackTrace);
+            }
 #endif
             throw rpcException;
         }
