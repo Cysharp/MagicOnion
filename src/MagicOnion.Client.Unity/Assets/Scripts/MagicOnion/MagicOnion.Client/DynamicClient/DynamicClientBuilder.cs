@@ -14,8 +14,8 @@ namespace MagicOnion.Client.DynamicClient
     {
         protected static class KnownTypes
         {
-            public static Type[] ClientConstructorParameters { get; } = new[] { typeof(MagicOnionClientOptions), typeof(MessagePackSerializerOptions) };
-            public static Type[] ClientCoreConstructorParameters { get; } = new[] { typeof(MessagePackSerializerOptions) };
+            public static Type[] ClientConstructorParameters { get; } = new[] { typeof(MagicOnionClientOptions), typeof(IMagicOnionMessageSerializer) };
+            public static Type[] ClientCoreConstructorParameters { get; } = new[] { typeof(IMagicOnionMessageSerializer) };
         }
     }
 
@@ -68,7 +68,7 @@ namespace MagicOnion.Client.DynamicClient
                 EmitClientCore(ctx);
                 // private readonly ClientCore core; ...
                 EmitFields(ctx);
-                // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) { ... } 
+                // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) { ... }
                 EmitConstructor(ctx);
                 // protected override ClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
                 EmitClone(ctx, constructedBaseClientType);
@@ -86,7 +86,7 @@ namespace MagicOnion.Client.DynamicClient
                 var il = cloneMethodBuilder.GetILGenerator();
                 il.Emit(OpCodes.Ldarg_1); // options
                 il.Emit(OpCodes.Ldarg_0); // this.
-                il.Emit(OpCodes.Ldfld, ctx.FieldCore); // core 
+                il.Emit(OpCodes.Ldfld, ctx.FieldCore); // core
                 il.Emit(OpCodes.Newobj, ctx.ServiceClientConstructor); // new {ServiceName}Client(options, core);
                 il.Emit(OpCodes.Ret);
             }
@@ -101,7 +101,7 @@ namespace MagicOnion.Client.DynamicClient
                 new[] { typeof(MagicOnionClientOptions) },
                 Array.Empty<ParameterModifier>()
             );
-            // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) {
+            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) {
             ctx.ServiceClientConstructor = ctx.ServiceClientType.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, KnownTypes.ClientConstructorParameters);
             {
                 var il = ctx.ServiceClientConstructor.GetILGenerator();
@@ -213,9 +213,9 @@ namespace MagicOnion.Client.DynamicClient
              *     // UnaryResult<string> HelloAsync(string name, int age);
              *     public UnaryMethodRawInvoker<DynamicArgumentTuple<string, int>, string> HelloAsync;
              *
-             *     public ClientCore(MessagePackSerializer options)
+             *     public ClientCore(IMagicOnionMessageSerializer messageSerializer)
              *     {
-             *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", options);
+             *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", messageSerializer);
              *     }
              * }
              */
@@ -231,12 +231,12 @@ namespace MagicOnion.Client.DynamicClient
                     ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName] = (field, methodInvokerType);
                 }
 
-                // public ClientCore(MessagePackSerializerOptions serializerOptions) {
+                // public ClientCore(IMagicOnionMessageSerializer messageSerializer) {
                 ctx.ClientCoreConstructor = ctx.ClientCoreType.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, KnownTypes.ClientCoreConstructorParameters);
                 {
                     var il = ctx.ClientCoreConstructor.GetILGenerator();
 
-                    // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerOptions);
+                    // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, messageSerializer);
                     foreach (var method in ctx.Definition.Methods)
                     {
                         il.Emit(OpCodes.Ldarg_0);
@@ -247,7 +247,7 @@ namespace MagicOnion.Client.DynamicClient
                         il.Emit(OpCodes.Ldc_I4, (int)method.MethodType); // methodType,
                         il.Emit(OpCodes.Ldstr, method.ServiceName); // serviceName,
                         il.Emit(OpCodes.Ldstr, method.MethodName); // methodName,
-                        il.Emit(OpCodes.Ldarg_1); // serializerOptions
+                        il.Emit(OpCodes.Ldarg_1); // messageSerializer
                         il.Emit(OpCodes.Call, methodInvokerType);
                         // );
 

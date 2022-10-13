@@ -30,7 +30,7 @@ public class StreamingHubContext
     public DateTime Timestamp { get; internal set; }
 
     // helper for reflection
-    internal MessagePackSerializerOptions SerializerOptions { get; set; } = default!; /* lateinit */
+    internal IMagicOnionMessageSerializer MessageSerializer { get; set; } = default!; /* lateinit */
     public Guid ConnectionId => ServiceContext.ContextId;
 
     // public AsyncLock AsyncWriterLock { get; internal set; } = default!; /* lateinit */
@@ -89,12 +89,12 @@ public class StreamingHubContext
                 writer.WriteArrayHeader(3);
                 writer.Write(MessageId);
                 writer.Write(MethodId);
-                MessagePackSerializer.Serialize(ref writer, v, SerializerOptions);
                 writer.Flush();
+                MessageSerializer.Serialize(buffer, v);
                 return buffer.WrittenSpan.ToArray();
             }
         }
-            
+
         var vv = await value.ConfigureAwait(false);
         byte[] result = BuildMessage(vv);
         ServiceContext.QueueResponseStreamWrite(result);
@@ -122,13 +122,14 @@ public class StreamingHubContext
 
                 if (msg != null)
                 {
-                    MessagePackSerializer.Serialize(ref writer, msg, SerializerOptions);
+                    writer.Flush();
+                    MessageSerializer.Serialize(buffer, msg);
                 }
                 else
                 {
                     writer.WriteNil();
+                    writer.Flush();
                 }
-                writer.Flush();
                 return buffer.WrittenSpan.ToArray();
             }
         }

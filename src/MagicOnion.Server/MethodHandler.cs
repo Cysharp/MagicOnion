@@ -26,68 +26,48 @@ public class MethodHandler : IEquatable<MethodHandler>
     static int methodHandlerIdBuild = 0;
 
     readonly int methodHandlerId;
+    readonly MethodHandlerMetadata metadata;
     readonly bool isStreamingHub;
-    readonly MessagePackSerializerOptions serializerOptions;
+    readonly IMagicOnionMessageSerializer messageSerializer;
     readonly Func<ServiceContext, ValueTask> methodBody;
-    
+
     // options
     readonly bool enableCurrentContext;
-    
+
     internal IMagicOnionLogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
 
-    public string ServiceName { get; }
+    public string ServiceName => metadata.ServiceInterface.Name;
     public string MethodName { get; }
-    public Type ServiceType { get; }
-    public MethodInfo MethodInfo { get; }
-    public MethodType MethodType { get; }
+    public Type ServiceType => metadata.ServiceImplementationType;
+    public MethodInfo MethodInfo => metadata.ServiceMethod;
+    public MethodType MethodType => metadata.MethodType;
 
-    public ILookup<Type, Attribute> AttributeLookup { get; }
+    public ILookup<Type, Attribute> AttributeLookup => metadata.AttributeLookup;
 
     // use for request handling.
-    public Type RequestType { get; }
-    public Type UnwrappedResponseType { get; }
+    public Type RequestType => metadata.RequestType;
+    public Type UnwrappedResponseType => metadata.ResponseType;
 
     public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)
     {
+        this.metadata = MethodHandlerMetadataFactory.Create(classType, methodInfo);
         this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
-
-        var serviceInterfaceType = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0];
-
-        this.ServiceType = classType;
-        this.ServiceName = serviceInterfaceType.Name;
-        this.MethodInfo = methodInfo;
-        this.MethodName = methodName;
-
-        this.UnwrappedResponseType = UnwrapResponseType(methodInfo, out var mt, out var responseIsTask, out var requestType);
-        this.MethodType = mt;
-        this.serializerOptions = handlerOptions.SerializerOptions;
         this.isStreamingHub = isStreamingHub;
 
-        var parameters = methodInfo.GetParameters();
-        if (requestType == null)
-        {
-            var resolver = this.serializerOptions.Resolver;
-            requestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
-            this.serializerOptions = this.serializerOptions.WithResolver(resolver);
-        }
-
-        this.RequestType = requestType;
-
-        this.AttributeLookup = classType.GetCustomAttributes(true)
-            .Concat(methodInfo.GetCustomAttributes(true))
-            .Cast<Attribute>()
-            .ToLookup(x => x.GetType());
-
-        var filters = FilterHelper.GetFilters(handlerOptions.GlobalFilters, classType, methodInfo);
+        this.MethodName = methodName;
+        this.messageSerializer = handlerOptions.MessageSerializer;
 
         // options
         this.IsReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
         this.Logger = logger;
         this.enableCurrentContext = handlerOptions.EnableCurrentContext;
 
+        var parameters = metadata.Parameters;
+        var filters = FilterHelper.GetFilters(handlerOptions.GlobalFilters, classType, methodInfo);
+
         // prepare lambda parameters
-        var createServiceMethodInfo = Helper_CreateService.MakeGenericMethod(classType, serviceInterfaceType);
+        var createServiceMethodInfo = Helper_CreateService.MakeGenericMethod(classType, metadata.ServiceInterface);
         var contextArg = Expression.Parameter(typeof(ServiceContext), "context");
         var instance = Expression.Call(createServiceMethodInfo, contextArg);
 
@@ -107,14 +87,14 @@ public class MethodHandler : IEquatable<MethodHandler>
                     var contextRequest = Expression.Property(contextArg, ServiceContext_Request);
                     var assignRequest = Expression.Assign(requestArg, Expression.Convert(contextRequest, RequestType));
 
-                    Expression[] arguments = new Expression[parameters.Length];
-                    if (parameters.Length == 1)
+                    Expression[] arguments = new Expression[parameters.Count];
+                    if (parameters.Count == 1)
                     {
                         arguments[0] = requestArg;
                     }
                     else
                     {
-                        for (int i = 0; i < parameters.Length; i++)
+                        for (int i = 0; i < parameters.Count; i++)
                         {
                             arguments[i] = Expression.Field(requestArg, "Item" + (i + 1));
                         }
@@ -124,14 +104,14 @@ public class MethodHandler : IEquatable<MethodHandler>
 
                     if (MethodType == MethodType.ServerStreaming)
                     {
-                        var finalMethod = (responseIsTask)
+                        var finalMethod = (metadata.IsResultTypeTask)
                             ? Helper_TaskToEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0]) // Task<ServerStreamingResult<TResponse>>
                             : Helper_NewEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType); // ServerStreamingResult<TResponse>
                         callBody = Expression.Call(finalMethod, callBody);
                     }
                     else
                     {
-                        var finalMethod = (responseIsTask)
+                        var finalMethod = (metadata.IsResultTypeTask)
                             ? Helper_SetTaskUnaryResult.MakeGenericMethod(UnwrappedResponseType)
                             : Helper_SetUnaryResult.MakeGenericMethod(UnwrappedResponseType);
                         callBody = Expression.Call(finalMethod, callBody, contextArg);
@@ -149,7 +129,7 @@ public class MethodHandler : IEquatable<MethodHandler>
                 break;
             case MethodType.ClientStreaming:
             case MethodType.DuplexStreaming:
-                if (parameters.Length != 0)
+                if (parameters.Count != 0)
                 {
                     throw new InvalidOperationException($"{MethodType} does not support method parameters. If you need to send initial parameter, use header instead. Path:{ToString()}");
                 }
@@ -161,14 +141,14 @@ public class MethodHandler : IEquatable<MethodHandler>
 
                     if (MethodType == MethodType.ClientStreaming)
                     {
-                        var finalMethod = (responseIsTask)
+                        var finalMethod = (metadata.IsResultTypeTask)
                             ? Helper_SerializeTaskClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType)
                             : Helper_SerializeClientStreamingResult.MakeGenericMethod(RequestType, UnwrappedResponseType);
                         callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
                     else
                     {
-                        var finalMethod = (responseIsTask)
+                        var finalMethod = (metadata.IsResultTypeTask)
                             ? Helper_TaskToEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType.GetGenericArguments()[0])
                             : Helper_NewEmptyValueTask.MakeGenericMethod(MethodInfo.ReturnType);
                         callBody = Expression.Call(finalMethod, callBody);
@@ -185,67 +165,6 @@ public class MethodHandler : IEquatable<MethodHandler>
                 break;
             default:
                 throw new InvalidOperationException("Unknown MethodType:" + MethodType + $"Path:{ToString()}");
-        }
-    }
-
-    // non-filtered.
-    public byte[] BoxedSerialize(object requestValue)
-    {
-        return MessagePackSerializer.Serialize(RequestType, requestValue, serializerOptions);
-    }
-
-    public object BoxedDeserialize(byte[] responseValue)
-    {
-        return MessagePackSerializer.Deserialize(UnwrappedResponseType, responseValue, serializerOptions);
-    }
-
-    static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type? requestTypeIfExists)
-    {
-        var t = methodInfo.ReturnType;
-        if (!t.GetTypeInfo().IsGenericType) throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
-
-        // Task<Unary<T>>
-        if (t.GetGenericTypeDefinition() == typeof(Task<>))
-        {
-            responseIsTask = true;
-            t = t.GetGenericArguments()[0];
-        }
-        else
-        {
-            responseIsTask = false;
-        }
-
-        // Unary<T>
-        var returnType = t.GetGenericTypeDefinition();
-        if (returnType == typeof(UnaryResult<>))
-        {
-            methodType = MethodType.Unary;
-            requestTypeIfExists = default;
-            return t.GetGenericArguments()[0];
-        }
-        else if (returnType == typeof(ClientStreamingResult<,>))
-        {
-            methodType = MethodType.ClientStreaming;
-            var genArgs = t.GetGenericArguments();
-            requestTypeIfExists = genArgs[0];
-            return genArgs[1];
-        }
-        else if (returnType == typeof(ServerStreamingResult<>))
-        {
-            methodType = MethodType.ServerStreaming;
-            requestTypeIfExists = default;
-            return t.GetGenericArguments()[0];
-        }
-        else if (returnType == typeof(DuplexStreamingResult<,>))
-        {
-            methodType = MethodType.DuplexStreaming;
-            var genArgs = t.GetGenericArguments();
-            requestTypeIfExists = genArgs[0];
-            return genArgs[1];
-        }
-        else
-        {
-            throw new Exception($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
         }
     }
 
@@ -272,27 +191,27 @@ public class MethodHandler : IEquatable<MethodHandler>
             case MethodType.Unary:
                 if (this.MethodInfo.GetParameters().Any())
                 {
-                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 }
                 else
                 {
-                    handlerBinder.BindUnaryPalameterless(binder, UnaryServerMethod<Nil, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                    handlerBinder.BindUnaryPalameterless(binder, UnaryServerMethod<Nil, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 }
                 break;
             case MethodType.ClientStreaming:
-                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 break;
             case MethodType.ServerStreaming:
-                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 break;
             case MethodType.DuplexStreaming:
                 if (isStreamingHub)
                 {
-                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 }
                 else
                 {
-                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.serializerOptions);
+                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
                 }
                 break;
             default:
@@ -303,7 +222,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     async Task<TResponse?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
-        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, serializerOptions, Logger, this, context.GetHttpContext().RequestServices);
+        var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, messageSerializer, Logger, this, context.GetHttpContext().RequestServices);
         serviceContext.SetRawRequest(request);
 
         TResponse? response = default;
@@ -390,7 +309,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             AttributeLookup,
             this.MethodType,
             context,
-            serializerOptions,
+            messageSerializer,
             Logger,
             this,
             context.GetHttpContext().RequestServices,
@@ -449,7 +368,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             AttributeLookup,
             this.MethodType,
             context,
-            serializerOptions, 
+            messageSerializer,
             Logger,
             this,
             context.GetHttpContext().RequestServices,
@@ -502,7 +421,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             AttributeLookup,
             this.MethodType,
             context,
-            serializerOptions,
+            messageSerializer,
             Logger,
             this,
             context.GetHttpContext().RequestServices,
@@ -589,14 +508,14 @@ public class MethodHandlerOptions
 
     public bool EnableCurrentContext { get; }
 
-    public MessagePackSerializerOptions SerializerOptions { get; }
+    public IMagicOnionMessageSerializer MessageSerializer { get; }
 
     public MethodHandlerOptions(MagicOnionOptions options)
     {
         GlobalFilters = options.GlobalFilters;
         IsReturnExceptionStackTraceInErrorDetail = options.IsReturnExceptionStackTraceInErrorDetail;
         EnableCurrentContext = options.EnableCurrentContext;
-        SerializerOptions = options.SerializerOptions;
+        MessageSerializer = options.MessageSerializer;
     }
 }
 

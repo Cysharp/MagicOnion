@@ -18,7 +18,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 
     internal readonly Type RequestType;
     readonly Type? UnwrappedResponseType;
-    internal readonly MessagePackSerializerOptions serializerOptions;
+    internal readonly IMagicOnionMessageSerializer messageSerializer;
     internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
 
     readonly string toStringCache;
@@ -53,11 +53,12 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 
         this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
 
-        var resolver = handlerOptions.SerializerOptions.Resolver;
+        throw new NotImplementedException();
+        //var resolver = handlerOptions.MessageSerializer.Resolver;
         var parameters = methodInfo.GetParameters();
-        this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
+        //this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
 
-        this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
+        this.messageSerializer = handlerOptions.MessageSerializer;
 
         this.AttributeLookup = classType.GetCustomAttributes(true)
             .Concat(methodInfo.GetCustomAttributes(true))
@@ -159,11 +160,11 @@ public class StreamingHubHandlerOptions
 {
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
 
-    public MessagePackSerializerOptions SerializerOptions { get; }
+    public IMagicOnionMessageSerializer MessageSerializer { get; }
 
     public StreamingHubHandlerOptions(MagicOnionOptions options)
     {
         GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
-        SerializerOptions = options.SerializerOptions;
+        MessageSerializer = options.MessageSerializer;
     }
 }

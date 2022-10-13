@@ -1,3 +1,4 @@
+using MagicOnion.Server;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,17 @@ public class MagicOnionApplicationFactory<TServiceImplementation> : WebApplicati
         builder.ConfigureServices(services =>
         {
             services.AddMagicOnion(new[] { typeof(TServiceImplementation) });
+        });
+    }
+
+    public WebApplicationFactory<MagicOnionTestServer.Program> WithMagicOnionOptions(Action<MagicOnionOptions> configure)
+    {
+        return this.WithWebHostBuilder(x =>
+        {
+            x.ConfigureServices(services =>
+            {
+                services.Configure<MagicOnionOptions>(configure);
+            });
         });
     }
 }

@@ -203,7 +203,7 @@ public static class MagicOnionEngine
                     {
                         factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
                     }
-                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.SerializerOptions, logger));
+                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer, logger));
                 }
             }
         }
