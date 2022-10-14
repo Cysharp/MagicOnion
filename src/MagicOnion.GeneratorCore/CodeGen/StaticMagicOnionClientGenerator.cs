@@ -51,7 +51,7 @@ public class StaticMagicOnionClientGenerator
         textWriter.WriteLine("#pragma warning disable 168");
         textWriter.WriteLine();
     }
-        
+
     static void EmitPreamble(ServiceClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLine($"namespace {ctx.Service.ServiceType.Namespace}");
@@ -87,8 +87,8 @@ public class StaticMagicOnionClientGenerator
             EmitClientCore(ctx);
             // private readonly ClientCore core; ...
             EmitFields(ctx);
-            // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) : base(options) { ... } 
-            // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore core) : base(options) { ... } 
+            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) : base(options) { ... }
+            // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore core) : base(options) { ... }
             EmitConstructor(ctx);
             // protected override ClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
             EmitClone(ctx);
@@ -112,20 +112,20 @@ public class StaticMagicOnionClientGenerator
 
     static void EmitConstructor(ServiceClientBuildContext ctx)
     {
-        // public {ServiceName}Client(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions) : base(options)
+        // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) : base(options)
         // {
-        ctx.TextWriter.WriteLine($"public {ctx.Service.GetClientName()}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MessagePack.MessagePackSerializerOptions serializerOptions) : base(options)");
+        ctx.TextWriter.WriteLine($"public {ctx.Service.GetClientName()}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)");
         ctx.TextWriter.WriteLine("{");
         using (ctx.TextWriter.BeginIndent())
         {
             // this.core = new ClientCore(serializerOptions);
-            ctx.TextWriter.WriteLine("this.core = new ClientCore(serializerOptions);");
+            ctx.TextWriter.WriteLine("this.core = new ClientCore(messageSerializer);");
         }
         // }
         ctx.TextWriter.WriteLine("}");
         ctx.TextWriter.WriteLine();
 
-        // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore serializerOptions) : base(options)
+        // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore core) : base(options)
         // {
         ctx.TextWriter.WriteLine($"private {ctx.Service.GetClientName()}(global::MagicOnion.Client.MagicOnionClientOptions options, ClientCore core) : base(options)");
         ctx.TextWriter.WriteLine("{");
@@ -210,9 +210,9 @@ public class StaticMagicOnionClientGenerator
          *     // UnaryResult<string> HelloAsync(string name, int age);
          *     public UnaryMethodRawInvoker<DynamicArgumentTuple<string, int>, string> HelloAsync;
          *
-         *     public ClientCore(MessagePackSerializer options)
+         *     public ClientCore(IMagicOnionMessageSerializer messageSerializer)
          *     {
-         *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", options);
+         *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", messageSerializer);
          *     }
          * }
          */
@@ -231,18 +231,18 @@ public class StaticMagicOnionClientGenerator
                 } // #endif
             }
 
-            // public ClientCore(MessagePackSerializerOptions serializerOptions) {
-            ctx.TextWriter.WriteLine("public ClientCore(global::MessagePack.MessagePackSerializerOptions serializerOptions)");
+            // public ClientCore(IMagicOnionMessageSerializer messageSerializer) {
+            ctx.TextWriter.WriteLine("public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)");
             ctx.TextWriter.WriteLine("{");
             using (ctx.TextWriter.BeginIndent())
             {
-                // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerOptions);
+                // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, messageSerializer);
                 foreach (var method in ctx.Service.Methods)
                 {
                     using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
                     {
                         var createMethodVariant = $"{(method.RequestType.IsValueType ? "Value" : "Ref")}Type_{(method.ResponseType.IsValueType ? "Value" : "Ref")}Type";
-                        ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", serializerOptions);");
+                        ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", messageSerializer);");
                     } // #endif
                 }
             }
