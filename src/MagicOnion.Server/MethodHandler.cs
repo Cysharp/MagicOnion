@@ -51,7 +51,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)
     {
-        this.metadata = MethodHandlerMetadataFactory.Create(classType, methodInfo);
+        this.metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(classType, methodInfo);
         this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
         this.isStreamingHub = isStreamingHub;
 

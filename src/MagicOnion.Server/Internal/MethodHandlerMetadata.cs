@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Server.Hubs;
+using MagicOnion.Utils;
 
 namespace MagicOnion.Server.Internal;
 
@@ -41,13 +43,39 @@ public readonly struct MethodHandlerMetadata
     }
 }
 
+public readonly struct StreamingHubMethodHandlerMetadata
+{
+    public int MethodId { get; }
+    public Type StreamingHubImplementationType { get; }
+    public Type StreamingHubInterfaceType { get; }
+    public MethodInfo InterfaceMethod { get; }
+    public MethodInfo ImplementationMethod { get; }
+    public Type? ResponseType { get; }
+    public Type RequestType { get; }
+    public IReadOnlyList<ParameterInfo> Parameters { get; }
+    public ILookup<Type, Attribute> AttributeLookup { get; }
+
+    public StreamingHubMethodHandlerMetadata(int methodId, Type streamingHubImplementationType, MethodInfo interfaceMethodInfo, MethodInfo implementationMethodInfo, Type? responseType, Type requestType, IReadOnlyList<ParameterInfo> parameters, Type streamingHubInterfaceType, ILookup<Type, Attribute> attributeLookup)
+    {
+        MethodId = methodId;
+        StreamingHubImplementationType = streamingHubImplementationType;
+        InterfaceMethod = interfaceMethodInfo;
+        ImplementationMethod = implementationMethodInfo;
+        ResponseType = responseType;
+        RequestType = requestType;
+        Parameters = parameters;
+        StreamingHubInterfaceType = streamingHubInterfaceType;
+        AttributeLookup = attributeLookup;
+    }
+}
+
 internal class MethodHandlerMetadataFactory
 {
-    public static MethodHandlerMetadata Create(Type serviceClass, MethodInfo methodInfo)
+    public static MethodHandlerMetadata CreateServiceMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)
     {
         var serviceInterfaceType = serviceClass.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IService<>)).GetGenericArguments()[0];
         var parameters = methodInfo.GetParameters();
-        var responseType = UnwrapResponseType(methodInfo, out var methodType, out var responseIsTask, out var requestTypeIfExists);
+        var responseType = UnwrapUnaryResponseType(methodInfo, out var methodType, out var responseIsTask, out var requestTypeIfExists);
         var requestType = requestTypeIfExists ?? GetRequestTypeFromMethod(methodInfo, parameters);
 
         var attributeLookup = serviceClass.GetCustomAttributes(true)
@@ -63,10 +91,46 @@ internal class MethodHandlerMetadataFactory
         return new MethodHandlerMetadata(serviceClass, methodInfo, methodType, responseType, requestType, parameters, serviceInterfaceType, attributeLookup, responseIsTask);
     }
 
-    static Type UnwrapResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type? requestTypeIfExists)
+    public static StreamingHubMethodHandlerMetadata CreateStreamingHubMethodHandlerMetadata(Type serviceClass, MethodInfo methodInfo)
+    {
+        var hubInterface = serviceClass.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
+        var parameters = methodInfo.GetParameters();
+        var responseType = UnwrapStreamingHubResponseType(methodInfo, out var responseIsTask);
+        var requestType = GetRequestTypeFromMethod(methodInfo, parameters);
+
+        var attributeLookup = serviceClass.GetCustomAttributes(true)
+            .Concat(methodInfo.GetCustomAttributes(true))
+            .Cast<Attribute>()
+            .ToLookup(x => x.GetType());
+
+        var interfaceMethodInfo = ResolveInterfaceMethod(serviceClass, hubInterface, methodInfo.Name);
+
+        if (!responseIsTask)
+        {
+            throw new InvalidOperationException($"A type of the StreamingHub method must be Task or Task<T>. (Member:{serviceClass.Name}.{methodInfo.Name})");
+        }
+
+        var methodId = interfaceMethodInfo.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethodInfo.Name);
+        if (methodInfo.GetCustomAttribute<MethodIdAttribute>() is not null)
+        {
+            throw new InvalidOperationException($"The '{serviceClass.Name}.{methodInfo.Name}' cannot have MethodId attribute. MethodId attribute must be annotated to a hub interface instead.");
+        }
+
+        return new StreamingHubMethodHandlerMetadata(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, parameters, hubInterface, attributeLookup);
+    }
+
+
+    static MethodInfo ResolveInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
+    {
+        var mapping = targetType.GetInterfaceMap(interfaceType);
+        var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);
+        return mapping.InterfaceMethods[methodIndex];
+    }
+
+    static Type UnwrapUnaryResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type? requestTypeIfExists)
     {
         var t = methodInfo.ReturnType;
-        if (!t.GetTypeInfo().IsGenericType) throw new InvalidOperationException($"A method has invalid return type. (Member:{methodInfo.DeclaringType!.Name}.{methodInfo.Name}, ReturnType:{methodInfo.ReturnType.Name})");
+        if (!t.GetTypeInfo().IsGenericType) throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. (Member:{methodInfo.DeclaringType!.Name}.{methodInfo.Name}, ReturnType:{methodInfo.ReturnType.Name})");
 
         // Task<Unary<T>>
         if (t.GetGenericTypeDefinition() == typeof(Task<>))
@@ -109,8 +173,27 @@ internal class MethodHandlerMetadataFactory
         }
         else
         {
-            throw new InvalidOperationException($"Invalid return type, path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+            throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
         }
+    }
+
+    static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsTask)
+    {
+        var t = methodInfo.ReturnType;
+
+        // Task<T>
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Task<>))
+        {
+            responseIsTask = true;
+            return t.GetGenericArguments()[0];
+        }
+        else if (t == typeof(Task))
+        {
+            responseIsTask = true;
+            return null;
+        }
+
+        throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
     }
 
     /// <summary>
@@ -140,7 +223,7 @@ internal class MethodHandlerMetadataFactory
             case 13: return typeof(DynamicArgumentTuple<,,,,,,,,,,,,>).MakeGenericType(parameterTypes[0], parameterTypes[1], parameterTypes[2], parameterTypes[3], parameterTypes[4], parameterTypes[5], parameterTypes[6], parameterTypes[7], parameterTypes[8], parameterTypes[9], parameterTypes[10], parameterTypes[11], parameterTypes[12]);
             case 14: return typeof(DynamicArgumentTuple<,,,,,,,,,,,,,>).MakeGenericType(parameterTypes[0], parameterTypes[1], parameterTypes[2], parameterTypes[3], parameterTypes[4], parameterTypes[5], parameterTypes[6], parameterTypes[7], parameterTypes[8], parameterTypes[9], parameterTypes[10], parameterTypes[11], parameterTypes[12], parameterTypes[13]);
             case 15: return typeof(DynamicArgumentTuple<,,,,,,,,,,,,,,>).MakeGenericType(parameterTypes[0], parameterTypes[1], parameterTypes[2], parameterTypes[3], parameterTypes[4], parameterTypes[5], parameterTypes[6], parameterTypes[7], parameterTypes[8], parameterTypes[9], parameterTypes[10], parameterTypes[11], parameterTypes[12], parameterTypes[13], parameterTypes[14]);
-            default: throw new InvalidOperationException($"A method '{methodInfo.Name}' has too many parameters. The method must have less than 16 parameters. (Length: {parameterTypes.Length})");
+            default: throw new InvalidOperationException($"The method '{methodInfo.Name}' has too many parameters. The method must have less than 16 parameters. (Length: {parameterTypes.Length})");
         }
     }
 }

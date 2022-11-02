@@ -13,7 +13,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyNonService.Unary_Parameterless))!;
 
         // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.Create(serviceType, methodInfo));
+        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
         ex.Should().NotBeNull();
@@ -28,7 +28,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup.Attribute_None))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().BeEmpty();
@@ -42,7 +42,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup.Attribute_One))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(1);
@@ -58,7 +58,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup.Attribute_Many))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
@@ -75,7 +75,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup.Attribute_Many_Multiple))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
@@ -93,7 +93,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup_WithClassAttribute.Attribute_None))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(1);
@@ -109,7 +109,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup_WithClassAttribute.Attribute_One))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
@@ -126,7 +126,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup_WithClassAttribute.Attribute_Many))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(3);
@@ -144,7 +144,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService_AttributeLookup_WithClassAttribute.Attribute_Many_Multiple))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(3);
@@ -163,7 +163,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.Unary_Parameterless))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -182,7 +182,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.Unary_Parameter_One))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -201,7 +201,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.Unary_Parameter_Many))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -220,7 +220,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Parameterless))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -239,7 +239,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Parameter_One))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -258,7 +258,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Parameter_Many))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -278,7 +278,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Sync_Parameterless))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -298,7 +298,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Sync_Parameter_One))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -318,7 +318,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ServerStreaming_Sync_Parameter_Many))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -338,7 +338,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ClientStreaming))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -358,7 +358,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ClientStreaming_Invalid))!;
 
         // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.Create(serviceType, methodInfo));
+        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
         ex.Should().NotBeNull();
@@ -373,7 +373,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ClientStreaming_Sync))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -393,7 +393,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.ClientStreaming_Sync_Invalid))!;
 
         // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.Create(serviceType, methodInfo));
+        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
         ex.Should().NotBeNull();
@@ -408,7 +408,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.DuplexStreaming))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -428,7 +428,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.DuplexStreaming_Invalid))!;
 
         // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.Create(serviceType, methodInfo));
+        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
         ex.Should().NotBeNull();
@@ -443,7 +443,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.DuplexStreaming_Sync))!;
 
         // Act
-        var metadata = MethodHandlerMetadataFactory.Create(serviceType, methodInfo);
+        var metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo);
 
         // Assert
         metadata.ServiceImplementationType.Should().Be<MyService>();
@@ -463,7 +463,7 @@ public class MethodHandlerMetadataFactoryTest
         var methodInfo = serviceType.GetMethod(nameof(MyService.DuplexStreaming_Sync_Invalid))!;
 
         // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.Create(serviceType, methodInfo));
+        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(serviceType, methodInfo));
 
         // Assert
         ex.Should().NotBeNull();
