@@ -312,7 +312,7 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
         {
             var tuple = new DynamicArgumentTuple<int, int>(x, y);
 
-            var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMessageSerializer.Default);
+            var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MagicOnionMessagePackMessageSerializer.Default);
             var request = Box.Create(tuple);
 
             var callResult = invoker.AsyncUnaryCall(method.Method, null, default(CallOptions), request);
