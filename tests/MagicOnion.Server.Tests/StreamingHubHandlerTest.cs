@@ -24,7 +24,6 @@ public class StreamingHubHandlerTest
         {
             HubInstance = hubInstance,
             ServiceContext = fakeStreamingHubContext,
-            MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
             Request = MessagePackSerializer.Serialize<Nil>(Nil.Default),
         };
         await handler.MethodBody.Invoke(ctx);
@@ -64,7 +63,6 @@ public class StreamingHubHandlerTest
         {
             HubInstance = hubInstance,
             ServiceContext = fakeStreamingHubContext,
-            MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
             Request = MessagePackSerializer.Serialize<Nil>(Nil.Default),
         };
         await handler.MethodBody.Invoke(ctx);
@@ -104,7 +102,6 @@ public class StreamingHubHandlerTest
         {
             HubInstance = hubInstance,
             ServiceContext = fakeStreamingHubContext,
-            MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
             Request = MessagePackSerializer.Serialize(12345),
         };
         await handler.MethodBody.Invoke(ctx);
@@ -144,7 +141,6 @@ public class StreamingHubHandlerTest
         {
             HubInstance = hubInstance,
             ServiceContext = fakeStreamingHubContext,
-            MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
             Request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)),
         };
         await handler.MethodBody.Invoke(ctx);
@@ -166,7 +162,6 @@ public class StreamingHubHandlerTest
         fakeStreamingHubContext.Responses[0].Should().Equal(BuildMessage());
     }
 
-
     [Fact]
     public async Task Parameter_Multiple_Returns_TaskOfInt32()
     {
@@ -184,7 +179,6 @@ public class StreamingHubHandlerTest
         {
             HubInstance = hubInstance,
             ServiceContext = fakeStreamingHubContext,
-            MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
             Request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true)),
         };
         await handler.MethodBody.Invoke(ctx);
@@ -193,7 +187,7 @@ public class StreamingHubHandlerTest
         hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.");
         byte[] BuildMessage()
         {
-            // [MessageId, MethodId, Nil]
+            // [MessageId, MethodId, {Int32:12345}]
             var buffer = new ArrayBufferWriter<byte>();
             var writer = new MessagePackWriter(buffer);
             writer.WriteArrayHeader(3);
@@ -226,7 +220,6 @@ public class StreamingHubHandlerTest
                 MessageId = i * 1000,
                 HubInstance = hubInstance,
                 ServiceContext = fakeStreamingHubContext,
-                MessageSerializer = MagicOnionMessagePackMessageSerializer.Default,
                 Request = MessagePackSerializer.Serialize(new DynamicArgumentTuple<int, string, bool>(i, $"テスト{i}", i % 2 == 0)),
             };
             await handler.MethodBody.Invoke(ctx);
@@ -239,7 +232,7 @@ public class StreamingHubHandlerTest
 
         byte[] BuildMessage(int messageId, int retVal)
         {
-            // [MessageId, MethodId, Nil]
+            // [MessageId, MethodId, {Int32:RetVal}]
             var buffer = new ArrayBufferWriter<byte>();
             var writer = new MessagePackWriter(buffer);
             writer.WriteArrayHeader(3);
@@ -253,6 +246,50 @@ public class StreamingHubHandlerTest
         fakeStreamingHubContext.Responses[1].Should().Equal(BuildMessage(1000, 1));
         fakeStreamingHubContext.Responses[2].Should().Equal(BuildMessage(2000, 2));
     }
+
+    [Fact]
+    public async Task UseCustomMessageSerializer()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var hubType = typeof(StreamingHubHandlerTestHub);
+        var hubMethod = hubType.GetMethod(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32))!;
+        var hubInstance = new StreamingHubHandlerTestHub();
+        var fakeStreamingHubContext = new FakeStreamingServiceContext<byte[], byte[]>(hubType, hubMethod, XorMagicOnionMessagePackSerializer.Default, serviceProvider);
+        var bufferWriter = new ArrayBufferWriter<byte>();
+        XorMagicOnionMessagePackSerializer.Default.Serialize(bufferWriter, new DynamicArgumentTuple<int, string, bool>(12345, "テスト", true));
+
+        // Act
+        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()
+        {
+            MessageSerializer = XorMagicOnionMessagePackSerializer.Default,
+        }), serviceProvider);
+        var ctx = new StreamingHubContext()
+        {
+            HubInstance = hubInstance,
+            ServiceContext = fakeStreamingHubContext,
+            Request = bufferWriter.WrittenMemory.ToArray(),
+        };
+        await handler.MethodBody.Invoke(ctx);
+
+        // Assert
+        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameter_Multiple_Returns_TaskOfInt32) + "(12345,テスト,True) called.");
+        byte[] BuildMessage()
+        {
+            // [MessageId, MethodId, {Xor:Int32:12345}]
+            var buffer = new ArrayBufferWriter<byte>();
+            var writer = new MessagePackWriter(buffer);
+            writer.WriteArrayHeader(3);
+            writer.Write(ctx.MessageId);
+            writer.Write(ctx.MethodId);
+            writer.Flush();
+            XorMagicOnionMessagePackSerializer.Default.Serialize(buffer, 12345);
+            return buffer.WrittenMemory.ToArray();
+        }
+        fakeStreamingHubContext.Responses[0].Should().Equal(BuildMessage());
+    }
+
 
     interface IStreamingHubHandlerTestHubReceiver
     {

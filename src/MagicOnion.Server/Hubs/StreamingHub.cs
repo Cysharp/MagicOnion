@@ -206,7 +206,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 {
                     var context = new StreamingHubContext() // create per invoke.
                     {
-                        MessageSerializer = handler.MessageSerializer,
                         HubInstance = this,
                         ServiceContext = (IStreamingServiceContext<byte[], byte[]>)Context,
                         Request = data.AsMemory(offset, data.Length - offset),
@@ -243,7 +242,6 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 {
                     var context = new StreamingHubContext() // create per invoke.
                     {
-                        MessageSerializer = handler.MessageSerializer,
                         HubInstance = this,
                         ServiceContext = (IStreamingServiceContext<byte[], byte[]>)Context,
                         Request = data.AsMemory(offset, data.Length - offset),
