@@ -37,7 +37,7 @@ namespace MagicOnion.Server.Hubs
 
         private static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
         {
-            var mapping = targetType.GetInterfaceMap(interfaceType);
+            var mapping = targetType.GetInterfaceMapWithParents(interfaceType);
             var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);
             return mapping.InterfaceMethods[methodIndex];
         }
