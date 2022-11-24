@@ -191,31 +191,31 @@ public class MethodHandler : IEquatable<MethodHandler>
             case MethodType.Unary:
                 if (this.MethodInfo.GetParameters().Any())
                 {
-                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                    handlerBinder.BindUnary(binder, UnaryServerMethod<TRequest, TResponse>, this, messageSerializer);
                 }
                 else
                 {
-                    handlerBinder.BindUnaryPalameterless(binder, UnaryServerMethod<Nil, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                    handlerBinder.BindUnaryParameterless(binder, UnaryServerMethod<Nil, TResponse>, this, messageSerializer);
                 }
                 break;
             case MethodType.ClientStreaming:
-                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                handlerBinder.BindClientStreaming(binder, ClientStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
                 break;
             case MethodType.ServerStreaming:
-                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                handlerBinder.BindServerStreaming(binder, ServerStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
                 break;
             case MethodType.DuplexStreaming:
                 if (isStreamingHub)
                 {
-                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                    handlerBinder.BindStreamingHub(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
                 }
                 else
                 {
-                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, this.ServiceName, this.MethodName, this.messageSerializer);
+                    handlerBinder.BindDuplexStreaming(binder, DuplexStreamingServerMethod<TRequest, TResponse>, this, messageSerializer);
                 }
                 break;
             default:
-                throw new InvalidOperationException("Unknown RegisterType:" + this.MethodType);
+                throw new InvalidOperationException("Unknown RegisterType:" + MethodType);
         }
     }
 
