@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Server.Hubs;
@@ -23,7 +23,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Default, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync();
@@ -39,7 +39,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Default, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync();
@@ -80,11 +80,11 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         {
             if (FNV1A32.GetHashCode(nameof(MethodParameterless)) == methodId)
             {
-                ((TaskCompletionSource<int>)taskCompletionSource).SetResult(messageSerializer.Deserialize<int>(new ReadOnlySequence<byte>(data)));
+                SetResultForResponse<int>(taskCompletionSource, data);
             }
             else if (FNV1A32.GetHashCode(nameof(Callback)) == methodId)
             {
-                ((TaskCompletionSource<int>)taskCompletionSource).SetResult(messageSerializer.Deserialize<int>(new ReadOnlySequence<byte>(data)));
+                SetResultForResponse<int>(taskCompletionSource, data);
             }
         }
 
@@ -92,7 +92,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         {
             if (FNV1A32.GetHashCode(nameof(IHandCraftedStreamingHubClientTestHubReceiver.OnMessage)) == methodId)
             {
-                var value = messageSerializer.Deserialize<DynamicArgumentTuple<int, string>>(new ReadOnlySequence<byte>(data));
+                var value = Deserialize<DynamicArgumentTuple<int, string>>(data);
                 receiver.OnMessage(value.Item1, value.Item2);
             }
         }

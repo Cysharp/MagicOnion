@@ -11,13 +11,13 @@ namespace MagicOnion.Client
         public static T Create<T>(ChannelBase channel)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MagicOnionMessagePackMessageSerializer.Default, emptyFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionMessagePackMessageSerializer.Instance, emptyFilters);
         }
 
         public static T Create<T>(ChannelBase channel, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MagicOnionMessagePackMessageSerializer.Default, clientFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionMessagePackMessageSerializer.Instance, clientFilters);
         }
 
         public static T Create<T>(ChannelBase channel, IMagicOnionMessageSerializer messageSerializer)
@@ -29,13 +29,13 @@ namespace MagicOnion.Client
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
-            return Create<T>(invoker, MagicOnionMessagePackMessageSerializer.Default, emptyFilters);
+            return Create<T>(invoker, MagicOnionMessagePackMessageSerializer.Instance, emptyFilters);
         }
 
         public static T Create<T>(CallInvoker invoker, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(invoker, MagicOnionMessagePackMessageSerializer.Default, clientFilters);
+            return Create<T>(invoker, MagicOnionMessagePackMessageSerializer.Instance, clientFilters);
         }
 
         public static T Create<T>(CallInvoker invoker, IMagicOnionMessageSerializer messageSerializer)

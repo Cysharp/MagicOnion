@@ -65,9 +65,11 @@ namespace MagicOnion.Client
             return (TStreamingHub)(object)client;
         }
 
-        private static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger)
+        static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
+            messageSerializer = messageSerializer ?? MagicOnionMessageSerializer.Default;
+
             var ctor = StreamingHubClientRegistry<TStreamingHub, TReceiver>.consturtor;
             StreamingHubClientBase<TStreamingHub, TReceiver> client = null;
             if (ctor == null)

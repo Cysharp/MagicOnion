@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+using System.Buffers;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +9,7 @@ public class XorMagicOnionMessagePackSerializer : MagicOnionMessagePackMessageSe
 {
     const int MagicNumber = 0x11;
 
-    public static MagicOnionMessagePackMessageSerializer Default { get; } = new XorMagicOnionMessagePackSerializer(MessagePackSerializer.DefaultOptions, enableFallback: false);
+    public static MagicOnionMessagePackMessageSerializer Instance { get; } = new XorMagicOnionMessagePackSerializer(MessagePackSerializer.DefaultOptions, enableFallback: false);
 
     private XorMagicOnionMessagePackSerializer(MessagePackSerializerOptions serializerOptions, bool enableFallback)
         : base(serializerOptions, enableFallback)

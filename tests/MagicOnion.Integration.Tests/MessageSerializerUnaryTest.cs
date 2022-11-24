@@ -1,4 +1,4 @@
-﻿using Grpc.Net.Client;
+using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Server;
 using MagicOnionTestServer;
@@ -14,7 +14,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     {
         this.factory = factory.WithMagicOnionOptions(x =>
         {
-            x.MessageSerializer = XorMagicOnionMessagePackSerializer.Default;
+            x.MessageSerializer = XorMagicOnionMessagePackSerializer.Instance;
         });
     }
 
@@ -23,7 +23,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, MagicOnionMessagePackMessageSerializer.Default); // Use the default serialize by client. but the server still use XorMagicOnionMessagePackSerializer.
+        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, MagicOnionMessagePackMessageSerializer.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
         var result  = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
@@ -37,7 +37,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Default);
+        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.UnaryReturnNil();
@@ -51,7 +51,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Default);
+        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.UnaryParameterless();
@@ -65,7 +65,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Default);
+        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);

@@ -36,7 +36,7 @@ public class MagicOnionOptions
     public MagicOnionOptions()
     {
         this.IsReturnExceptionStackTraceInErrorDetail = false;
-        this.MessageSerializer = MagicOnionMessagePackMessageSerializer.Default.WithEnableFallback(true);
+        this.MessageSerializer = MagicOnionMessagePackMessageSerializer.Instance.WithEnableFallback(true);
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;

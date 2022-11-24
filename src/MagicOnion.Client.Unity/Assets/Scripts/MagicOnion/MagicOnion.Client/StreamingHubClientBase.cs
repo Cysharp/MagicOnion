@@ -24,8 +24,7 @@ namespace MagicOnion.Client
         readonly CallOptions option;
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
-
-        protected readonly IMagicOnionMessageSerializer messageSerializer;
+        readonly IMagicOnionMessageSerializer messageSerializer;
         readonly AsyncLock asyncLock = new AsyncLock();
 
         IClientStreamWriter<byte[]> writer;
@@ -43,10 +42,10 @@ namespace MagicOnion.Client
 
         protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger)
         {
-            this.callInvoker = callInvoker;
+            this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;
             this.option = option;
-            this.messageSerializer = messageSerializer;
+            this.messageSerializer = messageSerializer ?? throw new ArgumentNullException(nameof(messageSerializer));
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 
@@ -106,6 +105,14 @@ namespace MagicOnion.Client
 
             this.subscription = StartSubscribe(syncContext, firstMoveNextTask);
         }
+
+        // Helper methods to make building clients easy.
+        protected void SetResultForResponse<TResponse>(object taskCompletionSource, ArraySegment<byte> data)
+            => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
+        protected void Serialize<T>(IBufferWriter<byte> writer, in T value)
+            => messageSerializer.Serialize<T>(writer, value);
+        protected T Deserialize<T>(ArraySegment<byte> bytes)
+            => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(bytes));
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
@@ -216,8 +223,8 @@ namespace MagicOnion.Client
                     var statusCode = messagePackReader.ReadInt32();
                     var detail = messagePackReader.ReadString();
                     var offset = (int)messagePackReader.Consumed;
-                    var rest = data.AsMemory(offset, data.Length - offset);
-                    var error = messageSerializer.Deserialize<string>(new ReadOnlySequence<byte>(rest));
+                    var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
+                    var error = Deserialize<string>(rest);
                     var ex = default(RpcException);
                     if (string.IsNullOrWhiteSpace(error))
                     {
@@ -251,9 +258,6 @@ namespace MagicOnion.Client
             }
         }
 
-        protected Task WriteMessageFireAndForgetAsync<T>(int methodId, T message)
-            => WriteMessageFireAndForgetAsync<T, Nil>(methodId, message);
-
         protected async Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
@@ -266,7 +270,7 @@ namespace MagicOnion.Client
                     writer.WriteArrayHeader(2);
                     writer.Write(methodId);
                     writer.Flush();
-                    messageSerializer.Serialize(buffer, message);
+                    Serialize(buffer, message);
                     return buffer.WrittenSpan.ToArray();
                 }
             }
@@ -297,7 +301,7 @@ namespace MagicOnion.Client
                     writer.Write(mid);
                     writer.Write(methodId);
                     writer.Flush();
-                    messageSerializer.Serialize(buffer, message);
+                    Serialize(buffer, message);
                     return buffer.WrittenSpan.ToArray();
                 }
             }

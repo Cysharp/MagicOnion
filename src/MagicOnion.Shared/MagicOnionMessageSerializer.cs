@@ -20,10 +20,14 @@ namespace MagicOnion
         T Deserialize<T>(in ReadOnlySequence<byte> bytes);
     }
 
+    public static class MagicOnionMessageSerializer
+    {
+        public static IMagicOnionMessageSerializer Default { get; set; } = MagicOnionMessagePackMessageSerializer.Instance;
+    }
 
     public abstract class MagicOnionMessagePackMessageSerializer : IMagicOnionMessageSerializer
     {
-        public static MagicOnionMessagePackMessageSerializer Default { get; } = new MagicOnionMessagePackMessageSerializerImpl(MessagePackSerializer.DefaultOptions, enableFallback: false);
+        public static MagicOnionMessagePackMessageSerializer Instance { get; } = new MagicOnionMessagePackMessageSerializerImpl(MessagePackSerializer.DefaultOptions, enableFallback: false);
 
         protected MessagePackSerializerOptions SerializerOptions { get; }
         protected bool EnableFallback { get; }
@@ -68,7 +72,6 @@ namespace MagicOnion
         protected abstract MagicOnionMessagePackMessageSerializer Create(MessagePackSerializerOptions serializerOptions, bool enableFallback);
         protected abstract T Deserialize<T>(in ReadOnlySequence<byte> bytes, MessagePackSerializerOptions serializerOptions);
         protected abstract void Serialize<T>(IBufferWriter<byte> writer, in T value, MessagePackSerializerOptions serializerOptions);
-
 
         static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
             .GetTypes()

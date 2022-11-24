@@ -53,7 +53,7 @@ dotnet_diagnostic.cs8614.severity = error
 
 [{src/MagicOnion.Client/**.cs,src/MagicOnion.Shared/**.cs,src/MagicOnion.Abstractions/**.cs}]
 # Lower language support for code shared with code for Unity
-csharp_style_namespace_declarations = global
+csharp_style_namespace_declarations = block_scoped
 
 [*.csproj]
 charset = utf-8
