@@ -164,7 +164,7 @@ public class StaticStreamingHubClientGenerator
                     // arg0
                     1 => $", {method.Parameters[0].Name}",
                     // new DynamicArgumentTuple(arg1, arg2, ...)
-                    _ => $", new global::MagicOnion.DynamicArgumentTuple<{string.Join(", ", method.Parameters.Select((x, i) => $"{x.Type.FullName}"))}>({string.Join(", ", method.Parameters.Select((x, i) => x.Name))})",
+                    _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
                 };
 
                 ctx.TextWriter.WriteLines($"""
