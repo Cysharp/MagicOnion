@@ -4,6 +4,14 @@ namespace MagicOnion.Generator.Internal;
 
 internal static class IndentedTextWriterExtensions
 {
+    public static void WriteLines(this IndentedTextWriter writer, string lines)
+    {
+        foreach (var line in lines.Split('\n'))
+        {
+            writer.WriteLine(line.TrimEnd());
+        }
+    }
+
     public static IndentedBlock BeginIndent(this IndentedTextWriter textWriter)
     {
         textWriter.Indent++;
