@@ -170,7 +170,7 @@ public class StaticMagicOnionClientGenerator
                 };
 
                 ctx.TextWriter.WriteLines($"""
-                public {method.MethodReturnType.FullName} {method.MethodName}({string.Join(", ", method.Parameters.Select((x, i) => $"{x.Type.FullName} {x.Name}"))})
+                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
                     => this.core.{method.MethodName}.Invoke{method.MethodType}(this, "{method.Path}"{invokeRequestParameters});
                 """);
             } // #endif
