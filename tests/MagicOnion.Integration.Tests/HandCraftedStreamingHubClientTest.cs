@@ -78,11 +78,11 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         {
             if (FNV1A32.GetHashCode(nameof(MethodParameterless)) == methodId)
             {
-                SetResultForResponse<int>(taskCompletionSource, data);
+                base.SetResultForResponse<int>(taskCompletionSource, data);
             }
             else if (FNV1A32.GetHashCode(nameof(Callback)) == methodId)
             {
-                SetResultForResponse<int>(taskCompletionSource, data);
+                base.SetResultForResponse<int>(taskCompletionSource, data);
             }
         }
 
@@ -90,7 +90,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         {
             if (FNV1A32.GetHashCode(nameof(IHandCraftedStreamingHubClientTestHubReceiver.OnMessage)) == methodId)
             {
-                var value = Deserialize<DynamicArgumentTuple<int, string>>(data);
+                var value = base.Deserialize<DynamicArgumentTuple<int, string>>(data);
                 receiver.OnMessage(value.Item1, value.Item2);
             }
         }
@@ -140,7 +140,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
 
         public Task MethodReturnWithoutValue()
         {
-            return WriteMessageWithResponseAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
+            return base.WriteMessageWithResponseAsync<MessagePack.Nil, MessagePack.Nil>(FNV1A32.GetHashCode(nameof(MethodReturnWithoutValue)), MessagePack.Nil.Default);
         }
 
         public Task<int> MethodParameterless()

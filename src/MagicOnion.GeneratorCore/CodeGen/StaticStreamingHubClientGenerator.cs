@@ -169,7 +169,7 @@ public class StaticStreamingHubClientGenerator
 
                 ctx.TextWriter.WriteLines($"""
                 public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                    => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+                    => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
                 """);
             } // #endif
         }
@@ -201,7 +201,7 @@ public class StaticStreamingHubClientGenerator
                         ctx.TextWriter.WriteLines($$"""
                         case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                             {
-                                var value = Deserialize<{{method.RequestType.FullName}}>(data);
+                                var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
                                 receiver.{{method.MethodName}}({{methodArgs}});
                             }
                             break;
@@ -231,7 +231,7 @@ public class StaticStreamingHubClientGenerator
                     {
                         ctx.TextWriter.WriteLines($$"""
                         case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                            SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
+                            base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
                             break;
                         """);
                     }
