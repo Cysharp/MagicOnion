@@ -73,7 +73,7 @@ public class MethodCollector
                 responseType = methodReturnType.GenericArguments[0];
                 break;
             default:
-                throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
+                throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified)}'.");
         }
 
         logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
