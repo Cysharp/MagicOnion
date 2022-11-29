@@ -41,7 +41,7 @@ public class MethodCollector
                 var receiverType = MagicOnionTypeInfo.CreateFromSymbol(receiverInterfaceSymbol);
                 var receiverMethods = receiverInterfaceSymbol.GetMembers()
                     .OfType<IMethodSymbol>()
-                    .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, y))
+                    .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, y))
                     .ToArray();
 
                 logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub Receiver type '{receiverType.FullName}'");
@@ -87,7 +87,7 @@ public class MethodCollector
             ifDirective
         );
     }
-    MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+    MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -97,7 +97,7 @@ public class MethodCollector
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
         {
-            throw new InvalidOperationException($"StreamingHub receiver method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
+            throw new InvalidOperationException($"StreamingHub receiver method '{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
         }
 
         logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub receiver method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
