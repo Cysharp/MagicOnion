@@ -79,11 +79,16 @@ public class TemporaryProjectWorkarea : IDisposable
     {
         var refAsmDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
+        var parseOptions = CSharpParseOptions.Default
+            .WithLanguageVersion(options.LangVersion)
+            .WithPreprocessorSymbols(preprocessorSymbols ?? Array.Empty<string>());
+
         var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
+            .AddSyntaxTrees(CSharpSyntaxTree.ParseText("", parseOptions))
             .AddSyntaxTrees(
                 Directory.EnumerateFiles(ProjectDirectory, "*.cs", SearchOption.AllDirectories)
                     .Concat(Directory.EnumerateFiles(OutputDirectory, "*.cs", SearchOption.AllDirectories))
-                    .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), CSharpParseOptions.Default.WithPreprocessorSymbols(preprocessorSymbols ?? Array.Empty<string>()), x)))
+                    .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), parseOptions, x)))
             .AddReferences(
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Private.CoreLib.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.Extensions.dll")),
@@ -94,7 +99,7 @@ public class TemporaryProjectWorkarea : IDisposable
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Memory.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "netstandard.dll")),
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    
+
                 MetadataReference.CreateFromFile(typeof(Grpc.Core.AsyncUnaryCall<>).Assembly.Location), // Grpc.Core.Api
                 MetadataReference.CreateFromFile(typeof(MagicOnion.Client.MagicOnionClient).Assembly.Location), // MagicOnion.Client
                 MetadataReference.CreateFromFile(typeof(MagicOnion.MagicOnionMarshallers).Assembly.Location), // MagicOnion.Shared
@@ -123,7 +128,8 @@ public record TemporaryProjectWorkareaOptions(
     string AdditionalCsProjectContent = "",
     IEnumerable<string> AdditionalReferences = default,
     IEnumerable<string> AdditionalPackageReferences = default,
-    IEnumerable<string> AdditionalProjectReferences = default
+    IEnumerable<string> AdditionalProjectReferences = default,
+    LanguageVersion LangVersion = LanguageVersion.Default
 )
 {
     public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();
