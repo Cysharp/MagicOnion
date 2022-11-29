@@ -50,6 +50,90 @@ public interface IMyHubReceiver
     }
 
     [Fact]
+    public void Ignore_Method()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    Task MethodA();
+
+    [Ignore]
+    Task MethodB();
+
+    Task MethodC();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyHub.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().HaveCount(1);
+        serviceCollection.Services.Should().BeEmpty();
+        serviceCollection.Hubs[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyHub"));
+        serviceCollection.Hubs[0].HasIfDirectiveCondition.Should().BeFalse();
+        serviceCollection.Hubs[0].Methods.Should().HaveCount(2);
+        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Hubs[0].Methods[1].MethodName.Should().Be("MethodC");
+    }
+    
+    [Fact]
+    public void Ignore_Interface()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+[Ignore]
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    Task MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyHub.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().BeEmpty();
+        serviceCollection.Services.Should().BeEmpty();
+        serviceCollection.Hubs.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Parameter_Zero()
     {
         // Arrange

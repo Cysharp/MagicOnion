@@ -30,11 +30,26 @@ public class MethodCollector
             {
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
                 var ifDirective = x.GetDefinedGenerateIfCondition();
+                var hasIgnore = HasIgnoreAttribute(x);
+                if (hasIgnore)
+                {
+                    logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub type '{serviceType.FullName}' (HasIgnore; Skipped)");
+                    return null;
+                }
                 logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub type '{serviceType.FullName}' (IfDirective={ifDirective})");
 
                 var methods = x.GetMembers()
                     .OfType<IMethodSymbol>()
-                    .Select(y => CreateHubMethodInfoFromMethodSymbol(serviceType, y))
+                    .Select(symbol =>
+                    {
+                        if (HasIgnoreAttribute(symbol))
+                        {
+                            logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{symbol.Name}' in type '{serviceType.FullName}'. (HasIgnore; Skipped)");
+                            return null;
+                        }
+                        return CreateHubMethodInfoFromMethodSymbol(serviceType, symbol);
+                    })
+                    .Where(x => x is not null)
                     .ToArray();
 
                 var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
@@ -49,12 +64,15 @@ public class MethodCollector
 
                 return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, ifDirective);
             })
+            .Where(x => x is not null)
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
     }
 
     static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
         => (int?)methodSymbol.GetAttributes().FindAttributeShortName("MethodIdAttribute")?.ConstructorArguments[0].Value ?? FNV1A32.GetHashCode(methodSymbol.Name);
+    static bool HasIgnoreAttribute(ISymbol symbol)
+        => symbol.GetAttributes().FindAttributeShortName("IgnoreAttribute") is not null;
 
     MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
     {
@@ -119,15 +137,32 @@ public class MethodCollector
             {
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
                 var ifDirective = x.GetDefinedGenerateIfCondition();
+                var hasIgnore = HasIgnoreAttribute(x);
+                if (hasIgnore)
+                {
+                    logger.Trace($"[{nameof(MethodCollectorContext)}] Service type '{serviceType.FullName}' (HasIgnore; Skipped)");
+                    return null;
+                }
+
                 logger.Trace($"[{nameof(MethodCollectorContext)}] Service type '{serviceType.FullName}' (IfDirective={ifDirective})");
 
                 var methods = x.GetMembers()
                     .OfType<IMethodSymbol>()
-                    .Select(y => CreateServiceMethodInfoFromMethodSymbol(serviceType, y))
+                    .Select(symbol =>
+                    {
+                        if (HasIgnoreAttribute(symbol))
+                        {
+                            logger.Trace($"[{nameof(MethodCollectorContext)}] Service method '{symbol.Name}' in type '{serviceType.FullName}'. (HasIgnore; Skipped)");
+                            return null;
+                        }
+                        return CreateServiceMethodInfoFromMethodSymbol(serviceType, symbol);
+                    })
+                    .Where(x => x is not null)
                     .ToArray();
 
                 return new MagicOnionServiceInfo(serviceType, methods, ifDirective);
             })
+            .Where(x => x is not null)
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
     }
@@ -175,7 +210,7 @@ public class MethodCollector
         {
             throw new InvalidOperationException($"Unsupported return type '{methodReturnType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
         }
-        if (methodType == MethodType.Unary && responseType.Namespace == "MagicOnion" && (responseType.Name == "ClientStreamingResult" || responseType.Name == "ServerStreamingResult" || responseType.Name == "DuplexStreamingResult"))
+        if (methodType == MethodType.Unary && responseType.Namespace == "MagicOnion" && (responseType.Name is "ClientStreamingResult" or "ServerStreamingResult" or "DuplexStreamingResult"))
         {
             throw new InvalidOperationException($"Unary methods can not return '{responseType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
         }
