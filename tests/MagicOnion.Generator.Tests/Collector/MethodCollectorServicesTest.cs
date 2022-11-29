@@ -100,6 +100,82 @@ public interface IMyService : IService<IMyService>
     }
 
     [Fact]
+    public void Ignore_Method()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyService : IService<IMyService>
+{
+    UnaryResult<Nil> MethodA();
+
+    [Ignore]
+    UnaryResult<Nil> MethodB();
+
+    UnaryResult<Nil> MethodC();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().BeEmpty();
+        serviceCollection.Services.Should().HaveCount(1);
+        serviceCollection.Services[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyService"));
+        serviceCollection.Services[0].Methods.Should().HaveCount(2);
+        serviceCollection.Services[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Services[0].Methods[1].MethodName.Should().Be("MethodC");
+    }
+
+    [Fact]
+    public void Ignore_Interface()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+[Ignore]
+public interface IMyService : IService<IMyService>
+{
+    UnaryResult<Nil> MethodA();
+
+    UnaryResult<Nil> MethodB();
+
+    UnaryResult<Nil> MethodC();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().BeEmpty();
+        serviceCollection.Services.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Unary_Array()
     {
         // Arrange
