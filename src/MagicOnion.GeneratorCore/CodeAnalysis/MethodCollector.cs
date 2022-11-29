@@ -257,8 +257,8 @@ public class MethodCollector
             ServiceAndHubInterfaces = serviceAndHubInterfaces;
             Logger = logger;
 
-            var serviceInterfaces = new HashSet<INamedTypeSymbol>();
-            var hubInterfaces = new HashSet<INamedTypeSymbol>();
+            var serviceInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            var hubInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
             foreach (var type in serviceAndHubInterfaces)
             {
                 if (type.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))

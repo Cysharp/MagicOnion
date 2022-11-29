@@ -136,4 +136,140 @@ namespace TempProject
         var compilation = tempWorkspace.GetOutputCompilation();
         compilation.GetCompilationErrors().Should().BeEmpty();
     }
+
+    [Fact]
+    public async Task ImplicitUsings_PropertyGroup_Enable()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
+        {
+            ImplicitUsings = true,
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", """
+            using MagicOnion;
+            using MessagePack;
+            
+            namespace MyNamespace;
+            
+            public interface IMyService : IService<IMyService>
+            {
+                // ImplicitUsings: Microsoft.NET.Sdk
+                // global::System
+                // global::System.Collections.Generic
+                // global::System.IO
+                // global::System.Linq
+                // global::System.Net.Http
+                // global::System.Threading
+                // global::System.Threading.Tasks
+                UnaryResult<Nil> A(Int32 arg0, IReadOnlyList<int> arg1, FileMode arg2, ILookup<string, string> arg3, ClientCertificateOption arg4, ApartmentState arg5, TaskCreationOptions arg6);
+            }
+        """);
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+    
+    [Fact]
+    public async Task ImplicitUsings_PropertyGroup_Disable()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
+        {
+            ImplicitUsings = false,
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", """
+            using MagicOnion;
+            using MessagePack;
+            
+            namespace MyNamespace;
+            
+            public interface IMyService : IService<IMyService>
+            {
+                // ImplicitUsings: Microsoft.NET.Sdk
+                // global::System
+                // global::System.Collections.Generic
+                // global::System.IO
+                // global::System.Linq
+                // global::System.Net.Http
+                // global::System.Threading
+                // global::System.Threading.Tasks
+                UnaryResult<Nil> A(Int32 arg0, IReadOnlyList<int> arg1, FileMode arg2, ILookup<string, string> arg3, ClientCertificateOption arg4, ApartmentState arg5, TaskCreationOptions arg6);
+            }
+        """);
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().NotBeEmpty();
+    }
+    
+    [Fact]
+    public async Task GlobalUsingsInProject()
+    {
+        var options = TemporaryProjectWorkareaOptions.Default with
+        {
+            ImplicitUsings = false,
+            Usings = new []
+            {
+                ("System", false),
+                ("System.Collections.Generic", false),
+                ("System.IO", false),
+                ("System.Linq", false),
+                ("System.Net.Http", false),
+                ("System.Threading", false),
+                ("System.Threading.Tasks", false),
+
+                ("MagicOnion", false),
+                ("MessagePack", false),
+            },
+        };
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(options);
+        tempWorkspace.AddFileToProject("IMyService.cs", """
+            namespace MyNamespace;
+            
+            public interface IMyService : IService<IMyService>
+            {
+                // ImplicitUsings: Microsoft.NET.Sdk
+                // global::System
+                // global::System.Collections.Generic
+                // global::System.IO
+                // global::System.Linq
+                // global::System.Net.Http
+                // global::System.Threading
+                // global::System.Threading.Tasks
+                UnaryResult<Nil> A(Int32 arg0, IReadOnlyList<int> arg1, FileMode arg2, ILookup<string, string> arg3, ClientCertificateOption arg4, ApartmentState arg5, TaskCreationOptions arg6);
+            }
+        """);
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 }

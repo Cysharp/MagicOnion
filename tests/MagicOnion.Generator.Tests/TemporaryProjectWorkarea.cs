@@ -57,6 +57,8 @@ public class TemporaryProjectWorkarea : IDisposable
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <TargetFramework>{options.TargetFramework}</TargetFramework>
+    {(options.ImplicitUsings ? "<ImplicitUsings>enable</ImplicitUsings>" : "")}
+    {string.Join("", (options.Usings ?? Array.Empty<(string Namespace, bool Static)>()).Select(x => $@"<Using Include=""{x}"" Static=""{(x.Static ? "True" : "False")}"" />"))}
   </PropertyGroup>
 
   <ItemGroup>
@@ -94,6 +96,7 @@ public class TemporaryProjectWorkarea : IDisposable
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.Extensions.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Collections.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Linq.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Net.Http.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Console.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Memory.dll")),
@@ -109,6 +112,24 @@ public class TemporaryProjectWorkarea : IDisposable
             )
             .AddReferences((options.AdditionalReferences ?? Array.Empty<string>()).Select(x => MetadataReference.CreateFromFile(x)))
             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        if (options.ImplicitUsings || options.Usings is not null)
+        {
+            var globalUsings = new (string Namespace, bool Static)[]
+            {
+                ("global::System", false),
+                ("global::System.Collections.Generic", false),
+                ("global::System.IO", false),
+                ("global::System.Linq", false),
+                ("global::System.Net.Http", false),
+                ("global::System.Threading", false),
+                ("global::System.Threading.Tasks", false),
+            }
+                .Concat(options.Usings?.ToArray() ?? Array.Empty<(string Namespace, bool Static)>())
+                .ToHashSet();
+
+            compilation = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(string.Join(Environment.NewLine, globalUsings.Select(x => $"global using {(x.Static ? "static" : "")} {x.Namespace};")), parseOptions));
+        }
 
         return new OutputCompilation(this, compilation);
     }
@@ -129,7 +150,9 @@ public record TemporaryProjectWorkareaOptions(
     IEnumerable<string> AdditionalReferences = default,
     IEnumerable<string> AdditionalPackageReferences = default,
     IEnumerable<string> AdditionalProjectReferences = default,
-    LanguageVersion LangVersion = LanguageVersion.Default
+    LanguageVersion LangVersion = LanguageVersion.Default,
+    bool ImplicitUsings = false,
+    IEnumerable<(string Namespace, bool Static)>? Usings = default
 )
 {
     public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();
