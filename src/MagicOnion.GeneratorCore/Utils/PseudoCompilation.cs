@@ -257,7 +257,7 @@ internal static class PseudoCompilation
                 }
                 else if (item.Attribute("Remove")?.Value is { } removeUsing)
                 {
-                    globalUsings.Add((removeUsing, string.Equals(item.Attribute("Static")?.Value, "True", StringComparison.OrdinalIgnoreCase)));
+                    globalUsings.Remove((removeUsing, string.Equals(item.Attribute("Static")?.Value, "True", StringComparison.OrdinalIgnoreCase)));
                 }
             }
 
