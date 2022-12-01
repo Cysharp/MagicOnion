@@ -905,34 +905,44 @@ public interface IMyService : IService<IMyService>
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
-    
-//    [Fact]
-//    public void ImplicitUsings()
-//    {
-//        // Arrange
-//        var source = @"
-//using MagicOnion;
-//using MessagePack;
+    [Fact]
+    public void GlobalUsings()
+    {
+        // Arrange
+        var source = @"
+using MagicOnion;
+using MessagePack;
 
-//namespace MyNamespace;
+namespace MyNamespace;
 
-//public interface IMyService : IService<IMyService>
-//{
-//    UnaryResult<Nil> NilAsync();
-//    UnaryResult<string> StringAsync();
-//    UnaryResult<Nil> OneParameter(string arg1);
-//    UnaryResult<Nil> TwoParameter(string arg1, int arg2);
-//    Task<ServerStreamingResult<int>> ServerStreaming(string arg1, int arg2);
-//}
-//";
-//        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-//        tempWorkspace.AddFileToProject("IMyService.cs", source);
-//        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+public interface IMyService : IService<IMyService>
+{
+    UnaryResult<Nil> NilAsync();
+    UnaryResult<string> StringAsync();
+    UnaryResult<Nil> OneParameter(string arg1);
+    UnaryResult<Nil> TwoParameter(string arg1, int arg2);
+    Task<ServerStreamingResult<int>> ServerStreaming(string arg1, int arg2);
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(new TemporaryProjectWorkareaOptions()
+        {
+            TargetFramework = "netstandard2.0",
+        });
+        tempWorkspace.AddFileToProject("Usings.cs", """
+            global using System;
+            global using System.Threading.Tasks;
+            global using System.Collections.Generic;
+        """);
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
-//        // Act
-//        var collector = new MethodCollector2();
-//        collector.Collect(compilation);
+        // Act
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var serviceCollection = collector.Collect(compilation);
 
-//        // Assert
-//    }
+        // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Services.Should().NotBeEmpty();
+    }
 }
