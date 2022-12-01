@@ -1,4 +1,6 @@
 using MagicOnion.Generator.CodeAnalysis;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Generator.Tests.Collector;
@@ -38,6 +40,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -86,6 +89,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -130,6 +134,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -170,6 +175,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().BeEmpty();
@@ -202,6 +208,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool, long>[]>());
         serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>[]>());
         serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<Tuple<int, string>[]>>());
@@ -234,6 +241,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Tuple<bool?, long?>>());
         serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int?>());
         serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult<int?>>());
@@ -266,6 +274,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -309,6 +318,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -351,6 +361,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -394,6 +405,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -438,6 +450,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Services[0].Methods[0].Parameters[0].Type.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
         serviceCollection.Services[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeTrue();
         serviceCollection.Services[0].Methods[0].Parameters[0].DefaultValue.Should().Be("\"Hello\"");
@@ -482,6 +495,7 @@ namespace MyNamespace
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -624,6 +638,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -665,6 +680,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -707,6 +723,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -778,6 +795,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -845,6 +863,7 @@ public interface IMyService : IService<IMyService>
         var serviceCollection = collector.Collect(compilation);
 
         // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().HaveCount(1);
@@ -886,34 +905,44 @@ public interface IMyService : IService<IMyService>
         Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
 
-    
-//    [Fact]
-//    public void ImplicitUsings()
-//    {
-//        // Arrange
-//        var source = @"
-//using MagicOnion;
-//using MessagePack;
+    [Fact]
+    public void GlobalUsings()
+    {
+        // Arrange
+        var source = @"
+using MagicOnion;
+using MessagePack;
 
-//namespace MyNamespace;
+namespace MyNamespace;
 
-//public interface IMyService : IService<IMyService>
-//{
-//    UnaryResult<Nil> NilAsync();
-//    UnaryResult<string> StringAsync();
-//    UnaryResult<Nil> OneParameter(string arg1);
-//    UnaryResult<Nil> TwoParameter(string arg1, int arg2);
-//    Task<ServerStreamingResult<int>> ServerStreaming(string arg1, int arg2);
-//}
-//";
-//        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-//        tempWorkspace.AddFileToProject("IMyService.cs", source);
-//        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+public interface IMyService : IService<IMyService>
+{
+    UnaryResult<Nil> NilAsync();
+    UnaryResult<string> StringAsync();
+    UnaryResult<Nil> OneParameter(string arg1);
+    UnaryResult<Nil> TwoParameter(string arg1, int arg2);
+    Task<ServerStreamingResult<int>> ServerStreaming(string arg1, int arg2);
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create(new TemporaryProjectWorkareaOptions()
+        {
+            TargetFramework = "netstandard2.0",
+        });
+        tempWorkspace.AddFileToProject("Usings.cs", """
+            global using System;
+            global using System.Threading.Tasks;
+            global using System.Collections.Generic;
+        """);
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
 
-//        // Act
-//        var collector = new MethodCollector2();
-//        collector.Collect(compilation);
+        // Act
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var serviceCollection = collector.Collect(compilation);
 
-//        // Assert
-//    }
+        // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Services.Should().NotBeEmpty();
+    }
 }

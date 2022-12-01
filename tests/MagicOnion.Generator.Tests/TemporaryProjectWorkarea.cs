@@ -57,6 +57,8 @@ public class TemporaryProjectWorkarea : IDisposable
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <TargetFramework>{options.TargetFramework}</TargetFramework>
+    {(options.ImplicitUsings ? "<ImplicitUsings>enable</ImplicitUsings>" : "")}
+    {string.Join("", (options.Usings ?? Array.Empty<(string Namespace, bool Static, bool Remove)>()).Select(x => $@"<Using {(x.Remove ? "Remove" : "Include")}=""{x.Namespace}"" Static=""{(x.Static ? "True" : "False")}"" />"))}
   </PropertyGroup>
 
   <ItemGroup>
@@ -79,22 +81,28 @@ public class TemporaryProjectWorkarea : IDisposable
     {
         var refAsmDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
+        var parseOptions = CSharpParseOptions.Default
+            .WithLanguageVersion(options.LangVersion)
+            .WithPreprocessorSymbols(preprocessorSymbols ?? Array.Empty<string>());
+
         var compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
+            .AddSyntaxTrees(CSharpSyntaxTree.ParseText("", parseOptions))
             .AddSyntaxTrees(
                 Directory.EnumerateFiles(ProjectDirectory, "*.cs", SearchOption.AllDirectories)
                     .Concat(Directory.EnumerateFiles(OutputDirectory, "*.cs", SearchOption.AllDirectories))
-                    .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), CSharpParseOptions.Default.WithPreprocessorSymbols(preprocessorSymbols ?? Array.Empty<string>()), x)))
+                    .Select(x => CSharpSyntaxTree.ParseText(File.ReadAllText(x), parseOptions, x)))
             .AddReferences(
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Private.CoreLib.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.Extensions.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Collections.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Linq.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Net.Http.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Console.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Runtime.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Memory.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "netstandard.dll")),
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    
+
                 MetadataReference.CreateFromFile(typeof(Grpc.Core.AsyncUnaryCall<>).Assembly.Location), // Grpc.Core.Api
                 MetadataReference.CreateFromFile(typeof(MagicOnion.Client.MagicOnionClient).Assembly.Location), // MagicOnion.Client
                 MetadataReference.CreateFromFile(typeof(MagicOnion.MagicOnionMarshallers).Assembly.Location), // MagicOnion.Shared
@@ -104,6 +112,24 @@ public class TemporaryProjectWorkarea : IDisposable
             )
             .AddReferences((options.AdditionalReferences ?? Array.Empty<string>()).Select(x => MetadataReference.CreateFromFile(x)))
             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        if (options.ImplicitUsings || options.Usings is not null)
+        {
+            var globalUsings = new (string Namespace, bool Static, bool Remove)[]
+            {
+                (Namespace: "global::System", Static: false, Remove: false),
+                (Namespace: "global::System.Collections.Generic", Static: false, Remove: false),
+                (Namespace: "global::System.IO", Static: false, Remove: false),
+                (Namespace: "global::System.Linq", Static: false, Remove: false),
+                (Namespace: "global::System.Net.Http", Static: false, Remove: false),
+                (Namespace: "global::System.Threading", Static: false, Remove: false),
+                (Namespace: "global::System.Threading.Tasks", Static: false, Remove: false),
+            }
+                .Concat(options.Usings?.ToArray() ?? Array.Empty<(string Namespace, bool Static, bool Remove)>())
+                .ToHashSet();
+
+            compilation = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(string.Join(Environment.NewLine, globalUsings.Select(x => $"global using {(x.Static ? "static" : "")} {x.Namespace};")), parseOptions));
+        }
 
         return new OutputCompilation(this, compilation);
     }
@@ -123,7 +149,10 @@ public record TemporaryProjectWorkareaOptions(
     string AdditionalCsProjectContent = "",
     IEnumerable<string> AdditionalReferences = default,
     IEnumerable<string> AdditionalPackageReferences = default,
-    IEnumerable<string> AdditionalProjectReferences = default
+    IEnumerable<string> AdditionalProjectReferences = default,
+    LanguageVersion LangVersion = LanguageVersion.Default,
+    bool ImplicitUsings = false,
+    IEnumerable<(string Namespace, bool Static, bool Remove)>? Usings = default
 )
 {
     public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();

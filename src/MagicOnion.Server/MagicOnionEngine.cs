@@ -137,7 +137,7 @@ public static class MagicOnionEngine
                     throw new NotImplementedException($"Type '{classType.FullName}' has no implementation of interface '{inheritInterface.FullName}'.");
                 }
 
-                var interfaceMap = classType.GetInterfaceMap(inheritInterface);
+                var interfaceMap = classType.GetInterfaceMapWithParents(inheritInterface);
 
                 for (int i = 0; i < interfaceMap.TargetMethods.Length; ++i)
                 {

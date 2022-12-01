@@ -20,9 +20,10 @@ internal static class PseudoCompilation
 
         var sources = new HashSet<string>();
         var locations = new List<string>();
+        var globalUsings = new HashSet<(string Namespace, bool Static)>();
         foreach (var csproj in csprojs)
         {
-            CollectDocument(csproj, sources, locations, logger);
+            CollectDocument(csproj, sources, locations, globalUsings, logger);
         }
 
         foreach (var file in sources.Select(Path.GetFullPath).Distinct())
@@ -33,6 +34,7 @@ internal static class PseudoCompilation
             var syntax = CSharpSyntaxTree.ParseText(text, parseOption, path);
             syntaxTrees.Add(syntax);
         }
+        syntaxTrees.Add(CSharpSyntaxTree.ParseText(string.Join(Environment.NewLine, globalUsings.Select(x => $"global using {(x.Static ? "static" : "")} {x.Namespace};"))));
 
         // ignore Unity's default metadatas(to avoid conflict .NET Core runtime import)
         // MonoBleedingEdge = .NET 4.x Unity metadata
@@ -120,6 +122,7 @@ internal static class PseudoCompilation
             typeof(System.ValueTuple<>),
             typeof(System.Collections.Concurrent.ConcurrentDictionary<,>),
             typeof(System.Collections.ObjectModel.ObservableCollection<>),
+            typeof(System.Net.Http.HttpClient),
         };
 
         var metadata = standardMetadataType
@@ -157,7 +160,7 @@ internal static class PseudoCompilation
         return preprocessorSymbols.Where(x => !string.IsNullOrWhiteSpace(x));
     }
 
-    private static void CollectDocument(string csproj, HashSet<string> source, List<string> metadataLocations, IMagicOnionGeneratorLogger logger)
+    private static void CollectDocument(string csproj, HashSet<string> source, List<string> metadataLocations, HashSet<(string Namespace, bool Static)> globalUsings, IMagicOnionGeneratorLogger logger)
     {
         logger.Trace($"[{nameof(PseudoCompilation)}] Open project '{csproj}'");
 
@@ -235,6 +238,29 @@ internal static class PseudoCompilation
                 }
             }
 
+            // ImplicitUsings / Using
+            if (document.Descendants("ImplicitUsings").FirstOrDefault()?.Value?.ToLowerInvariant() is "enable" or "true")
+            {
+                globalUsings.Add(("global::System", false));
+                globalUsings.Add(("global::System.Collections.Generic", false));
+                globalUsings.Add(("global::System.IO", false));
+                globalUsings.Add(("global::System.Linq", false));
+                globalUsings.Add(("global::System.Net.Http", false));
+                globalUsings.Add(("global::System.Threading", false));
+                globalUsings.Add(("global::System.Threading.Tasks", false));
+            }
+            foreach (var item in document.Descendants("Using"))
+            {
+                if (item.Attribute("Include")?.Value is { } includeUsing)
+                {
+                    globalUsings.Add((includeUsing, string.Equals(item.Attribute("Static")?.Value, "True", StringComparison.OrdinalIgnoreCase)));
+                }
+                else if (item.Attribute("Remove")?.Value is { } removeUsing)
+                {
+                    globalUsings.Remove((removeUsing, string.Equals(item.Attribute("Static")?.Value, "True", StringComparison.OrdinalIgnoreCase)));
+                }
+            }
+
             // shared
             foreach (var item in document.Descendants("Import"))
             {
@@ -256,7 +282,7 @@ internal static class PseudoCompilation
                 if (refCsProjPath != null)
                 {
                     logger.Trace($"[{nameof(PseudoCompilation)}] Resolve ProjectReference '{refCsProjPath}'");
-                    CollectDocument(Path.Combine(csProjRoot, NormalizeDirectorySeparators(refCsProjPath)), source, metadataLocations, logger);
+                    CollectDocument(Path.Combine(csProjRoot, NormalizeDirectorySeparators(refCsProjPath)), source, metadataLocations, globalUsings, logger);
                 }
             }
 

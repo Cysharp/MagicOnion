@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
@@ -119,10 +119,9 @@ internal class MethodHandlerMetadataFactory
         return new StreamingHubMethodHandlerMetadata(methodId, serviceClass, interfaceMethodInfo, methodInfo, responseType, requestType, parameters, hubInterface, attributeLookup);
     }
 
-
     static MethodInfo ResolveInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
     {
-        var mapping = targetType.GetInterfaceMap(interfaceType);
+        var mapping = targetType.GetInterfaceMapWithParents(interfaceType);
         var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);
         return mapping.InterfaceMethods[methodIndex];
     }
