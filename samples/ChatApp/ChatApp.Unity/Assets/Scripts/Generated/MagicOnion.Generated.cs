@@ -287,6 +287,7 @@ namespace ChatApp.Shared.Hubs {
         }
 
 
+        [Ignore]
         class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
         {
             readonly ChatHubClient __parent;
