@@ -137,7 +137,7 @@ public class SerializationInfoCollector
                 var genericTypeArgs = string.Join(", ", type.GenericArguments.Select(x => x.FullName));
 
                 string formatterName;
-                if (type.Namespace == "MagicOnion" && type.Name == "DynamicArgumentTuple")
+                if (type is { Namespace: "MagicOnion", Name: "DynamicArgumentTuple" })
                 {
                     // MagicOnion.DynamicArgumentTuple
                     var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
@@ -262,6 +262,22 @@ public static class WellKnownSerializationTypes
         {"global::System.Collections.Generic.IEnumerable<>", "global::MessagePack.Formatters.InterfaceEnumerableFormatter" },
         {"global::System.Linq.ILookup<,>", "global::MessagePack.Formatters.InterfaceLookupFormatter" },
         {"global::System.Linq.IGrouping<,>", "global::MessagePack.Formatters.InterfaceGroupingFormatter" },
+        {"global::System.Tuple<>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.Tuple<,,,,,,,>", "global::MessagePack.Formatters.TupleFormatter" },
+        {"global::System.ValueTuple<>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
+        {"global::System.ValueTuple<,,,,,,,>", "global::MessagePack.Formatters.ValueTupleFormatter" },
     };
 
     public static readonly HashSet<string> BuiltInTypes = new HashSet<string>(new string[]

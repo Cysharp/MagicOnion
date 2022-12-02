@@ -295,7 +295,73 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Enums.Should().BeEmpty();
         serializationInfoCollection.Generics.Should().BeEmpty();
     }
-    
+
+    [Fact]
+    public void KnownTypes_ValueTuple()
+    {
+        // Arrange
+        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var types = new[]
+        {
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short, Guid>>(), new string[] { }),
+        };
+
+        // Act
+        var serializationInfoCollection = collector.Collect(types);
+
+        // Assert
+        serializationInfoCollection.Should().NotBeNull();
+        serializationInfoCollection.Generics.Should().HaveCount(8);
+        serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32>()");
+        serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String>()");
+        serializationInfoCollection.Generics[2].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64>()");
+        serializationInfoCollection.Generics[3].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()");
+        serializationInfoCollection.Generics[4].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()");
+        serializationInfoCollection.Generics[5].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()");
+        serializationInfoCollection.Generics[6].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()");
+        serializationInfoCollection.Generics[7].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()");
+    }
+
+    [Fact]
+    public void KnownTypes_Tuple()
+    {
+        // Arrange
+        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var types = new[]
+        {
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short>>(), new string[] { }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short, Guid>>(), new string[] { }),
+        };
+
+        // Act
+        var serializationInfoCollection = collector.Collect(types);
+
+        // Assert
+        serializationInfoCollection.Should().NotBeNull();
+        serializationInfoCollection.Generics.Should().HaveCount(8);
+        serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32>()");
+        serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String>()");
+        serializationInfoCollection.Generics[2].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64>()");
+        serializationInfoCollection.Generics[3].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single>()");
+        serializationInfoCollection.Generics[4].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean>()");
+        serializationInfoCollection.Generics[5].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()");
+        serializationInfoCollection.Generics[6].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()");
+        serializationInfoCollection.Generics[7].FormatterName.Should().Be("global::MessagePack.Formatters.TupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()");
+    }
+
     [Fact]
     public void DynamicArgumentTuple()
     {
