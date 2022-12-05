@@ -183,6 +183,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         receiver.Verify(x => x.Receiver_Parameter_Many(12345, "Hello✨", true));
     }
 
+#if FALSE
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task Forget_NoReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
@@ -217,6 +218,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         result.Should().Be(default(int));
     }
+#endif
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
