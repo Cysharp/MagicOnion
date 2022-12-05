@@ -14,11 +14,18 @@ public class DynamicArgumentTupleServiceTest : IClassFixture<MagicOnionApplicati
         this.factory = factory;
     }
 
-    [Fact]
-    public async Task Unary1()
+    public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
+    {
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MessagePackSerializerOptions.Standard)) };
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MessagePackSerializerOptions.Standard)) };
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateMagicOnionClientFactory))]
+    public async Task Unary1(TestMagicOnionClientFactory<IDynamicArgumentTupleService> clientFactory)
     {
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IDynamicArgumentTupleService>(channel);
+        var client = clientFactory.Create(channel);
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
         result.Should().Be(120);
     }
