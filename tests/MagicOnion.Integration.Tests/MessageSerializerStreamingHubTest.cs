@@ -1,4 +1,4 @@
-﻿using Grpc.Net.Client;
+using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Server.Hubs;
 using MagicOnionTestServer;
@@ -18,13 +18,25 @@ public class MessageSerializerStreamingHubTest : IClassFixture<MagicOnionApplica
         });
     }
 
-    [Fact]
-    public async Task StreamingHub_Parameterless()
+    public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
+    {
+        yield return new [] { new TestStreamingHubClientFactory<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
+        yield return new [] { new TestStreamingHubClientFactory<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
+        {
+            var client = new MessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializer.Default, NullMagicOnionClientLogger.Instance);
+            await client.__ConnectAndSubscribeAsync(receiver, default);
+            return client;
+        })};
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task StreamingHub_Parameterless(TestStreamingHubClientFactory<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await StreamingHubClient.ConnectAsync<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>(channel, receiver, messageSerializer: XorMagicOnionMessagePackSerializer.Instance);
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.MethodParameterless();

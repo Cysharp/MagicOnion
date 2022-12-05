@@ -44,6 +44,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Act
         await client.ConnectAsync(receiver);
         var retVal = await client.Callback(1234, "FooBarBaz");
+        await Task.Delay(500); // Wait for the broadcast queue to be consumed.
 
         // Assert
         retVal.Should().Be(123);

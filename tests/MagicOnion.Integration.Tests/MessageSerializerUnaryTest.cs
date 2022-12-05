@@ -17,13 +17,20 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
             x.MessageSerializer = XorMagicOnionMessagePackSerializer.Instance;
         });
     }
+    
+    public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
+    {
+        yield return new [] { new TestMagicOnionClientFactory<IMessageSerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<IMessageSerializerTestService>(x, messageSerializer)) };
+        yield return new [] { new TestMagicOnionClientFactory<IMessageSerializerTestService>("Generated", (x, messageSerializer) => new MessageSerializerTestServiceClient(x, messageSerializer)) };
+    }
 
-    [Fact]
-    public async Task Unary_Incompatible()
+    [Theory]
+    [MemberData(nameof(EnumerateMagicOnionClientFactory))]
+    public async Task Unary_Incompatible(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, MagicOnionMessagePackMessageSerializer.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
+        var client = clientFactory.Create(channel, MagicOnionMessagePackMessageSerializer.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
         var result  = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
@@ -32,12 +39,13 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
         result.Should().NotBeNull();
     }
 
-    [Fact]
-    public async Task Unary_ReturnNil()
+    [Theory]
+    [MemberData(nameof(EnumerateMagicOnionClientFactory))]
+    public async Task Unary_ReturnNil(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
+        var client = clientFactory.Create(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.UnaryReturnNil();
@@ -46,12 +54,13 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
         result.Should().Be(Nil.Default);
     }
 
-    [Fact]
-    public async Task Unary_Parameterless()
+    [Theory]
+    [MemberData(nameof(EnumerateMagicOnionClientFactory))]
+    public async Task Unary_Parameterless(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
+        var client = clientFactory.Create(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.UnaryParameterless();
@@ -60,12 +69,13 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
         result.Should().Be(123);
     }
 
-    [Fact]
-    public async Task Unary_Parameter_Many()
+    [Theory]
+    [MemberData(nameof(EnumerateMagicOnionClientFactory))]
+    public async Task Unary_Parameter_Many(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = MagicOnionClient.Create<IMessageSerializerTestService>(channel, XorMagicOnionMessagePackSerializer.Instance);
+        var client = clientFactory.Create(channel, XorMagicOnionMessagePackSerializer.Instance);
 
         // Act
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
