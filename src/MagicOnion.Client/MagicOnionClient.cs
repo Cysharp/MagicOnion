@@ -50,10 +50,10 @@ namespace MagicOnion.Client
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
 
             var clientOptions = new MagicOnionClientOptions(invoker, default, default, clientFilters);
-            return Create<T>(clientOptions, serializerOptions);
+            return Create<T>(clientOptions, messageSerializer);
         }
 
-        public static T Create<T>(MagicOnionClientOptions clientOptions, MessagePackSerializerOptions serializerOptions)
+        public static T Create<T>(MagicOnionClientOptions clientOptions, IMagicOnionMessageSerializer messageSerializer)
             where T : IService<T>
         {
             var ctor = MagicOnionClientRegistry<T>.constructor;
