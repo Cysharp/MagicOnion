@@ -26,7 +26,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
-        await client.ConnectAsync();
+        await client.ConnectAsync(receiver);
         var retVal = await client.MethodParameterless();
 
         // Assert
@@ -42,7 +42,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
-        await client.ConnectAsync();
+        await client.ConnectAsync(receiver);
         var retVal = await client.Callback(1234, "FooBarBaz");
 
         // Assert
@@ -68,9 +68,9 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
             DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, nameof(IHandCraftedStreamingHubClientTestHub), "Connect", marshaller, marshaller);
         }
 
-        public Task ConnectAsync()
+        public Task ConnectAsync(IHandCraftedStreamingHubClientTestHubReceiver receiver)
         {
-            return __ConnectAndSubscribeAsync(null!, CancellationToken.None);
+            return __ConnectAndSubscribeAsync(receiver, CancellationToken.None);
         }
 
         protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
