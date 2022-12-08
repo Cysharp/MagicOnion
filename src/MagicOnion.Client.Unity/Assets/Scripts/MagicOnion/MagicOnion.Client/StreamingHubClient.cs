@@ -1,4 +1,5 @@
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MessagePack;
 using System;
 using System.Threading;

@@ -2,6 +2,7 @@ using MagicOnion.Client;
 using Grpc.Net.Client;
 using MagicOnion.Server;
 using Xunit.Abstractions;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 

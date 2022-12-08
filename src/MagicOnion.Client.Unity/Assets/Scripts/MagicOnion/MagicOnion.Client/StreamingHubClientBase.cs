@@ -11,6 +11,7 @@ using MagicOnion.Server;
 using System.Buffers;
 using System.Linq;
 using MagicOnion.Client.Internal;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Client
 {

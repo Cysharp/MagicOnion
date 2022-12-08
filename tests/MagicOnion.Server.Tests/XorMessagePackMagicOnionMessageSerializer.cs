@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MessagePack;
 
 namespace MagicOnion.Server.Tests;

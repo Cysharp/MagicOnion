@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using MagicOnion.Internal;
+using MagicOnion.Serialization;
 using MessagePack;
 
 namespace MagicOnion.Client.Internal

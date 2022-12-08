@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Integration.Tests;

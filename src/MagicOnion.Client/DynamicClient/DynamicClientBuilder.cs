@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using Grpc.Core;
 using MagicOnion.Client.Internal;
+using MagicOnion.Serialization;
 using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient

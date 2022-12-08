@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 

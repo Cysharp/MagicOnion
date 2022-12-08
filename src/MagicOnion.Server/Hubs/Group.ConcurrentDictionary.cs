@@ -1,3 +1,4 @@
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Utils;
 using MessagePack;

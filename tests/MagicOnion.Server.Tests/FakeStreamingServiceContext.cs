@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server.Tests;
 

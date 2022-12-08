@@ -1,4 +1,5 @@
 using MagicOnion.Client;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 

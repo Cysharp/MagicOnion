@@ -1,6 +1,7 @@
 using System.Buffers;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
 using MagicOnionTestServer;

@@ -1,6 +1,7 @@
 #if NON_UNITY || !NET_STANDARD_2_0
 
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
 using MessagePack;

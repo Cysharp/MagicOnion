@@ -1,5 +1,6 @@
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;

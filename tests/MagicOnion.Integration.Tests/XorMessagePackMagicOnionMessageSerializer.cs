@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Reflection;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 

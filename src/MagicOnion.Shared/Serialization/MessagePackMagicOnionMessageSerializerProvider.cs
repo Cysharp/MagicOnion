@@ -6,7 +6,7 @@ using Grpc.Core;
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace MagicOnion
+namespace MagicOnion.Serialization
 {
     public class MessagePackMessageMagicOnionSerializerProvider : IMagicOnionMessageSerializerProvider
     {
@@ -37,7 +37,7 @@ namespace MagicOnion
         public IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo methodInfo)
 #endif
         {
-            var serializerOptions = (EnableFallback && methodInfo != null) ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
+            var serializerOptions = EnableFallback && methodInfo != null ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
             return new MessagePackMagicOnionMessageSerializer(serializerOptions);
         }
 

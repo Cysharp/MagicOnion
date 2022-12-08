@@ -1,3 +1,5 @@
+using MagicOnion.Serialization;
+
 namespace MagicOnion.Integration.Tests;
 
 public record TestStreamingHubClientFactory<T, TReceiver>(string Name, Func<CallInvoker, TReceiver, IMagicOnionMessageSerializerProvider?, Task<T>> FactoryMethod)

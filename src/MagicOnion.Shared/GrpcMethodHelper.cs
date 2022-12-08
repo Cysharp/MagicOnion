@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Grpc.Core;
 using MagicOnion.Internal;
+using MagicOnion.Serialization;
 using MessagePack;
 
 namespace MagicOnion

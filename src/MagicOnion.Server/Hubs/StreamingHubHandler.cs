@@ -6,6 +6,7 @@ using Grpc.Core;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Internal;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server.Hubs;
 

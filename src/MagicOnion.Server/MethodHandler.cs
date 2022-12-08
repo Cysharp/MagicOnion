@@ -8,6 +8,7 @@ using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server;
 

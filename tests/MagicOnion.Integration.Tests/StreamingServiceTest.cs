@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
 using MagicOnion.Server;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 

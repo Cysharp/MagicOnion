@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Reflection;
 using Grpc.Core;
 
-namespace MagicOnion
+namespace MagicOnion.Serialization
 {
     /// <summary>
     /// Provides a serializer for request/response of MagicOnion services and hub methods.
