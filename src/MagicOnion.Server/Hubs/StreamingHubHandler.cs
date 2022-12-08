@@ -23,16 +23,15 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
     public ILookup<Type, Attribute> AttributeLookup => metadata.AttributeLookup;
 
     internal Type RequestType => metadata.RequestType;
-    internal IMagicOnionMessageSerializer MessageSerializer { get; }
     internal Func<StreamingHubContext, ValueTask> MethodBody { get; }
 
     public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)
     {
         this.metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(classType, methodInfo);
-        this.MessageSerializer = handlerOptions.MessageSerializer;
         this.toStringCache = HubName + "/" + MethodInfo.Name;
         this.getHashCodeCache = HashCode.Combine(HubName, MethodInfo.Name);
 
+        var messageSerializer = handlerOptions.MessageSerializer.Create(MethodType.DuplexStreaming, methodInfo);
         var parameters = metadata.Parameters;
         try
         {
@@ -62,7 +61,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
             Type invokerType = metadata.ResponseType is null
                 ? typeof(StreamingHubMethodInvoker<>).MakeGenericType(metadata.RequestType)
                 : typeof(StreamingHubMethodInvoker<,>).MakeGenericType(metadata.RequestType, metadata.ResponseType);
-            StreamingHubMethodInvoker invoker = (StreamingHubMethodInvoker)Activator.CreateInstance(invokerType, MessageSerializer, invokeHubMethodFunc)!;
+            StreamingHubMethodInvoker invoker = (StreamingHubMethodInvoker)Activator.CreateInstance(invokerType, messageSerializer, invokeHubMethodFunc)!;
 
             var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
             this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, invoker.InvokeAsync);
@@ -77,7 +76,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
     {
         protected IMagicOnionMessageSerializer MessageSerializer { get; }
 
-        public StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
+        protected StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
         {
             MessageSerializer = messageSerializer;
         }
@@ -138,7 +137,7 @@ public class StreamingHubHandlerOptions
 {
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
 
-    public IMagicOnionMessageSerializer MessageSerializer { get; }
+    public IMagicOnionMessageSerializerProvider MessageSerializer { get; }
 
     public StreamingHubHandlerOptions(MagicOnionOptions options)
     {

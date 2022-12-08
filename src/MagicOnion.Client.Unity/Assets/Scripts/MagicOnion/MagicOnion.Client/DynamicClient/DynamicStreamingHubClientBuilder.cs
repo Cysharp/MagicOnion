@@ -173,7 +173,7 @@ namespace MagicOnion.Client.DynamicClient
         {
             // .ctor(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger) :base(...)
             {
-                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IMagicOnionMessageSerializer), typeof(IMagicOnionClientLogger) };
+                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IMagicOnionMessageSerializerProvider), typeof(IMagicOnionClientLogger) };
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 

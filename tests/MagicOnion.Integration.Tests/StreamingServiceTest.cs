@@ -20,8 +20,8 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Dynamic", x => MagicOnionClient.Create<IStreamingTestService>(x, MagicOnionMessageSerializer.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Generated", x => new StreamingTestServiceClient(x, MagicOnionMessageSerializer.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Dynamic", x => MagicOnionClient.Create<IStreamingTestService>(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Generated", x => new StreamingTestServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
     }
 
     [Theory]

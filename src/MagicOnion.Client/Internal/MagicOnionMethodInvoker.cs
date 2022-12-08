@@ -12,21 +12,21 @@ namespace MagicOnion.Client.Internal
     // Pubternal API: This class is used from generated clients and is therefore `public` but internal API.
     public static class RawMethodInvoker
     {
-        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
             where TRequest : class
             where TResponse : class
-            => new RawMethodInvoker<TRequest, TResponse, TRequest, TResponse>(methodType, serviceName, name, messageSerializer);
+            => new RawMethodInvoker<TRequest, TResponse, TRequest, TResponse>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
             where TRequest : class
-            => new RawMethodInvoker<TRequest, TResponse, TRequest, Box<TResponse>>(methodType, serviceName, name, messageSerializer);
+            => new RawMethodInvoker<TRequest, TResponse, TRequest, Box<TResponse>>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
             where TResponse : class
-            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, TResponse>(methodType, serviceName, name, messageSerializer);
+            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, TResponse>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
-            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, Box<TResponse>>(methodType, serviceName, name, messageSerializer);
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
+            => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, Box<TResponse>>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
     }
 
     public abstract class RawMethodInvoker<TRequest, TResponse>

@@ -14,7 +14,7 @@ public class MessageSerializerStreamingHubTest : IClassFixture<MagicOnionApplica
     {
         this.factory = factory.WithMagicOnionOptions(x =>
         {
-            x.MessageSerializer = XorMagicOnionMessagePackSerializer.Instance;
+            x.MessageSerializer = XorMessagePackMagicOnionMessageSerializerProvider.Instance;
         });
     }
 
@@ -23,7 +23,7 @@ public class MessageSerializerStreamingHubTest : IClassFixture<MagicOnionApplica
         yield return new [] { new TestStreamingHubClientFactory<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
         yield return new [] { new TestStreamingHubClientFactory<IMessageSerializerTestHub, IMessageSerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
         {
-            var client = new MessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializer.Default, NullMagicOnionClientLogger.Instance);
+            var client = new MessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};
@@ -36,7 +36,7 @@ public class MessageSerializerStreamingHubTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: XorMagicOnionMessagePackSerializer.Instance);
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: XorMessagePackMagicOnionMessageSerializerProvider.Instance);
 
         // Act
         var result  = await client.MethodParameterless();

@@ -23,7 +23,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MessagePackMessageMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync(receiver);
@@ -39,7 +39,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionMessagePackMessageSerializer.Instance, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MessagePackMessageMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync(receiver);
@@ -62,7 +62,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
 
     class __HandCraftedClient__IHandCraftedStreamingHubClientTestHub : StreamingHubClientBase<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>, IHandCraftedStreamingHubClientTestHub
     {
-        public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger)
+        public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
             : base(callInvoker, host, option, messageSerializer, logger)
         {
             var marshaller = MagicOnionMarshallers.ThroughMarshaller;

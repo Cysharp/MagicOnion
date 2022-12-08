@@ -16,8 +16,8 @@ public class DynamicArgumentTupleServiceTest : IClassFixture<MagicOnionApplicati
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MagicOnionMessageSerializer.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MagicOnionMessageSerializer.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
     }
 
     [Theory]

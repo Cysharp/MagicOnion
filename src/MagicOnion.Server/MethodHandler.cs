@@ -56,7 +56,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         this.isStreamingHub = isStreamingHub;
 
         this.MethodName = methodName;
-        this.messageSerializer = handlerOptions.MessageSerializer;
+        this.messageSerializer = handlerOptions.MessageSerializer.Create(MethodType, methodInfo);
 
         // options
         this.IsReturnExceptionStackTraceInErrorDetail = handlerOptions.IsReturnExceptionStackTraceInErrorDetail;
@@ -508,7 +508,7 @@ public class MethodHandlerOptions
 
     public bool EnableCurrentContext { get; }
 
-    public IMagicOnionMessageSerializer MessageSerializer { get; }
+    public IMagicOnionMessageSerializerProvider MessageSerializer { get; }
 
     public MethodHandlerOptions(MagicOnionOptions options)
     {

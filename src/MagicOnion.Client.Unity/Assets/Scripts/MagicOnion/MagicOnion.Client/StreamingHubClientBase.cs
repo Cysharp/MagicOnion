@@ -40,12 +40,12 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
         {
             this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;
             this.option = option;
-            this.messageSerializer = messageSerializer ?? throw new ArgumentNullException(nameof(messageSerializer));
+            this.messageSerializer = messageSerializer?.Create(MethodType.DuplexStreaming, null) ?? throw new ArgumentNullException(nameof(messageSerializer));
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 

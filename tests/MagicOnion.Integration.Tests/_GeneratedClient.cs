@@ -145,7 +145,7 @@ namespace MagicOnion.Integration.Tests
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32> Unary1;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::MessagePack.Nil> HeaderEcho;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::MessagePack.Nil> AlwaysError;
-            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)
+            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer)
             {
                 this.Unary1 = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IClientFilterTestService", "Unary1", messageSerializer);
                 this.HeaderEcho = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IClientFilterTestService", "HeaderEcho", messageSerializer);
@@ -155,7 +155,7 @@ namespace MagicOnion.Integration.Tests
         
         readonly ClientCore core;
         
-        public ClientFilterTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public ClientFilterTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -191,7 +191,7 @@ namespace MagicOnion.Integration.Tests
         class ClientCore
         {
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32> Unary1;
-            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)
+            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer)
             {
                 this.Unary1 = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IDynamicArgumentTupleService", "Unary1", messageSerializer);
             }
@@ -199,7 +199,7 @@ namespace MagicOnion.Integration.Tests
         
         readonly ClientCore core;
         
-        public DynamicArgumentTupleServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public DynamicArgumentTupleServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -233,7 +233,7 @@ namespace MagicOnion.Integration.Tests
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::MessagePack.Nil> UnaryReturnNil;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Int32> UnaryParameterless;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32> Unary1;
-            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)
+            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer)
             {
                 this.UnaryReturnNil = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMessageSerializerTestService", "UnaryReturnNil", messageSerializer);
                 this.UnaryParameterless = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IMessageSerializerTestService", "UnaryParameterless", messageSerializer);
@@ -243,7 +243,7 @@ namespace MagicOnion.Integration.Tests
         
         readonly ClientCore core;
         
-        public MessageSerializerTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public MessageSerializerTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -281,7 +281,7 @@ namespace MagicOnion.Integration.Tests
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32> ClientStreaming;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32> ServerStreaming;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32> DuplexStreaming;
-            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)
+            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer)
             {
                 this.ClientStreaming = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.ClientStreaming, "IStreamingTestService", "ClientStreaming", messageSerializer);
                 this.ServerStreaming = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.ServerStreaming, "IStreamingTestService", "ServerStreaming", messageSerializer);
@@ -291,7 +291,7 @@ namespace MagicOnion.Integration.Tests
         
         readonly ClientCore core;
         
-        public StreamingTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public StreamingTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -334,7 +334,7 @@ namespace MagicOnion.Integration.Tests
     {
         protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
         
-        public HandCraftedStreamingHubClientTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+        public HandCraftedStreamingHubClientTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
             : base(callInvoker, host, options, messageSerializer, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
@@ -431,7 +431,7 @@ namespace MagicOnion.Integration.Tests
     {
         protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
         
-        public MessageSerializerTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+        public MessageSerializerTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
             : base(callInvoker, host, options, messageSerializer, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
@@ -528,7 +528,7 @@ namespace MagicOnion.Integration.Tests
     {
         protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
         
-        public StreamingHubTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+        public StreamingHubTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
             : base(callInvoker, host, options, messageSerializer, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;

@@ -20,7 +20,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
         yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
         {
-            var client = new StreamingHubTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializer.Default, NullMagicOnionClientLogger.Instance);
+            var client = new StreamingHubTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};

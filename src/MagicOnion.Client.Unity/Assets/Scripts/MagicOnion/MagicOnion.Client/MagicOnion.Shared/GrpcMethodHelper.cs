@@ -128,21 +128,26 @@ namespace MagicOnion
                 deserializer: (ctx) => Box.Create(Nil.Default) /* Box.Create always returns cached Box<Nil> */
             );
 
-        private static Marshaller<T> CreateMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
+        static Marshaller<T> CreateMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
         {
-            var serializer = messageSerializer.CreateSerializer<T>(methodType, methodInfo);
             return new Marshaller<T>(
-                serializer: serializer.ContextualSerializer,
-                deserializer: serializer.ContextualDeserializer
-            );
+                serializer: (obj, ctx) =>
+                {
+                    messageSerializer.Serialize(ctx.GetBufferWriter(), obj);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence()));
         }
 
-        private static Marshaller<Box<T>> CreateBoxedMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
+        static Marshaller<Box<T>> CreateBoxedMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
         {
-            var serializer = messageSerializer.CreateSerializer<T>(methodType, methodInfo);
             return new Marshaller<Box<T>>(
-                serializer: (obj, ctx) => serializer.ContextualSerializer(obj.Value, ctx),
-                deserializer: (ctx) => Box.Create(serializer.ContextualDeserializer(ctx))
+                serializer: (obj, ctx) =>
+                {
+                    messageSerializer.Serialize(ctx.GetBufferWriter(), obj.Value);
+                    ctx.Complete();
+                },
+                deserializer: (ctx) => Box.Create(messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence()))
             );
         }
 
