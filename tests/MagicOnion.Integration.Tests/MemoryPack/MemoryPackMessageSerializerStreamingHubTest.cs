@@ -21,13 +21,13 @@ public class MemoryPackMessageSerializerStreamingHubTest : IClassFixture<MagicOn
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        yield return new [] { new TestStreamingHubClientFactory<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
-        //yield return new [] { new TestStreamingHubClientFactory<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
-        //{
-        //    var client = new MessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MemoryPackMagicOnionMessageSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
-        //    await client.__ConnectAndSubscribeAsync(receiver, default);
-        //    return client;
-        //})};
+        yield return new[] { new TestStreamingHubClientFactory<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
+        yield return new[] { new TestStreamingHubClientFactory<IMemoryPackMessageSerializerTestHub, IMemoryPackMessageSerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
+        {
+            var client = new MemoryPackMessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MemoryPackMagicOnionMessageSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
+            await client.__ConnectAndSubscribeAsync(receiver, default);
+            return client;
+        })};
     }
 
     [Theory]
@@ -40,7 +40,7 @@ public class MemoryPackMessageSerializerStreamingHubTest : IClassFixture<MagicOn
         var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionMessageSerializerProvider.Instance);
 
         // Act
-        var result  = await client.MethodParameterless();
+        var result = await client.MethodParameterless();
 
         // Assert
         result.Should().Be(123);
@@ -56,7 +56,7 @@ public class MemoryPackMessageSerializerStreamingHubTest : IClassFixture<MagicOn
         var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionMessageSerializerProvider.Instance);
 
         // Act
-        var result  = await client.MethodParameter_One(12345);
+        var result = await client.MethodParameter_One(12345);
 
         // Assert
         result.Should().Be(123 + 12345);
@@ -72,7 +72,7 @@ public class MemoryPackMessageSerializerStreamingHubTest : IClassFixture<MagicOn
         var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionMessageSerializerProvider.Instance);
 
         // Act
-        var result  = await client.MethodParameter_Many(12345, "6789");
+        var result = await client.MethodParameter_Many(12345, "6789");
 
         // Assert
         result.Should().Be(123 + 12345 + 6789);
@@ -88,9 +88,9 @@ public class MemoryPackMessageSerializerStreamingHubTest : IClassFixture<MagicOn
         var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionMessageSerializerProvider.Instance);
 
         // Act
-        var result  = await client.Callback(12345, "6789");
+        var result = await client.Callback(12345, "6789");
         await Task.Delay(100);
-        var result2  = await client.Callback(98765, "43210");
+        var result2 = await client.Callback(98765, "43210");
         await Task.Delay(100);
 
         // Assert

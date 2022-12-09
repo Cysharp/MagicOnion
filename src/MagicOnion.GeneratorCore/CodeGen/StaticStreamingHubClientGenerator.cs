@@ -106,7 +106,7 @@ public class StaticStreamingHubClientGenerator
     static void EmitConstructor(StreamingHubClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        public {{ctx.Hub.GetClientName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+        public {{ctx.Hub.GetClientName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
             : base(callInvoker, host, options, messageSerializer, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;

@@ -94,7 +94,7 @@ public class StaticMagicOnionClientGenerator
             EmitClientCore(ctx);
             // private readonly ClientCore core; ...
             EmitFields(ctx);
-            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) : base(options) { ... }
+            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializerProvider messageSerializer) : base(options) { ... }
             // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore core) : base(options) { ... }
             EmitConstructor(ctx);
             // protected override ClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
@@ -118,7 +118,7 @@ public class StaticMagicOnionClientGenerator
     static void EmitConstructor(ServiceClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        public {{ctx.Service.GetClientName()}}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public {{ctx.Service.GetClientName()}}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -185,7 +185,7 @@ public class StaticMagicOnionClientGenerator
          *     // UnaryResult<string> HelloAsync(string name, int age);
          *     public UnaryMethodRawInvoker<DynamicArgumentTuple<string, int>, string> HelloAsync;
          *
-         *     public ClientCore(IMagicOnionMessageSerializer messageSerializer)
+         *     public ClientCore(IMagicOnionMessageSerializerProvider messageSerializer)
          *     {
          *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", messageSerializer);
          *     }
@@ -206,8 +206,8 @@ public class StaticMagicOnionClientGenerator
                 } // #endif
             }
 
-            // public ClientCore(IMagicOnionMessageSerializer messageSerializer) {
-            ctx.TextWriter.WriteLine("public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)");
+            // public ClientCore(IMagicOnionMessageSerializerProvider messageSerializer) {
+            ctx.TextWriter.WriteLine("public ClientCore(global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer)");
             ctx.TextWriter.WriteLine("{");
             using (ctx.TextWriter.BeginIndent())
             {
