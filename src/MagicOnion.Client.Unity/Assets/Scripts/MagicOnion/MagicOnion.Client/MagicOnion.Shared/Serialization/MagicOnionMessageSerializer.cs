@@ -27,8 +27,13 @@ namespace MagicOnion.Serialization
     /// </summary>
     public interface IMagicOnionMessageSerializer
     {
+#if NET5_0_OR_GREATER
+        void Serialize<T>(IBufferWriter<byte> writer, in T? value);
+        T? Deserialize<T>(in ReadOnlySequence<byte> bytes);
+#else
         void Serialize<T>(IBufferWriter<byte> writer, in T value);
         T Deserialize<T>(in ReadOnlySequence<byte> bytes);
+#endif
     }
 
     public static class MagicOnionMessageSerializerProvider
