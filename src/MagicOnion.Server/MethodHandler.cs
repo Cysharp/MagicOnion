@@ -37,6 +37,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     internal IMagicOnionLogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
+    public IMagicOnionMessageSerializer MessageSerializer => messageSerializer;
 
     public string ServiceName => metadata.ServiceInterface.Name;
     public string MethodName { get; }
