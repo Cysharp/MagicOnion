@@ -23,6 +23,11 @@ namespace MagicOnion.Integration.Tests.Generated
     {
         static bool isRegistered = false;
 
+#if UNITY_2019_4_OR_NEWER
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+#elif NET5_0_OR_GREATER
+        [System.Runtime.CompilerServices.ModuleInitializer]
+#endif
         public static void Register()
         {
             if(isRegistered) return;

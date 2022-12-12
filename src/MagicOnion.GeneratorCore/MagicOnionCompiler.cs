@@ -28,7 +28,7 @@ public class MagicOnionCompiler
     public async Task GenerateFileAsync(
         string input,
         string output,
-        bool omitUnityAttribute,
+        bool disableAutoRegister,
         string @namespace,
         string conditionalSymbol,
         string userDefinedMessagePackFormattersNamespace)
@@ -40,7 +40,7 @@ public class MagicOnionCompiler
         // Generator Start...
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Input: {input}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Output: {output}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:OmitUnityAttribute: {omitUnityAttribute}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:DisableAutoRegister: {disableAutoRegister}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {@namespace}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedMessagePackFormattersNamespace: {userDefinedMessagePackFormattersNamespace}");
@@ -82,7 +82,7 @@ public class MagicOnionCompiler
             Namespace = @namespace,
             Services = serviceCollection.Services,
             Hubs = serviceCollection.Hubs,
-            OmitUnityAttribute = omitUnityAttribute,
+            DisableAutoRegisterOnInitialize = disableAutoRegister,
         };
 
         if (Path.GetExtension(output) == ".cs")
