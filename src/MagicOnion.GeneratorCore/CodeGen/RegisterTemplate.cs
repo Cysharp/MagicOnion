@@ -53,9 +53,10 @@ namespace ");
         static bool isRegistered = false;
 
 ");
- if (!OmitUnityAttribute) { 
-            this.Write("        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeL" +
-                    "oadType.BeforeSceneLoad)]\r\n");
+ if (!DisableAutoRegisterOnInitialize) { 
+            this.Write("#if UNITY_2019_4_OR_NEWER\r\n        [UnityEngine.RuntimeInitializeOnLoadMethod(Uni" +
+                    "tyEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]\r\n#elif NET5_0_OR_GREATER\r\n " +
+                    "       [System.Runtime.CompilerServices.ModuleInitializer]\r\n#endif\r\n");
  } 
             this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
                     "turn;\r\n            isRegistered = true;\r\n\r\n");

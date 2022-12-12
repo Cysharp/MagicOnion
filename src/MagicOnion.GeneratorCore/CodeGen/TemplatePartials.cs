@@ -11,7 +11,7 @@ public partial class HubTemplate
 public partial class RegisterTemplate
 {
     public string Namespace { get; set; }
-    public bool OmitUnityAttribute { get; set; }
+    public bool DisableAutoRegisterOnInitialize { get; set; }
     public IReadOnlyList<MagicOnionServiceInfo> Services { get; set; }
     public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; set; }
 }
