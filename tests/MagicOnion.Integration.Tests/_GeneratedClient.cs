@@ -132,6 +132,12 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
 #pragma warning disable 219
 #pragma warning disable 168
 
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
+
 namespace MagicOnion.Integration.Tests
 {
     using global::System;
@@ -371,6 +377,12 @@ namespace MagicOnion.Integration.Tests.MemoryPack
 #pragma warning disable 414
 #pragma warning disable 219
 #pragma warning disable 168
+
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
 
 namespace MagicOnion.Integration.Tests
 {

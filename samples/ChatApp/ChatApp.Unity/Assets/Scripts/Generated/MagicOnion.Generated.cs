@@ -135,7 +135,7 @@ namespace ChatApp.Shared.Services
         {
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.String, global::MessagePack.Nil> GenerateException;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.String, global::MessagePack.Nil> SendReportAsync;
-            public ClientCore(global::MagicOnion.IMagicOnionMessageSerializer messageSerializer)
+            public ClientCore(global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer)
             {
                 this.GenerateException = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.String, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IChatService", "GenerateException", messageSerializer);
                 this.SendReportAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.String, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IChatService", "SendReportAsync", messageSerializer);
@@ -144,7 +144,7 @@ namespace ChatApp.Shared.Services
         
         readonly ClientCore core;
         
-        public ChatServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer) : base(options)
+        public ChatServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
         {
             this.core = new ClientCore(messageSerializer);
         }
@@ -185,7 +185,7 @@ namespace ChatApp.Shared.Hubs
     {
         protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
         
-        public ChatHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.IMagicOnionMessageSerializer messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+        public ChatHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
             : base(callInvoker, host, options, messageSerializer, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
