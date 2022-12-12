@@ -2,6 +2,7 @@ using MagicOnion.Server.Hubs;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
 
@@ -203,7 +204,7 @@ public static class MagicOnionEngine
                     {
                         factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
                     }
-                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.SerializerOptions, logger));
+                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null), logger));
                 }
             }
         }

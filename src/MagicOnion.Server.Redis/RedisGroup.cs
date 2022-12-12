@@ -1,3 +1,4 @@
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
@@ -9,7 +10,7 @@ namespace MagicOnion.Server.Redis;
 
 public class RedisGroupRepository : IGroupRepository
 {
-    MessagePackSerializerOptions serializerOptions;
+    IMagicOnionMessageSerializer messageSerializer;
     IMagicOnionLogger logger;
     ConnectionMultiplexer connection;
     int db;
@@ -17,9 +18,9 @@ public class RedisGroupRepository : IGroupRepository
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public RedisGroupRepository(MessagePackSerializerOptions serializerOptions, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
+    public RedisGroupRepository(IMagicOnionMessageSerializer messageSerializer, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
     {
-        this.serializerOptions = serializerOptions;
+        this.messageSerializer = messageSerializer;
         this.logger = logger;
         this.factory = CreateGroup;
         this.connection = redisGroupOptions.ConnectionMultiplexer ?? throw new InvalidOperationException("RedisGroup requires add ConnectionMultiplexer to MagicOnionOptions.ServiceLocator before create it. Please try new MagicOnionOptions{DefaultServiceLocator.Register(new ConnectionMultiplexer)}");
@@ -33,7 +34,7 @@ public class RedisGroupRepository : IGroupRepository
 
     IGroup CreateGroup(string groupName)
     {
-        return new RedisGroup(groupName, serializerOptions, new ConcurrentDictionaryGroup(groupName, this, serializerOptions, logger), connection.GetSubscriber(), connection.GetDatabase(db));
+        return new RedisGroup(groupName, messageSerializer, new ConcurrentDictionaryGroup(groupName, this, messageSerializer, logger), connection.GetSubscriber(), connection.GetDatabase(db));
     }
 
     public bool TryGet(string groupName, out IGroup group)
@@ -53,14 +54,14 @@ public class RedisGroup : IGroup
     IGroup inmemoryGroup;
     IDatabaseAsync database;
     RedisChannel channel;
-    MessagePackSerializerOptions serializerOptions;
+    IMagicOnionMessageSerializer messageSerializer;
     ChannelMessageQueue mq;
     RedisKey counterKey;
 
-    public RedisGroup(string groupName, MessagePackSerializerOptions serializerOptions, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
+    public RedisGroup(string groupName, IMagicOnionMessageSerializer messageSerializer, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
     {
         this.GroupName = groupName;
-        this.serializerOptions = serializerOptions;
+        this.messageSerializer = messageSerializer;
         this.channel = new RedisChannel("MagicOnion.Redis.RedisGroup?groupName=" + groupName, RedisChannel.PatternMode.Literal);
         this.counterKey = "MagicOnion.Redis.RedisGroup.MemberCount?groupName=" + groupName;
         this.inmemoryGroup = inmemoryGroup;
@@ -176,9 +177,10 @@ public class RedisGroup : IGroup
 
             writer.WriteArrayHeader(2);
             writer.WriteInt32(methodId);
-            MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
-
             writer.Flush();
+
+            messageSerializer.Serialize(buffer, value);
+
             var result = buffer.WrittenSpan.ToArray();
             return result;
         }

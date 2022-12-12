@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Integration.Tests;
@@ -17,10 +18,10 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Dynamic", (callInvoker, receiver) => StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(callInvoker, receiver)) };
-        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Static", async (callInvoker, receiver) =>
+        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
+        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
         {
-            var client = new StreamingHubTestHubClient(callInvoker, string.Empty, new CallOptions(), MessagePackSerializerOptions.Standard, NullMagicOnionClientLogger.Instance);
+            var client = new StreamingHubTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionMessageSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};
@@ -183,7 +184,6 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         receiver.Verify(x => x.Receiver_Parameter_Many(12345, "Hello✨", true));
     }
 
-#if FALSE
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task Forget_NoReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
@@ -218,7 +218,6 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         result.Should().Be(default(int));
     }
-#endif
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub

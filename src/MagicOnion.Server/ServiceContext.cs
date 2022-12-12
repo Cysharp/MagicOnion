@@ -1,4 +1,5 @@
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using System.Collections.Concurrent;
@@ -24,7 +25,7 @@ public interface IServiceContext
     /// <summary>Raw gRPC Context.</summary>
     ServerCallContext CallContext { get; }
 
-    MessagePackSerializerOptions SerializerOptions { get; }
+    IMagicOnionMessageSerializer MessageSerializer { get; }
 
     IServiceProvider ServiceProvider { get; }
 
@@ -72,7 +73,7 @@ public class ServiceContext : IServiceContext
     /// <summary>Raw gRPC Context.</summary>
     public ServerCallContext CallContext { get; }
 
-    public MessagePackSerializerOptions SerializerOptions { get; private set; }
+    public IMagicOnionMessageSerializer MessageSerializer { get; private set; }
 
     public IServiceProvider ServiceProvider { get; }
 
@@ -80,14 +81,14 @@ public class ServiceContext : IServiceContext
     internal object? Result { get; set; }
     internal IMagicOnionLogger MagicOnionLogger { get; }
     internal MethodHandler MethodHandler { get; }
-    
+
     public ServiceContext(
         Type serviceType,
         MethodInfo methodInfo,
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
         ServerCallContext context,
-        MessagePackSerializerOptions serializerOptions,
+        IMagicOnionMessageSerializer messageSerializer,
         IMagicOnionLogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider
@@ -100,7 +101,7 @@ public class ServiceContext : IServiceContext
         this.MethodType = methodType;
         this.CallContext = context;
         this.Timestamp = DateTime.UtcNow;
-        this.SerializerOptions = serializerOptions;
+        this.MessageSerializer = messageSerializer;
         this.MagicOnionLogger = logger;
         this.MethodHandler = methodHandler;
         this.ServiceProvider = serviceProvider;
@@ -130,12 +131,11 @@ public class ServiceContext : IServiceContext
         Result = response;
     }
 
-
     /// <summary>
     /// modify request/response options in this context.
     /// </summary>
-    public void ChangeSerializerOptions(MessagePackSerializerOptions serializerOptions)
+    public void ChangeSerializer(IMagicOnionMessageSerializer messageSerializer)
     {
-        this.SerializerOptions = serializerOptions;
+        this.MessageSerializer = messageSerializer;
     }
 }

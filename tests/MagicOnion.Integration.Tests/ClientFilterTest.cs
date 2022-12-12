@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -21,8 +22,8 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Dynamic", x => MagicOnionClient.Create<IClientFilterTestService>(x, MessagePackSerializerOptions.Standard)) };
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Generated", x => new ClientFilterTestServiceClient(x, MessagePackSerializerOptions.Standard)) };
+        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Dynamic", x => MagicOnionClient.Create<IClientFilterTestService>(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Generated", x => new ClientFilterTestServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
     }
 
     [Theory]

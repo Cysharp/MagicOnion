@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
 using MagicOnion.Server;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -20,8 +21,8 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Dynamic", x => MagicOnionClient.Create<IStreamingTestService>(x, MessagePackSerializerOptions.Standard)) };
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Generated", x => new StreamingTestServiceClient(x, MessagePackSerializerOptions.Standard)) };
+        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Dynamic", x => MagicOnionClient.Create<IStreamingTestService>(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Generated", x => new StreamingTestServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
     }
 
     [Theory]

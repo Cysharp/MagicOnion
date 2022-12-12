@@ -26,9 +26,49 @@ public class MagicOnionServiceInfo : IMagicOnionServiceInfo
         public string MethodName { get; }
         public string Path { get; }
         public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; } // T1, T2 ...
-        public MagicOnionTypeInfo MethodReturnType { get; } // UnaryResult<T> or Task<{Server,Client,Duplex}Streaming<>>
-        public MagicOnionTypeInfo RequestType { get; } // TArg or DynamicArgumentTuple<T1, T2 ...>
-        public MagicOnionTypeInfo ResponseType { get; } // TResponse
+
+        /// <summary>
+        /// Gets a type of method return value in the interface. ex. <c>UnaryResult&lt;T></c>, <c>Task&lt;ServerStreamingResult></c>, <c>Task&lt;ClientStreamingResult></c> or <c>Task&lt;DuplexStreamingResult></c>.
+        /// </summary>
+        public MagicOnionTypeInfo MethodReturnType { get; }
+
+        /// <summary>
+        /// Gets a type for serializing method parameters.
+        /// <list type="bullet">
+        /// <item>
+        ///     <term>The method has no parameter</term>
+        ///     <description><c>MessagePack.Nil</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has exact one parameter</term>
+        ///     <description><c>Parameters[0].Type</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has two or more parameters</term>
+        ///     <description><c>DynamicArgumentTuple&lt;Parameters[0].Type, Parameters[1].Type ...></c></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public MagicOnionTypeInfo RequestType { get; }
+
+        /// <summary>
+        /// Gets a type for serializing method return value.
+        /// <list type="bullet">
+        /// <item>
+        ///     <term>The method has no return value. (void, Task and ValueTask)</term>
+        ///     <description><c>MessagePack.Nil</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has return value. (Task&lt;T>)</term>
+        ///     <description><c>MethodReturnType.GenericArguments[0]</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has return value.</term>
+        ///     <description><c>MethodReturnType</c></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public MagicOnionTypeInfo ResponseType { get; }
 
         public string IfDirectiveCondition { get; }
         public bool HasIfDirectiveCondition => !string.IsNullOrEmpty(IfDirectiveCondition);

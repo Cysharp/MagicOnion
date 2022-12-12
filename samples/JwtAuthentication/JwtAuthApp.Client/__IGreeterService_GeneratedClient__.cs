@@ -6,6 +6,7 @@ using JwtAuthApp.Shared;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Client.Internal;
+using MagicOnion.Serialization;
 using MessagePack;
 
 namespace JwtAuthApp.Client
@@ -15,13 +16,13 @@ namespace JwtAuthApp.Client
     {
         readonly ClientCore core;
 
-        public __IGreeterService_GeneratedClient__(CallInvoker callInvoker, IReadOnlyList<IClientFilter> clientFilter, MessagePackSerializerOptions serializerOptions)
+        public __IGreeterService_GeneratedClient__(CallInvoker callInvoker, IReadOnlyList<IClientFilter> clientFilter, IMagicOnionMessageSerializerProvider serializerOptions)
             : this(new MagicOnionClientOptions(callInvoker, null, default, clientFilter), serializerOptions)
         {
             this.core = new ClientCore(serializerOptions);
         }
 
-        public __IGreeterService_GeneratedClient__(MagicOnionClientOptions options, MessagePackSerializerOptions serializerOptions)
+        public __IGreeterService_GeneratedClient__(MagicOnionClientOptions options, IMagicOnionMessageSerializerProvider serializerOptions)
             : base(options)
         {
             this.core = new ClientCore(serializerOptions);
@@ -43,7 +44,7 @@ namespace JwtAuthApp.Client
 
         public Task<DuplexStreamingResult<int, string>> DuplexAsync() => core.DuplexAsync.InvokeDuplexStreaming(this, "IGreeterService/DuplexAsync");
 
-        public static Func<MagicOnionClientOptions, IGreeterService> CreateFactory(MessagePackSerializerOptions serializerOptions)
+        public static Func<MagicOnionClientOptions, IGreeterService> CreateFactory(IMagicOnionMessageSerializerProvider serializerOptions)
         {
             var core = new ClientCore(serializerOptions);
             return (options) => new __IGreeterService_GeneratedClient__(options, core);
@@ -56,7 +57,7 @@ namespace JwtAuthApp.Client
             public readonly RawMethodInvoker<int, string> ClientAsync;
             public readonly RawMethodInvoker<int, string> DuplexAsync;
 
-            public ClientCore(MessagePackSerializerOptions serializerOptions)
+            public ClientCore(IMagicOnionMessageSerializerProvider serializerOptions)
             {
                 HelloAsync = RawMethodInvoker.Create_ValueType_RefType<Nil, string>(MethodType.Unary, nameof(IGreeterService), nameof(HelloAsync), serializerOptions);
                 ServerAsync = RawMethodInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>(MethodType.ServerStreaming, nameof(IGreeterService), nameof(ServerAsync), serializerOptions);

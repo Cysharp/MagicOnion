@@ -1,6 +1,7 @@
 #if NON_UNITY || !NET_STANDARD_2_0
 
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Utils;
 using MessagePack;
@@ -55,11 +56,6 @@ namespace MagicOnion.Client.DynamicClient
         static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes);
-
-        static readonly MethodInfo callMessagePackDesrialize = typeof(MessagePackSerializer).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
-        static readonly MethodInfo callCancellationTokenNone = typeof(CancellationToken).GetProperty("None", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetGetMethod();
-        static readonly PropertyInfo completedTask = typeof(Task).GetProperty("CompletedTask", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
 
         static DynamicStreamingHubClientBuilder()
         {
@@ -176,9 +172,9 @@ namespace MagicOnion.Client.DynamicClient
 
         static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
-            // .ctor(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions resolver, IMagicOnionClientLogger logger) :base(...)
+            // .ctor(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializer messageSerializer, IMagicOnionClientLogger logger) :base(...)
             {
-                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(MessagePackSerializerOptions), typeof(IMagicOnionClientLogger) };
+                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IMagicOnionMessageSerializerProvider), typeof(IMagicOnionClientLogger) };
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 
@@ -300,37 +296,25 @@ namespace MagicOnion.Client.DynamicClient
 
                     foreach (var item in labels)
                     {
-                        // var result = LZ4MessagePackSerializer.Deserialize<T>(data, resolver);
-                        // ((TaskCompletionSource<T>)taskCompletionSource).TrySetResult(result);
-
-                        // => ((TaskCompletionSource<T>)taskCompletionSource).TrySetResult(LZ4MessagePackSerializer.Deserialize<T>(data, resolver));
-
+                        // SetResultForResponse<T>(taskCompletionSource, data);
                         Type responseType;
-                        Type tcsType;
                         if (item.def.MethodInfo.ReturnType == typeof(Task))
                         {
                             // Task methods uses TaskCompletionSource<Nil>
                             responseType = typeof(Nil);
-                            tcsType = typeof(TaskCompletionSource<Nil>);
                         }
                         else
                         {
                             responseType = item.def.MethodInfo.ReturnType.GetGenericArguments()[0];
-                            tcsType = typeof(TaskCompletionSource<>).MakeGenericType(responseType);
                         }
 
                         il.MarkLabel(item.label);
 
-                        il.Emit(OpCodes.Ldarg_2);
-                        il.Emit(OpCodes.Castclass, tcsType);
-                        il.Emit(OpCodes.Ldarg_3);
-                        il.Emit(OpCodes.Ldarg_0);
-                        il.Emit(OpCodes.Ldfld, serializerOptionsField);
-                        il.Emit(OpCodes.Call, callCancellationTokenNone);
-                        il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(responseType));
-
-                        il.Emit(OpCodes.Callvirt, tcsType.GetMethod("TrySetResult"));
-                        il.Emit(OpCodes.Pop);
+                        // this.SetResultForResponse<T>(taskCompletionSource, data);
+                        il.Emit(OpCodes.Ldarg_0); // this
+                        il.Emit(OpCodes.Ldarg_2); // taskCompletionSource
+                        il.Emit(OpCodes.Ldarg_3); // data
+                        il.Emit(OpCodes.Call, baseType.GetMethod("SetResultForResponse", BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(responseType));
 
                         il.Emit(OpCodes.Ret);
                     }
@@ -361,44 +345,46 @@ namespace MagicOnion.Client.DynamicClient
                     foreach (var item in labels)
                     {
                         il.MarkLabel(item.label);
+                        // var value = Deserialize<DynamicArgumentTuple<int, string>>(data);
+                        // receiver.OnMessage(value.Item1, value.Item2);
 
-                        // var result = LZ4MessagePackSerializer.Deserialize<DynamicArgumentTuple<int, string>>(data, resolver);
-                        // return receiver.OnReceiveMessage(result.Item1, result.Item2);
-
+                        var deserializeMethod = baseType.GetMethod("Deserialize", BindingFlags.Instance | BindingFlags.NonPublic);
                         var parameters = item.def.MethodInfo.GetParameters();
                         if (parameters.Length == 0)
                         {
+                            // this.receiver.OnMessage();
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            il.Emit(OpCodes.Ret);
                         }
                         else if (parameters.Length == 1)
                         {
-                            // TODO:fix emit
-                            il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, receiverField);
-                            il.Emit(OpCodes.Ldarg_2);
-                            il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
-                            il.Emit(OpCodes.Call, callCancellationTokenNone);
-                            il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(parameters[0].ParameterType));
+                            // this.receiver.OnMessage(...);
+                            il.Emit(OpCodes.Ldarg_0); // this.
+                            il.Emit(OpCodes.Ldfld, receiverField); // receiver
+                            {
+                                // this.Deserialize<T>(data)
+                                il.Emit(OpCodes.Ldarg_0); // this
+                                il.Emit(OpCodes.Ldarg_2); // data
+                                il.Emit(OpCodes.Call, deserializeMethod.MakeGenericMethod(parameters[0].ParameterType));
+                            }
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            il.Emit(OpCodes.Ret);
                         }
                         else
                         {
-                            // TODO:fix emit
                             var deserializeType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2]
                                 .MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                             var lc = il.DeclareLocal(deserializeType);
-                            il.Emit(OpCodes.Ldarg_2);
-                            il.Emit(OpCodes.Ldarg_0);
-                            il.Emit(OpCodes.Ldfld, serializerOptionsField);
-                            il.Emit(OpCodes.Call, callCancellationTokenNone);
-                            il.Emit(OpCodes.Call, callMessagePackDesrialize.MakeGenericMethod(deserializeType));
-                            il.Emit(OpCodes.Stloc, lc);
 
+                            // var local0 = this.Deserialize<T>(data);
+                            {
+                                il.Emit(OpCodes.Ldarg_0); // this
+                                il.Emit(OpCodes.Ldarg_2); // data
+                                il.Emit(OpCodes.Call, deserializeMethod.MakeGenericMethod(deserializeType));
+                                il.Emit(OpCodes.Stloc, lc);
+                            }
+
+                            // this.receiver.OnMessage(local.Item1, local.Item2 ...);
                             il.Emit(OpCodes.Ldarg_0);
                             il.Emit(OpCodes.Ldfld, receiverField);
                             for (int i = 0; i < parameters.Length; i++)
@@ -406,10 +392,10 @@ namespace MagicOnion.Client.DynamicClient
                                 il.Emit(OpCodes.Ldloc, lc);
                                 il.Emit(OpCodes.Ldfld, deserializeType.GetField("Item" + (i + 1)));
                             }
-
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
-                            il.Emit(OpCodes.Ret);
                         }
+                        // return;
+                        il.Emit(OpCodes.Ret);
                     }
                 }
             }
@@ -517,7 +503,7 @@ namespace MagicOnion.Client.DynamicClient
                     parameters);
                 var il = method.GetILGenerator();
 
-                // return client.WriteMessage***<T>(methodId, message);
+                // return client.WriteMessageAsyncFireAndForget<T>(methodId, message);
 
                 // this.client.***
                 il.Emit(OpCodes.Ldarg_0);
@@ -532,35 +518,38 @@ namespace MagicOnion.Client.DynamicClient
                     il.Emit(OpCodes.Ldarg, j + 1);
                 }
 
-                Type callType = null;
+                Type requestType = null;
                 if (parameters.Length == 0)
                 {
                     // use Nil.
-                    callType = typeof(Nil);
+                    requestType = typeof(Nil);
                     il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default"));
                 }
                 else if (parameters.Length == 1)
                 {
                     // already loaded parameter.
-                    callType = parameters[0];
+                    requestType = parameters[0];
                 }
                 else
                 {
                     // call new DynamicArgumentTuple<T>
-                    callType = def.RequestType;
-                    il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
+                    requestType = def.RequestType;
+                    il.Emit(OpCodes.Newobj, requestType.GetConstructors().First());
                 }
 
+                Type responseType;
                 if (def.MethodInfo.ReturnType == typeof(Task))
                 {
-                    var mInfo = parentNestedType.BaseType.GetMethod("WriteMessageAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType));
+                    responseType = typeof(Nil);
                 }
                 else
                 {
-                    var mInfo = parentNestedType.BaseType.GetMethod("WriteMessageAsyncFireAndForget", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
+                    responseType = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                 }
+                var mInfo = parentNestedType.BaseType
+                    .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Single(x => x.Name == "WriteMessageFireAndForgetAsync"); // WriteMessageAsyncFireAndForget<TRequest, TResponse>
+                il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(requestType, responseType));
 
                 il.Emit(OpCodes.Ret);
             }

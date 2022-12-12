@@ -1,3 +1,4 @@
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Utils;
 using MessagePack;
@@ -9,23 +10,23 @@ namespace MagicOnion.Server.Hubs;
 
 public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+    public IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
     {
-        return new ImmutableArrayGroupRepository(serializerOptions, logger);
+        return new ImmutableArrayGroupRepository(messageSerializer, logger);
     }
 }
 
 public class ImmutableArrayGroupRepository : IGroupRepository
 {
-    MessagePackSerializerOptions serializerOptions;
+    IMagicOnionMessageSerializer messageSerializer;
     IMagicOnionLogger logger;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public ImmutableArrayGroupRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+    public ImmutableArrayGroupRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
     {
-        this.serializerOptions = serializerOptions;
+        this.messageSerializer = messageSerializer;
         this.factory = CreateGroup;
         this.logger = logger;
     }
@@ -37,7 +38,7 @@ public class ImmutableArrayGroupRepository : IGroupRepository
 
     IGroup CreateGroup(string groupName)
     {
-        return new ImmutableArrayGroup(groupName, this, serializerOptions, logger);
+        return new ImmutableArrayGroup(groupName, this, messageSerializer, logger);
     }
 
     public bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group)
@@ -55,7 +56,7 @@ public class ImmutableArrayGroup : IGroup
 {
     readonly object gate = new object();
     readonly IGroupRepository parent;
-    readonly MessagePackSerializerOptions serializerOptions;
+    readonly IMagicOnionMessageSerializer messageSerializer;
     readonly IMagicOnionLogger logger;
 
     ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
@@ -63,11 +64,11 @@ public class ImmutableArrayGroup : IGroup
 
     public string GroupName { get; }
 
-    public ImmutableArrayGroup(string groupName, IGroupRepository parent, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
     {
         this.GroupName = groupName;
         this.parent = parent;
-        this.serializerOptions = serializerOptions;
+        this.messageSerializer = messageSerializer;
         this.logger = logger;
         this.members = ImmutableArray<IServiceContextWithResponseStream<byte[]>>.Empty;
     }
@@ -356,8 +357,8 @@ public class ImmutableArrayGroup : IGroup
             var writer = new MessagePackWriter(buffer);
             writer.WriteArrayHeader(2);
             writer.WriteInt32(methodId);
-            MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
             writer.Flush();
+            messageSerializer.Serialize(buffer, value);
             return buffer.WrittenSpan.ToArray();
         }
     }

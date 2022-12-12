@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
 
@@ -23,7 +24,7 @@ public class GroupConfigurationAttribute : Attribute
 
 public interface IGroupRepositoryFactory
 {
-    IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger);
+    IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger);
 }
 
 public interface IGroupRepository

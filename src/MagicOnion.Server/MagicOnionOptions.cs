@@ -1,14 +1,15 @@
 using MessagePack;
 using MagicOnion.Server.Filters;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server;
 
 public class MagicOnionOptions
 {
     /// <summary>
-    /// MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).
+    /// Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.
     /// </summary>
-    public MessagePackSerializerOptions SerializerOptions { get; set; }
+    public IMagicOnionMessageSerializerProvider MessageSerializer { get; set; }
 
     /// <summary>
     /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
@@ -31,12 +32,12 @@ public class MagicOnionOptions
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; set; }
 
     /// <summary>
-    /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer. 
+    /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer.
     /// </summary>
     public MagicOnionOptions()
     {
         this.IsReturnExceptionStackTraceInErrorDetail = false;
-        this.SerializerOptions = MessagePackSerializer.DefaultOptions;
+        this.MessageSerializer = MessagePackMessageMagicOnionSerializerProvider.Instance.WithEnableFallback(true);
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;

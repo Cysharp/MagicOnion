@@ -1,5 +1,6 @@
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
@@ -42,13 +43,13 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
         ServerCallContext context,
-        MessagePackSerializerOptions serializerOptions,
+        IMagicOnionMessageSerializer messageSerializer,
         IMagicOnionLogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider,
         IAsyncStreamReader<TRequest>? requestStream,
         IServerStreamWriter<TResponse>? responseStream
-    ) : base(serviceType, methodInfo, attributeLookup, methodType, context, serializerOptions, logger, methodHandler, serviceProvider)
+    ) : base(serviceType, methodInfo, attributeLookup, methodType, context, messageSerializer, logger, methodHandler, serviceProvider)
     {
         RequestStream = requestStream;
         ResponseStream = responseStream;
@@ -63,7 +64,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
             this.streamingResponseWriter = null!;
         }
     }
-    
+
     // used in StreamingHub
     public void QueueResponseStreamWrite(in TResponse value)
     {

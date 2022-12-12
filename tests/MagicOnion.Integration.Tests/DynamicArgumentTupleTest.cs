@@ -2,6 +2,7 @@ using MagicOnion.Client;
 using Grpc.Net.Client;
 using MagicOnion.Server;
 using Xunit.Abstractions;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -16,8 +17,8 @@ public class DynamicArgumentTupleServiceTest : IClassFixture<MagicOnionApplicati
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MessagePackSerializerOptions.Standard)) };
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MessagePackSerializerOptions.Standard)) };
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
     }
 
     [Theory]

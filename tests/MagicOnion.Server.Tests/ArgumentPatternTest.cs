@@ -4,6 +4,7 @@ using MessagePack;
 using Grpc.Net.Client;
 using MagicOnion.Internal;
 using Xunit.Abstractions;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server.Tests;
 
@@ -312,7 +313,7 @@ public class ArgumentPatternTest : IClassFixture<ServerFixture<ArgumentPattern>>
         {
             var tuple = new DynamicArgumentTuple<int, int>(x, y);
 
-            var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MessagePackSerializerOptions.Standard);
+            var method = GrpcMethodHelper.CreateMethod<DynamicArgumentTuple<int, int>, MyResponse, Box<DynamicArgumentTuple<int, int>>, MyResponse>(MethodType.Unary, "IArgumentPattern", "Unary1", MessagePackMessageMagicOnionSerializerProvider.Instance.Create(MethodType.Unary, null));
             var request = Box.Create(tuple);
 
             var callResult = invoker.AsyncUnaryCall(method.Method, null, default(CallOptions), request);

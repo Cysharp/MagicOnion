@@ -26,8 +26,48 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         public int HubId { get; }
         public string MethodName { get; }
         public IReadOnlyList<MagicOnionMethodParameterInfo> Parameters { get; }
+
+        /// <summary>
+        /// Gets a type of method return value in the interface.
+        /// </summary>
         public MagicOnionTypeInfo MethodReturnType { get; }
+
+        /// <summary>
+        /// Gets a type for serializing method parameters.
+        /// <list type="bullet">
+        /// <item>
+        ///     <term>The method has no parameter</term>
+        ///     <description><c>MessagePack.Nil</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has exact one parameter</term>
+        ///     <description><c>Parameters[0].Type</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has two or more parameters</term>
+        ///     <description><c>DynamicArgumentTuple&lt;Parameters[0].Type, Parameters[1].Type ...></c></description>
+        /// </item>
+        /// </list>
+        /// </summary>
         public MagicOnionTypeInfo RequestType { get; }
+
+        /// <summary>
+        /// Gets a type for serializing method return value.
+        /// <list type="bullet">
+        /// <item>
+        ///     <term>The method has no return value. (void, Task and ValueTask)</term>
+        ///     <description><c>MessagePack.Nil</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has return value. (Task&lt;T>)</term>
+        ///     <description><c>MethodReturnType.GenericArguments[0]</c></description>
+        /// </item>
+        /// <item>
+        ///     <term>The method has return value.</term>
+        ///     <description><c>MethodReturnType</c></description>
+        /// </item>
+        /// </list>
+        /// </summary>
         public MagicOnionTypeInfo ResponseType { get; }
 
         public string IfDirectiveCondition { get; }

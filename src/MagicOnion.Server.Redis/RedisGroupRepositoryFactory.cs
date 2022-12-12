@@ -1,3 +1,4 @@
+using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MessagePack;
@@ -14,8 +15,8 @@ public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
         this.options = options.CurrentValue;
     }
 
-    public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+    public IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
     {
-        return new RedisGroupRepository(serializerOptions, options, logger);
+        return new RedisGroupRepository(messageSerializer, options, logger);
     }
 }

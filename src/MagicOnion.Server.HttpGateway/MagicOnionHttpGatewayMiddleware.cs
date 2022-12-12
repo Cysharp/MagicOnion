@@ -1,3 +1,4 @@
+using System.Buffers;
 using Grpc.Core;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
@@ -124,7 +125,9 @@ public class MagicOnionHttpGatewayMiddleware
             }
 
             // JSON to C# Object to MessagePack
-            var requestObject = handler.BoxedSerialize(deserializedObject);
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            handler.MessageSerializer.Serialize(bufferWriter, deserializedObject);
+            var requestObject = bufferWriter.WrittenSpan.ToArray();
 
             var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
@@ -139,7 +142,7 @@ public class MagicOnionHttpGatewayMiddleware
             var rawResponse = await invoker.AsyncUnaryCall(method, null, default(CallOptions).WithHeaders(metadata), requestObject);
 
             // MessagePack -> Object -> Json
-            var obj = handler.BoxedDeserialize(rawResponse);
+            var obj = Deserialize(handler, handler.UnwrappedResponseType, rawResponse);
             var v = JsonConvert.SerializeObject(obj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
             httpContext.Response.ContentType = "application/json";
             await httpContext.Response.WriteAsync(v);
@@ -150,6 +153,16 @@ public class MagicOnionHttpGatewayMiddleware
             httpContext.Response.ContentType = "text/plain";
             await httpContext.Response.WriteAsync(ex.ToString());
         }
+    }
+
+    static object Deserialize(MethodHandler handler, Type t, byte[] serializedData)
+    {
+        var method = typeof(MagicOnionHttpGatewayMiddleware).GetMethod(nameof(DeserializeCore), BindingFlags.NonPublic | BindingFlags.Static)!;
+        return method.Invoke(null, new object[] { handler, serializedData });
+    }
+    static T DeserializeCore<T>(MethodHandler handler, byte[] serializedData)
+    {
+        return handler.MessageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(serializedData));
     }
 
     Type GetCollectionType(Type type)

@@ -1,117 +1,71 @@
+using System.Buffers;
 using MessagePack;
-using MagicOnion.Utils;
 using System.Linq.Expressions;
 using System.Reflection;
+using Grpc.Core;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
+using MagicOnion.Server.Internal;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Server.Hubs;
 
 public class StreamingHubHandler : IEquatable<StreamingHubHandler>
 {
-    public string HubName { get; }
-    public Type HubType { get; }
-    public MethodInfo MethodInfo { get; }
-    public int MethodId { get; }
-
-    public ILookup<Type, Attribute> AttributeLookup { get; }
-
-    internal readonly Type RequestType;
-    readonly Type? UnwrappedResponseType;
-    internal readonly MessagePackSerializerOptions serializerOptions;
-    internal readonly Func<StreamingHubContext, ValueTask> MethodBody;
-
+    readonly StreamingHubMethodHandlerMetadata metadata;
     readonly string toStringCache;
     readonly int getHashCodeCache;
 
-    // reflection cache
-    // Deserialize<T>(ReadOnlyMemory<byte>, MessagePackSerializerOptions, CancellationToken)
-    static readonly MethodInfo messagePackDeserialize = typeof(MessagePackSerializer).GetMethods()
-        .First(x => x.Name == "Deserialize" && x.GetParameters().Length == 3 && x.GetParameters()[0].ParameterType == typeof(ReadOnlyMemory<byte>) && x.GetParameters()[1].ParameterType == typeof(MessagePackSerializerOptions));
+    public string HubName => metadata.StreamingHubInterfaceType.Name;
+    public Type HubType => metadata.StreamingHubImplementationType;
+    public MethodInfo MethodInfo => metadata.ImplementationMethod;
+    public int MethodId => metadata.MethodId;
 
-    static MethodInfo GetInterfaceMethod(Type targetType, Type interfaceType, string targetMethodName)
-    {
-        var mapping = targetType.GetInterfaceMapWithParents(interfaceType);
-        var methodIndex = Array.FindIndex(mapping.TargetMethods, mi => mi.Name == targetMethodName);
-        return mapping.InterfaceMethods[methodIndex];
-    }
+    public ILookup<Type, Attribute> AttributeLookup => metadata.AttributeLookup;
+
+    internal Type RequestType => metadata.RequestType;
+    internal Func<StreamingHubContext, ValueTask> MethodBody { get; }
 
     public StreamingHubHandler(Type classType, MethodInfo methodInfo, StreamingHubHandlerOptions handlerOptions, IServiceProvider serviceProvider)
     {
-        var hubInterface = classType.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
-        var interfaceMethod = GetInterfaceMethod(classType, hubInterface, methodInfo.Name);
-
-        this.HubType = classType;
-        this.HubName = hubInterface.Name;
-        this.MethodInfo = methodInfo;
-        // Validation for Id
-        if (methodInfo.GetCustomAttribute<MethodIdAttribute>() != null)
-        {
-            throw new InvalidOperationException($"Hub Implementation can not add [MethodId], you should add hub `interface`. {classType.Name}/{methodInfo.Name}");
-        }
-        this.MethodId = interfaceMethod.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethod.Name);
-
-        this.UnwrappedResponseType = UnwrapResponseType(methodInfo);
-
-        var resolver = handlerOptions.SerializerOptions.Resolver;
-        var parameters = methodInfo.GetParameters();
-        this.RequestType = MagicOnionMarshallers.CreateRequestTypeAndSetResolver(classType.Name + "/" + methodInfo.Name, parameters, ref resolver);
-
-        this.serializerOptions = handlerOptions.SerializerOptions.WithResolver(resolver);
-
-        this.AttributeLookup = classType.GetCustomAttributes(true)
-            .Concat(methodInfo.GetCustomAttributes(true))
-            .Cast<Attribute>()
-            .ToLookup(x => x.GetType());
-
+        this.metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(classType, methodInfo);
         this.toStringCache = HubName + "/" + MethodInfo.Name;
-        this.getHashCodeCache = HubName.GetHashCode() ^ MethodInfo.Name.GetHashCode() << 2;
+        this.getHashCodeCache = HashCode.Combine(HubName, MethodInfo.Name);
 
-        // ValueTask (StreamingHubContext context) =>
-        // {
-        //    T request = LZ4MessagePackSerializer.Deserialize<T>(context.Request, context.FormatterResolver);
-        //    Task<T> result = ((HubType)context.HubInstance).Foo(request);
-        //    return WriteInAsyncLockInTaskWithMessageId(result) || return new ValueTask(result)
-        // }
+        var messageSerializer = handlerOptions.MessageSerializer.Create(MethodType.DuplexStreaming, methodInfo);
+        var parameters = metadata.Parameters;
         try
         {
+            // var invokeHubMethodFunc = (context, request) => ((HubType)context.HubInstance).Foo(request);
+            // or
+            // var invokeHubMethodFunc = (context, request) => ((HubType)context.HubInstance).Foo(request.Item1, request.Item2 ...);
             var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
             var contextArg = Expression.Parameter(typeof(StreamingHubContext), "context");
             var requestArg = Expression.Parameter(RequestType, "request");
-            var getSerializerOptions = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("SerializerOptions", flags)!);
-            var contextRequest = Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("Request", flags)!);
-            var noneCancellation = Expression.Default(typeof(CancellationToken));
-            var getInstanceCast = Expression.Convert(Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty("HubInstance", flags)!), HubType);
-
-            var callDeserialize = Expression.Call(messagePackDeserialize.MakeGenericMethod(RequestType), contextRequest, getSerializerOptions, noneCancellation);
-            var assignRequest = Expression.Assign(requestArg, callDeserialize);
-
-            Expression[] arguments = new Expression[parameters.Length];
-            if (parameters.Length == 1)
+            var getInstanceCast = Expression.Convert(Expression.Property(contextArg, typeof(StreamingHubContext).GetProperty(nameof(StreamingHubContext.HubInstance), flags)!), HubType);
+            Expression[] arguments = new Expression[parameters.Count];
+            if (parameters.Count == 1)
             {
                 arguments[0] = requestArg;
             }
             else
             {
-                for (int i = 0; i < parameters.Length; i++)
+                for (int i = 0; i < parameters.Count; i++)
                 {
                     arguments[i] = Expression.Field(requestArg, "Item" + (i + 1));
                 }
             }
+            var callHubMethod = Expression.Call(getInstanceCast, methodInfo, arguments);
+            var invokeHubMethodFunc = Expression.Lambda(callHubMethod, contextArg, requestArg).Compile();
 
-            var callBody = Expression.Call(getInstanceCast, methodInfo, arguments);
-
-            var finalMethod = (methodInfo.ReturnType.IsGenericType)
-                ? typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessage), flags)!.MakeGenericMethod(UnwrappedResponseType!)
-                : typeof(StreamingHubContext).GetMethod(nameof(StreamingHubContext.WriteResponseMessageNil), flags)!;
-            callBody = Expression.Call(contextArg, finalMethod, callBody);
-
-            var body = Expression.Block(new[] { requestArg }, assignRequest, callBody);
-            var compiledBody = Expression.Lambda(body, contextArg).Compile();
+            // Create a StreamingHub method invoker and a wrapped-invoke method.
+            Type invokerType = metadata.ResponseType is null
+                ? typeof(StreamingHubMethodInvoker<>).MakeGenericType(metadata.RequestType)
+                : typeof(StreamingHubMethodInvoker<,>).MakeGenericType(metadata.RequestType, metadata.ResponseType);
+            StreamingHubMethodInvoker invoker = (StreamingHubMethodInvoker)Activator.CreateInstance(invokerType, messageSerializer, invokeHubMethodFunc)!;
 
             var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
-            this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, (Func<StreamingHubContext, ValueTask>)compiledBody);
+            this.MethodBody = FilterHelper.WrapMethodBodyWithFilter(serviceProvider, filters, invoker.InvokeAsync);
         }
         catch (Exception ex)
         {
@@ -119,37 +73,62 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
         }
     }
 
-    static Type? UnwrapResponseType(MethodInfo methodInfo)
+    abstract class StreamingHubMethodInvoker
     {
-        var t = methodInfo.ReturnType;
-        if (!typeof(Task).IsAssignableFrom(t)) throw new Exception($"Invalid return type, Hub return type must be Task or Task<T>. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
+        protected IMagicOnionMessageSerializer MessageSerializer { get; }
 
-        if (t.IsGenericType)
+        protected StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
         {
-            // Task<T>
-            return t.GetGenericArguments()[0];
+            MessageSerializer = messageSerializer;
         }
-        else
+
+        public abstract ValueTask InvokeAsync(StreamingHubContext context);
+    }
+
+    sealed class StreamingHubMethodInvoker<TRequest, TResponse> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, Task<TResponse>> hubMethodFunc;
+
+        public StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
         {
-            // Task
-            return null;
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task<TResponse>>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            Task<TResponse> response = hubMethodFunc(context, request);
+            return context.WriteResponseMessage(response);
+        }
+    }
+
+    sealed class StreamingHubMethodInvoker<TRequest> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, Task> hubMethodFunc;
+
+        public StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        {
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            Task response = hubMethodFunc(context, request);
+            return context.WriteResponseMessageNil(response);
         }
     }
 
     public override string ToString()
-    {
-        return toStringCache;
-    }
+        => toStringCache;
 
     public override int GetHashCode()
-    {
-        return getHashCodeCache;
-    }
+        => getHashCodeCache;
 
     public bool Equals(StreamingHubHandler? other)
-    {
-        return other != null && HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
-    }
+        => other != null && HubName.Equals(other.HubName) && MethodInfo.Name.Equals(other.MethodInfo.Name);
 }
 
 /// <summary>
@@ -159,11 +138,11 @@ public class StreamingHubHandlerOptions
 {
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
 
-    public MessagePackSerializerOptions SerializerOptions { get; }
+    public IMagicOnionMessageSerializerProvider MessageSerializer { get; }
 
     public StreamingHubHandlerOptions(MagicOnionOptions options)
     {
         GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
-        SerializerOptions = options.SerializerOptions;
+        MessageSerializer = options.MessageSerializer;
     }
 }

@@ -25,8 +25,19 @@ namespace MagicOnion.Generator.CodeGen
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("#pragma warning disable 618\r\n#pragma warning disable 612\r\n#pragma warning disable" +
-                    " 414\r\n#pragma warning disable 219\r\n#pragma warning disable 168\r\n\r\nnamespace ");
+            this.Write(@"#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
+
+namespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n    public class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(ResolverName));
@@ -117,7 +128,7 @@ namespace MagicOnion.Generator.CodeGen
  } 
             this.Write("                default: return null;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n#pra" +
                     "gma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning restore 41" +
-                    "4\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
+                    "4\r\n#pragma warning restore 612\r\n#pragma warning restore 618\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

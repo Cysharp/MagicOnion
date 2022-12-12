@@ -20,11 +20,6 @@
         <LastGenOutput>EnumTemplate.cs</LastGenOutput>
         <Generator>TextTemplatingFilePreprocessor</Generator>
       </None>
-      <None Update="CodeGen\HubTemplate.tt">
-        <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
-        <LastGenOutput>HubTemplate.cs</LastGenOutput>
-        <Generator>TextTemplatingFilePreprocessor</Generator>
-      </None>
       <None Update="CodeGen\RegisterTemplate.tt">
         <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
         <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
@@ -44,11 +39,6 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>EnumTemplate.tt</DependentUpon>
-      </Compile>
-      <Compile Update="CodeGen\HubTemplate.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>HubTemplate.tt</DependentUpon>
       </Compile>
       <Compile Update="CodeGen\RegisterTemplate.cs">
         <DesignTime>True</DesignTime>
