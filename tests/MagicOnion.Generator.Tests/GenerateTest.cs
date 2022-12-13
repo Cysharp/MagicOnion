@@ -55,8 +55,8 @@ namespace TempProject
             "MessagePack.Formatters"
         );
 
-        var compilation = tempWorkspace.GetOutputCompilation();
-        compilation.GetCompilationErrors().Should().BeEmpty();
+        var outputCompilation = tempWorkspace.GetOutputCompilation();
+        outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
 
     [Fact]
@@ -83,8 +83,8 @@ namespace TempProject
             "MessagePack.Formatters"
         );
 
-        var compilation = tempWorkspace.GetOutputCompilation();
-        compilation.GetCompilationErrors().Should().BeEmpty();
+        var outputCompilation = tempWorkspace.GetOutputCompilation();
+        outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
 
     [Fact]
@@ -111,8 +111,8 @@ namespace TempProject
             "MessagePack.Formatters"
         );
 
-        var compilation = tempWorkspace.GetOutputCompilation();
-        compilation.GetCompilationErrors().Should().BeEmpty();
+        var outputCompilation = tempWorkspace.GetOutputCompilation();
+        outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
 
     [Fact]
@@ -135,8 +135,8 @@ namespace TempProject
             "MessagePack.Formatters"
         );
 
-        var compilation = tempWorkspace.GetOutputCompilation();
-        compilation.GetCompilationErrors().Should().BeEmpty();
+        var outputCompilation = tempWorkspace.GetOutputCompilation();
+        outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
 
     [Fact]
@@ -168,7 +168,7 @@ namespace TempProject
         """);
 
         // Try create a compilation from the temporary project.
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(
+        var sourceProjectCompilation = await PseudoCompilation.CreateFromProjectAsync(
             new[] { tempWorkspace.CsProjectPath },
             Array.Empty<string>(),
             new MagicOnionGeneratorTestOutputLogger(testOutputHelper),
@@ -188,7 +188,7 @@ namespace TempProject
         var outputCompilation = tempWorkspace.GetOutputCompilation();
 
         // Assert
-        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
+        sourceProjectCompilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
     
@@ -221,7 +221,7 @@ namespace TempProject
         """);
 
         // Try create a compilation from the temporary project.
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(
+        var sourceProjectCompilation = await PseudoCompilation.CreateFromProjectAsync(
             new[] { tempWorkspace.CsProjectPath },
             Array.Empty<string>(),
             new MagicOnionGeneratorTestOutputLogger(testOutputHelper),
@@ -241,7 +241,7 @@ namespace TempProject
         var outputCompilation = tempWorkspace.GetOutputCompilation();
 
         // Assert
-        compilation.GetDiagnostics().Should().Contain(x => x.Severity == DiagnosticSeverity.Error); // Failed to compile the project.
+        sourceProjectCompilation.GetDiagnostics().Should().Contain(x => x.Severity == DiagnosticSeverity.Error); // Failed to compile the project.
         outputCompilation.GetCompilationErrors().Should().NotBeEmpty();
     }
 
@@ -284,7 +284,7 @@ namespace TempProject
         """);
 
         // Try create a compilation from the temporary project.
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(
+        var sourceProjectCompilation = await PseudoCompilation.CreateFromProjectAsync(
             new[] { tempWorkspace.CsProjectPath },
             Array.Empty<string>(),
             new MagicOnionGeneratorTestOutputLogger(testOutputHelper),
@@ -304,7 +304,7 @@ namespace TempProject
         var outputCompilation = tempWorkspace.GetOutputCompilation();
 
         // Assert
-        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
+        sourceProjectCompilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
         outputCompilation.GetCompilationErrors().Should().BeEmpty();
     }
     
@@ -350,7 +350,7 @@ namespace TempProject
         """);
 
         // Try create a compilation from the temporary project.
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(
+        var sourceProjectCompilation = await PseudoCompilation.CreateFromProjectAsync(
             new[] { tempWorkspace.CsProjectPath },
             Array.Empty<string>(),
             new MagicOnionGeneratorTestOutputLogger(testOutputHelper),
@@ -358,6 +358,6 @@ namespace TempProject
         );
 
         // Assert
-        compilation.GetDiagnostics().Should().Contain(x => x.Severity == DiagnosticSeverity.Error); // the compilation should have some errors.
+        sourceProjectCompilation.GetDiagnostics().Should().Contain(x => x.Severity == DiagnosticSeverity.Error); // the compilation should have some errors.
     }
 }

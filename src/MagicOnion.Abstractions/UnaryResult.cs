@@ -151,6 +151,11 @@ namespace MagicOnion
         }
 
         /// <summary>
+        /// Gets a completed <see cref="T:MagicOnion.UnaryResult" /> with the void result.
+        /// </summary>
+        public static UnaryResult CompletedResult => default;
+
+        /// <summary>
         /// Creates a <see cref="T:MagicOnion.UnaryResult`1" /> with the specified result.
         /// </summary>
         public static UnaryResult<T> FromResult<T>(T value)

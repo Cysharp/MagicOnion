@@ -37,6 +37,7 @@ namespace MagicOnion.Integration.Tests.Generated
             MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IDynamicArgumentTupleService>.Register((x, y) => new MagicOnion.Integration.Tests.DynamicArgumentTupleServiceClient(x, y));
             MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IMessageSerializerTestService>.Register((x, y) => new MagicOnion.Integration.Tests.MessageSerializerTestServiceClient(x, y));
             MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IStreamingTestService>.Register((x, y) => new MagicOnion.Integration.Tests.StreamingTestServiceClient(x, y));
+            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IUnaryService>.Register((x, y) => new MagicOnion.Integration.Tests.UnaryServiceClient(x, y));
             MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackMessageSerializerTestService>.Register((x, y) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackMessageSerializerTestServiceClient(x, y));
 
             StreamingHubClientRegistry<global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHub, global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHubReceiver>.Register((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.HandCraftedStreamingHubClientTestHubClient(a, b, c, d, e));
@@ -338,6 +339,50 @@ namespace MagicOnion.Integration.Tests
             => this.core.ServerStreaming.InvokeServerStreaming(this, "IStreamingTestService/ServerStreaming", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>(arg0, arg1));
         public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32>> DuplexStreaming()
             => this.core.DuplexStreaming.InvokeDuplexStreaming(this, "IStreamingTestService/DuplexStreaming");
+    }
+}
+
+namespace MagicOnion.Integration.Tests
+{
+    using global::System;
+    using global::Grpc.Core;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+    using global::MessagePack;
+    
+    [global::MagicOnion.Ignore]
+    public class UnaryServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::MagicOnion.Integration.Tests.IUnaryService>, global::MagicOnion.Integration.Tests.IUnaryService
+    {
+        class ClientCore
+        {
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Int32, global::MessagePack.Nil> NonGeneric;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32> ManyParametersReturnsValueType;
+            public ClientCore(global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer)
+            {
+                this.NonGeneric = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::System.Int32, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "NonGeneric", messageSerializer);
+                this.ManyParametersReturnsValueType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "ManyParametersReturnsValueType", messageSerializer);
+            }
+        }
+        
+        readonly ClientCore core;
+        
+        public UnaryServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
+        {
+            this.core = new ClientCore(messageSerializer);
+        }
+        
+        private UnaryServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+        {
+            this.core = core;
+        }
+        
+        protected override global::MagicOnion.Client.MagicOnionClientBase<IUnaryService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+            => new UnaryServiceClient(options, core);
+        
+        public global::MagicOnion.UnaryResult NonGeneric(global::System.Int32 arg0)
+            => this.core.NonGeneric.InvokeUnaryNonGeneric(this, "IUnaryService/NonGeneric", arg0);
+        public global::MagicOnion.UnaryResult<global::System.Int32> ManyParametersReturnsValueType(global::System.Int32 arg0, global::System.Int32 arg1, global::System.Int32 arg2, global::System.Int32 arg3, global::System.Int32 arg4, global::System.Int32 arg5, global::System.Int32 arg6, global::System.Int32 arg7, global::System.Int32 arg8, global::System.Int32 arg9, global::System.Int32 arg10, global::System.Int32 arg11, global::System.Int32 arg12, global::System.Int32 arg13, global::System.Int32 arg14)
+            => this.core.ManyParametersReturnsValueType.InvokeUnary(this, "IUnaryService/ManyParametersReturnsValueType", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14));
     }
 }
 

@@ -74,7 +74,8 @@ namespace MagicOnion.Client.DynamicClient
                 switch (MethodType)
                 {
                     case MethodType.Unary:
-                        if (!MethodReturnType.IsGenericType || MethodReturnType.GetGenericTypeDefinition() != typeof(UnaryResult<>))
+                        if ((MethodReturnType != typeof(UnaryResult)) &&
+                            (MethodReturnType.IsGenericType && MethodReturnType.GetGenericTypeDefinition() != typeof(UnaryResult<>)))
                         {
                             throw new InvalidOperationException($"The return type of Unary method must be UnaryResult<T>. (Service: {ServiceName}, Method: {MethodName})");
                         }
@@ -96,6 +97,10 @@ namespace MagicOnion.Client.DynamicClient
                     "The method of a service must return 'UnaryResult<T>', 'Task<ClientStreamingResult<TRequest, TResponse>>', 'Task<ServerStreamingResult<T>>' or 'DuplexStreamingResult<TRequest, TResponse>'.";
 
                 var returnType = methodInfo.ReturnType;
+                if (returnType == typeof(UnaryResult))
+                {
+                    return (MethodType.Unary, null, typeof(Nil));
+                }
                 if (!returnType.IsGenericType)
                 {
                     throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
@@ -114,11 +119,19 @@ namespace MagicOnion.Client.DynamicClient
                     returnTypeOpen = returnType.GetGenericTypeDefinition();
                 }
 
-                if (returnTypeOpen == typeof(UnaryResult<>))
+                if (returnTypeOpen == typeof(UnaryResult))
                 {
                     if (isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    }
+                    return (MethodType.Unary, null, typeof(Nil));
+                }
+                else if (returnTypeOpen == typeof(UnaryResult<>))
+                {
+                    if (isTaskOfT)
+                    {
+                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.Unary, null, returnType.GetGenericArguments()[0]);
                 }

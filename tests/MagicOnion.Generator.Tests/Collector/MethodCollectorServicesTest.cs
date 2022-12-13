@@ -180,6 +180,39 @@ public interface IMyService : IService<IMyService>
         serviceCollection.Hubs.Should().BeEmpty();
         serviceCollection.Services.Should().BeEmpty();
     }
+    
+    [Fact]
+    public void Unary_NonGenericResult()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult MethodA();
+    }
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper));
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        compilation.GetDiagnostics().Should().NotContain(x => x.Severity == DiagnosticSeverity.Error);
+        serviceCollection.Services[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
+        serviceCollection.Services[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<UnaryResult>());
+    }
 
     [Fact]
     public void Unary_Array()

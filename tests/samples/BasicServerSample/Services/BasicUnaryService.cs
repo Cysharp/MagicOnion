@@ -27,6 +27,10 @@ public interface IBasicUnaryService : IService<IBasicUnaryService>
     UnaryResult<int> TwoRefTypeParametersReturnValueTypeAsync(MyRequest a, MyRequest b);
     UnaryResult<MyResponse> OneRefTypeParameterReturnRefTypeAsync(MyRequest a);
     UnaryResult<MyResponse> TwoRefTypeParametersReturnRefTypeAsync(MyRequest a, MyRequest b);
+
+    UnaryResult NonGenericNoParameterAsync();
+    UnaryResult NonGenericOneValueTypeParameterAsync(int a);
+    UnaryResult NonGenericTwoValueTypeParameterAsync(int a, int b);
 }
 
 [MessagePackObject(true)]
@@ -103,4 +107,13 @@ public class BasicUnaryService : ServiceBase<IBasicUnaryService>, IBasicUnarySer
 
     public UnaryResult<MyResponse> TwoRefTypeParametersReturnRefTypeAsync(MyRequest a, MyRequest b)
         => UnaryResult(new MyResponse((a.Value + b.Value).ToString()));
+
+    public UnaryResult NonGenericNoParameterAsync()
+        => MagicOnion.UnaryResult.CompletedResult;
+
+    public UnaryResult NonGenericOneValueTypeParameterAsync(int a)
+        => MagicOnion.UnaryResult.CompletedResult;
+
+    public UnaryResult NonGenericTwoValueTypeParameterAsync(int a, int b)
+        => MagicOnion.UnaryResult.CompletedResult;
 }

@@ -153,6 +153,8 @@ public class StaticMagicOnionClientGenerator
         //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", request);
         // public UnaryResult<TResponse> MethodName()
         //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", Nil.Default);
+        // public UnaryResult MethodName()
+        //     => this.core.MethodName.InvokeUnaryNonGeneric(this, "ServiceName/MethodName", Nil.Default);
         // public Task<ServerStreamingResult<TRequest, TResponse>> MethodName(TArg1 arg1, TArg2 arg2, ...)
         //     => this.core.MethodName.InvokeServerStreaming(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
         // public Task<ClientStreamingResult<TRequest, TResponse>> MethodName()
@@ -174,10 +176,11 @@ public class StaticMagicOnionClientGenerator
                     // new DynamicArgumentTuple(arg1, arg2, ...)
                     _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
                 };
+                var hasNonGenericUnaryResult = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.MagicOnion_UnaryResult;
 
                 ctx.TextWriter.WriteLines($"""
                 public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                    => this.core.{method.MethodName}.Invoke{method.MethodType}(this, "{method.Path}"{invokeRequestParameters});
+                    => this.core.{method.MethodName}.Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}(this, "{method.Path}"{invokeRequestParameters});
                 """);
             } // #endif
         }

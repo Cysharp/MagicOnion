@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
@@ -39,14 +40,49 @@ internal static class PseudoCompilation
         // ignore Unity's default metadatas(to avoid conflict .NET Core runtime import)
         // MonoBleedingEdge = .NET 4.x Unity metadata
         // 2.0.0 = .NET Standard 2.0 Unity metadata
-        var metadata = new List<PortableExecutableReference>();
-        var targetMetadataLocations = locations.Select(Path.GetFullPath).Concat(GetStandardReferences()).Distinct().Where(x => !(x.Contains("MonoBleedingEdge") || x.Contains("2.0.0")));
+        var metadata = new Dictionary<string,PortableExecutableReference>(StringComparer.OrdinalIgnoreCase);
+        var targetMetadataLocations = locations.Select(Path.GetFullPath)
+            .Concat(GetStandardReferences())
+            .Distinct()
+            .Where(x => !(x.Contains("MonoBleedingEdge") || x.Contains("2.0.0")))
+            // .NET (Core) SDK libraries are prioritized.
+            .OrderBy(x => x.Contains(".NETCore") ? 0 : 1)
+            // We expect the NuGet package path to contain the version. :)
+            .ThenByDescending(x => x);
+
+        var netCoreBundledAssemblies = new[]
+        {
+            "Microsoft.Bcl.AsyncInterfaces.dll",
+            "System.Buffers.dll",
+            "System.Memory.dll",
+            "System.Runtime.CompilerServices.Unsafe.dll",
+            "System.Threading.Tasks.Extensions.dll",
+        };
+
+        var hasNetCoreLibrariesLoaded = false;
         foreach (var item in targetMetadataLocations)
         {
             if (File.Exists(item))
             {
-                logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}'");
-                metadata.Add(MetadataReference.CreateFromFile(item));
+                var assemblyFileName = Path.GetFileName(item);
+                if (metadata.ContainsKey(assemblyFileName))
+                {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}' (Skipped. Different version of the library is already loaded.)");
+                }
+                else if (hasNetCoreLibrariesLoaded && netCoreBundledAssemblies.Contains(assemblyFileName, StringComparer.OrdinalIgnoreCase))
+                {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}' (Skipped. Use .NET Runtime assembly instead.)");
+                }
+                else
+                {
+                    logger.Trace($"[{nameof(PseudoCompilation)}] Loading Metadata '{item}'.");
+                    metadata.Add(assemblyFileName, MetadataReference.CreateFromFile(item));
+
+                    if (item.Contains("Microsoft.NETCore.App"))
+                    {
+                        hasNetCoreLibrariesLoaded = true;
+                    }
+                }
             }
             else
             {
@@ -54,10 +90,11 @@ internal static class PseudoCompilation
             }
         }
 
+
         var compilation = CSharpCompilation.Create(
             "CodeGenTemp",
             syntaxTrees,
-            metadata,
+            metadata.Values,
             new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 allowUnsafe: true,

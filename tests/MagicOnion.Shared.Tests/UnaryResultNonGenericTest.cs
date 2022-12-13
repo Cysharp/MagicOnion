@@ -47,7 +47,7 @@ public class UnaryResultNonGenericTest
     public void Ctor_TaskOfResponseContext_Null()
     {
         // Arrange
-        var value = Task.FromResult(DummyResponseContext.Create(Nil.Default));
+        var value = default(Task<IResponseContext<Nil>>);
         // Act
         var result = Record.Exception(() => new UnaryResult(value));
         // Assert
