@@ -5,6 +5,8 @@ using MagicOnion.Server;
 using MagicOnionTestServer;
 using Microsoft.AspNetCore.Mvc.Testing;
 
+#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously
+
 namespace MagicOnion.Integration.Tests.MemoryPack;
 
 public class MemoryPackMessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<MemoryPackMessageSerializerTestService>>

@@ -152,7 +152,7 @@ public record TemporaryProjectWorkareaOptions(
     IEnumerable<string> AdditionalProjectReferences = default,
     LanguageVersion LangVersion = LanguageVersion.Default,
     bool ImplicitUsings = false,
-    IEnumerable<(string Namespace, bool Static, bool Remove)>? Usings = default
+    IEnumerable<(string Namespace, bool Static, bool Remove)> Usings = default
 )
 {
     public static TemporaryProjectWorkareaOptions Default { get; } = new TemporaryProjectWorkareaOptions();

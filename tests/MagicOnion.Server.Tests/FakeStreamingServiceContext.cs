@@ -22,7 +22,7 @@ class FakeStreamingServiceContext<TRequest, TResponse> : IStreamingServiceContex
     public ConcurrentDictionary<string, object> Items { get; } = new ConcurrentDictionary<string, object>();
     public bool IsDisconnected => false;
 
-    public FakeStreamingServiceContext(Type serviceType, MethodInfo methodInfo, IMagicOnionMessageSerializer messageSerializer, IServiceProvider serviceProvider, ILookup<Type, Attribute>? attributeLookup = null)
+    public FakeStreamingServiceContext(Type serviceType, MethodInfo methodInfo, IMagicOnionMessageSerializer messageSerializer, IServiceProvider serviceProvider, ILookup<Type, Attribute> attributeLookup = null)
     {
         ServiceType = serviceType;
         MethodInfo = methodInfo;
