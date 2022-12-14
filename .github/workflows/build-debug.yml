@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-dotnet
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
 
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-dotnet
       - run: dotnet test -c Debug MagicOnion.sln
       - run: dotnet test -c Release MagicOnion.sln
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-dotnet
       - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c  ${{ env.BUILD_CONFIG }}
 
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # todo: prepare runtime unit test
       # Execute scripts: RuntimeUnitTestToolkit

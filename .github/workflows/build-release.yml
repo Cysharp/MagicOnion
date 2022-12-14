@@ -25,7 +25,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit.outputs.sha }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Output package.json (Before)
         run: cat ${{ env.TARGET_FILE}}
 
@@ -78,7 +78,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - run: echo ${{ needs.update-packagejson.outputs.sha }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: ./.github/actions/setup-dotnet
@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: ./.github/actions/setup-dotnet
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       # execute scripts/Export Package
