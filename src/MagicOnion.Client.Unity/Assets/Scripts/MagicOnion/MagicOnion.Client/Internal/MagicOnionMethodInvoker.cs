@@ -33,6 +33,7 @@ namespace MagicOnion.Client.Internal
     public abstract class RawMethodInvoker<TRequest, TResponse>
     {
         public abstract UnaryResult<TResponse> InvokeUnary(MagicOnionClientBase client, string path, TRequest request);
+        public abstract UnaryResult InvokeUnaryNonGeneric(MagicOnionClientBase client, string path, TRequest request);
         public abstract Task<ServerStreamingResult<TResponse>> InvokeServerStreaming(MagicOnionClientBase client, string path, TRequest request);
         public abstract Task<ClientStreamingResult<TRequest, TResponse>> InvokeClientStreaming(MagicOnionClientBase client, string path);
         public abstract Task<DuplexStreamingResult<TRequest, TResponse>> InvokeDuplexStreaming(MagicOnionClientBase client, string path);
@@ -56,9 +57,15 @@ namespace MagicOnion.Client.Internal
         {
             var future = InvokeUnaryCore(client, path, request, createUnaryResponseContext);
             return new UnaryResult<TResponse>(future);
-
         }
-        private async Task<IResponseContext<TResponse>> InvokeUnaryCore(MagicOnionClientBase client, string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
+
+        public override UnaryResult InvokeUnaryNonGeneric(MagicOnionClientBase client, string path, TRequest request)
+        {
+            var future = (Task<IResponseContext<Nil>>)(object)InvokeUnaryCore(client, path, request, createUnaryResponseContext);
+            return new UnaryResult(future);
+        }
+
+        async Task<IResponseContext<TResponse>> InvokeUnaryCore(MagicOnionClientBase client, string path, TRequest request, Func<RequestContext, ResponseContext> requestMethod)
         {
             var requestContext = new RequestContext<TRequest>(request, client, path, client.Options.CallOptions, typeof(TResponse), client.Options.Filters, requestMethod);
             var response = await InterceptInvokeHelper.InvokeWithFilter(requestContext);

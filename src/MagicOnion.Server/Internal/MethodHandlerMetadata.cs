@@ -129,10 +129,23 @@ internal class MethodHandlerMetadataFactory
     static Type UnwrapUnaryResponseType(MethodInfo methodInfo, out MethodType methodType, out bool responseIsTask, out Type? requestTypeIfExists)
     {
         var t = methodInfo.ReturnType;
-        if (!t.GetTypeInfo().IsGenericType) throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. (Member:{methodInfo.DeclaringType!.Name}.{methodInfo.Name}, ReturnType:{methodInfo.ReturnType.Name})");
+        
+        // UnaryResult
+        if (t == typeof(UnaryResult))
+        {
+            methodType = MethodType.Unary;
+            requestTypeIfExists = default;
+            responseIsTask = false;
+            return typeof(MessagePack.Nil);
+        }
 
-        // Task<Unary<T>>
-        if (t.GetGenericTypeDefinition() == typeof(Task<>))
+        if (!t.GetTypeInfo().IsGenericType)
+        {
+            throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. (Member:{methodInfo.DeclaringType!.Name}.{methodInfo.Name}, ReturnType:{methodInfo.ReturnType.Name})");
+        }
+
+        // Task<UnaryResult<T>>
+        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Task<>))
         {
             responseIsTask = true;
             t = t.GetGenericArguments()[0];
@@ -142,7 +155,7 @@ internal class MethodHandlerMetadataFactory
             responseIsTask = false;
         }
 
-        // Unary<T>
+        // UnaryResult<T>, ClientStreamingResult<TRequest,TResponse>, ServerStreamingResult<T>, DuplexStreamingResult<TRequest,TResponse>
         var returnType = t.GetGenericTypeDefinition();
         if (returnType == typeof(UnaryResult<>))
         {
@@ -170,10 +183,8 @@ internal class MethodHandlerMetadataFactory
             requestTypeIfExists = genArgs[0];
             return genArgs[1];
         }
-        else
-        {
-            throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
-        }
+
+        throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
     }
 
     static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsTask)

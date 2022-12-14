@@ -6,6 +6,12 @@ public class ServiceClientDefinitionTest
 {
     public interface IDummyService
     {
+        UnaryResult<int> Unary();
+        UnaryResult UnaryNonGeneric();
+        Task<ClientStreamingResult<int, int>> ClientStreaming();
+        Task<ServerStreamingResult<int>> ServerStreaming();
+        Task<DuplexStreamingResult<int, int>> DuplexStreaming();
+
         Task<UnaryResult<int>> TaskOfUnary();
         ClientStreamingResult<int, int> NonTaskOfClientStreamingResult();
         ServerStreamingResult<int> NonTaskOfServerStreamingResult();
@@ -14,6 +20,52 @@ public class ServiceClientDefinitionTest
     }
 
     [Fact]
+    public void Unary()
+    {
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.Unary)));
+        methodInfo.Should().NotBeNull();
+        methodInfo.MethodName.Should().Be(nameof(IDummyService.Unary));
+        methodInfo.MethodReturnType.Should().Be<UnaryResult<int>>();
+        methodInfo.ResponseType.Should().Be<int>();
+    }
+    
+    [Fact]
+    public void Unary_NonGeneric()
+    {
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.UnaryNonGeneric)));
+        methodInfo.Should().NotBeNull();
+        methodInfo.MethodName.Should().Be(nameof(IDummyService.UnaryNonGeneric));
+        methodInfo.MethodReturnType.Should().Be<UnaryResult>();
+        methodInfo.ResponseType.Should().Be<Nil>();
+    }
+
+    [Fact]
+    public void ClientStreaming()
+    {
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ClientStreaming)));
+        methodInfo.Should().NotBeNull();
+        methodInfo.MethodName.Should().Be(nameof(IDummyService.ClientStreaming));
+        methodInfo.MethodReturnType.Should().Be<Task<ClientStreamingResult<int, int>>>();
+    }
+
+    [Fact]
+    public void ServerStreaming()
+    {
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ServerStreaming)));
+        methodInfo.Should().NotBeNull();
+        methodInfo.MethodName.Should().Be(nameof(IDummyService.ServerStreaming));
+        methodInfo.MethodReturnType.Should().Be<Task<ServerStreamingResult<int>>>();
+    }
+
+    [Fact]
+    public void DuplexStreaming()
+    {
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.DuplexStreaming)));
+        methodInfo.Should().NotBeNull();
+        methodInfo.MethodName.Should().Be(nameof(IDummyService.DuplexStreaming));
+        methodInfo.MethodReturnType.Should().Be<Task<DuplexStreamingResult<int, int>>>();
+    }
+    [Fact]
     public void InvalidUnaryTaskOfUnary()
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
@@ -21,7 +73,7 @@ public class ServiceClientDefinitionTest
             ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.TaskOfUnary)));
         });
 
-        ex.Message.Should().Contain("The return type of an Unary method must be 'UnaryResult<T>'");
+        ex.Message.Should().Contain("The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'");
     }
 
     [Fact]

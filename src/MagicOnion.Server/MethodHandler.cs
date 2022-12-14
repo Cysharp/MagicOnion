@@ -20,6 +20,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     static readonly MethodInfo Helper_NewEmptyValueTask = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.NewEmptyValueTask), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SetTaskUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetTaskUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SetUnaryResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
+    static readonly MethodInfo Helper_SetUnaryResultNonGeneric = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SetUnaryResultNonGeneric), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SerializeTaskClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeTaskClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly MethodInfo Helper_SerializeClientStreamingResult = typeof(MethodHandlerResultHelper).GetMethod(nameof(MethodHandlerResultHelper.SerializeClientStreamingResult), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
     static readonly PropertyInfo ServiceContext_Request = typeof(ServiceContext).GetProperty("Request", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!;
@@ -115,7 +116,9 @@ public class MethodHandler : IEquatable<MethodHandler>
                     {
                         var finalMethod = (metadata.IsResultTypeTask)
                             ? Helper_SetTaskUnaryResult.MakeGenericMethod(UnwrappedResponseType)
-                            : Helper_SetUnaryResult.MakeGenericMethod(UnwrappedResponseType);
+                            : metadata.ServiceMethod.ReturnType == typeof(UnaryResult)
+                                ? Helper_SetUnaryResultNonGeneric
+                                : Helper_SetUnaryResult.MakeGenericMethod(UnwrappedResponseType);
                         callBody = Expression.Call(finalMethod, callBody, contextArg);
                     }
 
@@ -524,6 +527,7 @@ public class MethodHandlerOptions
 internal class MethodHandlerResultHelper
 {
     static readonly ValueTask CopmletedValueTask = new ValueTask();
+    static readonly object BoxedNil = Nil.Default;
 
     public static ValueTask NewEmptyValueTask<T>(T result)
     {
@@ -535,6 +539,18 @@ internal class MethodHandlerResultHelper
     {
         // wait and ignore result.
         await result;
+    }
+
+    public static async ValueTask SetUnaryResultNonGeneric(UnaryResult result, ServiceContext context)
+    {
+        if (result.hasRawValue)
+        {
+            if (result.rawTaskValue != null)
+            {
+                await result.rawTaskValue.ConfigureAwait(false);
+            }
+            context.Result = BoxedNil;
+        }
     }
 
     public static async ValueTask SetUnaryResult<T>(UnaryResult<T> result, ServiceContext context)

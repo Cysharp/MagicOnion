@@ -177,6 +177,10 @@ public class MethodCollector
         var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
         switch (methodReturnType.FullNameOpenType)
         {
+            case "global::MagicOnion.UnaryResult":
+                methodType = MethodType.Unary;
+                responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
+                break;
             case "global::MagicOnion.UnaryResult<>":
                 methodType = MethodType.Unary;
                 responseType = methodReturnType.GenericArguments[0];

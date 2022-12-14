@@ -135,6 +135,8 @@ namespace MagicOnion.Client.DynamicClient
             //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", request);
             // public UnaryResult<TResponse> MethodName()
             //     => this.core.MethodName.InvokeUnary(this, "ServiceName/MethodName", Nil.Default);
+            // public UnaryResult MethodName()
+            //     => this.core.MethodName.InvokeUnaryNonGeneric(this, "ServiceName/MethodName", Nil.Default);
             // public Task<ServerStreamingResult<TRequest, TResponse>> MethodName(TArg1 arg1, TArg2 arg2, ...)
             //     => this.core.MethodName.InvokeServerStreaming(this, "ServiceName/MethodName", new DynamicArgumentTuple<T1, T2, ...>(arg1, arg2, ...));
             // public Task<ClientStreamingResult<TRequest, TResponse>> MethodName()
@@ -143,7 +145,8 @@ namespace MagicOnion.Client.DynamicClient
             //     => this.core.MethodName.InvokeDuplexStreaming(this, "ServiceName/MethodName");
             foreach (var method in ctx.Definition.Methods)
             {
-                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}");
+                var hasNonGenericUnaryResult = method.MethodReturnType == typeof(UnaryResult);
+                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}");
                 var methodBuilder = ctx.ServiceClientType.DefineMethod(method.MethodName, MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, methodInvokerInvokeMethod.ReturnType, method.ParameterTypes.ToArray());
                 var il = methodBuilder.GetILGenerator();
 

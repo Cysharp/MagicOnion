@@ -12,6 +12,39 @@ public class GenerateServiceTest
     }
 
     [Fact]
+    public async Task Return_UnaryResultNonGeneric()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult A();
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task Return_UnaryResultOfT()
     {
         using var tempWorkspace = TemporaryProjectWorkarea.Create();

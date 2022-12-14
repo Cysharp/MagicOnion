@@ -182,4 +182,31 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
 
         (await client.TwoRefTypeParametersReturnRefTypeAsync(new BasicServerSample.Services.MyRequest(123), new BasicServerSample.Services.MyRequest(456))).Value.Should().Be((123 + 456).ToString());
     }
+
+    [Fact]
+    public async Task NonGeneric_NoParameter()
+    {
+        var httpClient = factory.CreateDefaultClient();
+        var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
+
+        await client.NonGenericNoParameterAsync();
+    }
+
+    [Fact]
+    public async Task NonGeneric_OneValueTypeParameter()
+    {
+        var httpClient = factory.CreateDefaultClient();
+        var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
+
+        await client.NonGenericOneValueTypeParameterAsync(123);
+    }
+
+    [Fact]
+    public async Task NonGeneric_TwoValueTypeParameters()
+    {
+        var httpClient = factory.CreateDefaultClient();
+        var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
+
+        await client.NonGenericTwoValueTypeParameterAsync(123, 456);
+    }
 }
