@@ -73,7 +73,7 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
         var ex = await Assert.ThrowsAsync<RetryFailedException>(async () =>
         {
             var filter = new RetryFilter();
-            await MagicOnionClient.Create<IClientFilterTestService>(channel, new IClientFilter[]
+            await clientFactory.Create(channel, new IClientFilter[]
             {
                 filter
             }).AlwaysError();
