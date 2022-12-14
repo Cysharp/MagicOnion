@@ -451,7 +451,7 @@ public interface IMyHubReceiver
         var collector = new MethodCollector();
         var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
     }
-           
+
     [Fact]
     public void ReturnType_Task()
     {
@@ -487,7 +487,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task);
     }
-               
+
     [Fact]
     public void ReturnType_TaskOfT()
     {
@@ -522,6 +522,78 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
         serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_String);
         serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<string>>());
+    }
+
+    [Fact]
+    public void ReturnType_ValueTask()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    ValueTask MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyHub.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask);
+    }
+
+    [Fact]
+    public void ReturnType_ValueTaskOfT()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    ValueTask<string> MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyHub.cs", source);
+        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+
+        // Act
+        var collector = new MethodCollector();
+        var serviceCollection = collector.Collect(compilation);
+
+        // Assert
+        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_String);
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<ValueTask<string>>());
     }
 
     [Fact]

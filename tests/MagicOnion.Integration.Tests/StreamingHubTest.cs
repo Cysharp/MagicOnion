@@ -129,6 +129,106 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_Zero();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_One(12345);
+    }
+
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_Many(12345, "Hello✨", true);
+    }
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_Zero();
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_One(12345);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_Many(12345, "Hello✨", true);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task Receiver_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
     {
         // Arrange
@@ -294,7 +394,44 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         return new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100));
     }
+    
+    public ValueTask ValueTask_NoReturn_Parameter_Zero()
+    {
+        return default;
+    }
 
+    public ValueTask ValueTask_NoReturn_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return default;
+    }
+
+    public ValueTask ValueTask_NoReturn_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return default;
+    }
+
+    public ValueTask<int> ValueTask_Parameter_Zero()
+    {
+        return ValueTask.FromResult(67890);
+    }
+
+    public ValueTask<int> ValueTask_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return ValueTask.FromResult(67890);
+    }
+
+    public ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return ValueTask.FromResult(67890);
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -320,4 +457,13 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     Task Never();
     Task<int> Never_With_Return();
+
+    ValueTask ValueTask_NoReturn_Parameter_Zero();
+    ValueTask ValueTask_NoReturn_Parameter_One(int arg0);
+    ValueTask ValueTask_NoReturn_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    ValueTask<int> ValueTask_Parameter_Zero();
+    ValueTask<int> ValueTask_Parameter_One(int arg0);
+    ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, bool arg2);
+
 }

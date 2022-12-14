@@ -39,7 +39,7 @@ public class StreamingHubContext
     internal Type? responseType;
 
     // helper for reflection
-    internal async ValueTask WriteResponseMessageNil(Task value)
+    internal async ValueTask WriteResponseMessageNil(ValueTask value)
     {
         if (MessageId == -1) // don't write.
         {
@@ -70,7 +70,7 @@ public class StreamingHubContext
         responseType = typeof(Nil);
     }
 
-    internal async ValueTask WriteResponseMessage<T>(Task<T> value)
+    internal async ValueTask WriteResponseMessage<T>(ValueTask<T> value)
     {
         if (MessageId == -1) // don't write.
         {

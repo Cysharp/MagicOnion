@@ -12,7 +12,7 @@ public class MagicOnionGeneratorTestOutputLogger : IMagicOnionGeneratorLogger
         this.outputHelper = outputHelper;
     }
 
-#if TRUE
+#if FALSE
     public void Trace(string message) => outputHelper.WriteLine(message);
 #else
     public void Trace(string message) {}

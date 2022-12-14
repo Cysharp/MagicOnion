@@ -265,6 +265,84 @@ namespace TempProject
     }
 
     [Fact]
+    public async Task Return_ValueTask()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyHubReceiver { }
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+    {
+        ValueTask A(MyObject a);
+    }
+
+    [MessagePackObject]
+    public class MyObject
+    {
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Return_ValueTaskOfT()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyHubReceiver { }
+    public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+    {
+        ValueTask<MyObject> A(MyObject a);
+    }
+
+    [MessagePackObject]
+    public class MyObject
+    {
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters"
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task Invalid_Return_Void()
     {
         using var tempWorkspace = TemporaryProjectWorkarea.Create();

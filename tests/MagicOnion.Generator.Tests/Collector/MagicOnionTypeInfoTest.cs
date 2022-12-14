@@ -698,4 +698,15 @@ public class MagicOnionTypeInfoTest
             MagicOnionTypeInfo.CreateFromType<byte[]>(),
             MagicOnionTypeInfo.CreateFromType<byte>());
     }
+
+    [Fact]
+    public void GetGenericTypeDefinition()
+    {
+        // Arrange
+        var typeInfo = MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string>>();
+        // Act
+        var genericDefinition = typeInfo.GetGenericTypeDefinition();
+        // Assert
+        genericDefinition.Should().Be(MagicOnionTypeInfo.Create("System", "ValueTuple", Array.Empty<MagicOnionTypeInfo>(), true));
+    }
 }

@@ -95,7 +95,7 @@ internal class MethodHandlerMetadataFactory
     {
         var hubInterface = serviceClass.GetInterfaces().First(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IStreamingHub<,>)).GetGenericArguments()[0];
         var parameters = methodInfo.GetParameters();
-        var responseType = UnwrapStreamingHubResponseType(methodInfo, out var responseIsTask);
+        var responseType = UnwrapStreamingHubResponseType(methodInfo, out var responseIsTaskOrValueTask);
         var requestType = GetRequestTypeFromMethod(methodInfo, parameters);
 
         var attributeLookup = serviceClass.GetCustomAttributes(true)
@@ -105,9 +105,9 @@ internal class MethodHandlerMetadataFactory
 
         var interfaceMethodInfo = ResolveInterfaceMethod(serviceClass, hubInterface, methodInfo.Name);
 
-        if (!responseIsTask)
+        if (!responseIsTaskOrValueTask)
         {
-            throw new InvalidOperationException($"A type of the StreamingHub method must be Task or Task<T>. (Member:{serviceClass.Name}.{methodInfo.Name})");
+            throw new InvalidOperationException($"A type of the StreamingHub method must be Task, Task<T>, ValueTask or ValueTask<T>. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
         var methodId = interfaceMethodInfo.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethodInfo.Name);
@@ -187,19 +187,19 @@ internal class MethodHandlerMetadataFactory
         throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
     }
 
-    static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsTask)
+    static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsTaskOrValueTask)
     {
         var t = methodInfo.ReturnType;
 
         // Task<T>
-        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Task<>))
+        if (t.IsGenericType && (t.GetGenericTypeDefinition() == typeof(Task<>) || t.GetGenericTypeDefinition() == typeof(ValueTask<>)))
         {
-            responseIsTask = true;
+            responseIsTaskOrValueTask = true;
             return t.GetGenericArguments()[0];
         }
-        else if (t == typeof(Task))
+        else if (t == typeof(Task) || t == typeof(ValueTask))
         {
-            responseIsTask = true;
+            responseIsTaskOrValueTask = true;
             return null;
         }
 

@@ -1,4 +1,4 @@
-﻿using MagicOnion.Server.Hubs;
+using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Internal;
 using MagicOnion.Utils;
 using MessagePack;
@@ -308,6 +308,46 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         metadata.AttributeLookup[typeof(MySecondAttribute)].Should().BeEquivalentTo(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
     }
 
+    [Fact]
+    public void ValueTask()
+    {
+        // Arrange
+        var type = typeof(MyHub);
+        var methodInfo = type.GetMethod(nameof(MyHub.Method_ValueTask))!;
+
+        // Act
+        var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
+
+        // Assert
+        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
+        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
+        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTask)));
+        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
+        metadata.Parameters.Should().BeEmpty();
+        metadata.RequestType.Should().Be<Nil>();
+        metadata.ResponseType.Should().BeNull();
+    }
+
+    [Fact]
+    public void ValueTaskOfT()
+    {
+        // Arrange
+        var type = typeof(MyHub);
+        var methodInfo = type.GetMethod(nameof(MyHub.Method_ValueTaskOfValue))!;
+
+        // Act
+        var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
+
+        // Assert
+        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
+        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
+        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_ValueTaskOfValue)));
+        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
+        metadata.Parameters.Should().BeEmpty();
+        metadata.RequestType.Should().Be<Nil>();
+        metadata.ResponseType.Should().Be<int>();
+    }
+
     interface IMyHubReceiver
     {}
 
@@ -315,6 +355,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
     {
         Task Method_Task();
         Task<int> Method_TaskOfValue();
+        ValueTask Method_ValueTask();
+        ValueTask<int> Method_ValueTaskOfValue();
 
         Task Method_Parameterless();
         Task Method_OneParameter(int arg0);
@@ -328,6 +370,8 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
     {
         public Task Method_Task() => throw new NotImplementedException();
         public Task<int> Method_TaskOfValue() => throw new NotImplementedException();
+        public ValueTask Method_ValueTask() => throw new NotImplementedException();
+        public ValueTask<int> Method_ValueTaskOfValue() => throw new NotImplementedException();
         public Task Method_Parameterless() => throw new NotImplementedException();
         public Task Method_OneParameter(int arg0) => throw new NotImplementedException();
         public Task Method_TwoParameters(int arg0, string arg1) => throw new NotImplementedException();
