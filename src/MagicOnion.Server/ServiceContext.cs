@@ -73,7 +73,7 @@ public class ServiceContext : IServiceContext
     /// <summary>Raw gRPC Context.</summary>
     public ServerCallContext CallContext { get; }
 
-    public IMagicOnionMessageSerializer MessageSerializer { get; private set; }
+    public IMagicOnionMessageSerializer MessageSerializer { get; }
 
     public IServiceProvider ServiceProvider { get; }
 
@@ -129,13 +129,5 @@ public class ServiceContext : IServiceContext
     public void SetRawResponse(object? response)
     {
         Result = response;
-    }
-
-    /// <summary>
-    /// modify request/response options in this context.
-    /// </summary>
-    public void ChangeSerializer(IMagicOnionMessageSerializer messageSerializer)
-    {
-        this.MessageSerializer = messageSerializer;
     }
 }
