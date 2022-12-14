@@ -119,10 +119,12 @@ namespace MagicOnion
         public static Marshaller<Box<Nil>> IgnoreNilMarshaller { get; } = new Marshaller<Box<Nil>>(
                 serializer: (obj, ctx) =>
                 {
+                    ReadOnlySpan<byte> unsafeNilBytes = new [] { MessagePackCode.Nil };
+
                     var writer = ctx.GetBufferWriter();
-                    var buffer = writer.GetSpan(MagicOnionMarshallers.UnsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.
-                    MagicOnionMarshallers.UnsafeNilBytes.CopyTo(buffer);
-                    writer.Advance(buffer.Length);
+                    var buffer = writer.GetSpan(unsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.
+                    unsafeNilBytes.CopyTo(buffer);
+                    writer.Advance(unsafeNilBytes.Length);
 
                     ctx.Complete();
                 },
