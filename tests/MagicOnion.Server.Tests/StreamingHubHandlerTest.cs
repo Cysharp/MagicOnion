@@ -86,6 +86,83 @@ public class StreamingHubHandlerTest
         }
         fakeStreamingHubContext.Responses[0].Should().Equal(BuildMessage());
     }
+        [Fact]
+    public async Task Parameterless_Returns_ValueTask()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var hubType = typeof(StreamingHubHandlerTestHub);
+        var hubMethod = hubType.GetMethod(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTask))!;
+        var hubInstance = new StreamingHubHandlerTestHub();
+        var fakeStreamingHubContext = new FakeStreamingServiceContext<byte[], byte[]>(hubType, hubMethod, MessagePackMessageMagicOnionSerializerProvider.Instance.Create(MethodType.DuplexStreaming, null), serviceProvider);
+
+        // Act
+        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var ctx = new StreamingHubContext()
+        {
+            HubInstance = hubInstance,
+            ServiceContext = fakeStreamingHubContext,
+            Request = MessagePackSerializer.Serialize<Nil>(Nil.Default),
+        };
+        await handler.MethodBody.Invoke(ctx);
+
+        // Assert
+        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTask) + " called.");
+        byte[] BuildMessage()
+        {
+            // [MessageId, MethodId, Nil]
+            var buffer = new ArrayBufferWriter<byte>();
+            var writer = new MessagePackWriter(buffer);
+            writer.WriteArrayHeader(3);
+            writer.Write(ctx.MessageId);
+            writer.Write(ctx.MethodId);
+            writer.WriteNil();
+            writer.Flush();
+
+            return buffer.WrittenMemory.ToArray();
+        }
+        fakeStreamingHubContext.Responses[0].Should().Equal(BuildMessage());
+    }
+
+    [Fact]
+    public async Task Parameterless_Returns_ValueTaskOfInt32()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var serviceProvider = services.BuildServiceProvider();
+        var hubType = typeof(StreamingHubHandlerTestHub);
+        var hubMethod = hubType.GetMethod(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTaskOfInt32))!;
+        var hubInstance = new StreamingHubHandlerTestHub();
+        var fakeStreamingHubContext = new FakeStreamingServiceContext<byte[], byte[]>(hubType, hubMethod, MessagePackMessageMagicOnionSerializerProvider.Instance.Create(MethodType.DuplexStreaming, null), serviceProvider);
+
+        // Act
+        var handler = new StreamingHubHandler(hubType, hubMethod, new StreamingHubHandlerOptions(new MagicOnionOptions()), serviceProvider);
+        var ctx = new StreamingHubContext()
+        {
+            HubInstance = hubInstance,
+            ServiceContext = fakeStreamingHubContext,
+            Request = MessagePackSerializer.Serialize<Nil>(Nil.Default),
+        };
+        await handler.MethodBody.Invoke(ctx);
+
+        // Assert
+        hubInstance.Results.Should().Contain(nameof(StreamingHubHandlerTestHub.Method_Parameterless_Returns_ValueTaskOfInt32) + " called.");
+        byte[] BuildMessage()
+        {
+            // [MessageId, MethodId, {Int32:12345}]
+            var buffer = new ArrayBufferWriter<byte>();
+            var writer = new MessagePackWriter(buffer);
+            writer.WriteArrayHeader(3);
+            writer.Write(ctx.MessageId);
+            writer.Write(ctx.MethodId);
+            MessagePackSerializer.Serialize(ref writer, 12345);
+            writer.Flush();
+
+            return buffer.WrittenMemory.ToArray();
+        }
+        fakeStreamingHubContext.Responses[0].Should().Equal(BuildMessage());
+    }
 
     [Fact]
     public async Task Parameter_Single_Returns_Task()
@@ -306,6 +383,10 @@ public class StreamingHubHandlerTest
         Task Method_Parameter_Single_Returns_Task(int arg0);
         Task Method_Parameter_Multiple_Returns_Task(int arg0, string arg1, bool arg2);
         Task<int> Method_Parameter_Multiple_Returns_TaskOfInt32(int arg0, string arg1, bool arg2);
+
+        ValueTask Method_Parameterless_Returns_ValueTask();
+        ValueTask<int> Method_Parameterless_Returns_ValueTaskOfInt32();
+
     }
     class StreamingHubHandlerTestHub : IStreamingHubHandlerTestHub
     {
@@ -344,5 +425,18 @@ public class StreamingHubHandlerTest
             Results.Add(nameof(Method_Parameter_Multiple_Returns_TaskOfInt32) + $"({arg0},{arg1},{arg2}) called.");
             return Task.FromResult(arg0);
         }
+
+        public ValueTask Method_Parameterless_Returns_ValueTask()
+        {
+            Results.Add(nameof(Method_Parameterless_Returns_ValueTask) + " called.");
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask<int> Method_Parameterless_Returns_ValueTaskOfInt32()
+        {
+            Results.Add(nameof(Method_Parameterless_Returns_ValueTaskOfInt32) + " called.");
+            return ValueTask.FromResult(12345);
+        }
+
     }
 }

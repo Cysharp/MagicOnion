@@ -113,7 +113,6 @@ namespace MagicOnion
             }
         }
 
-
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
         //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
         //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
@@ -124,7 +123,7 @@ namespace MagicOnion
 
                     var writer = ctx.GetBufferWriter();
                     var buffer = writer.GetSpan(unsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.
-                    MagicOnionMarshallers.UnsafeNilBytes.CopyTo(buffer);
+                    unsafeNilBytes.CopyTo(buffer);
                     writer.Advance(unsafeNilBytes.Length);
 
                     ctx.Complete();

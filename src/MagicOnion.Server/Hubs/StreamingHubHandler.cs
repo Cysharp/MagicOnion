@@ -2,6 +2,7 @@ using System.Buffers;
 using MessagePack;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MagicOnion.Server.Filters;
 using MagicOnion.Server.Filters.Internal;
@@ -59,9 +60,7 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
             var invokeHubMethodFunc = Expression.Lambda(callHubMethod, contextArg, requestArg).Compile();
 
             // Create a StreamingHub method invoker and a wrapped-invoke method.
-            Type invokerType = metadata.ResponseType is null
-                ? typeof(StreamingHubMethodInvoker<>).MakeGenericType(metadata.RequestType)
-                : typeof(StreamingHubMethodInvoker<,>).MakeGenericType(metadata.RequestType, metadata.ResponseType);
+            Type invokerType = StreamingHubMethodInvoker.CreateInvokerTypeFromMetadata(metadata);
             StreamingHubMethodInvoker invoker = (StreamingHubMethodInvoker)Activator.CreateInstance(invokerType, messageSerializer, invokeHubMethodFunc)!;
 
             var filters = FilterHelper.GetFilters(handlerOptions.GlobalStreamingHubFilters, classType, methodInfo);
@@ -70,54 +69,6 @@ public class StreamingHubHandler : IEquatable<StreamingHubHandler>
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Can't create handler. Path:{ToString()}", ex);
-        }
-    }
-
-    abstract class StreamingHubMethodInvoker
-    {
-        protected IMagicOnionMessageSerializer MessageSerializer { get; }
-
-        protected StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
-        {
-            MessageSerializer = messageSerializer;
-        }
-
-        public abstract ValueTask InvokeAsync(StreamingHubContext context);
-    }
-
-    sealed class StreamingHubMethodInvoker<TRequest, TResponse> : StreamingHubMethodInvoker
-    {
-        readonly Func<StreamingHubContext, TRequest, Task<TResponse>> hubMethodFunc;
-
-        public StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
-        {
-            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task<TResponse>>)hubMethodFunc;
-        }
-
-        public override ValueTask InvokeAsync(StreamingHubContext context)
-        {
-            var seq = new ReadOnlySequence<byte>(context.Request);
-            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
-            Task<TResponse> response = hubMethodFunc(context, request);
-            return context.WriteResponseMessage(response);
-        }
-    }
-
-    sealed class StreamingHubMethodInvoker<TRequest> : StreamingHubMethodInvoker
-    {
-        readonly Func<StreamingHubContext, TRequest, Task> hubMethodFunc;
-
-        public StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
-        {
-            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task>)hubMethodFunc;
-        }
-
-        public override ValueTask InvokeAsync(StreamingHubContext context)
-        {
-            var seq = new ReadOnlySequence<byte>(context.Request);
-            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
-            Task response = hubMethodFunc(context, request);
-            return context.WriteResponseMessageNil(response);
         }
     }
 
@@ -145,4 +96,104 @@ public class StreamingHubHandlerOptions
         GlobalStreamingHubFilters = options.GlobalStreamingHubFilters;
         MessageSerializer = options.MessageSerializer;
     }
+}
+
+internal abstract class StreamingHubMethodInvoker
+{
+    protected IMagicOnionMessageSerializer MessageSerializer { get; }
+
+    protected StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
+    {
+        MessageSerializer = messageSerializer;
+    }
+
+    public abstract ValueTask InvokeAsync(StreamingHubContext context);
+
+    public static Type CreateInvokerTypeFromMetadata(in StreamingHubMethodHandlerMetadata metadata)
+    {
+        var isTaskOrTaskOfT = metadata.InterfaceMethod.ReturnType == typeof(Task) ||
+                              (metadata.InterfaceMethod.ReturnType is { IsGenericType: true } t && t.BaseType == typeof(Task));
+        return isTaskOrTaskOfT
+            ? (metadata.ResponseType is null
+                ? typeof(StreamingHubMethodInvokerTask<>).MakeGenericType(metadata.RequestType)
+                : typeof(StreamingHubMethodInvokerTask<,>).MakeGenericType(metadata.RequestType, metadata.ResponseType)
+            )
+            : (metadata.ResponseType is null
+                ? typeof(StreamingHubMethodInvokerValueTask<>).MakeGenericType(metadata.RequestType)
+                : typeof(StreamingHubMethodInvokerValueTask<,>).MakeGenericType(metadata.RequestType, metadata.ResponseType)
+            );
+    }
+
+    sealed class StreamingHubMethodInvokerTask<TRequest, TResponse> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, Task<TResponse>> hubMethodFunc;
+
+        public StreamingHubMethodInvokerTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        {
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task<TResponse>>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            Task<TResponse> response = hubMethodFunc(context, request);
+            return context.WriteResponseMessage(new ValueTask<TResponse>(response));
+        }
+    }
+
+    sealed class StreamingHubMethodInvokerTask<TRequest> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, Task> hubMethodFunc;
+
+        public StreamingHubMethodInvokerTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        {
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            Task response = hubMethodFunc(context, request);
+            return context.WriteResponseMessageNil(new ValueTask(response));
+        }
+    }
+
+    sealed class StreamingHubMethodInvokerValueTask<TRequest, TResponse> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, ValueTask<TResponse>> hubMethodFunc;
+
+        public StreamingHubMethodInvokerValueTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        {
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, ValueTask<TResponse>>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            ValueTask<TResponse> response = hubMethodFunc(context, request);
+            return context.WriteResponseMessage(response);
+        }
+    }
+
+    sealed class StreamingHubMethodInvokerValueTask<TRequest> : StreamingHubMethodInvoker
+    {
+        readonly Func<StreamingHubContext, TRequest, ValueTask> hubMethodFunc;
+
+        public StreamingHubMethodInvokerValueTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        {
+            this.hubMethodFunc = (Func<StreamingHubContext, TRequest, ValueTask>)hubMethodFunc;
+        }
+
+        public override ValueTask InvokeAsync(StreamingHubContext context)
+        {
+            var seq = new ReadOnlySequence<byte>(context.Request);
+            TRequest request = MessageSerializer.Deserialize<TRequest>(seq);
+            ValueTask response = hubMethodFunc(context, request);
+            return context.WriteResponseMessageNil(response);
+        }
+    }
+
 }

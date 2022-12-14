@@ -14,6 +14,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         public static MagicOnionTypeInfo System_Boolean { get; } = new MagicOnionTypeInfo("System", "Boolean", SubType.ValueType);
         public static MagicOnionTypeInfo MessagePack_Nil { get; } = new MagicOnionTypeInfo("MessagePack", "Nil", SubType.ValueType);
         public static MagicOnionTypeInfo System_Threading_Tasks_Task { get; } = new MagicOnionTypeInfo("System.Threading.Tasks", "Task");
+        public static MagicOnionTypeInfo System_Threading_Tasks_ValueTask { get; } = new MagicOnionTypeInfo("System.Threading.Tasks", "ValueTask", SubType.ValueType);
         public static MagicOnionTypeInfo MagicOnion_UnaryResult { get; } = new MagicOnionTypeInfo("MagicOnion", "UnaryResult", SubType.ValueType);
         // ReSharper restore InconsistentNaming
     }
@@ -25,6 +26,12 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
 
     public IReadOnlyList<MagicOnionTypeInfo> GenericArguments { get; }
     public bool HasGenericArguments => GenericArguments.Any();
+
+    public MagicOnionTypeInfo GetGenericTypeDefinition()
+    {
+        if (!HasGenericArguments) throw new InvalidOperationException("The type is not constructed generic type.");
+        return MagicOnionTypeInfo.Create(Namespace, Name, Array.Empty<MagicOnionTypeInfo>(), IsValueType);
+    }
 
     public bool IsArray => _subType == SubType.Array;
     public int ArrayRank { get; }
@@ -120,6 +127,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         if (@namespace == "System" && name == "String") return KnownTypes.System_String;
         if (@namespace == "System" && name == "Boolean") return KnownTypes.System_Boolean;
         if (@namespace == "System.Threading.Tasks" && name == "Task" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_Task;
+        if (@namespace == "System.Threading.Tasks" && name == "ValueTask" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_ValueTask;
         if (@namespace == "MagicOnion" && name == "UnaryResult" && genericArguments.Length == 0) return KnownTypes.MagicOnion_UnaryResult;
 
         return new MagicOnionTypeInfo(@namespace, name, isValueType ? SubType.ValueType : SubType.None, arrayRank:0, genericArguments);

@@ -173,10 +173,30 @@ public class StaticStreamingHubClientGenerator
                     _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
                 };
 
-                ctx.TextWriter.WriteLines($"""
-                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                    => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
-                """);
+                if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
+                {
+                    // ValueTask
+                    ctx.TextWriter.WriteLines($"""
+                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                        => new global::System.Threading.Tasks.ValueTask({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                    """);
+                }
+                else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
+                {
+                    // ValueTask<T>
+                    ctx.TextWriter.WriteLines($"""
+                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                        => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                    """);
+                }
+                else
+                {
+                    // Task, Task<T>
+                    ctx.TextWriter.WriteLines($"""
+                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                        => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+                    """);
+                }
             } // #endif
         }
 

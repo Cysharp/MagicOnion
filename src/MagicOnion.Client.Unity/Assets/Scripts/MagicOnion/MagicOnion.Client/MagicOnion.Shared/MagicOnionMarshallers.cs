@@ -24,8 +24,6 @@ namespace MagicOnion
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 
-        public static readonly byte[] UnsafeNilBytes = new byte[] { MessagePackCode.Nil };
-
         public static readonly Marshaller<byte[]> ThroughMarshaller = new Marshaller<byte[]>(x => x, x => x);
 
         internal static Type CreateRequestType(ParameterInfo[] parameters)
