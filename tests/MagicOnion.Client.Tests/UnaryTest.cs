@@ -353,7 +353,6 @@ public class UnaryTest
     {
         // Arrange
         var request = "RequestValue";
-        var response = 123;
         var callInvokerMock = new Mock<CallInvoker>();
         callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), request))
             .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
@@ -372,7 +371,6 @@ public class UnaryTest
     {
         // Arrange
         var request = 123;
-        var response = 456;
         var callInvokerMock = new Mock<CallInvoker>();
         callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<int>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), Box.Create(request)))
             .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
@@ -392,7 +390,6 @@ public class UnaryTest
         // Arrange
         var requestArg1 = 123;
         var requestArg2 = "Foo";
-        var response = 987;
         var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
         var callInvokerMock = new Mock<CallInvoker>();
         callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
