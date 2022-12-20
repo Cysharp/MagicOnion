@@ -25,7 +25,7 @@ namespace MagicOnion.Client.DynamicClient
     {
         public static Type ClientType { get; } = Build();
 
-        private static Type Build()
+        static Type Build()
         {
             var serviceClientDefinition = ServiceClientDefinition.CreateFromType<T>();
             var buildContext = new ServiceClientBuildContext(serviceClientDefinition);
@@ -35,7 +35,7 @@ namespace MagicOnion.Client.DynamicClient
             return buildContext.ServiceClientType.CreateTypeInfo();
         }
 
-        private class ServiceClientBuildContext
+        class ServiceClientBuildContext
         {
             public ServiceClientBuildContext(ServiceClientDefinition definition)
             {
@@ -49,12 +49,13 @@ namespace MagicOnion.Client.DynamicClient
 
             public TypeBuilder ServiceClientType { get; set; } // {ServiceName}Client
             public ConstructorBuilder ServiceClientConstructor { get; set; } // {ServiceName}Client..ctor
+            public ConstructorBuilder ServiceClientConstructorForClone { get; set; } // {ServiceName}Client..ctor
             public FieldBuilder FieldCore { get; set; }
 
             public Dictionary<string, (FieldBuilder Field, Type MethodInvokerType)> FieldAndMethodInvokerTypeByMethod { get; } = new Dictionary<string, (FieldBuilder Field, Type MethodInvokerType)>();
         }
 
-        private static void EmitServiceClientClass(ServiceClientBuildContext ctx)
+        static void EmitServiceClientClass(ServiceClientBuildContext ctx)
         {
             var constructedBaseClientType = typeof(MagicOnionClientBase<>).MakeGenericType(ctx.Definition.ServiceInterfaceType);
             // [Ignore]
@@ -79,7 +80,7 @@ namespace MagicOnion.Client.DynamicClient
             // }
         }
 
-        private static void EmitClone(ServiceClientBuildContext ctx, Type constructedBaseClientType)
+        static void EmitClone(ServiceClientBuildContext ctx, Type constructedBaseClientType)
         {
             // protected override MagicOnionClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
             var cloneMethodBuilder = ctx.ServiceClientType.DefineMethod("Clone", MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final, constructedBaseClientType, new[] { typeof(MagicOnionClientOptions) });
@@ -88,12 +89,12 @@ namespace MagicOnion.Client.DynamicClient
                 il.Emit(OpCodes.Ldarg_1); // options
                 il.Emit(OpCodes.Ldarg_0); // this.
                 il.Emit(OpCodes.Ldfld, ctx.FieldCore); // core
-                il.Emit(OpCodes.Newobj, ctx.ServiceClientConstructor); // new {ServiceName}Client(options, core);
+                il.Emit(OpCodes.Newobj, ctx.ServiceClientConstructorForClone); // new {ServiceName}Client(options, core);
                 il.Emit(OpCodes.Ret);
             }
         }
 
-        private static void EmitConstructor(ServiceClientBuildContext ctx)
+        static void EmitConstructor(ServiceClientBuildContext ctx)
         {
             var baseCtor = ctx.ServiceClientType.BaseType.GetConstructor(
                 BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
@@ -102,7 +103,7 @@ namespace MagicOnion.Client.DynamicClient
                 new[] { typeof(MagicOnionClientOptions) },
                 Array.Empty<ParameterModifier>()
             );
-            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializer messageSerializer) {
+            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializerProvider messageSerializer) {
             ctx.ServiceClientConstructor = ctx.ServiceClientType.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, KnownTypes.ClientConstructorParameters);
             {
                 var il = ctx.ServiceClientConstructor.GetILGenerator();
@@ -110,7 +111,7 @@ namespace MagicOnion.Client.DynamicClient
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Call, baseCtor);
-                // this.core = new ClientCore(serializerOptions);
+                // this.core = new ClientCore(messageSerializer);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Newobj, ctx.ClientCoreConstructor);
@@ -118,15 +119,31 @@ namespace MagicOnion.Client.DynamicClient
                 il.Emit(OpCodes.Ret);
             }
             // }
+
+            // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore clientCore) {
+            ctx.ServiceClientConstructorForClone = ctx.ServiceClientType.DefineConstructor(MethodAttributes.Private, CallingConventions.Standard, new [] { typeof(MagicOnionClientOptions), ctx.ClientCoreType });
+            {
+                var il = ctx.ServiceClientConstructorForClone.GetILGenerator();
+                // base(options);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Call, baseCtor);
+                // this.core = core;
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Stfld, ctx.FieldCore);
+                il.Emit(OpCodes.Ret);
+            }
+            // }
         }
 
-        private static void EmitFields(ServiceClientBuildContext ctx)
+        static void EmitFields(ServiceClientBuildContext ctx)
         {
             // private readonly ClientCore core;
             ctx.FieldCore = ctx.ServiceClientType.DefineField("core", ctx.ClientCoreType, FieldAttributes.Private);
         }
 
-        private static void EmitServiceMethods(ServiceClientBuildContext ctx)
+        static void EmitServiceMethods(ServiceClientBuildContext ctx)
         {
             // Implements
             // public UnaryResult<TResponse> MethodName(TArg1 arg1, TArg2 arg2, ...)
@@ -209,7 +226,7 @@ namespace MagicOnion.Client.DynamicClient
             }
         }
 
-        private static void EmitClientCore(ServiceClientBuildContext ctx)
+        static void EmitClientCore(ServiceClientBuildContext ctx)
         {
             /*
              * class ClientCore
@@ -235,7 +252,7 @@ namespace MagicOnion.Client.DynamicClient
                     ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName] = (field, methodInvokerType);
                 }
 
-                // public ClientCore(IMagicOnionMessageSerializer messageSerializer) {
+                // public ClientCore(IMagicOnionMessageSerializerProvider messageSerializer) {
                 ctx.ClientCoreConstructor = ctx.ClientCoreType.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, KnownTypes.ClientCoreConstructorParameters);
                 {
                     var il = ctx.ClientCoreConstructor.GetILGenerator();
