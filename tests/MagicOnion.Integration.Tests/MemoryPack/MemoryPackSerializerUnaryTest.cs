@@ -24,7 +24,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<IMemoryPackSerializerTestService>(x, messageSerializer)) };
-        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Generated", (x, messageSerializer) => new MemoryPackMessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Instance)) };
+        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Generated", (x, messageSerializer) => new MemoryPackMessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MessagePackMagicOnionSerializerProvider.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
+        var client = clientFactory.Create(channel, MessagePackMagicOnionSerializerProvider.Default); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
         var result = Record.ExceptionAsync(async () => await client.UnaryReturnNil());

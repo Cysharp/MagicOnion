@@ -37,7 +37,9 @@ public class MagicOnionOptions
     public MagicOnionOptions()
     {
         this.IsReturnExceptionStackTraceInErrorDetail = false;
-        this.MessageSerializer = MessagePackMagicOnionSerializerProvider.Instance.WithEnableFallback(true);
+        this.MessageSerializer = (MagicOnionSerializerProvider.Default is MessagePackMagicOnionSerializerProvider provider)
+            ? provider.WithEnableFallback(true) // If the default provider is MessagePack, we need to enable fallback options for optional parameters.
+            : MagicOnionSerializerProvider.Default;
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;

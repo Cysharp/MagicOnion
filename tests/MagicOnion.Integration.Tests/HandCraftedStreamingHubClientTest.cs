@@ -24,7 +24,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MessagePackMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync(receiver);
@@ -40,7 +40,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MessagePackMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
+        var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
 
         // Act
         await client.ConnectAsync(receiver);

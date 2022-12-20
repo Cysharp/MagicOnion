@@ -8,9 +8,15 @@ using MessagePack.Formatters;
 
 namespace MagicOnion.Serialization
 {
+    /// <summary>
+    /// Provides a <see cref="IMagicOnionSerializerProvider"/> using MessagePack.
+    /// </summary>
     public class MessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
     {
-        public static MessagePackMagicOnionSerializerProvider Instance { get; } = new MessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions, enableFallback: false);
+        /// <summary>
+        /// Gets the provider with <see cref="MessagePackSerializer.DefaultOptions"/> for serialization.
+        /// </summary>
+        public static MessagePackMagicOnionSerializerProvider Default { get; } = new MessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions, enableFallback: false);
 
         protected MessagePackSerializerOptions SerializerOptions { get; }
         protected bool EnableFallback { get; }
@@ -26,6 +32,11 @@ namespace MagicOnion.Serialization
             return new MessagePackMagicOnionSerializerProvider(serializerOptions, EnableFallback);
         }
 
+        /// <summary>
+        /// Gets a provider with method parameter fallback option. If the option is enabled, a serializer will respects the method's optional parameters.
+        /// </summary>
+        /// <param name="enableFallback"></param>
+        /// <returns></returns>
         public MessagePackMagicOnionSerializerProvider WithEnableFallback(bool enableFallback)
         {
             return new MessagePackMagicOnionSerializerProvider(SerializerOptions, enableFallback);

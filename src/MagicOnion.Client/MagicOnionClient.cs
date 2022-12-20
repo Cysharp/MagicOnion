@@ -1,6 +1,5 @@
 using Grpc.Core;
 using MagicOnion.Serialization;
-using MessagePack;
 using System;
 
 namespace MagicOnion.Client
@@ -12,13 +11,13 @@ namespace MagicOnion.Client
         public static T Create<T>(ChannelBase channel)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MessagePackMagicOnionSerializerProvider.Instance, emptyFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionSerializerProvider.Default, emptyFilters);
         }
 
         public static T Create<T>(ChannelBase channel, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MessagePackMagicOnionSerializerProvider.Instance, clientFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionSerializerProvider.Default, clientFilters);
         }
 
         public static T Create<T>(ChannelBase channel, IMagicOnionSerializerProvider messageSerializer)
@@ -30,13 +29,13 @@ namespace MagicOnion.Client
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
-            return Create<T>(invoker, MessagePackMagicOnionSerializerProvider.Instance, emptyFilters);
+            return Create<T>(invoker, MagicOnionSerializerProvider.Default, emptyFilters);
         }
 
         public static T Create<T>(CallInvoker invoker, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(invoker, MessagePackMagicOnionSerializerProvider.Instance, clientFilters);
+            return Create<T>(invoker, MagicOnionSerializerProvider.Default, clientFilters);
         }
 
         public static T Create<T>(CallInvoker invoker, IMagicOnionSerializerProvider messageSerializer)

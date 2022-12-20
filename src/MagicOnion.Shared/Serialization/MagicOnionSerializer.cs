@@ -36,8 +36,14 @@ namespace MagicOnion.Serialization
 #endif
     }
 
+    /// <summary>
+    /// Provides a serializer for request/response of MagicOnion services and hub methods.
+    /// </summary>
     public static class MagicOnionSerializerProvider
     {
-        public static IMagicOnionSerializerProvider Default { get; set; } = MessagePackMagicOnionSerializerProvider.Instance;
+        /// <summary>
+        /// Gets or sets the <see cref="IMagicOnionSerializerProvider"/> to be used by default.
+        /// </summary>
+        public static IMagicOnionSerializerProvider Default { get; set; } = MessagePackMagicOnionSerializerProvider.Default;
     }
 }
