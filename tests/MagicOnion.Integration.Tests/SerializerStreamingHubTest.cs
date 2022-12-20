@@ -24,7 +24,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<ISerializerTestHub, ISerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
         yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
         {
-            var client = new MessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
+            var client = new SerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};

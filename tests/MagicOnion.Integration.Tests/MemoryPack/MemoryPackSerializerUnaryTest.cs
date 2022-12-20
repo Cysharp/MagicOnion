@@ -24,7 +24,7 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<IMemoryPackSerializerTestService>(x, messageSerializer)) };
-        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Generated", (x, messageSerializer) => new MemoryPackMessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
+        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Generated", (x, messageSerializer) => new MemoryPackSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
     }
 
     [Theory]

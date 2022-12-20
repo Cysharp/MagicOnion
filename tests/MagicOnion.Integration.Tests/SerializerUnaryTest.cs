@@ -24,7 +24,7 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new [] { new TestMagicOnionClientFactory<ISerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<ISerializerTestService>(x, messageSerializer)) };
-        yield return new [] { new TestMagicOnionClientFactory<ISerializerTestService>("Generated", (x, messageSerializer) => new MessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<ISerializerTestService>("Generated", (x, messageSerializer) => new SerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
     }
 
     [Theory]

@@ -23,7 +23,7 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         yield return new[] { new TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
         yield return new[] { new TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
         {
-            var client = new MemoryPackMessageSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MemoryPackMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
+            var client = new MemoryPackSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MemoryPackMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};
