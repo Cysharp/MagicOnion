@@ -21,10 +21,10 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, messageSerializer) => StreamingHubClient.ConnectAsync<ISerializerTestHub, ISerializerTestHubReceiver>(callInvoker, receiver, messageSerializer: messageSerializer)) };
-        yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Static", async (callInvoker, receiver, messageSerializer) =>
+        yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, serializerProvider) => StreamingHubClient.ConnectAsync<ISerializerTestHub, ISerializerTestHubReceiver>(callInvoker, receiver, serializerProvider: serializerProvider)) };
+        yield return new [] { new TestStreamingHubClientFactory<ISerializerTestHub, ISerializerTestHubReceiver>("Static", async (callInvoker, receiver, serializerProvider) =>
         {
-            var client = new SerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), messageSerializer ?? MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
+            var client = new SerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), serializerProvider ?? MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
             await client.__ConnectAndSubscribeAsync(receiver, default);
             return client;
         })};
