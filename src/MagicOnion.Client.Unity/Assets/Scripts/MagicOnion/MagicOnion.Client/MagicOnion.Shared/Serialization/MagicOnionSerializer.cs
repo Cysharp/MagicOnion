@@ -7,7 +7,7 @@ namespace MagicOnion.Serialization
     /// <summary>
     /// Provides a serializer for request/response of MagicOnion services and hub methods.
     /// </summary>
-    public interface IMagicOnionMessageSerializerProvider
+    public interface IMagicOnionSerializerProvider
     {
         /// <summary>
         /// Create a serializer for the service method.
@@ -16,16 +16,16 @@ namespace MagicOnion.Serialization
         /// <param name="methodInfo">A method info for an implementation of the service method. It is a hint that handling request parameters on the server, which may be passed null on the client.</param>
         /// <returns></returns>
 #if NET5_0_OR_GREATER
-        IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo? methodInfo);
+        IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo);
 #else
-        IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo methodInfo);
+        IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo);
 #endif
     }
 
     /// <summary>
     /// Provides a processing for message serialization.
     /// </summary>
-    public interface IMagicOnionMessageSerializer
+    public interface IMagicOnionSerializer
     {
 #if NET5_0_OR_GREATER
         void Serialize<T>(IBufferWriter<byte> writer, in T? value);
@@ -36,8 +36,14 @@ namespace MagicOnion.Serialization
 #endif
     }
 
-    public static class MagicOnionMessageSerializerProvider
+    /// <summary>
+    /// Provides a serializer for request/response of MagicOnion services and hub methods.
+    /// </summary>
+    public static class MagicOnionSerializerProvider
     {
-        public static IMagicOnionMessageSerializerProvider Default { get; set; } = MessagePackMessageMagicOnionSerializerProvider.Instance;
+        /// <summary>
+        /// Gets or sets the <see cref="IMagicOnionSerializerProvider"/> to be used by default.
+        /// </summary>
+        public static IMagicOnionSerializerProvider Default { get; set; } = MessagePackMagicOnionSerializerProvider.Default;
     }
 }

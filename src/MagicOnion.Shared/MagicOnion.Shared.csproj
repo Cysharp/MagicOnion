@@ -51,12 +51,6 @@
   <ItemGroup>
     <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
   </ItemGroup>
-  <ItemGroup>
-    <TargetFiles Remove="Internal\BoxServerStreamWriter.cs" />
-    <TargetFiles Remove="MessagePackMagicOnionMessageSerializerProvider.cs" />
-    <TargetFiles Remove="Serialization\MagicOnionSerializer.cs" />
-    <TargetFiles Remove="Serialization\MessagePackMagicOnionSerializerProvider.cs" />
-  </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
