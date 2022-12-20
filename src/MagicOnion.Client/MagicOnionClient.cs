@@ -1,6 +1,5 @@
 using Grpc.Core;
 using MagicOnion.Serialization;
-using MessagePack;
 using System;
 
 namespace MagicOnion.Client
@@ -12,49 +11,49 @@ namespace MagicOnion.Client
         public static T Create<T>(ChannelBase channel)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MessagePackMessageMagicOnionSerializerProvider.Instance, emptyFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionSerializerProvider.Default, emptyFilters);
         }
 
         public static T Create<T>(ChannelBase channel, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), MessagePackMessageMagicOnionSerializerProvider.Instance, clientFilters);
+            return Create<T>(channel.CreateCallInvoker(), MagicOnionSerializerProvider.Default, clientFilters);
         }
 
-        public static T Create<T>(ChannelBase channel, IMagicOnionMessageSerializerProvider messageSerializer)
+        public static T Create<T>(ChannelBase channel, IMagicOnionSerializerProvider serializerProvider)
             where T : IService<T>
         {
-            return Create<T>(channel.CreateCallInvoker(), messageSerializer, emptyFilters);
+            return Create<T>(channel.CreateCallInvoker(), serializerProvider, emptyFilters);
         }
 
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
-            return Create<T>(invoker, MessagePackMessageMagicOnionSerializerProvider.Instance, emptyFilters);
+            return Create<T>(invoker, MagicOnionSerializerProvider.Default, emptyFilters);
         }
 
         public static T Create<T>(CallInvoker invoker, IClientFilter[] clientFilters)
             where T : IService<T>
         {
-            return Create<T>(invoker, MessagePackMessageMagicOnionSerializerProvider.Instance, clientFilters);
+            return Create<T>(invoker, MagicOnionSerializerProvider.Default, clientFilters);
         }
 
-        public static T Create<T>(CallInvoker invoker, IMagicOnionMessageSerializerProvider messageSerializer)
+        public static T Create<T>(CallInvoker invoker, IMagicOnionSerializerProvider serializerProvider)
             where T : IService<T>
         {
-            return Create<T>(invoker, messageSerializer, emptyFilters);
+            return Create<T>(invoker, serializerProvider, emptyFilters);
         }
 
-        public static T Create<T>(CallInvoker invoker, IMagicOnionMessageSerializerProvider messageSerializer, IClientFilter[] clientFilters)
+        public static T Create<T>(CallInvoker invoker, IMagicOnionSerializerProvider serializerProvider, IClientFilter[] clientFilters)
             where T : IService<T>
         {
             if (invoker == null) throw new ArgumentNullException(nameof(invoker));
 
             var clientOptions = new MagicOnionClientOptions(invoker, default, default, clientFilters);
-            return Create<T>(clientOptions, messageSerializer);
+            return Create<T>(clientOptions, serializerProvider);
         }
 
-        public static T Create<T>(MagicOnionClientOptions clientOptions, IMagicOnionMessageSerializerProvider messageSerializer)
+        public static T Create<T>(MagicOnionClientOptions clientOptions, IMagicOnionSerializerProvider serializerProvider)
             where T : IService<T>
         {
             var ctor = MagicOnionClientRegistry<T>.constructor;
@@ -64,12 +63,12 @@ namespace MagicOnion.Client
                 throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
 #else
                 var t = MagicOnion.Client.DynamicClient.DynamicClientBuilder<T>.ClientType;
-                return (T)Activator.CreateInstance(t, clientOptions, messageSerializer);
+                return (T)Activator.CreateInstance(t, clientOptions, serializerProvider);
 #endif
             }
             else
             {
-                return ctor(clientOptions, messageSerializer);
+                return ctor(clientOptions, serializerProvider);
             }
         }
     }
@@ -77,9 +76,9 @@ namespace MagicOnion.Client
     public static class MagicOnionClientRegistry<T>
         where T : IService<T>
     {
-        internal static Func<MagicOnionClientOptions, IMagicOnionMessageSerializerProvider, T> constructor;
+        internal static Func<MagicOnionClientOptions, IMagicOnionSerializerProvider, T> constructor;
 
-        public static void Register(Func<MagicOnionClientOptions, IMagicOnionMessageSerializerProvider, T> ctor)
+        public static void Register(Func<MagicOnionClientOptions, IMagicOnionSerializerProvider, T> ctor)
         {
             constructor = ctor;
         }

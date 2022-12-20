@@ -29,11 +29,11 @@ namespace MagicOnion
             }
         }
 
-        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
         {
             return CreateMethod<TResponse, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
-        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionMessageSerializer messageSerializer)
+        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)
         {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
             //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
@@ -62,11 +62,11 @@ namespace MagicOnion
             }
         }
 
-        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
         {
             return CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
-        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionMessageSerializer messageSerializer)
+        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)
         {
             var isMethodRequestTypeBoxed = typeof(TRequest).IsValueType;
             var isMethodResponseTypeBoxed = typeof(TResponse).IsValueType;
@@ -131,7 +131,7 @@ namespace MagicOnion
                 deserializer: (ctx) => Box.Create(Nil.Default) /* Box.Create always returns cached Box<Nil> */
             );
 
-        static Marshaller<T> CreateMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
+        static Marshaller<T> CreateMarshaller<T>(IMagicOnionSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
         {
             return new Marshaller<T>(
                 serializer: (obj, ctx) =>
@@ -142,7 +142,7 @@ namespace MagicOnion
                 deserializer: (ctx) => messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence()));
         }
 
-        static Marshaller<Box<T>> CreateBoxedMarshaller<T>(IMagicOnionMessageSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
+        static Marshaller<Box<T>> CreateBoxedMarshaller<T>(IMagicOnionSerializer messageSerializer, MethodType methodType, MethodInfo methodInfo)
         {
             return new Marshaller<Box<T>>(
                 serializer: (obj, ctx) =>

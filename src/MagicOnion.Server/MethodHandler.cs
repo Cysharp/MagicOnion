@@ -30,7 +30,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     readonly int methodHandlerId;
     readonly MethodHandlerMetadata metadata;
     readonly bool isStreamingHub;
-    readonly IMagicOnionMessageSerializer messageSerializer;
+    readonly IMagicOnionSerializer messageSerializer;
     readonly Func<ServiceContext, ValueTask> methodBody;
 
     // options
@@ -38,7 +38,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     internal IMagicOnionLogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
-    public IMagicOnionMessageSerializer MessageSerializer => messageSerializer;
+    public IMagicOnionSerializer MessageSerializer => messageSerializer;
 
     public string ServiceName => metadata.ServiceInterface.Name;
     public string MethodName { get; }
@@ -513,7 +513,7 @@ public class MethodHandlerOptions
 
     public bool EnableCurrentContext { get; }
 
-    public IMagicOnionMessageSerializerProvider MessageSerializer { get; }
+    public IMagicOnionSerializerProvider MessageSerializer { get; }
 
     public MethodHandlerOptions(MagicOnionOptions options)
     {

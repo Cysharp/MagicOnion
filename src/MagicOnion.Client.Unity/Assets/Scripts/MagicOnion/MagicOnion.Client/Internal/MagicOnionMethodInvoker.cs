@@ -13,20 +13,20 @@ namespace MagicOnion.Client.Internal
     // Pubternal API: This class is used from generated clients and is therefore `public` but internal API.
     public static class RawMethodInvoker
     {
-        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializerProvider messageSerializerProvider)
             where TRequest : class
             where TResponse : class
             => new RawMethodInvoker<TRequest, TResponse, TRequest, TResponse>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
+        public static RawMethodInvoker<TRequest, TResponse> Create_RefType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializerProvider messageSerializerProvider)
             where TRequest : class
             => new RawMethodInvoker<TRequest, TResponse, TRequest, Box<TResponse>>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_RefType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializerProvider messageSerializerProvider)
             where TResponse : class
             => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, TResponse>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
 
-        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializerProvider messageSerializerProvider)
+        public static RawMethodInvoker<TRequest, TResponse> Create_ValueType_ValueType<TRequest, TResponse>(MethodType methodType, string serviceName, string name, IMagicOnionSerializerProvider messageSerializerProvider)
             => new RawMethodInvoker<TRequest, TResponse, Box<TRequest>, Box<TResponse>>(methodType, serviceName, name, messageSerializerProvider.Create(methodType, null));
     }
 
@@ -46,7 +46,7 @@ namespace MagicOnion.Client.Internal
         readonly GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> method;
         readonly Func<RequestContext, ResponseContext> createUnaryResponseContext;
 
-        public RawMethodInvoker(MethodType methodType, string serviceName, string name, IMagicOnionMessageSerializer messageSerializer)
+        public RawMethodInvoker(MethodType methodType, string serviceName, string name, IMagicOnionSerializer messageSerializer)
         {
             this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, messageSerializer);
             this.createUnaryResponseContext = context => ResponseContext<TResponse>.Create<TRawResponse>(

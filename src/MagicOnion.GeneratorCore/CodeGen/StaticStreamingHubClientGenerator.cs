@@ -111,8 +111,8 @@ public class StaticStreamingHubClientGenerator
     static void EmitConstructor(StreamingHubClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        public {{ctx.Hub.GetClientName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer, global::MagicOnion.Client.IMagicOnionClientLogger logger)
-            : base(callInvoker, host, options, messageSerializer, logger)
+        public {{ctx.Hub.GetClientName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+            : base(callInvoker, host, options, serializerProvider, logger)
         {
             var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
             DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "{{ctx.Hub.ServiceType.Name}}", "Connect", marshaller, marshaller);

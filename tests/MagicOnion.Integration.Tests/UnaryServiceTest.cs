@@ -21,8 +21,8 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Dynamic", x => MagicOnionClient.Create<IUnaryService>(x, MagicOnionMessageSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Generated", x => new UnaryServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Dynamic", x => MagicOnionClient.Create<IUnaryService>(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Generated", x => new UnaryServiceClient(x, MagicOnionSerializerProvider.Default)) };
     }
 
     [Theory]

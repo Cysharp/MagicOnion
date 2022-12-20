@@ -25,14 +25,14 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
 {
     public static MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse> Instance { get; } = new MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse>();
 
-    public void BindUnary(ServiceBinderBase binder, Func<TRequest, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindUnary(ServiceBinderBase binder, Func<TRequest, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, context) => method.ToRawResponse(await serverMethod(method.FromRawRequest(request), context)));
     }
 
-    public void BindUnaryParameterless(ServiceBinderBase binder, Func<Nil, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindUnaryParameterless(ServiceBinderBase binder, Func<Nil, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
         //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
@@ -42,7 +42,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
             async (request, context) => method.ToRawResponse(await serverMethod(method.FromRawRequest(request), context)));
     }
 
-    public void BindStreamingHub(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindStreamingHub(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         // StreamingHub uses the special marshallers for streaming messages serialization.
         // TODO: Currently, MagicOnion expects TRawRequest/TRawResponse to be raw-byte array (`bytes[]`).
@@ -61,7 +61,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
             ));
     }
 
-    public void BindDuplexStreaming(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindDuplexStreaming(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
@@ -72,7 +72,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
             ));
     }
 
-    public void BindServerStreaming(ServiceBinderBase binder, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindServerStreaming(ServiceBinderBase binder, Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ServerStreaming, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
@@ -83,7 +83,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
             ));
     }
 
-    public void BindClientStreaming(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionMessageSerializer messageSerializer)
+    public void BindClientStreaming(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),

@@ -9,7 +9,7 @@ namespace MagicOnion.Server.Hubs;
 
 public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         return new ConcurrentDictionaryGroupRepository(messageSerializer, logger);
     }
@@ -17,13 +17,13 @@ public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactor
 
 public class ConcurrentDictionaryGroupRepository : IGroupRepository
 {
-    IMagicOnionMessageSerializer messageSerializer;
+    IMagicOnionSerializer messageSerializer;
     IMagicOnionLogger logger;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public ConcurrentDictionaryGroupRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public ConcurrentDictionaryGroupRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.factory = CreateGroup;
@@ -60,7 +60,7 @@ public class ConcurrentDictionaryGroup : IGroup
     readonly object gate = new object();
 
     readonly IGroupRepository parent;
-    readonly IMagicOnionMessageSerializer messageSerializer;
+    readonly IMagicOnionSerializer messageSerializer;
     readonly IMagicOnionLogger logger;
 
     ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>> members;
@@ -68,7 +68,7 @@ public class ConcurrentDictionaryGroup : IGroup
 
     public string GroupName { get; }
 
-    public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         this.GroupName = groupName;
         this.parent = parent;

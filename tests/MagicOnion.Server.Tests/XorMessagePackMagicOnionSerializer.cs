@@ -6,24 +6,24 @@ using MessagePack;
 
 namespace MagicOnion.Server.Tests;
 
-public class XorMessagePackMagicOnionMessageSerializerProvider : IMagicOnionMessageSerializerProvider
+public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
 {
     const int MagicNumber = 0x11;
 
     readonly MessagePackSerializerOptions serializerOptions;
 
-    public static IMagicOnionMessageSerializerProvider Instance { get; } = new XorMessagePackMagicOnionMessageSerializerProvider(MessagePackSerializer.DefaultOptions);
+    public static IMagicOnionSerializerProvider Instance { get; } = new XorMessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions);
 
-    XorMessagePackMagicOnionMessageSerializerProvider(MessagePackSerializerOptions serializerOptions)
+    XorMessagePackMagicOnionSerializerProvider(MessagePackSerializerOptions serializerOptions)
     {
         this.serializerOptions = serializerOptions;
     }
 
-    class XorMessagePackMagicOnionMessageSerializer : IMagicOnionMessageSerializer
+    class XorMessagePackMagicOnionSerializer : IMagicOnionSerializer
     {
         readonly MessagePackSerializerOptions serializerOptions;
 
-        public XorMessagePackMagicOnionMessageSerializer(MessagePackSerializerOptions serializerOptions)
+        public XorMessagePackMagicOnionSerializer(MessagePackSerializerOptions serializerOptions)
         {
             this.serializerOptions = serializerOptions;
         }
@@ -57,8 +57,8 @@ public class XorMessagePackMagicOnionMessageSerializerProvider : IMagicOnionMess
         }
     }
 
-    public IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo methodInfo)
+    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
     {
-        return new XorMessagePackMagicOnionMessageSerializer(serializerOptions);
+        return new XorMessagePackMagicOnionSerializer(serializerOptions);
     }
 }

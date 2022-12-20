@@ -99,7 +99,7 @@ public class StaticMagicOnionClientGenerator
             EmitClientCore(ctx);
             // private readonly ClientCore core; ...
             EmitFields(ctx);
-            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionMessageSerializerProvider messageSerializer) : base(options) { ... }
+            // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionSerializerProvider serializerProvider) : base(options) { ... }
             // private {ServiceName}Client(MagicOnionClientOptions options, ClientCore core) : base(options) { ... }
             EmitConstructor(ctx);
             // protected override ClientBase<{ServiceName}> Clone(MagicOnionClientOptions options) => new {ServiceName}Client(options, core);
@@ -123,9 +123,9 @@ public class StaticMagicOnionClientGenerator
     static void EmitConstructor(ServiceClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        public {{ctx.Service.GetClientName()}}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer) : base(options)
+        public {{ctx.Service.GetClientName()}}(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
         {
-            this.core = new ClientCore(messageSerializer);
+            this.core = new ClientCore(serializerProvider);
         }
 
         private {{ctx.Service.GetClientName()}}(MagicOnionClientOptions options, ClientCore core) : base(options)
@@ -193,9 +193,9 @@ public class StaticMagicOnionClientGenerator
          *     // UnaryResult<string> HelloAsync(string name, int age);
          *     public UnaryMethodRawInvoker<DynamicArgumentTuple<string, int>, string> HelloAsync;
          *
-         *     public ClientCore(IMagicOnionMessageSerializerProvider messageSerializer)
+         *     public ClientCore(IMagicOnionSerializerProvider serializerProvider)
          *     {
-         *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", messageSerializer);
+         *         this.HelloAsync = UnaryMethodRawInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, int>, string>("IGreeterService", "HelloAsync", serializerProvider);
          *     }
          * }
          */
@@ -214,18 +214,18 @@ public class StaticMagicOnionClientGenerator
                 } // #endif
             }
 
-            // public ClientCore(IMagicOnionMessageSerializerProvider messageSerializer) {
-            ctx.TextWriter.WriteLine("public ClientCore(global::MagicOnion.Serialization.IMagicOnionMessageSerializerProvider messageSerializer)");
+            // public ClientCore(IMagicOnionSerializerProvider serializerProvider) {
+            ctx.TextWriter.WriteLine("public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)");
             ctx.TextWriter.WriteLine("{");
             using (ctx.TextWriter.BeginIndent())
             {
-                // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, messageSerializer);
+                // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerProvider);
                 foreach (var method in ctx.Service.Methods)
                 {
                     using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
                     {
                         var createMethodVariant = $"{(method.RequestType.IsValueType ? "Value" : "Ref")}Type_{(method.ResponseType.IsValueType ? "Value" : "Ref")}Type";
-                        ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", messageSerializer);");
+                        ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", serializerProvider);");
                     } // #endif
                 }
             }

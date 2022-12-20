@@ -24,7 +24,7 @@ public class GroupConfigurationAttribute : Attribute
 
 public interface IGroupRepositoryFactory
 {
-    IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger);
+    IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger);
 }
 
 public interface IGroupRepository

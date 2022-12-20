@@ -10,7 +10,7 @@ namespace MagicOnion.Server.Redis;
 
 public class RedisGroupRepository : IGroupRepository
 {
-    IMagicOnionMessageSerializer messageSerializer;
+    IMagicOnionSerializer messageSerializer;
     IMagicOnionLogger logger;
     ConnectionMultiplexer connection;
     int db;
@@ -18,7 +18,7 @@ public class RedisGroupRepository : IGroupRepository
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public RedisGroupRepository(IMagicOnionMessageSerializer messageSerializer, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
+    public RedisGroupRepository(IMagicOnionSerializer messageSerializer, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.logger = logger;
@@ -54,11 +54,11 @@ public class RedisGroup : IGroup
     IGroup inmemoryGroup;
     IDatabaseAsync database;
     RedisChannel channel;
-    IMagicOnionMessageSerializer messageSerializer;
+    IMagicOnionSerializer messageSerializer;
     ChannelMessageQueue mq;
     RedisKey counterKey;
 
-    public RedisGroup(string groupName, IMagicOnionMessageSerializer messageSerializer, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
+    public RedisGroup(string groupName, IMagicOnionSerializer messageSerializer, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)
     {
         this.GroupName = groupName;
         this.messageSerializer = messageSerializer;

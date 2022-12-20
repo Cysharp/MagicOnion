@@ -15,7 +15,7 @@ public class RedisGroupRepositoryFactory : IGroupRepositoryFactory
         this.options = options.CurrentValue;
     }
 
-    public IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         return new RedisGroupRepository(messageSerializer, options, logger);
     }
