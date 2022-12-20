@@ -135,10 +135,14 @@ namespace MagicOnion.Client.DynamicClient
                 }
                 map.Add(methodId, item);
 
-                if (!(item.MethodInfo.ReturnType.IsGenericType && item.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                   && item.MethodInfo.ReturnType != typeof(Task))
+                var returnTypeNonGenericOrOpenGeneric = item.MethodInfo.ReturnType.IsGenericType ? item.MethodInfo.ReturnType.GetGenericTypeDefinition() : item.MethodInfo.ReturnType;
+
+                if (returnTypeNonGenericOrOpenGeneric != typeof(ValueTask) &&
+                    returnTypeNonGenericOrOpenGeneric != typeof(Task) &&
+                    returnTypeNonGenericOrOpenGeneric != typeof(ValueTask<>) &&
+                    returnTypeNonGenericOrOpenGeneric != typeof(Task<>))
                 {
-                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `Task` or `Task<T>`. {item.MethodInfo.Name}.");
+                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. {item.MethodInfo.Name}.");
                 }
 
                 item.MethodId = methodId;
@@ -298,7 +302,7 @@ namespace MagicOnion.Client.DynamicClient
                     {
                         // SetResultForResponse<T>(taskCompletionSource, data);
                         Type responseType;
-                        if (item.def.MethodInfo.ReturnType == typeof(Task))
+                        if (item.def.MethodInfo.ReturnType == typeof(Task) || item.def.MethodInfo.ReturnType == typeof(ValueTask))
                         {
                             // Task methods uses TaskCompletionSource<Nil>
                             responseType = typeof(Nil);
@@ -445,7 +449,7 @@ namespace MagicOnion.Client.DynamicClient
                     il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
                 }
 
-                if (def.MethodInfo.ReturnType == typeof(Task))
+                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
                 {
                     var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, typeof(Nil)));
@@ -454,6 +458,17 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
+                }
+
+                // If the return type is `ValueTask`, the task must be wrapped as ValueTask.
+                if (def.MethodInfo.ReturnType == typeof(ValueTask))
+                {
+                    il.Emit(OpCodes.Newobj, typeof(ValueTask).GetConstructor(new [] { typeof(Task) }));
+                }
+                else if (def.MethodInfo.IsGenericMethod && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                {
+                    var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
+                    il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) }));
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -538,7 +553,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
 
                 Type responseType;
-                if (def.MethodInfo.ReturnType == typeof(Task))
+                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
                 {
                     responseType = typeof(Nil);
                 }
@@ -550,6 +565,17 @@ namespace MagicOnion.Client.DynamicClient
                     .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                     .Single(x => x.Name == "WriteMessageFireAndForgetAsync"); // WriteMessageAsyncFireAndForget<TRequest, TResponse>
                 il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(requestType, responseType));
+
+                // If the return type is `ValueTask`, the task must be wrapped as ValueTask.
+                if (def.MethodInfo.ReturnType == typeof(ValueTask))
+                {
+                    il.Emit(OpCodes.Newobj, typeof(ValueTask).GetConstructor(new [] { typeof(Task) }));
+                }
+                else if (def.MethodInfo.IsGenericMethod && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                {
+                    var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
+                    il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) }));
+                }
 
                 il.Emit(OpCodes.Ret);
             }

@@ -318,6 +318,41 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         result.Should().Be(default(int));
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Forget_NoReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        await client.ValueTask_Never();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Forget_WithReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        var result = await client.ValueTask_Never_With_Return();
+
+        // Assert
+        result.Should().Be(default(int));
+    }
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -432,6 +467,17 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         Debug.Assert(arg2 == true);
         return ValueTask.FromResult(67890);
     }
+
+    public ValueTask ValueTask_Never()
+    {
+        return new ValueTask(new TaskCompletionSource().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
+    }
+    
+    public ValueTask<int> ValueTask_Never_With_Return()
+    {
+        return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
+    }
+
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -465,5 +511,8 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     ValueTask<int> ValueTask_Parameter_Zero();
     ValueTask<int> ValueTask_Parameter_One(int arg0);
     ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    ValueTask ValueTask_Never();
+    ValueTask<int> ValueTask_Never_With_Return();
 
 }

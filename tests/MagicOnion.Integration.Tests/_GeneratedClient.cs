@@ -689,6 +689,10 @@ namespace MagicOnion.Integration.Tests
             => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(base.WriteMessageWithResponseAsync<global::System.Int32, global::System.Int32>(-435674772, arg0));
         public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Parameter_Many(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
             => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.Int32>(-52442641, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2)));
+        public global::System.Threading.Tasks.ValueTask ValueTask_Never()
+            => new global::System.Threading.Tasks.ValueTask(base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1647082094, global::MessagePack.Nil.Default));
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Never_With_Return()
+            => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32>(-1197600090, global::MessagePack.Nil.Default));
         
         public global::MagicOnion.Integration.Tests.IStreamingHubTestHub FireAndForget()
             => new FireAndForgetClient(this);
@@ -739,6 +743,10 @@ namespace MagicOnion.Integration.Tests
                 => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(parent.WriteMessageFireAndForgetAsync<global::System.Int32, global::System.Int32>(-435674772, arg0));
             public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Parameter_Many(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
                 => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>, global::System.Int32>(-52442641, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>(arg0, arg1, arg2)));
+            public global::System.Threading.Tasks.ValueTask ValueTask_Never()
+                => new global::System.Threading.Tasks.ValueTask(parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1647082094, global::MessagePack.Nil.Default));
+            public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Never_With_Return()
+                => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::System.Int32>(-1197600090, global::MessagePack.Nil.Default));
             
         }
         
@@ -820,6 +828,12 @@ namespace MagicOnion.Integration.Tests
                     base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
                     break;
                 case -52442641: // ValueTask<Int32> ValueTask_Parameter_Many(global::System.Int32 arg0, global::System.String arg1, global::System.Boolean arg2)
+                    base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                    break;
+                case -1647082094: // ValueTask ValueTask_Never()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case -1197600090: // ValueTask<Int32> ValueTask_Never_With_Return()
                     base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
                     break;
             }
