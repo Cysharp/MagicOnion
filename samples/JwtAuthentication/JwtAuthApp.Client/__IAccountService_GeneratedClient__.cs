@@ -16,13 +16,13 @@ namespace JwtAuthApp.Client
     {
         readonly ClientCore core;
 
-        public __IAccountService_GeneratedClient__(CallInvoker callInvoker, IReadOnlyList<IClientFilter> clientFilter, IMagicOnionMessageSerializerProvider serializerOptions)
+        public __IAccountService_GeneratedClient__(CallInvoker callInvoker, IReadOnlyList<IClientFilter> clientFilter, IMagicOnionSerializerProvider serializerOptions)
             : this(new MagicOnionClientOptions(callInvoker, null, default, clientFilter), serializerOptions)
         {
             this.core = new ClientCore(serializerOptions);
         }
 
-        public __IAccountService_GeneratedClient__(MagicOnionClientOptions options, IMagicOnionMessageSerializerProvider serializerOptions)
+        public __IAccountService_GeneratedClient__(MagicOnionClientOptions options, IMagicOnionSerializerProvider serializerOptions)
             : base(options)
         {
             this.core = new ClientCore(serializerOptions);
@@ -44,7 +44,7 @@ namespace JwtAuthApp.Client
             => core.DangerousOperationAsync.InvokeUnary(this, "IAccountService/DangerousOperationAsync", MessagePack.Nil.Default);
 
 
-        public static Func<MagicOnionClientOptions, IAccountService> CreateFactory(IMagicOnionMessageSerializerProvider serializerOptions)
+        public static Func<MagicOnionClientOptions, IAccountService> CreateFactory(IMagicOnionSerializerProvider serializerOptions)
         {
             var core = new ClientCore(serializerOptions);
             return (options) => new __IAccountService_GeneratedClient__(options, core);
@@ -56,7 +56,7 @@ namespace JwtAuthApp.Client
             public readonly RawMethodInvoker<MessagePack.Nil, CurrentUserResponse> GetCurrentUserNameAsync;
             public readonly RawMethodInvoker<MessagePack.Nil, string> DangerousOperationAsync;
 
-            public ClientCore(IMagicOnionMessageSerializerProvider serializerOptions)
+            public ClientCore(IMagicOnionSerializerProvider serializerOptions)
             {
                 SignInAsync = RawMethodInvoker.Create_ValueType_RefType<DynamicArgumentTuple<string, string>, SignInResponse>(MethodType.Unary, nameof(IAccountService), nameof(SignInAsync), serializerOptions);
                 GetCurrentUserNameAsync = RawMethodInvoker.Create_ValueType_RefType<MessagePack.Nil, CurrentUserResponse>(MethodType.Unary, nameof(IAccountService), nameof(GetCurrentUserNameAsync), serializerOptions);

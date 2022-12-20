@@ -89,7 +89,7 @@ public class StreamingHubHandlerOptions
 {
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; }
 
-    public IMagicOnionMessageSerializerProvider MessageSerializer { get; }
+    public IMagicOnionSerializerProvider MessageSerializer { get; }
 
     public StreamingHubHandlerOptions(MagicOnionOptions options)
     {
@@ -100,9 +100,9 @@ public class StreamingHubHandlerOptions
 
 internal abstract class StreamingHubMethodInvoker
 {
-    protected IMagicOnionMessageSerializer MessageSerializer { get; }
+    protected IMagicOnionSerializer MessageSerializer { get; }
 
-    protected StreamingHubMethodInvoker(IMagicOnionMessageSerializer messageSerializer)
+    protected StreamingHubMethodInvoker(IMagicOnionSerializer messageSerializer)
     {
         MessageSerializer = messageSerializer;
     }
@@ -128,7 +128,7 @@ internal abstract class StreamingHubMethodInvoker
     {
         readonly Func<StreamingHubContext, TRequest, Task<TResponse>> hubMethodFunc;
 
-        public StreamingHubMethodInvokerTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        public StreamingHubMethodInvokerTask(IMagicOnionSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
         {
             this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task<TResponse>>)hubMethodFunc;
         }
@@ -146,7 +146,7 @@ internal abstract class StreamingHubMethodInvoker
     {
         readonly Func<StreamingHubContext, TRequest, Task> hubMethodFunc;
 
-        public StreamingHubMethodInvokerTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        public StreamingHubMethodInvokerTask(IMagicOnionSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
         {
             this.hubMethodFunc = (Func<StreamingHubContext, TRequest, Task>)hubMethodFunc;
         }
@@ -164,7 +164,7 @@ internal abstract class StreamingHubMethodInvoker
     {
         readonly Func<StreamingHubContext, TRequest, ValueTask<TResponse>> hubMethodFunc;
 
-        public StreamingHubMethodInvokerValueTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        public StreamingHubMethodInvokerValueTask(IMagicOnionSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
         {
             this.hubMethodFunc = (Func<StreamingHubContext, TRequest, ValueTask<TResponse>>)hubMethodFunc;
         }
@@ -182,7 +182,7 @@ internal abstract class StreamingHubMethodInvoker
     {
         readonly Func<StreamingHubContext, TRequest, ValueTask> hubMethodFunc;
 
-        public StreamingHubMethodInvokerValueTask(IMagicOnionMessageSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
+        public StreamingHubMethodInvokerValueTask(IMagicOnionSerializer messageSerializer, Delegate hubMethodFunc) : base(messageSerializer)
         {
             this.hubMethodFunc = (Func<StreamingHubContext, TRequest, ValueTask>)hubMethodFunc;
         }

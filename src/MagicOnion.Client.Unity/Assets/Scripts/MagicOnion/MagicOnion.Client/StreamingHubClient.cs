@@ -10,7 +10,7 @@ namespace MagicOnion.Client
     public static partial class StreamingHubClient
     {
         [Obsolete("Use ConnectAsync instead.")]
-        public static TStreamingHub Connect<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionMessageSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null)
+        public static TStreamingHub Connect<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var hubClient = Connect<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, messageSerializer, logger);
@@ -22,7 +22,7 @@ namespace MagicOnion.Client
             return hubClient;
         }
 
-        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionMessageSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var hubClient = await ConnectAsync<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, messageSerializer, logger, cancellationToken);
@@ -35,7 +35,7 @@ namespace MagicOnion.Client
         }
 
         [Obsolete("Use ConnectAsync instead.")]
-        public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionMessageSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null)
+        public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null)
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, messageSerializer, logger);
@@ -58,7 +58,7 @@ namespace MagicOnion.Client
             return (TStreamingHub)(object)client;
         }
 
-        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionMessageSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider messageSerializer = null, IMagicOnionClientLogger logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, messageSerializer, logger);
@@ -66,10 +66,10 @@ namespace MagicOnion.Client
             return (TStreamingHub)(object)client;
         }
 
-        static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, IMagicOnionMessageSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
+        static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            messageSerializer = messageSerializer ?? MagicOnionMessageSerializerProvider.Default;
+            messageSerializer = messageSerializer ?? MagicOnionSerializerProvider.Default;
 
             var ctor = StreamingHubClientRegistry<TStreamingHub, TReceiver>.consturtor;
             StreamingHubClientBase<TStreamingHub, TReceiver> client = null;
@@ -94,9 +94,9 @@ namespace MagicOnion.Client
     public static class StreamingHubClientRegistry<TStreamingHub, TReceiver>
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
-        public static Func<CallInvoker, TReceiver, string, CallOptions, IMagicOnionMessageSerializerProvider, IMagicOnionClientLogger, TStreamingHub> consturtor;
+        public static Func<CallInvoker, TReceiver, string, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, TStreamingHub> consturtor;
 
-        public static void Register(Func<CallInvoker, TReceiver, string, CallOptions, IMagicOnionMessageSerializerProvider, IMagicOnionClientLogger, TStreamingHub> ctor)
+        public static void Register(Func<CallInvoker, TReceiver, string, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger, TStreamingHub> ctor)
         {
             consturtor = ctor;
         }

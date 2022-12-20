@@ -8,37 +8,37 @@ using MessagePack.Formatters;
 
 namespace MagicOnion.Serialization
 {
-    public class MessagePackMessageMagicOnionSerializerProvider : IMagicOnionMessageSerializerProvider
+    public class MessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
     {
-        public static MessagePackMessageMagicOnionSerializerProvider Instance { get; } = new MessagePackMessageMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions, enableFallback: false);
+        public static MessagePackMagicOnionSerializerProvider Instance { get; } = new MessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions, enableFallback: false);
 
         protected MessagePackSerializerOptions SerializerOptions { get; }
         protected bool EnableFallback { get; }
 
-        protected MessagePackMessageMagicOnionSerializerProvider(MessagePackSerializerOptions serializerOptions, bool enableFallback)
+        protected MessagePackMagicOnionSerializerProvider(MessagePackSerializerOptions serializerOptions, bool enableFallback)
         {
             SerializerOptions = serializerOptions;
             EnableFallback = enableFallback;
         }
 
-        public MessagePackMessageMagicOnionSerializerProvider WithOptions(MessagePackSerializerOptions serializerOptions)
+        public MessagePackMagicOnionSerializerProvider WithOptions(MessagePackSerializerOptions serializerOptions)
         {
-            return new MessagePackMessageMagicOnionSerializerProvider(serializerOptions, EnableFallback);
+            return new MessagePackMagicOnionSerializerProvider(serializerOptions, EnableFallback);
         }
 
-        public MessagePackMessageMagicOnionSerializerProvider WithEnableFallback(bool enableFallback)
+        public MessagePackMagicOnionSerializerProvider WithEnableFallback(bool enableFallback)
         {
-            return new MessagePackMessageMagicOnionSerializerProvider(SerializerOptions, enableFallback);
+            return new MessagePackMagicOnionSerializerProvider(SerializerOptions, enableFallback);
         }
 
 #if NET5_0_OR_GREATER
-        public IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo? methodInfo)
+        public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
 #else
-        public IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo methodInfo)
+        public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
 #endif
         {
             var serializerOptions = EnableFallback && methodInfo != null ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
-            return new MessagePackMagicOnionMessageSerializer(serializerOptions);
+            return new MessagePackMagicOnionSerializer(serializerOptions);
         }
 
         static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
@@ -90,10 +90,10 @@ namespace MagicOnion.Serialization
             return SerializerOptions.WithResolver(new PriorityResolver(t, formatter, SerializerOptions.Resolver));
         }
 
-        class MessagePackMagicOnionMessageSerializer : IMagicOnionMessageSerializer
+        class MessagePackMagicOnionSerializer : IMagicOnionSerializer
         {
             readonly MessagePackSerializerOptions serializerOptions;
-            public MessagePackMagicOnionMessageSerializer(MessagePackSerializerOptions serializerOptions)
+            public MessagePackMagicOnionSerializer(MessagePackSerializerOptions serializerOptions)
             {
                 this.serializerOptions = serializerOptions;
             }

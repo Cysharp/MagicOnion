@@ -22,8 +22,8 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Dynamic", x => MagicOnionClient.Create<IClientFilterTestService>(x, MagicOnionMessageSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Generated", x => new ClientFilterTestServiceClient(x, MagicOnionMessageSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Dynamic", x => MagicOnionClient.Create<IClientFilterTestService>(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Generated", x => new ClientFilterTestServiceClient(x, MagicOnionSerializerProvider.Default)) };
     }
 
     [Theory]

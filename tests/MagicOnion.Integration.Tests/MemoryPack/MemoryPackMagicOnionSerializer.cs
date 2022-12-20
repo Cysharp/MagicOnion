@@ -5,20 +5,20 @@ using MemoryPack;
 
 namespace MagicOnion.Integration.Tests.MemoryPack;
 
-internal class MemoryPackMagicOnionMessageSerializerProvider : IMagicOnionMessageSerializerProvider
+internal class MemoryPackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
 {
-    public static IMagicOnionMessageSerializerProvider Instance { get; } = new MemoryPackMagicOnionMessageSerializerProvider();
+    public static IMagicOnionSerializerProvider Instance { get; } = new MemoryPackMagicOnionSerializerProvider();
 
-    public IMagicOnionMessageSerializer Create(MethodType methodType, MethodInfo methodInfo)
+    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
     {
-        return new MagicOnionMessageSerializer(MemoryPackSerializerOptions.Default);
+        return new MagicOnionSerializer(MemoryPackSerializerOptions.Default);
     }
 
-    class MagicOnionMessageSerializer : IMagicOnionMessageSerializer
+    class MagicOnionSerializer : IMagicOnionSerializer
     {
         readonly MemoryPackSerializerOptions serializerOptions;
 
-        public MagicOnionMessageSerializer(MemoryPackSerializerOptions serializerOptions)
+        public MagicOnionSerializer(MemoryPackSerializerOptions serializerOptions)
         {
             this.serializerOptions = serializerOptions;
         }

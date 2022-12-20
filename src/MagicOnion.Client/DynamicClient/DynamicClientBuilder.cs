@@ -15,8 +15,8 @@ namespace MagicOnion.Client.DynamicClient
     {
         protected static class KnownTypes
         {
-            public static Type[] ClientConstructorParameters { get; } = new[] { typeof(MagicOnionClientOptions), typeof(IMagicOnionMessageSerializerProvider) };
-            public static Type[] ClientCoreConstructorParameters { get; } = new[] { typeof(IMagicOnionMessageSerializerProvider) };
+            public static Type[] ClientConstructorParameters { get; } = new[] { typeof(MagicOnionClientOptions), typeof(IMagicOnionSerializerProvider) };
+            public static Type[] ClientCoreConstructorParameters { get; } = new[] { typeof(IMagicOnionSerializerProvider) };
         }
     }
 

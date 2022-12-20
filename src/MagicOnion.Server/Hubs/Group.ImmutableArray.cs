@@ -10,7 +10,7 @@ namespace MagicOnion.Server.Hubs;
 
 public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public IGroupRepository CreateRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         return new ImmutableArrayGroupRepository(messageSerializer, logger);
     }
@@ -18,13 +18,13 @@ public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 
 public class ImmutableArrayGroupRepository : IGroupRepository
 {
-    IMagicOnionMessageSerializer messageSerializer;
+    IMagicOnionSerializer messageSerializer;
     IMagicOnionLogger logger;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public ImmutableArrayGroupRepository(IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public ImmutableArrayGroupRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.factory = CreateGroup;
@@ -56,7 +56,7 @@ public class ImmutableArrayGroup : IGroup
 {
     readonly object gate = new object();
     readonly IGroupRepository parent;
-    readonly IMagicOnionMessageSerializer messageSerializer;
+    readonly IMagicOnionSerializer messageSerializer;
     readonly IMagicOnionLogger logger;
 
     ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
@@ -64,7 +64,7 @@ public class ImmutableArrayGroup : IGroup
 
     public string GroupName { get; }
 
-    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionMessageSerializer messageSerializer, IMagicOnionLogger logger)
+    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
         this.GroupName = groupName;
         this.parent = parent;

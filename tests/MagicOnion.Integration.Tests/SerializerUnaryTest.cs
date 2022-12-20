@@ -9,31 +9,31 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace MagicOnion.Integration.Tests;
 
-public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<MessageSerializerTestService>>
+public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<SerializerTestService>>
 {
     readonly WebApplicationFactory<Program> factory;
 
-    public MessageSerializerUnaryTest(MagicOnionApplicationFactory<MessageSerializerTestService> factory)
+    public SerializerUnaryTest(MagicOnionApplicationFactory<SerializerTestService> factory)
     {
         this.factory = factory.WithMagicOnionOptions(x =>
         {
-            x.MessageSerializer = XorMessagePackMagicOnionMessageSerializerProvider.Instance;
+            x.MessageSerializer = XorMessagePackMagicOnionSerializerProvider.Instance;
         });
     }
     
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IMessageSerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<IMessageSerializerTestService>(x, messageSerializer)) };
-        yield return new [] { new TestMagicOnionClientFactory<IMessageSerializerTestService>("Generated", (x, messageSerializer) => new MessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMessageMagicOnionSerializerProvider.Instance)) };
+        yield return new [] { new TestMagicOnionClientFactory<ISerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<ISerializerTestService>(x, messageSerializer)) };
+        yield return new [] { new TestMagicOnionClientFactory<ISerializerTestService>("Generated", (x, messageSerializer) => new MessageSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Instance)) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Incompatible(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
+    public async Task Unary_Incompatible(TestMagicOnionClientFactory<ISerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MessagePackMessageMagicOnionSerializerProvider.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
+        var client = clientFactory.Create(channel, MessagePackMagicOnionSerializerProvider.Instance); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
         var result  = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
@@ -44,11 +44,11 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_ReturnNil(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
+    public async Task Unary_ReturnNil(TestMagicOnionClientFactory<ISerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, XorMessagePackMagicOnionMessageSerializerProvider.Instance);
+        var client = clientFactory.Create(channel, XorMessagePackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result  = await client.UnaryReturnNil();
@@ -59,11 +59,11 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Parameterless(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
+    public async Task Unary_Parameterless(TestMagicOnionClientFactory<ISerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, XorMessagePackMagicOnionMessageSerializerProvider.Instance);
+        var client = clientFactory.Create(channel, XorMessagePackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result  = await client.UnaryParameterless();
@@ -74,11 +74,11 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Parameter_Many(TestMagicOnionClientFactory<IMessageSerializerTestService> clientFactory)
+    public async Task Unary_Parameter_Many(TestMagicOnionClientFactory<ISerializerTestService> clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, XorMessagePackMagicOnionMessageSerializerProvider.Instance);
+        var client = clientFactory.Create(channel, XorMessagePackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -88,7 +88,7 @@ public class MessageSerializerUnaryTest : IClassFixture<MagicOnionApplicationFac
     }
 }
 
-public interface IMessageSerializerTestService : IService<IMessageSerializerTestService>
+public interface ISerializerTestService : IService<ISerializerTestService>
 {
     UnaryResult<Nil> UnaryReturnNil();
     UnaryResult<int> UnaryParameterless();
@@ -97,7 +97,7 @@ public interface IMessageSerializerTestService : IService<IMessageSerializerTest
     UnaryResult<int> Unary1(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14);
 }
 
-public class MessageSerializerTestService : ServiceBase<IMessageSerializerTestService>, IMessageSerializerTestService
+public class SerializerTestService : ServiceBase<ISerializerTestService>, ISerializerTestService
 {
     public UnaryResult<Nil> UnaryReturnNil()
         => UnaryResult(Nil.Default);

@@ -43,7 +43,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
         ServerCallContext context,
-        IMagicOnionMessageSerializer messageSerializer,
+        IMagicOnionSerializer messageSerializer,
         IMagicOnionLogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider,

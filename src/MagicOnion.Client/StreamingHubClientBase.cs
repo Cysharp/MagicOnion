@@ -25,7 +25,7 @@ namespace MagicOnion.Client
         readonly CallOptions option;
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
-        readonly IMagicOnionMessageSerializer messageSerializer;
+        readonly IMagicOnionSerializer messageSerializer;
         readonly AsyncLock asyncLock = new AsyncLock();
 
         IClientStreamWriter<byte[]> writer;
@@ -41,7 +41,7 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionMessageSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
         {
             this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;

@@ -25,7 +25,7 @@ public interface IServiceContext
     /// <summary>Raw gRPC Context.</summary>
     ServerCallContext CallContext { get; }
 
-    IMagicOnionMessageSerializer MessageSerializer { get; }
+    IMagicOnionSerializer MessageSerializer { get; }
 
     IServiceProvider ServiceProvider { get; }
 
@@ -73,7 +73,7 @@ public class ServiceContext : IServiceContext
     /// <summary>Raw gRPC Context.</summary>
     public ServerCallContext CallContext { get; }
 
-    public IMagicOnionMessageSerializer MessageSerializer { get; }
+    public IMagicOnionSerializer MessageSerializer { get; }
 
     public IServiceProvider ServiceProvider { get; }
 
@@ -88,7 +88,7 @@ public class ServiceContext : IServiceContext
         ILookup<Type, Attribute> attributeLookup,
         MethodType methodType,
         ServerCallContext context,
-        IMagicOnionMessageSerializer messageSerializer,
+        IMagicOnionSerializer messageSerializer,
         IMagicOnionLogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider

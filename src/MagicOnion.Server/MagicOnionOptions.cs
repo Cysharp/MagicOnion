@@ -9,7 +9,7 @@ public class MagicOnionOptions
     /// <summary>
     /// Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.
     /// </summary>
-    public IMagicOnionMessageSerializerProvider MessageSerializer { get; set; }
+    public IMagicOnionSerializerProvider MessageSerializer { get; set; }
 
     /// <summary>
     /// If true, MagicOnion handles exception own self and send to message. If false, propagate to gRPC engine. Default is false.
@@ -37,7 +37,7 @@ public class MagicOnionOptions
     public MagicOnionOptions()
     {
         this.IsReturnExceptionStackTraceInErrorDetail = false;
-        this.MessageSerializer = MessagePackMessageMagicOnionSerializerProvider.Instance.WithEnableFallback(true);
+        this.MessageSerializer = MessagePackMagicOnionSerializerProvider.Instance.WithEnableFallback(true);
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;

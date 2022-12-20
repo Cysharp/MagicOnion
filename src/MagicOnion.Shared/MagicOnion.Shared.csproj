@@ -54,6 +54,8 @@
   <ItemGroup>
     <TargetFiles Remove="Internal\BoxServerStreamWriter.cs" />
     <TargetFiles Remove="MessagePackMagicOnionMessageSerializerProvider.cs" />
+    <TargetFiles Remove="Serialization\MagicOnionSerializer.cs" />
+    <TargetFiles Remove="Serialization\MessagePackMagicOnionSerializerProvider.cs" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
