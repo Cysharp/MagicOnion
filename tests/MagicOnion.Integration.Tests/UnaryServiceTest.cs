@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
 using MagicOnion.Server;
+using MagicOnion.Integration.Tests.Generated;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -21,16 +22,16 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Dynamic", x => MagicOnionClient.Create<IUnaryService>(x, MagicOnionSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IUnaryService>("Generated", x => new UnaryServiceClient(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task NonGeneric(TestMagicOnionClientFactory<IUnaryService> clientFactory)
+    public async Task NonGeneric(TestMagicOnionClientFactory clientFactory)
     {
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IUnaryService>(channel);
         var result = client.NonGeneric(123);
         await result;
 
@@ -39,10 +40,10 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task ManyParametersReturnsValueType(TestMagicOnionClientFactory<IUnaryService> clientFactory)
+    public async Task ManyParametersReturnsValueType(TestMagicOnionClientFactory clientFactory)
     {
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IUnaryService>(channel);
         var result  = await client.ManyParametersReturnsValueType(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
         result.Should().Be(120);
     }

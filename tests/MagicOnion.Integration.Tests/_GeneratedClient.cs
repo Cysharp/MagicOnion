@@ -25,22 +25,99 @@ namespace MagicOnion.Integration.Tests.Generated
 
         public static void Register()
         {
-            if(isRegistered) return;
+            if (isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IClientFilterTestService>.Register((x, y) => new MagicOnion.Integration.Tests.ClientFilterTestServiceClient(x, y));
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IDynamicArgumentTupleService>.Register((x, y) => new MagicOnion.Integration.Tests.DynamicArgumentTupleServiceClient(x, y));
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.ISerializerTestService>.Register((x, y) => new MagicOnion.Integration.Tests.SerializerTestServiceClient(x, y));
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IStreamingTestService>.Register((x, y) => new MagicOnion.Integration.Tests.StreamingTestServiceClient(x, y));
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.IUnaryService>.Register((x, y) => new MagicOnion.Integration.Tests.UnaryServiceClient(x, y));
-            MagicOnionClientRegistry<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService>.Register((x, y) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestServiceClient(x, y));
+            global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default =
+                (global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider immutableMagicOnionClientFactoryProvider)
+                    ? immutableMagicOnionClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new ImmutableMagicOnionClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
 
-            StreamingHubClientRegistry<global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHub, global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHubReceiver>.Register((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.HandCraftedStreamingHubClientTestHubClient(a, b, c, d, e));
-            StreamingHubClientRegistry<global::MagicOnion.Integration.Tests.ISerializerTestHub, global::MagicOnion.Integration.Tests.ISerializerTestHubReceiver>.Register((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.SerializerTestHubClient(a, b, c, d, e));
-            StreamingHubClientRegistry<global::MagicOnion.Integration.Tests.IStreamingHubTestHub, global::MagicOnion.Integration.Tests.IStreamingHubTestHubReceiver>.Register((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.StreamingHubTestHubClient(a, b, c, d, e));
-            StreamingHubClientRegistry<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver>.Register((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestHubClient(a, b, c, d, e));
+            global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default =
+                (global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider immutableStreamingHubClientFactoryProvider)
+                    ? immutableStreamingHubClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new ImmutableStreamingHubClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
         }
     }
+
+    public partial class MagicOnionGeneratedClientFactoryProvider : IMagicOnionClientFactoryProvider, IStreamingHubClientFactoryProvider
+    {
+        public static MagicOnionGeneratedClientFactoryProvider Instance { get; } = new MagicOnionGeneratedClientFactoryProvider();
+
+        MagicOnionGeneratedClientFactoryProvider() {}
+
+        bool IMagicOnionClientFactoryProvider.TryGetFactory<T>(out global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> factory)
+            => (factory = MagicOnionClientFactoryCache<T>.Factory) != null;
+
+        bool IStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory)
+            => (factory = StreamingHubClientFactoryCache<TStreamingHub, TReceiver>.Factory) != null;
+
+        static class MagicOnionClientFactoryCache<T> where T : global::MagicOnion.IService<T>
+        {
+            public readonly static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Factory;
+
+            static MagicOnionClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
+
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.IClientFilterTestService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.IClientFilterTestService>)((x, y) => new MagicOnion.Integration.Tests.ClientFilterTestServiceClient(x, y)));
+                }
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.IDynamicArgumentTupleService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.IDynamicArgumentTupleService>)((x, y) => new MagicOnion.Integration.Tests.DynamicArgumentTupleServiceClient(x, y)));
+                }
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.ISerializerTestService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.ISerializerTestService>)((x, y) => new MagicOnion.Integration.Tests.SerializerTestServiceClient(x, y)));
+                }
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.IStreamingTestService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.IStreamingTestService>)((x, y) => new MagicOnion.Integration.Tests.StreamingTestServiceClient(x, y)));
+                }
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.IUnaryService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.IUnaryService>)((x, y) => new MagicOnion.Integration.Tests.UnaryServiceClient(x, y)));
+                }
+                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService>)((x, y) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestServiceClient(x, y)));
+                }
+                Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
+            }
+        }
+        
+        static class StreamingHubClientFactoryCache<TStreamingHub, TReceiver> where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            public readonly static global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory;
+
+            static StreamingHubClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>);
+
+                if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHub, global::MagicOnion.Integration.Tests.IHandCraftedStreamingHubClientTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.HandCraftedStreamingHubClientTestHubClient(a, b, c, d, e)));
+                }
+                if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.ISerializerTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.ISerializerTestHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.ISerializerTestHub, global::MagicOnion.Integration.Tests.ISerializerTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.SerializerTestHubClient(a, b, c, d, e)));
+                }
+                if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.IStreamingHubTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.IStreamingHubTestHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.IStreamingHubTestHub, global::MagicOnion.Integration.Tests.IStreamingHubTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.StreamingHubTestHubClient(a, b, c, d, e)));
+                }
+                if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestHubClient(a, b, c, d, e)));
+                }
+
+                Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
+            }
+        }
+    }
+
 }
 
 #pragma warning restore 168

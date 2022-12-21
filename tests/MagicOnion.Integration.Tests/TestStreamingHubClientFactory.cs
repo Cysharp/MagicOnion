@@ -1,10 +1,12 @@
+using MagicOnion.Client;
 using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 
-public record TestStreamingHubClientFactory<T, TReceiver>(string Name, Func<CallInvoker, TReceiver, IMagicOnionSerializerProvider?, Task<T>> FactoryMethod)
+public record TestStreamingHubClientFactory(string Name, IStreamingHubClientFactoryProvider FactoryProvider)
 {
     public override string ToString() => Name;
-    public Task<T> CreateAndConnectAsync(ChannelBase channelBase, TReceiver receiver, IMagicOnionSerializerProvider? messageSerializer = default)
-        => FactoryMethod(channelBase.CreateCallInvoker(), receiver, messageSerializer);
+    public Task<T> CreateAndConnectAsync<T, TReceiver>(ChannelBase channelBase, TReceiver receiver, IMagicOnionSerializerProvider? serializerProvider = default)
+        where T : IStreamingHub<T, TReceiver>
+        => StreamingHubClient.ConnectAsync<T, TReceiver>(channelBase.CreateCallInvoker(), receiver, serializerProvider: serializerProvider, factoryProvider: FactoryProvider);
 }

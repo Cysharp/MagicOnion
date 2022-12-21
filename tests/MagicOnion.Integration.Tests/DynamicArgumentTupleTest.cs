@@ -3,6 +3,7 @@ using Grpc.Net.Client;
 using MagicOnion.Server;
 using Xunit.Abstractions;
 using MagicOnion.Serialization;
+using MagicOnion.Integration.Tests.Generated;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -17,16 +18,16 @@ public class DynamicArgumentTupleServiceTest : IClassFixture<MagicOnionApplicati
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Dynamic", x => MagicOnionClient.Create<IDynamicArgumentTupleService>(x, MagicOnionSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IDynamicArgumentTupleService>("Generated", x => new DynamicArgumentTupleServiceClient(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary1(TestMagicOnionClientFactory<IDynamicArgumentTupleService> clientFactory)
+    public async Task Unary1(TestMagicOnionClientFactory clientFactory)
     {
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IDynamicArgumentTupleService>(channel);
         var result  = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
         result.Should().Be(120);
     }

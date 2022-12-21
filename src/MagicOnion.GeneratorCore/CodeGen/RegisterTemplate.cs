@@ -58,44 +58,104 @@ namespace ");
                     "tyEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]\r\n#elif NET5_0_OR_GREATER\r\n " +
                     "       [System.Runtime.CompilerServices.ModuleInitializer]\r\n#endif\r\n");
  } 
-            this.Write("        public static void Register()\r\n        {\r\n            if(isRegistered) re" +
-                    "turn;\r\n            isRegistered = true;\r\n\r\n");
+            this.Write("        public static void Register()\r\n        {\r\n            if (isRegistered) r" +
+                    "eturn;\r\n            isRegistered = true;\r\n\r\n            global::MagicOnion.Clien" +
+                    "t.MagicOnionClientFactoryProvider.Default =\r\n                (global::MagicOnion" +
+                    ".Client.MagicOnionClientFactoryProvider.Default is global::MagicOnion.Client.Imm" +
+                    "utableMagicOnionClientFactoryProvider immutableMagicOnionClientFactoryProvider)\r" +
+                    "\n                    ? immutableMagicOnionClientFactoryProvider.Add(MagicOnionGe" +
+                    "neratedClientFactoryProvider.Instance)\r\n                    : new ImmutableMagic" +
+                    "OnionClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);\r\n" +
+                    "\r\n            global::MagicOnion.Client.StreamingHubClientFactoryProvider.Defaul" +
+                    "t =\r\n                (global::MagicOnion.Client.StreamingHubClientFactoryProvide" +
+                    "r.Default is global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvide" +
+                    "r immutableStreamingHubClientFactoryProvider)\r\n                    ? immutableSt" +
+                    "reamingHubClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Ins" +
+                    "tance)\r\n                    : new ImmutableStreamingHubClientFactoryProvider(Mag" +
+                    "icOnionGeneratedClientFactoryProvider.Instance);\r\n        }\r\n    }\r\n\r\n    public" +
+                    " partial class MagicOnionGeneratedClientFactoryProvider : IMagicOnionClientFacto" +
+                    "ryProvider, IStreamingHubClientFactoryProvider\r\n    {\r\n        public static Mag" +
+                    "icOnionGeneratedClientFactoryProvider Instance { get; } = new MagicOnionGenerate" +
+                    "dClientFactoryProvider();\r\n\r\n        MagicOnionGeneratedClientFactoryProvider() " +
+                    "{}\r\n\r\n        bool IMagicOnionClientFactoryProvider.TryGetFactory<T>(out global:" +
+                    ":MagicOnion.Client.MagicOnionClientFactoryDelegate<T> factory)\r\n            => (" +
+                    "factory = MagicOnionClientFactoryCache<T>.Factory) != null;\r\n\r\n        bool IStr" +
+                    "eamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out globa" +
+                    "l::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>" +
+                    " factory)\r\n            => (factory = StreamingHubClientFactoryCache<TStreamingHu" +
+                    "b, TReceiver>.Factory) != null;\r\n\r\n        static class MagicOnionClientFactoryC" +
+                    "ache<T> where T : global::MagicOnion.IService<T>\r\n        {\r\n            public " +
+                    "readonly static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Fac" +
+                    "tory;\r\n\r\n            static MagicOnionClientFactoryCache()\r\n            {\r\n     " +
+                    "           object factory = default(global::MagicOnion.Client.MagicOnionClientFa" +
+                    "ctoryDelegate<T>);\r\n\r\n");
  foreach(var serviceInfo in Services) { 
  if(serviceInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
-            this.Write("            MagicOnionClientRegistry<");
+            this.Write("                if (typeof(T) == typeof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
-            this.Write(">.Register((x, y) => new ");
+            this.Write("))\r\n                {\r\n                    factory = ((global::MagicOnion.Client." +
+                    "MagicOnionClientFactoryDelegate<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
+            this.Write(">)((x, y) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.GetClientFullName()));
-            this.Write("(x, y));\r\n");
+            this.Write("(x, y)));\r\n                }\r\n");
  if(serviceInfo.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 
-            this.Write("\r\n");
+            this.Write(@"                Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
+            }
+        }
+        
+        static class StreamingHubClientFactoryCache<TStreamingHub, TReceiver> where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            public readonly static global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory;
+
+            static StreamingHubClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>);
+
+");
  foreach(var hubInfo in Hubs) { 
  if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
             this.Write("\r\n");
  } 
-            this.Write("            StreamingHubClientRegistry<");
+            this.Write("                if (typeof(TStreamingHub) == typeof(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
+            this.Write(") && typeof(TReceiver) == typeof(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
+            this.Write("))\r\n                {\r\n                    factory = ((global::MagicOnion.Client." +
+                    "StreamingHubClientFactoryDelegate<");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.Receiver.ReceiverType.FullName));
-            this.Write(">.Register((a, _, b, c, d, e) => new ");
+            this.Write(">)((a, _, b, c, d, e) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.GetClientFullName()));
-            this.Write("(a, b, c, d, e));\r\n");
+            this.Write("(a, b, c, d, e)));\r\n                }\r\n");
  if(hubInfo.HasIfDirectiveCondition) { 
             this.Write("#endif\r\n");
  } 
  } // foreach 
-            this.Write("        }\r\n    }\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n" +
-                    "#pragma warning restore 414\r\n#pragma warning restore 612\r\n#pragma warning restor" +
-                    "e 618\r\n");
+            this.Write(@"
+                Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
+            }
+        }
+    }
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 612
+#pragma warning restore 618
+");
             return this.GenerationEnvironment.ToString();
         }
     }

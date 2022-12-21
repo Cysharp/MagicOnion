@@ -30,14 +30,67 @@ namespace MagicOnion
 #endif
         public static void Register()
         {
-            if(isRegistered) return;
+            if (isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<global::ChatApp.Shared.Services.IChatService>.Register((x, y) => new ChatApp.Shared.Services.ChatServiceClient(x, y));
+            global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default =
+                (global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider immutableMagicOnionClientFactoryProvider)
+                    ? immutableMagicOnionClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new ImmutableMagicOnionClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
 
-            StreamingHubClientRegistry<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.ChatHubClient(a, b, c, d, e));
+            global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default =
+                (global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider immutableStreamingHubClientFactoryProvider)
+                    ? immutableStreamingHubClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new ImmutableStreamingHubClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
         }
     }
+
+    public partial class MagicOnionGeneratedClientFactoryProvider : IMagicOnionClientFactoryProvider, IStreamingHubClientFactoryProvider
+    {
+        public static MagicOnionGeneratedClientFactoryProvider Instance { get; } = new MagicOnionGeneratedClientFactoryProvider();
+
+        MagicOnionGeneratedClientFactoryProvider() {}
+
+        bool IMagicOnionClientFactoryProvider.TryGetFactory<T>(out global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> factory)
+            => (factory = MagicOnionClientFactoryCache<T>.Factory) != null;
+
+        bool IStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory)
+            => (factory = StreamingHubClientFactoryCache<TStreamingHub, TReceiver>.Factory) != null;
+
+        static class MagicOnionClientFactoryCache<T> where T : global::MagicOnion.IService<T>
+        {
+            public readonly static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Factory;
+
+            static MagicOnionClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
+
+                if (typeof(T) == typeof(global::ChatApp.Shared.Services.IChatService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::ChatApp.Shared.Services.IChatService>)((x, y) => new ChatApp.Shared.Services.ChatServiceClient(x, y)));
+                }
+                Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
+            }
+        }
+        
+        static class StreamingHubClientFactoryCache<TStreamingHub, TReceiver> where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            public readonly static global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory;
+
+            static StreamingHubClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>);
+
+                if (typeof(TStreamingHub) == typeof(global::ChatApp.Shared.Hubs.IChatHub) && typeof(TReceiver) == typeof(global::ChatApp.Shared.Hubs.IChatHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>)((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.ChatHubClient(a, b, c, d, e)));
+                }
+
+                Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
+            }
+        }
+    }
+
 }
 
 #pragma warning restore 168
