@@ -1,5 +1,6 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Serialization;
 using MagicOnion.Server;
 using MagicOnionTestServer;
@@ -23,17 +24,17 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Dynamic", (x, messageSerializer) => MagicOnionClient.Create<IMemoryPackSerializerTestService>(x, messageSerializer)) };
-        yield return new[] { new TestMagicOnionClientFactory<IMemoryPackSerializerTestService>("Generated", (x, messageSerializer) => new MemoryPackSerializerTestServiceClient(x, messageSerializer ?? MessagePackMagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Incompatible(TestMagicOnionClientFactory<IMemoryPackSerializerTestService> clientFactory)
+    public async Task Unary_Incompatible(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MessagePackMagicOnionSerializerProvider.Default); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
+        var client = clientFactory.Create<IMemoryPackSerializerTestService>(channel, MessagePackMagicOnionSerializerProvider.Default); // Use MagicOnionMessagePackMessageSerializer by client. but the server still use XorMagicOnionMessagePackSerializer.
 
         // Act
         var result = Record.ExceptionAsync(async () => await client.UnaryReturnNil());
@@ -44,11 +45,11 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_ReturnNil(TestMagicOnionClientFactory<IMemoryPackSerializerTestService> clientFactory)
+    public async Task Unary_ReturnNil(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = clientFactory.Create<IMemoryPackSerializerTestService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.UnaryReturnNil();
@@ -59,11 +60,11 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Parameterless(TestMagicOnionClientFactory<IMemoryPackSerializerTestService> clientFactory)
+    public async Task Unary_Parameterless(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = clientFactory.Create<IMemoryPackSerializerTestService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.UnaryParameterless();
@@ -74,11 +75,11 @@ public class MemoryPackSerializerUnaryTest : IClassFixture<MagicOnionApplication
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task Unary_Parameter_Many(TestMagicOnionClientFactory<IMemoryPackSerializerTestService> clientFactory)
+    public async Task Unary_Parameter_Many(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel, MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = clientFactory.Create<IMemoryPackSerializerTestService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.Unary1(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, "15");

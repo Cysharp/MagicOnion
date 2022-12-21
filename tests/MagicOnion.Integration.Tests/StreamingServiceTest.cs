@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
+using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Server;
 using MagicOnion.Serialization;
 
@@ -21,17 +22,17 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Dynamic", x => MagicOnionClient.Create<IStreamingTestService>(x, MagicOnionSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IStreamingTestService>("Generated", x => new StreamingTestServiceClient(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task ClientStreaming_1(TestMagicOnionClientFactory<IStreamingTestService> clientFactory)
+    public async Task ClientStreaming_1(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IStreamingTestService>(channel);
         var result  = await client.ClientStreaming();
 
         // Act
@@ -46,11 +47,11 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task ServerStreaming_1(TestMagicOnionClientFactory<IStreamingTestService> clientFactory)
+    public async Task ServerStreaming_1(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IStreamingTestService>(channel);
         var result  = await client.ServerStreaming(123, 456);
 
         // Act
@@ -66,11 +67,11 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task DuplexStreaming_1(TestMagicOnionClientFactory<IStreamingTestService> clientFactory)
+    public async Task DuplexStreaming_1(TestMagicOnionClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var client = clientFactory.Create(channel);
+        var client = clientFactory.Create<IStreamingTestService>(channel);
         var result  = await client.DuplexStreaming();
 
         // Act

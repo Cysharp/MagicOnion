@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
+using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
@@ -22,20 +23,20 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Dynamic", x => MagicOnionClient.Create<IClientFilterTestService>(x, MagicOnionSerializerProvider.Default)) };
-        yield return new [] { new TestMagicOnionClientFactory<IClientFilterTestService>("Generated", x => new ClientFilterTestServiceClient(x, MagicOnionSerializerProvider.Default)) };
+        yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
     }
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task SimpleFilter(TestMagicOnionClientFactory<IClientFilterTestService> clientFactory)
+    public async Task SimpleFilter(TestMagicOnionClientFactory clientFactory)
     {
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
         for (int i = 1; i <= 20; i++)
         {
             var filters = Enumerable.Range(0, i).Select(_ => new CountFilter(i)).ToArray();
-            var client = clientFactory.Create(channel, filters);
+            var client = clientFactory.Create<IClientFilterTestService>(channel, filters);
             var r0 = await client.Unary1(1000, 2000);
             r0.Should().Be(3000 + 10 * i);
 
@@ -48,11 +49,11 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task HeaderEcho(TestMagicOnionClientFactory<IClientFilterTestService> clientFactory)
+    public async Task HeaderEcho(TestMagicOnionClientFactory clientFactory)
     {
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
-        var res = clientFactory.Create(channel, new IClientFilter[]
+        var res = clientFactory.Create<IClientFilterTestService>(channel, new IClientFilter[]
         {
             new AppendHeaderFilter(),
             new RetryFilter()
@@ -66,14 +67,14 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
 
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
-    public async Task ErrorRetry(TestMagicOnionClientFactory<IClientFilterTestService> clientFactory)
+    public async Task ErrorRetry(TestMagicOnionClientFactory clientFactory)
     {
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
         var ex = await Assert.ThrowsAsync<RetryFailedException>(async () =>
         {
             var filter = new RetryFilter();
-            await clientFactory.Create(channel, new IClientFilter[]
+            await clientFactory.Create<IClientFilterTestService>(channel, new IClientFilter[]
             {
                 filter
             }).AlwaysError();

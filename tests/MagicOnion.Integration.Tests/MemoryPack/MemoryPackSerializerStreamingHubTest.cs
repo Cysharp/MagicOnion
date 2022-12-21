@@ -1,5 +1,6 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Server.Hubs;
 using MagicOnionTestServer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -20,23 +21,18 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        yield return new[] { new TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>("Dynamic", (callInvoker, receiver, serializerProvider) => StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(callInvoker, receiver, serializerProvider: serializerProvider)) };
-        yield return new[] { new TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>("Static", async (callInvoker, receiver, serializerProvider) =>
-        {
-            var client = new MemoryPackSerializerTestHubClient(callInvoker, string.Empty, new CallOptions(), serializerProvider ?? MemoryPackMagicOnionSerializerProvider.Instance, NullMagicOnionClientLogger.Instance);
-            await client.__ConnectAndSubscribeAsync(receiver, default);
-            return client;
-        })};
+        yield return new [] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
+        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientFactoryProvider.Instance)};
     }
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task StreamingHub_Parameterless(TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver> clientFactory)
+    public async Task StreamingHub_Parameterless(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await clientFactory.CreateAndConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.MethodParameterless();
@@ -47,12 +43,12 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task StreamingHub_Parameter_One(TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver> clientFactory)
+    public async Task StreamingHub_Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await clientFactory.CreateAndConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.MethodParameter_One(12345);
@@ -63,12 +59,12 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task StreamingHub_Parameter_Many(TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver> clientFactory)
+    public async Task StreamingHub_Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await clientFactory.CreateAndConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.MethodParameter_Many(12345, "6789");
@@ -79,12 +75,12 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task StreamingHub_Callback(TestStreamingHubClientFactory<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver> clientFactory)
+    public async Task StreamingHub_Callback(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
         var receiver = new Receiver();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver, messageSerializer: MemoryPackMagicOnionSerializerProvider.Instance);
+        var client = await clientFactory.CreateAndConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
 
         // Act
         var result = await client.Callback(12345, "6789");

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 
@@ -18,25 +19,20 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Dynamic", (callInvoker, receiver, serializerProvider) => StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(callInvoker, receiver, serializerProvider: serializerProvider)) };
-        yield return new [] { new TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver>("Static", async (callInvoker, receiver, serializerProvider) =>
-        {
-            var client = new StreamingHubTestHubClient(callInvoker, string.Empty, new CallOptions(), serializerProvider ?? MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
-            await client.__ConnectAndSubscribeAsync(receiver, default);
-            return client;
-        })};
+        yield return new [] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
+        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientFactoryProvider.Instance)};
     }
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task NoReturn_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task NoReturn_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.NoReturn_Parameter_Zero();
@@ -44,14 +40,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task NoReturn_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task NoReturn_Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.NoReturn_Parameter_One(12345);
@@ -60,14 +56,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
     
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task NoReturn_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.NoReturn_Parameter_Many(12345, "Hello✨", true);
@@ -75,14 +71,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
     
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Parameter_Zero(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.Parameter_Zero();
@@ -93,14 +89,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.Parameter_One(12345);
@@ -111,14 +107,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.Parameter_Many(12345, "Hello✨", true);
@@ -129,14 +125,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_NoReturn_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_NoReturn_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.ValueTask_NoReturn_Parameter_Zero();
@@ -144,14 +140,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_NoReturn_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_NoReturn_Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.ValueTask_NoReturn_Parameter_One(12345);
@@ -160,14 +156,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
     
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_NoReturn_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act & Assert
         await client.ValueTask_NoReturn_Parameter_Many(12345, "Hello✨", true);
@@ -175,14 +171,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
     
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.ValueTask_Parameter_Zero();
@@ -193,14 +189,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.ValueTask_Parameter_One(12345);
@@ -211,14 +207,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         var result = await client.ValueTask_Parameter_Many(12345, "Hello✨", true);
@@ -229,14 +225,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Receiver_Parameter_Zero(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Receiver_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         await client.CallReceiver_Parameter_Zero();
@@ -248,14 +244,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Receiver_Parameter_One(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Receiver_Parameter_One(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         await client.CallReceiver_Parameter_One(12345);
@@ -267,14 +263,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Receiver_Parameter_Many(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Receiver_Parameter_Many(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
 
         // Act
         await client.CallReceiver_Parameter_Many(12345, "Hello✨", true);
@@ -286,14 +282,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Forget_NoReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Forget_NoReturnValue(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
         client = client.FireAndForget(); // Use FireAndForget client
 
         // Act
@@ -302,14 +298,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Forget_WithReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task Forget_WithReturnValue(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
         client = client.FireAndForget(); // Use FireAndForget client
 
         // Act
@@ -321,14 +317,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_Forget_NoReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_Forget_NoReturnValue(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
         client = client.FireAndForget(); // Use FireAndForget client
 
         // Act
@@ -337,14 +333,14 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task ValueTask_Forget_WithReturnValue(TestStreamingHubClientFactory<IStreamingHubTestHub, IStreamingHubTestHubReceiver> clientFactory)
+    public async Task ValueTask_Forget_WithReturnValue(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
         var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
 
         var receiver = new Mock<IStreamingHubTestHubReceiver>();
-        var client = await clientFactory.CreateAndConnectAsync(channel, receiver.Object);
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
         client = client.FireAndForget(); // Use FireAndForget client
 
         // Act
