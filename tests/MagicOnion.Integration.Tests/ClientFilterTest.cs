@@ -106,7 +106,7 @@ public class ClientFilterTestService : ServiceBase<IClientFilterTestService>, IC
             Context.CallContext.ResponseTrailers.Add(item);
         }
 
-        return ReturnNil();
+        return UnaryResult.FromResult(Nil.Default);
     }
 
     public UnaryResult<Nil> AlwaysError()

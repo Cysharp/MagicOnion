@@ -188,30 +188,30 @@ public class FilterConstructorInjectionTester : ServiceBase<IFilterConstructorIn
 {
     public UnaryResult<int> A()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     [FromTypeFilter(typeof(ConstructorInjectedFilter2Attribute))]
     public UnaryResult<int> B()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     [FromTypeFilter(typeof(ConstructorInjectedFilter3Attribute), Arguments = new object[] { "foo", 987654 })]
     public UnaryResult<int> C()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     [FromServiceFilter(typeof(ServiceFilterForMethodTestFilterAttribute))]
     public UnaryResult<int> D()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     [FilterFactoryTestFilter("Hogemoge")]
     public UnaryResult<int> E()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 }

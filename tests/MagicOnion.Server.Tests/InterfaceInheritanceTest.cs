@@ -21,11 +21,11 @@ public interface IInterfaceInheritanceService : IService<IInterfaceInheritanceSe
 
 public class InterfaceInheritanceService : ServiceBase<IInterfaceInheritanceService>, IInterfaceInheritanceService
 {
-    public UnaryResult<int> UnaryBaseBase(int x, int y) => UnaryResult(x - y);
+    public UnaryResult<int> UnaryBaseBase(int x, int y) => UnaryResult.FromResult(x - y);
 
-    public UnaryResult<int> UnaryBase(int x, int y) => UnaryResult(x * y);
+    public UnaryResult<int> UnaryBase(int x, int y) => UnaryResult.FromResult(x * y);
 
-    public UnaryResult<int> Unary1(int x, int y) => UnaryResult(x + y);
+    public UnaryResult<int> Unary1(int x, int y) => UnaryResult.FromResult(x + y);
 }
 
 public class InterfaceInheritanceTest : IClassFixture<ServerFixture<InterfaceInheritanceService>>

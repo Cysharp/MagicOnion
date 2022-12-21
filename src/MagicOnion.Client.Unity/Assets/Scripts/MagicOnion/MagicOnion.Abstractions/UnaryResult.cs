@@ -170,6 +170,7 @@ namespace MagicOnion
         /// <summary>
         /// Gets the result that contains <see cref="F:MessagePack.Nil.Default"/> as the result value.
         /// </summary>
+        [Obsolete("Use `UnaryResult` or `UnaryResult.FromResult(Nil.Default)` instead.")]
         public static UnaryResult<Nil> Nil
             => new UnaryResult<Nil>(MessagePack.Nil.Default);
     }

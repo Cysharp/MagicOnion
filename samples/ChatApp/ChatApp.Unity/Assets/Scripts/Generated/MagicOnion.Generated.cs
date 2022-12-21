@@ -233,10 +233,10 @@ namespace ChatApp.Shared.Services
         protected override global::MagicOnion.Client.MagicOnionClientBase<IChatService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
             => new ChatServiceClient(options, core);
         
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GenerateException(global::System.String message)
-            => this.core.GenerateException.InvokeUnary(this, "IChatService/GenerateException", message);
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> SendReportAsync(global::System.String message)
-            => this.core.SendReportAsync.InvokeUnary(this, "IChatService/SendReportAsync", message);
+        public global::MagicOnion.UnaryResult GenerateException(global::System.String message)
+            => this.core.GenerateException.InvokeUnaryNonGeneric(this, "IChatService/GenerateException", message);
+        public global::MagicOnion.UnaryResult SendReportAsync(global::System.String message)
+            => this.core.SendReportAsync.InvokeUnaryNonGeneric(this, "IChatService/SendReportAsync", message);
     }
 }
 

@@ -15,10 +15,10 @@ public interface IAuthorizeClassService : IService<IAuthorizeClassService>
 [Authorize]
 public class AuthorizeClassService : ServiceBase<IAuthorizeClassService>, IAuthorizeClassService
 {
-    public UnaryResult<string> GetUserNameAsync() => UnaryResult(Context.CallContext.GetHttpContext().User.Identity?.Name ?? throw new InvalidOperationException("Unauthenticated"));
+    public UnaryResult<string> GetUserNameAsync() => UnaryResult.FromResult(Context.CallContext.GetHttpContext().User.Identity?.Name ?? throw new InvalidOperationException("Unauthenticated"));
 
     [AllowAnonymous]
-    public UnaryResult<int> AddAsync(int a, int b) => UnaryResult(a + b);
+    public UnaryResult<int> AddAsync(int a, int b) => UnaryResult.FromResult(a + b);
 }
 
 public interface IAuthorizeMethodService : IService<IAuthorizeMethodService>
@@ -30,9 +30,9 @@ public interface IAuthorizeMethodService : IService<IAuthorizeMethodService>
 public class AuthorizeMethodService : ServiceBase<IAuthorizeMethodService>, IAuthorizeMethodService
 {
     [Authorize]
-    public UnaryResult<string> GetUserNameAsync() => UnaryResult(Context.CallContext.GetHttpContext().User.Identity?.Name ?? throw new InvalidOperationException("Unauthenticated"));
+    public UnaryResult<string> GetUserNameAsync() => UnaryResult.FromResult(Context.CallContext.GetHttpContext().User.Identity?.Name ?? throw new InvalidOperationException("Unauthenticated"));
 
-    public UnaryResult<int> AddAsync(int a, int b) => UnaryResult(a + b);
+    public UnaryResult<int> AddAsync(int a, int b) => UnaryResult.FromResult(a + b);
 }
 
 public interface IAuthorizeHubReceiver {}

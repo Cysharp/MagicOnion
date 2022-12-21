@@ -20,16 +20,6 @@ public abstract class ServiceBase<TServiceInterface> : IService<TServiceInterfac
 
     // Helpers
 
-    protected UnaryResult<TResponse> UnaryResult<TResponse>(TResponse result)
-    {
-        return new MagicOnion.UnaryResult<TResponse>(result);
-    }
-
-    protected UnaryResult<Nil> ReturnNil()
-    {
-        return new MagicOnion.UnaryResult<Nil>(Nil.Default);
-    }
-
     protected TResponse ReturnStatusCode<TResponse>(int statusCode, string detail)
     {
         Context.CallContext.Status = new Status((StatusCode)statusCode, detail ?? "");
