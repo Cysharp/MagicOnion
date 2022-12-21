@@ -64,31 +64,33 @@ namespace ");
                     ".Client.MagicOnionClientFactoryProvider.Default is global::MagicOnion.Client.Imm" +
                     "utableMagicOnionClientFactoryProvider immutableMagicOnionClientFactoryProvider)\r" +
                     "\n                    ? immutableMagicOnionClientFactoryProvider.Add(MagicOnionGe" +
-                    "neratedClientFactoryProvider.Instance)\r\n                    : new ImmutableMagic" +
-                    "OnionClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);\r\n" +
-                    "\r\n            global::MagicOnion.Client.StreamingHubClientFactoryProvider.Defaul" +
-                    "t =\r\n                (global::MagicOnion.Client.StreamingHubClientFactoryProvide" +
-                    "r.Default is global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvide" +
-                    "r immutableStreamingHubClientFactoryProvider)\r\n                    ? immutableSt" +
-                    "reamingHubClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Ins" +
-                    "tance)\r\n                    : new ImmutableStreamingHubClientFactoryProvider(Mag" +
-                    "icOnionGeneratedClientFactoryProvider.Instance);\r\n        }\r\n    }\r\n\r\n    public" +
-                    " partial class MagicOnionGeneratedClientFactoryProvider : IMagicOnionClientFacto" +
-                    "ryProvider, IStreamingHubClientFactoryProvider\r\n    {\r\n        public static Mag" +
-                    "icOnionGeneratedClientFactoryProvider Instance { get; } = new MagicOnionGenerate" +
-                    "dClientFactoryProvider();\r\n\r\n        MagicOnionGeneratedClientFactoryProvider() " +
-                    "{}\r\n\r\n        bool IMagicOnionClientFactoryProvider.TryGetFactory<T>(out global:" +
-                    ":MagicOnion.Client.MagicOnionClientFactoryDelegate<T> factory)\r\n            => (" +
-                    "factory = MagicOnionClientFactoryCache<T>.Factory) != null;\r\n\r\n        bool IStr" +
-                    "eamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out globa" +
-                    "l::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>" +
-                    " factory)\r\n            => (factory = StreamingHubClientFactoryCache<TStreamingHu" +
-                    "b, TReceiver>.Factory) != null;\r\n\r\n        static class MagicOnionClientFactoryC" +
-                    "ache<T> where T : global::MagicOnion.IService<T>\r\n        {\r\n            public " +
-                    "readonly static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Fac" +
-                    "tory;\r\n\r\n            static MagicOnionClientFactoryCache()\r\n            {\r\n     " +
-                    "           object factory = default(global::MagicOnion.Client.MagicOnionClientFa" +
-                    "ctoryDelegate<T>);\r\n\r\n");
+                    "neratedClientFactoryProvider.Instance)\r\n                    : new global::MagicO" +
+                    "nion.Client.ImmutableMagicOnionClientFactoryProvider(MagicOnionGeneratedClientFa" +
+                    "ctoryProvider.Instance);\r\n\r\n            global::MagicOnion.Client.StreamingHubCl" +
+                    "ientFactoryProvider.Default =\r\n                (global::MagicOnion.Client.Stream" +
+                    "ingHubClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableStream" +
+                    "ingHubClientFactoryProvider immutableStreamingHubClientFactoryProvider)\r\n       " +
+                    "             ? immutableStreamingHubClientFactoryProvider.Add(MagicOnionGenerate" +
+                    "dClientFactoryProvider.Instance)\r\n                    : new global::MagicOnion.C" +
+                    "lient.ImmutableStreamingHubClientFactoryProvider(MagicOnionGeneratedClientFactor" +
+                    "yProvider.Instance);\r\n        }\r\n    }\r\n\r\n    public partial class MagicOnionGen" +
+                    "eratedClientFactoryProvider : global::MagicOnion.Client.IMagicOnionClientFactory" +
+                    "Provider, global::MagicOnion.Client.IStreamingHubClientFactoryProvider\r\n    {\r\n " +
+                    "       public static MagicOnionGeneratedClientFactoryProvider Instance { get; } " +
+                    "= new MagicOnionGeneratedClientFactoryProvider();\r\n\r\n        MagicOnionGenerated" +
+                    "ClientFactoryProvider() {}\r\n\r\n        bool global::MagicOnion.Client.IMagicOnion" +
+                    "ClientFactoryProvider.TryGetFactory<T>(out global::MagicOnion.Client.MagicOnionC" +
+                    "lientFactoryDelegate<T> factory)\r\n            => (factory = MagicOnionClientFact" +
+                    "oryCache<T>.Factory) != null;\r\n\r\n        bool global::MagicOnion.Client.IStreami" +
+                    "ngHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out global::M" +
+                    "agicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> fac" +
+                    "tory)\r\n            => (factory = StreamingHubClientFactoryCache<TStreamingHub, T" +
+                    "Receiver>.Factory) != null;\r\n\r\n        static class MagicOnionClientFactoryCache" +
+                    "<T> where T : global::MagicOnion.IService<T>\r\n        {\r\n            public read" +
+                    "only static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Factory" +
+                    ";\r\n\r\n            static MagicOnionClientFactoryCache()\r\n            {\r\n         " +
+                    "       object factory = default(global::MagicOnion.Client.MagicOnionClientFactor" +
+                    "yDelegate<T>);\r\n\r\n");
  foreach(var serviceInfo in Services) { 
  if(serviceInfo.HasIfDirectiveCondition) { 
             this.Write("#if ");
