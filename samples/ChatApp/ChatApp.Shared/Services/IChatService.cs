@@ -1,4 +1,4 @@
-﻿using MagicOnion;
+using MagicOnion;
 using MessagePack;
 
 namespace ChatApp.Shared.Services
@@ -8,7 +8,7 @@ namespace ChatApp.Shared.Services
     /// </summary>
     public interface IChatService : IService<IChatService>
     {
-        UnaryResult<Nil> GenerateException(string message);
-        UnaryResult<Nil> SendReportAsync(string message);
+        UnaryResult GenerateException(string message);
+        UnaryResult SendReportAsync(string message);
     }
 }
