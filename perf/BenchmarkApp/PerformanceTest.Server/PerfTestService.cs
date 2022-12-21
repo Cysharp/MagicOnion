@@ -9,7 +9,7 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
 {
     public UnaryResult<ServerInformation> GetServerInformationAsync()
     {
-        return UnaryResult(new ServerInformation(
+        return UnaryResult.FromResult(new ServerInformation(
             Environment.MachineName,
             ApplicationInformation.Current.MagicOnionVersion,
             ApplicationInformation.Current.GrpcNetVersion,
@@ -46,11 +46,11 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
 
     public UnaryResult<(int StatusCode, byte[] Data)> UnaryLargePayloadAsync(string arg1, int arg2, byte[] arg3)
     {
-        return UnaryResult((123, arg3));
+        return UnaryResult.FromResult((123, arg3));
     }
 
     public UnaryResult<ComplexResponse> UnaryComplexAsync(string arg1, int arg2)
     {
-        return UnaryResult(ComplexResponse.Cached);
+        return UnaryResult.FromResult(ComplexResponse.Cached);
     }
 }
