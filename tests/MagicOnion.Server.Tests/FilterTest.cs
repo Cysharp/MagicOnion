@@ -132,14 +132,14 @@ public class FilterTester : ServiceBase<IFilterTester>, IFilterTester
     [SimpleFilter1(Order = 10)]
     public UnaryResult<int> A()
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     [SimpleFilter1(Order = 300)]
     [MultiFilter2(99, 30, Z = 4595, Order = 200)]
     public UnaryResult<int> B()
     {
-        return UnaryResult(999);
+        return UnaryResult.FromResult(999);
     }
 
     [SimpleFilter1(Order = int.MinValue)]

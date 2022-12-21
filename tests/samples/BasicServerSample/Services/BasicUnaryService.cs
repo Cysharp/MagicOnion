@@ -64,49 +64,49 @@ public class BasicUnaryService : ServiceBase<IBasicUnaryService>, IBasicUnarySer
         => throw new ReturnStatusException(statusCode, nameof(ReturnTypeIsNilAndNonSuccessResponseAsync));
 
     public UnaryResult<Nil> NoParameterReturnNilAsync()
-        => UnaryResult(Nil.Default);
+        => UnaryResult.FromResult(Nil.Default);
 
     public UnaryResult<int> NoParameterReturnValueTypeAsync()
-        => UnaryResult(1234);
+        => UnaryResult.FromResult(1234);
 
     public UnaryResult<MyResponse> NoParameterReturnRefTypeAsync()
-        => UnaryResult(new MyResponse("1234"));
+        => UnaryResult.FromResult(new MyResponse("1234"));
 
     public UnaryResult<Nil> OneValueTypeParameterReturnNilAsync(int a)
-        => UnaryResult(Nil.Default);
+        => UnaryResult.FromResult(Nil.Default);
 
     public UnaryResult<Nil> TwoValueTypeParametersReturnNilAsync(int a, int b)
-        => UnaryResult(Nil.Default);
+        => UnaryResult.FromResult(Nil.Default);
 
     public UnaryResult<int> OneValueTypeParameterReturnValueTypeAsync(int a)
-        => UnaryResult(a);
+        => UnaryResult.FromResult(a);
 
     public UnaryResult<int> TwoValueTypeParametersReturnValueTypeAsync(int a, int b)
-        => UnaryResult(a + b);
+        => UnaryResult.FromResult(a + b);
 
     public UnaryResult<MyResponse> OneValueTypeParameterReturnRefTypeAsync(int a)
-        => UnaryResult(new MyResponse(a.ToString()));
+        => UnaryResult.FromResult(new MyResponse(a.ToString()));
 
     public UnaryResult<MyResponse> TwoValueTypeParametersReturnRefTypeAsync(int a, int b)
-        => UnaryResult(new MyResponse((a + b).ToString()));
+        => UnaryResult.FromResult(new MyResponse((a + b).ToString()));
 
     public UnaryResult<Nil> OneRefTypeParameterReturnNilAsync(MyRequest a)
-        => UnaryResult(Nil.Default);
+        => UnaryResult.FromResult(Nil.Default);
 
     public UnaryResult<Nil> TwoRefTypeParametersReturnNilAsync(MyRequest a, MyRequest b)
-        => UnaryResult(Nil.Default);
+        => UnaryResult.FromResult(Nil.Default);
 
     public UnaryResult<int> OneRefTypeParameterReturnValueTypeAsync(MyRequest a)
-        => UnaryResult(a.Value);
+        => UnaryResult.FromResult(a.Value);
 
     public UnaryResult<int> TwoRefTypeParametersReturnValueTypeAsync(MyRequest a, MyRequest b)
-        => UnaryResult(a.Value + b.Value);
+        => UnaryResult.FromResult(a.Value + b.Value);
 
     public UnaryResult<MyResponse> OneRefTypeParameterReturnRefTypeAsync(MyRequest a)
-        => UnaryResult(new MyResponse(a.Value.ToString()));
+        => UnaryResult.FromResult(new MyResponse(a.Value.ToString()));
 
     public UnaryResult<MyResponse> TwoRefTypeParametersReturnRefTypeAsync(MyRequest a, MyRequest b)
-        => UnaryResult(new MyResponse((a.Value + b.Value).ToString()));
+        => UnaryResult.FromResult(new MyResponse((a.Value + b.Value).ToString()));
 
     public UnaryResult NonGenericNoParameterAsync()
         => MagicOnion.UnaryResult.CompletedResult;

@@ -79,7 +79,7 @@ public class ArgumentPattern : ServiceBase<IArgumentPattern>, IArgumentPattern
 
     public UnaryResult<MyResponse> Unary1(int x, int y, string z = "unknown")
     {
-        return UnaryResult(new MyResponse
+        return UnaryResult.FromResult(new MyResponse
         {
             Id = x + y,
             Data = z
@@ -88,7 +88,7 @@ public class ArgumentPattern : ServiceBase<IArgumentPattern>, IArgumentPattern
 
     public UnaryResult<MyResponse> Unary2(MyRequest req)
     {
-        return UnaryResult(new MyResponse
+        return UnaryResult.FromResult(new MyResponse
         {
             Id = req.Id,
             Data = req.Data
@@ -97,7 +97,7 @@ public class ArgumentPattern : ServiceBase<IArgumentPattern>, IArgumentPattern
 
     public UnaryResult<MyResponse> Unary3()
     {
-        return UnaryResult(new MyResponse
+        return UnaryResult.FromResult(new MyResponse
         {
             Id = -1,
             Data = "NoArg"
@@ -106,12 +106,12 @@ public class ArgumentPattern : ServiceBase<IArgumentPattern>, IArgumentPattern
 
     public UnaryResult<Nil> Unary4()
     {
-        return UnaryResult(Nil.Default);
+        return UnaryResult.FromResult(Nil.Default);
     }
 
     public UnaryResult<MyStructResponse> Unary5(MyStructRequest req)
     {
-        return UnaryResult(new MyStructResponse
+        return UnaryResult.FromResult(new MyStructResponse
         {
             X = req.X,
             Y = req.Y

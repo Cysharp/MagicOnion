@@ -11,12 +11,12 @@ public class OverloadService : ServiceBase<IOverloadMethod>, IOverloadMethod
 {
     public UnaryResult<int> Hoge(int x)
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 
     public UnaryResult<int> Hoge(int x, int y)
     {
-        return UnaryResult(0);
+        return UnaryResult.FromResult(0);
     }
 }
 
