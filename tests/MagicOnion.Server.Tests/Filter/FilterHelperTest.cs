@@ -113,6 +113,21 @@ public class FilterHelperTest
         filters[1].Filter.Should().BeOfType<TestFilterAttribute>();
     }
 
+    [Fact]
+    public void GetFilters_Service_LegacyCompatAttributeFactoryAttribute()
+    {
+        // Arrange
+        var methodInfo = new TestService().LegacyFilterFactoryAttributeAttachedMethod;
+
+        // Act
+        var filters = FilterHelper.GetFilters(Array.Empty<MagicOnionServiceFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(2);
+        filters[0].Filter.Should().BeOfType<LegacyFilterFactoryAttribute>();
+        filters[1].Filter.Should().BeOfType<TestFilterAttribute>();
+    }
+
     [TestFilter("Attribute.Class")]
     class TestService
     {
@@ -123,6 +138,8 @@ public class FilterHelperTest
 
         [MetadataOnlyFilter]
         public UnaryResult<int> UnknownFilterMethod() => default;
+
+        public UnaryResult<int> LegacyFilterFactoryAttributeAttachedMethod() => default;
     }
 
     [TestFilter("Unordered.3")]
@@ -158,6 +175,24 @@ public class FilterHelperTest
     }
 
     class LegacyFilterFactory : IMagicOnionFilterFactory<MagicOnionFilterAttribute>
+    {
+        public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new FilterImpl();
+        }
+
+        public int Order { get; }
+
+        public class FilterImpl : MagicOnionFilterAttribute
+        {
+            public override ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+            {
+                return next(context);
+            }
+        }
+    }
+    
+    class LegacyFilterFactoryAttribute : Attribute, IMagicOnionFilterFactory<MagicOnionFilterAttribute>, IMagicOnionOrderedFilter
     {
         public MagicOnionFilterAttribute CreateInstance(IServiceProvider serviceLocator)
         {
@@ -297,6 +332,21 @@ public class FilterHelperTest
         filters[0].Filter.Should().BeOfType<LegacyHubFilterFactory>();
         filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>();
     }
+    
+    [Fact]
+    public void GetFilters_StreamingHub_LegacyCompatAttributeFactoryAttribute()
+    {
+        // Arrange
+        var methodInfo = new TestHub().LegacyFilterFactoryAttributeAttachedMethod;
+
+        // Act
+        var filters = FilterHelper.GetFilters(Array.Empty<StreamingHubFilterDescriptor>(), methodInfo.Target!.GetType(), methodInfo.Method);
+
+        // Assert
+        filters.Should().HaveCount(2);
+        filters[0].Filter.Should().BeOfType<LegacyHubFilterFactoryAttribute>();
+        filters[1].Filter.Should().BeOfType<TestHubFilterAttribute>();
+    }
 
     [TestHubFilter("Attribute.Class")]
     class TestHub
@@ -308,6 +358,9 @@ public class FilterHelperTest
 
         [MetadataOnlyHubFilter]
         public Task<int> UnknownFilterMethod() => default;
+
+        [LegacyHubFilterFactory]
+        public Task<int> LegacyFilterFactoryAttributeAttachedMethod() => default;
     }
 
     [TestFilter("Attribute.Class")]
@@ -337,6 +390,24 @@ public class FilterHelperTest
     { }
 
     class LegacyHubFilterFactory : IMagicOnionFilterFactory<StreamingHubFilterAttribute>
+    {
+        public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceLocator)
+        {
+            return new FilterImpl();
+        }
+
+        public int Order { get; }
+
+        public class FilterImpl : StreamingHubFilterAttribute
+        {
+            public override ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+            {
+                return next(context);
+            }
+        }
+    }
+
+    class LegacyHubFilterFactoryAttribute : Attribute, IMagicOnionFilterFactory<StreamingHubFilterAttribute>, IMagicOnionOrderedFilter
     {
         public StreamingHubFilterAttribute CreateInstance(IServiceProvider serviceLocator)
         {
