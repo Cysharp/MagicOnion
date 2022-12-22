@@ -139,6 +139,7 @@ public class FilterHelperTest
         [MetadataOnlyFilter]
         public UnaryResult<int> UnknownFilterMethod() => default;
 
+        [LegacyFilterFactory]
         public UnaryResult<int> LegacyFilterFactoryAttributeAttachedMethod() => default;
     }
 
