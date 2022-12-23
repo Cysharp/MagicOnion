@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MemoryPack" Version="1.9.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DynamicArgumentTupleMemoryPackFormatter.cs">
+      <DependentUpon>DynamicArgumentTupleMemoryPackFormatter.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DynamicArgumentTupleMemoryPackFormatter.tt">
+      <LastGenOutput>DynamicArgumentTupleMemoryPackFormatter.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+</Project>

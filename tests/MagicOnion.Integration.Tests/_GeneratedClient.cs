@@ -80,10 +80,6 @@ namespace MagicOnion.Integration.Tests.Generated
                 {
                     factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.IUnaryService>)((x, y) => new MagicOnion.Integration.Tests.UnaryServiceClient(x, y)));
                 }
-                if (typeof(T) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService))
-                {
-                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService>)((x, y) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestServiceClient(x, y)));
-                }
                 Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
             }
         }
@@ -107,10 +103,6 @@ namespace MagicOnion.Integration.Tests.Generated
                 if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.IStreamingHubTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.IStreamingHubTestHubReceiver))
                 {
                     factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.IStreamingHubTestHub, global::MagicOnion.Integration.Tests.IStreamingHubTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.StreamingHubTestHubClient(a, b, c, d, e)));
-                }
-                if (typeof(TStreamingHub) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub) && typeof(TReceiver) == typeof(global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver))
-                {
-                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver>)((a, _, b, c, d, e) => new MagicOnion.Integration.Tests.MemoryPack.MemoryPackSerializerTestHubClient(a, b, c, d, e)));
                 }
 
                 Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
@@ -178,14 +170,13 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
 
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(6)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(5)
             {
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>), 0 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.String>), 1 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>), 2 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>), 3 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>), 4 },
-                {typeof(global::System.ValueTuple<global::System.Int32, global::System.Int32>), 5 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>), 1 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>), 2 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>), 3 },
+                {typeof(global::System.ValueTuple<global::System.Int32, global::System.Int32>), 4 },
             };
         }
 
@@ -200,11 +191,10 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
             switch (key)
             {
                 case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>(default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32));
-                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.String>(default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.String));
-                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32>(default(global::System.Int32), default(global::System.Int32));
-                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.String, global::System.Boolean>(default(global::System.Int32), default(global::System.String), default(global::System.Boolean));
-                case 4: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.String>(default(global::System.Int32), default(global::System.String));
-                case 5: return new global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.Int32>();
+                case 1: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32>(default(global::System.Int32), default(global::System.Int32));
+                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.String, global::System.Boolean>(default(global::System.Int32), default(global::System.String), default(global::System.Boolean));
+                case 3: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.String>(default(global::System.Int32), default(global::System.String));
+                case 4: return new global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.Int32>();
                 default: return null;
             }
         }
@@ -454,54 +444,6 @@ namespace MagicOnion.Integration.Tests
             => this.core.NonGeneric.InvokeUnaryNonGeneric(this, "IUnaryService/NonGeneric", arg0);
         public global::MagicOnion.UnaryResult<global::System.Int32> ManyParametersReturnsValueType(global::System.Int32 arg0, global::System.Int32 arg1, global::System.Int32 arg2, global::System.Int32 arg3, global::System.Int32 arg4, global::System.Int32 arg5, global::System.Int32 arg6, global::System.Int32 arg7, global::System.Int32 arg8, global::System.Int32 arg9, global::System.Int32 arg10, global::System.Int32 arg11, global::System.Int32 arg12, global::System.Int32 arg13, global::System.Int32 arg14)
             => this.core.ManyParametersReturnsValueType.InvokeUnary(this, "IUnaryService/ManyParametersReturnsValueType", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14));
-    }
-}
-
-namespace MagicOnion.Integration.Tests.MemoryPack
-{
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-    
-    [global::MagicOnion.Ignore]
-    public class MemoryPackSerializerTestServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService>, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestService
-    {
-        class ClientCore
-        {
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::MessagePack.Nil> UnaryReturnNil;
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MessagePack.Nil, global::System.Int32> UnaryParameterless;
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.String>, global::System.Int32> Unary1;
-            public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
-            {
-                this.UnaryReturnNil = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMemoryPackSerializerTestService", "UnaryReturnNil", serializerProvider);
-                this.UnaryParameterless = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IMemoryPackSerializerTestService", "UnaryParameterless", serializerProvider);
-                this.Unary1 = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.String>, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IMemoryPackSerializerTestService", "Unary1", serializerProvider);
-            }
-        }
-        
-        readonly ClientCore core;
-        
-        public MemoryPackSerializerTestServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
-        {
-            this.core = new ClientCore(serializerProvider);
-        }
-        
-        private MemoryPackSerializerTestServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
-        {
-            this.core = core;
-        }
-        
-        protected override global::MagicOnion.Client.MagicOnionClientBase<IMemoryPackSerializerTestService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
-            => new MemoryPackSerializerTestServiceClient(options, core);
-        
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> UnaryReturnNil()
-            => this.core.UnaryReturnNil.InvokeUnary(this, "IMemoryPackSerializerTestService/UnaryReturnNil", global::MessagePack.Nil.Default);
-        public global::MagicOnion.UnaryResult<global::System.Int32> UnaryParameterless()
-            => this.core.UnaryParameterless.InvokeUnary(this, "IMemoryPackSerializerTestService/UnaryParameterless", global::MessagePack.Nil.Default);
-        public global::MagicOnion.UnaryResult<global::System.Int32> Unary1(global::System.Int32 arg0, global::System.Int32 arg1, global::System.Int32 arg2, global::System.Int32 arg3, global::System.Int32 arg4, global::System.Int32 arg5, global::System.Int32 arg6, global::System.Int32 arg7, global::System.Int32 arg8, global::System.Int32 arg9, global::System.Int32 arg10, global::System.Int32 arg11, global::System.Int32 arg12, global::System.Int32 arg13, global::System.String arg14)
-            => this.core.Unary1.InvokeUnary(this, "IMemoryPackSerializerTestService/Unary1", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.String>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14));
     }
 }
 
@@ -911,103 +853,6 @@ namespace MagicOnion.Integration.Tests
                     base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                     break;
                 case -1197600090: // ValueTask<Int32> ValueTask_Never_With_Return()
-                    base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
-                    break;
-            }
-        }
-        
-    }
-}
-
-namespace MagicOnion.Integration.Tests.MemoryPack
-{
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-    
-    [global::MagicOnion.Ignore]
-    public class MemoryPackSerializerTestHubClient : global::MagicOnion.Client.StreamingHubClientBase<global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHubReceiver>, global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub
-    {
-        protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
-        
-        public MemoryPackSerializerTestHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
-            : base(callInvoker, host, options, serializerProvider, logger)
-        {
-            var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
-            DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "IMemoryPackSerializerTestHub", "Connect", marshaller, marshaller);
-        }
-        
-        public global::System.Threading.Tasks.Task MethodReturnWithoutValue()
-            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-925124953, global::MessagePack.Nil.Default);
-        public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameterless()
-            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32>(-545082062, global::MessagePack.Nil.Default);
-        public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameter_One(global::System.Int32 arg0)
-            => base.WriteMessageWithResponseAsync<global::System.Int32, global::System.Int32>(85995236, arg0);
-        public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameter_Many(global::System.Int32 arg0, global::System.String arg1)
-            => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(1242061127, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
-        public global::System.Threading.Tasks.Task<global::System.Int32> Callback(global::System.Int32 arg0, global::System.String arg1)
-            => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(-2118022106, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
-        
-        public global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub FireAndForget()
-            => new FireAndForgetClient(this);
-        
-        [global::MagicOnion.Ignore]
-        class FireAndForgetClient : global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub
-        {
-            readonly MemoryPackSerializerTestHubClient parent;
-        
-            public FireAndForgetClient(MemoryPackSerializerTestHubClient parent)
-                => this.parent = parent;
-        
-            public global::MagicOnion.Integration.Tests.MemoryPack.IMemoryPackSerializerTestHub FireAndForget() => this;
-            public global::System.Threading.Tasks.Task DisposeAsync() => throw new global::System.NotSupportedException();
-            public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
-        
-            public global::System.Threading.Tasks.Task MethodReturnWithoutValue()
-                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-925124953, global::MessagePack.Nil.Default);
-            public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameterless()
-                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::System.Int32>(-545082062, global::MessagePack.Nil.Default);
-            public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameter_One(global::System.Int32 arg0)
-                => parent.WriteMessageFireAndForgetAsync<global::System.Int32, global::System.Int32>(85995236, arg0);
-            public global::System.Threading.Tasks.Task<global::System.Int32> MethodParameter_Many(global::System.Int32 arg0, global::System.String arg1)
-                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(1242061127, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
-            public global::System.Threading.Tasks.Task<global::System.Int32> Callback(global::System.Int32 arg0, global::System.String arg1)
-                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(-2118022106, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
-            
-        }
-        
-        protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
-        {
-            switch (methodId)
-            {
-                case -1262822265: // Void OnMessage(global::System.Int32 arg0, global::System.String arg1)
-                    {
-                        var value = base.Deserialize<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>>(data);
-                        receiver.OnMessage(value.Item1, value.Item2);
-                    }
-                    break;
-            }
-        }
-        
-        protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
-        {
-            switch (methodId)
-            {
-                case -925124953: // Task MethodReturnWithoutValue()
-                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
-                    break;
-                case -545082062: // Task<Int32> MethodParameterless()
-                    base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
-                    break;
-                case 85995236: // Task<Int32> MethodParameter_One(global::System.Int32 arg0)
-                    base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
-                    break;
-                case 1242061127: // Task<Int32> MethodParameter_Many(global::System.Int32 arg0, global::System.String arg1)
-                    base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
-                    break;
-                case -2118022106: // Task<Int32> Callback(global::System.Int32 arg0, global::System.String arg1)
                     base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
                     break;
             }
