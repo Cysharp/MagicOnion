@@ -8,16 +8,25 @@ namespace MagicOnion.Serialization.MemoryPack
 {
     public class MemoryPackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
     {
-        public static IMagicOnionSerializerProvider Instance { get; } = new MemoryPackMagicOnionSerializerProvider();
+        readonly MemoryPackSerializerOptions serializerOptions;
+        public static MemoryPackMagicOnionSerializerProvider Instance { get; } = new MemoryPackMagicOnionSerializerProvider(MemoryPackSerializerOptions.Default);
+
+        MemoryPackMagicOnionSerializerProvider(MemoryPackSerializerOptions serializerOptions)
+        {
+            this.serializerOptions = serializerOptions;
+        }
 
         static MemoryPackMagicOnionSerializerProvider()
         {
             DynamicArgumentTupleFormatter.Register();
         }
 
+        public MemoryPackMagicOnionSerializerProvider WithOptions(MemoryPackSerializerOptions serializerOptions)
+            => new MemoryPackMagicOnionSerializerProvider(serializerOptions);
+
         public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
         {
-            return new MagicOnionSerializer(MemoryPackSerializerOptions.Default);
+            return new MagicOnionSerializer(serializerOptions);
         }
 
         class MagicOnionSerializer : IMagicOnionSerializer
