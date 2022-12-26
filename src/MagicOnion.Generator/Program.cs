@@ -21,7 +21,8 @@ public class Program
         [Option("n", "The namespace of clients to generate.")]string @namespace = "MagicOnion",
         [Option("m", "The namespace of pre-generated MessagePackFormatters.")]string messagepackFormatterNamespace = "MessagePack.Formatters",
         [Option("c", "The conditional compiler symbols used during code analysis. The value is split by ','.")]string conditionalSymbol = null,
-        [Option("v", "Enable verbose logging")]bool verbose = false
+        [Option("v", "Enable verbose logging")]bool verbose = false,
+        [Option("s", "The serializer used for message serialization")] SerializerType serializer = SerializerType.MessagePack
     )
     {
         await new MagicOnionCompiler(new MagicOnionGeneratorConsoleLogger(verbose), ctx.CancellationToken)
@@ -31,6 +32,7 @@ public class Program
                 disableAutoRegister,
                 @namespace,
                 conditionalSymbol,
-                messagepackFormatterNamespace);
+                messagepackFormatterNamespace,
+                serializer);
     }
 }

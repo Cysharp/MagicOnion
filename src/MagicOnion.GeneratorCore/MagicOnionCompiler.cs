@@ -9,8 +9,15 @@ using MagicOnion.Generator.CodeGen;
 using MagicOnion.Generator.Utils;
 using MagicOnion.Generator.CodeGen.Extensions;
 using MagicOnion.Generator.Internal;
+using System.Collections.Generic;
 
 namespace MagicOnion.Generator;
+
+public enum SerializerType
+{
+    MessagePack,
+    MemoryPack,
+}
 
 public class MagicOnionCompiler
 {
@@ -31,7 +38,8 @@ public class MagicOnionCompiler
         bool disableAutoRegister,
         string @namespace,
         string conditionalSymbol,
-        string userDefinedMessagePackFormattersNamespace)
+        string userDefinedFormattersNamespace,
+        SerializerType serializerType)
     {
         // Prepare args
         var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
@@ -43,11 +51,36 @@ public class MagicOnionCompiler
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:DisableAutoRegister: {disableAutoRegister}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {@namespace}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedMessagePackFormattersNamespace: {userDefinedMessagePackFormattersNamespace}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedFormattersNamespace: {userDefinedFormattersNamespace}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:SerializerType: {serializerType}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Assembly version: {typeof(MagicOnionCompiler).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.OSDescription: {RuntimeInformation.OSDescription}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.FrameworkDescription: {RuntimeInformation.FrameworkDescription}");
+
+        // Configure serialization
+        var serialization = serializerType switch
+        {
+            SerializerType.MemoryPack => (
+                Mapper: (ISerializationFormatterNameMapper)new MemoryPackFormatterNameMapper(),
+                Namespace: @namespace,
+                InitializerName: "MagicOnionMemoryPackFormatterProvider",
+                Generator: (ISerializerFormatterGenerator)new MemoryPackFormatterRegistrationGenerator(),
+                EnumFormatterGenerator: (Func<IEnumerable<EnumSerializationInfo>, string>)(enumSerializationInfo => string.Empty)
+            ),
+            SerializerType.MessagePack => (
+                Mapper: (ISerializationFormatterNameMapper)new MessagePackFormatterNameMapper(userDefinedFormattersNamespace),
+                Namespace: namespaceDot + "Resolvers",
+                InitializerName: "MagicOnionResolver",
+                Generator: (ISerializerFormatterGenerator)new MessagePackFormatterResolverGenerator(),
+                EnumFormatterGenerator: (Func<IEnumerable<EnumSerializationInfo>, string>)(enumSerializationInfo => new EnumTemplate()
+                {
+                    Namespace = namespaceDot + "Formatters",
+                    EnumSerializationInfos = enumSerializationInfo.ToArray()
+                }.TransformText())
+            ),
+            _ => throw new NotImplementedException(),
+        };
 
         var sw = Stopwatch.StartNew();
         logger.Information("Project Compilation Start:" + input);
@@ -62,21 +95,13 @@ public class MagicOnionCompiler
             
         sw.Restart();
         logger.Information("Collect serialization information Start");
-        var serializationInfoCollector = new SerializationInfoCollector(logger);
-        var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection, userDefinedMessagePackFormattersNamespace);
+        var serializationInfoCollector = new SerializationInfoCollector(logger, serialization.Mapper);
+        var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection);
         logger.Information("Collect serialization information Complete:" + sw.Elapsed.ToString());
 
         logger.Information("Output Generation Start");
         sw.Restart();
-
-        var resolverTemplate = new ResolverTemplate()
-        {
-            Namespace = namespaceDot + "Resolvers",
-            FormatterNamespace = namespaceDot + "Formatters",
-            ResolverName = "MagicOnionResolver",
-            RegisterInfos = serializationInfoCollection.RequireRegistrationFormatters,
-        };
-
+        
         var registerTemplate = new RegisterTemplate
         {
             Namespace = @namespace,
@@ -85,16 +110,14 @@ public class MagicOnionCompiler
             DisableAutoRegisterOnInitialize = disableAutoRegister,
         };
 
+        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters);
+        var resolverTexts = serialization.Generator.Build(formatterCodeGenContext);
+
         if (Path.GetExtension(output) == ".cs")
         {
-            var enumTemplates = serializationInfoCollection.Enums
+            var enums = serializationInfoCollection.Enums
                 .GroupBy(x => x.Namespace)
                 .OrderBy(x => x.Key)
-                .Select(x => new EnumTemplate()
-                {
-                    Namespace = namespaceDot + "Formatters",
-                    EnumSerializationInfos = x.ToArray()
-                })
                 .ToArray();
 
             var clientTexts = StaticMagicOnionClientGenerator.Build(serviceCollection.Services);
@@ -103,10 +126,10 @@ public class MagicOnionCompiler
             var sb = new StringBuilder();
             sb.AppendLine("// <auto-generated />");
             sb.AppendLine(registerTemplate.TransformText());
-            sb.AppendLine(resolverTemplate.TransformText());
-            foreach (var item in enumTemplates)
+            sb.AppendLine(resolverTexts);
+            foreach (var item in enums)
             {
-                sb.AppendLine(item.TransformText());
+                sb.AppendLine(serialization.EnumFormatterGenerator(item));
             }
 
             sb.AppendLine(clientTexts);
@@ -117,17 +140,11 @@ public class MagicOnionCompiler
         else
         {
             Output(NormalizePath(output, registerTemplate.Namespace, "MagicOnionInitializer"), WithAutoGenerated(registerTemplate.TransformText()));
-            Output(NormalizePath(output, resolverTemplate.Namespace, resolverTemplate.ResolverName), WithAutoGenerated(resolverTemplate.TransformText()));
+            Output(NormalizePath(output, formatterCodeGenContext.Namespace, formatterCodeGenContext.InitializerName), WithAutoGenerated(resolverTexts));
 
             foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
             {
-                var x = new EnumTemplate()
-                {
-                    Namespace = namespaceDot + "Formatters",
-                    EnumSerializationInfos = new[] { enumSerializationInfo }
-                };
-
-                Output(NormalizePath(output, x.Namespace, enumSerializationInfo.Name + "Formatter"), WithAutoGenerated(x.TransformText()));
+                Output(NormalizePath(output, namespaceDot + "Formatters", enumSerializationInfo.Name + "Formatter"), WithAutoGenerated(serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
             }
 
             foreach (var service in serviceCollection.Services)

@@ -47,7 +47,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -98,7 +99,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -150,7 +152,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -237,7 +240,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -321,7 +325,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -378,7 +383,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {
@@ -452,7 +458,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         {

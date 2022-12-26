@@ -41,7 +41,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         var compilation = tempWorkspace.GetOutputCompilation();
@@ -81,7 +82,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         var compilation = tempWorkspace.GetOutputCompilation();
@@ -120,7 +122,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         var compilation = tempWorkspace.GetOutputCompilation();
@@ -159,7 +162,8 @@ namespace TempProject
             true,
             "TempProject.Generated",
             "",
-            "MessagePack.Formatters"
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
         );
 
         var compilation = tempWorkspace.GetOutputCompilation();

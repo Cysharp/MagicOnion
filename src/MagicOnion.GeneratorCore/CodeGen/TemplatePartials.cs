@@ -16,14 +16,6 @@ public partial class RegisterTemplate
     public IReadOnlyList<MagicOnionStreamingHubInfo> Hubs { get; set; }
 }
 
-public partial class ResolverTemplate
-{
-    public string Namespace { get; set; }
-    public string FormatterNamespace { get; set; }
-    public string ResolverName  { get; set; } = "GeneratedResolver";
-    public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> RegisterInfos { get; set; }
-}
-
 public partial class EnumTemplate
 {
     public string Namespace { get; set; }

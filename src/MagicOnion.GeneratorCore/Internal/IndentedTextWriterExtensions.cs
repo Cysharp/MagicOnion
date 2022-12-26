@@ -12,24 +12,26 @@ internal static class IndentedTextWriterExtensions
         }
     }
 
-    public static IndentedBlock BeginIndent(this IndentedTextWriter textWriter)
+    public static IndentedBlock BeginIndent(this IndentedTextWriter textWriter, int depth = 1)
     {
-        textWriter.Indent++;
-        return new IndentedBlock(textWriter);
+        textWriter.Indent += depth;
+        return new IndentedBlock(textWriter, depth);
     }
 
     public readonly struct IndentedBlock : IDisposable
     {
         readonly IndentedTextWriter textWriter;
+        readonly int depth;
 
-        public IndentedBlock(IndentedTextWriter textWriter)
+        public IndentedBlock(IndentedTextWriter textWriter, int depth)
         {
             this.textWriter = textWriter;
+            this.depth = depth;
         }
 
         public void Dispose()
         {
-            textWriter.Indent--;
+            textWriter.Indent -= depth;
         }
     }
 
