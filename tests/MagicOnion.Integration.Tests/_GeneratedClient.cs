@@ -129,30 +129,23 @@ namespace MagicOnion.Integration.Tests.Generated
 #pragma warning disable 8603 // Possible null reference return.
 #pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
 #pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
-
 namespace MagicOnion.Integration.Tests.Generated.Resolvers
 {
-    using System;
-    using MessagePack;
-
+    using global::System;
+    using global::MessagePack;
     public class MagicOnionResolver : global::MessagePack.IFormatterResolver
     {
         public static readonly global::MessagePack.IFormatterResolver Instance = new MagicOnionResolver();
-
-        MagicOnionResolver()
-        {
-
-        }
-
+    
+        MagicOnionResolver() {}
+    
         public global::MessagePack.Formatters.IMessagePackFormatter<T> GetFormatter<T>()
-        {
-            return FormatterCache<T>.formatter;
-        }
-
+            => FormatterCache<T>.formatter;
+    
         static class FormatterCache<T>
         {
             public static readonly global::MessagePack.Formatters.IMessagePackFormatter<T> formatter;
-
+    
             static FormatterCache()
             {
                 var f = MagicOnionResolverGetFormatterHelper.GetFormatter(typeof(T));
@@ -163,14 +156,13 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
             }
         }
     }
-
     internal static class MagicOnionResolverGetFormatterHelper
     {
-        static readonly global::System.Collections.Generic.Dictionary<Type, int> lookup;
-
+        static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> lookup;
+    
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(5)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(5)
             {
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>), 0 },
                 {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>), 1 },
@@ -179,7 +171,6 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
                 {typeof(global::System.ValueTuple<global::System.Int32, global::System.Int32>), 4 },
             };
         }
-
         internal static object GetFormatter(Type t)
         {
             int key;
@@ -187,7 +178,7 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
             {
                 return null;
             }
-
+        
             switch (key)
             {
                 case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>(default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32), default(global::System.Int32));
@@ -200,7 +191,6 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
         }
     }
 }
-
 #pragma warning restore 168
 #pragma warning restore 219
 #pragma warning restore 414
