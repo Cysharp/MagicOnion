@@ -1,7 +1,7 @@
 namespace MagicOnion.Generator.CodeAnalysis;
 
 // MessagePack Definitions
-public interface IMessagePackFormatterResolverRegisterInfo
+public interface ISerializationFormatterRegisterInfo
 {
     string FullName { get; }
     string FormatterName { get; }
@@ -10,7 +10,7 @@ public interface IMessagePackFormatterResolverRegisterInfo
     bool HasIfDirectiveConditions { get; }
 }
 
-public class GenericSerializationInfo : IMessagePackFormatterResolverRegisterInfo
+public class GenericSerializationInfo : ISerializationFormatterRegisterInfo
 {
     public string FullName { get; }
 
@@ -27,7 +27,7 @@ public class GenericSerializationInfo : IMessagePackFormatterResolverRegisterInf
     }
 }
 
-public class EnumSerializationInfo : IMessagePackFormatterResolverRegisterInfo
+public class EnumSerializationInfo : ISerializationFormatterRegisterInfo
 {
     public string Namespace { get; }
     public string Name { get;}

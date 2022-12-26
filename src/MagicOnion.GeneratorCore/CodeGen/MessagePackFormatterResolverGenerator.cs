@@ -7,34 +7,9 @@ using MagicOnion.Generator.Internal;
 
 namespace MagicOnion.Generator.CodeGen;
 
-public class MessagePackFormatterCodeGenContext
+internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGenerator
 {
-    readonly StringWriter underlyingWriter;
-
-    public string Namespace { get; }
-    public string FormatterNamespace { get; }
-    public string ResolverName { get; }
-    public IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> ResolverRegistrations { get; }
-
-    public IndentedTextWriter TextWriter { get; }
-
-    public MessagePackFormatterCodeGenContext(string @namespace, string formatterNamespace, string resolverName, IReadOnlyList<IMessagePackFormatterResolverRegisterInfo> resolverRegistrations)
-    {
-        Namespace = @namespace;
-        FormatterNamespace = formatterNamespace;
-        ResolverName = resolverName;
-        ResolverRegistrations = resolverRegistrations;
-
-        underlyingWriter = new StringWriter();
-        TextWriter = new IndentedTextWriter(underlyingWriter);
-    }
-
-    public string GetWrittenText() => underlyingWriter.ToString();
-}
-
-internal class MessagePackFormatterResolverGenerator
-{
-    public static string Build(MessagePackFormatterCodeGenContext ctx)
+    public string Build(SerializationFormatterCodeGenContext ctx)
     {
         EmitPreamble(ctx);
         EmitBody(ctx);
@@ -43,7 +18,7 @@ internal class MessagePackFormatterResolverGenerator
         return ctx.GetWrittenText();
     }
 
-    static void EmitPreamble(MessagePackFormatterCodeGenContext ctx)
+    static void EmitPreamble(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines("""
         #pragma warning disable 618
@@ -60,7 +35,7 @@ internal class MessagePackFormatterResolverGenerator
         """);
     }
 
-    static void EmitBody(MessagePackFormatterCodeGenContext ctx)
+    static void EmitBody(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
         namespace {{ctx.Namespace}}
@@ -80,14 +55,14 @@ internal class MessagePackFormatterResolverGenerator
         """);
     }
 
-    static void EmitResolver(MessagePackFormatterCodeGenContext ctx)
+    static void EmitResolver(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        public class {{ctx.ResolverName}} : global::MessagePack.IFormatterResolver
+        public class {{ctx.InitializerName}} : global::MessagePack.IFormatterResolver
         {
-            public static readonly global::MessagePack.IFormatterResolver Instance = new {{ctx.ResolverName}}();
+            public static readonly global::MessagePack.IFormatterResolver Instance = new {{ctx.InitializerName}}();
 
-            {{ctx.ResolverName}}() {}
+            {{ctx.InitializerName}}() {}
 
             public global::MessagePack.Formatters.IMessagePackFormatter<T> GetFormatter<T>()
                 => FormatterCache<T>.formatter;
@@ -98,7 +73,7 @@ internal class MessagePackFormatterResolverGenerator
 
                 static FormatterCache()
                 {
-                    var f = {{ctx.ResolverName}}GetFormatterHelper.GetFormatter(typeof(T));
+                    var f = {{ctx.InitializerName}}GetFormatterHelper.GetFormatter(typeof(T));
                     if (f != null)
                     {
                         formatter = (global::MessagePack.Formatters.IMessagePackFormatter<T>)f;
@@ -109,16 +84,16 @@ internal class MessagePackFormatterResolverGenerator
         """);
     }
 
-    static void EmitGetFormatterHelper(MessagePackFormatterCodeGenContext ctx)
+    static void EmitGetFormatterHelper(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines($$"""
-        internal static class {{ctx.ResolverName}}GetFormatterHelper
+        internal static class {{ctx.InitializerName}}GetFormatterHelper
         {
             static readonly global::System.Collections.Generic.Dictionary<global::System.Type, int> lookup;
 
-            static {{ctx.ResolverName}}GetFormatterHelper()
+            static {{ctx.InitializerName}}GetFormatterHelper()
             {
-                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>({{ctx.ResolverRegistrations.Count}})
+                lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>({{ctx.FormatterRegistrations.Count}})
                 {
         """);
         using (ctx.TextWriter.BeginIndent())
@@ -127,7 +102,7 @@ internal class MessagePackFormatterResolverGenerator
             {
                 using (ctx.TextWriter.BeginIndent())
                 {
-                    foreach (var (resolverInfo, index) in ctx.ResolverRegistrations.Select((x, i) => (x, i)))
+                    foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
                     {
                         using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
                         {
@@ -157,7 +132,7 @@ internal class MessagePackFormatterResolverGenerator
             {
                 using (ctx.TextWriter.BeginIndent())
                 {
-                    foreach (var (resolverInfo, index) in ctx.ResolverRegistrations.Select((x, i) => (x, i)))
+                    foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
                     {
                         using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
                         {
@@ -175,7 +150,7 @@ internal class MessagePackFormatterResolverGenerator
         ctx.TextWriter.WriteLine("}");
     }
 
-    static void EmitPostscript(MessagePackFormatterCodeGenContext ctx)
+    static void EmitPostscript(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines("""
         #pragma warning restore 168

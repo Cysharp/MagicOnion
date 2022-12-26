@@ -6,7 +6,7 @@ using MemoryPack;
 
 namespace MagicOnion.Serialization.MemoryPack
 {
-    public class MemoryPackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
+    public partial class MemoryPackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
     {
         readonly MemoryPackSerializerOptions serializerOptions;
         public static MemoryPackMagicOnionSerializerProvider Instance { get; } = new MemoryPackMagicOnionSerializerProvider(MemoryPackSerializerOptions.Default);

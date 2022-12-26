@@ -7,7 +7,7 @@ using MemoryPack;
 
 namespace MagicOnion.Serialization.MemoryPack
 {
-    internal static class DynamicArgumentTupleFormatter
+    public static class DynamicArgumentTupleFormatter
     {
         static bool isRegistered = false;
         public static void Register()
@@ -32,10 +32,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?> value)
 #else
@@ -51,7 +51,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item2);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?> value)
 #else
@@ -71,10 +71,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?> value)
 #else
@@ -91,7 +91,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item3);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?> value)
 #else
@@ -112,10 +112,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?> value)
 #else
@@ -133,7 +133,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item4);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?> value)
 #else
@@ -155,10 +155,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?> value)
 #else
@@ -177,7 +177,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item5);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?> value)
 #else
@@ -200,10 +200,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?> value)
 #else
@@ -223,7 +223,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item6);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?> value)
 #else
@@ -247,10 +247,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?> value)
 #else
@@ -271,7 +271,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item7);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?> value)
 #else
@@ -296,10 +296,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?> value)
 #else
@@ -321,7 +321,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item8);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?> value)
 #else
@@ -347,10 +347,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?> value)
 #else
@@ -373,7 +373,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item9);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?> value)
 #else
@@ -400,10 +400,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?> value)
 #else
@@ -427,7 +427,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item10);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?> value)
 #else
@@ -455,10 +455,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?> value)
 #else
@@ -483,7 +483,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item11);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?> value)
 #else
@@ -512,10 +512,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?> value)
 #else
@@ -541,7 +541,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item12);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?> value)
 #else
@@ -571,10 +571,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?> value)
 #else
@@ -601,7 +601,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item13);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?> value)
 #else
@@ -632,10 +632,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?> value)
 #else
@@ -663,7 +663,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item14);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?> value)
 #else
@@ -695,10 +695,10 @@ namespace MagicOnion.Serialization.MemoryPack
         }
     }
 
-    [Preserve]
-    internal class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?, T15?>>
+    [global::MagicOnion.Serialization.MemoryPack.Preserve]
+    public class DynamicArgumentTupleFormatter<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : MemoryPackFormatter<DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?, T15?>>
     {
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?, T15?> value)
 #else
@@ -727,7 +727,7 @@ namespace MagicOnion.Serialization.MemoryPack
             writer.WriteValue(value.Item15);
         }
 
-        [Preserve]
+        [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if FALSE && UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, T9?, T10?, T11?, T12?, T13?, T14?, T15?> value)
 #else
