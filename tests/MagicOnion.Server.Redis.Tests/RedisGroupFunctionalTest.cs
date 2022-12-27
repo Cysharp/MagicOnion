@@ -73,18 +73,19 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
     public async Task RemoveMemberFromInMemoryGroup_CounterKeyIsNotDeleted()
     {
         // Arrange
+        var groupName = nameof(RemoveMemberFromInMemoryGroup_CounterKeyIsNotDeleted);
         // Client-1 on Server-1
         var httpClient1 = factory.CreateDefaultClient();
         var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
         var receiver1 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1.Object);
-        await client1.JoinAsync("group-1");
+        await client1.JoinAsync(groupName);
         // Client-2 on Server-2
         var httpClient2 = factory2.CreateDefaultClient();
         var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
         var receiver2 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client2 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel2, receiver2.Object);
-        await client2.JoinAsync("group-1");
+        await client2.JoinAsync(groupName);
 
         // Act
         var beforeCount = (await client1.GetMemberCountAsync());
@@ -100,24 +101,25 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
     public async Task RemoveMemberFromInMemoryGroup_KeepSubscription()
     {
         // Arrange
+        var groupName = nameof(RemoveMemberFromInMemoryGroup_KeepSubscription);
         // Client-1 on Server-1
         var httpClient1 = factory.CreateDefaultClient();
         var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
         var receiver1 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1.Object);
-        await client1.JoinAsync("group-1");
+        await client1.JoinAsync(groupName);
         // Client-2 on Server-2
         var httpClient2 = factory2.CreateDefaultClient();
         var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
         var receiver2 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client2 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel2, receiver2.Object);
-        await client2.JoinAsync("group-1");
+        await client2.JoinAsync(groupName);
         // Client-3 on Server-2 (same as Client-2)
         var httpClient3 = factory2.CreateDefaultClient();
         var channel3 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient3 });
         var receiver3 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client3 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel3, receiver3.Object);
-        await client3.JoinAsync("group-1");
+        await client3.JoinAsync(groupName);
 
         // Act
         await client2.LeaveAsync(); // Leave Client-2 from the group on Server-2.
