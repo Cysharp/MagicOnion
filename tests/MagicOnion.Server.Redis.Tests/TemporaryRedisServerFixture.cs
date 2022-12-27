@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+using System.Net.Sockets;
 using System.Net;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
@@ -20,6 +20,8 @@ public class TemporaryRedisServerFixture : IAsyncLifetime
     {
         container = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage("redis")
+             // WORKAROUND: `assignRandomHostPort` on Windows, a port within the range of `excludedport` setting may be selected.
+             //             We get an available port from the operating system.
             .WithPortBinding(Port, 6379)
             .Build();
 
