@@ -11,6 +11,7 @@
     <!-- NuGet -->
     <PackageId>MagicOnion.Serialization.MemoryPack</PackageId>
     <Description>MagicOnion extension package for serialization using MemoryPack.</Description>
+    <VersionSuffix>preview</VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
