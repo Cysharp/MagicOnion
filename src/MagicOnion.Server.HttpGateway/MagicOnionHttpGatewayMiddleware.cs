@@ -6,6 +6,7 @@ using Microsoft.Extensions.Primitives;
 using System.Text;
 using Grpc.Net.Client;
 using Newtonsoft.Json;
+using MessagePack;
 
 namespace MagicOnion.Server.HttpGateway;
 
@@ -121,7 +122,15 @@ public class MagicOnionHttpGatewayMiddleware
                 {
                     body = "[]";
                 }
-                deserializedObject = Newtonsoft.Json.JsonConvert.DeserializeObject(body, handler.RequestType);
+
+                if (handler.RequestType == typeof(Nil) && string.IsNullOrWhiteSpace(body))
+                {
+                    deserializedObject = Nil.Default;
+                }
+                else
+                {
+                    deserializedObject = Newtonsoft.Json.JsonConvert.DeserializeObject(body, handler.RequestType);
+                }
             }
 
             // JSON to C# Object to MessagePack
@@ -157,7 +166,7 @@ public class MagicOnionHttpGatewayMiddleware
 
     static object Deserialize(MethodHandler handler, Type t, byte[] serializedData)
     {
-        var method = typeof(MagicOnionHttpGatewayMiddleware).GetMethod(nameof(DeserializeCore), BindingFlags.NonPublic | BindingFlags.Static)!;
+        var method = typeof(MagicOnionHttpGatewayMiddleware).GetMethod(nameof(DeserializeCore), BindingFlags.NonPublic | BindingFlags.Static)!.MakeGenericMethod(t);
         return method.Invoke(null, new object[] { handler, serializedData });
     }
     static T DeserializeCore<T>(MethodHandler handler, byte[] serializedData)
