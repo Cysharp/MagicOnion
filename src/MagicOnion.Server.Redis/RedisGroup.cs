@@ -83,7 +83,7 @@ public class RedisGroup : IGroup
 
     public async ValueTask AddAsync(ServiceContext context)
     {
-        await database.StringIncrementAsync(counterKey, 1).ConfigureAwait(false);
+        await database.StringIncrementAsync(counterKey).ConfigureAwait(false);
         await inmemoryGroup.AddAsync(context).ConfigureAwait(false);
     }
 
@@ -91,13 +91,17 @@ public class RedisGroup : IGroup
     {
         if (await inmemoryGroup.RemoveAsync(context)) // if inmemoryGroup.Remove succeed, removed from.RedisGroupRepository.
         {
-            await database.KeyDeleteAsync(counterKey).ConfigureAwait(false);
+            if (await database.StringDecrementAsync(counterKey) == 0)
+            {
+                await database.KeyDeleteAsync(counterKey).ConfigureAwait(false);
+            }
             await mq.UnsubscribeAsync();
+
             return true;
         }
         else
         {
-            await database.StringIncrementAsync(counterKey, -1).ConfigureAwait(false);
+            await database.StringDecrementAsync(counterKey).ConfigureAwait(false);
         }
 
         return false;
