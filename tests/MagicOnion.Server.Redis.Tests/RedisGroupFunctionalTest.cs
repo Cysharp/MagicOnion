@@ -46,13 +46,13 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
     public async Task Broadcast()
     {
         // Arrange
-        // Client-1
+        // Client-1 on Server-1
         var httpClient1 = factory.CreateDefaultClient();
         var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
         var receiver1 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1.Object);
         await client1.JoinAsync("group-1");
-        // Client-2
+        // Client-2 on Server-2
         var httpClient2 = factory2.CreateDefaultClient();
         var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
         var receiver2 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
@@ -70,16 +70,16 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
     }
 
     [Fact]
-    public async Task RemoveMemberFromGroup_CounterKeyIsNotDeleted()
+    public async Task RemoveMemberFromInMemoryGroup_CounterKeyIsNotDeleted()
     {
         // Arrange
-        // Client-1
+        // Client-1 on Server-1
         var httpClient1 = factory.CreateDefaultClient();
         var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
         var receiver1 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
         var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1.Object);
         await client1.JoinAsync("group-1");
-        // Client-2
+        // Client-2 on Server-2
         var httpClient2 = factory2.CreateDefaultClient();
         var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
         var receiver2 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
@@ -89,10 +89,43 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
         // Act
         var beforeCount = (await client1.GetMemberCountAsync());
         await client2.LeaveAsync(); // Leave Client-2 from the group.
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
 
         // Assert
         beforeCount.Should().Be(2);
         (await client1.GetMemberCountAsync()).Should().Be(1);
+    }
+    
+    [Fact]
+    public async Task RemoveMemberFromInMemoryGroup_KeepSubscription()
+    {
+        // Arrange
+        // Client-1 on Server-1
+        var httpClient1 = factory.CreateDefaultClient();
+        var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
+        var receiver1 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
+        var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1.Object);
+        await client1.JoinAsync("group-1");
+        // Client-2 on Server-2
+        var httpClient2 = factory2.CreateDefaultClient();
+        var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
+        var receiver2 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
+        var client2 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel2, receiver2.Object);
+        await client2.JoinAsync("group-1");
+        // Client-3 on Server-2 (same as Client-2)
+        var httpClient3 = factory2.CreateDefaultClient();
+        var channel3 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient3 });
+        var receiver3 = new Mock<IRedisGroupFunctionalTestHubReceiver>();
+        var client3 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel3, receiver3.Object);
+        await client3.JoinAsync("group-1");
+
+        // Act
+        await client2.LeaveAsync(); // Leave Client-2 from the group on Server-2.
+        await client1.CallAsync(123); // Client-1 --> Server-1 --> Redis --> Server-2 --> Client-3
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver3.Verify(x => x.OnMessage(123)); //
     }
 }
 
