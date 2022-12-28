@@ -41,67 +41,29 @@ MagicOnion client supports a wide range of platforms, including .NET Framework 4
 ## Quick Start
 ### Server-side project
 #### Setup a project for MagicOnion
-First, you need to create a **gRPC Service** project from within Visual Studio or the .NET CLI tools. MagicOnion Server is built on top of ASP.NET Core and gRPC, so the server project must be an ASP.NET Core project.
-
-When you create a project, it contains `Protos` and `Services` folders, which are not needed in MagicOnion projects and should be removed.
-
-Add NuGet package `MagicOnion.Server` to your project. If you are using the .NET CLI tools to add it, you can run the following command.
+Start from minimal API(details: [Tutorial: Create a minimal web API with ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api)) so create **ASP.NET Core Empty** template and Add NuGet package `Grpc.AspNetCore` and `MagicOnion.Server` to your project. If you are using the .NET CLI tools to add it, you can run the following command.
 
 ```bash
+dotnet add package Grpc.AspNetCore
 dotnet add package MagicOnion.Server
 ```
 
-Open Startup.cs and add the following line to `ConfigureServices` method.
+Open `Program.cs` and add some configuration to Services and App.
 
 ```csharp
-services.AddMagicOnion();
-```
+using MagicOnion;
+using MagicOnion.Server;
 
-`app.UseEndpoints` call in `Configure` method is rewritten as follows.
+var builder = WebApplication.CreateBuilder(args);
 
-```csharp
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapMagicOnionService();
+builder.Services.AddGrpc();       // Add this line(Grpc.AspNetCore)
+builder.Services.AddMagicOnion(); // Add this line(MagicOnion.Server)
 
-    endpoints.MapGet("/", async context =>
-    {
-        await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-    });
-});
-```
+var app = builder.Build();
 
-The complete Startup.cs will look like this:
+app.MapMagicOnionService(); // Add this line
 
-```csharp
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-namespace MyApp
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddGrpc();
-            services.AddMagicOnion(); // Add this line
-        }
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                // Replace to this line instead of MapGrpcService<GreeterService>()
-                endpoints.MapMagicOnionService();
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-                });
-            });
-        }
-    }
-}
+app.Run();
 ```
 
 Now you are ready to use MagicOnion on your server project.
