@@ -119,7 +119,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_">StreamingHubClientBase(CallInvoker, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_">StreamingHubClientBase(CallInvoker, String, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -144,12 +144,6 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_receiver">receiver</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_serializerOptions">serializerOptions</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -191,6 +185,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_Deserialize__1_ArraySegment_System_Byte__">Deserialize&lt;T&gt;(ArraySegment&lt;Byte&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_DisposeAsync">DisposeAsync()</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -209,19 +209,25 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_Serialize__1_IBufferWriter_System_Byte____0__">Serialize&lt;T&gt;(IBufferWriter&lt;Byte&gt;, in T)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_SetResultForResponse__1_System_Object_ArraySegment_System_Byte__">SetResultForResponse&lt;TResponse&gt;(Object, ArraySegment&lt;Byte&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WaitForDisconnect">WaitForDisconnect()</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsync__1_System_Int32___0_">WriteMessageAsync&lt;T&gt;(Int32, T)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsyncFireAndForget__2_System_Int32___0_">WriteMessageAsyncFireAndForget&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync__2_System_Int32___0_">WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -238,12 +244,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_StreamingHubClientBase_2__ctor_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_String_CallOptions_MessagePackSerializerOptions_MagicOnion_Client_IMagicOnionClientLogger_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.String,CallOptions,MessagePackSerializerOptions,MagicOnion.Client.IMagicOnionClientLogger)">StreamingHubClientBase(CallInvoker, String, CallOptions, MessagePackSerializerOptions, IMagicOnionClientLogger)</h4>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)">StreamingHubClientBase(CallInvoker, String, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)</code></pre>
   </div>
 
   <section>
@@ -255,7 +261,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>option</code></span> <span class="xref">CallOptions</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
     <dd></dd>
     <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
     <dd></dd>
@@ -334,35 +340,6 @@
   
   
   </section>
-  <section>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_serializerOptions" data-uid="MagicOnion.Client.StreamingHubClientBase`2.serializerOptions">serializerOptions</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected readonly MessagePackSerializerOptions serializerOptions</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">MessagePackSerializerOptions</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <h3 id="properties">Properties
   </h3>
   <section>
@@ -425,6 +402,50 @@
   </dl>
   </section>
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_Deserialize_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.Deserialize*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_Deserialize__1_ArraySegment_System_Byte__" data-uid="MagicOnion.Client.StreamingHubClientBase`2.Deserialize``1(ArraySegment{System.Byte})">Deserialize&lt;T&gt;(ArraySegment&lt;Byte&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected T Deserialize&lt;T&gt;(ArraySegment&lt;byte&gt; bytes)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>bytes</code></span> <span class="xref">ArraySegment</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   
   
@@ -533,6 +554,84 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_Serialize_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.Serialize*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_Serialize__1_IBufferWriter_System_Byte____0__" data-uid="MagicOnion.Client.StreamingHubClientBase`2.Serialize``1(IBufferWriter{System.Byte},``0@)">Serialize&lt;T&gt;(IBufferWriter&lt;Byte&gt;, in T)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void Serialize&lt;T&gt;(IBufferWriter&lt;byte&gt; writer, in T value)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>writer</code></span> <span class="xref">IBufferWriter</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_SetResultForResponse_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.SetResultForResponse*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_SetResultForResponse__1_System_Object_ArraySegment_System_Byte__" data-uid="MagicOnion.Client.StreamingHubClientBase`2.SetResultForResponse``1(System.Object,ArraySegment{System.Byte})">SetResultForResponse&lt;TResponse&gt;(Object, ArraySegment&lt;Byte&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void SetResultForResponse&lt;TResponse&gt;(object taskCompletionSource, ArraySegment&lt;byte&gt; data)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>taskCompletionSource</code></span> <span class="xref">System.Object</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>data</code></span> <span class="xref">ArraySegment</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Client_StreamingHubClientBase_2_WaitForDisconnect_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WaitForDisconnect*"></a>
   <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WaitForDisconnect" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WaitForDisconnect">WaitForDisconnect()</h4>
   <div class="markdown level1 summary"></div>
@@ -563,59 +662,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageAsync*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsync__1_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageAsync``1(System.Int32,``0)">WriteMessageAsync&lt;T&gt;(Int32, T)</h4>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync``2(System.Int32,``0)">WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected async Task WriteMessageAsync&lt;T&gt;(int methodId, T message)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>message</code></span> <span class="xref">T</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>T</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsyncFireAndForget_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageAsyncFireAndForget*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageAsyncFireAndForget__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageAsyncFireAndForget``2(System.Int32,``0)">WriteMessageAsyncFireAndForget&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected async Task&lt;TResponse&gt; WriteMessageAsyncFireAndForget&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+    <pre><code class="lang-csharp hljs">protected async Task&lt;TResponse&gt; WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
   </div>
 
   <section>

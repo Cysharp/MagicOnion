@@ -157,9 +157,9 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_SerializerOptions">SerializerOptions</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_MessageSerializer">MessageSerializer</a>
         </td>
-        <td class="markdown level1 summary"><p>MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).</p>
+        <td class="markdown level1 summary"><p>Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.</p>
 </td>
       </tr>
     </tbody>
@@ -242,7 +242,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IList</span>&lt;<a class="xref" href="MagicOnion.Server.MagicOnionServiceFilterDescriptor.html">MagicOnionServiceFilterDescriptor</a>&gt;</dt>
+    <dt><span class="xref">IList</span>&lt;<a class="xref" href="MagicOnion.Server.Filters.MagicOnionServiceFilterDescriptor.html">MagicOnionServiceFilterDescriptor</a>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -273,7 +273,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">IList</span>&lt;<a class="xref" href="MagicOnion.Server.StreamingHubFilterDescriptor.html">StreamingHubFilterDescriptor</a>&gt;</dt>
+    <dt><span class="xref">IList</span>&lt;<a class="xref" href="MagicOnion.Server.Filters.StreamingHubFilterDescriptor.html">StreamingHubFilterDescriptor</a>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -318,14 +318,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_MagicOnionOptions_SerializerOptions_" data-uid="MagicOnion.Server.MagicOnionOptions.SerializerOptions*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionOptions_SerializerOptions" data-uid="MagicOnion.Server.MagicOnionOptions.SerializerOptions">SerializerOptions</h4>
-  <div class="markdown level1 summary"><p>MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions).</p>
+  <a id="MagicOnion_Server_MagicOnionOptions_MessageSerializer_" data-uid="MagicOnion.Server.MagicOnionOptions.MessageSerializer*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionOptions_MessageSerializer" data-uid="MagicOnion.Server.MagicOnionOptions.MessageSerializer">MessageSerializer</h4>
+  <div class="markdown level1 summary"><p>Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MessagePackSerializerOptions SerializerOptions { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IMagicOnionSerializerProvider MessageSerializer { get; set; }</code></pre>
   </div>
 
   
@@ -335,7 +335,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
     <dd></dd>
   </dl>
   </section>

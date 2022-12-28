@@ -118,7 +118,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.RequestContext-1.html#MagicOnion_Client_RequestContext_1__ctor__0_MagicOnion_Client_MagicOnionClientBase_System_String_CallOptions_Type_MagicOnion_Client_IClientFilter___Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__">RequestContext(T, MagicOnionClientBase, String, CallOptions, Type, IClientFilter[], Func&lt;RequestContext, ResponseContext&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.RequestContext-1.html#MagicOnion_Client_RequestContext_1__ctor__0_MagicOnion_Client_MagicOnionClientBase_System_String_CallOptions_Type_IReadOnlyList_MagicOnion_Client_IClientFilter__Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__">RequestContext(T, MagicOnionClientBase, String, CallOptions, Type, IReadOnlyList&lt;IClientFilter&gt;, Func&lt;RequestContext, ResponseContext&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -153,12 +153,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_RequestContext_1__ctor_" data-uid="MagicOnion.Client.RequestContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_RequestContext_1__ctor__0_MagicOnion_Client_MagicOnionClientBase_System_String_CallOptions_Type_MagicOnion_Client_IClientFilter___Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__" data-uid="MagicOnion.Client.RequestContext`1.#ctor(`0,MagicOnion.Client.MagicOnionClientBase,System.String,CallOptions,Type,MagicOnion.Client.IClientFilter[],Func{MagicOnion.Client.RequestContext,MagicOnion.Client.ResponseContext})">RequestContext(T, MagicOnionClientBase, String, CallOptions, Type, IClientFilter[], Func&lt;RequestContext, ResponseContext&gt;)</h4>
+  <h4 id="MagicOnion_Client_RequestContext_1__ctor__0_MagicOnion_Client_MagicOnionClientBase_System_String_CallOptions_Type_IReadOnlyList_MagicOnion_Client_IClientFilter__Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__" data-uid="MagicOnion.Client.RequestContext`1.#ctor(`0,MagicOnion.Client.MagicOnionClientBase,System.String,CallOptions,Type,IReadOnlyList{MagicOnion.Client.IClientFilter},Func{MagicOnion.Client.RequestContext,MagicOnion.Client.ResponseContext})">RequestContext(T, MagicOnionClientBase, String, CallOptions, Type, IReadOnlyList&lt;IClientFilter&gt;, Func&lt;RequestContext, ResponseContext&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RequestContext(T request, MagicOnionClientBase client, string methodPath, CallOptions callOptions, Type responseType, IClientFilter[] filters, Func&lt;RequestContext, ResponseContext&gt; requestMethod)</code></pre>
+    <pre><code class="lang-csharp hljs">public RequestContext(T request, MagicOnionClientBase client, string methodPath, CallOptions callOptions, Type responseType, IReadOnlyList&lt;IClientFilter&gt; filters, Func&lt;RequestContext, ResponseContext&gt; requestMethod)</code></pre>
   </div>
 
   <section>
@@ -174,7 +174,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>responseType</code></span> <span class="xref">Type</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>filters</code></span> <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
+    <dt><span class="parametername"><code>filters</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>requestMethod</code></span> <span class="xref">Func</span>&lt;<a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a>, <a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;</dt>
     <dd></dd>

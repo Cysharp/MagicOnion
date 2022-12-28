@@ -118,13 +118,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1__ctor">MagicOnionClientBase()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1__ctor_CallInvoker_MessagePackSerializerOptions_MagicOnion_Client_IClientFilter___">MagicOnionClientBase(CallInvoker, MessagePackSerializerOptions, IClientFilter[])</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1__ctor_MagicOnion_Client_MagicOnionClientOptions_">MagicOnionClientBase(MagicOnionClientOptions)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -142,19 +136,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1_Clone">Clone()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1_InvokeAsync__2_System_String___0_Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__">InvokeAsync&lt;TRequest, TResponse&gt;(String, TRequest, Func&lt;RequestContext, ResponseContext&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1_InvokeTaskAsync__2_System_String___0_Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__">InvokeTaskAsync&lt;TRequest, TResponse&gt;(String, TRequest, Func&lt;RequestContext, ResponseContext&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase-1.html#MagicOnion_Client_MagicOnionClientBase_1_Clone_MagicOnion_Client_MagicOnionClientOptions_">Clone(MagicOnionClientOptions)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -195,45 +177,18 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_MagicOnionClientBase_1__ctor_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_1__ctor" data-uid="MagicOnion.Client.MagicOnionClientBase`1.#ctor">MagicOnionClientBase()</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClientBase_1__ctor_MagicOnion_Client_MagicOnionClientOptions_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.#ctor(MagicOnion.Client.MagicOnionClientOptions)">MagicOnionClientBase(MagicOnionClientOptions)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected MagicOnionClientBase()</code></pre>
-  </div>
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_MagicOnionClientBase_1__ctor_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_1__ctor_CallInvoker_MessagePackSerializerOptions_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClientBase`1.#ctor(CallInvoker,MessagePackSerializerOptions,MagicOnion.Client.IClientFilter[])">MagicOnionClientBase(CallInvoker, MessagePackSerializerOptions, IClientFilter[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected MagicOnionClientBase(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] filters)</code></pre>
+    <pre><code class="lang-csharp hljs">protected MagicOnionClientBase(MagicOnionClientOptions options)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>callInvoker</code></span> <span class="xref">CallInvoker</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>filters</code></span> <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
+    <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -254,14 +209,21 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_MagicOnionClientBase_1_Clone_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.Clone*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_1_Clone" data-uid="MagicOnion.Client.MagicOnionClientBase`1.Clone">Clone()</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClientBase_1_Clone_MagicOnion_Client_MagicOnionClientOptions_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.Clone(MagicOnion.Client.MagicOnionClientOptions)">Clone(MagicOnionClientOptions)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected abstract MagicOnionClientBase&lt;T&gt; Clone()</code></pre>
+    <pre><code class="lang-csharp hljs">protected abstract MagicOnionClientBase&lt;T&gt; Clone(MagicOnionClientOptions options)</code></pre>
   </div>
 
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   <section>
   <h5 class="returns">Returns</h5>
@@ -271,106 +233,6 @@
   </dl>
   </section>
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_MagicOnionClientBase_1_InvokeAsync_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.InvokeAsync*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_1_InvokeAsync__2_System_String___0_Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__" data-uid="MagicOnion.Client.MagicOnionClientBase`1.InvokeAsync``2(System.String,``0,Func{MagicOnion.Client.RequestContext,MagicOnion.Client.ResponseContext})">InvokeAsync&lt;TRequest, TResponse&gt;(String, TRequest, Func&lt;RequestContext, ResponseContext&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected UnaryResult&lt;TResponse&gt; InvokeAsync&lt;TRequest, TResponse&gt;(string path, TRequest request, Func&lt;RequestContext, ResponseContext&gt; requestMethod)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>path</code></span> <span class="xref">System.String</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>request</code></span> <span class="xref">TRequest</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>requestMethod</code></span> <span class="xref">Func</span>&lt;<a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a>, <a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.UnaryResult-1.html">UnaryResult</a>&lt;TResponse&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>TRequest</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>TResponse</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_MagicOnionClientBase_1_InvokeTaskAsync_" data-uid="MagicOnion.Client.MagicOnionClientBase`1.InvokeTaskAsync*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_1_InvokeTaskAsync__2_System_String___0_Func_MagicOnion_Client_RequestContext_MagicOnion_Client_ResponseContext__" data-uid="MagicOnion.Client.MagicOnionClientBase`1.InvokeTaskAsync``2(System.String,``0,Func{MagicOnion.Client.RequestContext,MagicOnion.Client.ResponseContext})">InvokeTaskAsync&lt;TRequest, TResponse&gt;(String, TRequest, Func&lt;RequestContext, ResponseContext&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected async Task&lt;UnaryResult&lt;TResponse&gt;&gt; InvokeTaskAsync&lt;TRequest, TResponse&gt;(string path, TRequest request, Func&lt;RequestContext, ResponseContext&gt; requestMethod)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>path</code></span> <span class="xref">System.String</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>request</code></span> <span class="xref">TRequest</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>requestMethod</code></span> <span class="xref">Func</span>&lt;<a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a>, <a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.UnaryResult-1.html">UnaryResult</a>&lt;TResponse&gt;&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>TRequest</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>TResponse</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   
   
@@ -537,13 +399,13 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual T WithOptions(CallOptions option)</code></pre>
+    <pre><code class="lang-csharp hljs">public virtual T WithOptions(CallOptions options)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>option</code></span> <span class="xref">CallOptions</span></dt>
+    <dt><span class="parametername"><code>options</code></span> <span class="xref">CallOptions</span></dt>
     <dd></dd>
   </dl>
   </section>

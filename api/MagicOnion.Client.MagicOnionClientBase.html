@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class MagicOnionClientBase : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionClientBase : object</code></pre>
   </div>
 
   <div class="inheritance">
@@ -102,7 +102,7 @@
   
   
   <h3 id="members">Members</h3>
-  <h4>Fields
+  <h4>Constructors
   </h4>
   <table class="table table-condensed">
     <thead>
@@ -114,37 +114,13 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_callInvoker">callInvoker</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_filters">filters</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_host">host</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_option">option</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_serializerOptions">serializerOptions</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase__ctor_MagicOnion_Client_MagicOnionClientOptions_">MagicOnionClientBase(MagicOnionClientOptions)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
-  <h4>Methods
+  <h4>Properties
   </h4>
   <table class="table table-condensed">
     <thead>
@@ -156,200 +132,29 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_CreateResponseContext__1_MagicOnion_Client_RequestContext_Method_System_Byte___System_Byte____">CreateResponseContext&lt;TResponse&gt;(RequestContext, Method&lt;Byte[], Byte[]&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_CreateResponseContext__2_MagicOnion_Client_RequestContext_Method_System_Byte___System_Byte____">CreateResponseContext&lt;TRequest, TResponse&gt;(RequestContext, Method&lt;Byte[], Byte[]&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClientBase.html#MagicOnion_Client_MagicOnionClientBase_Options">Options</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="fields">Fields
+  <h3 id="constructors">Constructors
   </h3>
   <section>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_callInvoker" data-uid="MagicOnion.Client.MagicOnionClientBase.callInvoker">callInvoker</h4>
+  <a id="MagicOnion_Client_MagicOnionClientBase__ctor_" data-uid="MagicOnion.Client.MagicOnionClientBase.#ctor*"></a>
+  <h4 id="MagicOnion_Client_MagicOnionClientBase__ctor_MagicOnion_Client_MagicOnionClientOptions_" data-uid="MagicOnion.Client.MagicOnionClientBase.#ctor(MagicOnion.Client.MagicOnionClientOptions)">MagicOnionClientBase(MagicOnionClientOptions)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected CallInvoker callInvoker</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">CallInvoker</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_filters" data-uid="MagicOnion.Client.MagicOnionClientBase.filters">filters</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected IClientFilter[] filters</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_host" data-uid="MagicOnion.Client.MagicOnionClientBase.host">host</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected string host</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_option" data-uid="MagicOnion.Client.MagicOnionClientBase.option">option</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected CallOptions option</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">CallOptions</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_serializerOptions" data-uid="MagicOnion.Client.MagicOnionClientBase.serializerOptions">serializerOptions</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected MessagePackSerializerOptions serializerOptions</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">MessagePackSerializerOptions</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <h3 id="methods">Methods
-  </h3>
-  <section>
-  <a id="MagicOnion_Client_MagicOnionClientBase_CreateResponseContext_" data-uid="MagicOnion.Client.MagicOnionClientBase.CreateResponseContext*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_CreateResponseContext__1_MagicOnion_Client_RequestContext_Method_System_Byte___System_Byte____" data-uid="MagicOnion.Client.MagicOnionClientBase.CreateResponseContext``1(MagicOnion.Client.RequestContext,Method{System.Byte[],System.Byte[]})">CreateResponseContext&lt;TResponse&gt;(RequestContext, Method&lt;Byte[], Byte[]&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected static ResponseContext CreateResponseContext&lt;TResponse&gt;(RequestContext context, Method&lt;byte[], byte[]&gt; method)</code></pre>
+    <pre><code class="lang-csharp hljs">protected MagicOnionClientBase(MagicOnionClientOptions options)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>method</code></span> <span class="xref">Method</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -363,46 +168,32 @@
   
   
   
+  
+  
   </section>
+  <h3 id="properties">Properties
+  </h3>
   <section>
-  <a id="MagicOnion_Client_MagicOnionClientBase_CreateResponseContext_" data-uid="MagicOnion.Client.MagicOnionClientBase.CreateResponseContext*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientBase_CreateResponseContext__2_MagicOnion_Client_RequestContext_Method_System_Byte___System_Byte____" data-uid="MagicOnion.Client.MagicOnionClientBase.CreateResponseContext``2(MagicOnion.Client.RequestContext,Method{System.Byte[],System.Byte[]})">CreateResponseContext&lt;TRequest, TResponse&gt;(RequestContext, Method&lt;Byte[], Byte[]&gt;)</h4>
+  <a id="MagicOnion_Client_MagicOnionClientBase_Options_" data-uid="MagicOnion.Client.MagicOnionClientBase.Options*"></a>
+  <h4 id="MagicOnion_Client_MagicOnionClientBase_Options" data-uid="MagicOnion.Client.MagicOnionClientBase.Options">Options</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected static ResponseContext CreateResponseContext&lt;TRequest, TResponse&gt;(RequestContext context, Method&lt;byte[], byte[]&gt; method)</code></pre>
+    <pre><code class="lang-csharp hljs">protected MagicOnionClientOptions Options { get; }</code></pre>
   </div>
 
+  
+  
+  
+  
   <section>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>context</code></span> <a class="xref" href="MagicOnion.Client.RequestContext.html">RequestContext</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>method</code></span> <span class="xref">Method</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
+    <dt><a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
     <dd></dd>
   </dl>
   </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>TRequest</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>TResponse</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
   
   
   

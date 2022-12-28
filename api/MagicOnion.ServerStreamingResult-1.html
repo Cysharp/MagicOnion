@@ -83,7 +83,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct ServerStreamingResult&lt;TResponse&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly struct ServerStreamingResult&lt;TResponse&gt;</code></pre>
   </div>
 
   
@@ -117,7 +117,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.ServerStreamingResult-1.html#MagicOnion_ServerStreamingResult_1__ctor_AsyncServerStreamingCall_System_Byte____IAsyncStreamReader__0__MessagePackSerializerOptions_">ServerStreamingResult(AsyncServerStreamingCall&lt;Byte[]&gt;, IAsyncStreamReader&lt;TResponse&gt;, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.ServerStreamingResult-1.html#MagicOnion_ServerStreamingResult_1__ctor_MagicOnion_Internal_IAsyncServerStreamingCallWrapper__0__">ServerStreamingResult(IAsyncServerStreamingCallWrapper&lt;TResponse&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -192,22 +192,18 @@ Throws InvalidOperationException otherwise.</p>
   </h3>
   <section>
   <a id="MagicOnion_ServerStreamingResult_1__ctor_" data-uid="MagicOnion.ServerStreamingResult`1.#ctor*"></a>
-  <h4 id="MagicOnion_ServerStreamingResult_1__ctor_AsyncServerStreamingCall_System_Byte____IAsyncStreamReader__0__MessagePackSerializerOptions_" data-uid="MagicOnion.ServerStreamingResult`1.#ctor(AsyncServerStreamingCall{System.Byte[]},IAsyncStreamReader{`0},MessagePackSerializerOptions)">ServerStreamingResult(AsyncServerStreamingCall&lt;Byte[]&gt;, IAsyncStreamReader&lt;TResponse&gt;, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_ServerStreamingResult_1__ctor_MagicOnion_Internal_IAsyncServerStreamingCallWrapper__0__" data-uid="MagicOnion.ServerStreamingResult`1.#ctor(MagicOnion.Internal.IAsyncServerStreamingCallWrapper{`0})">ServerStreamingResult(IAsyncServerStreamingCallWrapper&lt;TResponse&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ServerStreamingResult(AsyncServerStreamingCall&lt;byte[]&gt; inner, IAsyncStreamReader&lt;TResponse&gt; responseStream, MessagePackSerializerOptions serializerOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public ServerStreamingResult(IAsyncServerStreamingCallWrapper&lt;TResponse&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncServerStreamingCall</span>&lt;<span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>responseStream</code></span> <span class="xref">IAsyncStreamReader</span>&lt;TResponse&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>inner</code></span> <a class="xref" href="MagicOnion.Internal.IAsyncServerStreamingCallWrapper-1.html">IAsyncServerStreamingCallWrapper</a>&lt;TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -301,7 +297,7 @@ As a result, all resources being used by the call should be released eventually.
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly void Dispose()</code></pre>
   </div>
 
   
@@ -330,7 +326,7 @@ Throws InvalidOperationException otherwise.</p>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Status GetStatus()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Status GetStatus()</code></pre>
   </div>
 
   
@@ -362,7 +358,7 @@ Throws InvalidOperationException otherwise.</p>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Metadata GetTrailers()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Metadata GetTrailers()</code></pre>
   </div>
 
   

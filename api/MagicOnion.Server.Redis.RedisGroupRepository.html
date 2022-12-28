@@ -114,7 +114,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Redis.RedisGroupRepository.html#MagicOnion_Server_Redis_RedisGroupRepository__ctor_MessagePackSerializerOptions_MagicOnion_Server_Redis_RedisGroupOptions_MagicOnion_Server_IMagicOnionLogger_">RedisGroupRepository(MessagePackSerializerOptions, RedisGroupOptions, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroupRepository.html#MagicOnion_Server_Redis_RedisGroupRepository__ctor_IMagicOnionSerializer_MagicOnion_Server_Redis_RedisGroupOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, IMagicOnionLogger)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -155,22 +155,22 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Redis_RedisGroupRepository__ctor_" data-uid="MagicOnion.Server.Redis.RedisGroupRepository.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Redis_RedisGroupRepository__ctor_MessagePackSerializerOptions_MagicOnion_Server_Redis_RedisGroupOptions_MagicOnion_Server_IMagicOnionLogger_" data-uid="MagicOnion.Server.Redis.RedisGroupRepository.#ctor(MessagePackSerializerOptions,MagicOnion.Server.Redis.RedisGroupOptions,MagicOnion.Server.IMagicOnionLogger)">RedisGroupRepository(MessagePackSerializerOptions, RedisGroupOptions, IMagicOnionLogger)</h4>
+  <h4 id="MagicOnion_Server_Redis_RedisGroupRepository__ctor_IMagicOnionSerializer_MagicOnion_Server_Redis_RedisGroupOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.Redis.RedisGroupRepository.#ctor(IMagicOnionSerializer,MagicOnion.Server.Redis.RedisGroupOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, IMagicOnionLogger)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RedisGroupRepository(MessagePackSerializerOptions serializerOptions, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public RedisGroupRepository(IMagicOnionSerializer messageSerializer, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>messageSerializer</code></span> <span class="xref">IMagicOnionSerializer</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>redisGroupOptions</code></span> <a class="xref" href="MagicOnion.Server.Redis.RedisGroupOptions.html">RedisGroupOptions</a></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
     <dd></dd>
   </dl>
   </section>

@@ -110,31 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_">MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
-  <h4>Fields
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_RequestType">RequestType</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_UnwrappedResponseType">UnwrappedResponseType</a>
+          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_">MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, IMagicOnionLogger, Boolean)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -158,6 +134,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_MessageSerializer">MessageSerializer</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_MethodInfo">MethodInfo</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -176,6 +158,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_RequestType">RequestType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_ServiceName">ServiceName</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -183,6 +171,12 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_ServiceType">ServiceType</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_UnwrappedResponseType">UnwrappedResponseType</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -198,18 +192,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_BoxedDeserialize_System_Byte___">BoxedDeserialize(Byte[])</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_BoxedSerialize_System_Object_">BoxedSerialize(Object)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler_Equals_MagicOnion_Server_MethodHandler_">Equals(MethodHandler)</a>
@@ -235,12 +217,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_MethodHandler__ctor_" data-uid="MagicOnion.Server.MethodHandler.#ctor*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_" data-uid="MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider)">MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider)</h4>
+  <h4 id="MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_" data-uid="MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)">MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, IMagicOnionLogger, Boolean)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider)</code></pre>
+    <pre><code class="lang-csharp hljs">public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)</code></pre>
   </div>
 
   <section>
@@ -256,71 +238,15 @@
     <dd></dd>
     <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
     <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <h3 id="fields">Fields
-  </h3>
-  <section>
-  <h4 id="MagicOnion_Server_MethodHandler_RequestType" data-uid="MagicOnion.Server.MethodHandler.RequestType">RequestType</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type RequestType</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Type</span></dt>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>isStreamingHub</code></span> <span class="xref">System.Boolean</span></dt>
     <dd></dd>
   </dl>
   </section>
   
   
   
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <h4 id="MagicOnion_Server_MethodHandler_UnwrappedResponseType" data-uid="MagicOnion.Server.MethodHandler.UnwrappedResponseType">UnwrappedResponseType</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly Type UnwrappedResponseType</code></pre>
-  </div>
-
-  
-  
-  
-  <section>
-  <h5 class="fieldValue">Field Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Type</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   
   
@@ -351,6 +277,36 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">ILookup</span>&lt;<span class="xref">Type</span>, <span class="xref">Attribute</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_MethodHandler_MessageSerializer_" data-uid="MagicOnion.Server.MethodHandler.MessageSerializer*"></a>
+  <h4 id="MagicOnion_Server_MethodHandler_MessageSerializer" data-uid="MagicOnion.Server.MethodHandler.MessageSerializer">MessageSerializer</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IMagicOnionSerializer MessageSerializer { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -454,6 +410,36 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Server_MethodHandler_RequestType_" data-uid="MagicOnion.Server.MethodHandler.RequestType*"></a>
+  <h4 id="MagicOnion_Server_MethodHandler_RequestType" data-uid="MagicOnion.Server.MethodHandler.RequestType">RequestType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Type RequestType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Type</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_MethodHandler_ServiceName_" data-uid="MagicOnion.Server.MethodHandler.ServiceName*"></a>
   <h4 id="MagicOnion_Server_MethodHandler_ServiceName" data-uid="MagicOnion.Server.MethodHandler.ServiceName">ServiceName</h4>
   <div class="markdown level1 summary"></div>
@@ -513,82 +499,38 @@
   
   
   </section>
+  <section>
+  <a id="MagicOnion_Server_MethodHandler_UnwrappedResponseType_" data-uid="MagicOnion.Server.MethodHandler.UnwrappedResponseType*"></a>
+  <h4 id="MagicOnion_Server_MethodHandler_UnwrappedResponseType" data-uid="MagicOnion.Server.MethodHandler.UnwrappedResponseType">UnwrappedResponseType</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Type UnwrappedResponseType { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Type</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <h3 id="methods">Methods
   </h3>
-  <section>
-  <a id="MagicOnion_Server_MethodHandler_BoxedDeserialize_" data-uid="MagicOnion.Server.MethodHandler.BoxedDeserialize*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler_BoxedDeserialize_System_Byte___" data-uid="MagicOnion.Server.MethodHandler.BoxedDeserialize(System.Byte[])">BoxedDeserialize(Byte[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public object BoxedDeserialize(byte[] responseValue)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>responseValue</code></span> <span class="xref">System.Byte</span>[]</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Object</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_MethodHandler_BoxedSerialize_" data-uid="MagicOnion.Server.MethodHandler.BoxedSerialize*"></a>
-  <h4 id="MagicOnion_Server_MethodHandler_BoxedSerialize_System_Object_" data-uid="MagicOnion.Server.MethodHandler.BoxedSerialize(System.Object)">BoxedSerialize(Object)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public byte[] BoxedSerialize(object requestValue)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>requestValue</code></span> <span class="xref">System.Object</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Byte</span>[]</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <section>
   <a id="MagicOnion_Server_MethodHandler_Equals_" data-uid="MagicOnion.Server.MethodHandler.Equals*"></a>
   <h4 id="MagicOnion_Server_MethodHandler_Equals_MagicOnion_Server_MethodHandler_" data-uid="MagicOnion.Server.MethodHandler.Equals(MagicOnion.Server.MethodHandler)">Equals(MethodHandler)</h4>

@@ -105,7 +105,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.IGroupRepositoryFactory.html#MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MessagePackSerializerOptions_MagicOnion_Server_IMagicOnionLogger_">CreateRepository(MessagePackSerializerOptions, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.IGroupRepositoryFactory.html#MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -116,20 +116,20 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_" data-uid="MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository*"></a>
-  <h4 id="MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MessagePackSerializerOptions_MagicOnion_Server_IMagicOnionLogger_" data-uid="MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MessagePackSerializerOptions,MagicOnion.Server.IMagicOnionLogger)">CreateRepository(MessagePackSerializerOptions, IMagicOnionLogger)</h4>
+  <h4 id="MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
+    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
     <dd></dd>
   </dl>
   </section>

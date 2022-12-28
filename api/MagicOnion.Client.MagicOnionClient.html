@@ -122,13 +122,19 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MessagePackSerializerOptions_">Create&lt;T&gt;(CallInvoker, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MessagePackSerializerOptions_MagicOnion_Client_IClientFilter___">Create&lt;T&gt;(CallInvoker, MessagePackSerializerOptions, IClientFilter[])</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IClientFilter___">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider, IClientFilter[])</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IClientFilter___MagicOnion_Client_IMagicOnionClientFactoryProvider_">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider, IClientFilter[], IMagicOnionClientFactoryProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -146,7 +152,19 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_ChannelBase_MessagePackSerializerOptions_">Create&lt;T&gt;(ChannelBase, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_ChannelBase_MagicOnion_Serialization_IMagicOnionSerializerProvider_">Create&lt;T&gt;(ChannelBase, IMagicOnionSerializerProvider)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_MagicOnion_Client_MagicOnionClientOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_">Create&lt;T&gt;(MagicOnionClientOptions, IMagicOnionSerializerProvider)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_MagicOnion_Client_MagicOnionClientOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientFactoryProvider_">Create&lt;T&gt;(MagicOnionClientOptions, IMagicOnionSerializerProvider, IMagicOnionClientFactoryProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -249,12 +267,12 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MessagePackSerializerOptions_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(CallInvoker,MessagePackSerializerOptions)">Create&lt;T&gt;(CallInvoker, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(CallInvoker,MagicOnion.Serialization.IMagicOnionSerializerProvider)">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(CallInvoker invoker, MessagePackSerializerOptions serializerOptions)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(CallInvoker invoker, IMagicOnionSerializerProvider serializerProvider)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
@@ -263,7 +281,7 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>invoker</code></span> <span class="xref">CallInvoker</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -296,12 +314,12 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MessagePackSerializerOptions_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(CallInvoker,MessagePackSerializerOptions,MagicOnion.Client.IClientFilter[])">Create&lt;T&gt;(CallInvoker, MessagePackSerializerOptions, IClientFilter[])</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(CallInvoker,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IClientFilter[])">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider, IClientFilter[])</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(CallInvoker invoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] clientFilters)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(CallInvoker invoker, IMagicOnionSerializerProvider serializerProvider, IClientFilter[] clientFilters)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
@@ -310,9 +328,60 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>invoker</code></span> <span class="xref">CallInvoker</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
     <dd></dd>
     <dt><span class="parametername"><code>clientFilters</code></span> <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_CallInvoker_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IClientFilter___MagicOnion_Client_IMagicOnionClientFactoryProvider_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(CallInvoker,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IClientFilter[],MagicOnion.Client.IMagicOnionClientFactoryProvider)">Create&lt;T&gt;(CallInvoker, IMagicOnionSerializerProvider, IClientFilter[], IMagicOnionClientFactoryProvider)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(CallInvoker invoker, IMagicOnionSerializerProvider serializerProvider, IClientFilter[] clientFilters, IMagicOnionClientFactoryProvider clientFactoryProvider)
+    where T : IService&lt;T&gt;</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>invoker</code></span> <span class="xref">CallInvoker</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>clientFilters</code></span> <a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>[]</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>clientFactoryProvider</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientFactoryProvider.html">IMagicOnionClientFactoryProvider</a></dt>
     <dd></dd>
   </dl>
   </section>
@@ -437,12 +506,12 @@
   </section>
   <section>
   <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_ChannelBase_MessagePackSerializerOptions_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(ChannelBase,MessagePackSerializerOptions)">Create&lt;T&gt;(ChannelBase, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_ChannelBase_MagicOnion_Serialization_IMagicOnionSerializerProvider_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(ChannelBase,MagicOnion.Serialization.IMagicOnionSerializerProvider)">Create&lt;T&gt;(ChannelBase, IMagicOnionSerializerProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(ChannelBase channel, MessagePackSerializerOptions serializerOptions)
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(ChannelBase channel, IMagicOnionSerializerProvider serializerProvider)
     where T : IService&lt;T&gt;</code></pre>
   </div>
 
@@ -451,7 +520,103 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>channel</code></span> <span class="xref">ChannelBase</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_MagicOnion_Client_MagicOnionClientOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(MagicOnion.Client.MagicOnionClientOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider)">Create&lt;T&gt;(MagicOnionClientOptions, IMagicOnionSerializerProvider)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(MagicOnionClientOptions clientOptions, IMagicOnionSerializerProvider serializerProvider)
+    where T : IService&lt;T&gt;</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>clientOptions</code></span> <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">T</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_MagicOnionClient_Create_" data-uid="MagicOnion.Client.MagicOnionClient.Create*"></a>
+  <h4 id="MagicOnion_Client_MagicOnionClient_Create__1_MagicOnion_Client_MagicOnionClientOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientFactoryProvider_" data-uid="MagicOnion.Client.MagicOnionClient.Create``1(MagicOnion.Client.MagicOnionClientOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientFactoryProvider)">Create&lt;T&gt;(MagicOnionClientOptions, IMagicOnionSerializerProvider, IMagicOnionClientFactoryProvider)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static T Create&lt;T&gt;(MagicOnionClientOptions clientOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientFactoryProvider clientFactoryProvider)
+    where T : IService&lt;T&gt;</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>clientOptions</code></span> <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html">MagicOnionClientOptions</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>clientFactoryProvider</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientFactoryProvider.html">IMagicOnionClientFactoryProvider</a></dt>
     <dd></dd>
   </dl>
   </section>

@@ -125,7 +125,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.ClientStreamingResult-2.html#MagicOnion_ClientStreamingResult_2__ctor_AsyncClientStreamingCall_System_Byte___System_Byte____IClientStreamWriter__0__MessagePackSerializerOptions_">ClientStreamingResult(AsyncClientStreamingCall&lt;Byte[], Byte[]&gt;, IClientStreamWriter&lt;TRequest&gt;, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.ClientStreamingResult-2.html#MagicOnion_ClientStreamingResult_2__ctor_MagicOnion_Internal_IAsyncClientStreamingCallWrapper__0__1__">ClientStreamingResult(IAsyncClientStreamingCallWrapper&lt;TRequest, TResponse&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -244,22 +244,18 @@ Throws InvalidOperationException otherwise.</p>
   </section>
   <section>
   <a id="MagicOnion_ClientStreamingResult_2__ctor_" data-uid="MagicOnion.ClientStreamingResult`2.#ctor*"></a>
-  <h4 id="MagicOnion_ClientStreamingResult_2__ctor_AsyncClientStreamingCall_System_Byte___System_Byte____IClientStreamWriter__0__MessagePackSerializerOptions_" data-uid="MagicOnion.ClientStreamingResult`2.#ctor(AsyncClientStreamingCall{System.Byte[],System.Byte[]},IClientStreamWriter{`0},MessagePackSerializerOptions)">ClientStreamingResult(AsyncClientStreamingCall&lt;Byte[], Byte[]&gt;, IClientStreamWriter&lt;TRequest&gt;, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_ClientStreamingResult_2__ctor_MagicOnion_Internal_IAsyncClientStreamingCallWrapper__0__1__" data-uid="MagicOnion.ClientStreamingResult`2.#ctor(MagicOnion.Internal.IAsyncClientStreamingCallWrapper{`0,`1})">ClientStreamingResult(IAsyncClientStreamingCallWrapper&lt;TRequest, TResponse&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ClientStreamingResult(AsyncClientStreamingCall&lt;byte[], byte[]&gt; inner, IClientStreamWriter&lt;TRequest&gt; requestStream, MessagePackSerializerOptions serializerOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public ClientStreamingResult(IAsyncClientStreamingCallWrapper&lt;TRequest, TResponse&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncClientStreamingCall</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>requestStream</code></span> <span class="xref">IClientStreamWriter</span>&lt;TRequest&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>inner</code></span> <a class="xref" href="MagicOnion.Internal.IAsyncClientStreamingCallWrapper-2.html">IAsyncClientStreamingCallWrapper</a>&lt;TRequest, TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>

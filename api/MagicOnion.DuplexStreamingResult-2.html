@@ -83,7 +83,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public struct DuplexStreamingResult&lt;TRequest, TResponse&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly struct DuplexStreamingResult&lt;TRequest, TResponse&gt;</code></pre>
   </div>
 
   
@@ -119,7 +119,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.DuplexStreamingResult-2.html#MagicOnion_DuplexStreamingResult_2__ctor_AsyncDuplexStreamingCall_System_Byte___System_Byte____IClientStreamWriter__0__IAsyncStreamReader__1__MessagePackSerializerOptions_">DuplexStreamingResult(AsyncDuplexStreamingCall&lt;Byte[], Byte[]&gt;, IClientStreamWriter&lt;TRequest&gt;, IAsyncStreamReader&lt;TResponse&gt;, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.DuplexStreamingResult-2.html#MagicOnion_DuplexStreamingResult_2__ctor_MagicOnion_Internal_IAsyncDuplexStreamingCallWrapper__0__1__">DuplexStreamingResult(IAsyncDuplexStreamingCallWrapper&lt;TRequest, TResponse&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -135,12 +135,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.DuplexStreamingResult-2.html#MagicOnion_DuplexStreamingResult_2_RawStreamingCall">RawStreamingCall</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.DuplexStreamingResult-2.html#MagicOnion_DuplexStreamingResult_2_RequestStream">RequestStream</a>
@@ -207,24 +201,18 @@ Throws InvalidOperationException otherwise.</p>
   </h3>
   <section>
   <a id="MagicOnion_DuplexStreamingResult_2__ctor_" data-uid="MagicOnion.DuplexStreamingResult`2.#ctor*"></a>
-  <h4 id="MagicOnion_DuplexStreamingResult_2__ctor_AsyncDuplexStreamingCall_System_Byte___System_Byte____IClientStreamWriter__0__IAsyncStreamReader__1__MessagePackSerializerOptions_" data-uid="MagicOnion.DuplexStreamingResult`2.#ctor(AsyncDuplexStreamingCall{System.Byte[],System.Byte[]},IClientStreamWriter{`0},IAsyncStreamReader{`1},MessagePackSerializerOptions)">DuplexStreamingResult(AsyncDuplexStreamingCall&lt;Byte[], Byte[]&gt;, IClientStreamWriter&lt;TRequest&gt;, IAsyncStreamReader&lt;TResponse&gt;, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_DuplexStreamingResult_2__ctor_MagicOnion_Internal_IAsyncDuplexStreamingCallWrapper__0__1__" data-uid="MagicOnion.DuplexStreamingResult`2.#ctor(MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper{`0,`1})">DuplexStreamingResult(IAsyncDuplexStreamingCallWrapper&lt;TRequest, TResponse&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DuplexStreamingResult(AsyncDuplexStreamingCall&lt;byte[], byte[]&gt; inner, IClientStreamWriter&lt;TRequest&gt; requestStream, IAsyncStreamReader&lt;TResponse&gt; responseStream, MessagePackSerializerOptions serializerOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public DuplexStreamingResult(IAsyncDuplexStreamingCallWrapper&lt;TRequest, TResponse&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncDuplexStreamingCall</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>requestStream</code></span> <span class="xref">IClientStreamWriter</span>&lt;TRequest&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>responseStream</code></span> <span class="xref">IAsyncStreamReader</span>&lt;TResponse&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>inner</code></span> <a class="xref" href="MagicOnion.Internal.IAsyncDuplexStreamingCallWrapper-2.html">IAsyncDuplexStreamingCallWrapper</a>&lt;TRequest, TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -243,36 +231,6 @@ Throws InvalidOperationException otherwise.</p>
   </section>
   <h3 id="properties">Properties
   </h3>
-  <section>
-  <a id="MagicOnion_DuplexStreamingResult_2_RawStreamingCall_" data-uid="MagicOnion.DuplexStreamingResult`2.RawStreamingCall*"></a>
-  <h4 id="MagicOnion_DuplexStreamingResult_2_RawStreamingCall" data-uid="MagicOnion.DuplexStreamingResult`2.RawStreamingCall">RawStreamingCall</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly AsyncDuplexStreamingCall&lt;byte[], byte[]&gt; RawStreamingCall { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">AsyncDuplexStreamingCall</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <section>
   <a id="MagicOnion_DuplexStreamingResult_2_RequestStream_" data-uid="MagicOnion.DuplexStreamingResult`2.RequestStream*"></a>
   <h4 id="MagicOnion_DuplexStreamingResult_2_RequestStream" data-uid="MagicOnion.DuplexStreamingResult`2.RequestStream">RequestStream</h4>
@@ -379,7 +337,7 @@ As a result, all resources being used by the call should be released eventually.
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly void Dispose()</code></pre>
   </div>
 
   
@@ -408,7 +366,7 @@ Throws InvalidOperationException otherwise.</p>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Status GetStatus()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Status GetStatus()</code></pre>
   </div>
 
   
@@ -440,7 +398,7 @@ Throws InvalidOperationException otherwise.</p>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Metadata GetTrailers()</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly Metadata GetTrailers()</code></pre>
   </div>
 
   

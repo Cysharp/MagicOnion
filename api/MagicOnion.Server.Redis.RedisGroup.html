@@ -114,7 +114,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup__ctor_System_String_MessagePackSerializerOptions_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_">RedisGroup(String, MessagePackSerializerOptions, IGroup, ISubscriber, IDatabaseAsync)</a>
+          <a class="xref" href="MagicOnion.Server.Redis.RedisGroup.html#MagicOnion_Server_Redis_RedisGroup__ctor_System_String_IMagicOnionSerializer_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_">RedisGroup(String, IMagicOnionSerializer, IGroup, ISubscriber, IDatabaseAsync)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -221,12 +221,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_Redis_RedisGroup__ctor_" data-uid="MagicOnion.Server.Redis.RedisGroup.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Redis_RedisGroup__ctor_System_String_MessagePackSerializerOptions_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.#ctor(System.String,MessagePackSerializerOptions,MagicOnion.Server.Hubs.IGroup,ISubscriber,IDatabaseAsync)">RedisGroup(String, MessagePackSerializerOptions, IGroup, ISubscriber, IDatabaseAsync)</h4>
+  <h4 id="MagicOnion_Server_Redis_RedisGroup__ctor_System_String_IMagicOnionSerializer_MagicOnion_Server_Hubs_IGroup_ISubscriber_IDatabaseAsync_" data-uid="MagicOnion.Server.Redis.RedisGroup.#ctor(System.String,IMagicOnionSerializer,MagicOnion.Server.Hubs.IGroup,ISubscriber,IDatabaseAsync)">RedisGroup(String, IMagicOnionSerializer, IGroup, ISubscriber, IDatabaseAsync)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public RedisGroup(string groupName, MessagePackSerializerOptions serializerOptions, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)</code></pre>
+    <pre><code class="lang-csharp hljs">public RedisGroup(string groupName, IMagicOnionSerializer messageSerializer, IGroup inmemoryGroup, ISubscriber redisSubscriber, IDatabaseAsync database)</code></pre>
   </div>
 
   <section>
@@ -234,7 +234,7 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>groupName</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>messageSerializer</code></span> <span class="xref">IMagicOnionSerializer</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>inmemoryGroup</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
     <dd></dd>

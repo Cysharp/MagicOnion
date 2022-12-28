@@ -83,7 +83,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class MagicOnionOpenTelemetryTracerFilterFactoryAttribute : Attribute, IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionOpenTelemetryTracerFilterFactoryAttribute : Attribute, IMagicOnionFilterFactory&lt;MagicOnionFilterAttribute&gt;, IMagicOnionFilterMetadata</code></pre>
   </div>
 
   <div class="inheritance">
@@ -94,7 +94,8 @@
   
   <div classs="implements">
     <h5>Implements</h5>
-    <div><a class="xref" href="MagicOnion.Server.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory</a>&lt;<a class="xref" href="MagicOnion.Server.MagicOnionFilterAttribute.html">MagicOnionFilterAttribute</a>&gt;</div>
+    <div><a class="xref" href="MagicOnion.Server.Filters.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory</a>&lt;<a class="xref" href="MagicOnion.Server.MagicOnionFilterAttribute.html">MagicOnionFilterAttribute</a>&gt;</div>
+    <div><a class="xref" href="MagicOnion.Server.Filters.IMagicOnionFilterMetadata.html">IMagicOnionFilterMetadata</a></div>
   </div>
   
   
@@ -157,7 +158,10 @@
   
   <h3 id="implements">Implements</h3>
   <div>
-      <a class="xref" href="MagicOnion.Server.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory&lt;T&gt;</a>
+      <a class="xref" href="MagicOnion.Server.Filters.IMagicOnionFilterFactory-1.html">IMagicOnionFilterFactory&lt;T&gt;</a>
+  </div>
+  <div>
+      <a class="xref" href="MagicOnion.Server.Filters.IMagicOnionFilterMetadata.html">IMagicOnionFilterMetadata</a>
   </div>
   
   

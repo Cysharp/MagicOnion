@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>UnaryResult Class
+    <title>UnaryResult Struct
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="UnaryResult Class
+    <meta name="title" content="UnaryResult Struct
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -73,7 +73,7 @@
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="MagicOnion.UnaryResult">
   
-  <h1 id="MagicOnion_UnaryResult" data-uid="MagicOnion.UnaryResult" class="text-break">UnaryResult Class
+  <h1 id="MagicOnion_UnaryResult" data-uid="MagicOnion.UnaryResult" class="text-break">UnaryResult Struct
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.html">MagicOnion</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Abstractions.dll</h6>
@@ -83,14 +83,9 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static class UnaryResult : object</code></pre>
+    <pre><code class="lang-csharp hljs">public readonly struct UnaryResult</code></pre>
   </div>
 
-  <div class="inheritance">
-    <h5>Inheritance</h5>
-    <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">UnaryResult</span>
-  </div>
   
   
   
@@ -99,6 +94,36 @@
   
   
   <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult__ctor_Nil_">UnaryResult(Nil)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult__ctor_Task_MagicOnion_Client_IResponseContext_Nil___">UnaryResult(Task&lt;IResponseContext&lt;Nil&gt;&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult__ctor_Task_Nil__">UnaryResult(Task&lt;Nil&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
   <h4>Properties
   </h4>
   <table class="table table-condensed">
@@ -111,9 +136,30 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_CompletedResult">CompletedResult</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets a completed <a class="xref" href="MagicOnion.UnaryResult.html">UnaryResult</a> with the void result.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_Nil">Nil</a>
         </td>
         <td class="markdown level1 summary"><p>Gets the result that contains <span class="xref">MessagePack.Nil.Default</span> as the result value.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_ResponseAsync">ResponseAsync</a>
+        </td>
+        <td class="markdown level1 summary"><p>Asynchronous call result.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_ResponseHeadersAsync">ResponseHeadersAsync</a>
+        </td>
+        <td class="markdown level1 summary"><p>Asynchronous access to response headers.</p>
 </td>
       </tr>
     </tbody>
@@ -130,6 +176,16 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_Dispose">Dispose()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Provides means to cleanup after the call.
+If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+As a result, all resources being used by the call should be released eventually.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_FromResult__1___0_">FromResult&lt;T&gt;(T)</a>
         </td>
         <td class="markdown level1 summary"><p>Creates a <a class="xref" href="MagicOnion.UnaryResult-1.html">UnaryResult&lt;TResponse&gt;</a> with the specified result.</p>
@@ -142,11 +198,157 @@
         <td class="markdown level1 summary"><p>Creates a <a class="xref" href="MagicOnion.UnaryResult-1.html">UnaryResult&lt;TResponse&gt;</a> with the specified result task.</p>
 </td>
       </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_GetAwaiter">GetAwaiter()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Allows awaiting this object directly.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_GetStatus">GetStatus()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets the call status if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.UnaryResult.html#MagicOnion_UnaryResult_GetTrailers">GetTrailers()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets the call trailing metadata if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</td>
+      </tr>
     </tbody>
   </table>
   
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult__ctor_" data-uid="MagicOnion.UnaryResult.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult__ctor_Nil_" data-uid="MagicOnion.UnaryResult.#ctor(Nil)">UnaryResult(Nil)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(Nil nil)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>nil</code></span> <span class="xref">Nil</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult__ctor_" data-uid="MagicOnion.UnaryResult.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult__ctor_Task_MagicOnion_Client_IResponseContext_Nil___" data-uid="MagicOnion.UnaryResult.#ctor(Task{MagicOnion.Client.IResponseContext{Nil}})">UnaryResult(Task&lt;IResponseContext&lt;Nil&gt;&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(Task&lt;IResponseContext&lt;Nil&gt;&gt; response)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>response</code></span> <span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.Client.IResponseContext-1.html">IResponseContext</a>&lt;<span class="xref">Nil</span>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult__ctor_" data-uid="MagicOnion.UnaryResult.#ctor*"></a>
+  <h4 id="MagicOnion_UnaryResult__ctor_Task_Nil__" data-uid="MagicOnion.UnaryResult.#ctor(Task{Nil})">UnaryResult(Task&lt;Nil&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public UnaryResult(Task&lt;Nil&gt; rawTaskValue)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>rawTaskValue</code></span> <span class="xref">Task</span>&lt;<span class="xref">Nil</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <h3 id="properties">Properties
   </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult_CompletedResult_" data-uid="MagicOnion.UnaryResult.CompletedResult*"></a>
+  <h4 id="MagicOnion_UnaryResult_CompletedResult" data-uid="MagicOnion.UnaryResult.CompletedResult">CompletedResult</h4>
+  <div class="markdown level1 summary"><p>Gets a completed <a class="xref" href="MagicOnion.UnaryResult.html">UnaryResult</a> with the void result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly UnaryResult CompletedResult { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.UnaryResult.html">UnaryResult</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <section>
   <a id="MagicOnion_UnaryResult_Nil_" data-uid="MagicOnion.UnaryResult.Nil*"></a>
   <h4 id="MagicOnion_UnaryResult_Nil" data-uid="MagicOnion.UnaryResult.Nil">Nil</h4>
@@ -155,7 +357,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static UnaryResult&lt;Nil&gt; Nil { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public static readonly UnaryResult&lt;Nil&gt; Nil { get; }</code></pre>
   </div>
 
   
@@ -178,8 +380,101 @@
   
   
   </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_ResponseAsync_" data-uid="MagicOnion.UnaryResult.ResponseAsync*"></a>
+  <h4 id="MagicOnion_UnaryResult_ResponseAsync" data-uid="MagicOnion.UnaryResult.ResponseAsync">ResponseAsync</h4>
+  <div class="markdown level1 summary"><p>Asynchronous call result.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Task ResponseAsync { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_ResponseHeadersAsync_" data-uid="MagicOnion.UnaryResult.ResponseHeadersAsync*"></a>
+  <h4 id="MagicOnion_UnaryResult_ResponseHeadersAsync" data-uid="MagicOnion.UnaryResult.ResponseHeadersAsync">ResponseHeadersAsync</h4>
+  <div class="markdown level1 summary"><p>Asynchronous access to response headers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Task&lt;Metadata&gt; ResponseHeadersAsync { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;<span class="xref">Metadata</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <h3 id="methods">Methods
   </h3>
+  <section>
+  <a id="MagicOnion_UnaryResult_Dispose_" data-uid="MagicOnion.UnaryResult.Dispose*"></a>
+  <h4 id="MagicOnion_UnaryResult_Dispose" data-uid="MagicOnion.UnaryResult.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Provides means to cleanup after the call.
+If the call has already finished normally (request stream has been completed and call result has been received), doesn't do anything.
+Otherwise, requests cancellation of the call which should terminate all pending async operations associated with the call.
+As a result, all resources being used by the call should be released eventually.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly void Dispose()</code></pre>
+  </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h5 id="MagicOnion_UnaryResult_Dispose_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Normally, there is no need for you to dispose the call unless you want to utilize the
+&quot;Cancel&quot; semantics of invoking <code>Dispose</code>.</p>
+</div>
+  
+  
+  
+  
+  </section>
   <section>
   <a id="MagicOnion_UnaryResult_FromResult_" data-uid="MagicOnion.UnaryResult.FromResult*"></a>
   <h4 id="MagicOnion_UnaryResult_FromResult__1___0_" data-uid="MagicOnion.UnaryResult.FromResult``1(``0)">FromResult&lt;T&gt;(T)</h4>
@@ -259,6 +554,101 @@
     <dd></dd>
   </dl>
   </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_GetAwaiter_" data-uid="MagicOnion.UnaryResult.GetAwaiter*"></a>
+  <h4 id="MagicOnion_UnaryResult_GetAwaiter" data-uid="MagicOnion.UnaryResult.GetAwaiter">GetAwaiter()</h4>
+  <div class="markdown level1 summary"><p>Allows awaiting this object directly.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly TaskAwaiter GetAwaiter()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TaskAwaiter</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_GetStatus_" data-uid="MagicOnion.UnaryResult.GetStatus*"></a>
+  <h4 id="MagicOnion_UnaryResult_GetStatus" data-uid="MagicOnion.UnaryResult.GetStatus">GetStatus()</h4>
+  <div class="markdown level1 summary"><p>Gets the call status if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Status GetStatus()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Status</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_UnaryResult_GetTrailers_" data-uid="MagicOnion.UnaryResult.GetTrailers*"></a>
+  <h4 id="MagicOnion_UnaryResult_GetTrailers" data-uid="MagicOnion.UnaryResult.GetTrailers">GetTrailers()</h4>
+  <div class="markdown level1 summary"><p>Gets the call trailing metadata if the call has already finished.
+Throws InvalidOperationException otherwise.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public readonly Metadata GetTrailers()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Metadata</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
   
   
   

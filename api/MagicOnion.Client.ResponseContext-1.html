@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ResponseContext&lt;T&gt; : ResponseContext, IResponseContext&lt;T&gt;, IResponseContext</code></pre>
+    <pre><code class="lang-csharp hljs">public class ResponseContext&lt;T&gt; : ResponseContext, IResponseContext&lt;T&gt;, IResponseContext</code></pre>
   </div>
 
   <div class="inheritance">
@@ -124,19 +124,31 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_">ResponseContext(T)</a>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall__0__">ResponseContext(T, AsyncUnaryCall&lt;T&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_Metadata_Metadata_Status_">ResponseContext(T, Metadata, Metadata, Status)</a>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall_MagicOnion_Internal_Box__0___">ResponseContext(T, AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_System_Byte____MessagePackSerializerOptions_">ResponseContext(AsyncUnaryCall&lt;Byte[]&gt;, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_Status_Metadata_Metadata_">ResponseContext(T, Status, Metadata, Metadata)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall__0__">ResponseContext(AsyncUnaryCall&lt;T&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_MagicOnion_Internal_Box__0___">ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -184,6 +196,12 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Dispose">Dispose()</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -219,18 +237,20 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0)">ResponseContext(T)</h4>
+  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall__0__" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{`0})">ResponseContext(T, AsyncUnaryCall&lt;T&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(T responseObject)</code></pre>
+    <pre><code class="lang-csharp hljs">public ResponseContext(T value, AsyncUnaryCall&lt;T&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>responseObject</code></span> <span class="xref">T</span></dt>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;T&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -249,25 +269,57 @@
   </section>
   <section>
   <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_Metadata_Metadata_Status_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,Metadata,Metadata,Status)">ResponseContext(T, Metadata, Metadata, Status)</h4>
+  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall_MagicOnion_Internal_Box__0___" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{MagicOnion.Internal.Box{`0}})">ResponseContext(T, AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(T responseObject, Metadata trailers, Metadata responseHeaders, Status status)</code></pre>
+    <pre><code class="lang-csharp hljs">public ResponseContext(T value, AsyncUnaryCall&lt;Box&lt;T&gt;&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>responseObject</code></span> <span class="xref">T</span></dt>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>trailers</code></span> <span class="xref">Metadata</span></dt>
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;<a class="xref" href="MagicOnion.Internal.Box-1.html">Box</a>&lt;T&gt;&gt;</dt>
     <dd></dd>
-    <dt><span class="parametername"><code>responseHeaders</code></span> <span class="xref">Metadata</span></dt>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
+  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_Status_Metadata_Metadata_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,Status,Metadata,Metadata)">ResponseContext(T, Status, Metadata, Metadata)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>status</code></span> <span class="xref">Status</span></dt>
     <dd></dd>
+    <dt><span class="parametername"><code>responseHeaders</code></span> <span class="xref">Metadata</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>trailers</code></span> <span class="xref">Metadata</span></dt>
+    <dd></dd>
   </dl>
   </section>
   
@@ -285,20 +337,48 @@
   </section>
   <section>
   <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_System_Byte____MessagePackSerializerOptions_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{System.Byte[]},MessagePackSerializerOptions)">ResponseContext(AsyncUnaryCall&lt;Byte[]&gt;, MessagePackSerializerOptions)</h4>
+  <h4 id="MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall__0__" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{`0})">ResponseContext(AsyncUnaryCall&lt;T&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(AsyncUnaryCall&lt;byte[]&gt; inner, MessagePackSerializerOptions serializerOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public ResponseContext(AsyncUnaryCall&lt;T&gt; inner)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;<span class="xref">System.Byte</span>[]&gt;</dt>
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;T&gt;</dt>
     <dd></dd>
-    <dt><span class="parametername"><code>serializerOptions</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
+  <h4 id="MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_MagicOnion_Internal_Box__0___" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{MagicOnion.Internal.Box{`0}})">ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt; inner)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;<a class="xref" href="MagicOnion.Internal.Box-1.html">Box</a>&lt;T&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -413,6 +493,50 @@
   </section>
   <h3 id="methods">Methods
   </h3>
+  <section>
+  <a id="MagicOnion_Client_ResponseContext_1_Create_" data-uid="MagicOnion.Client.ResponseContext`1.Create*"></a>
+  <h4 id="MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__" data-uid="MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ResponseContext Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt; inner)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;TRaw&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRaw</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <section>
   <a id="MagicOnion_Client_ResponseContext_1_Dispose_" data-uid="MagicOnion.Client.ResponseContext`1.Dispose*"></a>
   <h4 id="MagicOnion_Client_ResponseContext_1_Dispose" data-uid="MagicOnion.Client.ResponseContext`1.Dispose">Dispose()</h4>
@@ -541,13 +665,13 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext&lt;T&gt; WithNewResult(T result)</code></pre>
+    <pre><code class="lang-csharp hljs">public ResponseContext&lt;T&gt; WithNewResult(T newValue)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>result</code></span> <span class="xref">T</span></dt>
+    <dt><span class="parametername"><code>newValue</code></span> <span class="xref">T</span></dt>
     <dd></dd>
   </dl>
   </section>
