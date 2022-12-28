@@ -24,7 +24,7 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
                 services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
                 services.Configure<RedisGroupOptions>(options =>
                 {
-                    options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect($"127.0.0.1:{redisServer.Port}");
+                    options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(redisServer.GetConnectionString());
                 });
             });
         });
@@ -36,7 +36,7 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
                 services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
                 services.Configure<RedisGroupOptions>(options =>
                 {
-                    options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect($"127.0.0.1:{redisServer.Port}");
+                    options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(redisServer.GetConnectionString());
                 });
             });
         });
@@ -96,7 +96,7 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
         beforeCount.Should().Be(2);
         (await client1.GetMemberCountAsync()).Should().Be(1);
     }
-    
+
     [Fact]
     public async Task RemoveMemberFromInMemoryGroup_KeepSubscription()
     {
