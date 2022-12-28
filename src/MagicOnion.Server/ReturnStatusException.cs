@@ -1,23 +1,21 @@
 using Grpc.Core;
-using System;
 
-namespace MagicOnion
+namespace MagicOnion;
+
+public class ReturnStatusException : Exception
 {
-    public class ReturnStatusException : Exception
+    public StatusCode StatusCode { get; }
+    public string Detail { get; }
+
+    public ReturnStatusException(StatusCode statusCode, string detail)
+        : base($"The method has returned the status code '{statusCode}'." + (string.IsNullOrWhiteSpace(detail) ? "" : $" (Detail={detail})"))
     {
-        public StatusCode StatusCode { get; private set; }
-        public string Detail { get; private set; }
+        this.StatusCode = statusCode;
+        this.Detail = detail;
+    }
 
-        public ReturnStatusException(StatusCode statusCode, string detail)
-            : base($"The method has returned the status code '{statusCode}'." + (string.IsNullOrWhiteSpace(detail) ? "" : $" (Detail={detail})"))
-        {
-            this.StatusCode = statusCode;
-            this.Detail = detail;
-        }
-
-        public Status ToStatus()
-        {
-            return new Status(StatusCode, Detail ?? "");
-        }
+    public Status ToStatus()
+    {
+        return new Status(StatusCode, Detail ?? "");
     }
 }

@@ -4,69 +4,59 @@ on:
   push:
     branches:
       - master
+      - "5.0"
     tags:
       - "!*" # not a tag push
   pull_request:
     branches:
       - "master"
+      - "5.0"
 
 env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-  NUGET_XMLDOC_MODE: skip
-  DOTNET_VERSION: '6.0.x'
+  BUILD_CONFIG: Debug
 
 jobs:
   build-dotnet:
+    name: "Build .NET projects"
     runs-on: ubuntu-latest
-
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      # build
-      - run: dotnet build ./src/MagicOnion/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Abstractions/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Shared/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Client/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Server/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Server.HttpGateway/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Server.Redis/ -c Debug
-      #- run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
-      - run: dotnet build ./src/MagicOnion.MSBuild.Tasks/ -c Debug
-      - run: dotnet build ./src/MagicOnion.Generator/ -c Debug
-      # test
-      - run: dotnet test ./tests/MagicOnion.Server.Tests/ -c Debug
-      - run: dotnet test ./tests/MagicOnion.Generator.Tests/ -c Debug
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-dotnet
+      - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
+
+  run-tests:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-dotnet
+      - run: dotnet test -c Debug MagicOnion.sln
+      - run: dotnet test -c Release MagicOnion.sln
 
   build-dotnet-experimental:
+    name: "Build .NET Experimental libraries"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Debug
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-dotnet
+      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c  ${{ env.BUILD_CONFIG }}
 
   build-unity:
+    name: "Build Unity package"
     if: "((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"
     strategy:
       matrix:
-        unity: ["2019.3.9f1", "2019.4.13f1", "2020.1.12f1"]
+        unity: ["2020.3.33f1"]
         include:
-          - unity: 2019.3.9f1
-            license: UNITY_LICENSE_2019
-          - unity: 2019.4.13f1
-            license: UNITY_LICENSE_2019
-          - unity: 2020.1.12f1
+          - unity: 2020.3.33f1
             license: UNITY_LICENSE_2020
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # todo: prepare runtime unit test
       # Execute scripts: RuntimeUnitTestToolkit
@@ -79,7 +69,7 @@ jobs:
       # execute scripts/Export Package
       # /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
       - name: Export unitypackage
-        uses: game-ci/unity-builder@v2.0-alpha-6
+        uses: game-ci/unity-builder@v2
         env:
           UNITY_LICENSE: ${{ secrets[matrix.license] }}
         with:
@@ -89,15 +79,9 @@ jobs:
           buildMethod: PackageExporter.Export
           versioning: None
 
-      - name: check all .meta is commited
-        run: |
-          if git ls-files --others --exclude-standard -t | grep --regexp='[.]meta$'; then
-            echo "Detected .meta file generated. Do you forgot commit a .meta file?"
-            exit 1
-          else
-            echo "Great, all .meta files are commited."
-          fi
-        working-directory: src/MagicOnion.Client.Unity
+      - uses: ./.github/actions/check-metas
+        with:
+          directory: src/MagicOnion.Client.Unity
 
       # Store artifacts.
       - uses: actions/upload-artifact@v1

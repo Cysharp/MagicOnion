@@ -1,63 +1,60 @@
 ﻿using MagicOnion.Utils;
-using System;
-using System.Collections.Generic;
 
-namespace MagicOnion.Server.Hubs
+namespace MagicOnion.Server.Hubs;
+
+// Global cache of Streaming Handler
+internal static class StreamingHubHandlerRepository
 {
-    // Global cache of Streaming Handler
-    internal static class StreamingHubHandlerRepository
+    static Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
+        = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(new MethodHandler.UniqueEqualityComparer());
+
+    static Dictionary<MethodHandler, IGroupRepository> cacheGroup
+        = new Dictionary<MethodHandler, IGroupRepository>(new MethodHandler.UniqueEqualityComparer());
+
+    public static void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
     {
-        static Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
-            = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(new MethodHandler.UniqueEqualityComparer());
+        var handlers = VerifyDuplicate(hubHandlers);
+        var hashDict = new UniqueHashDictionary<StreamingHubHandler>(handlers);
 
-        static Dictionary<MethodHandler, IGroupRepository> cacheGroup
-            = new Dictionary<MethodHandler, IGroupRepository>(new MethodHandler.UniqueEqualityComparer());
-
-        public static void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
+        lock (cache)
         {
-            var handlers = VerifyDuplicate(hubHandlers);
-            var hashDict = new UniqueHashDictionary<StreamingHubHandler>(handlers);
+            cache.Add(parent, hashDict);
+        }
+    }
 
-            lock (cache)
+    public static UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
+    {
+        return cache[parent];
+    }
+
+    static (int, StreamingHubHandler)[] VerifyDuplicate(StreamingHubHandler[] hubHandlers)
+    {
+        var list = new List<(int, StreamingHubHandler)>();
+        var map = new Dictionary<int, StreamingHubHandler>();
+        foreach (var item in hubHandlers)
+        {
+            var hash = item.MethodId;
+            if (map.ContainsKey(hash))
             {
-                cache.Add(parent, hashDict);
+                throw new InvalidOperationException($"StreamingHubHandler.MethodName found duplicate hashCode name. Please rename or use [MethodId] to avoid conflict. {map[hash]} and {item.MethodInfo.Name}");
             }
+            map.Add(hash, item);
+            list.Add((hash, item));
         }
 
-        public static UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
+        return list.ToArray();
+    }
+
+    public static void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
+    {
+        lock (cacheGroup)
         {
-            return cache[parent];
+            cacheGroup.Add(parent, repository);
         }
+    }
 
-        static (int, StreamingHubHandler)[] VerifyDuplicate(StreamingHubHandler[] hubHandlers)
-        {
-            var list = new List<(int, StreamingHubHandler)>();
-            var map = new Dictionary<int, StreamingHubHandler>();
-            foreach (var item in hubHandlers)
-            {
-                var hash = item.MethodId;
-                if (map.ContainsKey(hash))
-                {
-                    throw new InvalidOperationException($"StreamingHubHandler.MethodName found duplicate hashCode name. Please rename or use [MethodId] to avoid conflict. {map[hash]} and {item.MethodInfo.Name}");
-                }
-                map.Add(hash, item);
-                list.Add((hash, item));
-            }
-
-            return list.ToArray();
-        }
-
-        public static void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
-        {
-            lock (cacheGroup)
-            {
-                cacheGroup.Add(parent, repository);
-            }
-        }
-
-        public static IGroupRepository GetGroupRepository(MethodHandler parent)
-        {
-            return cacheGroup[parent];
-        }
+    public static IGroupRepository GetGroupRepository(MethodHandler parent)
+    {
+        return cacheGroup[parent];
     }
 }

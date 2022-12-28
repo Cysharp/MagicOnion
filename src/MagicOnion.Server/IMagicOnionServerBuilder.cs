@@ -1,22 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MagicOnion.Server
+namespace MagicOnion.Server;
+
+public interface IMagicOnionServerBuilder
 {
-    public interface IMagicOnionServerBuilder
-    {
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
+}
 
-    internal class MagicOnionServerBuilder : IMagicOnionServerBuilder
-    {
-        public IServiceCollection Services { get; }
+internal class MagicOnionServerBuilder : IMagicOnionServerBuilder
+{
+    public IServiceCollection Services { get; }
 
-        public MagicOnionServerBuilder(IServiceCollection services)
-        {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-        }
+    public MagicOnionServerBuilder(IServiceCollection services)
+    {
+        Services = services ?? throw new ArgumentNullException(nameof(services));
     }
 }

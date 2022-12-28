@@ -15,16 +15,16 @@ namespace ChatApp.Server
             _logger = logger;
         }
 
-        public UnaryResult<Nil> GenerateException(string message)
+        public UnaryResult GenerateException(string message)
         {
             throw new System.NotImplementedException();
         }
 
-        public UnaryResult<Nil> SendReportAsync(string message)
+        public UnaryResult SendReportAsync(string message)
         {
             _logger.LogDebug($"{message}");
 
-            return UnaryResult(Nil.Default);
+            return UnaryResult.CompletedResult;
         }
     }
 }

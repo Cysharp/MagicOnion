@@ -1,29 +1,55 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Generator.Tests
+namespace MagicOnion.Generator.Tests;
+
+public class GenerateServiceTest
 {
-    public class GenerateServiceTest
+    readonly ITestOutputHelper testOutputHelper;
+
+    public GenerateServiceTest(ITestOutputHelper testOutputHelper)
     {
-        private readonly ITestOutputHelper _testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
+    }
 
-        public GenerateServiceTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
+    [Fact]
+    public async Task Return_UnaryResultNonGeneric()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
 
-        [Fact]
-        public async Task Return_UnaryResultOfT()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult A();
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Return_UnaryResultOfT()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -38,25 +64,94 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+        
+    [Fact]
+    public async Task Return_UnaryResultOfValueType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
 
-        [Fact]
-        public async Task Return_TaskOfUnaryResultOfT()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<long> A();
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+                
+    [Fact]
+    public async Task Return_UnaryResultOfRefType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
+using System;
+using System.Threading.Tasks;
+using MessagePack;
+using MagicOnion;
+
+namespace TempProject
+{
+    public interface IMyService : IService<IMyService>
+    {
+        UnaryResult<string> A();
+    }
+}
+            ");
+
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
+
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Invalid_Return_TaskOfUnaryResultOfT()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -71,26 +166,27 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        ));
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 
 
-        [Fact]
-        public async Task Return_StreamingResult()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task Return_StreamingResult()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -107,25 +203,26 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task Invalid_Return_NonGenerics()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task Invalid_Return_NonGenerics()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -140,25 +237,26 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await compiler.GenerateFileAsync(
-                    tempWorkspace.CsProjectPath,
-                    Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                    true,
-                    "TempProject.Generated",
-                    "",
-                    "MessagePack.Formatters"
-                );
-            });
-        }
-
-        [Fact]
-        public async Task Invalid_Return_NonSupportedUnaryResultOfT()
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters",
+            SerializerType.MessagePack
+            );
+        });
+    }
+
+    [Fact]
+    public async Task Invalid_Return_NonSupportedUnaryResultOfT()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -173,25 +271,26 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await compiler.GenerateFileAsync(
-                    tempWorkspace.CsProjectPath,
-                    Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                    true,
-                    "TempProject.Generated",
-                    "",
-                    "MessagePack.Formatters"
-                );
-            });
-        }
-
-        [Fact]
-        public async Task Invalid_Return_RawStreaming_NonTask()
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters",
+            SerializerType.MessagePack
+            );
+        });
+    }
+
+    [Fact]
+    public async Task Invalid_Return_RawStreaming_NonTask()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -208,18 +307,18 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await compiler.GenerateFileAsync(
-                    tempWorkspace.CsProjectPath,
-                    Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                    true,
-                    "TempProject.Generated",
-                    "",
-                    "MessagePack.Formatters"
-                );
-            });
-        }
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await compiler.GenerateFileAsync(
+                tempWorkspace.CsProjectPath,
+                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+                true,
+                "TempProject.Generated",
+                "",
+                "MessagePack.Formatters",
+                SerializerType.MessagePack
+            );
+        });
     }
 }

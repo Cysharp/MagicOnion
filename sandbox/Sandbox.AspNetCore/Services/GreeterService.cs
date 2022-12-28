@@ -16,7 +16,7 @@ namespace Sandbox.AspNetCore.Services
     {
         public UnaryResult<string> HelloAsync()
         {
-            return UnaryResult("Konnichiwa from MagicOnion + ASP.NET Core");
+            return UnaryResult.FromResult("Konnichiwa from MagicOnion + ASP.NET Core");
         }
     }
 }

@@ -1,63 +1,49 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using MagicOnion.Internal;
 
 namespace MagicOnion
 {
     /// <summary>
     /// Wrapped AsyncServerStreamingCall.
     /// </summary>
-    public struct ServerStreamingResult<TResponse> : IDisposable
+    public readonly struct ServerStreamingResult<TResponse> : IDisposable
     {
-        readonly AsyncServerStreamingCall<byte[]> inner;
-        readonly IAsyncStreamReader<TResponse> responseStream;
+        readonly IAsyncServerStreamingCallWrapper<TResponse> inner;
 
-        public ServerStreamingResult(AsyncServerStreamingCall<byte[]> inner, IAsyncStreamReader<TResponse> responseStream, MessagePackSerializerOptions serializerOptions)
+        public ServerStreamingResult(IAsyncServerStreamingCallWrapper<TResponse> inner)
         {
             this.inner = inner;
-            this.responseStream = responseStream;
         }
 
         /// <summary>
         /// Async stream to read streaming responses.
         /// </summary>
         public IAsyncStreamReader<TResponse> ResponseStream
-        {
-            get
-            {
-                return responseStream;
-            }
-        }
+            => inner.ResponseStream;
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-        {
-            get
-            {
-                return this.inner.ResponseHeadersAsync;
-            }
-        }
+            => inner.ResponseHeadersAsync;
 
         /// <summary>
         /// Gets the call status if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-        {
-            return this.inner.GetStatus();
-        }
+            => inner.GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-        {
-            return this.inner.GetTrailers();
-        }
+            => inner.GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.
@@ -70,11 +56,6 @@ namespace MagicOnion
         /// "Cancel" semantics of invoking <c>Dispose</c>.
         /// </remarks>
         public void Dispose()
-        {
-            if (this.inner != null)
-            {
-                this.inner.Dispose();
-            }
-        }
+            => inner?.Dispose();
     }
 }

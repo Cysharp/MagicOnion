@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 EXPOSE 12345
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["ChatApp.Server/ChatApp.Server.csproj", "ChatApp.Server/"]
 COPY ["ChatApp.Shared/ChatApp.Shared.csproj", "ChatApp.Shared/"]

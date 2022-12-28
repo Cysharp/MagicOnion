@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "MagicOnionTestServer": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5197;https://localhost:7197",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

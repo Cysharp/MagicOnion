@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "messagepack.generator": {
+      "version": "2.4.35",
+      "commands": [
+        "mpc"
+      ]
+    }
+  }
+}

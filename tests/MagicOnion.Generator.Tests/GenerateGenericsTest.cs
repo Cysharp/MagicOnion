@@ -1,31 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using MessagePack;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace MagicOnion.Generator.Tests
+namespace MagicOnion.Generator.Tests;
+
+public class GenerateGenericsTest
 {
-    public class GenerateGenericsTest
+    readonly ITestOutputHelper testOutputHelper;
+
+    public GenerateGenericsTest(ITestOutputHelper testOutputHelper)
     {
-        private readonly ITestOutputHelper _testOutputHelper;
+        this.testOutputHelper = testOutputHelper;
+    }
 
-        public GenerateGenericsTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
-        [Fact]
-        public async Task Parameters()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task Parameters()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -50,29 +40,30 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_MultipleTypeArgs()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_MultipleTypeArgs()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -97,29 +88,30 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int, global::TempProject.MyObject>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, int>",
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_Nested()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32, global::TempProject.MyObject>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, global::System.Int32>",
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_Nested()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -145,33 +137,34 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<int>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
-            });
-        }
-
-
-        [Fact]
-        public async Task Parameters_Nested_Enum()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
+        });
+    }
+
+
+    [Fact]
+    public async Task Parameters_Nested_Enum()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -195,32 +188,33 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+        var compilation = tempWorkspace.GetOutputCompilation();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
 
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>",
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_Nested_Array()
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>",
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_Nested_Array()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -243,30 +237,31 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyNestedGenericObject[]>",
-                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyNestedGenericObject>"
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_ListFormatter_KnownType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyNestedGenericObject[]>",
+            "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyNestedGenericObject>"
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_ListFormatter_KnownType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -283,30 +278,31 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ListFormatter<string>",
-                "global::MessagePack.Formatters.ListFormatter<int>"
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_ListFormatter_UserType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.ListFormatter<global::System.String>",
+            "global::MessagePack.Formatters.ListFormatter<global::System.Int32>"
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_ListFormatter_UserType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -325,29 +321,30 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
-            });
-        }
-
-        [Fact]
-        public async Task Parameters_ArrayFormatter_KnownType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
+        });
+    }
+
+    [Fact]
+    public async Task Parameters_ArrayFormatter_KnownType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -366,27 +363,28 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task Parameters_ArrayFormatter_UserType()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task Parameters_ArrayFormatter_UserType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -405,30 +403,31 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyResponse>"
-            });
-        }
-
-        [Fact]
-        public async Task Return()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyResponse>"
+        });
+    }
+
+    [Fact]
+    public async Task Return()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -463,30 +462,31 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_Nested()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_Nested()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -522,33 +522,34 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<int>>>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_MultipleTypeArgs()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyObject>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_MultipleTypeArgs()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -583,30 +584,31 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<int, global::TempProject.MyObject>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, int>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_Enum()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::System.Int32, global::TempProject.MyObject>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyObject, global::System.Int32>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_Enum()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -640,32 +642,33 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
 
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_Nested_Enum()
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_Nested_Enum()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using MessagePack;
 using MagicOnion;
@@ -699,33 +702,34 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            Path.Combine(tempWorkspace.OutputDirectory, "Generated.cs"),
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        symbols.Should().Contain(x => x.Name.EndsWith("MyEnumFormatter"));
 
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_Nested_Array()
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyEnum>",
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_Nested_Array()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -758,31 +762,32 @@ namespace MessagePack.Formatters.TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyNestedGenericObject[]>",
-                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyNestedGenericObject>"
-            });
-        }
-
-        [Fact]
-        public async Task Return_ListFormatter_KnownType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyNestedGenericObject[]>",
+            "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyNestedGenericObject>"
+        });
+    }
+
+    [Fact]
+    public async Task Return_ListFormatter_KnownType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -799,31 +804,32 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ListFormatter<string>",
-                "global::MessagePack.Formatters.ListFormatter<int>"
-            });
-        }
-
-        [Fact]
-        public async Task Return_ListFormatter_UserType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.ListFormatter<global::System.String>",
+            "global::MessagePack.Formatters.ListFormatter<global::System.Int32>"
+        });
+    }
+
+    [Fact]
+    public async Task Return_ListFormatter_UserType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -842,30 +848,31 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
-            });
-        }
-
-        [Fact]
-        public async Task Return_ArrayFormatter_KnownType()
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
         {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+            "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
+        });
+    }
+
+    [Fact]
+    public async Task Return_ArrayFormatter_KnownType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -884,27 +891,28 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().BeEmpty();
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().BeEmpty();
+    }
 
-        [Fact]
-        public async Task Return_ArrayFormatter_UserType()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task Return_ArrayFormatter_UserType()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Threading.Tasks;
 using MessagePack;
@@ -923,31 +931,32 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyResponse>"
-            });
-        }
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+        {
+            "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyResponse>"
+        });
+    }
 
         
-        [Fact]
-        public async Task KnownFormatters()
-        {
-            using var tempWorkspace = TemporaryProjectWorkarea.Create();
-            tempWorkspace.AddFileToProject("IMyService.cs", @"
+    [Fact]
+    public async Task KnownFormatters()
+    {
+        using var tempWorkspace = TemporaryProjectWorkarea.Create();
+        tempWorkspace.AddFileToProject("IMyService.cs", @"
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -980,38 +989,38 @@ namespace TempProject
 }
             ");
 
-            var compiler = new MagicOnionCompiler(_testOutputHelper.WriteLine, CancellationToken.None);
-            await compiler.GenerateFileAsync(
-                tempWorkspace.CsProjectPath,
-                tempWorkspace.OutputDirectory,
-                true,
-                "TempProject.Generated",
-                "",
-                "MessagePack.Formatters"
-            );
+        var compiler = new MagicOnionCompiler(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), CancellationToken.None);
+        await compiler.GenerateFileAsync(
+            tempWorkspace.CsProjectPath,
+            tempWorkspace.OutputDirectory,
+            true,
+            "TempProject.Generated",
+            "",
+            "MessagePack.Formatters",
+            SerializerType.MessagePack
+        );
 
-            var compilation = tempWorkspace.GetOutputCompilation();
-            compilation.GetCompilationErrors().Should().BeEmpty();
-            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
-            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
-            {
-                "global::MessagePack.Formatters.ListFormatter<int>",
-                "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceListFormatter2<global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::TempProject.MyResponse>",
+        var compilation = tempWorkspace.GetOutputCompilation();
+        compilation.GetCompilationErrors().Should().BeEmpty();
+        var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+        compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+        {
+            "global::MessagePack.Formatters.ListFormatter<global::System.Int32>",
+            "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceListFormatter2<global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::TempProject.MyResponse>",
 
-                "global::MessagePack.Formatters.DictionaryFormatter<string, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceDictionaryFormatter<string, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<string, global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.DictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceDictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceReadOnlyDictionaryFormatter<global::System.String, global::TempProject.MyResponse>",
 
-                "global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::TempProject.MyResponse>",
 
-                "global::MessagePack.Formatters.InterfaceLookupFormatter<int, global::TempProject.MyResponse>",
-                "global::MessagePack.Formatters.InterfaceGroupingFormatter<int, global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.Int32, global::TempProject.MyResponse>",
+            "global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.Int32, global::TempProject.MyResponse>",
 
-            });
-        }
+        });
     }
 }

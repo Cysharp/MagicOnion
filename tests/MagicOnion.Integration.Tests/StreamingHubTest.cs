@@ -1,0 +1,514 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using Grpc.Net.Client;
+using MagicOnion.Client;
+using MagicOnion.Integration.Tests.Generated;
+using MagicOnion.Serialization;
+using MagicOnion.Server.Hubs;
+
+namespace MagicOnion.Integration.Tests;
+
+public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<StreamingHubTestHub>>
+{
+    readonly MagicOnionApplicationFactory<StreamingHubTestHub> factory;
+
+    public StreamingHubTest(MagicOnionApplicationFactory<StreamingHubTestHub> factory)
+    {
+        this.factory = factory;
+    }
+
+    public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
+    {
+        yield return new [] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
+        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientFactoryProvider.Instance)};
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task NoReturn_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.NoReturn_Parameter_Zero();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task NoReturn_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.NoReturn_Parameter_One(12345);
+    }
+
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.NoReturn_Parameter_Many(12345, "Hello✨", true);
+    }
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.Parameter_Zero();
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.Parameter_One(12345);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.Parameter_Many(12345, "Hello✨", true);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_Zero();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_One(12345);
+    }
+
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act & Assert
+        await client.ValueTask_NoReturn_Parameter_Many(12345, "Hello✨", true);
+    }
+    
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_Zero();
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_One(12345);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.ValueTask_Parameter_Many(12345, "Hello✨", true);
+
+        // Assert
+        result.Should().Be(67890);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Receiver_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        await client.CallReceiver_Parameter_Zero();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_Parameter_Zero());
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Receiver_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        await client.CallReceiver_Parameter_One(12345);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_Parameter_One(12345));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Receiver_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        await client.CallReceiver_Parameter_Many(12345, "Hello✨", true);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_Parameter_Many(12345, "Hello✨", true));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Forget_NoReturnValue(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        await client.Never();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Forget_WithReturnValue(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        var result = await client.Never_With_Return();
+
+        // Assert
+        result.Should().Be(default(int));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Forget_NoReturnValue(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        await client.ValueTask_Never();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ValueTask_Forget_WithReturnValue(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        client = client.FireAndForget(); // Use FireAndForget client
+
+        // Act
+        var result = await client.ValueTask_Never_With_Return();
+
+        // Assert
+        result.Should().Be(default(int));
+    }
+}
+
+public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
+{
+    IGroup group = default!;
+
+    protected override async ValueTask OnConnecting()
+    {
+        group = await Group.AddAsync(ConnectionId.ToString());
+    }
+
+    public Task NoReturn_Parameter_Zero()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task NoReturn_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return Task.CompletedTask;
+    }
+
+    public Task NoReturn_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return Task.CompletedTask;
+    }
+
+    public Task<int> Parameter_Zero()
+    {
+        return Task.FromResult(67890);
+    }
+
+    public Task<int> Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return Task.FromResult(67890);
+    }
+
+    public Task<int> Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return Task.FromResult(67890);
+    }
+
+    public Task CallReceiver_Parameter_Zero()
+    {
+        Broadcast(group).Receiver_Parameter_Zero();
+        return Task.CompletedTask;
+    }
+
+    public Task CallReceiver_Parameter_One(int arg0)
+    {
+        Broadcast(group).Receiver_Parameter_One(12345);
+        return Task.CompletedTask;
+    }
+
+    public Task CallReceiver_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Broadcast(group).Receiver_Parameter_Many(12345, "Hello✨", true);
+        return Task.CompletedTask;
+    }
+
+    public Task Never()
+    {
+        return new TaskCompletionSource().Task.WaitAsync(TimeSpan.FromMilliseconds(100));
+    }
+    
+    public Task<int> Never_With_Return()
+    {
+        return new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100));
+    }
+    
+    public ValueTask ValueTask_NoReturn_Parameter_Zero()
+    {
+        return default;
+    }
+
+    public ValueTask ValueTask_NoReturn_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return default;
+    }
+
+    public ValueTask ValueTask_NoReturn_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return default;
+    }
+
+    public ValueTask<int> ValueTask_Parameter_Zero()
+    {
+        return ValueTask.FromResult(67890);
+    }
+
+    public ValueTask<int> ValueTask_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        return ValueTask.FromResult(67890);
+    }
+
+    public ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        return ValueTask.FromResult(67890);
+    }
+
+    public ValueTask ValueTask_Never()
+    {
+        return new ValueTask(new TaskCompletionSource().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
+    }
+    
+    public ValueTask<int> ValueTask_Never_With_Return()
+    {
+        return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
+    }
+
+}
+
+public interface IStreamingHubTestHubReceiver
+{
+    void Receiver_Parameter_Zero();
+    void Receiver_Parameter_One(int arg0);
+    void Receiver_Parameter_Many(int arg0, string arg1, bool arg2);
+}
+
+public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
+{
+    Task NoReturn_Parameter_Zero();
+    Task NoReturn_Parameter_One(int arg0);
+    Task NoReturn_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    Task<int> Parameter_Zero();
+    Task<int> Parameter_One(int arg0);
+    Task<int> Parameter_Many(int arg0, string arg1, bool arg2);
+
+    Task CallReceiver_Parameter_Zero();
+    Task CallReceiver_Parameter_One(int arg0);
+    Task CallReceiver_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    Task Never();
+    Task<int> Never_With_Return();
+
+    ValueTask ValueTask_NoReturn_Parameter_Zero();
+    ValueTask ValueTask_NoReturn_Parameter_One(int arg0);
+    ValueTask ValueTask_NoReturn_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    ValueTask<int> ValueTask_Parameter_Zero();
+    ValueTask<int> ValueTask_Parameter_One(int arg0);
+    ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    ValueTask ValueTask_Never();
+    ValueTask<int> ValueTask_Never_With_Return();
+
+}

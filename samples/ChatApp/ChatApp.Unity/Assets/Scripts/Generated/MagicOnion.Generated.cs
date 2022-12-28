@@ -5,6 +5,12 @@
 #pragma warning disable 219
 #pragma warning disable 168
 
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
+
 namespace MagicOnion
 {
     using global::System;
@@ -17,17 +23,74 @@ namespace MagicOnion
     {
         static bool isRegistered = false;
 
+#if UNITY_2019_4_OR_NEWER
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+#elif NET5_0_OR_GREATER
+        [System.Runtime.CompilerServices.ModuleInitializer]
+#endif
         public static void Register()
         {
-            if(isRegistered) return;
+            if (isRegistered) return;
             isRegistered = true;
 
-            MagicOnionClientRegistry<ChatApp.Shared.Services.IChatService>.Register((x, y, z) => new ChatApp.Shared.Services.ChatServiceClient(x, y, z));
+            global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default =
+                (global::MagicOnion.Client.MagicOnionClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider immutableMagicOnionClientFactoryProvider)
+                    ? immutableMagicOnionClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new global::MagicOnion.Client.ImmutableMagicOnionClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
 
-            StreamingHubClientRegistry<ChatApp.Shared.Hubs.IChatHub, ChatApp.Shared.Hubs.IChatHubReceiver>.Register((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.ChatHubClient(a, b, c, d, e));
+            global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default =
+                (global::MagicOnion.Client.StreamingHubClientFactoryProvider.Default is global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider immutableStreamingHubClientFactoryProvider)
+                    ? immutableStreamingHubClientFactoryProvider.Add(MagicOnionGeneratedClientFactoryProvider.Instance)
+                    : new global::MagicOnion.Client.ImmutableStreamingHubClientFactoryProvider(MagicOnionGeneratedClientFactoryProvider.Instance);
         }
     }
+
+    public partial class MagicOnionGeneratedClientFactoryProvider : global::MagicOnion.Client.IMagicOnionClientFactoryProvider, global::MagicOnion.Client.IStreamingHubClientFactoryProvider
+    {
+        public static MagicOnionGeneratedClientFactoryProvider Instance { get; } = new MagicOnionGeneratedClientFactoryProvider();
+
+        MagicOnionGeneratedClientFactoryProvider() {}
+
+        bool global::MagicOnion.Client.IMagicOnionClientFactoryProvider.TryGetFactory<T>(out global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> factory)
+            => (factory = MagicOnionClientFactoryCache<T>.Factory) != null;
+
+        bool global::MagicOnion.Client.IStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory)
+            => (factory = StreamingHubClientFactoryCache<TStreamingHub, TReceiver>.Factory) != null;
+
+        static class MagicOnionClientFactoryCache<T> where T : global::MagicOnion.IService<T>
+        {
+            public readonly static global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T> Factory;
+
+            static MagicOnionClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
+
+                if (typeof(T) == typeof(global::ChatApp.Shared.Services.IChatService))
+                {
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::ChatApp.Shared.Services.IChatService>)((x, y) => new ChatApp.Shared.Services.ChatServiceClient(x, y)));
+                }
+                Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
+            }
+        }
+        
+        static class StreamingHubClientFactoryCache<TStreamingHub, TReceiver> where TStreamingHub : global::MagicOnion.IStreamingHub<TStreamingHub, TReceiver>
+        {
+            public readonly static global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory;
+
+            static StreamingHubClientFactoryCache()
+            {
+                object factory = default(global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>);
+
+                if (typeof(TStreamingHub) == typeof(global::ChatApp.Shared.Hubs.IChatHub) && typeof(TReceiver) == typeof(global::ChatApp.Shared.Hubs.IChatHubReceiver))
+                {
+                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>)((a, _, b, c, d, e) => new ChatApp.Shared.Hubs.ChatHubClient(a, b, c, d, e)));
+                }
+
+                Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
+            }
+        }
+    }
+
 }
 
 #pragma warning restore 168
@@ -35,11 +98,18 @@ namespace MagicOnion
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 219
 #pragma warning disable 168
+
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
 
 namespace MagicOnion.Resolvers
 {
@@ -83,9 +153,9 @@ namespace MagicOnion.Resolvers
         {
             lookup = new global::System.Collections.Generic.Dictionary<Type, int>(3)
             {
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>), 0 },
-                {typeof(global::System.Collections.Generic.Dictionary<int, string>), 1 },
-                {typeof(global::System.Collections.Generic.List<int>), 2 },
+                {typeof(global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>), 0 },
+                {typeof(global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>), 1 },
+                {typeof(global::System.Collections.Generic.List<global::System.Int32>), 2 },
             };
         }
 
@@ -99,9 +169,9 @@ namespace MagicOnion.Resolvers
 
             switch (key)
             {
-                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>(default(global::System.Collections.Generic.List<int>), default(global::System.Collections.Generic.Dictionary<int, string>));
-                case 1: return new global::MessagePack.Formatters.DictionaryFormatter<int, string>();
-                case 2: return new global::MessagePack.Formatters.ListFormatter<int>();
+                case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>(default(global::System.Collections.Generic.List<global::System.Int32>), default(global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>));
+                case 1: return new global::MessagePack.Formatters.DictionaryFormatter<global::System.Int32, global::System.String>();
+                case 2: return new global::MessagePack.Formatters.ListFormatter<global::System.Int32>();
                 default: return null;
             }
         }
@@ -113,284 +183,183 @@ namespace MagicOnion.Resolvers
 #pragma warning restore 414
 #pragma warning restore 612
 #pragma warning restore 618
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
 #pragma warning disable 219
 #pragma warning disable 168
 
-namespace ChatApp.Shared.Services {
-    using System;
-    using MagicOnion;
-    using MagicOnion.Client;
-    using Grpc.Core;
-    using MessagePack;
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
 
-    [Ignore]
-    public class ChatServiceClient : MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
+namespace ChatApp.Shared.Services
+{
+    using global::System;
+    using global::Grpc.Core;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+    using global::MessagePack;
+    
+    [global::MagicOnion.Ignore]
+    public class ChatServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::ChatApp.Shared.Services.IChatService>, global::ChatApp.Shared.Services.IChatService
     {
-        static readonly Method<byte[], byte[]> GenerateExceptionMethod;
-        static readonly Func<RequestContext, ResponseContext> GenerateExceptionDelegate;
-        static readonly Method<byte[], byte[]> SendReportAsyncMethod;
-        static readonly Func<RequestContext, ResponseContext> SendReportAsyncDelegate;
-
-        static ChatServiceClient()
+        class ClientCore
         {
-            GenerateExceptionMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "GenerateException", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-            GenerateExceptionDelegate = _GenerateException;
-            SendReportAsyncMethod = new Method<byte[], byte[]>(MethodType.Unary, "IChatService", "SendReportAsync", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-            SendReportAsyncDelegate = _SendReportAsync;
-        }
-
-        ChatServiceClient()
-        {
-        }
-
-        public ChatServiceClient(CallInvoker callInvoker, MessagePackSerializerOptions serializerOptions, IClientFilter[] filters)
-            : base(callInvoker, serializerOptions, filters)
-        {
-        }
-
-        protected override MagicOnionClientBase<IChatService> Clone()
-        {
-            var clone = new ChatServiceClient();
-            clone.host = this.host;
-            clone.option = this.option;
-            clone.callInvoker = this.callInvoker;
-            clone.serializerOptions = this.serializerOptions;
-            clone.filters = filters;
-            return clone;
-        }
-
-        public new IChatService WithHeaders(Metadata headers)
-        {
-            return base.WithHeaders(headers);
-        }
-
-        public new IChatService WithCancellationToken(System.Threading.CancellationToken cancellationToken)
-        {
-            return base.WithCancellationToken(cancellationToken);
-        }
-
-        public new IChatService WithDeadline(System.DateTime deadline)
-        {
-            return base.WithDeadline(deadline);
-        }
-
-        public new IChatService WithHost(string host)
-        {
-            return base.WithHost(host);
-        }
-
-        public new IChatService WithOptions(CallOptions option)
-        {
-            return base.WithOptions(option);
-        }
-   
-        static ResponseContext _GenerateException(RequestContext __context)
-        {
-            return CreateResponseContext<string, global::MessagePack.Nil>(__context, GenerateExceptionMethod);
-        }
-
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GenerateException(string message)
-        {
-            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/GenerateException", message, GenerateExceptionDelegate);
-        }
-        static ResponseContext _SendReportAsync(RequestContext __context)
-        {
-            return CreateResponseContext<string, global::MessagePack.Nil>(__context, SendReportAsyncMethod);
-        }
-
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> SendReportAsync(string message)
-        {
-            return InvokeAsync<string, global::MessagePack.Nil>("IChatService/SendReportAsync", message, SendReportAsyncDelegate);
-        }
-    }
-}
-
-#pragma warning restore 168
-#pragma warning restore 219
-#pragma warning restore 414
-#pragma warning restore 612
-#pragma warning restore 618
-#pragma warning disable 618
-#pragma warning disable 612
-#pragma warning disable 414
-#pragma warning disable 219
-#pragma warning disable 168
-
-namespace ChatApp.Shared.Hubs {
-    using Grpc.Core;
-    using MagicOnion;
-    using MagicOnion.Client;
-    using MessagePack;
-    using System;
-    using System.Threading.Tasks;
-
-    [Ignore]
-    public class ChatHubClient : StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
-    {
-        static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IChatHub", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-
-        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get { return method; } }
-
-        readonly global::ChatApp.Shared.Hubs.IChatHub __fireAndForgetClient;
-
-        public ChatHubClient(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
-            : base(callInvoker, host, option, serializerOptions, logger)
-        {
-            this.__fireAndForgetClient = new FireAndForgetClient(this);
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.String, global::MessagePack.Nil> GenerateException;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.String, global::MessagePack.Nil> SendReportAsync;
+            public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+            {
+                this.GenerateException = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.String, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IChatService", "GenerateException", serializerProvider);
+                this.SendReportAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.String, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IChatService", "SendReportAsync", serializerProvider);
+            }
         }
         
-        public global::ChatApp.Shared.Hubs.IChatHub FireAndForget()
+        readonly ClientCore core;
+        
+        public ChatServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
         {
-            return __fireAndForgetClient;
+            this.core = new ClientCore(serializerProvider);
         }
-
-        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        
+        private ChatServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
         {
-            switch (methodId)
-            {
-                case -1297457280: // OnJoin
-                {
-                    var result = MessagePackSerializer.Deserialize<string>(data, serializerOptions);
-                    receiver.OnJoin(result); break;
-                }
-                case 532410095: // OnLeave
-                {
-                    var result = MessagePackSerializer.Deserialize<string>(data, serializerOptions);
-                    receiver.OnLeave(result); break;
-                }
-                case -552695459: // OnSendMessage
-                {
-                    var result = MessagePackSerializer.Deserialize<global::ChatApp.Shared.MessagePackObjects.MessageResponse>(data, serializerOptions);
-                    receiver.OnSendMessage(result); break;
-                }
-                default:
-                    break;
-            }
+            this.core = core;
         }
-
-        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
-        {
-            switch (methodId)
-            {
-                case -733403293: // JoinAsync
-                {
-                    var result = MessagePackSerializer.Deserialize<Nil>(data, serializerOptions);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
-                case 1368362116: // LeaveAsync
-                {
-                    var result = MessagePackSerializer.Deserialize<Nil>(data, serializerOptions);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
-                case -601690414: // SendMessageAsync
-                {
-                    var result = MessagePackSerializer.Deserialize<Nil>(data, serializerOptions);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
-                case 517938971: // GenerateException
-                {
-                    var result = MessagePackSerializer.Deserialize<Nil>(data, serializerOptions);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
-                case -852153394: // SampleMethod
-                {
-                    var result = MessagePackSerializer.Deserialize<Nil>(data, serializerOptions);
-                    ((TaskCompletionSource<Nil>)taskCompletionSource).TrySetResult(result);
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-   
-        public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
-        {
-            return WriteMessageWithResponseAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest, Nil>(-733403293, request);
-        }
-
-        public global::System.Threading.Tasks.Task LeaveAsync()
-        {
-            return WriteMessageWithResponseAsync<Nil, Nil>(1368362116, Nil.Default);
-        }
-
-        public global::System.Threading.Tasks.Task SendMessageAsync(string message)
-        {
-            return WriteMessageWithResponseAsync<string, Nil>(-601690414, message);
-        }
-
-        public global::System.Threading.Tasks.Task GenerateException(string message)
-        {
-            return WriteMessageWithResponseAsync<string, Nil>(517938971, message);
-        }
-
-        public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)
-        {
-            return WriteMessageWithResponseAsync<DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>, Nil>(-852153394, new DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>(sampleList, sampleDictionary));
-        }
-
-
-        class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
-        {
-            readonly ChatHubClient __parent;
-
-            public FireAndForgetClient(ChatHubClient parentClient)
-            {
-                this.__parent = parentClient;
-            }
-
-            public global::ChatApp.Shared.Hubs.IChatHub FireAndForget()
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task DisposeAsync()
-            {
-                throw new NotSupportedException();
-            }
-
-            public Task WaitForDisconnect()
-            {
-                throw new NotSupportedException();
-            }
-
-            public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
-            {
-                return __parent.WriteMessageAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest>(-733403293, request);
-            }
-
-            public global::System.Threading.Tasks.Task LeaveAsync()
-            {
-                return __parent.WriteMessageAsync<Nil>(1368362116, Nil.Default);
-            }
-
-            public global::System.Threading.Tasks.Task SendMessageAsync(string message)
-            {
-                return __parent.WriteMessageAsync<string>(-601690414, message);
-            }
-
-            public global::System.Threading.Tasks.Task GenerateException(string message)
-            {
-                return __parent.WriteMessageAsync<string>(517938971, message);
-            }
-
-            public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<int> sampleList, global::System.Collections.Generic.Dictionary<int, string> sampleDictionary)
-            {
-                return __parent.WriteMessageAsync<DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>>(-852153394, new DynamicArgumentTuple<global::System.Collections.Generic.List<int>, global::System.Collections.Generic.Dictionary<int, string>>(sampleList, sampleDictionary));
-            }
-
-        }
+        
+        protected override global::MagicOnion.Client.MagicOnionClientBase<IChatService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+            => new ChatServiceClient(options, core);
+        
+        public global::MagicOnion.UnaryResult GenerateException(global::System.String message)
+            => this.core.GenerateException.InvokeUnaryNonGeneric(this, "IChatService/GenerateException", message);
+        public global::MagicOnion.UnaryResult SendReportAsync(global::System.String message)
+            => this.core.SendReportAsync.InvokeUnaryNonGeneric(this, "IChatService/SendReportAsync", message);
     }
 }
 
-#pragma warning restore 168
-#pragma warning restore 219
-#pragma warning restore 414
-#pragma warning restore 618
-#pragma warning restore 612
+
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+// NOTE: Disable warnings for nullable reference types.
+// `#nullable disable` causes compile error on old C# compilers (-7.3)
+#pragma warning disable 8603 // Possible null reference return.
+#pragma warning disable 8618 // Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+#pragma warning disable 8625 // Cannot convert null literal to non-nullable reference type.
+
+namespace ChatApp.Shared.Hubs
+{
+    using global::System;
+    using global::Grpc.Core;
+    using global::MagicOnion;
+    using global::MagicOnion.Client;
+    using global::MessagePack;
+    
+    [global::MagicOnion.Ignore]
+    public class ChatHubClient : global::MagicOnion.Client.StreamingHubClientBase<global::ChatApp.Shared.Hubs.IChatHub, global::ChatApp.Shared.Hubs.IChatHubReceiver>, global::ChatApp.Shared.Hubs.IChatHub
+    {
+        protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
+        
+        public ChatHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
+            : base(callInvoker, host, options, serializerProvider, logger)
+        {
+            var marshaller = global::MagicOnion.MagicOnionMarshallers.ThroughMarshaller;
+            DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "IChatHub", "Connect", marshaller, marshaller);
+        }
+        
+        public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
+            => base.WriteMessageWithResponseAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest, global::MessagePack.Nil>(-733403293, request);
+        public global::System.Threading.Tasks.Task LeaveAsync()
+            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1368362116, global::MessagePack.Nil.Default);
+        public global::System.Threading.Tasks.Task SendMessageAsync(global::System.String message)
+            => base.WriteMessageWithResponseAsync<global::System.String, global::MessagePack.Nil>(-601690414, message);
+        public global::System.Threading.Tasks.Task GenerateException(global::System.String message)
+            => base.WriteMessageWithResponseAsync<global::System.String, global::MessagePack.Nil>(517938971, message);
+        public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<global::System.Int32> sampleList, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String> sampleDictionary)
+            => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>, global::MessagePack.Nil>(-852153394, new global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>(sampleList, sampleDictionary));
+        
+        public global::ChatApp.Shared.Hubs.IChatHub FireAndForget()
+            => new FireAndForgetClient(this);
+        
+        [global::MagicOnion.Ignore]
+        class FireAndForgetClient : global::ChatApp.Shared.Hubs.IChatHub
+        {
+            readonly ChatHubClient parent;
+        
+            public FireAndForgetClient(ChatHubClient parent)
+                => this.parent = parent;
+        
+            public global::ChatApp.Shared.Hubs.IChatHub FireAndForget() => this;
+            public global::System.Threading.Tasks.Task DisposeAsync() => throw new global::System.NotSupportedException();
+            public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
+        
+            public global::System.Threading.Tasks.Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
+                => parent.WriteMessageFireAndForgetAsync<global::ChatApp.Shared.MessagePackObjects.JoinRequest, global::MessagePack.Nil>(-733403293, request);
+            public global::System.Threading.Tasks.Task LeaveAsync()
+                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(1368362116, global::MessagePack.Nil.Default);
+            public global::System.Threading.Tasks.Task SendMessageAsync(global::System.String message)
+                => parent.WriteMessageFireAndForgetAsync<global::System.String, global::MessagePack.Nil>(-601690414, message);
+            public global::System.Threading.Tasks.Task GenerateException(global::System.String message)
+                => parent.WriteMessageFireAndForgetAsync<global::System.String, global::MessagePack.Nil>(517938971, message);
+            public global::System.Threading.Tasks.Task SampleMethod(global::System.Collections.Generic.List<global::System.Int32> sampleList, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String> sampleDictionary)
+                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>, global::MessagePack.Nil>(-852153394, new global::MagicOnion.DynamicArgumentTuple<global::System.Collections.Generic.List<global::System.Int32>, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>>(sampleList, sampleDictionary));
+            
+        }
+        
+        protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+        {
+            switch (methodId)
+            {
+                case -1297457280: // Void OnJoin(global::System.String name)
+                    {
+                        var value = base.Deserialize<global::System.String>(data);
+                        receiver.OnJoin(value);
+                    }
+                    break;
+                case 532410095: // Void OnLeave(global::System.String name)
+                    {
+                        var value = base.Deserialize<global::System.String>(data);
+                        receiver.OnLeave(value);
+                    }
+                    break;
+                case -552695459: // Void OnSendMessage(global::ChatApp.Shared.MessagePackObjects.MessageResponse message)
+                    {
+                        var value = base.Deserialize<global::ChatApp.Shared.MessagePackObjects.MessageResponse>(data);
+                        receiver.OnSendMessage(value);
+                    }
+                    break;
+            }
+        }
+        
+        protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+        {
+            switch (methodId)
+            {
+                case -733403293: // Task JoinAsync(global::ChatApp.Shared.MessagePackObjects.JoinRequest request)
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case 1368362116: // Task LeaveAsync()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case -601690414: // Task SendMessageAsync(global::System.String message)
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case 517938971: // Task GenerateException(global::System.String message)
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case -852153394: // Task SampleMethod(global::System.Collections.Generic.List<global::System.Int32> sampleList, global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String> sampleDictionary)
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+            }
+        }
+        
+    }
+}
+
+

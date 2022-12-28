@@ -32,12 +32,11 @@ MagicOnion server requires NET Core 3.1 or .NET 5.0+.
 MagicOnion client supports a wide range of platforms, including .NET Framework 4.6.1 to .NET 5.0 as well as Unity.
 
 - Server-side (MagicOnion.Server)
-    - .NET 5.0+
-    - .NET Core 3.1
+    - .NET 6.0+
 - Client-side (MagicOnion.Client)
     - .NET Standard 2.1 (.NET Core 3.x+, .NET 5.0+, Xamarin)
     - .NET Standard 2.0 (.NET Framework 4.6.1+, Universal Windows Platform, .NET Core 2.x)
-    - Unity 2018.4.13f1+
+    - Unity 2020.3 (LTS) or newer
 
 ## Quick Start
 ### Server-side project
@@ -122,7 +121,7 @@ namespace MyApp.Shared
     // The interface is shared between server and client.
     public interface IMyFirstService : IService<IMyFirstService>
     {
-        // The return type must be `UnaryResult<T>`.
+        // The return type must be `UnaryResult<T>` or `UnaryResult`.
         UnaryResult<int> SumAsync(int x, int y);
     }
 }
@@ -228,8 +227,8 @@ dotnet add package MagicOnion
     - [ServiceContext and Lifecycle](#servicecontext-and-lifecycle)
     - [ExceptionHandling and StatusCode](#exceptionhandling-and-statuscode)
     - [Group and GroupConfiguration](#group-and-groupconfiguration)
-    - [Project Structure](#project-structure)
     - [Dependency Injection](#dependency-injection)
+    - [Project Structure](#project-structure)
 - Client
     - [Support for Unity client](#support-for-unity-client)
         - [iOS build with gRPC](#ios-build-with-grpc)
@@ -251,7 +250,7 @@ dotnet add package MagicOnion
 
 ## Fundamentals
 ### Service
-A service is a mechanism that provides a request/response API in the style of RPC or Web-API, and is implemented as a Unary call to gRPC. 
+A service is a mechanism that provides a request/response API in the style of RPC or Web-API, and is implemented as a Unary call to gRPC.
 A service can be defined as a C# interface to benefit from the type. This means that it can be observed as a request over HTTP/2.
 
 #### Service definition (Shared library)
@@ -265,8 +264,10 @@ namespace MyApp.Shared
     // The interface is shared between server and client.
     public interface IMyFirstService : IService<IMyFirstService>
     {
-        // The return type must be `UnaryResult<T>`.
+        // The return type must be `UnaryResult<T>` or `UnaryResult`.
         UnaryResult<int> SumAsync(int x, int y);
+        // `UnaryResult` does not have a return value like `Task`, `ValueTask`, or `void`.
+        UnaryResult DoWorkAsync();
     }
 }
 ```
@@ -290,6 +291,11 @@ namespace MyApp.Services
             Console.WriteLine($"Received:{x}, {y}");
             return x + y;
         }
+
+        public async UnaryResult DoWorkAsync()
+        {
+            // Something to do ...
+        }
     }
 }
 ```
@@ -311,17 +317,17 @@ public interface IGamingHubReceiver
     void OnLeave(Player player);
     void OnMove(Player player);
 }
- 
+
 // Client -> Server definition
 // implements `IStreamingHub<TSelf, TReceiver>`  and share this type between server and client.
 public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
 {
-    // The method must return `Task` or `Task<T>` and can have up to 15 parameters of any type.
-    Task<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
-    Task LeaveAsync();
-    Task MoveAsync(Vector3 position, Quaternion rotation);
+    // The method must return `ValueTask`, `ValueTask<T>`, `Task` or `Task<T>` and can have up to 15 parameters of any type.
+    ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
+    ValueTask LeaveAsync();
+    ValueTask MoveAsync(Vector3 position, Quaternion rotation);
 }
- 
+
 // for example, request object by MessagePack.
 [MessagePackObject]
 public class Player
@@ -345,11 +351,11 @@ public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGami
     Player self;
     IInMemoryStorage<Player> storage;
 
-    public async Task<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation)
+    public async ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation)
     {
         self = new Player() { Name = userName, Position = position, Rotation = rotation };
 
-        // Group can bundle many connections and it has inmemory-storage so add any type per group. 
+        // Group can bundle many connections and it has inmemory-storage so add any type per group.
         (room, storage) = await Group.AddAsync(roomName, self);
 
         // Typed Server->Client broadcast.
@@ -358,13 +364,13 @@ public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGami
         return storage.AllValues.ToArray();
     }
 
-    public async Task LeaveAsync()
+    public async ValueTask LeaveAsync()
     {
         await room.RemoveAsync(this.Context);
         Broadcast(room).OnLeave(self);
     }
 
-    public async Task MoveAsync(Vector3 position, Quaternion rotation)
+    public async ValueTask MoveAsync(Vector3 position, Quaternion rotation)
     {
         self.Position = position;
         self.Rotation = rotation;
@@ -372,10 +378,10 @@ public class GamingHub : StreamingHubBase<IGamingHub, IGamingHubReceiver>, IGami
     }
 
     // You can hook OnConnecting/OnDisconnected by override.
-    protected override async ValueTask OnDisconnected()
+    protected override ValueTask OnDisconnected()
     {
         // on disconnecting, if automatically removed this connection from group.
-        return CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }
 ```
@@ -386,72 +392,72 @@ You can write client like this.
 public class GamingHubClient : IGamingHubReceiver
 {
     Dictionary<string, GameObject> players = new Dictionary<string, GameObject>();
- 
+
     IGamingHub client;
- 
-    public async Task<GameObject> ConnectAsync(ChannelBase grpcChannel, string roomName, string playerName)
+
+    public async ValueTask<GameObject> ConnectAsync(ChannelBase grpcChannel, string roomName, string playerName)
     {
         this.client = await StreamingHubClient.ConnectAsync<IGamingHub, IGamingHubReceiver>(grpcChannel, this);
- 
+
         var roomPlayers = await client.JoinAsync(roomName, playerName, Vector3.zero, Quaternion.identity);
         foreach (var player in roomPlayers)
         {
             (this as IGamingHubReceiver).OnJoin(player);
         }
- 
+
         return players[playerName];
     }
- 
+
     // methods send to server.
- 
-    public Task LeaveAsync()
+
+    public ValueTask LeaveAsync()
     {
         return client.LeaveAsync();
     }
- 
-    public Task MoveAsync(Vector3 position, Quaternion rotation)
+
+    public ValueTask MoveAsync(Vector3 position, Quaternion rotation)
     {
         return client.MoveAsync(position, rotation);
     }
- 
+
     // dispose client-connection before channel.ShutDownAsync is important!
     public Task DisposeAsync()
     {
         return client.DisposeAsync();
     }
- 
+
     // You can watch connection state, use this for retry etc.
     public Task WaitForDisconnect()
     {
         return client.WaitForDisconnect();
     }
- 
+
     // Receivers of message from server.
- 
+
     void IGamingHubReceiver.OnJoin(Player player)
     {
         Debug.Log("Join Player:" + player.Name);
- 
+
         var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cube.name = player.Name;
         cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
         players[player.Name] = cube;
     }
- 
+
     void IGamingHubReceiver.OnLeave(Player player)
     {
         Debug.Log("Leave Player:" + player.Name);
- 
+
         if (players.TryGetValue(player.Name, out var cube))
         {
             GameObject.Destroy(cube);
         }
     }
- 
+
     void IGamingHubReceiver.OnMove(Player player)
     {
         Debug.Log("Move Player:" + player.Name);
- 
+
         if (players.TryGetValue(player.Name, out var cube))
         {
             cube.transform.SetPositionAndRotation(player.Position, player.Rotation);
@@ -495,26 +501,55 @@ Here is example of what kind of filter can be stacked.
 
 ![image](https://user-images.githubusercontent.com/46207/50969539-2bd59600-1522-11e9-84ab-15dd85e3dcac.png)
 
-GlobalFilter can attach to MagicOnionOptions.
+MagicOnion also provides an API for filters that is very similar to filter on ASP.NET Core MVC.
+These APIs support flexible filter implementations.
 
-MagicOnion filters supports [DI](#dependency-injection).
+- `IMagicOnionServiceFilter` interface
+- `IStreamingHubFilter` interface
+- `IMagicOnionFilterFactory<T>` interface
+- `IMagicOnionOrderedFilter` interface
+
+#### Ordering
+Filters can be ordered and they are executed in the following order:
+
+```
+[Ordered Filters] -> [Global Filters] -> [Class Filters] -> [Method Filters]
+```
+
+Unordered filters are treated as last (`int.MaxValue`) and executed in the order in which they are added.
+
+#### GlobalFilters
+Filters that apply to the application globally can be added at `GlobalFilters` of `MagicOnionOptions`.
 
 ```csharp
-public class MyStreamingHubFilterAttribute : StreamingHubFilterAttribute
+services.AddMagicOnion(options =>
+{
+    options.GlobalFilters.Add<MyServiceFilter>();
+    options.GlobalStreamingHubFilters.Add<MyHubFilter>();
+});
+```
+
+#### Dependency Injections
+MagicOnion filters supports [Dependency Injection](#dependency-injection). There are two ways to activate a filter by using `FromTypeFilter`, `FromServiceFitler` or by using `IMagicOnionFilterFactory`.
+
+The following is an example of how to use `FromTypeFilter`, `FromServiceFitler`.
+
+```csharp
+public class MyServiceFilterAttribute : MagicOnionFilterAttribute
 {
     private readonly ILogger _logger;
 
     // the `logger` parameter will be injected at instantiating.
-    public MyStreamingHubFilterAttribute(ILogger<MyStreamingHubFilterAttribute> logger)
+    public MyServiceFilterAttribute(ILogger<MyServiceFilterAttribute> logger)
     {
         _logger = logger;
     }
 
-    public override async ValueTask Invoke(StreamingHubContext context, Func<StreamingHubContext, ValueTask> next)
+    public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        _logger.LogInformation($"MyStreamingHubFilter Begin: {context.Path}");
+        _logger.LogInformation($"MyServiceFilter Begin: {context.Path}");
         await next(context);
-        _logger.LogInformation($"MyStreamingHubFilter End: {context.Path}");
+        _logger.LogInformation($"MyServiceFilter End: {context.Path}");
     }
 }
 ```
@@ -532,14 +567,14 @@ public class MyService : ServiceBase<IMyService>, IMyService
         return UnaryResult(0);
     }
 
-    // The filter will instantiate from type with some arguments. if the arguments are missing, it will be obtained from `IServiceLocator` 
+    // The filter will instantiate from type with some arguments. if the arguments are missing, it will be obtained from `IServiceProvider`
     [FromTypeFilter(typeof(MyThirdFilterAttribute), Arguments = new object[] { "foo", 987654 })]
     public UnaryResult<int> Bar()
     {
         return UnaryResult(0);
     }
 
-    // The filter instance will be provided via `IServiceLocator`.
+    // The filter instance will be provided via `IServiceProvider`.
     [FromServiceFilter(typeof(MyFourthFilterAttribute))]
     public UnaryResult<int> Baz()
     {
@@ -547,6 +582,68 @@ public class MyService : ServiceBase<IMyService>, IMyService
     }
 }
 ```
+
+The following is an example of how to use `IMagicOnionFilterFactory<T>`.
+
+This is a clean way of writing when using DI while still having parameters for the attributes.
+
+```csharp
+public class MyServiceFilterAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionOrderedFilter
+{
+    readonly string label;
+
+    public int Order { get; set; } = int.MaxValue;
+
+    public MyServiceFilterAttribute(string label)
+    {
+        this.label = label;
+    }
+
+    public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceProvider)
+        => new MyServiceFilter(serviceProvider.GetRequiredService<ILogger<MyServiceFilterAttribute>>());
+
+    class MyServiceFilter : IMagicOnionServiceFilter
+    {
+        readonly string label;
+        readonly ILogger logger;
+
+        public MyServiceFilter(string label, ILogger<MyServiceFilterAttribute> logger)
+        {
+            this.label = label;
+            this.logger = logger;
+        }
+
+        public async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
+        {
+            logger.LogInformation($"[{label}] MyServiceFilter Begin: {context.Path}");
+            await next(context);
+            logger.LogInformation($"[{label}] MyServiceFilter End: {context.Path}");
+        }
+    }
+}
+```
+```csharp
+[MyServiceFilter("Class")]
+public class MyService : ServiceBase<IMyService>, IMyService
+{
+    [MyServiceFilter("Method")]
+    public UnaryResult<int> Foo()
+    {
+        return UnaryResult(0);
+    }
+}
+```
+
+#### Extension Interfaces
+The following interfaces are provided for filter extensions. These interfaces are similar to ASP.NET Core MVC filter mechanism.
+
+- `IMagicOnionFilterFactory<T>`
+- `IMagicOnionOrderedFilter`
+- `IMagicOnionServiceFilter`
+- `IStreamingHubFilter`
+
+`MagicOnionFilterAttributes` and `StreamingHubFilterAttribute` implement these interfaces for easy use. You can use these interfaces for more flexible implementation.
+
 
 ### ClientFilter
 MagicOnion client-filter is a powerful feature to hook before-after invoke. It is useful than gRPC client interceptor.
@@ -699,14 +796,14 @@ public class EncryptFilter : IClientFilter
     {
         context.SetRequestMutator(bytes => Encrypt(bytes));
         context.SetResponseMutator(bytes => Decrypt(bytes));
-        
+
         return await next(context);
     }
 }
 ```
 
 ### ServiceContext and Lifecycle
-Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it is 
+Service/StreamingHub's method or `MagicOnionFilter` can access `this.Context` it is
 
 | Property | Description |
 | --- | --- |
@@ -731,7 +828,7 @@ Lifecycle image of ServiceBase
 ```
 gRPC In(
     var context = new ServiceContext();
-    Filter.Invoke(context, 
+    Filter.Invoke(context,
         var service = new ServiceImpl();
         service.ServiceContext = context;
         service.MethodInvoke(
@@ -746,7 +843,7 @@ Lifecycle image of StreamingHub(StreamingHub is inherited from ServiceBase)
 ```
 gRPC In(
     var context = new ServiceContext();
-    Filter.Invoke(context, 
+    Filter.Invoke(context,
         var hub = new StreamingHubImpl();
         hub.ServiceContext = context;
         hub.Connect(
@@ -799,13 +896,13 @@ public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
     string userName;
     IGroup room;
 
-    public async Task JoinAsync(string userName, string roomName)
+    public async ValueTask JoinAsync(string userName, string roomName)
     {
         this.userName = userName;
         this.room = await Group.AddAsync(roomName);
     }
 
-    public async Task SendMessageAsync(string message)
+    public async ValueTask SendMessageAsync(string message)
     {
         Broadcast(room).OnReceiveMessage(userName, message);
     }
@@ -814,7 +911,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IMessageReceiver>, IChatHub
 
 > GroupRepository is created per StreamingHub type
 
-> If you want to create ServerSide loop and broadcast out of StreamingHub, you can pass Broadcast(room) result but it is unnatural, I'll add support kit of create server-side loop  
+> If you want to create ServerSide loop and broadcast out of StreamingHub, you can pass Broadcast(room) result but it is unnatural, I'll add support kit of create server-side loop
 
 Group has in-memory storage, it can store extra data to group member. It can set `Group.AddAsync(string groupName, TStorage data)` instead of standard AddAsync.
 
@@ -857,6 +954,26 @@ public class ...
 }
 ```
 
+### Dependency Injection
+Like Dependency Injection on ASP.NET Core MVC, MagicOnion also supports DI to services and hubs.
+
+```csharp
+public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+{
+    IOptions<MyConfig> config;
+    ILogger<MyFirstService> logger;
+
+    public MyFirstService(IOptions<MyConfig> config, ILogger<MyFirstService> logger)
+    {
+        this.config = config;
+        this.logger = logger;
+    }
+
+    // ...
+}
+```
+
+
 ### Project Structure
 If creates Server-Client project, I recommend make three projects. `Server`, `ServerDefinition`, `Client`.
 
@@ -864,7 +981,7 @@ If creates Server-Client project, I recommend make three projects. `Server`, `Se
 
 ServerDefinition is only defined interface(`IService<>`, `IStreamingHub<,>`)(and some share request/response types).
 
-If debugging, I recommend use [SwitchStartupProject](https://marketplace.visualstudio.com/items?itemName=vs-publisher-141975.SwitchStartupProjectforVS2017) extension of VisualStudio and launch both Server and Client.
+If debugging, We recommend use [SwitchStartupProject](https://marketplace.visualstudio.com/items?itemName=vs-publisher-141975.SwitchStartupProjectforVS2017) extension of VisualStudio and launch both Server and Client.
 
 ```json
 "MultiProjectConfigurations": {
@@ -884,24 +1001,6 @@ for Unity, you can't share by DLL(because can't share `IServer<>` because it is 
 see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
 
 
-### Dependency Injection
-You can use DI(constructor injection) on the server.
-
-```csharp
-public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
-{
-    IOptions<MyConfig> config;
-    ILogger<MyFirstService> logger;
-
-    public MyFirstService(IOptions<MyConfig> config, ILogger<MyFirstService> logger)
-    {
-        this.config = config;
-        this.logger = logger;
-    }
-
-    // ...
-}
-```
 
 # Clients
 
@@ -937,11 +1036,6 @@ See [MessagePack for C# installation for Unity](https://github.com/neuecc/Messag
 ### MagicOnion code generator (for IL2CPP)
 
 MagicOnion's default client only supports Unity Editor or non-IL2CPP environments (e.g. Windows/macOS/Linux Standalone). If you want to use MagicOnion on IL2CPP environments, you need to generate a client and register it in your Unity project.
-
-There are two ways to generate code:
-
-- Using `mpc` (MagicOnion Codegen) command line tool
-- Using `MagicOnion.MSBuild.Task` (MSBuild Integration)
 
 #### MessagePack for C#
 For the same reason, MessagePack for C# code generation is also required.
@@ -984,57 +1078,27 @@ dotnet tool install MagicOnion.Generator
 If `moc` is installed as a local tool, you can run it with `dotnet moc` command.
 
 ```bash
-dotnet moc -h
-```
+$ dotnet moc --help
 
-```
-argument list:
--i, -input: Input path of analyze csproj or directory.
--o, -output: Output path(file) or directory base(in separated mode).
--u, -unuseUnityAttr: [default=False]Unuse UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer.
--n, -namespace: [default=MagicOnion]Set namespace root name.
--c, -conditionalSymbol: [default=null]Conditional compiler symbols, split with ','.
+Usage:  [options...]
+
+MagicOnion Code Generator generates client codes for Ahead-of-Time compilation.
+
+Options:
+  -i, --input <String>                              The path to the project (.csproj) to generate the client. (Required)
+  -o, --output <String>                             The generated file path (single file) or the directory path to generate the files (multiple files). (Required)
+  -u, --no-use-unity-attr                           Do not use UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer. (Same as --disable-auto-register) (Optional)
+  -d, --disable-auto-register                       Do not automatically call MagicOnionInitializer during start-up. (Automatic registration requires .NET 5+ or Unity) (Optional)
+  -n, --namespace <String>                          The namespace of clients to generate. (Default: MagicOnion)
+  -m, --messagepack-formatter-namespace <String>    The namespace of pre-generated MessagePackFormatters. (Default: MessagePack.Formatters)
+  -c, --conditional-symbol <String>                 The conditional compiler symbols used during code analysis. The value is split by ','. (Default: null)
+  -v, --verbose                                     Enable verbose logging (Optional)
+  -s, --serializer <SerializerType>                 The serializer used for message serialization (Default: MessagePack)
 ```
 
 ```bash
 dotnet moc -i ./Assembly-CSharp.csproj -o Assets/Scripts/MagicOnion.Generated.cs
 ```
-
-#### MagicOnion.MSBuild.Tasks (MSBuild Integration)
-`MagicOnion.MSBuild.Tasks` is easy way of generate code that target to shared project. We're mostly recommended to use this way. For example, PostCompile sample.
-
-```csharp
-<!-- in Shared.csproj -->
-
-<ItemGroup>
-    <!-- Install MSBuild Task(with PrivateAssets="All", it means to use dependency only in build time). -->
-    <PackageReference Include="MessagePack.MSBuild.Tasks" Version="*" PrivateAssets="All" />
-    <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="*" PrivateAssets="All" />
-</ItemGroup>
-
-<!-- Call code generator after compile successfully. -->
-<Target Name="GenerateMessagePack" AfterTargets="Compile">
-    <MessagePackGenerator Input="$(ProjectPath)" Output="..\UnityClient\Assets\Scripts\Generated\MessagePack.Generated.cs" />
-</Target>
-<Target Name="GenerateMagicOnion" AfterTargets="Compile">
-    <MagicOnionGenerator Input="$(ProjectPath)" Output="..\UnityClient\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
-</Target>
- ```
-
-Full options are below.
-
-```xml
-<MagicOnionGenerator
-    Input="string:required"
-    Output="string:required"
-    ConditionalSymbol="string:optional"
-    ResolverName="string:optional"
-    Namespace="string:optional"
-    UnuseUnityAttr="bool:optional"
-/>
-```
-
-Project structure and code generation samples are found in [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) directory and README.
 
 ### gRPC channel management integration for Unity
 Wraps gRPC channels and provides a mechanism to manage them with Unity's lifecycle.
@@ -1137,7 +1201,7 @@ public class BuildIos
 
         // libgrpc_csharp_ext missing bitcode. as BITCODE exand binary size to 250MB.
         project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
-        
+
         File.WriteAllText(projectPath, project.WriteToString());
     }
 }
@@ -1427,7 +1491,7 @@ Open `http://localhost:5000`, you can see swagger view.
 ### Internal Logging
 `IMagicOnionLogger` is structured logger of MagicOnion internal information.
 
- Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToLogger` that structured log to string log and send to `Microsoft.Extensions.Logging.ILogger`. `MagicOnionLogToLoggerWithDataDump` is includes data dump it is useful for debugging(but slightly heavy, recommended to only use debugging). `MagicOnionLogToLoggerWithNamedDataDump` is more readable than simple WithDataDump logger.
+ Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToLogger` that structured log to string log and send to `Microsoft.Extensions.Logging.ILogger`.
 
 ### Raw gRPC APIs
 MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
@@ -1533,7 +1597,7 @@ static async Task UnaryRun(IMyFirstService client)
     // await(C# 7.0, Unity 2018.3+)
     var vvvvv = await client.SumAsync(10, 20);
     Console.WriteLine("SumAsync:" + vvvvv);
-    
+
     // if use Task<UnaryResult>(Unity 2018.2), use await await
     var vvvv2 = await await client.SumLegacyTaskAsync(10, 20);
 }
@@ -1598,18 +1662,18 @@ public struct CustomStruct
     public int Mp;
     public byte Status;
 }
- 
+
 // ---- Register the following code when initializing.
- 
+
 // By registering it, T and T[] can be handled using zero deserialization mapping.
 UnsafeDirectBlitResolver.Register<CustomStruct>();
- 
+
 // The struct-type above as well as Unity-provided struct-types (Vector2, Rect, etc.), and their arrays are registered as standards.
 CompositeResolver.RegisterAndSetAsDefault(
     UnsafeDirectBlitResolver.Instance,
     MessagePack.Unity.Extension.UnityBlitResolver.Instance
     );
- 
+
 // --- Now the communication will be in the format above when they are used for transmission.
 await client.SendAsync(new CustomStruct { Hp = 99 });
 ```
@@ -1617,6 +1681,60 @@ await client.SendAsync(new CustomStruct { Hp = 99 });
 Nothing needs to be processed here, so it promises the best performance theoretically possible in terms of transmission speed. However, since these struct-type variables need to be copied, I recommend handling everything as ref as a rule when you need to define a large struct-type, or it might slow down the process.
 
 I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
+
+### Customizing message serialization
+MagicOnion uses MessagePack for serialization by default, but it also provides extension points to customize serialization.
+
+It allows for customization, such as encryption and the using of serializers other than MessagePack.
+
+```csharp
+/// <summary>
+/// Provides a serializer for request/response of MagicOnion services and hub methods.
+/// </summary>
+public interface IMagicOnionSerializerProvider
+{
+    IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo);
+}
+
+/// <summary>
+/// Provides a processing for message serialization.
+/// </summary>
+public interface IMagicOnionSerializer
+{
+    void Serialize<T>(IBufferWriter<byte> writer, in T? value);
+    T? Deserialize<T>(in ReadOnlySequence<byte> bytes);
+}
+
+public static class MagicOnionSerializerProvider
+{
+    /// <summary>
+    /// Gets or sets the <see cref="IMagicOnionSerializerProvider"/> to be used by default.
+    /// </summary>
+    public static IMagicOnionSerializerProvider Default { get; set; } = MessagePackMagicOnionSerializerProvider.Default;
+}
+```
+
+#### MemoryPack support
+MagicOnion also supports MemoryPack as a message serializer. (preview)
+
+```
+dotnet add package MagicOnion.Serialization.MemoryPack
+```
+
+Set `MemoryPackMagicOnionSerializerProvider` to `MagicOnionSerializerProvider` on the client and server to serialize using MemoryPack.
+
+```csharp
+MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;
+
+// or
+
+await StreamingHubClient.ConnectAsync<IMyHub, IMyHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+MagicOnionClient.Create<IMyService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
+```
+
+If you want to use MagicOnion.Generator (moc), you need to specify `--serializer MemoryPack` as an option. The generated code will use MemoryPack instead of MessagePack.
+
+The application must also call `MagicOnionMemoryPackFormatterProvider.RegisterFormatters()` on startup.
 
 ## Experimentals
 ### OpenTelemetry

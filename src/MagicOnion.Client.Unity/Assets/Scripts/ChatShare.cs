@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Server.Hubs;

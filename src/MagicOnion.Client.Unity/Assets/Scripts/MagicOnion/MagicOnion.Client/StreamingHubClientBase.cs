@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using MagicOnion.Server;
 using System.Buffers;
 using System.Linq;
+using MagicOnion.Client.Internal;
+using MagicOnion.Serialization;
 
 namespace MagicOnion.Client
 {
@@ -23,11 +25,12 @@ namespace MagicOnion.Client
         readonly CallOptions option;
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
-
-        protected readonly MessagePackSerializerOptions serializerOptions;
+        readonly IMagicOnionSerializer messageSerializer;
         readonly AsyncLock asyncLock = new AsyncLock();
 
-        DuplexStreamingResult<byte[], byte[]> connection;
+        IClientStreamWriter<byte[]> writer;
+        IAsyncStreamReader<byte[]> reader;
+
         protected TReceiver receiver;
         Task subscription;
         TaskCompletionSource<object> waitForDisconnect = new TaskCompletionSource<object>();
@@ -38,12 +41,12 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, MessagePackSerializerOptions serializerOptions, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         {
-            this.callInvoker = callInvoker;
+            this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;
             this.option = option;
-            this.serializerOptions = serializerOptions;
+            this.messageSerializer = serializerProvider?.Create(MethodType.DuplexStreaming, null) ?? throw new ArgumentNullException(nameof(serializerProvider));
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 
@@ -54,14 +57,9 @@ namespace MagicOnion.Client
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
             var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
-            var streamingResult = new DuplexStreamingResult<byte[], byte[]>(
-                callResult,
-                new MarshallingClientStreamWriter<byte[]>(callResult.RequestStream, serializerOptions),
-                new MarshallingAsyncStreamReader<byte[]>(callResult.ResponseStream, serializerOptions),
-                serializerOptions
-            );
 
-            this.connection = streamingResult;
+            this.writer = callResult.RequestStream;
+            this.reader = callResult.ResponseStream;
             this.receiver = receiver;
 
             // Establish StreamingHub connection between the client and the server.
@@ -74,7 +72,7 @@ namespace MagicOnion.Client
                 //           If the channel can not be connected, ResponseHeadersAsync will throw an exception.
                 //       C-core:
                 //           If the channel can not be connected, ResponseHeadersAsync will **return** an empty metadata.
-                var headers = await streamingResult.ResponseHeadersAsync.ConfigureAwait(false);
+                var headers = await callResult.ResponseHeadersAsync.ConfigureAwait(false);
                 messageVersion = headers.FirstOrDefault(x => x.Key == StreamingHubVersionHeaderKey);
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -90,7 +88,7 @@ namespace MagicOnion.Client
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
             }
 
-            var firstMoveNextTask = connection.RawStreamingCall.ResponseStream.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
+            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
             if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
                 // NOTE: Grpc.Net:
@@ -109,12 +107,20 @@ namespace MagicOnion.Client
             this.subscription = StartSubscribe(syncContext, firstMoveNextTask);
         }
 
+        // Helper methods to make building clients easy.
+        protected void SetResultForResponse<TResponse>(object taskCompletionSource, ArraySegment<byte> data)
+            => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
+        protected void Serialize<T>(IBufferWriter<byte> writer, in T value)
+            => messageSerializer.Serialize<T>(writer, value);
+        protected T Deserialize<T>(ArraySegment<byte> bytes)
+            => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(bytes));
+
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
 
         async Task StartSubscribe(SynchronizationContext syncContext, Task<bool> firstMoveNext)
         {
-            var reader = connection.RawStreamingCall.ResponseStream;
+            var reader = this.reader;
             try
             {
                 var moveNext = firstMoveNext;
@@ -219,7 +225,7 @@ namespace MagicOnion.Client
                     var detail = messagePackReader.ReadString();
                     var offset = (int)messagePackReader.Consumed;
                     var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
-                    var error = MessagePackSerializer.Deserialize<string>(rest, serializerOptions);
+                    var error = Deserialize<string>(rest);
                     var ex = default(RpcException);
                     if (string.IsNullOrWhiteSpace(error))
                     {
@@ -253,7 +259,7 @@ namespace MagicOnion.Client
             }
         }
 
-        protected async Task WriteMessageAsync<T>(int methodId, T message)
+        protected async Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
 
@@ -264,8 +270,8 @@ namespace MagicOnion.Client
                     var writer = new MessagePackWriter(buffer);
                     writer.WriteArrayHeader(2);
                     writer.Write(methodId);
-                    MessagePackSerializer.Serialize(ref writer, message, serializerOptions);
                     writer.Flush();
+                    Serialize(buffer, message);
                     return buffer.WrittenSpan.ToArray();
                 }
             }
@@ -273,16 +279,10 @@ namespace MagicOnion.Client
             var v = BuildMessage();
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
-                await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
+                await writer.WriteAsync(v).ConfigureAwait(false);
             }
-        }
 
-        protected async Task<TResponse> WriteMessageAsyncFireAndForget<TRequest, TResponse>(int methodId, TRequest message)
-        {
-            await WriteMessageAsync(methodId, message).ConfigureAwait(false);
-#pragma warning disable CS8603 // Possible null reference return.
             return default;
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
         protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
@@ -301,8 +301,8 @@ namespace MagicOnion.Client
                     writer.WriteArrayHeader(3);
                     writer.Write(mid);
                     writer.Write(methodId);
-                    MessagePackSerializer.Serialize(ref writer, message, serializerOptions);
                     writer.Flush();
+                    Serialize(buffer, message);
                     return buffer.WrittenSpan.ToArray();
                 }
             }
@@ -310,7 +310,7 @@ namespace MagicOnion.Client
             var v = BuildMessage();
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
-                await connection.RawStreamingCall.RequestStream.WriteAsync(v).ConfigureAwait(false);
+                await writer.WriteAsync(v).ConfigureAwait(false);
             }
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
@@ -337,13 +337,13 @@ namespace MagicOnion.Client
         async Task DisposeAsyncCore(bool waitSubscription)
         {
             if (disposed) return;
-            if (connection.RawStreamingCall == null) return;
+            if (writer == null) return;
 
             disposed = true;
 
             try
             {
-                await connection.RequestStream.CompleteAsync().ConfigureAwait(false);
+                await writer.CompleteAsync().ConfigureAwait(false);
             }
             catch { } // ignore error?
             finally

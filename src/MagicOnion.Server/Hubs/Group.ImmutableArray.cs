@@ -1,368 +1,365 @@
+using MagicOnion.Serialization;
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Utils;
 using MessagePack;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using System.Threading.Channels;
 
-namespace MagicOnion.Server.Hubs
+namespace MagicOnion.Server.Hubs;
+
+public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
     {
-        public IGroupRepository CreateRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+        return new ImmutableArrayGroupRepository(messageSerializer, logger);
+    }
+}
+
+public class ImmutableArrayGroupRepository : IGroupRepository
+{
+    IMagicOnionSerializer messageSerializer;
+    IMagicOnionLogger logger;
+
+    readonly Func<string, IGroup> factory;
+    ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
+
+    public ImmutableArrayGroupRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    {
+        this.messageSerializer = messageSerializer;
+        this.factory = CreateGroup;
+        this.logger = logger;
+    }
+
+    public IGroup GetOrAdd(string groupName)
+    {
+        return dictionary.GetOrAdd(groupName, factory);
+    }
+
+    IGroup CreateGroup(string groupName)
+    {
+        return new ImmutableArrayGroup(groupName, this, messageSerializer, logger);
+    }
+
+    public bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group)
+    {
+        return dictionary.TryGetValue(groupName, out group);
+    }
+
+    public bool TryRemove(string groupName)
+    {
+        return dictionary.TryRemove(groupName, out _);
+    }
+}
+
+public class ImmutableArrayGroup : IGroup
+{
+    readonly object gate = new object();
+    readonly IGroupRepository parent;
+    readonly IMagicOnionSerializer messageSerializer;
+    readonly IMagicOnionLogger logger;
+
+    ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
+    IInMemoryStorage? inmemoryStorage;
+
+    public string GroupName { get; }
+
+    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    {
+        this.GroupName = groupName;
+        this.parent = parent;
+        this.messageSerializer = messageSerializer;
+        this.logger = logger;
+        this.members = ImmutableArray<IServiceContextWithResponseStream<byte[]>>.Empty;
+    }
+
+    public ValueTask<int> GetMemberCountAsync()
+    {
+        return new ValueTask<int>(members.Length);
+    }
+
+    public IInMemoryStorage<T> GetInMemoryStorage<T>()
+        where T : class
+    {
+        lock (gate)
         {
-            return new ImmutableArrayGroupRepository(serializerOptions, logger);
+            if (inmemoryStorage == null)
+            {
+                inmemoryStorage = new DefaultInMemoryStorage<T>();
+            }
+            else if (!(inmemoryStorage is IInMemoryStorage<T>))
+            {
+                throw new ArgumentException("already initialized inmemory-storage by another type, inmemory-storage only use single type");
+            }
+
+            return (IInMemoryStorage<T>)inmemoryStorage;
         }
     }
 
-    public class ImmutableArrayGroupRepository : IGroupRepository
+    public ValueTask AddAsync(ServiceContext context)
     {
-        MessagePackSerializerOptions serializerOptions;
-        IMagicOnionLogger logger;
-
-        readonly Func<string, IGroup> factory;
-        ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
-
-        public ImmutableArrayGroupRepository(MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+        lock (gate)
         {
-            this.serializerOptions = serializerOptions;
-            this.factory = CreateGroup;
-            this.logger = logger;
+            members = members.Add((IServiceContextWithResponseStream<byte[]>)context);
         }
+        return default(ValueTask);
+    }
 
-        public IGroup GetOrAdd(string groupName)
+    public ValueTask<bool> RemoveAsync(ServiceContext context)
+    {
+        lock (gate)
         {
-            return dictionary.GetOrAdd(groupName, factory);
-        }
+            if (!members.IsEmpty)
+            {
+                members = members.Remove((IServiceContextWithResponseStream<byte[]>)context);
+                if (inmemoryStorage != null)
+                {
+                    inmemoryStorage.Remove(context.ContextId);
+                }
 
-        IGroup CreateGroup(string groupName)
-        {
-            return new ImmutableArrayGroup(groupName, this, serializerOptions, logger);
-        }
+                if (members.Length == 0)
+                {
+                    if (parent.TryRemove(GroupName))
+                    {
+                        return new ValueTask<bool>(true);
+                    }
+                }
+            }
 
-        public bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group)
-        {
-            return dictionary.TryGetValue(groupName, out group);
-        }
-
-        public bool TryRemove(string groupName)
-        {
-            return dictionary.TryRemove(groupName, out _);
+            return new ValueTask<bool>(false);
         }
     }
 
-    public class ImmutableArrayGroup : IGroup
+    // broadcast: [methodId, [argument]]
+
+    public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
     {
-        readonly object gate = new object();
-        readonly IGroupRepository parent;
-        readonly MessagePackSerializerOptions serializerOptions;
-        readonly IMagicOnionLogger logger;
+        var message = BuildMessage(methodId, value);
 
-        ImmutableArray<ServiceContext> members;
-        IInMemoryStorage? inmemoryStorage;
+        var source = members;
 
-        public string GroupName { get; }
-
-        public ImmutableArrayGroup(string groupName, IGroupRepository parent, MessagePackSerializerOptions serializerOptions, IMagicOnionLogger logger)
+        if (fireAndForget)
         {
-            this.GroupName = groupName;
-            this.parent = parent;
-            this.serializerOptions = serializerOptions;
-            this.logger = logger;
-            this.members = ImmutableArray<ServiceContext>.Empty;
-        }
-
-        public ValueTask<int> GetMemberCountAsync()
-        {
-            return new ValueTask<int>(members.Length);
-        }
-
-        public IInMemoryStorage<T> GetInMemoryStorage<T>()
-            where T : class
-        {
-            lock (gate)
+            for (int i = 0; i < source.Length; i++)
             {
-                if (inmemoryStorage == null)
+                source[i].QueueResponseStreamWrite(message);
+            }
+            logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
+            return TaskEx.CompletedTask;
+        }
+        else
+        {
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
+
+    public Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+    {
+        var message = BuildMessage(methodId, value);
+
+        var source = members;
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source[i].ContextId != connectionId)
                 {
-                    inmemoryStorage = new DefaultInMemoryStorage<T>();
-                }
-                else if (!(inmemoryStorage is IInMemoryStorage<T>))
-                {
-                    throw new ArgumentException("already initialized inmemory-storage by another type, inmemory-storage only use single type");
-                }
-
-                return (IInMemoryStorage<T>)inmemoryStorage;
-            }
-        }
-
-        public ValueTask AddAsync(ServiceContext context)
-        {
-            lock (gate)
-            {
-                members = members.Add(context);
-            }
-            return default(ValueTask);
-        }
-
-        public ValueTask<bool> RemoveAsync(ServiceContext context)
-        {
-            lock (gate)
-            {
-                if (!members.IsEmpty)
-                {
-                    members = members.Remove(context);
-                    if (inmemoryStorage != null)
-                    {
-                        inmemoryStorage.Remove(context.ContextId);
-                    }
-
-                    if (members.Length == 0)
-                    {
-                        if (parent.TryRemove(GroupName))
-                        {
-                            return new ValueTask<bool>(true);
-                        }
-                    }
-                }
-
-                return new ValueTask<bool>(false);
-            }
-        }
-
-        // broadcast: [methodId, [argument]]
-
-        public Task WriteAllAsync<T>(int methodId, T value, bool fireAndForget)
-        {
-            var message = BuildMessage(methodId, value);
-
-            var source = members;
-
-            if (fireAndForget)
-            {
-                for (int i = 0; i < source.Length; i++)
-                {
-                    source[i].QueueResponseStreamWrite(message);
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
-                return TaskEx.CompletedTask;
-            }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
-        }
-
-        public Task WriteExceptAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
-        {
-            var message = BuildMessage(methodId, value);
-
-            var source = members;
-            if (fireAndForget)
-            {
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    if (source[i].ContextId != connectionId)
-                    {
-                        source[i].QueueResponseStreamWrite(message);
-                        writeCount++;
-                    }
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
-            }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
-        }
-
-        public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
-        {
-            var message = BuildMessage(methodId, value);
-
-            var source = members;
-            if (fireAndForget)
-            {
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
-                {
-                    foreach (var item in connectionIds)
-                    {
-                        if (source[i].ContextId == item)
-                        {
-                            goto NEXT;
-                        }
-                    }
-
                     source[i].QueueResponseStreamWrite(message);
                     writeCount++;
-                NEXT:
-                    continue;
                 }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
             }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
+            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            return TaskEx.CompletedTask;
         }
-
-        public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+        else
         {
-            var message = BuildMessage(methodId, value);
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
 
-            var source = members;
+    public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+    {
+        var message = BuildMessage(methodId, value);
 
-            if (fireAndForget)
+        var source = members;
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            for (int i = 0; i < source.Length; i++)
             {
-                var writeCount = 0;
-                for (int i = 0; i < source.Length; i++)
+                foreach (var item in connectionIds)
                 {
-                    if (source[i].ContextId == connectionId)
+                    if (source[i].ContextId == item)
+                    {
+                        goto NEXT;
+                    }
+                }
+
+                source[i].QueueResponseStreamWrite(message);
+                writeCount++;
+                NEXT:
+                continue;
+            }
+            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            return TaskEx.CompletedTask;
+        }
+        else
+        {
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
+
+    public Task WriteToAsync<T>(int methodId, T value, Guid connectionId, bool fireAndForget)
+    {
+        var message = BuildMessage(methodId, value);
+
+        var source = members;
+
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source[i].ContextId == connectionId)
+                {
+                    source[i].QueueResponseStreamWrite(message);
+                    writeCount++;
+                    break;
+                }
+            }
+            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            return TaskEx.CompletedTask;
+        }
+        else
+        {
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
+
+    public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+    {
+        var message = BuildMessage(methodId, value);
+
+        var source = members;
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            for (int i = 0; i < source.Length; i++)
+            {
+                foreach (var item in connectionIds)
+                {
+                    if (source[i].ContextId == item)
                     {
                         source[i].QueueResponseStreamWrite(message);
                         writeCount++;
-                        break;
+                        goto NEXT;
                     }
                 }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
+
+                NEXT:
+                continue;
+            }
+            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            return TaskEx.CompletedTask;
+        }
+        else
+        {
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
+
+    public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+    {
+        // oh, copy is bad but current gRPC interface only accepts byte[]...
+        var message = new byte[msg.Count];
+        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
+
+        var source = members;
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            if (exceptConnectionIds == null)
+            {
+                for (int i = 0; i < source.Length; i++)
+                {
+                    source[i].QueueResponseStreamWrite(message);
+                    writeCount++;
+                }
             }
             else
             {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+                for (int i = 0; i < source.Length; i++)
+                {
+                    foreach (var item in exceptConnectionIds)
+                    {
+                        if (source[i].ContextId == item)
+                        {
+                            goto NEXT;
+                        }
+                    }
+                    source[i].QueueResponseStreamWrite(message);
+                    writeCount++;
+                    NEXT:
+                    continue;
+                }
             }
+            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            return TaskEx.CompletedTask;
         }
-
-        public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+        else
         {
-            var message = BuildMessage(methodId, value);
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
+        }
+    }
 
-            var source = members;
-            if (fireAndForget)
+    public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
+    {
+        // oh, copy is bad but current gRPC interface only accepts byte[]...
+        var message = new byte[msg.Count];
+        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
+
+        var source = members;
+        if (fireAndForget)
+        {
+            var writeCount = 0;
+            if (connectionIds != null)
             {
-                var writeCount = 0;
                 for (int i = 0; i < source.Length; i++)
                 {
                     foreach (var item in connectionIds)
                     {
-                        if (source[i].ContextId == item)
+                        if (source[i].ContextId != item)
                         {
-                            source[i].QueueResponseStreamWrite(message);
-                            writeCount++;
                             goto NEXT;
                         }
                     }
-
-                NEXT:
+                    source[i].QueueResponseStreamWrite(message);
+                    writeCount++;
+                    NEXT:
                     continue;
                 }
+
                 logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
             }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
+            return TaskEx.CompletedTask;
         }
-
-        public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
+        else
         {
-            // oh, copy is bad but current gRPC interface only accepts byte[]...
-            var message = new byte[msg.Count];
-            Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
-
-            var source = members;
-            if (fireAndForget)
-            {
-                var writeCount = 0;
-                if (exceptConnectionIds == null)
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        source[i].QueueResponseStreamWrite(message);
-                        writeCount++;
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        foreach (var item in exceptConnectionIds)
-                        {
-                            if (source[i].ContextId == item)
-                            {
-                                goto NEXT;
-                            }
-                        }
-                        source[i].QueueResponseStreamWrite(message);
-                        writeCount++;
-                    NEXT:
-                        continue;
-                    }
-                }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
-            }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
+            throw new NotSupportedException("The write operation must be called with Fire and Forget option");
         }
+    }
 
-        public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
+    byte[] BuildMessage<T>(int methodId, T value)
+    {
+        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
         {
-            // oh, copy is bad but current gRPC interface only accepts byte[]...
-            var message = new byte[msg.Count];
-            Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
-
-            var source = members;
-            if (fireAndForget)
-            {
-                var writeCount = 0;
-                if (connectionIds != null)
-                {
-                    for (int i = 0; i < source.Length; i++)
-                    {
-                        foreach (var item in connectionIds)
-                        {
-                            if (source[i].ContextId != item)
-                            {
-                                goto NEXT;
-                            }
-                        }
-                        source[i].QueueResponseStreamWrite(message);
-                        writeCount++;
-                    NEXT:
-                        continue;
-                    }
-
-                    logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
-                }
-                return TaskEx.CompletedTask;
-            }
-            else
-            {
-                throw new NotSupportedException("The write operation must be called with Fire and Forget option");
-            }
-        }
-
-        byte[] BuildMessage<T>(int methodId, T value)
-        {
-            using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-            {
-                var writer = new MessagePackWriter(buffer);
-                writer.WriteArrayHeader(2);
-                writer.WriteInt32(methodId);
-                MessagePackSerializer.Serialize(ref writer, value, serializerOptions);
-                writer.Flush();
-                return buffer.WrittenSpan.ToArray();
-            }
+            var writer = new MessagePackWriter(buffer);
+            writer.WriteArrayHeader(2);
+            writer.WriteInt32(methodId);
+            writer.Flush();
+            messageSerializer.Serialize(buffer, value);
+            return buffer.WrittenSpan.ToArray();
         }
     }
 }

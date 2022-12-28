@@ -1,0 +1,45 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" linePragmas="false" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="MagicOnion.Generator.CodeGen.Extensions" #>
+#pragma warning disable 618
+#pragma warning disable 612
+#pragma warning disable 414
+#pragma warning disable 219
+#pragma warning disable 168
+
+namespace <#= Namespace #>
+{
+    using System;
+    using MessagePack;
+
+<# foreach (var info in EnumSerializationInfos) { #>
+<#   if (info.HasIfDirectiveConditions) { #>
+#if <#= string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})")) #>
+<#   } #>
+    public sealed class <#= info.Name #>Formatter : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
+    {
+        public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, MessagePackSerializerOptions options)
+        {
+            writer.Write((<#= info.UnderlyingType #>)value);
+        }
+        
+        public <#= info.FullName #> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return (<#= info.FullName #>)reader.Read<#= info.UnderlyingType #>();
+        }
+    }
+<#   if (info.HasIfDirectiveConditions) { #>
+#endif
+<#   } #>
+<# } #>
+
+}
+
+#pragma warning restore 168
+#pragma warning restore 219
+#pragma warning restore 414
+#pragma warning restore 612
+#pragma warning restore 618
