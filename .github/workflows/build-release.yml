@@ -151,6 +151,9 @@ jobs:
       [update-packagejson, build-dotnet, build-dotnet-experimental, build-unity]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: ./.github/actions/setup-dotnet
       # Create Release
       - uses: actions/create-release@v1
