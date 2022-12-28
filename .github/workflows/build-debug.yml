@@ -3,14 +3,12 @@ name: build-debug
 on:
   push:
     branches:
-      - master
-      - "5.0"
+      - main
     tags:
       - "!*" # not a tag push
   pull_request:
     branches:
-      - "master"
-      - "5.0"
+      - main
 
 env:
   BUILD_CONFIG: Debug

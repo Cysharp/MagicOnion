@@ -3,8 +3,7 @@ name: build-canary
 on:
   push:
     branches:
-      - "master"
-      - "5.0"
+      - main
     tags:
       - "!*" # not a tag push
   workflow_dispatch:
