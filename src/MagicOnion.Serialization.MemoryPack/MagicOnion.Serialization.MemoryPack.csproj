@@ -23,6 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="DynamicArgumentTupleMemoryPackFormatter.cs">
       <DependentUpon>DynamicArgumentTupleMemoryPackFormatter.tt</DependentUpon>
       <DesignTime>True</DesignTime>
