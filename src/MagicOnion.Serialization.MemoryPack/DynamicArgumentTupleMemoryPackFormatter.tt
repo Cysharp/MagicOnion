@@ -35,7 +35,7 @@ namespace MagicOnion.Serialization.MemoryPack
     public class DynamicArgumentTupleFormatter<<#= dynamicArgumentTupleFormatterGenericArgs #>> : MemoryPackFormatter<DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>>>
     {
         [global::MagicOnion.Serialization.MemoryPack.Preserve]
-#if FALSE && UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
 #else
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
@@ -52,7 +52,7 @@ namespace MagicOnion.Serialization.MemoryPack
         }
 
         [global::MagicOnion.Serialization.MemoryPack.Preserve]
-#if FALSE && UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
         public override void Deserialize(ref MemoryPackReader reader, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
 #else
         public override void Deserialize(ref MemoryPackReader reader, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
