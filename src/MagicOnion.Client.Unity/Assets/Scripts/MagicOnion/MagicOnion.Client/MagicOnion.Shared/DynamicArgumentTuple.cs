@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Runtime.InteropServices;
 using MessagePack;
 using MessagePack.Formatters;
 
@@ -10,6 +11,7 @@ namespace MagicOnion
 
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2>
     {
         [Key(0)]
@@ -73,6 +75,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3>
     {
         [Key(0)]
@@ -146,6 +149,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4>
     {
         [Key(0)]
@@ -229,6 +233,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5>
     {
         [Key(0)]
@@ -322,6 +327,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6>
     {
         [Key(0)]
@@ -425,6 +431,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7>
     {
         [Key(0)]
@@ -538,6 +545,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8>
     {
         [Key(0)]
@@ -661,6 +669,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>
     {
         [Key(0)]
@@ -794,6 +803,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>
     {
         [Key(0)]
@@ -937,6 +947,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>
     {
         [Key(0)]
@@ -1090,6 +1101,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>
     {
         [Key(0)]
@@ -1253,6 +1265,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>
     {
         [Key(0)]
@@ -1426,6 +1439,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>
     {
         [Key(0)]
@@ -1609,6 +1623,7 @@ namespace MagicOnion
     }
     
     [MessagePackObject]
+    [StructLayout(LayoutKind.Auto)]
     public struct DynamicArgumentTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>
     {
         [Key(0)]
