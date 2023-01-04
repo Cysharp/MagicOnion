@@ -5,43 +5,41 @@ using DotNet.Testcontainers.Containers;
 
 namespace MagicOnion.Server.Redis.Tests;
 
-public class TemporaryRedisServerFixture : IAsyncLifetime
+public sealed class TemporaryRedisServerFixture : IAsyncLifetime
 {
-    TestcontainersContainer? container;
+    const string redisImage = "redis:7.0";
 
-    public int Port { get; }
+    const ushort redisPort = 6379;
 
-    public TemporaryRedisServerFixture()
+    readonly TestcontainersContainer container = new TestcontainersBuilder<TestcontainersContainer>()
+        .WithImage(redisImage)
+        .WithPortBinding(GetAvailableListenerPort(), redisPort)
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilCommandIsCompleted("redis-cli", "ping"))
+        .Build();
+
+    public string GetConnectionString()
     {
-        this.Port = GetAvailableListenerPort();
+        return $"{container.Hostname}:{container.GetMappedPublicPort(redisPort)}";
     }
 
-    async Task IAsyncLifetime.InitializeAsync()
+    Task IAsyncLifetime.InitializeAsync()
     {
-        container = new TestcontainersBuilder<TestcontainersContainer>()
-            .WithImage("redis")
-             // WORKAROUND: `assignRandomHostPort` on Windows, a port within the range of `excludedport` setting may be selected.
-             //             We get an available port from the operating system.
-            .WithPortBinding(Port, 6379)
-            .Build();
-
-        await container.StartAsync();
+        return container.StartAsync();
     }
 
-    async Task IAsyncLifetime.DisposeAsync()
+    Task IAsyncLifetime.DisposeAsync()
     {
-        if (container is not null)
-        {
-            await container.DisposeAsync();
-        }
+        return container.DisposeAsync().AsTask();
     }
 
     static int GetAvailableListenerPort()
     {
-        var tcpListener = new TcpListener(IPAddress.Loopback, 0);
-        tcpListener.Start();
-        var port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
-        tcpListener.Stop();
-        return port;
+        // WORKAROUND: `assignRandomHostPort` on Windows, a port within the range of `excludedport` setting may be selected.
+        //             We get an available port from the operating system.
+        using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+        {
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            return ((IPEndPoint)socket.LocalEndPoint!).Port;
+        }
     }
 }
