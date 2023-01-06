@@ -34,17 +34,30 @@ public static class MagicOnionEngine
         var wellKnownIgnoreAssemblies = new[]
         {
             "netstandard",
-            "System.*",
-            "Microsoft.Win32.*",
-            "Microsoft.Extensions.*",
-            "Microsoft.AspNetCore",
+            "mscorlib",
             "Microsoft.AspNetCore.*",
+            "Microsoft.CSharp.*",
+            "Microsoft.CodeAnalysis.*",
+            "Microsoft.Extensions.*",
+            "Microsoft.Win32.*",
+            "NuGet.*",
+            "System.*",
+            "Newtonsoft.Json",
+            "Microsoft.Identity.*",
+            "Microsoft.IdentityModel.*",
+            "StackExchange.Redis.*",
+            // gRPC
             "Grpc.*",
-            "MessagePack",
+            // WPF
+            "Accessibility",
+            "PresentationFramework",
+            "PresentationCore",
+            "WindowsBase",
+            // MessagePack, MemoryPack
             "MessagePack.*",
-            "MagicOnion.Server",
+            "MemoryPack.*",
+            // MagicOnion
             "MagicOnion.Server.*",
-            "MagicOnion.Client",
             "MagicOnion.Client.*", // MagicOnion.Client.DynamicClient (MagicOnionClient.Create<T>)
             "MagicOnion.Abstractions",
             "MagicOnion.Shared",
@@ -55,9 +68,9 @@ public static class MagicOnionEngine
             {
                 return !wellKnownIgnoreAssemblies.Any(y =>
                 {
-                    if (y.EndsWith('*'))
+                    if (y.EndsWith(".*"))
                     {
-                        return x.GetName().Name!.StartsWith(y.Substring(0, y.Length - 1));
+                        return x.GetName().Name!.StartsWith(y.Substring(0, y.Length - 2));
                     }
                     else
                     {
@@ -91,7 +104,7 @@ public static class MagicOnionEngine
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
-                    return ex.Types.Where(t => t != null);
+                    return Array.Empty<Type>();
                 }
             });
 
