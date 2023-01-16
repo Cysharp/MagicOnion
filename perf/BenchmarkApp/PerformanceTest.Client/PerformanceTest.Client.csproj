@@ -12,16 +12,20 @@
     <PackageReference Include="ConsoleAppFramework" Version="4.2.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(UseRepositoryClient)' == ''">
-    <PackageReference Include="MagicOnion.Client" Version="4.5.2" />
+  <ItemGroup Condition="'$(UseNuGetClient)' != ''">
+    <PackageReference Include="MagicOnion.Client" Version="$(UseNuGetClient)" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(UseRepositoryClient)' != ''">
+  <ItemGroup Condition="'$(UseNuGetClient)' == ''">
     <ProjectReference Include="..\..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\PerformanceTest.Shared\**\*.cs" Exclude="**\obj\**;**\bin\**" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
   </ItemGroup>
 
 </Project>

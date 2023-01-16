@@ -14,6 +14,7 @@ public class PerfTestService : ServiceBase<IPerfTestService>, IPerfTestService
             ApplicationInformation.Current.MagicOnionVersion,
             ApplicationInformation.Current.GrpcNetVersion,
             ApplicationInformation.Current.MessagePackVersion,
+            ApplicationInformation.Current.MemoryPackVersion,
             ApplicationInformation.Current.IsReleaseBuild,
             ApplicationInformation.Current.FrameworkDescription,
             ApplicationInformation.Current.OSDescription,

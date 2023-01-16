@@ -3,6 +3,7 @@ using MessagePack;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime;
+using MemoryPack;
 
 namespace PerformanceTest.Shared;
 
@@ -18,12 +19,14 @@ public interface IPerfTestService : IService<IPerfTestService>
 }
 
 [MessagePackObject(true)]
-public class ServerInformation
+[MemoryPackable]
+public partial class ServerInformation
 {
     public string MachineName { get; set; }
     public string? MagicOnionVersion { get; }
     public string? GrpcNetVersion { get; }
     public string? MessagePackVersion { get; }
+    public string? MemoryPackVersion { get; }
     public bool IsReleaseBuild { get; }
     public string FrameworkDescription { get; }
     public string OSDescription { get; }
@@ -33,12 +36,13 @@ public class ServerInformation
     public int ProcessorCount { get; }
     public bool IsAttached { get; }
 
-    public ServerInformation(string machineName, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, bool isServerGC, int processorCount, bool isAttached)
+    public ServerInformation(string machineName, string? magicOnionVersion, string? grpcNetVersion, string? messagePackVersion, string? memoryPackVersion, bool isReleaseBuild, string frameworkDescription, string osDescription, Architecture osArchitecture, Architecture processArchitecture, bool isServerGC, int processorCount, bool isAttached)
     {
         MachineName = machineName;
         MagicOnionVersion = magicOnionVersion;
         GrpcNetVersion = grpcNetVersion;
         MessagePackVersion = messagePackVersion;
+        MemoryPackVersion = memoryPackVersion;
         IsReleaseBuild = isReleaseBuild;
         FrameworkDescription = frameworkDescription;
         OSDescription = osDescription;
@@ -51,7 +55,8 @@ public class ServerInformation
 }
 
 [MessagePackObject]
-public class ComplexResponse
+[MemoryPackable]
+public partial class ComplexResponse
 {
     public static ComplexResponse Cached { get; } = new ComplexResponse
     {
@@ -93,36 +98,38 @@ public class ComplexResponse
     public InnerObject1 Value3 { get; set; } = default!;
     [Key(3)]
     public IReadOnlyList<InnerObject2> Value4 { get; set; } = default!;
+}
 
-    [MessagePackObject]
-    public class InnerObject1
-    {
-        [Key(0)]
-        public int Value1 { get; set; }
-        [Key(1)]
-        public string Value2 { get; set; } = default!;
-        [Key(2)]
-        public long Value3 { get; set; }
-        [Key(3)]
-        public bool Value4 { get; set; }
-        [Key(4)]
-        public int Value5 { get; set; }
-        [Key(5)]
-        public int Value6 { get; set; }
-        [Key(6)]
-        public int Value7 { get; set; }
-        [Key(7)]
-        public int Value8 { get; set; }
-        [Key(8)]
-        public DateTimeOffset Value9 { get; set; }
-    }
+[MessagePackObject]
+[MemoryPackable]
+public partial class InnerObject1
+{
+    [Key(0)]
+    public int Value1 { get; set; }
+    [Key(1)]
+    public string Value2 { get; set; } = default!;
+    [Key(2)]
+    public long Value3 { get; set; }
+    [Key(3)]
+    public bool Value4 { get; set; }
+    [Key(4)]
+    public int Value5 { get; set; }
+    [Key(5)]
+    public int Value6 { get; set; }
+    [Key(6)]
+    public int Value7 { get; set; }
+    [Key(7)]
+    public int Value8 { get; set; }
+    [Key(8)]
+    public DateTimeOffset Value9 { get; set; }
+}
     
-    [MessagePackObject]
-    public class InnerObject2
-    {
-        [Key(0)]
-        public long Value1 { get; set; }
-        [Key(1)]
-        public int Value2 { get; set; }
-    }
+[MessagePackObject]
+[MemoryPackable]
+public partial class InnerObject2
+{
+    [Key(0)]
+    public long Value1 { get; set; }
+    [Key(1)]
+    public int Value2 { get; set; }
 }

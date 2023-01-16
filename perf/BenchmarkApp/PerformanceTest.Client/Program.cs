@@ -1,9 +1,10 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Serialization;
+using MagicOnion.Serialization.MemoryPack;
 using PerformanceTest.Shared;
 
 var app = ConsoleApp.Create(args);
@@ -19,7 +20,8 @@ async Task Main(
     [Option("c")]int channels = 10,
     [Option("r")]string? report = null,
     uint rounds = 1,
-    [Option("v")]bool verbose = false
+    [Option("v")]bool verbose = false,
+    SerializationType serialization = SerializationType.MessagePack
 )
 {
     var config = new ScenarioConfiguration(url, warmup, duration, streams, channels, verbose);
@@ -33,6 +35,18 @@ async Task Main(
     WriteLog($"Streams: {config.Streams}");
     WriteLog($"Channels: {config.Channels}");
     WriteLog($"Rounds: {rounds}");
+    WriteLog($"Serialization: {serialization}");
+
+    // Setup serializer
+    switch (serialization)
+    {
+        case SerializationType.MessagePack:
+            MagicOnionSerializerProvider.Default = MessagePackMagicOnionSerializerProvider.Default;
+            break;
+        case SerializationType.MemoryPack:
+            MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;
+            break;
+    }
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
@@ -72,6 +86,7 @@ async Task Main(
         writer.WriteLine($"MagicOnion {serverInfo.MagicOnionVersion}");
         writer.WriteLine($"grpc-dotnet {serverInfo.GrpcNetVersion}");
         writer.WriteLine($"MessagePack {serverInfo.MessagePackVersion}");
+        writer.WriteLine($"MemoryPack {serverInfo.MemoryPackVersion}");
         writer.WriteLine($"Build Configuration: {(serverInfo.IsReleaseBuild ? "Release" : "Debug")}");
         writer.WriteLine($"FrameworkDescription: {serverInfo.FrameworkDescription}");
         writer.WriteLine($"OSDescription: {serverInfo.OSDescription}");
@@ -80,12 +95,13 @@ async Task Main(
         writer.WriteLine($"IsServerGC: {serverInfo.IsServerGC}");
         writer.WriteLine($"ProcessorCount: {serverInfo.ProcessorCount}");
         writer.WriteLine($"========================================");
-        writer.WriteLine($"Scenario: {scenario}");
-        writer.WriteLine($"Url     : {config.Url}");
-        writer.WriteLine($"Warmup  : {config.Warmup} s");
-        writer.WriteLine($"Duration: {config.Duration} s");
-        writer.WriteLine($"Streams : {config.Streams}");
-        writer.WriteLine($"Channels: {config.Channels}");
+        writer.WriteLine($"Scenario     : {scenario}");
+        writer.WriteLine($"Url          : {config.Url}");
+        writer.WriteLine($"Warmup       : {config.Warmup} s");
+        writer.WriteLine($"Duration     : {config.Duration} s");
+        writer.WriteLine($"Streams      : {config.Streams}");
+        writer.WriteLine($"Channels     : {config.Channels}");
+        writer.WriteLine($"Serialization: {serialization}");
         writer.WriteLine($"========================================");
         foreach (var (s, results) in resultsByScenario)
         {
@@ -178,6 +194,7 @@ void PrintStartupInformation(TextWriter? writer = null)
     writer.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
     writer.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
     writer.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
+    writer.WriteLine($"MemoryPack {ApplicationInformation.Current.MemoryPackVersion}");
     writer.WriteLine();
 
     writer.WriteLine("Configurations:");

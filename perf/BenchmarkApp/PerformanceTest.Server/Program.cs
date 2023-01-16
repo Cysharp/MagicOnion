@@ -1,4 +1,12 @@
+using MagicOnion.Serialization;
+using MagicOnion.Serialization.MemoryPack;
 using PerformanceTest.Server;
+
+// Setup serializer
+if (Array.IndexOf(args, "--serialization") is var index and > -1 && args[index + 1].ToLowerInvariant() == "memorypack")
+{
+    MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
