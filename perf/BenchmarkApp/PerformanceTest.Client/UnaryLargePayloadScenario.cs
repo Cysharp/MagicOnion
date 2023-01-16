@@ -24,7 +24,7 @@ public abstract class UnaryLargePayloadScenarioBase : IScenario
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            _ = await client.UnaryLargePayloadAsync("Foo", 123, data);
+            _ = await client.UnaryLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
             ctx.Increment();
         }
     }

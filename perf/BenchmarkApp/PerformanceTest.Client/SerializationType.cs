@@ -1,0 +1,5 @@
+enum SerializationType
+{
+    MessagePack,
+    MemoryPack
+}

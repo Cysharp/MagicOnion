@@ -1,8 +1,7 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using MagicOnion.Server;
+using MagicOnion.Serialization;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using PerformanceTest.Shared;
@@ -24,6 +23,7 @@ class StartupService : IHostedService
         Console.WriteLine($"MagicOnion {ApplicationInformation.Current.MagicOnionVersion}");
         Console.WriteLine($"grpc-dotnet {ApplicationInformation.Current.GrpcNetVersion}");
         Console.WriteLine($"MessagePack {ApplicationInformation.Current.MessagePackVersion}");
+        Console.WriteLine($"MemoryPack {ApplicationInformation.Current.MemoryPackVersion}");
         Console.WriteLine();
 
         Console.WriteLine($"Listening on:");
@@ -39,6 +39,7 @@ class StartupService : IHostedService
         Console.WriteLine($"{nameof(GCSettings.IsServerGC)}: {ApplicationInformation.Current.IsServerGC}");
         Console.WriteLine($"{nameof(Environment.ProcessorCount)}: {ApplicationInformation.Current.ProcessorCount}");
         Console.WriteLine($"{nameof(Debugger)}.{nameof(Debugger.IsAttached)}: {ApplicationInformation.Current.IsAttached}");
+        Console.WriteLine($"{nameof(MagicOnionSerializerProvider)}.{nameof(MagicOnionSerializerProvider.Default)}: {MagicOnionSerializerProvider.Default}");
         Console.WriteLine();
 
         Console.WriteLine("Application started.");

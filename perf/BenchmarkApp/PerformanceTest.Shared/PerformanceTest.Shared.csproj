@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
   </ItemGroup>
 
 </Project>

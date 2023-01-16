@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using MessagePack;
 
 namespace PerformanceTest.Shared;
 
@@ -21,6 +20,7 @@ public class ApplicationInformation
     public string? GrpcNetVersion { get; } = default;
 #endif
     public string? MessagePackVersion { get; } = typeof(MessagePack.MessagePackSerializer).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+    public string? MemoryPackVersion { get; } = typeof(MemoryPack.MemoryPackSerializer).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
     public bool IsReleaseBuild { get; }
 #if RELEASE

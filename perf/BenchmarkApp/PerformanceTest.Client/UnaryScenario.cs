@@ -16,7 +16,7 @@ public class UnaryScenario : IScenario
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await client.UnaryArgDynamicArgumentTupleReturnValue("Foo", 123);
+            await client.UnaryArgDynamicArgumentTupleReturnValue("FooBarBaz🚀こんにちは世界", 123, 4567, 891011);
             ctx.Increment();
         }
     }
@@ -36,7 +36,7 @@ public class UnaryComplexScenario : IScenario
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            await client.UnaryComplexAsync("Foo", 1234567);
+            await client.UnaryComplexAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011);
             ctx.Increment();
         }
     }
