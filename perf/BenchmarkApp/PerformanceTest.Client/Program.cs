@@ -138,6 +138,7 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         ScenarioType.UnaryLargePayload32K => () => new UnaryLargePayload32KScenario(),
         ScenarioType.UnaryLargePayload64K => () => new UnaryLargePayload64KScenario(),
         ScenarioType.StreamingHub => () => new StreamingHubScenario(),
+        ScenarioType.StreamingHubComplex => () => new StreamingHubComplexScenario(),
         ScenarioType.StreamingHubLargePayload1K => () => new StreamingHubLargePayload1KScenario(),
         ScenarioType.StreamingHubLargePayload2K => () => new StreamingHubLargePayload2KScenario(),
         ScenarioType.StreamingHubLargePayload4K => () => new StreamingHubLargePayload4KScenario(),

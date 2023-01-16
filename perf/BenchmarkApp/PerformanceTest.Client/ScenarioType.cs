@@ -12,6 +12,7 @@ public enum ScenarioType
     UnaryLargePayload64K,
 
     StreamingHub,
+    StreamingHubComplex,
     StreamingHubLargePayload1K,
     StreamingHubLargePayload2K,
     StreamingHubLargePayload4K,

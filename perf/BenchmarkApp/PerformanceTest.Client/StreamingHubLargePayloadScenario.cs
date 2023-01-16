@@ -23,7 +23,7 @@ public abstract class StreamingHubLargePayloadScenarioBase : IScenario, IPerfTes
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            _ = await client.CallMethodLargePayloadAsync("Foo", 123, data);
+            _ = await client.CallMethodLargePayloadAsync("FooBarBaz🚀こんにちは世界", 123, 4567, 891011, data);
             ctx.Increment();
         }
     }
