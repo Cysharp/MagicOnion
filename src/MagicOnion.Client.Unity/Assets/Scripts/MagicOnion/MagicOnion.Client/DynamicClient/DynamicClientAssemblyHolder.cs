@@ -1,3 +1,4 @@
+#if NON_UNITY || !NET_STANDARD_2_0
 using MagicOnion.Utils;
 
 namespace MagicOnion.Client.DynamicClient
@@ -29,3 +30,4 @@ namespace MagicOnion.Client.DynamicClient
 #endif
     }
 }
+#endif

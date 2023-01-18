@@ -452,7 +452,7 @@ namespace MagicOnion
                 }
 
                 public override IBufferWriter<byte> GetBufferWriter()
-                    => _bufferWriter ??= _inner.GetBufferWriter();
+                    => _bufferWriter ?? (_bufferWriter = _inner.GetBufferWriter());
 
                 public override void Complete(byte[] payload)
                 {
