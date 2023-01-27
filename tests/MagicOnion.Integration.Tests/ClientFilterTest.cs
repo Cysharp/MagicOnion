@@ -187,7 +187,7 @@ public class MockRequestFilter : IClientFilter
         if (context.MethodPath == "ICalc/Sum")
         {
             // don't call next, return mock result.
-            return new ResponseContext<int>(9999, Status.DefaultSuccess, Metadata.Empty, Metadata.Empty);
+            return ResponseContext<int>.Create(9999, Status.DefaultSuccess, Metadata.Empty, Metadata.Empty);
         }
 
         return await next(context);

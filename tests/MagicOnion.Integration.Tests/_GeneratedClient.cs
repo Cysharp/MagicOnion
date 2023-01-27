@@ -361,11 +361,23 @@ namespace MagicOnion.Integration.Tests
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32> ClientStreaming;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32> ServerStreaming;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32> DuplexStreaming;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> ClientStreamingRefType;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> ServerStreamingRefType;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> DuplexStreamingRefType;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> ClientStreamingRefTypeReturnsNull;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> ServerStreamingRefTypeReturnsNull;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse> DuplexStreamingRefTypeReturnsNull;
             public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
             {
                 this.ClientStreaming = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.ClientStreaming, "IStreamingTestService", "ClientStreaming", serializerProvider);
                 this.ServerStreaming = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.ServerStreaming, "IStreamingTestService", "ServerStreaming", serializerProvider);
                 this.DuplexStreaming = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.DuplexStreaming, "IStreamingTestService", "DuplexStreaming", serializerProvider);
+                this.ClientStreamingRefType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.ClientStreaming, "IStreamingTestService", "ClientStreamingRefType", serializerProvider);
+                this.ServerStreamingRefType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.ServerStreaming, "IStreamingTestService", "ServerStreamingRefType", serializerProvider);
+                this.DuplexStreamingRefType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.DuplexStreaming, "IStreamingTestService", "DuplexStreamingRefType", serializerProvider);
+                this.ClientStreamingRefTypeReturnsNull = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.ClientStreaming, "IStreamingTestService", "ClientStreamingRefTypeReturnsNull", serializerProvider);
+                this.ServerStreamingRefTypeReturnsNull = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.ServerStreaming, "IStreamingTestService", "ServerStreamingRefTypeReturnsNull", serializerProvider);
+                this.DuplexStreamingRefTypeReturnsNull = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(global::Grpc.Core.MethodType.DuplexStreaming, "IStreamingTestService", "DuplexStreamingRefTypeReturnsNull", serializerProvider);
             }
         }
         
@@ -390,6 +402,18 @@ namespace MagicOnion.Integration.Tests
             => this.core.ServerStreaming.InvokeServerStreaming(this, "IStreamingTestService/ServerStreaming", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>(arg0, arg1));
         public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<global::System.ValueTuple<global::System.Int32, global::System.Int32>, global::System.Int32>> DuplexStreaming()
             => this.core.DuplexStreaming.InvokeDuplexStreaming(this, "IStreamingTestService/DuplexStreaming");
+        public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>> ClientStreamingRefType()
+            => this.core.ClientStreamingRefType.InvokeClientStreaming(this, "IStreamingTestService/ClientStreamingRefType");
+        public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingResponse>> ServerStreamingRefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+            => this.core.ServerStreamingRefType.InvokeServerStreaming(this, "IStreamingTestService/ServerStreamingRefType", request);
+        public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>> DuplexStreamingRefType()
+            => this.core.DuplexStreamingRefType.InvokeDuplexStreaming(this, "IStreamingTestService/DuplexStreamingRefType");
+        public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>> ClientStreamingRefTypeReturnsNull()
+            => this.core.ClientStreamingRefTypeReturnsNull.InvokeClientStreaming(this, "IStreamingTestService/ClientStreamingRefTypeReturnsNull");
+        public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingResponse>> ServerStreamingRefTypeReturnsNull(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+            => this.core.ServerStreamingRefTypeReturnsNull.InvokeServerStreaming(this, "IStreamingTestService/ServerStreamingRefTypeReturnsNull", request);
+        public global::System.Threading.Tasks.Task<global::MagicOnion.DuplexStreamingResult<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>> DuplexStreamingRefTypeReturnsNull()
+            => this.core.DuplexStreamingRefTypeReturnsNull.InvokeDuplexStreaming(this, "IStreamingTestService/DuplexStreamingRefTypeReturnsNull");
     }
 }
 
@@ -408,10 +432,14 @@ namespace MagicOnion.Integration.Tests
         {
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Int32, global::MessagePack.Nil> NonGeneric;
             public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32> ManyParametersReturnsValueType;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyUnaryRequest, global::MagicOnion.Integration.Tests.MyUnaryResponse> RefType;
+            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.Integration.Tests.MyUnaryRequest, global::MagicOnion.Integration.Tests.MyUnaryResponse> RefTypeNull;
             public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
             {
                 this.NonGeneric = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::System.Int32, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "NonGeneric", serializerProvider);
                 this.ManyParametersReturnsValueType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>, global::System.Int32>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "ManyParametersReturnsValueType", serializerProvider);
+                this.RefType = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyUnaryRequest, global::MagicOnion.Integration.Tests.MyUnaryResponse>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "RefType", serializerProvider);
+                this.RefTypeNull = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::MagicOnion.Integration.Tests.MyUnaryRequest, global::MagicOnion.Integration.Tests.MyUnaryResponse>(global::Grpc.Core.MethodType.Unary, "IUnaryService", "RefTypeNull", serializerProvider);
             }
         }
         
@@ -434,6 +462,10 @@ namespace MagicOnion.Integration.Tests
             => this.core.NonGeneric.InvokeUnaryNonGeneric(this, "IUnaryService/NonGeneric", arg0);
         public global::MagicOnion.UnaryResult<global::System.Int32> ManyParametersReturnsValueType(global::System.Int32 arg0, global::System.Int32 arg1, global::System.Int32 arg2, global::System.Int32 arg3, global::System.Int32 arg4, global::System.Int32 arg5, global::System.Int32 arg6, global::System.Int32 arg7, global::System.Int32 arg8, global::System.Int32 arg9, global::System.Int32 arg10, global::System.Int32 arg11, global::System.Int32 arg12, global::System.Int32 arg13, global::System.Int32 arg14)
             => this.core.ManyParametersReturnsValueType.InvokeUnary(this, "IUnaryService/ManyParametersReturnsValueType", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14));
+        public global::MagicOnion.UnaryResult<global::MagicOnion.Integration.Tests.MyUnaryResponse> RefType(global::MagicOnion.Integration.Tests.MyUnaryRequest request)
+            => this.core.RefType.InvokeUnary(this, "IUnaryService/RefType", request);
+        public global::MagicOnion.UnaryResult<global::MagicOnion.Integration.Tests.MyUnaryResponse> RefTypeNull(global::MagicOnion.Integration.Tests.MyUnaryRequest request)
+            => this.core.RefTypeNull.InvokeUnary(this, "IUnaryService/RefTypeNull", request);
     }
 }
 
@@ -702,6 +734,14 @@ namespace MagicOnion.Integration.Tests
             => new global::System.Threading.Tasks.ValueTask(base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1647082094, global::MessagePack.Nil.Default));
         public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Never_With_Return()
             => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32>(-1197600090, global::MessagePack.Nil.Default));
+        public global::System.Threading.Tasks.Task<global::MagicOnion.Integration.Tests.MyStreamingResponse> RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+            => base.WriteMessageWithResponseAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(1032130514, request);
+        public global::System.Threading.Tasks.Task<global::MagicOnion.Integration.Tests.MyStreamingResponse> RefType_Null(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+            => base.WriteMessageWithResponseAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(1253352858, request);
+        public global::System.Threading.Tasks.Task CallReceiver_RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+            => base.WriteMessageWithResponseAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MessagePack.Nil>(1503747814, request);
+        public global::System.Threading.Tasks.Task CallReceiver_RefType_Null()
+            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1093215042, global::MessagePack.Nil.Default);
         
         public global::MagicOnion.Integration.Tests.IStreamingHubTestHub FireAndForget()
             => new FireAndForgetClient(this);
@@ -756,6 +796,14 @@ namespace MagicOnion.Integration.Tests
                 => new global::System.Threading.Tasks.ValueTask(parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1647082094, global::MessagePack.Nil.Default));
             public global::System.Threading.Tasks.ValueTask<global::System.Int32> ValueTask_Never_With_Return()
                 => new global::System.Threading.Tasks.ValueTask<global::System.Int32>(parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::System.Int32>(-1197600090, global::MessagePack.Nil.Default));
+            public global::System.Threading.Tasks.Task<global::MagicOnion.Integration.Tests.MyStreamingResponse> RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(1032130514, request);
+            public global::System.Threading.Tasks.Task<global::MagicOnion.Integration.Tests.MyStreamingResponse> RefType_Null(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MagicOnion.Integration.Tests.MyStreamingResponse>(1253352858, request);
+            public global::System.Threading.Tasks.Task CallReceiver_RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MessagePack.Nil>(1503747814, request);
+            public global::System.Threading.Tasks.Task CallReceiver_RefType_Null()
+                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1093215042, global::MessagePack.Nil.Default);
             
         }
         
@@ -779,6 +827,18 @@ namespace MagicOnion.Integration.Tests
                     {
                         var value = base.Deserialize<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>>(data);
                         receiver.Receiver_Parameter_Many(value.Item1, value.Item2, value.Item3);
+                    }
+                    break;
+                case -1554122998: // Void Receiver_RefType(global::MagicOnion.Integration.Tests.MyStreamingResponse request)
+                    {
+                        var value = base.Deserialize<global::MagicOnion.Integration.Tests.MyStreamingResponse>(data);
+                        receiver.Receiver_RefType(value);
+                    }
+                    break;
+                case -218411390: // Void Receiver_RefType_Null(global::MagicOnion.Integration.Tests.MyStreamingResponse request)
+                    {
+                        var value = base.Deserialize<global::MagicOnion.Integration.Tests.MyStreamingResponse>(data);
+                        receiver.Receiver_RefType_Null(value);
                     }
                     break;
             }
@@ -844,6 +904,18 @@ namespace MagicOnion.Integration.Tests
                     break;
                 case -1197600090: // ValueTask<Int32> ValueTask_Never_With_Return()
                     base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                    break;
+                case 1032130514: // Task<MyStreamingResponse> RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                    base.SetResultForResponse<global::MagicOnion.Integration.Tests.MyStreamingResponse>(taskCompletionSource, data);
+                    break;
+                case 1253352858: // Task<MyStreamingResponse> RefType_Null(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                    base.SetResultForResponse<global::MagicOnion.Integration.Tests.MyStreamingResponse>(taskCompletionSource, data);
+                    break;
+                case 1503747814: // Task CallReceiver_RefType(global::MagicOnion.Integration.Tests.MyStreamingRequest request)
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case -1093215042: // Task CallReceiver_RefType_Null()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                     break;
             }
         }

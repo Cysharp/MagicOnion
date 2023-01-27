@@ -55,8 +55,8 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
         ));
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, response, context) => await serverMethod(
-                UnboxAsyncStreamReader.Create<TRequest, TRawRequest>(request),
-                BoxServerStreamWriter.Create<TResponse, TRawResponse>(response),
+                new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(request, method.FromRawRequest),
+                new MagicOnionServerStreamWriter<TResponse, TRawResponse>(response, method.ToRawResponse),
                 context
             ));
     }
@@ -66,8 +66,8 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.DuplexStreaming, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, response, context) => await serverMethod(
-                UnboxAsyncStreamReader.Create<TRequest, TRawRequest>(request),
-                BoxServerStreamWriter.Create<TResponse, TRawResponse>(response),
+                new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(request, method.FromRawRequest),
+                new MagicOnionServerStreamWriter<TResponse, TRawResponse>(response, method.ToRawResponse),
                 context
             ));
     }
@@ -78,7 +78,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, response, context) => await serverMethod(
                 method.FromRawRequest(request),
-                BoxServerStreamWriter.Create<TResponse, TRawResponse>(response),
+                new MagicOnionServerStreamWriter<TResponse, TRawResponse>(response, method.ToRawResponse),
                 context
             ));
     }
@@ -88,7 +88,7 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.ClientStreaming, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, context) => method.ToRawResponse(await serverMethod(
-                UnboxAsyncStreamReader.Create<TRequest, TRawRequest>(request),
+                new MagicOnionAsyncStreamReader<TRequest, TRawRequest>(request, method.FromRawRequest),
                 context
             )));
     }

@@ -349,6 +349,84 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         result.Should().Be(default(int));
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task RefType(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        var request = new MyStreamingRequest(123, 456);
+
+        // Act
+        var result = await client.RefType(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Value.Should().Be(123 + 456);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task RefType_Null(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var result = await client.RefType_Null(null);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Receiver_RefType(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+        var request = new MyStreamingRequest(123, 456);
+
+        // Act
+        await client.CallReceiver_RefType(request);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_RefType(It.Is<MyStreamingResponse>(y => y.Value == 123 + 456)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Receiver_RefType_Null(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        await client.CallReceiver_RefType_Null();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_RefType_Null(default));
+    }
+
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -474,6 +552,28 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
     }
 
+    public Task<MyStreamingResponse> RefType(MyStreamingRequest request)
+    {
+        return Task.FromResult(new MyStreamingResponse(request.Argument0 + request.Argument1));
+    }
+
+    public Task<MyStreamingResponse?> RefType_Null(MyStreamingRequest? request)
+    {
+        Debug.Assert(request is null);
+        return Task.FromResult(default(MyStreamingResponse));
+    }
+
+    public Task CallReceiver_RefType(MyStreamingRequest request)
+    {
+        Broadcast(group).Receiver_RefType(new MyStreamingResponse(request.Argument0 + request.Argument1));
+        return Task.CompletedTask;
+    }
+
+    public Task CallReceiver_RefType_Null()
+    {
+        Broadcast(group).Receiver_RefType_Null(default);
+        return Task.CompletedTask;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -481,6 +581,8 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_Parameter_Zero();
     void Receiver_Parameter_One(int arg0);
     void Receiver_Parameter_Many(int arg0, string arg1, bool arg2);
+    void Receiver_RefType(MyStreamingResponse request);
+    void Receiver_RefType_Null(MyStreamingResponse? request);
 }
 
 public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
@@ -511,4 +613,8 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     ValueTask ValueTask_Never();
     ValueTask<int> ValueTask_Never_With_Return();
 
+    Task<MyStreamingResponse> RefType(MyStreamingRequest request);
+    Task<MyStreamingResponse?> RefType_Null(MyStreamingRequest? request);
+    Task CallReceiver_RefType(MyStreamingRequest request);
+    Task CallReceiver_RefType_Null();
 }

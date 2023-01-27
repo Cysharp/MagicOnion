@@ -31,6 +31,7 @@ public interface IBasicUnaryService : IService<IBasicUnaryService>
     UnaryResult NonGenericNoParameterAsync();
     UnaryResult NonGenericOneValueTypeParameterAsync(int a);
     UnaryResult NonGenericTwoValueTypeParameterAsync(int a, int b);
+    UnaryResult<MyResponse?> NullResponseAsync(MyRequest? a);
 }
 
 [MessagePackObject(true)]
@@ -116,4 +117,7 @@ public class BasicUnaryService : ServiceBase<IBasicUnaryService>, IBasicUnarySer
 
     public UnaryResult NonGenericTwoValueTypeParameterAsync(int a, int b)
         => MagicOnion.UnaryResult.CompletedResult;
+
+    public UnaryResult<MyResponse?> NullResponseAsync(MyRequest? a)
+        => MagicOnion.UnaryResult.FromResult(default(MyResponse));
 }

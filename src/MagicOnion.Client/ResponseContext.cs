@@ -5,9 +5,9 @@ using MagicOnion.Internal;
 
 namespace MagicOnion.Client
 {
-    public class ResponseContext<T> : ResponseContext, IResponseContext<T>
+    internal class ResponseContextRaw<T, TRaw> : ResponseContext<T>
     {
-        readonly IDisposable inner; // AsyncUnaryCall<T> or AsyncUnaryCall<Box<T>>
+        readonly AsyncUnaryCall<TRaw> inner;
 
         readonly bool hasValue;
         readonly T value;
@@ -16,35 +16,22 @@ namespace MagicOnion.Client
         readonly Status status;
         readonly Metadata responseHeaders;
         readonly Metadata trailers;
+        readonly Func<TRaw, T> fromRawResponseToResponse;
 
-        public static ResponseContext Create<TRaw>(AsyncUnaryCall<TRaw> inner)
-        {
-            return (typeof(TRaw) == typeof(Box<T>))
-                ? new ResponseContext<T>((AsyncUnaryCall<Box<T>>)(object)inner)
-                : new ResponseContext<T>((AsyncUnaryCall<T>)(object)inner);
-        }
-
-        public ResponseContext(AsyncUnaryCall<T> inner)
-            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
-        { }
-        public ResponseContext(AsyncUnaryCall<Box<T>> inner)
-            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
-        { }
-        public ResponseContext(T value, AsyncUnaryCall<T> inner)
-            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
-        { }
-        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
-            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
-        { }
-        public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)
-            : this(default, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders, trailers)
+        public ResponseContextRaw(T value, Status status, Metadata responseHeaders, Metadata trailers)
+            : this(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers, x => (T)(object)x)
         { }
 
-        private ResponseContext(IDisposable inner, bool hasValue, T value, bool hasMetadataAndStatus, Status status, Metadata responseHeaders, Metadata trailers)
+        public ResponseContextRaw(AsyncUnaryCall<TRaw> inner, Func<TRaw, T> fromRawResponseToResponse)
+            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
+        { }
+
+        public ResponseContextRaw(AsyncUnaryCall<TRaw> inner, bool hasValue, T value, bool hasMetadataAndStatus, Status status, Metadata responseHeaders, Metadata trailers, Func<TRaw, T> fromRawResponseToResponse)
         {
             if (!hasValue && inner == null) throw new ArgumentNullException(nameof(inner));
             if (hasMetadataAndStatus && responseHeaders == null) throw new ArgumentNullException(nameof(responseHeaders));
             if (hasMetadataAndStatus && trailers == null) throw new ArgumentNullException(nameof(trailers));
+            if (fromRawResponseToResponse == null) throw new ArgumentNullException(nameof(fromRawResponseToResponse));
 
             this.inner = inner;
 
@@ -55,6 +42,7 @@ namespace MagicOnion.Client
             this.status = status;
             this.responseHeaders = responseHeaders;
             this.trailers = trailers;
+            this.fromRawResponseToResponse = fromRawResponseToResponse;
         }
 
         public override Type ResponseType => typeof(T);
@@ -68,40 +56,43 @@ namespace MagicOnion.Client
         public override Status GetStatus()
             => hasMetadataAndStatus
                 ? status
-                : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? boxed.GetStatus()
-                    : ((AsyncUnaryCall<T>)inner).GetStatus();
+                : inner.GetStatus();
         
         public override Task<Metadata> ResponseHeadersAsync
             => hasMetadataAndStatus
                 ? Task.FromResult(responseHeaders)
-                : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? boxed.ResponseHeadersAsync
-                    : ((AsyncUnaryCall<T>)inner).ResponseHeadersAsync;
+                : inner.ResponseHeadersAsync;
         public override  Metadata GetTrailers()
             => hasMetadataAndStatus
                 ? trailers
-                : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? boxed.GetTrailers()
-                    : ((AsyncUnaryCall<T>)inner).GetTrailers();
+                : inner.GetTrailers();
 
-        public Task<T> ResponseAsync
+        public override Task<T> ResponseAsync
             => hasValue
                 ? Task.FromResult(value)
-                : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? UnboxResponseAsync(boxed)
-                    : ((AsyncUnaryCall<T>)inner).ResponseAsync;
+                : FromRawResponseToResponseAsync();
 
-        private static async Task<T> UnboxResponseAsync(AsyncUnaryCall<Box<T>> boxed)
-            => (await boxed.ResponseAsync.ConfigureAwait(false)).Value;
-
+        async Task<T> FromRawResponseToResponseAsync()
+            => fromRawResponseToResponse(await inner.ResponseAsync.ConfigureAwait(false));
+ 
         public override void Dispose()
             => inner?.Dispose();
 
-        public ResponseContext<T> WithNewResult(T newValue)
-            => new ResponseContext<T>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers);
+        public override ResponseContext<T> WithNewResult(T newValue)
+            => new ResponseContextRaw<T, TRaw>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers, fromRawResponseToResponse);
     }
 
+    public abstract class ResponseContext<T> : ResponseContext, IResponseContext<T>
+    {
+        public static ResponseContext<T> Create<TRaw>(AsyncUnaryCall<TRaw> inner, Func<TRaw, T> fromRawResponseToResponse)
+            => new ResponseContextRaw<T, TRaw>(inner, fromRawResponseToResponse);
+
+        public static ResponseContext<T> Create(T value, Status status, Metadata responseHeaders, Metadata trailers)
+            => new ResponseContextRaw<T, T>(null, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders: responseHeaders, trailers: trailers, x => x);
+
+        public abstract Task<T> ResponseAsync { get; }
+        public abstract ResponseContext<T> WithNewResult(T newValue);
+    }
 
     public abstract class ResponseContext : IResponseContext
     {

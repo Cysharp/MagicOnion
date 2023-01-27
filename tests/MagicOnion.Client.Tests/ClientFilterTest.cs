@@ -9,7 +9,7 @@ public class ClientFilterTest
         var clientFilterMock = new Mock<IClientFilter>();
         clientFilterMock.Setup(x => x.SendAsync(It.IsAny<RequestContext>(), It.IsAny<Func<RequestContext, ValueTask<ResponseContext>>>()))
             // NOTE: Mock IClientFilter returns a value immediately. (The filter will not call `next`)
-            .Returns(ValueTask.FromResult((ResponseContext)new ResponseContext<string>("Response", Status.DefaultSuccess, Metadata.Empty, Metadata.Empty)))
+            .Returns(ValueTask.FromResult((ResponseContext)ResponseContext<string>.Create("Response", Status.DefaultSuccess, Metadata.Empty, Metadata.Empty)))
             .Verifiable();
         var callInvokerMock = new Mock<CallInvoker>();
         callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<string>()))

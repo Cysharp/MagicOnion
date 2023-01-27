@@ -19,6 +19,7 @@ public class GenerateGenericsTest
 using System;
 using MessagePack;
 using MagicOnion;
+using System.Collections.Generic;
 
 namespace TempProject
 {
@@ -26,6 +27,7 @@ namespace TempProject
     {
         UnaryResult<Nil> A(MyGenericObject<int> a);
         UnaryResult<Nil> B(MyGenericObject<MyObject> a);
+        UnaryResult<MyGenericObject<IReadOnlyList<MyObject>>> C();
     }
 
     [MessagePackObject]

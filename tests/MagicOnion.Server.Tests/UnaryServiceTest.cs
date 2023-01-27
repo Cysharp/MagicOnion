@@ -209,4 +209,16 @@ public class UnaryServiceTest : IClassFixture<WebApplicationFactory<BasicServerS
 
         await client.NonGenericTwoValueTypeParameterAsync(123, 456);
     }
+
+    [Fact]
+    public async Task NullResponse()
+    {
+        var httpClient = factory.CreateDefaultClient();
+        var client = MagicOnionClient.Create<IBasicUnaryService>(GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient }));
+
+        var result = await client.NullResponseAsync(null);
+
+        result.Should().BeNull();
+    }
+
 }
