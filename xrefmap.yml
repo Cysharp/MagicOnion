@@ -1642,59 +1642,14 @@ references:
   fullName.vb: MagicOnion.Client.ResponseContext(Of T)
   nameWithType: ResponseContext<T>
   nameWithType.vb: ResponseContext(Of T)
-- uid: MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{`0})
-  name: ResponseContext(T, AsyncUnaryCall<T>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall__0__
-  commentId: M:MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{`0})
-  name.vb: ResponseContext(T, AsyncUnaryCall(Of T))
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext(T, AsyncUnaryCall<T>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext(T, AsyncUnaryCall(Of T))
-  nameWithType: ResponseContext<T>.ResponseContext(T, AsyncUnaryCall<T>)
-  nameWithType.vb: ResponseContext(Of T).ResponseContext(T, AsyncUnaryCall(Of T))
-- uid: MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{MagicOnion.Internal.Box{`0}})
-  name: ResponseContext(T, AsyncUnaryCall<Box<T>>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall_MagicOnion_Internal_Box__0___
-  commentId: M:MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{MagicOnion.Internal.Box{`0}})
-  name.vb: ResponseContext(T, AsyncUnaryCall(Of Box(Of T)))
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext(T, AsyncUnaryCall<MagicOnion.Internal.Box<T>>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext(T, AsyncUnaryCall(Of MagicOnion.Internal.Box(Of T)))
-  nameWithType: ResponseContext<T>.ResponseContext(T, AsyncUnaryCall<Box<T>>)
-  nameWithType.vb: ResponseContext(Of T).ResponseContext(T, AsyncUnaryCall(Of Box(Of T)))
-- uid: MagicOnion.Client.ResponseContext`1.#ctor(`0,Status,Metadata,Metadata)
-  name: ResponseContext(T, Status, Metadata, Metadata)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_Status_Metadata_Metadata_
-  commentId: M:MagicOnion.Client.ResponseContext`1.#ctor(`0,Status,Metadata,Metadata)
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext(T, Status, Metadata, Metadata)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext(T, Status, Metadata, Metadata)
-  nameWithType: ResponseContext<T>.ResponseContext(T, Status, Metadata, Metadata)
-  nameWithType.vb: ResponseContext(Of T).ResponseContext(T, Status, Metadata, Metadata)
-- uid: MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{`0})
-  name: ResponseContext(AsyncUnaryCall<T>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall__0__
-  commentId: M:MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{`0})
-  name.vb: ResponseContext(AsyncUnaryCall(Of T))
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext(AsyncUnaryCall<T>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext(AsyncUnaryCall(Of T))
-  nameWithType: ResponseContext<T>.ResponseContext(AsyncUnaryCall<T>)
-  nameWithType.vb: ResponseContext(Of T).ResponseContext(AsyncUnaryCall(Of T))
-- uid: MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{MagicOnion.Internal.Box{`0}})
-  name: ResponseContext(AsyncUnaryCall<Box<T>>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_MagicOnion_Internal_Box__0___
-  commentId: M:MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{MagicOnion.Internal.Box{`0}})
-  name.vb: ResponseContext(AsyncUnaryCall(Of Box(Of T)))
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext(AsyncUnaryCall<MagicOnion.Internal.Box<T>>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext(AsyncUnaryCall(Of MagicOnion.Internal.Box(Of T)))
-  nameWithType: ResponseContext<T>.ResponseContext(AsyncUnaryCall<Box<T>>)
-  nameWithType.vb: ResponseContext(Of T).ResponseContext(AsyncUnaryCall(Of Box(Of T)))
-- uid: MagicOnion.Client.ResponseContext`1.#ctor*
-  name: ResponseContext
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseContext
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseContext
-  nameWithType: ResponseContext<T>.ResponseContext
-  nameWithType.vb: ResponseContext(Of T).ResponseContext
+- uid: MagicOnion.Client.ResponseContext`1.Create(`0,Status,Metadata,Metadata)
+  name: Create(T, Status, Metadata, Metadata)
+  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__0_Status_Metadata_Metadata_
+  commentId: M:MagicOnion.Client.ResponseContext`1.Create(`0,Status,Metadata,Metadata)
+  fullName: MagicOnion.Client.ResponseContext<T>.Create(T, Status, Metadata, Metadata)
+  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create(T, Status, Metadata, Metadata)
+  nameWithType: ResponseContext<T>.Create(T, Status, Metadata, Metadata)
+  nameWithType.vb: ResponseContext(Of T).Create(T, Status, Metadata, Metadata)
 - uid: MagicOnion.Client.ResponseContext`1.Create*
   name: Create
   href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create_
@@ -1704,66 +1659,15 @@ references:
   fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create
   nameWithType: ResponseContext<T>.Create
   nameWithType.vb: ResponseContext(Of T).Create
-- uid: MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})
-  name: Create<TRaw>(AsyncUnaryCall<TRaw>)
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__
-  commentId: M:MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})
-  name.vb: Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
-  fullName: MagicOnion.Client.ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>)
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
-  nameWithType: ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>)
-  nameWithType.vb: ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw))
-- uid: MagicOnion.Client.ResponseContext`1.Dispose
-  name: Dispose()
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Dispose
-  commentId: M:MagicOnion.Client.ResponseContext`1.Dispose
-  fullName: MagicOnion.Client.ResponseContext<T>.Dispose()
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Dispose()
-  nameWithType: ResponseContext<T>.Dispose()
-  nameWithType.vb: ResponseContext(Of T).Dispose()
-- uid: MagicOnion.Client.ResponseContext`1.Dispose*
-  name: Dispose
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Dispose_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.Dispose
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.Dispose
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Dispose
-  nameWithType: ResponseContext<T>.Dispose
-  nameWithType.vb: ResponseContext(Of T).Dispose
-- uid: MagicOnion.Client.ResponseContext`1.GetStatus
-  name: GetStatus()
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetStatus
-  commentId: M:MagicOnion.Client.ResponseContext`1.GetStatus
-  fullName: MagicOnion.Client.ResponseContext<T>.GetStatus()
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).GetStatus()
-  nameWithType: ResponseContext<T>.GetStatus()
-  nameWithType.vb: ResponseContext(Of T).GetStatus()
-- uid: MagicOnion.Client.ResponseContext`1.GetStatus*
-  name: GetStatus
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetStatus_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.GetStatus
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.GetStatus
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).GetStatus
-  nameWithType: ResponseContext<T>.GetStatus
-  nameWithType.vb: ResponseContext(Of T).GetStatus
-- uid: MagicOnion.Client.ResponseContext`1.GetTrailers
-  name: GetTrailers()
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetTrailers
-  commentId: M:MagicOnion.Client.ResponseContext`1.GetTrailers
-  fullName: MagicOnion.Client.ResponseContext<T>.GetTrailers()
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).GetTrailers()
-  nameWithType: ResponseContext<T>.GetTrailers()
-  nameWithType.vb: ResponseContext(Of T).GetTrailers()
-- uid: MagicOnion.Client.ResponseContext`1.GetTrailers*
-  name: GetTrailers
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetTrailers_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.GetTrailers
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.GetTrailers
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).GetTrailers
-  nameWithType: ResponseContext<T>.GetTrailers
-  nameWithType.vb: ResponseContext(Of T).GetTrailers
+- uid: MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0},Func{``0,`0})
+  name: Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
+  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__Func___0__0__
+  commentId: M:MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0},Func{``0,`0})
+  name.vb: Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
+  fullName: MagicOnion.Client.ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
+  fullName.vb: MagicOnion.Client.ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
+  nameWithType: ResponseContext<T>.Create<TRaw>(AsyncUnaryCall<TRaw>, Func<TRaw, T>)
+  nameWithType.vb: ResponseContext(Of T).Create(Of TRaw)(AsyncUnaryCall(Of TRaw), Func(Of TRaw, T))
 - uid: MagicOnion.Client.ResponseContext`1.ResponseAsync
   name: ResponseAsync
   href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseAsync
@@ -1781,57 +1685,6 @@ references:
   fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseAsync
   nameWithType: ResponseContext<T>.ResponseAsync
   nameWithType.vb: ResponseContext(Of T).ResponseAsync
-- uid: MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync
-  name: ResponseHeadersAsync
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseHeadersAsync
-  commentId: P:MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseHeadersAsync
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseHeadersAsync
-  nameWithType: ResponseContext<T>.ResponseHeadersAsync
-  nameWithType.vb: ResponseContext(Of T).ResponseHeadersAsync
-- uid: MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync*
-  name: ResponseHeadersAsync
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseHeadersAsync_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseHeadersAsync
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseHeadersAsync
-  nameWithType: ResponseContext<T>.ResponseHeadersAsync
-  nameWithType.vb: ResponseContext(Of T).ResponseHeadersAsync
-- uid: MagicOnion.Client.ResponseContext`1.ResponseType
-  name: ResponseType
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseType
-  commentId: P:MagicOnion.Client.ResponseContext`1.ResponseType
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseType
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseType
-  nameWithType: ResponseContext<T>.ResponseType
-  nameWithType.vb: ResponseContext(Of T).ResponseType
-- uid: MagicOnion.Client.ResponseContext`1.ResponseType*
-  name: ResponseType
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseType_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.ResponseType
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.ResponseType
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).ResponseType
-  nameWithType: ResponseContext<T>.ResponseType
-  nameWithType.vb: ResponseContext(Of T).ResponseType
-- uid: MagicOnion.Client.ResponseContext`1.WaitResponseAsync
-  name: WaitResponseAsync()
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_WaitResponseAsync
-  commentId: M:MagicOnion.Client.ResponseContext`1.WaitResponseAsync
-  fullName: MagicOnion.Client.ResponseContext<T>.WaitResponseAsync()
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).WaitResponseAsync()
-  nameWithType: ResponseContext<T>.WaitResponseAsync()
-  nameWithType.vb: ResponseContext(Of T).WaitResponseAsync()
-- uid: MagicOnion.Client.ResponseContext`1.WaitResponseAsync*
-  name: WaitResponseAsync
-  href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_WaitResponseAsync_
-  commentId: Overload:MagicOnion.Client.ResponseContext`1.WaitResponseAsync
-  isSpec: "True"
-  fullName: MagicOnion.Client.ResponseContext<T>.WaitResponseAsync
-  fullName.vb: MagicOnion.Client.ResponseContext(Of T).WaitResponseAsync
-  nameWithType: ResponseContext<T>.WaitResponseAsync
-  nameWithType.vb: ResponseContext(Of T).WaitResponseAsync
 - uid: MagicOnion.Client.ResponseContext`1.WithNewResult(`0)
   name: WithNewResult(T)
   href: api/MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_WithNewResult__0_

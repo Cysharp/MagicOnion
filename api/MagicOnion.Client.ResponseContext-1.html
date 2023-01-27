@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ResponseContext&lt;T&gt; : ResponseContext, IResponseContext&lt;T&gt;, IResponseContext</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class ResponseContext&lt;T&gt; : ResponseContext, IResponseContext&lt;T&gt;, IResponseContext</code></pre>
   </div>
 
   <div class="inheritance">
@@ -112,48 +112,6 @@
   
   
   <h3 id="members">Members</h3>
-  <h4>Constructors
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall__0__">ResponseContext(T, AsyncUnaryCall&lt;T&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall_MagicOnion_Internal_Box__0___">ResponseContext(T, AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor__0_Status_Metadata_Metadata_">ResponseContext(T, Status, Metadata, Metadata)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall__0__">ResponseContext(AsyncUnaryCall&lt;T&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_MagicOnion_Internal_Box__0___">ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
   <h4>Properties
   </h4>
   <table class="table table-condensed">
@@ -167,18 +125,6 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseAsync">ResponseAsync</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseHeadersAsync">ResponseHeadersAsync</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_ResponseType">ResponseType</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -196,31 +142,13 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__0_Status_Metadata_Metadata_">Create(T, Status, Metadata, Metadata)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Dispose">Dispose()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetStatus">GetStatus()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_GetTrailers">GetTrailers()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_WaitResponseAsync">WaitResponseAsync()</a>
+          <a class="xref" href="MagicOnion.Client.ResponseContext-1.html#MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__Func___0__0__">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;, Func&lt;TRaw, T&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -233,168 +161,6 @@
     </tbody>
   </table>
   
-  <h3 id="constructors">Constructors
-  </h3>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall__0__" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{`0})">ResponseContext(T, AsyncUnaryCall&lt;T&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(T value, AsyncUnaryCall&lt;T&gt; inner)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;T&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_AsyncUnaryCall_MagicOnion_Internal_Box__0___" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,AsyncUnaryCall{MagicOnion.Internal.Box{`0}})">ResponseContext(T, AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(T value, AsyncUnaryCall&lt;Box&lt;T&gt;&gt; inner)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;<a class="xref" href="MagicOnion.Internal.Box-1.html">Box</a>&lt;T&gt;&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor__0_Status_Metadata_Metadata_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(`0,Status,Metadata,Metadata)">ResponseContext(T, Status, Metadata, Metadata)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>status</code></span> <span class="xref">Status</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>responseHeaders</code></span> <span class="xref">Metadata</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>trailers</code></span> <span class="xref">Metadata</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall__0__" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{`0})">ResponseContext(AsyncUnaryCall&lt;T&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(AsyncUnaryCall&lt;T&gt; inner)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;T&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1__ctor_" data-uid="MagicOnion.Client.ResponseContext`1.#ctor*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1__ctor_AsyncUnaryCall_MagicOnion_Internal_Box__0___" data-uid="MagicOnion.Client.ResponseContext`1.#ctor(AsyncUnaryCall{MagicOnion.Internal.Box{`0}})">ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt;)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext(AsyncUnaryCall&lt;Box&lt;T&gt;&gt; inner)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;<a class="xref" href="MagicOnion.Internal.Box-1.html">Box</a>&lt;T&gt;&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <h3 id="properties">Properties
   </h3>
   <section>
@@ -404,7 +170,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;T&gt; ResponseAsync { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract Task&lt;T&gt; ResponseAsync { get; }</code></pre>
   </div>
 
   
@@ -427,86 +193,28 @@
   
   
   </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1_ResponseHeadersAsync_" data-uid="MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_ResponseHeadersAsync" data-uid="MagicOnion.Client.ResponseContext`1.ResponseHeadersAsync">ResponseHeadersAsync</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override Task&lt;Metadata&gt; ResponseHeadersAsync { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;<span class="xref">Metadata</span>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_ResponseHeadersAsync">ResponseContext.ResponseHeadersAsync</a></div>
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1_ResponseType_" data-uid="MagicOnion.Client.ResponseContext`1.ResponseType*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_ResponseType" data-uid="MagicOnion.Client.ResponseContext`1.ResponseType">ResponseType</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override Type ResponseType { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Type</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_ResponseType">ResponseContext.ResponseType</a></div>
-  
-  
-  
-  
-  
-  </section>
   <h3 id="methods">Methods
   </h3>
   <section>
   <a id="MagicOnion_Client_ResponseContext_1_Create_" data-uid="MagicOnion.Client.ResponseContext`1.Create*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__" data-uid="MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0})">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;)</h4>
+  <h4 id="MagicOnion_Client_ResponseContext_1_Create__0_Status_Metadata_Metadata_" data-uid="MagicOnion.Client.ResponseContext`1.Create(`0,Status,Metadata,Metadata)">Create(T, Status, Metadata, Metadata)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static ResponseContext Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt; inner)</code></pre>
+    <pre><code class="lang-csharp hljs">public static ResponseContext&lt;T&gt; Create(T value, Status status, Metadata responseHeaders, Metadata trailers)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;TRaw&gt;</dt>
+    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>status</code></span> <span class="xref">Status</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>responseHeaders</code></span> <span class="xref">Metadata</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>trailers</code></span> <span class="xref">Metadata</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -514,7 +222,46 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a></dt>
+    <dt><a class="xref" href="MagicOnion.Client.ResponseContext-1.html">ResponseContext</a>&lt;T&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_ResponseContext_1_Create_" data-uid="MagicOnion.Client.ResponseContext`1.Create*"></a>
+  <h4 id="MagicOnion_Client_ResponseContext_1_Create__1_AsyncUnaryCall___0__Func___0__0__" data-uid="MagicOnion.Client.ResponseContext`1.Create``1(AsyncUnaryCall{``0},Func{``0,`0})">Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt;, Func&lt;TRaw, T&gt;)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ResponseContext&lt;T&gt; Create&lt;TRaw&gt;(AsyncUnaryCall&lt;TRaw&gt; inner, Func&lt;TRaw, T&gt; fromRawResponseToResponse)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>inner</code></span> <span class="xref">AsyncUnaryCall</span>&lt;TRaw&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>fromRawResponseToResponse</code></span> <span class="xref">Func</span>&lt;TRaw, T&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Client.ResponseContext-1.html">ResponseContext</a>&lt;T&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -538,134 +285,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_ResponseContext_1_Dispose_" data-uid="MagicOnion.Client.ResponseContext`1.Dispose*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_Dispose" data-uid="MagicOnion.Client.ResponseContext`1.Dispose">Dispose()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override void Dispose()</code></pre>
-  </div>
-
-  
-  
-  
-  
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_Dispose">ResponseContext.Dispose()</a></div>
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1_GetStatus_" data-uid="MagicOnion.Client.ResponseContext`1.GetStatus*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_GetStatus" data-uid="MagicOnion.Client.ResponseContext`1.GetStatus">GetStatus()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override Status GetStatus()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Status</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_GetStatus">ResponseContext.GetStatus()</a></div>
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1_GetTrailers_" data-uid="MagicOnion.Client.ResponseContext`1.GetTrailers*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_GetTrailers" data-uid="MagicOnion.Client.ResponseContext`1.GetTrailers">GetTrailers()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override Metadata GetTrailers()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Metadata</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_GetTrailers">ResponseContext.GetTrailers()</a></div>
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_ResponseContext_1_WaitResponseAsync_" data-uid="MagicOnion.Client.ResponseContext`1.WaitResponseAsync*"></a>
-  <h4 id="MagicOnion_Client_ResponseContext_1_WaitResponseAsync" data-uid="MagicOnion.Client.ResponseContext`1.WaitResponseAsync">WaitResponseAsync()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override async Task&lt;ResponseContext&gt; WaitResponseAsync()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.Client.ResponseContext.html">ResponseContext</a>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="MagicOnion.Client.ResponseContext.html#MagicOnion_Client_ResponseContext_WaitResponseAsync">ResponseContext.WaitResponseAsync()</a></div>
-  
-  
-  
-  
-  
-  </section>
-  <section>
   <a id="MagicOnion_Client_ResponseContext_1_WithNewResult_" data-uid="MagicOnion.Client.ResponseContext`1.WithNewResult*"></a>
   <h4 id="MagicOnion_Client_ResponseContext_1_WithNewResult__0_" data-uid="MagicOnion.Client.ResponseContext`1.WithNewResult(`0)">WithNewResult(T)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ResponseContext&lt;T&gt; WithNewResult(T newValue)</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract ResponseContext&lt;T&gt; WithNewResult(T newValue)</code></pre>
   </div>
 
   <section>
