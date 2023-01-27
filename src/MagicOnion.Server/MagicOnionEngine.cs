@@ -102,7 +102,7 @@ public static class MagicOnionEngine
                         .Where(x => x.GetCustomAttribute<IgnoreAttribute>(false) == null)
                         .Where(x => x.IsPublic && !x.IsAbstract && !x.IsGenericTypeDefinition);
                 }
-                catch (ReflectionTypeLoadException ex)
+                catch (ReflectionTypeLoadException)
                 {
                     return Array.Empty<Type>();
                 }
