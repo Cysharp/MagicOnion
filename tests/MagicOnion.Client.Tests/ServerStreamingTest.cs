@@ -195,7 +195,7 @@ public class ServerStreamingTest
         Task<ServerStreamingResult<int>> ValueTypeReturnValueType(int arg1);
         Task<ServerStreamingResult<int>> RefTypeReturnValueType(string arg1);
         Task<ServerStreamingResult<string>> ValueTypeReturnRefType(int arg1);
-        Task<ServerStreamingResult<string>> RefTypeReturnRefType(string arg1);
+        Task<ServerStreamingResult<string?>> RefTypeReturnRefType(string? arg1);
     }
 
     [Fact]

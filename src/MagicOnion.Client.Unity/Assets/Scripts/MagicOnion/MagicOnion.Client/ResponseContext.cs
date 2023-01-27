@@ -16,35 +16,37 @@ namespace MagicOnion.Client
         readonly Status status;
         readonly Metadata responseHeaders;
         readonly Metadata trailers;
+        readonly Func<object, T> fromRawResponseToResponse;
 
-        public static ResponseContext Create<TRaw>(AsyncUnaryCall<TRaw> inner)
+        public static ResponseContext Create<TRaw>(AsyncUnaryCall<TRaw> inner, Func<object, T> fromRawResponseToResponse)
         {
             return (typeof(TRaw) == typeof(Box<T>))
-                ? new ResponseContext<T>((AsyncUnaryCall<Box<T>>)(object)inner)
-                : new ResponseContext<T>((AsyncUnaryCall<T>)(object)inner);
+                ? new ResponseContext<T>((AsyncUnaryCall<Box<T>>)(object)inner, fromRawResponseToResponse)
+                : new ResponseContext<T>((AsyncUnaryCall<T>)(object)inner, fromRawResponseToResponse);
         }
 
-        public ResponseContext(AsyncUnaryCall<T> inner)
-            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
+        public ResponseContext(AsyncUnaryCall<T> inner, Func<object, T> fromRawResponseToResponse)
+            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
         { }
-        public ResponseContext(AsyncUnaryCall<Box<T>> inner)
-            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default)
+        public ResponseContext(AsyncUnaryCall<Box<T>> inner, Func<object, T> fromRawResponseToResponse)
+            : this(inner, hasValue: false, default, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
         { }
-        public ResponseContext(T value, AsyncUnaryCall<T> inner)
-            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
+        public ResponseContext(T value, AsyncUnaryCall<T> inner, Func<object, T> fromRawResponseToResponse)
+            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
         { }
-        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner)
-            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default)
+        public ResponseContext(T value, AsyncUnaryCall<Box<T>> inner, Func<object, T> fromRawResponseToResponse)
+            : this(inner, hasValue: true, value, hasMetadataAndStatus: false, default, default, default, fromRawResponseToResponse)
         { }
         public ResponseContext(T value, Status status, Metadata responseHeaders, Metadata trailers)
-            : this(default, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders, trailers)
+            : this(default, hasValue: true, value, hasMetadataAndStatus: true, status, responseHeaders, trailers, x => (T)x)
         { }
 
-        private ResponseContext(IDisposable inner, bool hasValue, T value, bool hasMetadataAndStatus, Status status, Metadata responseHeaders, Metadata trailers)
+        ResponseContext(IDisposable inner, bool hasValue, T value, bool hasMetadataAndStatus, Status status, Metadata responseHeaders, Metadata trailers, Func<object, T> fromRawResponseToResponse)
         {
             if (!hasValue && inner == null) throw new ArgumentNullException(nameof(inner));
             if (hasMetadataAndStatus && responseHeaders == null) throw new ArgumentNullException(nameof(responseHeaders));
             if (hasMetadataAndStatus && trailers == null) throw new ArgumentNullException(nameof(trailers));
+            if (fromRawResponseToResponse == null) throw new ArgumentNullException(nameof(fromRawResponseToResponse));
 
             this.inner = inner;
 
@@ -55,6 +57,7 @@ namespace MagicOnion.Client
             this.status = status;
             this.responseHeaders = responseHeaders;
             this.trailers = trailers;
+            this.fromRawResponseToResponse = fromRawResponseToResponse;
         }
 
         public override Type ResponseType => typeof(T);
@@ -88,18 +91,18 @@ namespace MagicOnion.Client
         public Task<T> ResponseAsync
             => hasValue
                 ? Task.FromResult(value)
-                : (inner is AsyncUnaryCall<Box<T>> boxed)
-                    ? UnboxResponseAsync(boxed)
-                    : ((AsyncUnaryCall<T>)inner).ResponseAsync;
+                : FromRawResponseToResponseAsync(inner);
 
-        private static async Task<T> UnboxResponseAsync(AsyncUnaryCall<Box<T>> boxed)
-            => (await boxed.ResponseAsync.ConfigureAwait(false)).Value;
-
+        async Task<T> FromRawResponseToResponseAsync(object unaryCall)
+            => fromRawResponseToResponse((unaryCall is AsyncUnaryCall<Box<T>> boxed)
+                ? (object)(await boxed.ResponseAsync.ConfigureAwait(false))
+                : (object)(await ((AsyncUnaryCall<T>)unaryCall).ResponseAsync.ConfigureAwait(false)));
+ 
         public override void Dispose()
             => inner?.Dispose();
 
         public ResponseContext<T> WithNewResult(T newValue)
-            => new ResponseContext<T>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers);
+            => new ResponseContext<T>(inner, hasValue: true, newValue, hasMetadataAndStatus, status, responseHeaders, trailers, x => (T)x);
     }
 
 

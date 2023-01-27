@@ -1,6 +1,7 @@
 using Grpc.Net.Client;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -177,7 +178,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         var response = await result.ResponseAsync;
 
         // Assert
-        response.Should().Be(123 + 456 + 789 + 123);
+        response.Should().BeNull();
     }
 
     [Theory]
@@ -352,7 +353,7 @@ public class StreamingTestService : ServiceBase<IStreamingTestService>, IStreami
             sum += (value.Argument0 + value.Argument1);
         }
 
-        return context.Result(new MyStreamingResponse(sum));
+        return context.Result(null);
 
     }
 
@@ -378,7 +379,7 @@ public class StreamingTestService : ServiceBase<IStreamingTestService>, IStreami
 
         await foreach (var value in context.ReadAllAsync())
         {
-            if (value is null) continue;
+            Debug.Assert(value is null);
             await context.WriteAsync(null);
         }
 

@@ -7,6 +7,7 @@ using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MessagePack;
+// ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
 namespace MagicOnion.Client.Internal
 {
@@ -50,7 +51,9 @@ namespace MagicOnion.Client.Internal
         {
             this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, messageSerializer);
             this.createUnaryResponseContext = context => ResponseContext<TResponse>.Create<TRawResponse>(
-                context.Client.Options.CallInvoker.AsyncUnaryCall(method.Method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)));
+                context.Client.Options.CallInvoker.AsyncUnaryCall(method.Method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)),
+                method.FromRawResponseObject
+            );
         }
 
         public override UnaryResult<TResponse> InvokeUnary(MagicOnionClientBase client, string path, TRequest request)
@@ -84,28 +87,34 @@ namespace MagicOnion.Client.Internal
             => Task.FromResult(
                 new ServerStreamingResult<TResponse>(
                     new AsyncServerStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncServerStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions, method.ToRawRequest(request)))));
+                        client.Options.CallInvoker.AsyncServerStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions, method.ToRawRequest(request)),
+                        method.FromRawResponse)));
 
         public override Task<ClientStreamingResult<TRequest, TResponse>> InvokeClientStreaming(MagicOnionClientBase client, string path)
             => Task.FromResult(
                 new ClientStreamingResult<TRequest, TResponse>(
                     new AsyncClientStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncClientStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions))));
+                        client.Options.CallInvoker.AsyncClientStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions),
+                        method.ToRawRequest, method.FromRawResponse)));
 
         public override Task<DuplexStreamingResult<TRequest, TResponse>> InvokeDuplexStreaming(MagicOnionClientBase client, string path)
             => Task.FromResult(
                 new DuplexStreamingResult<TRequest, TResponse>(
                     new AsyncDuplexStreamingCallWrapper(
-                        client.Options.CallInvoker.AsyncDuplexStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions))));
+                        client.Options.CallInvoker.AsyncDuplexStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions),
+                        method.ToRawRequest, method.FromRawResponseObject)));
 
         class AsyncServerStreamingCallWrapper : IAsyncServerStreamingCallWrapper<TResponse>
         {
             readonly AsyncServerStreamingCall<TRawResponse> inner;
+            readonly Func<TRawResponse, TResponse> fromRawResponse;
+
             IAsyncStreamReader<TResponse> responseStream;
 
-            public AsyncServerStreamingCallWrapper(AsyncServerStreamingCall<TRawResponse> inner)
+            public AsyncServerStreamingCallWrapper(AsyncServerStreamingCall<TRawResponse> inner, Func<TRawResponse, TResponse> fromRawResponse)
             {
                 this.inner = inner;
+                this.fromRawResponse = fromRawResponse;
             }
 
             public Task<Metadata> ResponseHeadersAsync
@@ -116,7 +125,7 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IAsyncStreamReader<TResponse> ResponseStream
-                => responseStream ?? (responseStream = (typeof(TRawResponse) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
+                => responseStream ?? (responseStream = new MagicOnionAsyncStreamReader<TResponse, TRawResponse>(inner.ResponseStream, fromRawResponse));
 
             public void Dispose()
                 => inner.Dispose();
@@ -125,11 +134,15 @@ namespace MagicOnion.Client.Internal
         class AsyncClientStreamingCallWrapper : IAsyncClientStreamingCallWrapper<TRequest, TResponse>
         {
             readonly AsyncClientStreamingCall<TRawRequest, TRawResponse> inner;
+            readonly Func<TRequest, TRawRequest> toRawRequest;
+            readonly Func<TRawResponse, TResponse> fromRawResponse;
             IClientStreamWriter<TRequest> requestStream;
 
-            public AsyncClientStreamingCallWrapper(AsyncClientStreamingCall<TRawRequest, TRawResponse> inner)
+            public AsyncClientStreamingCallWrapper(AsyncClientStreamingCall<TRawRequest, TRawResponse> inner, Func<TRequest, TRawRequest> toRawRequest, Func<TRawResponse, TResponse> fromRawResponse)
             {
                 this.inner = inner;
+                this.toRawRequest = toRawRequest;
+                this.fromRawResponse = fromRawResponse;
             }
 
             public Task<Metadata> ResponseHeadersAsync
@@ -140,14 +153,12 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IClientStreamWriter<TRequest> RequestStream
-                => requestStream ?? (requestStream = (typeof(TRawRequest) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
+                => requestStream ?? (requestStream = new MagicOnionClientStreamWriter<TRequest, TRawRequest>(inner.RequestStream, toRawRequest));
             public Task<TResponse> ResponseAsync
-                => UnboxResponseAsync();
+                => ResponseAsyncCore();
 
-            private async Task<TResponse> UnboxResponseAsync()
-                => (typeof(TRawResponse) == typeof(Box<TResponse>))
-                    ? ((Box<TResponse>)(object)(await inner.ResponseAsync)).Value
-                    : (TResponse)(object)await inner.ResponseAsync;
+             async Task<TResponse> ResponseAsyncCore()
+                => fromRawResponse(await inner.ResponseAsync.ConfigureAwait(false));
 
             public void Dispose()
                 => inner.Dispose();
@@ -156,12 +167,16 @@ namespace MagicOnion.Client.Internal
         class AsyncDuplexStreamingCallWrapper : IAsyncDuplexStreamingCallWrapper<TRequest, TResponse>
         {
             readonly AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner;
+            readonly Func<TRequest, TRawRequest> toRawRequest;
+            readonly Func<TRawResponse, TResponse> fromRawResponse;
             IClientStreamWriter<TRequest> requestStream;
             IAsyncStreamReader<TResponse> responseStream;
 
-            public AsyncDuplexStreamingCallWrapper(AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner)
+            public AsyncDuplexStreamingCallWrapper(AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner, Func<TRequest, TRawRequest> toRawRequest, Func<TRawResponse, TResponse> fromRawResponse)
             {
                 this.inner = inner;
+                this.toRawRequest = toRawRequest;
+                this.fromRawResponse = fromRawResponse;
             }
 
             public Task<Metadata> ResponseHeadersAsync
@@ -172,9 +187,9 @@ namespace MagicOnion.Client.Internal
                 => inner.GetTrailers();
 
             public IClientStreamWriter<TRequest> RequestStream
-                => requestStream ?? (requestStream = (typeof(TRawRequest) == typeof(Box<TRequest>)) ? new BoxClientStreamWriter<TRequest>((IClientStreamWriter<Box<TRequest>>)inner.RequestStream) : (IClientStreamWriter<TRequest>)inner.RequestStream);
+                => requestStream ?? (requestStream = new MagicOnionClientStreamWriter<TRequest, TRawRequest>(inner.RequestStream, toRawRequest));
             public IAsyncStreamReader<TResponse> ResponseStream
-                => responseStream ?? (responseStream = (typeof(TRawResponse) == typeof(Box<TResponse>)) ? new UnboxAsyncStreamReader<TResponse>((IAsyncStreamReader<Box<TResponse>>)inner.ResponseStream) : (IAsyncStreamReader<TResponse>)inner.ResponseStream);
+                => responseStream ?? (responseStream = new MagicOnionAsyncStreamReader<TResponse, TRawResponse>(inner.ResponseStream, fromRawResponse));
 
             public void Dispose()
                 => inner.Dispose();
