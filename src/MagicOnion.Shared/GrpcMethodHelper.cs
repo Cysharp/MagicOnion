@@ -18,7 +18,6 @@ namespace MagicOnion
             public Func<TResponse, TRawResponse> ToRawResponse { get; }
             public Func<TRawRequest, TRequest> FromRawRequest { get; }
             public Func<TRawResponse, TResponse> FromRawResponse { get; }
-            public Func<object, TResponse> FromRawResponseObject { get; }
 
             public MagicOnionMethod(Method<TRawRequest, TRawResponse> method)
             {
@@ -27,7 +26,6 @@ namespace MagicOnion
                 ToRawResponse = ((typeof(TRawResponse) == typeof(Box<TResponse>)) ? (Func<TResponse, TRawResponse>)(x => (TRawResponse)(object)Box.Create(x)) : x => DangerousDummyNull.GetObjectOrDummyNull((TRawResponse)(object)x));
                 FromRawRequest = ((typeof(TRawRequest) == typeof(Box<TRequest>)) ? (Func<TRawRequest, TRequest>)(x => ((Box<TRequest>)(object)x).Value) : x => DangerousDummyNull.GetObjectOrDefault<TRequest>(x));
                 FromRawResponse = ((typeof(TRawResponse) == typeof(Box<TResponse>)) ? (Func<TRawResponse, TResponse>)(x => ((Box<TResponse>)(object)x).Value) : x => DangerousDummyNull.GetObjectOrDefault<TResponse>(x));
-                FromRawResponseObject = ((typeof(TRawResponse) == typeof(Box<TResponse>)) ? (Func<object, TResponse>)(x => ((Box<TResponse>)(object)x).Value) : x => DangerousDummyNull.GetObjectOrDefault<TResponse>(x));
             }
         }
 

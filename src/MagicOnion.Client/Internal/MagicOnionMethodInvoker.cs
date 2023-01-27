@@ -52,7 +52,7 @@ namespace MagicOnion.Client.Internal
             this.method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, messageSerializer);
             this.createUnaryResponseContext = context => ResponseContext<TResponse>.Create<TRawResponse>(
                 context.Client.Options.CallInvoker.AsyncUnaryCall(method.Method, context.Client.Options.Host, context.CallOptions, method.ToRawRequest(((RequestContext<TRequest>)context).Request)),
-                method.FromRawResponseObject
+                method.FromRawResponse
             );
         }
 
@@ -102,7 +102,7 @@ namespace MagicOnion.Client.Internal
                 new DuplexStreamingResult<TRequest, TResponse>(
                     new AsyncDuplexStreamingCallWrapper(
                         client.Options.CallInvoker.AsyncDuplexStreamingCall(method.Method, client.Options.Host, client.Options.CallOptions),
-                        method.ToRawRequest, method.FromRawResponseObject)));
+                        method.ToRawRequest, method.FromRawResponse)));
 
         class AsyncServerStreamingCallWrapper : IAsyncServerStreamingCallWrapper<TResponse>
         {
