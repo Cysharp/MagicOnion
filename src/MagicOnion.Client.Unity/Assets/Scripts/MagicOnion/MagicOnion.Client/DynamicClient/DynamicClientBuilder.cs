@@ -12,6 +12,28 @@ using MessagePack;
 
 namespace MagicOnion.Client.DynamicClient
 {
+    /// <summary>
+    /// Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
+    /// </summary>
+    public class DynamicMagicOnionClientFactoryProvider : IMagicOnionClientFactoryProvider
+    {
+        public static IMagicOnionClientFactoryProvider Instance { get; } = new DynamicMagicOnionClientFactoryProvider();
+
+        DynamicMagicOnionClientFactoryProvider() { }
+
+        public bool TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T> factory) where T : IService<T>
+        {
+            factory = Cache<T>.Factory;
+            return true;
+        }
+
+        static class Cache<T> where T : IService<T>
+        {
+            public static readonly MagicOnionClientFactoryDelegate<T> Factory
+                = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider);
+        }
+    }
+
     internal class DynamicClientBuilder
     {
         protected static class KnownTypes
