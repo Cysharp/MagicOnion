@@ -1,7 +1,6 @@
 using MagicOnion.Serialization;
 using System;
 using System.Linq;
-using MagicOnion.Client.DynamicClient;
 
 namespace MagicOnion.Client
 {
@@ -14,10 +13,10 @@ namespace MagicOnion.Client
         /// Gets or set the MagicOnionClient factory provider to use by default.
         /// </summary>
         public static IMagicOnionClientFactoryProvider Default { get; set; }
-#if ((ENABLE_IL2CPP && !UNITY_EDITOR) || NET_STANDARD_2_0)
-            = DynamicNotSupportedMagicOnionClientFactoryProvider.Instance;
-#else
+#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
             = DynamicMagicOnionClientFactoryProvider.Instance;
+#else
+            = DynamicNotSupportedMagicOnionClientFactoryProvider.Instance;
 #endif
     }
 
@@ -78,6 +77,7 @@ namespace MagicOnion.Client
         }
     }
 
+#if ((ENABLE_IL2CPP && !UNITY_EDITOR) || !NET_STANDARD_2_0)
     /// <summary>
     /// Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
     /// </summary>
@@ -96,7 +96,8 @@ namespace MagicOnion.Client
         static class Cache<T> where T : IService<T>
         {
             public static readonly MagicOnionClientFactoryDelegate<T> Factory
-                = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider);
+                = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClient.DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider);
         }
     }
+#endif
 }
