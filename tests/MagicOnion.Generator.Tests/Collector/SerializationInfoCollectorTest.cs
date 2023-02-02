@@ -242,6 +242,7 @@ public class SerializationInfoCollectorTest
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "ICollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyCollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IEnumerable",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
+            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "KeyValuePair",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Linq", "ILookup",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Linq", "IGrouping",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
         };
@@ -251,7 +252,7 @@ public class SerializationInfoCollectorTest
 
         // Assert
         serializationInfoCollection.Should().NotBeNull();
-        serializationInfoCollection.Generics.Should().HaveCount(11);
+        serializationInfoCollection.Generics.Should().HaveCount(12);
         serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.ListFormatter<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceListFormatter2<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[2].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceReadOnlyListFormatter<global::MyNamespace.MyObject>()");
@@ -261,8 +262,9 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[6].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceCollectionFormatter2<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[7].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceReadOnlyCollectionFormatter<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[8].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceEnumerableFormatter<global::MyNamespace.MyObject>()");
-        serializationInfoCollection.Generics[9].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.String, global::MyNamespace.MyObject>()");
-        serializationInfoCollection.Generics[10].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.String, global::MyNamespace.MyObject>()");
+        serializationInfoCollection.Generics[9].FormatterName.Should().Be("global::MessagePack.Formatters.KeyValuePairFormatter<global::System.String, global::MyNamespace.MyObject>()");
+        serializationInfoCollection.Generics[10].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.String, global::MyNamespace.MyObject>()");
+        serializationInfoCollection.Generics[11].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.String, global::MyNamespace.MyObject>()");
     }
     
     [Fact]

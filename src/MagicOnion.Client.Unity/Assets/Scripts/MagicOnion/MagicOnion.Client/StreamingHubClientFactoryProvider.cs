@@ -14,10 +14,10 @@ namespace MagicOnion.Client
         /// Gets or set the StreamingHubClient factory provider to use by default.
         /// </summary>
         public static IStreamingHubClientFactoryProvider Default { get; set; }
-#if ((ENABLE_IL2CPP && !UNITY_EDITOR) || NET_STANDARD_2_0)
-            = DynamicNotSupportedStreamingHubClientFactoryProvider.Instance;
-#else
+#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
             = DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance;
+#else
+            = DynamicNotSupportedStreamingHubClientFactoryProvider.Instance;
 #endif
     }
 
