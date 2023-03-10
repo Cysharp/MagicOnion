@@ -191,6 +191,7 @@ dotnet add package MagicOnion
     - [Group and GroupConfiguration](#group-and-groupconfiguration)
     - [Dependency Injection](#dependency-injection)
     - [Project Structure](#project-structure)
+    - [Ignore Custom Base Class Inherit From ServiceBase ](#ignore-custom-base-class-inherit-from-servicebase)
 - Client
     - [Support for Unity client](#support-for-unity-client)
         - [iOS build with gRPC](#ios-build-with-grpc)
@@ -964,6 +965,49 @@ see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page a
 
 
 
+### Ignore Custom Base Class Inherit From ServiceBase
+
+when you create a base class inherit from `ServiceBase<TServiceInterface>` ,and want to add some custom servcie,for example ,integrated with volo.abp and add `AbpLazyServiceProvider` ， then other grpc service inherit from this like below:
+
+```c#
+public class BaseGrpcService<TServiceInterface> : ServiceBase<TServiceInterface>
+    where TServiceInterface : IServiceMarker
+{
+    protected AbpLazyServiceProvider AbpLazyServiceProvider;
+    public BaseGrpcService(AbpLazyServiceProvider abpLazyServiceProvider)
+    {
+        AbpLazyServiceProvider = abpLazyServiceProvider;
+    }
+}
+```
+It will throw a error like BaseGrpcService has not interface,to solve this,
+we can add `MagicOnion.IgnoreAttribute`, it only effect to base class,no effect in derived classes, the source code is defined the effect range.
+
+```c#
+namespace MagicOnion
+{
+    //
+    // 摘要:
+    //     Don't register on MagicOnionEngine.
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]//Inherited = false define the effect range
+    public class IgnoreAttribute : Attribute
+    {
+    }
+}
+```
+Useage:
+```c#
+[Ignore]
+public class BaseGrpcService<TServiceInterface> : ServiceBase<TServiceInterface>
+    where TServiceInterface : IServiceMarker
+{
+    protected AbpLazyServiceProvider AbpLazyServiceProvider;
+    public BaseGrpcService(AbpLazyServiceProvider abpLazyServiceProvider)
+    {
+        AbpLazyServiceProvider = abpLazyServiceProvider;
+    }
+}
+```
 # Clients
 
 ## Support for Unity client
