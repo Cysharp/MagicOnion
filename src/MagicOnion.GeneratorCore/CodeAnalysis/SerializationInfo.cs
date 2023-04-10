@@ -48,3 +48,19 @@ public class EnumSerializationInfo : ISerializationFormatterRegisterInfo
         IfDirectiveConditions = ifDirectiveConditions;
     }
 }
+
+public class SerializationTypeHintInfo : ISerializationFormatterRegisterInfo
+{
+    public string FullName { get; }
+
+    string ISerializationFormatterRegisterInfo.FormatterName => string.Empty; // Dummy
+
+    public IReadOnlyList<string> IfDirectiveConditions { get; }
+    public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
+
+    public SerializationTypeHintInfo(string fullName, IReadOnlyList<string> ifDirectiveConditions)
+    {
+        FullName = fullName;
+        IfDirectiveConditions = ifDirectiveConditions;
+    }
+}

@@ -42,12 +42,15 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
         {
             using global::System;
             using global::MessagePack;
+
+            partial class PreserveAttribute : global::System.Attribute {}
         """);
 
         using (ctx.TextWriter.BeginIndent())
         {
             EmitResolver(ctx);
             EmitGetFormatterHelper(ctx);
+            EmitTypeHints(ctx);
         }
 
         ctx.TextWriter.WriteLines($$"""
@@ -107,8 +110,8 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
                         using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
                         {
                             ctx.TextWriter.WriteLines($$"""
-                        {typeof({{resolverInfo.FullName}}), {{index}} },
-                        """);
+                            {typeof({{resolverInfo.FullName}}), {{index}} },
+                            """);
                         }
                     }
                 } // lookup = new ...
@@ -149,7 +152,38 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
         }
         ctx.TextWriter.WriteLine("}");
     }
-
+    
+    static void EmitTypeHints(SerializationFormatterCodeGenContext ctx)
+    {
+        ctx.TextWriter.WriteLines($$"""
+        /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+        [{{ctx.Namespace}}.Preserve]
+        internal static class TypeHints
+        {
+            [{{ctx.Namespace}}.Preserve]
+            internal static void Register()
+            {
+        """);
+        using (ctx.TextWriter.BeginIndent())
+        {
+            using (ctx.TextWriter.BeginIndent())
+            {
+                foreach (var typeHint in ctx.TypeHints)
+                {
+                    using (ctx.TextWriter.IfDirective(string.Join(" || ", typeHint.IfDirectiveConditions.Select(y => $"({y})"))))
+                    {
+                        ctx.TextWriter.WriteLines($$"""
+                        _ = {{ctx.InitializerName}}.Instance.GetFormatter<{{typeHint.FullName}}>();
+                        """);
+                    }
+                }
+            }
+        }
+        ctx.TextWriter.WriteLines($$"""
+            }
+        }
+        """);
+    }
     static void EmitPostscript(SerializationFormatterCodeGenContext ctx)
     {
         ctx.TextWriter.WriteLines("""

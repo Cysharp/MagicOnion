@@ -110,7 +110,7 @@ public class MagicOnionCompiler
             DisableAutoRegisterOnInitialize = disableAutoRegister,
         };
 
-        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters);
+        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
         var resolverTexts = serialization.Generator.Build(formatterCodeGenContext);
 
         if (Path.GetExtension(output) == ".cs")
