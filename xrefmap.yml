@@ -5304,15 +5304,15 @@ references:
   commentId: T:MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection
   fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection
   nameWithType: MagicOnionSerializationInfoCollection
-- uid: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.#ctor(IReadOnlyList{MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo})
-  name: MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo>, IReadOnlyList<GenericSerializationInfo>)
-  href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html#MagicOnion_Generator_CodeAnalysis_MagicOnionSerializationInfoCollection__ctor_IReadOnlyList_MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo__IReadOnlyList_MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__
-  commentId: M:MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.#ctor(IReadOnlyList{MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo})
-  name.vb: MagicOnionSerializationInfoCollection(IReadOnlyList(Of EnumSerializationInfo), IReadOnlyList(Of GenericSerializationInfo))
-  fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList<MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo>, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo>)
-  fullName.vb: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo), IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo))
-  nameWithType: MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo>, IReadOnlyList<GenericSerializationInfo>)
-  nameWithType.vb: MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList(Of EnumSerializationInfo), IReadOnlyList(Of GenericSerializationInfo))
+- uid: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.#ctor(IReadOnlyList{MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo})
+  name: MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo>, IReadOnlyList<GenericSerializationInfo>, IReadOnlyList<SerializationTypeHintInfo>)
+  href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html#MagicOnion_Generator_CodeAnalysis_MagicOnionSerializationInfoCollection__ctor_IReadOnlyList_MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo__IReadOnlyList_MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__IReadOnlyList_MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.#ctor(IReadOnlyList{MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo})
+  name.vb: MagicOnionSerializationInfoCollection(IReadOnlyList(Of EnumSerializationInfo), IReadOnlyList(Of GenericSerializationInfo), IReadOnlyList(Of SerializationTypeHintInfo))
+  fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList<MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo>, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo>, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo>)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo), IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo), IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo))
+  nameWithType: MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo>, IReadOnlyList<GenericSerializationInfo>, IReadOnlyList<SerializationTypeHintInfo>)
+  nameWithType.vb: MagicOnionSerializationInfoCollection.MagicOnionSerializationInfoCollection(IReadOnlyList(Of EnumSerializationInfo), IReadOnlyList(Of GenericSerializationInfo), IReadOnlyList(Of SerializationTypeHintInfo))
 - uid: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.#ctor*
   name: MagicOnionSerializationInfoCollection
   href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html#MagicOnion_Generator_CodeAnalysis_MagicOnionSerializationInfoCollection__ctor_
@@ -5359,6 +5359,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.RequireRegistrationFormatters
   nameWithType: MagicOnionSerializationInfoCollection.RequireRegistrationFormatters
+- uid: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints
+  name: TypeHints
+  href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html#MagicOnion_Generator_CodeAnalysis_MagicOnionSerializationInfoCollection_TypeHints
+  commentId: P:MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints
+  fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints
+  nameWithType: MagicOnionSerializationInfoCollection.TypeHints
+- uid: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints*
+  name: TypeHints
+  href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html#MagicOnion_Generator_CodeAnalysis_MagicOnionSerializationInfoCollection_TypeHints_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.TypeHints
+  nameWithType: MagicOnionSerializationInfoCollection.TypeHints
 - uid: MagicOnion.Generator.CodeAnalysis.MagicOnionServiceCollection
   name: MagicOnionServiceCollection
   href: api/MagicOnion.Generator.CodeAnalysis.MagicOnionServiceCollection.html
@@ -6834,6 +6847,84 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.SerializationInfoCollector.TypeWithIfDirectives.Type
   nameWithType: SerializationInfoCollector.TypeWithIfDirectives.Type
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo
+  name: SerializationTypeHintInfo
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html
+  commentId: T:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo
+  nameWithType: SerializationTypeHintInfo
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.#ctor(System.String,IReadOnlyList{System.String})
+  name: SerializationTypeHintInfo(String, IReadOnlyList<String>)
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo__ctor_System_String_IReadOnlyList_System_String__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.#ctor(System.String,IReadOnlyList{System.String})
+  name.vb: SerializationTypeHintInfo(String, IReadOnlyList(Of String))
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.SerializationTypeHintInfo(System.String, IReadOnlyList<System.String>)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.SerializationTypeHintInfo(System.String, IReadOnlyList(Of System.String))
+  nameWithType: SerializationTypeHintInfo.SerializationTypeHintInfo(String, IReadOnlyList<String>)
+  nameWithType.vb: SerializationTypeHintInfo.SerializationTypeHintInfo(String, IReadOnlyList(Of String))
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.#ctor*
+  name: SerializationTypeHintInfo
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo__ctor_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.SerializationTypeHintInfo
+  nameWithType: SerializationTypeHintInfo.SerializationTypeHintInfo
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName
+  name: FullName
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_FullName
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName
+  nameWithType: SerializationTypeHintInfo.FullName
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName*
+  name: FullName
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_FullName_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.FullName
+  nameWithType: SerializationTypeHintInfo.FullName
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_HasIfDirectiveConditions
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions
+  nameWithType: SerializationTypeHintInfo.HasIfDirectiveConditions
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions*
+  name: HasIfDirectiveConditions
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_HasIfDirectiveConditions_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.HasIfDirectiveConditions
+  nameWithType: SerializationTypeHintInfo.HasIfDirectiveConditions
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
+  name: IfDirectiveConditions
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_IfDirectiveConditions
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
+  nameWithType: SerializationTypeHintInfo.IfDirectiveConditions
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions*
+  name: IfDirectiveConditions
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_IfDirectiveConditions_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
+  nameWithType: SerializationTypeHintInfo.IfDirectiveConditions
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterName
+  name: ISerializationFormatterRegisterInfo.FormatterName
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterName
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterName
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterName
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterName*
+  name: ISerializationFormatterRegisterInfo.FormatterName
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterName_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterName
+  isSpec: "True"
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterName
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
 - uid: MagicOnion.Generator.CodeGen
   name: MagicOnion.Generator.CodeGen
   href: api/MagicOnion.Generator.CodeGen.html
@@ -7584,15 +7675,15 @@ references:
   commentId: T:MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext
   fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext
   nameWithType: SerializationFormatterCodeGenContext
-- uid: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.#ctor(System.String,System.String,System.String,IReadOnlyList{MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo})
-  name: SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList<ISerializationFormatterRegisterInfo>)
-  href: api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html#MagicOnion_Generator_CodeGen_SerializationFormatterCodeGenContext__ctor_System_String_System_String_System_String_IReadOnlyList_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo__
-  commentId: M:MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.#ctor(System.String,System.String,System.String,IReadOnlyList{MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo})
-  name.vb: SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList(Of ISerializationFormatterRegisterInfo))
-  fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(System.String, System.String, System.String, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo>)
-  fullName.vb: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(System.String, System.String, System.String, IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo))
-  nameWithType: SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList<ISerializationFormatterRegisterInfo>)
-  nameWithType.vb: SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList(Of ISerializationFormatterRegisterInfo))
+- uid: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.#ctor(System.String,System.String,System.String,IReadOnlyList{MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo})
+  name: SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList<ISerializationFormatterRegisterInfo>, IReadOnlyList<SerializationTypeHintInfo>)
+  href: api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html#MagicOnion_Generator_CodeGen_SerializationFormatterCodeGenContext__ctor_System_String_System_String_System_String_IReadOnlyList_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo__IReadOnlyList_MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo__
+  commentId: M:MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.#ctor(System.String,System.String,System.String,IReadOnlyList{MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo},IReadOnlyList{MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo})
+  name.vb: SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList(Of ISerializationFormatterRegisterInfo), IReadOnlyList(Of SerializationTypeHintInfo))
+  fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(System.String, System.String, System.String, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo>, IReadOnlyList<MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo>)
+  fullName.vb: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(System.String, System.String, System.String, IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo), IReadOnlyList(Of MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo))
+  nameWithType: SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList<ISerializationFormatterRegisterInfo>, IReadOnlyList<SerializationTypeHintInfo>)
+  nameWithType.vb: SerializationFormatterCodeGenContext.SerializationFormatterCodeGenContext(String, String, String, IReadOnlyList(Of ISerializationFormatterRegisterInfo), IReadOnlyList(Of SerializationTypeHintInfo))
 - uid: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.#ctor*
   name: SerializationFormatterCodeGenContext
   href: api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html#MagicOnion_Generator_CodeGen_SerializationFormatterCodeGenContext__ctor_
@@ -7678,6 +7769,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TextWriter
   nameWithType: SerializationFormatterCodeGenContext.TextWriter
+- uid: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints
+  name: TypeHints
+  href: api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html#MagicOnion_Generator_CodeGen_SerializationFormatterCodeGenContext_TypeHints
+  commentId: P:MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints
+  fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints
+  nameWithType: SerializationFormatterCodeGenContext.TypeHints
+- uid: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints*
+  name: TypeHints
+  href: api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html#MagicOnion_Generator_CodeGen_SerializationFormatterCodeGenContext_TypeHints_
+  commentId: Overload:MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.TypeHints
+  nameWithType: SerializationFormatterCodeGenContext.TypeHints
 - uid: MagicOnion.Generator.CodeGen.StaticMagicOnionClientGenerator
   name: StaticMagicOnionClientGenerator
   href: api/MagicOnion.Generator.CodeGen.StaticMagicOnionClientGenerator.html

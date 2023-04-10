@@ -957,7 +957,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.MagicOnionSerializationInfoCollection.html",
-          "hash": "NHaN6LLWdKI4e9mdyqwp+o5LBkwirkhmzCS5GB4jvVU="
+          "hash": "iF3OhWW4wjKkCNkLA53U1/yyQJLzJ3cumK59DJfkxbI="
         }
       },
       "is_incremental": false,
@@ -1157,11 +1157,23 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html",
+          "hash": "Frzj782XJsRq8mW08Wa7o4IYlLPB+E1nwoV8XgWZQQQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.Generator.CodeAnalysis.yml",
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.html",
-          "hash": "gL7i1DqH0bqL4GVwrOe5j2ghcZyakEDgZxflC0M/1Kc="
+          "hash": "fbFmJ5KZc0RtFnUON2Nw1S6oI+PNWHxmMr85PYxYXmY="
         }
       },
       "is_incremental": false,
@@ -1317,7 +1329,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeGen.SerializationFormatterCodeGenContext.html",
-          "hash": "16rDN8Gl42Z0Bz4LsHAFrzOG2At3I8e+7OYoVLHZu7I="
+          "hash": "ZNJ8AWx6j8FZqDlvDOuAk064crTnDF5fEIrO0FNA7o4="
         }
       },
       "is_incremental": false,
@@ -3357,7 +3369,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "KD46E9TqWz0Zc6v9h14xahEkfv221duMszcozDHXzPU="
+          "hash": "cC9+7N0EQ18MMUUxLfx0BmaFIFkUibUzyLmSeCot6Jw="
         }
       },
       "is_incremental": false,
@@ -3444,7 +3456,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 279,
+          "total_file_count": 280,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
