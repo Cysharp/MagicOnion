@@ -133,6 +133,8 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
 {
     using global::System;
     using global::MessagePack;
+
+    partial class PreserveAttribute : global::System.Attribute {}
     public class MagicOnionResolver : global::MessagePack.IFormatterResolver
     {
         public static readonly global::MessagePack.IFormatterResolver Instance = new MagicOnionResolver();
@@ -188,6 +190,28 @@ namespace MagicOnion.Integration.Tests.Generated.Resolvers
                 case 4: return new global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.Int32>();
                 default: return null;
             }
+        }
+    }
+    /// <summary>Type hints for Ahead-of-Time compilation.</summary>
+    [MagicOnion.Integration.Tests.Generated.Resolvers.Preserve]
+    internal static class TypeHints
+    {
+        [MagicOnion.Integration.Tests.Generated.Resolvers.Preserve]
+        internal static void Register()
+        {
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.Int32>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MessagePack.Nil>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32, global::System.Int32>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.ValueTuple<global::System.Int32, global::System.Int32>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.Integration.Tests.MyStreamingResponse>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.Integration.Tests.MyStreamingRequest>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.Integration.Tests.MyUnaryResponse>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.Integration.Tests.MyUnaryRequest>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.String>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String, global::System.Boolean>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.Boolean>();
         }
     }
 }

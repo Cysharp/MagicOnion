@@ -132,7 +132,11 @@ public class SerializationInfoCollector
             }
         }
 
-        return new MagicOnionSerializationInfoCollection(MergeResolverRegisterInfo(context.Enums), MergeResolverRegisterInfo(context.Generics));
+        return new MagicOnionSerializationInfoCollection(
+            MergeResolverRegisterInfo(context.Enums),
+            MergeResolverRegisterInfo(context.Generics),
+            MergeSerializationTypeHintInfo(proceeded.Select(x => new SerializationTypeHintInfo(x.Type.FullName, x.IfDirectives)))
+        );
     }
 
     static GenericSerializationInfo[] MergeResolverRegisterInfo(IEnumerable<GenericSerializationInfo> serializationInfoSet)
@@ -155,6 +159,22 @@ public class SerializationInfoCollector
             )
         );
 
+    static SerializationTypeHintInfo[] MergeSerializationTypeHintInfo(IEnumerable<SerializationTypeHintInfo> serializationInfoSet)
+        => MergeResolverRegisterInfo(serializationInfoSet, (serializationInfo, serializationInfoCandidate) =>
+            new SerializationTypeHintInfo(
+                serializationInfo.FullName,
+                serializationInfo.IfDirectiveConditions.Concat(serializationInfoCandidate.IfDirectiveConditions).ToArray()
+            )
+        );
+
+    /// <summary>
+    /// Merge `#if` directives by type of serialization target.
+    /// </summary>
+    /// <remarks>
+    /// * Foo --> Foo<br />
+    /// * Bar, Bar (#if CONST_1) --> Bar<br />
+    /// * Baz (#if CONST_1), Baz (#if CONST_2) --> Baz (#if CONST_1 || CONST_2)<br />
+    /// </remarks>
     static T[] MergeResolverRegisterInfo<T>(IEnumerable<T> serializationInfoSet, Func<T, T, T> mergeFunc)
         where T : ISerializationFormatterRegisterInfo
     {
@@ -220,11 +240,13 @@ public class MagicOnionSerializationInfoCollection
     public IReadOnlyList<EnumSerializationInfo> Enums { get; }
     public IReadOnlyList<GenericSerializationInfo> Generics { get; }
     public IReadOnlyList<ISerializationFormatterRegisterInfo> RequireRegistrationFormatters { get; }
+    public IReadOnlyList<SerializationTypeHintInfo> TypeHints { get; }
 
-    public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics)
+    public MagicOnionSerializationInfoCollection(IReadOnlyList<EnumSerializationInfo> enums, IReadOnlyList<GenericSerializationInfo> generics, IReadOnlyList<SerializationTypeHintInfo> typeHints)
     {
         Enums = enums;
         Generics = generics;
         RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<ISerializationFormatterRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
+        TypeHints = typeHints;
     }
 }

@@ -33,6 +33,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Should().NotBeNull();
         serializationInfoCollection.Enums.Should().BeEmpty();
         serializationInfoCollection.Generics.Should().BeEmpty();
+        serializationInfoCollection.TypeHints.Should().HaveCount(3);
     }
 
     [Fact]
@@ -55,6 +56,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics.Should().HaveCount(2);
         serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()");
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.YetAnotherGenericObject>()");
+        serializationInfoCollection.TypeHints.Should().HaveCount(4); // Non-nullable + Nullable
     }
 
     [Fact]
@@ -83,6 +85,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.MyNamespace.YetAnotherGenericObjectFormatter<global::System.String>()");
         serializationInfoCollection.Generics[1].IfDirectiveConditions.Should().HaveCount(2);
         serializationInfoCollection.Generics[1].IfDirectiveConditions.Should().BeEquivalentTo("CONST_2 || DEBUG", "CONST_3");
+        serializationInfoCollection.TypeHints.Should().HaveCount(4); // int, string, MyGenericObject<string>, YetAnotherGenericObject<string>
     }
 
     [Fact]
@@ -104,6 +107,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics.Should().HaveCount(2);
         serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String, global::System.Int64>()");
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String, global::System.Int32>()");
+        serializationInfoCollection.TypeHints.Should().HaveCount(5); // string, int, long, MyGenericObject<string, long>, MyGenericObject<string, int>
     }
 
     [Fact]
@@ -139,6 +143,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Enums[2].Name.Should().Be("YetAnotherEnum");
         serializationInfoCollection.Enums[2].FormatterName.Should().Be("YetAnotherEnumFormatter()");
         serializationInfoCollection.Enums[2].HasIfDirectiveConditions.Should().BeFalse();
+        serializationInfoCollection.TypeHints.Should().HaveCount(6); // MyEnum, MyEnumConditional, YetAnotherEnum, MyGenericObject<MyEnum>, MyGenericObject<MyEnumConditional>, MyGenericObject<YetAnotherEnum>
     }
         
     [Fact]
@@ -158,9 +163,9 @@ public class SerializationInfoCollectorTest
         // Assert
         serializationInfoCollection.Should().NotBeNull();
         serializationInfoCollection.Generics.Should().BeEmpty();
-    }  
+        serializationInfoCollection.TypeHints.Should().HaveCount(3); // byte, ArraySegment<byte>, Nullable<ArraySegment<byte>>
+    }
 
-    
     [Fact]
     public void KnownTypes_Array_SkipBuiltInTypes()
     {
@@ -199,6 +204,7 @@ public class SerializationInfoCollectorTest
         // Assert
         serializationInfoCollection.Should().NotBeNull();
         serializationInfoCollection.Generics.Should().BeEmpty();
+        serializationInfoCollection.TypeHints.Should().HaveCount(46);
     }  
     
     [Fact]
@@ -224,6 +230,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MessagePack.Formatters.TwoDimensionalArrayFormatter<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[2].FormatterName.Should().Be("global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[3].FormatterName.Should().Be("global::MessagePack.Formatters.FourDimensionalArrayFormatter<global::MyNamespace.MyObject>()");
+        serializationInfoCollection.TypeHints.Should().HaveCount(5); // MyObject, MyObject[], MyObject[,], MyObject[,,], MyObject[,,,]
     }
 
     [Fact]
@@ -265,6 +272,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[9].FormatterName.Should().Be("global::MessagePack.Formatters.KeyValuePairFormatter<global::System.String, global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[10].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceLookupFormatter<global::System.String, global::MyNamespace.MyObject>()");
         serializationInfoCollection.Generics[11].FormatterName.Should().Be("global::MessagePack.Formatters.InterfaceGroupingFormatter<global::System.String, global::MyNamespace.MyObject>()");
+        serializationInfoCollection.TypeHints.Should().HaveCount(14);
     }
     
     [Fact]
@@ -296,6 +304,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Should().NotBeNull();
         serializationInfoCollection.Enums.Should().BeEmpty();
         serializationInfoCollection.Generics.Should().BeEmpty();
+        serializationInfoCollection.TypeHints.Should().HaveCount(26);
     }
 
     [Fact]
@@ -329,6 +338,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics[5].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte>()");
         serializationInfoCollection.Generics[6].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16>()");
         serializationInfoCollection.Generics[7].FormatterName.Should().Be("global::MessagePack.Formatters.ValueTupleFormatter<global::System.Int32, global::System.String, global::System.Int64, global::System.Single, global::System.Boolean, global::System.Byte, global::System.Int16, global::System.Guid>()");
+        serializationInfoCollection.TypeHints.Should().HaveCount(8 + 8);
     }
 
     [Fact]
@@ -383,6 +393,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Generics.Should().HaveCount(2);
         serializationInfoCollection.Generics[0].FormatterName.Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
         serializationInfoCollection.Generics[1].FormatterName.Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32))");
+        serializationInfoCollection.TypeHints.Should().HaveCount(5); // string, long, int, DynamicArgumentTuple<string, long>, DynamicArgumentTuple<string, int>
     }
 
     [Fact]
