@@ -247,6 +247,6 @@ public class MagicOnionSerializationInfoCollection
         Enums = enums;
         Generics = generics;
         RequireRegistrationFormatters = generics.OrderBy(x => x.FullName).Cast<ISerializationFormatterRegisterInfo>().Concat(enums.OrderBy(x => x.FullName)).ToArray();
-        TypeHints = typeHints;
+        TypeHints = typeHints.OrderBy(x => x.FullName).ToArray();
     }
 }
