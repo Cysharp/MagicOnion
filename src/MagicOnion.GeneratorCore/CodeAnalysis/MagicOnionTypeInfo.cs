@@ -126,6 +126,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         if (@namespace == "MessagePack" && name == "Nil") return KnownTypes.MessagePack_Nil;
         if (@namespace == "System" && name == "String") return KnownTypes.System_String;
         if (@namespace == "System" && name == "Boolean") return KnownTypes.System_Boolean;
+        if (@namespace == "System" && name == "Void") return KnownTypes.System_Void;
         if (@namespace == "System.Threading.Tasks" && name == "Task" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_Task;
         if (@namespace == "System.Threading.Tasks" && name == "ValueTask" && genericArguments.Length == 0) return KnownTypes.System_Threading_Tasks_ValueTask;
         if (@namespace == "MagicOnion" && name == "UnaryResult" && genericArguments.Length == 0) return KnownTypes.MagicOnion_UnaryResult;
