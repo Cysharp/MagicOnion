@@ -112,9 +112,6 @@ jobs:
     strategy:
       matrix:
         unity: ["2020.3.33f1"]
-        include:
-          - unity: 2020.3.33f1
-            license: UNITY_LICENSE_2020
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -123,17 +120,18 @@ jobs:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       # execute scripts/Export Package
       # /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod PackageExporter.Export
-      - name: Export unitypackage
-        uses: game-ci/unity-builder@v2
+      - name: Build Unity (.unitypacakge)
+        uses: Cysharp/Actions/.github/actions/unity-builder@main
         env:
-          UNITY_LICENSE: ${{ secrets[matrix.license] }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
           UNITY_PACKAGE_VERSION: ${{ env.GIT_TAG }}
         with:
           projectPath: src/MagicOnion.Client.Unity
           unityVersion: ${{ matrix.unity }}
           targetPlatform: StandaloneLinux64
           buildMethod: PackageExporter.Export
-          versioning: None
 
       - uses: ./.github/actions/check-metas
         with:
