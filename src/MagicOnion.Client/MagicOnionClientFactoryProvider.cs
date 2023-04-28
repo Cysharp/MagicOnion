@@ -77,7 +77,7 @@ namespace MagicOnion.Client
         }
     }
 
-#if ((ENABLE_IL2CPP && !UNITY_EDITOR) || !NET_STANDARD_2_0)
+#if ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
     /// <summary>
     /// Provides to get a MagicOnionClient factory of the specified service type. The provider is backed by DynamicMagicOnionClientBuilder.
     /// </summary>

@@ -26,6 +26,12 @@ namespace MagicOnion.Client
             return Create<T>(channel.CreateCallInvoker(), serializerProvider, emptyFilters, MagicOnionClientFactoryProvider.Default);
         }
 
+        public static T Create<T>(ChannelBase channel, IMagicOnionSerializerProvider serializerProvider, IClientFilter[] clientFilters)
+            where T : IService<T>
+        {
+            return Create<T>(channel.CreateCallInvoker(), serializerProvider, clientFilters, MagicOnionClientFactoryProvider.Default);
+        }
+
         public static T Create<T>(CallInvoker invoker)
             where T : IService<T>
         {
