@@ -766,6 +766,8 @@ namespace MagicOnion.Integration.Tests
             => base.WriteMessageWithResponseAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MessagePack.Nil>(1503747814, request);
         public global::System.Threading.Tasks.Task CallReceiver_RefType_Null()
             => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1093215042, global::MessagePack.Nil.Default);
+        public global::System.Threading.Tasks.Task CallReceiver_Delay(global::System.Int32 milliseconds)
+            => base.WriteMessageWithResponseAsync<global::System.Int32, global::MessagePack.Nil>(1865731236, milliseconds);
         
         public global::MagicOnion.Integration.Tests.IStreamingHubTestHub FireAndForget()
             => new FireAndForgetClient(this);
@@ -828,6 +830,8 @@ namespace MagicOnion.Integration.Tests
                 => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.Integration.Tests.MyStreamingRequest, global::MessagePack.Nil>(1503747814, request);
             public global::System.Threading.Tasks.Task CallReceiver_RefType_Null()
                 => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1093215042, global::MessagePack.Nil.Default);
+            public global::System.Threading.Tasks.Task CallReceiver_Delay(global::System.Int32 milliseconds)
+                => parent.WriteMessageFireAndForgetAsync<global::System.Int32, global::MessagePack.Nil>(1865731236, milliseconds);
             
         }
         
@@ -863,6 +867,12 @@ namespace MagicOnion.Integration.Tests
                     {
                         var value = base.Deserialize<global::MagicOnion.Integration.Tests.MyStreamingResponse>(data);
                         receiver.Receiver_RefType_Null(value);
+                    }
+                    break;
+                case -5486432: // Void Receiver_Delay()
+                    {
+                        var value = base.Deserialize<global::MessagePack.Nil>(data);
+                        receiver.Receiver_Delay();
                     }
                     break;
             }
@@ -939,6 +949,9 @@ namespace MagicOnion.Integration.Tests
                     base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                     break;
                 case -1093215042: // Task CallReceiver_RefType_Null()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case 1865731236: // Task CallReceiver_Delay(global::System.Int32 milliseconds)
                     base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                     break;
             }
