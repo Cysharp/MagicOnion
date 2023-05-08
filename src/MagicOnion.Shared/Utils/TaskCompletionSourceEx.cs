@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace MagicOnion.Utils
@@ -11,6 +11,11 @@ namespace MagicOnion.Utils
 
     internal class TaskCompletionSourceEx<T> : TaskCompletionSource<T>, ITaskCompletion
     {
+        public TaskCompletionSourceEx()
+        { }
+        public TaskCompletionSourceEx(TaskCreationOptions options) : base(options)
+        { }
+
         bool ITaskCompletion.TrySetCanceled()
         {
             return this.TrySetCanceled();

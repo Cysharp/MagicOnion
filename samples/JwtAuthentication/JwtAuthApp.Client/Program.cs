@@ -63,7 +63,6 @@ namespace JwtAuthApp.Client
                         { "Authorization", "Bearer " + AuthenticationTokenStorage.Current.Token }
                     }));
                 await timerHubClient.SetAsync(TimeSpan.FromSeconds(5));
-                await Task.Yield(); // NOTE: Release the gRPC's worker thread here.
             }
 
             // 6. Insufficient privilege (The current user is not in administrators role).

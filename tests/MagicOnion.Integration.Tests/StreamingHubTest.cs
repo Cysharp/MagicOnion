@@ -427,6 +427,30 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         receiver.Verify(x => x.Receiver_RefType_Null(default));
     }
 
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task ContinuationBlocking(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        // NOTE: Runs on another thread.
+        _ = Task.Run(async () =>
+        {
+            await client.CallReceiver_Delay(500); // The receiver will be called after 500ms.
+            Thread.Sleep(60 * 1000); // Block the continuation.
+        });
+        await Task.Delay(1000); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Verify(x => x.Receiver_Delay());
+    }
+
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -574,6 +598,17 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         Broadcast(group).Receiver_RefType_Null(default);
         return Task.CompletedTask;
     }
+
+    public Task CallReceiver_Delay(int milliseconds)
+    {
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(milliseconds);
+            Broadcast(group).Receiver_Delay();
+        });
+
+        return Task.CompletedTask;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -583,6 +618,7 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_Parameter_Many(int arg0, string arg1, bool arg2);
     void Receiver_RefType(MyStreamingResponse request);
     void Receiver_RefType_Null(MyStreamingResponse? request);
+    void Receiver_Delay();
 }
 
 public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
@@ -617,4 +653,6 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     Task<MyStreamingResponse?> RefType_Null(MyStreamingRequest? request);
     Task CallReceiver_RefType(MyStreamingRequest request);
     Task CallReceiver_RefType_Null();
+
+    Task CallReceiver_Delay(int milliseconds);
 }

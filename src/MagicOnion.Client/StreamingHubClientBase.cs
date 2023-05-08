@@ -36,7 +36,7 @@ namespace MagicOnion.Client
         TaskCompletionSource<object> waitForDisconnect = new TaskCompletionSource<object>();
 
         // {messageId, TaskCompletionSource}
-        ConcurrentDictionary<int, object> responseFutures = new ConcurrentDictionary<int, object>();
+        ConcurrentDictionary<int, ITaskCompletion> responseFutures = new ConcurrentDictionary<int, ITaskCompletion>();
         protected CancellationTokenSource cts = new CancellationTokenSource();
         int messageId = 0;
         bool disposed;
@@ -196,8 +196,7 @@ namespace MagicOnion.Client
             if (arrayLength == 3)
             {
                 var messageId = messagePackReader.ReadInt32();
-                object future;
-                if (responseFutures.TryRemove(messageId, out future))
+                if (responseFutures.TryRemove(messageId, out var future))
                 {
                     var methodId = messagePackReader.ReadInt32();
                     try
@@ -208,7 +207,7 @@ namespace MagicOnion.Client
                     }
                     catch (Exception ex)
                     {
-                        if (!(future as ITaskCompletion).TrySetException(ex))
+                        if (!future.TrySetException(ex))
                         {
                             throw;
                         }
@@ -218,8 +217,7 @@ namespace MagicOnion.Client
             else if (arrayLength == 4)
             {
                 var messageId = messagePackReader.ReadInt32();
-                object future;
-                if (responseFutures.TryRemove(messageId, out future))
+                if (responseFutures.TryRemove(messageId, out var future))
                 {
                     var statusCode = messagePackReader.ReadInt32();
                     var detail = messagePackReader.ReadString();
@@ -236,7 +234,7 @@ namespace MagicOnion.Client
                         ex = new RpcException(new Status((StatusCode)statusCode, detail), detail + Environment.NewLine + error);
                     }
 
-                    (future as ITaskCompletion).TrySetException(ex);
+                    future.TrySetException(ex);
                 }
             }
             else
@@ -290,8 +288,11 @@ namespace MagicOnion.Client
             ThrowIfDisposed();
 
             var mid = Interlocked.Increment(ref messageId);
-            var tcs = new TaskCompletionSourceEx<TResponse>(); // use Ex
-            responseFutures[mid] = (object)tcs;
+            // NOTE: The continuations (user code) should be executed asynchronously.
+            //       This is because the continuation may block the thread, for example, Console.ReadLine().
+            //       If the thread is blocked, it will no longer return to the message consuming loop.
+            var tcs = new TaskCompletionSourceEx<TResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+            responseFutures[mid] = tcs;
 
             byte[] BuildMessage()
             {
