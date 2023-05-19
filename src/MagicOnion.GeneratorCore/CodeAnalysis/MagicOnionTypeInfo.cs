@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using MagicOnion.Generator.Utils;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator.CodeAnalysis;
@@ -167,7 +168,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
             return CreateEnum(type.Namespace, type.Name, CreateFromType(type.GetEnumUnderlyingType()));
         }
 
-        return Create(type.Namespace, type.Name, Array.Empty<MagicOnionTypeInfo>(), type.IsValueType);
+        return Create(type.Namespace, type.GetFullDeclaringTypeName(), Array.Empty<MagicOnionTypeInfo>(), type.IsValueType);
     }
 
     public static MagicOnionTypeInfo CreateFromSymbol(ITypeSymbol symbol)
@@ -186,7 +187,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         if (finalSymbol is INamedTypeSymbol namedTypeSymbol)
         {
             var @namespace = finalSymbol.ContainingNamespace.IsGlobalNamespace ? string.Empty : finalSymbol.ContainingNamespace.ToDisplayString();
-            var name = finalSymbol.Name;
+            var name = finalSymbol.GetFullDeclaringTypeName();
             var typeArguments = namedTypeSymbol.TypeArguments.Select(MagicOnionTypeInfo.CreateFromSymbol).ToArray();
 
             MagicOnionTypeInfo type;
