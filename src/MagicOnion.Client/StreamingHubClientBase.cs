@@ -223,7 +223,7 @@ namespace MagicOnion.Client
                     var detail = messagePackReader.ReadString();
                     var offset = (int)messagePackReader.Consumed;
                     var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
-                    var error = Deserialize<string>(rest);
+                    var error = MessagePackSerializer.Deserialize<string>(rest);
                     var ex = default(RpcException);
                     if (string.IsNullOrWhiteSpace(error))
                     {
