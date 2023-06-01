@@ -562,6 +562,37 @@ public class MagicOnionTypeInfoTest
     }
 
     [Fact]
+    public void FromSymbol_NamedValueTuple()
+    {
+        // Arrange
+        var (compilation, semModel) = CompilationHelper.Create(@"
+            namespace MyNamespace
+            {
+                using System;
+                using System.Collections.Generic;
+                public class MyClass
+                {
+                    public (string Name, int Age) FieldA;
+                }
+            }
+        ");
+        var symbols = compilation.GetSymbolsWithName(x => x == "FieldA", SymbolFilter.Member)
+            .OfType<IFieldSymbol>()
+            .ToArray();
+
+        // Act
+        var typeInfo = MagicOnionTypeInfo.CreateFromSymbol(symbols[0].Type);
+
+        // Assert
+        typeInfo.Namespace.Should().Be("System");
+        typeInfo.Name.Should().Be("ValueTuple");
+        typeInfo.GenericArguments.Should().HaveCount(2);
+        typeInfo.GenericArguments[0].Should().Be(MagicOnionTypeInfo.Create("System", "String"));
+        typeInfo.GenericArguments[1].Should().Be(MagicOnionTypeInfo.CreateValueType("System", "Int32"));
+        typeInfo.FullName.Should().Be("global::System.ValueTuple<global::System.String, global::System.Int32>");
+    }
+
+    [Fact]
     public void ToDisplay_Short()
     {
         // Arrange

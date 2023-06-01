@@ -18,6 +18,13 @@ internal static class TypeExtensions
 
     public static string GetFullDeclaringTypeName(this ITypeSymbol typeSymbol)
     {
+        if (typeSymbol is INamedTypeSymbol { IsGenericType: true, IsValueType: true, ContainingNamespace.Name: "System", Name: "ValueTuple" })
+        {
+            // NOTE: Roslyn 4.3.0 does not support `ExpandValueTuple` flag.
+            //       https://github.com/dotnet/roslyn/pull/66929
+            return "ValueTuple";
+        }
+
         return typeSymbol.ToDisplayString(
             new SymbolDisplayFormat(
                 SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining,
