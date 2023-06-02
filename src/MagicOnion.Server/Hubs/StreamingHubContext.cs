@@ -118,16 +118,9 @@ public class StreamingHubContext
                     ? ex.ToString()
                     : null;
 
-                if (msg != null)
-                {
-                    writer.Flush();
-                    ServiceContext.MessageSerializer.Serialize(buffer, msg);
-                }
-                else
-                {
-                    writer.WriteNil();
-                    writer.Flush();
-                }
+                writer.Write(msg);
+                writer.Flush();
+
                 return buffer.WrittenSpan.ToArray();
             }
         }

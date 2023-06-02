@@ -242,6 +242,10 @@ namespace MagicOnion.Serialization.MemoryPack.Tests
             => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(-2118022106, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
         public global::System.Threading.Tasks.Task<global::System.Int32> CallbackCustomObject(global::MagicOnion.Serialization.MemoryPack.Tests.MyRequestResponse arg0)
             => base.WriteMessageWithResponseAsync<global::MagicOnion.Serialization.MemoryPack.Tests.MyRequestResponse, global::System.Int32>(-2048231118, arg0);
+        public global::System.Threading.Tasks.Task ThrowReturnStatusException()
+            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(28149104, global::MessagePack.Nil.Default);
+        public global::System.Threading.Tasks.Task Throw()
+            => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(540272591, global::MessagePack.Nil.Default);
         
         public global::MagicOnion.Serialization.MemoryPack.Tests.IMemoryPackSerializerTestHub FireAndForget()
             => new FireAndForgetClient(this);
@@ -274,6 +278,10 @@ namespace MagicOnion.Serialization.MemoryPack.Tests
                 => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>, global::System.Int32>(-2118022106, new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.String>(arg0, arg1));
             public global::System.Threading.Tasks.Task<global::System.Int32> CallbackCustomObject(global::MagicOnion.Serialization.MemoryPack.Tests.MyRequestResponse arg0)
                 => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.Serialization.MemoryPack.Tests.MyRequestResponse, global::System.Int32>(-2048231118, arg0);
+            public global::System.Threading.Tasks.Task ThrowReturnStatusException()
+                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(28149104, global::MessagePack.Nil.Default);
+            public global::System.Threading.Tasks.Task Throw()
+                => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(540272591, global::MessagePack.Nil.Default);
             
         }
         
@@ -323,6 +331,12 @@ namespace MagicOnion.Serialization.MemoryPack.Tests
                     break;
                 case -2048231118: // Task<Int32> CallbackCustomObject(global::MagicOnion.Serialization.MemoryPack.Tests.MyRequestResponse arg0)
                     base.SetResultForResponse<global::System.Int32>(taskCompletionSource, data);
+                    break;
+                case 28149104: // Task ThrowReturnStatusException()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
+                    break;
+                case 540272591: // Task Throw()
+                    base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                     break;
             }
         }

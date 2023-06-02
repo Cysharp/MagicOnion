@@ -1,9 +1,11 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MagicOnionTestServer;
 using MemoryPack;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Serialization.MemoryPack.Tests;
 
@@ -140,6 +142,59 @@ public class MemoryPackSerializerStreamingHubTest : IClassFixture<MagicOnionAppl
         receiver.Received.Should().Contain((98765, "43210"));
     }
 
+    [Fact]
+    public async Task StreamingHub_ThrowReturnStatusException()
+    {
+        // Arrange
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Receiver();
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.ThrowReturnStatusException());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Unknown);
+        ex.Status.Detail.Should().Be("Detail-String");
+    }
+
+    [Fact]
+    public async Task StreamingHub_Throw()
+    {
+        // Arrange
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Receiver();
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Internal);
+        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+    }
+
+    [Fact]
+    public async Task StreamingHub_Throw_WithServerStackTrace()
+    {
+        // Arrange
+        var factory = this.factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.Configure<MagicOnionOptions>(options => options.IsReturnExceptionStackTraceInErrorDetail = true)));
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Receiver();
+        var client = await StreamingHubClient.ConnectAsync<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>(channel, receiver, serializerProvider: MemoryPackMagicOnionSerializerProvider.Instance);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Internal);
+        ex.Message.Should().Contain("Something went wrong.");
+        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+    }
+
     class Receiver : IMemoryPackSerializerTestHubReceiver
     {
         public List<(int Arg0, string Arg1)> Received { get; } = new List<(int Arg0, string Arg1)>();
@@ -172,6 +227,8 @@ public interface IMemoryPackSerializerTestHub : IStreamingHub<IMemoryPackSeriali
     Task<int> MethodParameter_CustomObject(MyRequestResponse arg0);
     Task<int> Callback(int arg0, string arg1);
     Task<int> CallbackCustomObject(MyRequestResponse arg0);
+    Task ThrowReturnStatusException();
+    Task Throw();
 }
 
 public class MemoryPackSerializerTestHub : StreamingHubBase<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>, IMemoryPackSerializerTestHub
@@ -200,6 +257,16 @@ public class MemoryPackSerializerTestHub : StreamingHubBase<IMemoryPackSerialize
     {
         Broadcast(group!).OnMessageCustomObject(new MyRequestResponse() { Item1 = arg0.Item1, Item2 = arg0.Item2 });
         return Task.FromResult(123);
+    }
+
+    public Task ThrowReturnStatusException()
+    {
+        throw new ReturnStatusException(StatusCode.Unknown, "Detail-String");
+    }
+
+    public Task Throw()
+    {
+        throw new InvalidOperationException("Something went wrong.");
     }
 }
 
