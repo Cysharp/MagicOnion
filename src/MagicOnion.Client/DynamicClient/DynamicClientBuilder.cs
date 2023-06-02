@@ -63,7 +63,7 @@ namespace MagicOnion.Client.DynamicClient
             // public class {ServiceName}Client : ClientBase<{ServiceName}>
             // {
             //
-            ctx.ServiceClientType = DynamicClientAssemblyHolder.Assembly.DefineType($"{ctx.Definition.ServiceInterfaceType.Name}Client", TypeAttributes.Public | TypeAttributes.Sealed, constructedBaseClientType, new[] { ctx.Definition.ServiceInterfaceType });
+            ctx.ServiceClientType = DynamicClientAssemblyHolder.Assembly.DefineType($"MagicOnion.DynamicallyGeneratedClient.{ctx.Definition.ServiceInterfaceType.Namespace}.{ctx.Definition.ServiceInterfaceType.Name}Client", TypeAttributes.Public | TypeAttributes.Sealed, constructedBaseClientType, new[] { ctx.Definition.ServiceInterfaceType });
             // Set `IgnoreAttribute` to the generated client type. Hides generated-types from building MagicOnion service definitions.
             ctx.ServiceClientType.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoreAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
             {
