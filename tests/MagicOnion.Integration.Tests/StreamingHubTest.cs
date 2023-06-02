@@ -4,7 +4,9 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Serialization;
+using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -451,6 +453,58 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         receiver.Verify(x => x.Receiver_Delay());
     }
 
+    [Fact]
+    public async Task ThrowReturnStatusException()
+    {
+        // Arrange
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.ThrowReturnStatusException());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Unknown);
+        ex.Status.Detail.Should().Be("Detail-String");
+    }
+
+    [Fact]
+    public async Task Throw()
+    {
+        // Arrange
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Internal);
+        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+    }
+
+    [Fact]
+    public async Task Throw_WithServerStackTrace()
+    {
+        // Arrange
+        var factory = this.factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.Configure<MagicOnionOptions>(options => options.IsReturnExceptionStackTraceInErrorDetail = true)));
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
+        var receiver = new Mock<IStreamingHubTestHubReceiver>();
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver.Object);
+
+        // Act
+        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+
+        // Assert
+        ex.Should().NotBeNull();
+        ex!.StatusCode.Should().Be(StatusCode.Internal);
+        ex.Message.Should().Contain("Something went wrong.");
+        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+    }
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -609,6 +663,16 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
         return Task.CompletedTask;
     }
+
+    public Task ThrowReturnStatusException()
+    {
+        throw new ReturnStatusException(StatusCode.Unknown, "Detail-String");
+    }
+
+    public Task Throw()
+    {
+        throw new InvalidOperationException("Something went wrong.");
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -655,4 +719,7 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     Task CallReceiver_RefType_Null();
 
     Task CallReceiver_Delay(int milliseconds);
+
+    Task ThrowReturnStatusException();
+    Task Throw();
 }
