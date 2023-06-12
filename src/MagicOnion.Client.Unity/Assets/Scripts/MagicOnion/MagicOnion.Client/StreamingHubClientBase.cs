@@ -287,10 +287,14 @@ namespace MagicOnion.Client
             ThrowIfDisposed();
 
             var mid = Interlocked.Increment(ref messageId);
-            // NOTE: The continuations (user code) should be executed asynchronously.
+            // NOTE: The continuations (user code) should be executed asynchronously. (Except: Unity WebGL)
             //       This is because the continuation may block the thread, for example, Console.ReadLine().
             //       If the thread is blocked, it will no longer return to the message consuming loop.
-            var tcs = new TaskCompletionSourceEx<TResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSourceEx<TResponse>(
+#if !UNITY_WEBGL
+                TaskCreationOptions.RunContinuationsAsynchronously
+#endif
+            );
             responseFutures[mid] = tcs;
 
             byte[] BuildMessage()
