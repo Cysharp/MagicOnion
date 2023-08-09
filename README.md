@@ -3,7 +3,7 @@
 
 Unified Realtime/API framework for .NET platform and Unity.
 
-[📖 Table of contents](#📖-table-of-contents)
+[📖 Table of contents](#-table-of-contents)
 
 ## About MagicOnion
 MagicOnion is a modern RPC framework for .NET platform that provides bi-directional real-time communications such as [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR) and [Socket.io](https://socket.io/) and RPC mechanisms such as WCF and web-based APIs.
