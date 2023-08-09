@@ -3,7 +3,7 @@
 
 Unified Realtime/API framework for .NET platform and Unity.
 
-[📖 Table of contents](#-table-of-contents)
+[📖 Table of contents](#📖-table-of-contents)
 
 ## About MagicOnion
 MagicOnion is a modern RPC framework for .NET platform that provides bi-directional real-time communications such as [SignalR](https://github.com/aspnet/AspNetCore/tree/master/src/SignalR) and [Socket.io](https://socket.io/) and RPC mechanisms such as WCF and web-based APIs.
@@ -195,15 +195,16 @@ dotnet add package MagicOnion
     - [Support for Unity client](#support-for-unity-client)
         - [iOS build with gRPC](#ios-build-with-grpc)
         - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
-        - [Stripping debug symbols from libgrpc_csharp_ext.so](#stripping-debug-symbols-from-libgrpccsharpextso)
-        - [Workaround for il2cpp + Windows Build failure](#workaround-for-il2cpp--windows-build-failure)
+        - [Stripping debug symbols from libgrpc_csharp_ext.so](#stripping-debug-symbols-from-libgrpc_csharp_extso)
+        - [Workaround for il2cpp + Windows/Linux Build failure](#workaround-for-il2cpp--windowslinux-build-failure)
     - [gRPC Keepalive](#grpc-keepalive)
 - [HTTPS (TLS)](#https-tls)
 - [Deployment](#deployment)
 - Integrations
     - [Swagger](#swagger)
 - Advanced
-    - [MagicOnionOption/Logging](#magiconionoptionlogging)
+    - [MagicOnionOption](#magiconionoption)
+    - [Internal Logging](#internal-logging)
     - [Raw gRPC APIs](#raw-grpc-apis)
     - [Zero deserialization mapping](#zero-deserialization-mapping)
 - Experimentals
