@@ -8,10 +8,10 @@ public class ClientStreamingTest
     public void Create()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act
-        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Assert
         client.Should().NotBeNull();
@@ -22,20 +22,18 @@ public class ClientStreamingTest
     {
         // Arrange
         var clientStreamWriterMock = new MockClientStreamWriter<Box<int>>();
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
         var response = 9876;
-        callInvokerMock.Setup(x => x.AsyncClientStreamingCall(It.IsAny<Method<Box<int>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>()))
-            .Returns(() => new AsyncClientStreamingCall<Box<int>, Box<int>>(
+        callInvokerMock.AsyncClientStreamingCall(default(Method<Box<int>, Box<int>>)!, default, default)
+            .ReturnsForAnyArgs(new AsyncClientStreamingCall<Box<int>, Box<int>>(
                 clientStreamWriterMock,
                 Task.FromResult(Box.Create(response)),
                 _ => Task.FromResult(Metadata.Empty),
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default)
-            )
-            .Verifiable();
-        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock.Object);
+                default));
+        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
         var result = await client.ValueTypeReturnValueType();
@@ -46,30 +44,29 @@ public class ClientStreamingTest
         // Assert
         client.Should().NotBeNull();
         (await result.ResponseAsync).Should().Be(9876);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         clientStreamWriterMock.Completed.Should().BeTrue();
         clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Box.Create(123), Box.Create(456) });
     }
-    
+
     [Fact]
     public async Task WriteAndCompleteArgumentRefTypeReturnValueType()
     {
         // Arrange
         var clientStreamWriterMock = new MockClientStreamWriter<string>();
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
         var response = 9876;
-        callInvokerMock.Setup(x => x.AsyncClientStreamingCall(It.IsAny<Method<string, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>()))
-            .Returns(() => new AsyncClientStreamingCall<string, Box<int>>(
+        callInvokerMock.AsyncClientStreamingCall(default(Method<string, Box<int>>)!, default, default)
+            .ReturnsForAnyArgs(new AsyncClientStreamingCall<string, Box<int>>(
                 clientStreamWriterMock,
                 Task.FromResult(Box.Create(response)),
                 _ => Task.FromResult(Metadata.Empty),
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default)
-            )
-            .Verifiable();
-        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock.Object);
+                default));
+
+        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
         var result = await client.RefTypeReturnValueType();
@@ -80,7 +77,7 @@ public class ClientStreamingTest
         // Assert
         client.Should().NotBeNull();
         (await result.ResponseAsync).Should().Be(9876);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         clientStreamWriterMock.Completed.Should().BeTrue();
         clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { "foo", "bar" });
     }
@@ -90,20 +87,18 @@ public class ClientStreamingTest
     {
         // Arrange
         var clientStreamWriterMock = new MockClientStreamWriter<Box<int>>();
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
         var response = "OK";
-        callInvokerMock.Setup(x => x.AsyncClientStreamingCall(It.IsAny<Method<Box<int>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>()))
-            .Returns(() => new AsyncClientStreamingCall<Box<int>, string>(
+        callInvokerMock.AsyncClientStreamingCall(default(Method<Box<int>, string>), default, default)
+            .ReturnsForAnyArgs(new AsyncClientStreamingCall<Box<int>, string>(
                 clientStreamWriterMock,
                 Task.FromResult(response),
                 _ => Task.FromResult(Metadata.Empty),
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default)
-            )
-            .Verifiable();
-        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock.Object);
+                default));
+        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
         var result = await client.ValueTypeReturnRefType();
@@ -114,7 +109,7 @@ public class ClientStreamingTest
         // Assert
         client.Should().NotBeNull();
         (await result.ResponseAsync).Should().Be("OK");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         clientStreamWriterMock.Completed.Should().BeTrue();
         clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Box.Create(123), Box.Create(456) });
     }
@@ -124,20 +119,18 @@ public class ClientStreamingTest
     {
         // Arrange
         var clientStreamWriterMock = new MockClientStreamWriter<Tuple<string, string>>();
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
         var response = "OK";
-        callInvokerMock.Setup(x => x.AsyncClientStreamingCall(It.IsAny<Method<Tuple<string, string>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>()))
-            .Returns(() => new AsyncClientStreamingCall<Tuple<string, string>, string>(
+        callInvokerMock.AsyncClientStreamingCall(default(Method<Tuple<string, string>, string>), default, default)
+            .ReturnsForAnyArgs(new AsyncClientStreamingCall<Tuple<string, string>, string>(
                 clientStreamWriterMock,
                 Task.FromResult(response),
                 _ => Task.FromResult(Metadata.Empty),
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default)
-            )
-            .Verifiable();
-        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock.Object);
+                default));
+        var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
         var result = await client.RefTypeReturnRefType();
@@ -148,7 +141,7 @@ public class ClientStreamingTest
         // Assert
         client.Should().NotBeNull();
         (await result.ResponseAsync).Should().Be("OK");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         clientStreamWriterMock.Completed.Should().BeTrue();
         clientStreamWriterMock.Written.Should().BeEquivalentTo(new[] { Tuple.Create("Foo", "Bar"), Tuple.Create("Baz", "Hello") });
     }
@@ -165,10 +158,10 @@ public class ClientStreamingTest
     public void UnsupportedReturnTypeNonTaskOfClientStreamingResult()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act & Assert
-        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IUnsupportedReturnTypeNonTaskOfClientStreamingResultService>(callInvokerMock.Object));
+        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IUnsupportedReturnTypeNonTaskOfClientStreamingResultService>(callInvokerMock));
     }
 
     public interface IUnsupportedReturnTypeNonTaskOfClientStreamingResultService : IService<IUnsupportedReturnTypeNonTaskOfClientStreamingResultService>
@@ -180,10 +173,10 @@ public class ClientStreamingTest
     public void MethodMustHaveNoParameter()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act & Assert
-        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IMethodMustHaveNoParameterService>(callInvokerMock.Object));
+        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IMethodMustHaveNoParameterService>(callInvokerMock));
     }
 
     public interface IMethodMustHaveNoParameterService : IService<IMethodMustHaveNoParameterService>

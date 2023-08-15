@@ -18,8 +18,10 @@ namespace MagicOnion.Client
     public abstract class StreamingHubClientBase<TStreamingHub, TReceiver>
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
+#pragma warning disable IDE1006 // Naming Styles
         const string StreamingHubVersionHeaderKey = "x-magiconion-streaminghub-version";
         const string StreamingHubVersionHeaderValue = "2";
+#pragma warning restore IDE1006 // Naming Styles
 
         readonly string host;
         readonly CallOptions option;
