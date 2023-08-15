@@ -1,4 +1,6 @@
+using Grpc.Core;
 using MagicOnion.Internal;
+using NSubstitute;
 
 namespace MagicOnion.Client.Tests;
 
@@ -8,10 +10,10 @@ public class UnaryTest
     public void Create()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Assert
         client.Should().NotBeNull();
@@ -22,15 +24,16 @@ public class UnaryTest
     {
         // Arrange
         var actualCallOptions = default(CallOptions);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+            .ReturnsForAnyArgs(x =>
             {
+                // method, host, callOptions, request
+                var callOptions = x.ArgAt<CallOptions>(2);
                 actualCallOptions = callOptions;
-            })
-            .Verifiable();
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+                return new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { });
+            });
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Act
         client = client.WithOptions(new CallOptions(new Metadata() { { "foo", "bar" } }));
@@ -38,7 +41,7 @@ public class UnaryTest
 
         // Assert
         client.Should().NotBeNull();
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         actualCallOptions.Headers.Should().Contain(x => x.Key == "foo" && x.Value == "bar");
     }
 
@@ -46,12 +49,10 @@ public class UnaryTest
     public async Task Clone_WithHost()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.SetReturnsDefault(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), "www.example.com", It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<Nil>>>(), "www.example.com", Arg.Any<CallOptions>(), Arg.Any<Box<Nil>>())
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Act
         client = client.WithHost("www.example.com");
@@ -59,7 +60,7 @@ public class UnaryTest
 
         // Assert
         client.Should().NotBeNull();
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -68,16 +69,16 @@ public class UnaryTest
         // Arrange
         var cts = new CancellationTokenSource();
         var actualCancellationToken = default(CancellationToken);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.SetReturnsDefault(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+            .ReturnsForAnyArgs(x =>
             {
+                // method, host, callOptions, request
+                var callOptions = x.ArgAt<CallOptions>(2);
                 actualCancellationToken = callOptions.CancellationToken;
-            })
-            .Verifiable();
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+                return new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { });
+            });
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Act
         client = client.WithCancellationToken(cts.Token);
@@ -85,7 +86,7 @@ public class UnaryTest
 
         // Assert
         client.Should().NotBeNull();
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         actualCancellationToken.Should().Be(cts.Token);
     }
     
@@ -94,16 +95,16 @@ public class UnaryTest
     {
         // Arrange
         var actualHeaders = default(Metadata);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.SetReturnsDefault(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+            .ReturnsForAnyArgs(x =>
             {
+                // method, host, callOptions, request
+                var callOptions = x.ArgAt<CallOptions>(2);
                 actualHeaders = callOptions.Headers;
-            })
-            .Verifiable();
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+                return new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { });
+            });
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
 
         // Act
         client = client.WithHeaders(new Metadata() { { "foo", "bar" }});
@@ -111,7 +112,7 @@ public class UnaryTest
 
         // Assert
         client.Should().NotBeNull();
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         actualHeaders.Should().Contain(x => x.Key == "foo" && x.Value == "bar");
     }
 
@@ -120,24 +121,26 @@ public class UnaryTest
     {
         // Arrange
         var serializedResponse = new ReadOnlyMemory<byte>();
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<Nil>>()))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<Nil>, Box<Nil>>, string, CallOptions, Box<Nil>>((method, host, callOptions, request) =>
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+            .ReturnsForAnyArgs(x =>
             {
+                // method, host, callOptions, request
+                var method = x.ArgAt<Method<Box<Nil>, Box<Nil>>>(0);
+
                 var serializationContext = new MockSerializationContext();
                 method.RequestMarshaller.ContextualSerializer(Box.Create(Nil.Default), serializationContext);
                 serializedResponse = serializationContext.ToMemory();
-            })
-            .Verifiable();
+                return new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { });
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.ParameterlessReturnNil();
 
         // Assert
         result.Should().Be(Nil.Default);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         serializedResponse.ToArray().Should().BeEquivalentTo(new[] { MessagePackCode.Nil });
     }
 
@@ -145,54 +148,51 @@ public class UnaryTest
     public async Task ParameterlessReturnNil()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.ParameterlessReturnNil();
 
         // Assert
         result.Should().Be(Nil.Default);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
     public async Task ParameterlessReturnValueType()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
-            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(123)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(123)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.ParameterlessReturnValueType();
 
         // Assert
         result.Should().Be(123);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
     public async Task ParameterlessReturnRefType()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
-            .Returns(new AsyncUnaryCall<string>(Task.FromResult("FooBar"), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, string>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
+            .Returns(new AsyncUnaryCall<string>(Task.FromResult("FooBar"), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.ParameterlessReturnRefType();
 
         // Assert
         result.Should().Be("FooBar");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -201,18 +201,17 @@ public class UnaryTest
         // Arrange
         var request = "RequestValue";
         var response = 123;
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), request))
-            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<string, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), request)
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.OneRefTypeParameterReturnValueType(request);
 
         // Assert
         result.Should().Be(123);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -221,18 +220,17 @@ public class UnaryTest
         // Arrange
         var request = 123;
         var response = 456;
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<int>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), Box.Create(request)))
-            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<int>, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Box.Create(request))
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.OneValueTypeParameterReturnValueType(request);
 
         // Assert
         result.Should().Be(456);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -242,19 +240,23 @@ public class UnaryTest
         var request = "RequestValue";
         var response = "Ok";
         var sentRequest = default(string);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), request))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<string, string>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), request)
             .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<string, string>, string, CallOptions, string>((method, host, options, request) => sentRequest = request)
-            .Verifiable();
+            .AndDoes(x =>
+            {
+                // method, host, callOptions, request
+                var request = x.ArgAt<string>(3);
+                sentRequest = request;
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.OneRefTypeParameterReturnRefType(request);
 
         // Assert
         result.Should().Be("Ok");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         sentRequest.Should().Be("RequestValue");
     }
 
@@ -265,19 +267,23 @@ public class UnaryTest
         var request = 123;
         var response = "OK";
         var sentRequest = default(Box<int>);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<int>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), Box.Create(request)))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<int>, string>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Box.Create(request))
             .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<int>, string>, string, CallOptions, Box<int>>((method, host, options, request) => sentRequest = request)
-            .Verifiable();
+            .AndDoes(x =>
+            {
+                // method, host, callOptions, request
+                var request = x.ArgAt<Box<int>>(3);
+                sentRequest = request;
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.OneValueTypeParameterReturnRefType(request);
 
         // Assert
         result.Should().Be("OK");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         (sentRequest?.Value).Should().Be(123);
     }
 
@@ -289,19 +295,23 @@ public class UnaryTest
         var requestArg2 = "Foo";
         var response = "OK";
         var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, string>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<DynamicArgumentTuple<int, string>>, string>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Any<Box<DynamicArgumentTuple<int, string>>>())
             .Returns(new AsyncUnaryCall<string>(Task.FromResult(response), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<DynamicArgumentTuple<int, string>>, string>, string, CallOptions, Box<DynamicArgumentTuple<int, string>>>((method, host, options, request) => sentRequest = request)
-            .Verifiable();
+            .AndDoes(x =>
+            {
+                // method, host, callOptions, request
+                var request = x.ArgAt<Box<DynamicArgumentTuple<int, string>>>(3);
+                sentRequest = request;
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.TwoParametersReturnRefType(requestArg1, requestArg2);
 
         // Assert
         result.Should().Be("OK");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         (sentRequest?.Value.Item1).Should().Be(123);
         (sentRequest?.Value.Item2).Should().Be("Foo");
     }
@@ -314,19 +324,23 @@ public class UnaryTest
         var requestArg2 = "Foo";
         var response = 987;
         var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Any<Box<DynamicArgumentTuple<int, string>>>())
             .Returns(new AsyncUnaryCall<Box<int>>(Task.FromResult(Box.Create(response)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<DynamicArgumentTuple<int, string>>, Box<int>>, string, CallOptions, Box<DynamicArgumentTuple<int, string>>>((method, host, options, request) => sentRequest = request)
-            .Verifiable();
+            .AndDoes(x =>
+            {
+                // method, host, callOptions, request
+                var request = x.ArgAt<Box<DynamicArgumentTuple<int, string>>>(3);
+                sentRequest = request;
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await client.TwoParametersReturnValueType(requestArg1, requestArg2);
 
         // Assert
         result.Should().Be(987);
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         (sentRequest?.Value.Item1).Should().Be(123);
         (sentRequest?.Value.Item2).Should().Be("Foo");
     }
@@ -335,17 +349,16 @@ public class UnaryTest
     public async Task ParameterlessNonGenericReturnType()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         await client.ParameterlessNonGenericReturnType();
 
         // Assert
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -353,17 +366,16 @@ public class UnaryTest
     {
         // Arrange
         var request = "RequestValue";
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<string, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), request))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<string, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), request)
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         await client.OneRefTypeParameterNonGenericReturnType(request);
 
         // Assert
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -371,17 +383,16 @@ public class UnaryTest
     {
         // Arrange
         var request = 123;
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<int>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), Box.Create(request)))
-            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<int>, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Box.Create(request))
+            .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         await client.OneValueTypeParameterNonGenericReturnType(request);
 
         // Assert
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
@@ -391,18 +402,22 @@ public class UnaryTest
         var requestArg1 = 123;
         var requestArg2 = "Foo";
         var sentRequest = default(Box<DynamicArgumentTuple<int, string>>);
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.IsAny<Box<DynamicArgumentTuple<int, string>>>()))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Any<Box<DynamicArgumentTuple<int, string>>>())
             .Returns(new AsyncUnaryCall<Box<Nil>>(Task.FromResult(Box.Create(Nil.Default)), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Callback<Method<Box<DynamicArgumentTuple<int, string>>, Box<Nil>>, string, CallOptions, Box<DynamicArgumentTuple<int, string>>>((method, host, options, request) => sentRequest = request)
-            .Verifiable();
+            .AndDoes(x =>
+            {
+                // method, host, callOptions, request
+                var request = x.ArgAt<Box<DynamicArgumentTuple<int, string>>>(3);
+                sentRequest = request;
+            });
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         await client.TwoParametersNonGenericReturnType(requestArg1, requestArg2);
 
         // Assert
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
         (sentRequest?.Value.Item1).Should().Be(123);
         (sentRequest?.Value.Item2).Should().Be("Foo");
     }
@@ -411,43 +426,41 @@ public class UnaryTest
     public async Task ThrowsResponseHeaders()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
             .Returns(new AsyncUnaryCall<Box<int>>(
                 Task.FromException<Box<int>>(new RpcException(new Status(StatusCode.Unknown, "Faulted"), "Faulted")),
                 Task.FromException<Metadata>(new RpcException(new Status(StatusCode.Unknown, "FaultedOnResponseHeaders"), "FaultedOnResponseHeaders")),
                 () => Status.DefaultSuccess,
                 () => Metadata.Empty,
-                () => { }))
-            .Verifiable();
+                () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType().ResponseHeadersAsync);
 
         // Assert
         result.StatusCode.Should().Be(StatusCode.Unknown);
         result.Message.Should().Be("FaultedOnResponseHeaders");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     [Fact]
     public async Task ThrowsResponse()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
-        callInvokerMock.Setup(x => x.AsyncUnaryCall(It.IsAny<Method<Box<Nil>, Box<int>>>(), It.IsAny<string>(), It.IsAny<CallOptions>(), It.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default))))
-            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromException<Box<int>>(new RpcException(new Status(StatusCode.Unknown, "Faulted"), "Faulted")), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }))
-            .Verifiable();
+        var callInvokerMock = Substitute.For<CallInvoker>();
+        callInvokerMock.AsyncUnaryCall(Arg.Any<Method<Box<Nil>, Box<int>>>(), Arg.Any<string>(), Arg.Any<CallOptions>(), Arg.Is<Box<Nil>>(x => x.Value.Equals(Nil.Default)))
+            .Returns(new AsyncUnaryCall<Box<int>>(Task.FromException<Box<int>>(new RpcException(new Status(StatusCode.Unknown, "Faulted"), "Faulted")), Task.FromResult(Metadata.Empty), () => Status.DefaultSuccess, () => Metadata.Empty, () => { }));
 
         // Act
-        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IUnaryTestService>(callInvokerMock);
         var result = await Assert.ThrowsAsync<RpcException>(async () => await client.ParameterlessReturnValueType());
 
         // Assert
         result.StatusCode.Should().Be(StatusCode.Unknown);
         result.Message.Should().Be("Faulted");
-        callInvokerMock.Verify();
+        callInvokerMock.Received();
     }
 
     public interface IUnaryTestService : IService<IUnaryTestService>
@@ -472,10 +485,10 @@ public class UnaryTest
     public void MaxParameters()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act
-        var client = MagicOnionClient.Create<IMaxParametersService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IMaxParametersService>(callInvokerMock);
 
         // Assert
         client.Should().NotBeNull();
@@ -490,10 +503,10 @@ public class UnaryTest
     public void TooManyParameters()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act / Assert
-        Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<ITooManyParametersService>(callInvokerMock.Object));
+        Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<ITooManyParametersService>(callInvokerMock));
     }
 
     public interface ITooManyParametersService : IService<ITooManyParametersService>
@@ -505,10 +518,10 @@ public class UnaryTest
     public void ReturnTaskOfUnaryResult()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act / Assert
-        Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IReturnTaskOfUnaryResultService>(callInvokerMock.Object));
+        Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IReturnTaskOfUnaryResultService>(callInvokerMock));
     }
 
     public interface IReturnTaskOfUnaryResultService : IService<IReturnTaskOfUnaryResultService>

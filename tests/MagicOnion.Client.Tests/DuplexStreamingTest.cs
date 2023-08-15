@@ -6,10 +6,10 @@ public class DuplexStreamingTest
     public void Create()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act
-        var client = MagicOnionClient.Create<IDuplexStreamingTestService>(callInvokerMock.Object);
+        var client = MagicOnionClient.Create<IDuplexStreamingTestService>(callInvokerMock);
 
         // Assert
         client.Should().NotBeNull();
@@ -24,10 +24,10 @@ public class DuplexStreamingTest
     public void UnsupportedReturnTypeNonTaskOfDuplexStreamingResult()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act & Assert
-        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IUnsupportedReturnTypeNonTaskOfDuplexStreamingResultService>(callInvokerMock.Object));
+        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IUnsupportedReturnTypeNonTaskOfDuplexStreamingResultService>(callInvokerMock));
     }
 
     public interface IUnsupportedReturnTypeNonTaskOfDuplexStreamingResultService : IService<IUnsupportedReturnTypeNonTaskOfDuplexStreamingResultService>
@@ -39,10 +39,10 @@ public class DuplexStreamingTest
     public void MethodMustHaveNoParameter()
     {
         // Arrange
-        var callInvokerMock = new Mock<CallInvoker>();
+        var callInvokerMock = Substitute.For<CallInvoker>();
 
         // Act & Assert
-        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IMethodMustHaveNoParameterService>(callInvokerMock.Object));
+        var client = Assert.Throws<TypeInitializationException>(() => MagicOnionClient.Create<IMethodMustHaveNoParameterService>(callInvokerMock));
     }
 
     public interface IMethodMustHaveNoParameterService : IService<IMethodMustHaveNoParameterService>

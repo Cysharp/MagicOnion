@@ -7,17 +7,17 @@ namespace MagicOnion.Client.Tests.DynamicClient
         [Fact]
         public void Create_MagicOnionClient()
         {
-            var callInvoker = Mock.Of<CallInvoker>();
+            var callInvoker = Substitute.For<CallInvoker>();
             MagicOnionClient.Create<MagicOnion.Client.Tests.DynamicClient.AreaA.IFoo>(callInvoker);
             MagicOnionClient.Create<MagicOnion.Client.Tests.DynamicClient.AreaB.IFoo>(callInvoker);
         }
 
         [Fact]
-        public async Task DynamicStreamingHubClientFactoryProvider_TryGetFactory()
+        public void DynamicStreamingHubClientFactoryProvider_TryGetFactory()
         {
-            var callInvoker = Mock.Of<CallInvoker>();
-            var receiverA = Mock.Of<MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHubReceiver>();
-            var receiverB = Mock.Of<MagicOnion.Client.Tests.DynamicClient.AreaB.IBazHubReceiver>();
+            var callInvoker = Substitute.For<CallInvoker>();
+            var receiverA = Substitute.For<MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHubReceiver>();
+            var receiverB = Substitute.For<MagicOnion.Client.Tests.DynamicClient.AreaB.IBazHubReceiver>();
 
             DynamicStreamingHubClientFactoryProvider.Instance.TryGetFactory<MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHub, MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHubReceiver>(out var factoryA);
             var clientA = factoryA(callInvoker, receiverA, "", default, MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
