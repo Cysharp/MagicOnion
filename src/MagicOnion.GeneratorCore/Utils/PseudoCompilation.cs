@@ -305,7 +305,7 @@ internal static class PseudoCompilation
                 {
                     var sharedRoot = Path.GetDirectoryName(Path.Combine(csProjRoot, item.Attribute("Project").Value));
                     logger.Trace($"[{nameof(PseudoCompilation)}] Import project '{sharedRoot}'");
-                    foreach (var file in IterateCsFileWithoutBinObj(Path.GetDirectoryName(sharedRoot)))
+                    foreach (var file in IterateCsFileWithoutBinObj(sharedRoot))
                     {
                         source.Add(file);
                     }
