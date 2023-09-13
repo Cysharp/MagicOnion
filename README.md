@@ -752,17 +752,6 @@ public class RetryFilter : IClientFilter
         throw new Exception("Retry failed", lastException);
     }
 }
-
-public class EncryptFilter : IClientFilter
-{
-    public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
-    {
-        context.SetRequestMutator(bytes => Encrypt(bytes));
-        context.SetResponseMutator(bytes => Decrypt(bytes));
-
-        return await next(context);
-    }
-}
 ```
 
 ### ServiceContext and Lifecycle
