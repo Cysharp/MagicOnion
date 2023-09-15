@@ -224,13 +224,13 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
     }
 
-    async Task<TResponse?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
+    async Task<object?> UnaryServerMethod<TRequest, TResponse>(TRequest request, ServerCallContext context)
     {
         var isErrorOrInterrupted = false;
         var serviceContext = new ServiceContext(ServiceType, MethodInfo, AttributeLookup, this.MethodType, context, messageSerializer, Logger, this, context.GetHttpContext().RequestServices);
         serviceContext.SetRawRequest(request);
 
-        TResponse? response = default;
+        object? response = default(TResponse?);
         try
         {
             Logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
@@ -241,7 +241,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             await this.methodBody(serviceContext).ConfigureAwait(false);
             if (serviceContext.Result is not null)
             {
-                response = (TResponse?)serviceContext.Result;
+                response = serviceContext.Result;
             }
         }
         catch (ReturnStatusException ex)
