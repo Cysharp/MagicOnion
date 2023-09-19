@@ -8147,14 +8147,14 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
   nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod
   nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest
-  name: FromRawRequest
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest
-  commentId: P:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
+- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
+  name: FromRawRequest(TRawRequest)
+  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest__2_
+  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
+  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
+  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
 - uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest*
   name: FromRawRequest
   href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest_
@@ -8164,14 +8164,14 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
   nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
   nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse
-  name: FromRawResponse
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse
-  commentId: P:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
+- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
+  name: FromRawResponse(TRawResponse)
+  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse__3_
+  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
+  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
+  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
 - uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse*
   name: FromRawResponse
   href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse_
@@ -8198,14 +8198,14 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
   nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
   nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest
-  name: ToRawRequest
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest
-  commentId: P:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
+- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
+  name: ToRawRequest(TRequest)
+  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest__0_
+  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
+  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
+  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
 - uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest*
   name: ToRawRequest
   href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest_
@@ -8215,14 +8215,14 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
   nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
   nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse
-  name: ToRawResponse
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse
-  commentId: P:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
+- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
+  name: ToRawResponse(TResponse)
+  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse__1_
+  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
+  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
+  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
 - uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse*
   name: ToRawResponse
   href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse_
@@ -8519,6 +8519,41 @@ references:
   fullName.vb: MagicOnion.Internal.IAsyncServerStreamingCallWrapper(Of TResponse).ResponseStream
   nameWithType: IAsyncServerStreamingCallWrapper<TResponse>.ResponseStream
   nameWithType.vb: IAsyncServerStreamingCallWrapper(Of TResponse).ResponseStream
+- uid: MagicOnion.Internal.RawBytesBox
+  name: RawBytesBox
+  href: api/MagicOnion.Internal.RawBytesBox.html
+  commentId: T:MagicOnion.Internal.RawBytesBox
+  fullName: MagicOnion.Internal.RawBytesBox
+  nameWithType: RawBytesBox
+- uid: MagicOnion.Internal.RawBytesBox.#ctor(ReadOnlyMemory{System.Byte})
+  name: RawBytesBox(ReadOnlyMemory<Byte>)
+  href: api/MagicOnion.Internal.RawBytesBox.html#MagicOnion_Internal_RawBytesBox__ctor_ReadOnlyMemory_System_Byte__
+  commentId: M:MagicOnion.Internal.RawBytesBox.#ctor(ReadOnlyMemory{System.Byte})
+  name.vb: RawBytesBox(ReadOnlyMemory(Of Byte))
+  fullName: MagicOnion.Internal.RawBytesBox.RawBytesBox(ReadOnlyMemory<System.Byte>)
+  fullName.vb: MagicOnion.Internal.RawBytesBox.RawBytesBox(ReadOnlyMemory(Of System.Byte))
+  nameWithType: RawBytesBox.RawBytesBox(ReadOnlyMemory<Byte>)
+  nameWithType.vb: RawBytesBox.RawBytesBox(ReadOnlyMemory(Of Byte))
+- uid: MagicOnion.Internal.RawBytesBox.#ctor*
+  name: RawBytesBox
+  href: api/MagicOnion.Internal.RawBytesBox.html#MagicOnion_Internal_RawBytesBox__ctor_
+  commentId: Overload:MagicOnion.Internal.RawBytesBox.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Internal.RawBytesBox.RawBytesBox
+  nameWithType: RawBytesBox.RawBytesBox
+- uid: MagicOnion.Internal.RawBytesBox.Bytes
+  name: Bytes
+  href: api/MagicOnion.Internal.RawBytesBox.html#MagicOnion_Internal_RawBytesBox_Bytes
+  commentId: P:MagicOnion.Internal.RawBytesBox.Bytes
+  fullName: MagicOnion.Internal.RawBytesBox.Bytes
+  nameWithType: RawBytesBox.Bytes
+- uid: MagicOnion.Internal.RawBytesBox.Bytes*
+  name: Bytes
+  href: api/MagicOnion.Internal.RawBytesBox.html#MagicOnion_Internal_RawBytesBox_Bytes_
+  commentId: Overload:MagicOnion.Internal.RawBytesBox.Bytes
+  isSpec: "True"
+  fullName: MagicOnion.Internal.RawBytesBox.Bytes
+  nameWithType: RawBytesBox.Bytes
 - uid: MagicOnion.IService`1
   name: IService<TSelf>
   href: api/MagicOnion.IService-1.html
@@ -15854,6 +15889,22 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.ServiceContext.ServiceType
   nameWithType: ServiceContext.ServiceType
+- uid: MagicOnion.Server.ServiceContext.SetRawBytesResponse(ReadOnlyMemory{System.Byte})
+  name: SetRawBytesResponse(ReadOnlyMemory<Byte>)
+  href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawBytesResponse_ReadOnlyMemory_System_Byte__
+  commentId: M:MagicOnion.Server.ServiceContext.SetRawBytesResponse(ReadOnlyMemory{System.Byte})
+  name.vb: SetRawBytesResponse(ReadOnlyMemory(Of Byte))
+  fullName: MagicOnion.Server.ServiceContext.SetRawBytesResponse(ReadOnlyMemory<System.Byte>)
+  fullName.vb: MagicOnion.Server.ServiceContext.SetRawBytesResponse(ReadOnlyMemory(Of System.Byte))
+  nameWithType: ServiceContext.SetRawBytesResponse(ReadOnlyMemory<Byte>)
+  nameWithType.vb: ServiceContext.SetRawBytesResponse(ReadOnlyMemory(Of Byte))
+- uid: MagicOnion.Server.ServiceContext.SetRawBytesResponse*
+  name: SetRawBytesResponse
+  href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawBytesResponse_
+  commentId: Overload:MagicOnion.Server.ServiceContext.SetRawBytesResponse
+  isSpec: "True"
+  fullName: MagicOnion.Server.ServiceContext.SetRawBytesResponse
+  nameWithType: ServiceContext.SetRawBytesResponse
 - uid: MagicOnion.Server.ServiceContext.SetRawRequest(System.Nullable{System.Object})
   name: SetRawRequest(Nullable<Object>)
   href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawRequest_System_Nullable_System_Object__

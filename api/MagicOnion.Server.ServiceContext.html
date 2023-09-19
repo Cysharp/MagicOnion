@@ -216,28 +216,36 @@
         <td>
           <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_GetRawRequest">GetRawRequest()</a>
         </td>
-        <td class="markdown level1 summary"><p>Get Raw Request.</p>
+        <td class="markdown level1 summary"><p>Gets a request object.</p>
 </td>
       </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_GetRawResponse">GetRawResponse()</a>
         </td>
-        <td class="markdown level1 summary"><p>Can get after method body was finished.</p>
+        <td class="markdown level1 summary"><p>Gets a response object. The object is available after the service method has completed.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawBytesResponse_ReadOnlyMemory_System_Byte__">SetRawBytesResponse(ReadOnlyMemory&lt;Byte&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"><p>Sets a raw bytes response. The response will not be serialized and the bytes will be sent directly.
+This can overwrite the result of the service method.</p>
 </td>
       </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawRequest_System_Nullable_System_Object__">SetRawRequest(Nullable&lt;Object&gt;)</a>
         </td>
-        <td class="markdown level1 summary"><p>Set Raw Request, you can set before method body was called.</p>
+        <td class="markdown level1 summary"><p>Sets a request object.</p>
 </td>
       </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext_SetRawResponse_System_Nullable_System_Object__">SetRawResponse(Nullable&lt;Object&gt;)</a>
         </td>
-        <td class="markdown level1 summary"><p>Can set after method body was finished.</p>
+        <td class="markdown level1 summary"><p>Sets a response object. This can overwrite the result of the service method.</p>
 </td>
       </tr>
     </tbody>
@@ -632,7 +640,7 @@
   <section>
   <a id="MagicOnion_Server_ServiceContext_GetRawRequest_" data-uid="MagicOnion.Server.ServiceContext.GetRawRequest*"></a>
   <h4 id="MagicOnion_Server_ServiceContext_GetRawRequest" data-uid="MagicOnion.Server.ServiceContext.GetRawRequest">GetRawRequest()</h4>
-  <div class="markdown level1 summary"><p>Get Raw Request.</p>
+  <div class="markdown level1 summary"><p>Gets a request object.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
@@ -663,7 +671,7 @@
   <section>
   <a id="MagicOnion_Server_ServiceContext_GetRawResponse_" data-uid="MagicOnion.Server.ServiceContext.GetRawResponse*"></a>
   <h4 id="MagicOnion_Server_ServiceContext_GetRawResponse" data-uid="MagicOnion.Server.ServiceContext.GetRawResponse">GetRawResponse()</h4>
-  <div class="markdown level1 summary"><p>Can get after method body was finished.</p>
+  <div class="markdown level1 summary"><p>Gets a response object. The object is available after the service method has completed.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
@@ -692,9 +700,41 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Server_ServiceContext_SetRawBytesResponse_" data-uid="MagicOnion.Server.ServiceContext.SetRawBytesResponse*"></a>
+  <h4 id="MagicOnion_Server_ServiceContext_SetRawBytesResponse_ReadOnlyMemory_System_Byte__" data-uid="MagicOnion.Server.ServiceContext.SetRawBytesResponse(ReadOnlyMemory{System.Byte})">SetRawBytesResponse(ReadOnlyMemory&lt;Byte&gt;)</h4>
+  <div class="markdown level1 summary"><p>Sets a raw bytes response. The response will not be serialized and the bytes will be sent directly.
+This can overwrite the result of the service method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetRawBytesResponse(ReadOnlyMemory&lt;byte&gt; bytes)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>bytes</code></span> <span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_ServiceContext_SetRawRequest_" data-uid="MagicOnion.Server.ServiceContext.SetRawRequest*"></a>
   <h4 id="MagicOnion_Server_ServiceContext_SetRawRequest_System_Nullable_System_Object__" data-uid="MagicOnion.Server.ServiceContext.SetRawRequest(System.Nullable{System.Object})">SetRawRequest(Nullable&lt;Object&gt;)</h4>
-  <div class="markdown level1 summary"><p>Set Raw Request, you can set before method body was called.</p>
+  <div class="markdown level1 summary"><p>Sets a request object.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
@@ -725,7 +765,7 @@
   <section>
   <a id="MagicOnion_Server_ServiceContext_SetRawResponse_" data-uid="MagicOnion.Server.ServiceContext.SetRawResponse*"></a>
   <h4 id="MagicOnion_Server_ServiceContext_SetRawResponse_System_Nullable_System_Object__" data-uid="MagicOnion.Server.ServiceContext.SetRawResponse(System.Nullable{System.Object})">SetRawResponse(Nullable&lt;Object&gt;)</h4>
-  <div class="markdown level1 summary"><p>Can set after method body was finished.</p>
+  <div class="markdown level1 summary"><p>Sets a response object. This can overwrite the result of the service method.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
