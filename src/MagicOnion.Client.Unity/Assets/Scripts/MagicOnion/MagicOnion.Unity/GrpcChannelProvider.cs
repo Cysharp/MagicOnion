@@ -40,17 +40,17 @@ namespace MagicOnion.Unity
     /// </summary>
     public static class GrpcChannelProvider
     {
-        private static IGrpcChannelProvider _defaultProvider;
+        static IGrpcChannelProvider defaultProvider;
 
         /// <summary>
         /// Gets a default channel provider. the provider will be initialized by <see cref="GrpcChannelProviderHost"/>.
         /// </summary>
         public static IGrpcChannelProvider Default
-            => _defaultProvider ?? throw new InvalidOperationException("The default GrpcChannelProvider is not configured yet. Setup GrpcChannelProviderHost or initialize manually. ");
+            => defaultProvider ?? throw new InvalidOperationException("The default GrpcChannelProvider is not configured yet. Setup GrpcChannelProviderHost or initialize manually. ");
 
         public static void SetDefaultProvider(IGrpcChannelProvider provider)
         {
-            _defaultProvider = provider;
+            defaultProvider = provider;
         }
     }
 
@@ -59,34 +59,34 @@ namespace MagicOnion.Unity
     /// </summary>
     public sealed class LoggingGrpcChannelProvider : IGrpcChannelProvider
     {
-        private readonly IGrpcChannelProvider _baseProvider;
+        readonly IGrpcChannelProvider baseProvider;
 
         public LoggingGrpcChannelProvider(IGrpcChannelProvider baseProvider)
         {
-            _baseProvider = baseProvider ?? throw new ArgumentNullException(nameof(baseProvider));
+            this.baseProvider = baseProvider ?? throw new ArgumentNullException(nameof(baseProvider));
         }
 
         public GrpcChannelx CreateChannel(CreateGrpcChannelContext context)
         {
-            var channel = _baseProvider.CreateChannel(context);
+            var channel = baseProvider.CreateChannel(context);
             Debug.Log($"Channel Created: {context.Target.Host}:{context.Target.Port} ({(context.Target.IsInsecure ? "Insecure" : "Secure")}) [{channel.Id}]");
             return channel;
         }
 
         public IReadOnlyCollection<GrpcChannelx> GetAllChannels()
         {
-            return _baseProvider.GetAllChannels();
+            return baseProvider.GetAllChannels();
         }
 
         public void UnregisterChannel(GrpcChannelx channel)
         {
-            _baseProvider.UnregisterChannel(channel);
+            baseProvider.UnregisterChannel(channel);
             Debug.Log($"Channel Unregistered: {channel.TargetUri.Host}:{channel.TargetUri.Port} [{channel.Id}]");
         }
 
         public void ShutdownAllChannels()
         {
-            _baseProvider.ShutdownAllChannels();
+            baseProvider.ShutdownAllChannels();
         }
     }
 
@@ -169,6 +169,7 @@ namespace MagicOnion.Unity
     {
         public DefaultGrpcChannelProvider() : base() {}
         public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) {}
+        public DefaultGrpcChannelProvider(Func<GrpcChannelOptions> channelOptionsFactory) : base(channelOptionsFactory) {}
     }
 #else
     public class DefaultGrpcChannelProvider : GrpcCCoreGrpcChannelProvider
@@ -185,15 +186,20 @@ namespace MagicOnion.Unity
     /// </summary>
     public class GrpcNetClientGrpcChannelProvider : GrpcChannelProviderBase
     {
-        private readonly GrpcChannelOptions _defaultChannelOptions;
+        readonly Func<GrpcChannelOptions> defaultChannelOptionsFactory;
         public GrpcNetClientGrpcChannelProvider()
             : this(new GrpcChannelOptions())
         {
         }
 
         public GrpcNetClientGrpcChannelProvider(GrpcChannelOptions options)
+            : this(() => options)
         {
-            _defaultChannelOptions = options ?? throw new ArgumentNullException(nameof(options));
+        }
+
+        public GrpcNetClientGrpcChannelProvider(Func<GrpcChannelOptions> optionsFactory)
+        {
+            defaultChannelOptionsFactory = optionsFactory ?? throw new ArgumentNullException(nameof(optionsFactory));
         }
 
         /// <summary>
@@ -202,7 +208,7 @@ namespace MagicOnion.Unity
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
             var address = new Uri((context.Target.IsInsecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}");
-            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptions;
+            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? defaultChannelOptionsFactory();
             var channel = GrpcChannel.ForAddress(address, channelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
@@ -223,7 +229,7 @@ namespace MagicOnion.Unity
     /// </summary>
     public class GrpcCCoreGrpcChannelProvider : GrpcChannelProviderBase
     {
-        private readonly GrpcCCoreChannelOptions _defaultChannelOptions;
+        private readonly GrpcCCoreChannelOptions defaultChannelOptions;
 
         public GrpcCCoreGrpcChannelProvider()
             : this(new GrpcCCoreChannelOptions())
@@ -237,7 +243,7 @@ namespace MagicOnion.Unity
 
         public GrpcCCoreGrpcChannelProvider(GrpcCCoreChannelOptions channelOptions)
         {
-            _defaultChannelOptions = channelOptions ?? throw new ArgumentNullException(nameof(channelOptions));
+            defaultChannelOptions = channelOptions ?? throw new ArgumentNullException(nameof(channelOptions));
         }
 
         /// <summary>
@@ -245,7 +251,7 @@ namespace MagicOnion.Unity
         /// </summary>
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
-            var channelOptions = context.ChannelOptions.Get<GrpcCCoreChannelOptions>() ?? _defaultChannelOptions;
+            var channelOptions = context.ChannelOptions.Get<GrpcCCoreChannelOptions>() ?? defaultChannelOptions;
             var channel = new Channel(context.Target.Host, context.Target.Port, context.Target.IsInsecure ? ChannelCredentials.Insecure : channelOptions.ChannelCredentials, channelOptions.ChannelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
