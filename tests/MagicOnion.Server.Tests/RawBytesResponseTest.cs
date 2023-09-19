@@ -77,7 +77,7 @@ file class FixedResponseFilterAttribute : MagicOnionFilterAttribute
     {
         if (ResponseBytesCache.TryGetValue(context.CallContext.Method, out var cachedBytes))
         {
-            context.SetRawResponse(new RawBytesBox(cachedBytes));
+            context.SetRawBytesResponse(cachedBytes);
             return;
         }
 

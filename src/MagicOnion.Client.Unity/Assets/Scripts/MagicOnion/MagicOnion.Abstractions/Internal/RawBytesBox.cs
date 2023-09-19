@@ -1,7 +1,10 @@
 using System;
+using System.ComponentModel;
 
-namespace MagicOnion
+namespace MagicOnion.Internal
 {
+    // Pubternal
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class RawBytesBox
     {
         public ReadOnlyMemory<byte> Bytes { get; }
@@ -12,4 +15,3 @@ namespace MagicOnion
         }
     }
 }
-

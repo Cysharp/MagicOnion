@@ -4,6 +4,7 @@ using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Reflection;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Server;
 
@@ -107,27 +108,36 @@ public class ServiceContext : IServiceContext
         this.ServiceProvider = serviceProvider;
     }
 
-    /// <summary>Get Raw Request.</summary>
+    /// <summary>Gets a request object.</summary>
     public object? GetRawRequest()
     {
         return request;
     }
 
-    /// <summary>Set Raw Request, you can set before method body was called.</summary>
+    /// <summary>Sets a request object.</summary>
     public void SetRawRequest(object? request)
     {
         this.request = request;
     }
 
-    /// <summary>Can get after method body was finished.</summary>
+    /// <summary>Gets a response object. The object is available after the service method has completed.</summary>
     public object? GetRawResponse()
     {
         return Result;
     }
 
-    /// <summary>Can set after method body was finished.</summary>
+    /// <summary>Sets a response object. This can overwrite the result of the service method.</summary>
     public void SetRawResponse(object? response)
     {
         Result = response;
+    }
+
+    /// <summary>
+    /// Sets a raw bytes response. The response will not be serialized and the bytes will be sent directly.
+    /// This can overwrite the result of the service method.
+    /// </summary>
+    public void SetRawBytesResponse(ReadOnlyMemory<byte> bytes)
+    {
+        Result = new RawBytesBox(bytes);
     }
 }
