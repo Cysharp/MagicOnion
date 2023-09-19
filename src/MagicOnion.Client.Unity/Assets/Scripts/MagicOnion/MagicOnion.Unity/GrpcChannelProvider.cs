@@ -169,6 +169,7 @@ namespace MagicOnion.Unity
     {
         public DefaultGrpcChannelProvider() : base() {}
         public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) {}
+        public DefaultGrpcChannelProvider(Func<GrpcChannelOptions> channelOptionsFactory) : base(channelOptionsFactory) {}
     }
 #else
     public class DefaultGrpcChannelProvider : GrpcCCoreGrpcChannelProvider
@@ -185,15 +186,20 @@ namespace MagicOnion.Unity
     /// </summary>
     public class GrpcNetClientGrpcChannelProvider : GrpcChannelProviderBase
     {
-        private readonly GrpcChannelOptions _defaultChannelOptions;
+        readonly Func<GrpcChannelOptions> _defaultChannelOptionsFactory;
         public GrpcNetClientGrpcChannelProvider()
             : this(new GrpcChannelOptions())
         {
         }
 
         public GrpcNetClientGrpcChannelProvider(GrpcChannelOptions options)
+            : this(() => options)
         {
-            _defaultChannelOptions = options ?? throw new ArgumentNullException(nameof(options));
+        }
+
+        public GrpcNetClientGrpcChannelProvider(Func<GrpcChannelOptions> optionsFactory)
+        {
+            _defaultChannelOptionsFactory = optionsFactory ?? throw new ArgumentNullException(nameof(optionsFactory));
         }
 
         /// <summary>
@@ -202,7 +208,7 @@ namespace MagicOnion.Unity
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
             var address = new Uri((context.Target.IsInsecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}");
-            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptions;
+            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? _defaultChannelOptionsFactory();
             var channel = GrpcChannel.ForAddress(address, channelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
