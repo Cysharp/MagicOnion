@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MessagePack;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Server.Internal;
 
@@ -25,21 +27,37 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
 {
     public static MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse> Instance { get; } = new MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, TRawResponse>();
 
-    public void BindUnary(ServiceBinderBase binder, Func<TRequest, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
+    public void BindUnary(ServiceBinderBase binder, Func<TRequest, ServerCallContext, Task<object?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         var method = GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType.Unary, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
-            async (request, context) => method.ToRawResponse(await serverMethod(method.FromRawRequest(request), context)));
+            async (request, context) =>
+            {
+                var response = await serverMethod(method.FromRawRequest(request), context);
+                if (response is RawBytesBox rawBytesResponse)
+                {
+                    return Unsafe.As<RawBytesBox, TRawResponse>(ref rawBytesResponse); // NOTE: To disguise an object as a `TRawResponse`, `TRawResponse` must be `class`.
+                }
+                return method.ToRawResponse((TResponse?)response);
+            });
     }
 
-    public void BindUnaryParameterless(ServiceBinderBase binder, Func<Nil, ServerCallContext, Task<TResponse?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
+    public void BindUnaryParameterless(ServiceBinderBase binder, Func<Nil, ServerCallContext, Task<object?>> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
         // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
         //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
         //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
         var method = GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType.Unary, methodHandler.ServiceName, methodHandler.MethodName, methodHandler.MethodInfo, messageSerializer);
         binder.AddMethod(new MagicOnionServerMethod<Box<Nil>, TRawResponse>(method.Method, methodHandler),
-            async (request, context) => method.ToRawResponse(await serverMethod(method.FromRawRequest(request), context)));
+            async (request, context) =>
+            {
+                var response = await serverMethod(method.FromRawRequest(request), context);
+                if (response is RawBytesBox rawBytesResponse)
+                {
+                    return Unsafe.As<RawBytesBox, TRawResponse>(ref rawBytesResponse); // NOTE: To disguise an object as a `TRawResponse`, `TRawResponse` must be `class`.
+                }
+                return method.ToRawResponse((TResponse?)response);
+            });
     }
 
     public void BindStreamingHub(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)

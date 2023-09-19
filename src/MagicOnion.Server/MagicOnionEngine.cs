@@ -125,6 +125,9 @@ public static class MagicOnionEngine
         var handlers = new HashSet<MethodHandler>();
         var streamingHubHandlers = new List<StreamingHubHandler>();
 
+        var methodHandlerOptions = new MethodHandlerOptions(options);
+        var streamingHubHandlerOptions = new StreamingHubHandlerOptions(options);
+
         logger.BeginBuildServiceDefinition();
         var sw = Stopwatch.StartNew();
 
@@ -179,7 +182,7 @@ public static class MagicOnionEngine
                     // register for StreamingHub
                     if (isStreamingHub && methodName != "Connect")
                     {
-                        var streamingHandler = new StreamingHubHandler(classType, methodInfo, new StreamingHubHandlerOptions(options), serviceProvider);
+                        var streamingHandler = new StreamingHubHandler(classType, methodInfo, streamingHubHandlerOptions, serviceProvider);
                         if (!tempStreamingHubHandlers!.Add(streamingHandler))
                         {
                             throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
@@ -189,7 +192,7 @@ public static class MagicOnionEngine
                     else
                     {
                         // create handler
-                        var handler = new MethodHandler(classType, methodInfo, methodName, new MethodHandlerOptions(options), serviceProvider, logger, isStreamingHub: false);
+                        var handler = new MethodHandler(classType, methodInfo, methodName, methodHandlerOptions, serviceProvider, logger, isStreamingHub: false);
                         if (!handlers.Add(handler))
                         {
                             throw new InvalidOperationException($"Method does not allow overload, {className}.{methodName}");
@@ -199,7 +202,7 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", new MethodHandlerOptions(options), serviceProvider, logger, isStreamingHub: true);
+                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", methodHandlerOptions, serviceProvider, logger, isStreamingHub: true);
                     if (!handlers.Add(connectHandler))
                     {
                         throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
