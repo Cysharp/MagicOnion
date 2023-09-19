@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace MagicOnion.Internal
 {
-    // Pubternal
+    // Pubternal API
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class RawBytesBox
     {

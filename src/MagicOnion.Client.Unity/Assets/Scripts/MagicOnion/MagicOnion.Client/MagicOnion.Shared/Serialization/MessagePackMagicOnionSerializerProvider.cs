@@ -111,7 +111,6 @@ namespace MagicOnion.Serialization
 
             public T Deserialize<T>(in ReadOnlySequence<byte> bytes)
                 => MessagePackSerializer.Deserialize<T>(bytes, serializerOptions);
-
             public void Serialize<T>(IBufferWriter<byte> writer, in T value)
                 => MessagePackSerializer.Serialize(writer, value, serializerOptions);
         }
