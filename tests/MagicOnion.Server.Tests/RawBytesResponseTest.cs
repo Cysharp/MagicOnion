@@ -64,7 +64,7 @@ file class FixedResponseFilterAttribute : MagicOnionFilterAttribute
     public static readonly RawBytesResponseTestService_RefTypeResponse ResponseRefType;
     public static readonly RawBytesResponseTestService_ValueTypeResponse ResponseValueType;
 
-    public static readonly ConcurrentDictionary<string, object?> ResponseCache = new();
+    public static readonly ConcurrentDictionary<string, object> ResponseCache = new();
     public static readonly ConcurrentDictionary<string, byte[]> ResponseBytesCache = new();
 
     static FixedResponseFilterAttribute()
