@@ -37,8 +37,8 @@ namespace MagicOnion.Generator.CodeGen
             this.Write("\r\n");
    } 
             this.Write("    public sealed class ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
-            this.Write("Formatter : global::MessagePack.Formatters.IMessagePackFormatter<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.FormatterName));
+            this.Write(" : global::MessagePack.Formatters.IMessagePackFormatter<");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             this.Write(">\r\n    {\r\n        public void Serialize(ref MessagePackWriter writer, ");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
@@ -58,7 +58,7 @@ namespace MagicOnion.Generator.CodeGen
    } 
  } 
             this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning " +
-                    "restore 414\r\n#pragma warning restore 612\r\n#pragma warning restore 618");
+                    "restore 414\r\n#pragma warning restore 612\r\n#pragma warning restore 618\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -81,7 +81,7 @@ namespace MagicOnion.Generator.CodeGen
         /// <summary>
         /// The string builder that generation-time code is using to assemble generated output
         /// </summary>
-        protected System.Text.StringBuilder GenerationEnvironment
+        public System.Text.StringBuilder GenerationEnvironment
         {
             get
             {

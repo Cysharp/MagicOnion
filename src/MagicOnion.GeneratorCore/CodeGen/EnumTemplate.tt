@@ -19,7 +19,7 @@ namespace <#= Namespace #>
 <#   if (info.HasIfDirectiveConditions) { #>
 #if <#= string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})")) #>
 <#   } #>
-    public sealed class <#= info.Name #>Formatter : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
+    public sealed class <#= info.FormatterName #> : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
     {
         public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, MessagePackSerializerOptions options)
         {

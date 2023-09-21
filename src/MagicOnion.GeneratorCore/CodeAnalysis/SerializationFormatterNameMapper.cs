@@ -3,8 +3,8 @@ namespace MagicOnion.Generator.CodeAnalysis;
 public interface ISerializationFormatterNameMapper
 {
     IWellKnownSerializationTypes WellKnownTypes { get; }
-    bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName);
-    string MapArray(MagicOnionTypeInfo type);
+    bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs);
+    (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type);
 }
 
 
@@ -30,38 +30,43 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         this.userDefinedFormatterNamespace = userDefinedFormatterNamespace;
     }
 
-    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName)
+    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs)
     {
         formatterName = null;
+        formatterConstructorArgs = null;
+
         var genericTypeArgs = string.Join(", ", type.GenericArguments.Select(x => x.FullName));
         if (type is { Namespace: "MagicOnion", Name: "DynamicArgumentTuple" })
         {
             // MagicOnion.DynamicArgumentTuple
             var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
-            formatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{genericTypeArgs}>({ctorArguments})";
+            formatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{genericTypeArgs}>";
+            formatterConstructorArgs = $"({ctorArguments})";
         }
         else if (MessagePackWellKnownSerializationTypes.Instance.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))
         {
             // Well-known generic types (Nullable<T>, IList<T>, List<T>, Dictionary<TKey, TValue> ...)
-            formatterName = $"{mappedFormatterName}<{genericTypeArgs}>()";
+            formatterName = $"{mappedFormatterName}<{genericTypeArgs}>";
+            formatterConstructorArgs = "()";
         }
         else
         {
             // User-defined generic types
-            formatterName = $"{userDefinedFormatterNamespace}{(string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>()";
+            formatterName = $"{userDefinedFormatterNamespace}{(string.IsNullOrWhiteSpace(userDefinedFormatterNamespace) ? "" : ".")}{type.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace | MagicOnionTypeInfo.DisplayNameFormat.WithoutGenericArguments)}Formatter<{genericTypeArgs}>";
+            formatterConstructorArgs = "()";
         }
 
         return formatterName != null;
     }
 
-    public string MapArray(MagicOnionTypeInfo type)
+    public (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type)
     {
         return type.ArrayRank switch
         {
-            1 => $"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType.FullName}>()",
-            2 => $"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>()",
-            3 => $"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>()",
-            4 => $"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>()",
+            1 => ($"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType.FullName}>", "()"),
+            2 => ($"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            3 => ($"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            4 => ($"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
             _ => throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})"),
         };
     }
@@ -181,33 +186,37 @@ public class MemoryPackFormatterNameMapper : ISerializationFormatterNameMapper
     {
     }
 
-    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName)
+    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs)
     {
         formatterName = null;
+        formatterConstructorArgs = null;
+
         var genericTypeArgs = string.Join(", ", type.GenericArguments.Select(x => x.FullName));
         if (type is { Namespace: "MagicOnion", Name: "DynamicArgumentTuple" })
         {
             // MagicOnion.DynamicArgumentTuple
             var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
-            formatterName = $"global::MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter<{genericTypeArgs}>()";
+            formatterName = $"global::MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter<{genericTypeArgs}>";
+            formatterConstructorArgs = "()";
         }
         else if (MessagePackWellKnownSerializationTypes.Instance.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))
         {
             // Well-known generic types (Nullable<T>, IList<T>, List<T>, Dictionary<TKey, TValue> ...)
-            formatterName = $"{mappedFormatterName}<{genericTypeArgs}>()";
+            formatterName = $"{mappedFormatterName}<{genericTypeArgs}>";
+            formatterConstructorArgs = "()";
         }
 
         return formatterName != null;
     }
 
-    public string MapArray(MagicOnionTypeInfo type)
+    public (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type)
     {
         return type.ArrayRank switch
         {
-            1 => $"global::MemoryPack.Formatters.ArrayFormatter<{type.ElementType.FullName}>()",
-            2 => $"global::MemoryPack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>()",
-            3 => $"global::MemoryPack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>()",
-            4 => $"global::MemoryPack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>()",
+            1 => ($"global::MemoryPack.Formatters.ArrayFormatter<{type.ElementType.FullName}>", "()"),
+            2 => ($"global::MemoryPack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            3 => ($"global::MemoryPack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            4 => ($"global::MemoryPack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
             _ => throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})"),
         };
     }
