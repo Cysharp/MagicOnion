@@ -4843,6 +4843,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.EnumSerializationInfo
   nameWithType: EnumSerializationInfo.EnumSerializationInfo
+- uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FormatterConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs
+  nameWithType: EnumSerializationInfo.FormatterConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs*
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FormatterConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterConstructorArgs
+  nameWithType: EnumSerializationInfo.FormatterConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterName
   name: FormatterName
   href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FormatterName
@@ -4856,6 +4869,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterName
   nameWithType: EnumSerializationInfo.FormatterName
+- uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FormatterNameWithConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs
+  nameWithType: EnumSerializationInfo.FormatterNameWithConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs*
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FormatterNameWithConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FormatterNameWithConstructorArgs
+  nameWithType: EnumSerializationInfo.FormatterNameWithConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.FullName
   name: FullName
   href: api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_EnumSerializationInfo_FullName
@@ -4940,15 +4966,15 @@ references:
   commentId: T:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo
   fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo
   nameWithType: GenericSerializationInfo
-- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,IReadOnlyList{System.String})
-  name: GenericSerializationInfo(String, String, IReadOnlyList<String>)
-  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_IReadOnlyList_System_String__
-  commentId: M:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,IReadOnlyList{System.String})
-  name.vb: GenericSerializationInfo(String, String, IReadOnlyList(Of String))
-  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, IReadOnlyList<System.String>)
-  fullName.vb: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, IReadOnlyList(Of System.String))
-  nameWithType: GenericSerializationInfo.GenericSerializationInfo(String, String, IReadOnlyList<String>)
-  nameWithType.vb: GenericSerializationInfo.GenericSerializationInfo(String, String, IReadOnlyList(Of String))
+- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,System.String,IReadOnlyList{System.String})
+  name: GenericSerializationInfo(String, String, String, IReadOnlyList<String>)
+  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_System_String_IReadOnlyList_System_String__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,System.String,IReadOnlyList{System.String})
+  name.vb: GenericSerializationInfo(String, String, String, IReadOnlyList(Of String))
+  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, System.String, IReadOnlyList<System.String>)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo(System.String, System.String, System.String, IReadOnlyList(Of System.String))
+  nameWithType: GenericSerializationInfo.GenericSerializationInfo(String, String, String, IReadOnlyList<String>)
+  nameWithType.vb: GenericSerializationInfo.GenericSerializationInfo(String, String, String, IReadOnlyList(Of String))
 - uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor*
   name: GenericSerializationInfo
   href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_
@@ -4956,6 +4982,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.GenericSerializationInfo
   nameWithType: GenericSerializationInfo.GenericSerializationInfo
+- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs
+  nameWithType: GenericSerializationInfo.FormatterConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs*
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs
+  nameWithType: GenericSerializationInfo.FormatterConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterName
   name: FormatterName
   href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterName
@@ -4969,6 +5008,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterName
   nameWithType: GenericSerializationInfo.FormatterName
+- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterNameWithConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs
+  nameWithType: GenericSerializationInfo.FormatterNameWithConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs*
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterNameWithConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs
+  nameWithType: GenericSerializationInfo.FormatterNameWithConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FullName
   name: FullName
   href: api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FullName
@@ -5078,15 +5130,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.MapArray
   nameWithType: ISerializationFormatterNameMapper.MapArray
-- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name: TryMapGeneric(MagicOnionTypeInfo, out String)
-  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__
-  commentId: M:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String)
-  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String)
-  fullName.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String)
-  nameWithType: ISerializationFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String)
-  nameWithType.vb: ISerializationFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String)
+- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name: TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__System_String__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
+  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String, out System.String)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String, ByRef System.String)
+  nameWithType: ISerializationFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  nameWithType.vb: ISerializationFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
 - uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric*
   name: TryMapGeneric
   href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_
@@ -5113,6 +5165,19 @@ references:
   commentId: T:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo
   fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo
   nameWithType: ISerializationFormatterRegisterInfo
+- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType: ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs*
+  name: FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType: ISerializationFormatterRegisterInfo.FormatterConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
   name: FormatterName
   href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterName
@@ -5126,6 +5191,19 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
   nameWithType: ISerializationFormatterRegisterInfo.FormatterName
+- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterNameWithConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType: ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs*
+  name: FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterNameWithConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  isSpec: "True"
+  fullName: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType: ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FullName
   name: FullName
   href: api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FullName
@@ -6492,15 +6570,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.MapArray
   nameWithType: MemoryPackFormatterNameMapper.MapArray
-- uid: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name: TryMapGeneric(MagicOnionTypeInfo, out String)
-  href: api/MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MemoryPackFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__
-  commentId: M:MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String)
-  fullName: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String)
-  fullName.vb: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String)
-  nameWithType: MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String)
-  nameWithType.vb: MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String)
+- uid: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name: TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  href: api/MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MemoryPackFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__System_String__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
+  fullName: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String, out System.String)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String, ByRef System.String)
+  nameWithType: MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  nameWithType.vb: MemoryPackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
 - uid: MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.TryMapGeneric*
   name: TryMapGeneric
   href: api/MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MemoryPackFormatterNameMapper_TryMapGeneric_
@@ -6553,15 +6631,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.MapArray
   nameWithType: MessagePackFormatterNameMapper.MapArray
-- uid: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name: TryMapGeneric(MagicOnionTypeInfo, out String)
-  href: api/MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MessagePackFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__
-  commentId: M:MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)
-  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String)
-  fullName: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String)
-  fullName.vb: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String)
-  nameWithType: MessagePackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String)
-  nameWithType.vb: MessagePackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String)
+- uid: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name: TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  href: api/MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MessagePackFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__System_String__
+  commentId: M:MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)
+  name.vb: TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
+  fullName: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, out System.String, out System.String)
+  fullName.vb: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo, ByRef System.String, ByRef System.String)
+  nameWithType: MessagePackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, out String, out String)
+  nameWithType.vb: MessagePackFormatterNameMapper.TryMapGeneric(MagicOnionTypeInfo, ByRef String, ByRef String)
 - uid: MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.TryMapGeneric*
   name: TryMapGeneric
   href: api/MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_MessagePackFormatterNameMapper_TryMapGeneric_
@@ -6917,6 +6995,23 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.IfDirectiveConditions
   nameWithType: SerializationTypeHintInfo.IfDirectiveConditions
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterConstructorArgs
+  name: ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterConstructorArgs
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterConstructorArgs*
+  name: ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterConstructorArgs
+  isSpec: "True"
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterConstructorArgs
 - uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterName
   name: ISerializationFormatterRegisterInfo.FormatterName
   href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterName
@@ -6934,6 +7029,23 @@ references:
   fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
   nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterName
   nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterName
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterNameWithConstructorArgs
+  name: ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterNameWithConstructorArgs
+  commentId: P:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterNameWithConstructorArgs
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+- uid: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterNameWithConstructorArgs*
+  name: ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  href: api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html#MagicOnion_Generator_CodeAnalysis_SerializationTypeHintInfo_MagicOnion_Generator_CodeAnalysis_ISerializationFormatterRegisterInfo_FormatterNameWithConstructorArgs_
+  commentId: Overload:MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion#Generator#CodeAnalysis#ISerializationFormatterRegisterInfo#FormatterNameWithConstructorArgs
+  isSpec: "True"
+  name.vb: MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  fullName: MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType: SerializationTypeHintInfo.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
+  nameWithType.vb: SerializationTypeHintInfo.MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs
 - uid: MagicOnion.Generator.CodeGen
   name: MagicOnion.Generator.CodeGen
   href: api/MagicOnion.Generator.CodeGen.html

@@ -129,7 +129,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__">TryMapGeneric(MagicOnionTypeInfo, out String)</a>
+          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html#MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__System_String__">TryMapGeneric(MagicOnionTypeInfo, out String, out String)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -177,7 +177,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">string MapArray(MagicOnionTypeInfo type)</code></pre>
+    <pre><code class="lang-csharp hljs">(string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type)</code></pre>
   </div>
 
   <section>
@@ -191,7 +191,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
+    <dt><span class="xref">System.ValueTuple</span>&lt;<span class="xref">System.String</span>, <span class="xref">System.String</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -209,12 +209,12 @@
   </section>
   <section>
   <a id="MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_" data-uid="MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric*"></a>
-  <h4 id="MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__" data-uid="MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@)">TryMapGeneric(MagicOnionTypeInfo, out String)</h4>
+  <h4 id="MagicOnion_Generator_CodeAnalysis_ISerializationFormatterNameMapper_TryMapGeneric_MagicOnion_Generator_CodeAnalysis_MagicOnionTypeInfo_System_String__System_String__" data-uid="MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.TryMapGeneric(MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo,System.String@,System.String@)">TryMapGeneric(MagicOnionTypeInfo, out String, out String)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs)</code></pre>
   </div>
 
   <section>
@@ -223,6 +223,8 @@
     <dt><span class="parametername"><code>type</code></span> <a class="xref" href="MagicOnion.Generator.CodeAnalysis.MagicOnionTypeInfo.html">MagicOnionTypeInfo</a></dt>
     <dd></dd>
     <dt><span class="parametername"><code>formatterName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>formatterConstructorArgs</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>

@@ -114,7 +114,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_IReadOnlyList_System_String__">GenericSerializationInfo(String, String, IReadOnlyList&lt;String&gt;)</a>
+          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_System_String_IReadOnlyList_System_String__">GenericSerializationInfo(String, String, String, IReadOnlyList&lt;String&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -132,7 +132,19 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterConstructorArgs">FormatterConstructorArgs</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterName">FormatterName</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html#MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterNameWithConstructorArgs">FormatterNameWithConstructorArgs</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -161,12 +173,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor*"></a>
-  <h4 id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_IReadOnlyList_System_String__" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,IReadOnlyList{System.String})">GenericSerializationInfo(String, String, IReadOnlyList&lt;String&gt;)</h4>
+  <h4 id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo__ctor_System_String_System_String_System_String_IReadOnlyList_System_String__" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.#ctor(System.String,System.String,System.String,IReadOnlyList{System.String})">GenericSerializationInfo(String, String, String, IReadOnlyList&lt;String&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public GenericSerializationInfo(string fullName, string formatterName, IReadOnlyList&lt;string&gt; ifDirectiveConditions)</code></pre>
+    <pre><code class="lang-csharp hljs">public GenericSerializationInfo(string fullName, string formatterName, string formatterConstructorArgs, IReadOnlyList&lt;string&gt; ifDirectiveConditions)</code></pre>
   </div>
 
   <section>
@@ -175,6 +187,8 @@
     <dt><span class="parametername"><code>fullName</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>formatterName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>formatterConstructorArgs</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>ifDirectiveConditions</code></span> <span class="xref">IReadOnlyList</span>&lt;<span class="xref">System.String</span>&gt;</dt>
     <dd></dd>
@@ -196,6 +210,36 @@
   <h3 id="properties">Properties
   </h3>
   <section>
+  <a id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterConstructorArgs_" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs*"></a>
+  <h4 id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterConstructorArgs" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterConstructorArgs">FormatterConstructorArgs</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string FormatterConstructorArgs { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterName_" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterName*"></a>
   <h4 id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterName" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterName">FormatterName</h4>
   <div class="markdown level1 summary"></div>
@@ -203,6 +247,36 @@
   
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public string FormatterName { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterNameWithConstructorArgs_" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs*"></a>
+  <h4 id="MagicOnion_Generator_CodeAnalysis_GenericSerializationInfo_FormatterNameWithConstructorArgs" data-uid="MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.FormatterNameWithConstructorArgs">FormatterNameWithConstructorArgs</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string FormatterNameWithConstructorArgs { get; }</code></pre>
   </div>
 
   

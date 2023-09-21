@@ -861,7 +861,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.EnumSerializationInfo.html",
-          "hash": "2pa88/jPNxVW0u7rQfw6aHJ0mAo58uVBE0HX4qeC9wI="
+          "hash": "Y8EwlT5ujLi7lOlXz/4uiTiFFn01Is30lE4JE2+5eak="
         }
       },
       "is_incremental": false,
@@ -873,7 +873,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.GenericSerializationInfo.html",
-          "hash": "4o7Eyrh3WA77Y6t3zeSlycqJgP7BzzkFnGwg0tS2jLA="
+          "hash": "LOB/WzbYZhU0DC/ICJsxuRlQ7x6dL1sxBTimrgsSR/s="
         }
       },
       "is_incremental": false,
@@ -909,7 +909,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterNameMapper.html",
-          "hash": "HSbupX6v5GPL3BzPLm8tSdrLd5T8D0k32096S65Fdik="
+          "hash": "J8F8GAei4I46/6mC6ESO4ybpmYyJ7LmoWxJ4lf4IduA="
         }
       },
       "is_incremental": false,
@@ -921,7 +921,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.ISerializationFormatterRegisterInfo.html",
-          "hash": "xC4I3K2kekY0zsZuNgfR1S3A5Nhh4NjjjBYTdCZUU8c="
+          "hash": "5ZkYanYY/+4vL1fgtk/5dgMV+70LQADTZta04uL9p1w="
         }
       },
       "is_incremental": false,
@@ -1077,7 +1077,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.MemoryPackFormatterNameMapper.html",
-          "hash": "Pp5qa4rAiAPRhWfGbyNOElHOU4Vv1RO9wSlW4z6zYvs="
+          "hash": "ZIUMdXiA0WcE/8ll7GZ8WKr+rxGlZ9gL1Vsqoqv9wcU="
         }
       },
       "is_incremental": false,
@@ -1089,7 +1089,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.MessagePackFormatterNameMapper.html",
-          "hash": "90jWq7F0HaEELJeqIrNWpt7bLgrwtR408XPBH0dsaZI="
+          "hash": "rIstFpjwvOpvEB/AGahnHMlISOfhwSyUlRtT3wRDyFE="
         }
       },
       "is_incremental": false,
@@ -1161,7 +1161,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeAnalysis.SerializationTypeHintInfo.html",
-          "hash": "Frzj782XJsRq8mW08Wa7o4IYlLPB+E1nwoV8XgWZQQQ="
+          "hash": "GAq7P3ourhj8Onz8o62CgYWg9awtKY3HKku8EFAQzcE="
         }
       },
       "is_incremental": false,
@@ -1209,7 +1209,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Generator.CodeGen.EnumTemplateBase.html",
-          "hash": "p0u+YVoUN41cZBm15+1G+B7NJ9W53+BWV0Vsd/+PDx8="
+          "hash": "shxslvcszyqJ4D4QfVhvYYu8LoXxrDd3bBlfvCG6oiM="
         }
       },
       "is_incremental": false,
