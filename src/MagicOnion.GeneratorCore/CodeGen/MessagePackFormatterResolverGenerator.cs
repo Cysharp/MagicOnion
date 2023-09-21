@@ -140,7 +140,7 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
                         using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
                         {
                             ctx.TextWriter.WriteLines($$"""
-                            case {{index}}: return new {{(resolverInfo.FormatterName.StartsWith("global::") ? resolverInfo.FormatterName : (string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName)}};
+                            case {{index}}: return new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}};
                             """);
                         }
                     }

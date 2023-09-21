@@ -69,7 +69,7 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
                 using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
                 {
                     ctx.TextWriter.WriteLines($$"""
-                    global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") ? resolverInfo.FormatterName : (string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName)}});
+                    global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}});
                     """);
                 }
             }
