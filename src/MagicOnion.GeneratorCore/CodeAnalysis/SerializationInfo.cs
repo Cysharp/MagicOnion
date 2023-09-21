@@ -6,7 +6,6 @@ public interface ISerializationFormatterRegisterInfo
     string FullName { get; }
     string FormatterName { get; }
     string FormatterConstructorArgs { get; }
-    string FormatterNameWithConstructorArgs { get; } // e.g. MyEnumFormatter(), DynamicArgumentTupleFormatter<T1, T2>(default, default) ...
 
     IReadOnlyList<string> IfDirectiveConditions { get; }
     bool HasIfDirectiveConditions { get; }
@@ -18,7 +17,6 @@ public class GenericSerializationInfo : ISerializationFormatterRegisterInfo
 
     public string FormatterName { get; }
     public string FormatterConstructorArgs { get; }
-    public string FormatterNameWithConstructorArgs => FormatterName + FormatterConstructorArgs;
 
     public IReadOnlyList<string> IfDirectiveConditions { get; }
     public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
@@ -41,7 +39,6 @@ public class EnumSerializationInfo : ISerializationFormatterRegisterInfo
 
     public string FormatterName => $"{Name.Replace(".", "_")}Formatter";
     public string FormatterConstructorArgs => "()";
-    public string FormatterNameWithConstructorArgs => FormatterName + FormatterConstructorArgs;
 
     public IReadOnlyList<string> IfDirectiveConditions { get; }
     public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
@@ -62,7 +59,6 @@ public class SerializationTypeHintInfo : ISerializationFormatterRegisterInfo
 
     string ISerializationFormatterRegisterInfo.FormatterName => string.Empty; // Dummy
     string ISerializationFormatterRegisterInfo.FormatterConstructorArgs => string.Empty; // Dummy
-    string ISerializationFormatterRegisterInfo.FormatterNameWithConstructorArgs => string.Empty; // Dummy
 
     public IReadOnlyList<string> IfDirectiveConditions { get; }
     public bool HasIfDirectiveConditions => IfDirectiveConditions.Any();
