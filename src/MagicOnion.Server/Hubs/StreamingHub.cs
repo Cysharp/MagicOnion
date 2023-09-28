@@ -9,13 +9,17 @@ namespace MagicOnion.Server.Hubs;
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
-    static protected readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
-    static protected readonly ValueTask CompletedTask = new ValueTask();
+    protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
+    protected static readonly ValueTask CompletedTask = new ValueTask();
 
     static readonly Metadata ResponseHeaders = new Metadata()
     {
         { "x-magiconion-streaminghub-version", "2" },
     };
+
+    // response:  [messageId, methodId, response]
+    // HACK: If the ID of the message is `-1`, the client will ignore the message.
+    static readonly byte[] MarkerResponseBytes = { 0x93, 0xff, 0x00, 0x0c }; // MsgPack: [-1, 0, nil]
 
     public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
@@ -146,23 +150,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
-        static byte[] BuildMarkerResponse()
-        {
-            using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-            {
-                var writer = new MessagePackWriter(buffer);
-
-                // response:  [messageId, methodId, response]
-                // HACK: If the ID of the message is `-1`, the client will ignore the message.
-                writer.WriteArrayHeader(3);
-                writer.Write(-1);
-                writer.Write(0);
-                writer.WriteNil();
-                writer.Flush();
-                return buffer.WrittenSpan.ToArray();
-            }
-        }
-        await writer.WriteAsync(BuildMarkerResponse());
+        await writer.WriteAsync(MarkerResponseBytes);
 
         var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 
