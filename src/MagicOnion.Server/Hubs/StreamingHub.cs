@@ -19,7 +19,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     // response:  [messageId, methodId, response]
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
-    static readonly byte[] MarkerResponseBytes = { 0x93, 0xff, 0x00, 0x0c };
+    static readonly byte[] MarkerResponseBytes = { 0x93, 0xff, 0x00, 0x0c }; // MsgPack: [-1, 0, nil]
 
     public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
