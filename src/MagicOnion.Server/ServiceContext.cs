@@ -1,10 +1,10 @@
 using Grpc.Core;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
-using MessagePack;
 using System.Collections.Concurrent;
 using System.Reflection;
 using MagicOnion.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
@@ -80,7 +80,7 @@ public class ServiceContext : IServiceContext
 
     internal object? Request => request;
     internal object? Result { get; set; }
-    internal IMagicOnionLogger MagicOnionLogger { get; }
+    internal ILogger Logger { get; }
     internal MethodHandler MethodHandler { get; }
 
     public ServiceContext(
@@ -90,7 +90,7 @@ public class ServiceContext : IServiceContext
         MethodType methodType,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
-        IMagicOnionLogger logger,
+        ILogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider
     )
@@ -103,7 +103,7 @@ public class ServiceContext : IServiceContext
         this.CallContext = context;
         this.Timestamp = DateTime.UtcNow;
         this.MessageSerializer = messageSerializer;
-        this.MagicOnionLogger = logger;
+        this.Logger = logger;
         this.MethodHandler = methodHandler;
         this.ServiceProvider = serviceProvider;
     }

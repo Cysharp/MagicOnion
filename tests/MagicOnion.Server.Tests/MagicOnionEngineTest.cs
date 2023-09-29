@@ -14,12 +14,13 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{};
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
         def.MethodHandlers.Should().BeEmpty();
@@ -31,12 +32,13 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(NonService) };
         var options = new MagicOnionOptions();
 
         // Act
-        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
         ex.Should().NotBeNull();
@@ -48,12 +50,13 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyService) };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
         def.MethodHandlers.Should().HaveCount(2);
@@ -65,13 +68,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyHub) };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options);
 
         // Assert
         def.MethodHandlers.Should().HaveCount(1); // Connect
@@ -83,13 +87,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().HaveCount(6); // IMyHub.Connect, IMyService.MethodA, IMyService.MethodB, IMyGenericsHub.Connect, IMyGenericsService.MethodA, IMyGenericsService.MethodB
@@ -101,13 +106,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyIgnoredService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Ignored"));
@@ -119,13 +125,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyNonPublicService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("NonPublic"));
@@ -137,13 +144,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyAbstractService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().NotContain(x => x.ServiceName.Contains("Abstract"));
@@ -155,13 +163,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().Contain(x => x.ServiceType == typeof(MyConstructedGenericsService));
@@ -173,13 +182,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
         var options = new MagicOnionOptions();
 
         // Act
-        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options, new NullMagicOnionLogger());
+        var def = MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, assemblies, options);
 
         // Assert
         def.MethodHandlers.Should().NotContain(x => x.ServiceType.Name.Contains("GenericsDefinition"));
@@ -193,13 +203,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyService), typeof(MyService) };
         var options = new MagicOnionOptions();
 
         // Act
-        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
         ex.Should().NotBeNull();
@@ -211,13 +222,14 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton<IGroupRepositoryFactory, ConcurrentDictionaryGroupRepositoryFactory>();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyHub), typeof(MyHub) };
         var options = new MagicOnionOptions();
 
         // Act
-        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options, new NullMagicOnionLogger()));
+        var ex = Record.Exception(() => MagicOnionEngine.BuildServerServiceDefinition(serviceProvider, types, options));
 
         // Assert
         ex.Should().NotBeNull();

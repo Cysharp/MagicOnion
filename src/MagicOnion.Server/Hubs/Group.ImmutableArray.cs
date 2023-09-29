@@ -5,12 +5,20 @@ using MessagePack;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server.Hubs;
 
 public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    readonly ILogger logger;
+
+    public ImmutableArrayGroupRepositoryFactory(ILogger<ImmutableArrayGroup> logger)
+    {
+        this.logger = logger;
+    }
+
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer)
     {
         return new ImmutableArrayGroupRepository(messageSerializer, logger);
     }
@@ -18,13 +26,13 @@ public class ImmutableArrayGroupRepositoryFactory : IGroupRepositoryFactory
 
 public class ImmutableArrayGroupRepository : IGroupRepository
 {
-    IMagicOnionSerializer messageSerializer;
-    IMagicOnionLogger logger;
+    readonly IMagicOnionSerializer messageSerializer;
+    readonly ILogger logger;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public ImmutableArrayGroupRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    public ImmutableArrayGroupRepository(IMagicOnionSerializer messageSerializer, ILogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.factory = CreateGroup;
@@ -57,14 +65,14 @@ public class ImmutableArrayGroup : IGroup
     readonly object gate = new object();
     readonly IGroupRepository parent;
     readonly IMagicOnionSerializer messageSerializer;
-    readonly IMagicOnionLogger logger;
+    readonly ILogger logger;
 
     ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
 
-    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    public ImmutableArrayGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, ILogger logger)
     {
         this.GroupName = groupName;
         this.parent = parent;
@@ -144,7 +152,7 @@ public class ImmutableArrayGroup : IGroup
             {
                 source[i].QueueResponseStreamWrite(message);
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, source.Length);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, source.Length);
             return TaskEx.CompletedTask;
         }
         else
@@ -169,7 +177,7 @@ public class ImmutableArrayGroup : IGroup
                     writeCount++;
                 }
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -201,7 +209,7 @@ public class ImmutableArrayGroup : IGroup
                 NEXT:
                 continue;
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -228,7 +236,7 @@ public class ImmutableArrayGroup : IGroup
                     break;
                 }
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -260,7 +268,7 @@ public class ImmutableArrayGroup : IGroup
                 NEXT:
                 continue;
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -304,7 +312,7 @@ public class ImmutableArrayGroup : IGroup
                     continue;
                 }
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -340,7 +348,7 @@ public class ImmutableArrayGroup : IGroup
                     continue;
                 }
 
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             }
             return TaskEx.CompletedTask;
         }

@@ -4,12 +4,20 @@ using MagicOnion.Utils;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server.Hubs;
 
 public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactory
 {
-    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    readonly ILogger logger;
+
+    public ConcurrentDictionaryGroupRepositoryFactory(ILogger<ConcurrentDictionaryGroup> logger)
+    {
+        this.logger = logger;
+    }
+
+    public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer)
     {
         return new ConcurrentDictionaryGroupRepository(messageSerializer, logger);
     }
@@ -17,13 +25,13 @@ public class ConcurrentDictionaryGroupRepositoryFactory : IGroupRepositoryFactor
 
 public class ConcurrentDictionaryGroupRepository : IGroupRepository
 {
-    IMagicOnionSerializer messageSerializer;
-    IMagicOnionLogger logger;
+    readonly IMagicOnionSerializer messageSerializer;
+    readonly ILogger logger;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public ConcurrentDictionaryGroupRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    public ConcurrentDictionaryGroupRepository(IMagicOnionSerializer messageSerializer, ILogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.factory = CreateGroup;
@@ -61,14 +69,14 @@ public class ConcurrentDictionaryGroup : IGroup
 
     readonly IGroupRepository parent;
     readonly IMagicOnionSerializer messageSerializer;
-    readonly IMagicOnionLogger logger;
+    readonly ILogger logger;
 
     ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
 
-    public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)
+    public ConcurrentDictionaryGroup(string groupName, IGroupRepository parent, IMagicOnionSerializer messageSerializer, ILogger logger)
     {
         this.GroupName = groupName;
         this.parent = parent;
@@ -144,7 +152,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 item.Value.QueueResponseStreamWrite(message);
                 writeCount++;
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -167,7 +175,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     writeCount++;
                 }
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -196,7 +204,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 NEXT:
                 continue;
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -213,7 +221,7 @@ public class ConcurrentDictionaryGroup : IGroup
             if (members.TryGetValue(connectionId, out var context))
             {
                 context.QueueResponseStreamWrite(message);
-                logger.InvokeHubBroadcast(GroupName, message.Length, 1);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, 1);
             }
             return TaskEx.CompletedTask;
         }
@@ -237,7 +245,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     writeCount++;
                 }
             }
-            logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             return TaskEx.CompletedTask;
         }
         else
@@ -261,7 +269,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     item.Value.QueueResponseStreamWrite(message);
                     writeCount++;
                 }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
                 return TaskEx.CompletedTask;
             }
             else
@@ -281,7 +289,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     NEXT:
                     continue;
                 }
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
                 return TaskEx.CompletedTask;
             }
         }
@@ -312,7 +320,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     }
                 }
 
-                logger.InvokeHubBroadcast(GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             }
 
             return TaskEx.CompletedTask;

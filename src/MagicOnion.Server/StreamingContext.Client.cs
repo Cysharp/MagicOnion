@@ -1,6 +1,7 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
@@ -8,13 +9,13 @@ public class ClientStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
 {
     readonly StreamingServiceContext<TRequest, Nil /* Dummy */> context;
     readonly IAsyncStreamReader<TRequest> inner;
-    readonly IMagicOnionLogger logger;
+    readonly ILogger logger;
 
     internal ClientStreamingContext(StreamingServiceContext<TRequest, Nil /* Dummy */> context)
     {
         this.context = context;
         this.inner = context.RequestStream!;
-        this.logger = context.MagicOnionLogger;
+        this.logger = context.Logger;
     }
 
     public ServiceContext ServiceContext => context;
@@ -30,7 +31,7 @@ public class ClientStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
         }
         else
         {
-            logger.ReadFromStream(context, typeof(TRequest), true);
+            MagicOnionServerLog.ReadFromStream(logger, context, typeof(TRequest), true);
             return false;
         }
     }
