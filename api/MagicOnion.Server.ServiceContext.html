@@ -114,7 +114,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_MagicOnion_Server_MethodHandler_IServiceProvider_">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)</a>
+          <a class="xref" href="MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_MagicOnion_Server_MethodHandler_IServiceProvider_">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -255,12 +255,12 @@ This can overwrite the result of the service method.</p>
   </h3>
   <section>
   <a id="MagicOnion_Server_ServiceContext__ctor_" data-uid="MagicOnion.Server.ServiceContext.#ctor*"></a>
-  <h4 id="MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_MagicOnion_Server_MethodHandler_IServiceProvider_" data-uid="MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger,MagicOnion.Server.MethodHandler,IServiceProvider)">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)</h4>
+  <h4 id="MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_MagicOnion_Server_MethodHandler_IServiceProvider_" data-uid="MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,ILogger,MagicOnion.Server.MethodHandler,IServiceProvider)">ServiceContext(Type, MethodInfo, ILookup&lt;Type, Attribute&gt;, MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup&lt;Type, Attribute&gt; attributeLookup, MethodType methodType, ServerCallContext context, IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger, MethodHandler methodHandler, IServiceProvider serviceProvider)</code></pre>
+    <pre><code class="lang-csharp hljs">public ServiceContext(Type serviceType, MethodInfo methodInfo, ILookup&lt;Type, Attribute&gt; attributeLookup, MethodType methodType, ServerCallContext context, IMagicOnionSerializer messageSerializer, ILogger logger, MethodHandler methodHandler, IServiceProvider serviceProvider)</code></pre>
   </div>
 
   <section>
@@ -278,7 +278,7 @@ This can overwrite the result of the service method.</p>
     <dd></dd>
     <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>methodHandler</code></span> <a class="xref" href="MagicOnion.Server.MethodHandler.html">MethodHandler</a></dt>
     <dd></dd>

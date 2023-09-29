@@ -9929,466 +9929,216 @@ references:
   commentId: N:MagicOnion.Server.Diagnostics
   fullName: MagicOnion.Server.Diagnostics
   nameWithType: MagicOnion.Server.Diagnostics
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger
-  name: IMagicOnionLogger
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html
-  commentId: T:MagicOnion.Server.Diagnostics.IMagicOnionLogger
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger
-  nameWithType: IMagicOnionLogger
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition
-  name: BeginBuildServiceDefinition()
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginBuildServiceDefinition
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition()
-  nameWithType: IMagicOnionLogger.BeginBuildServiceDefinition()
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition*
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog
+  name: MagicOnionServerLog
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html
+  commentId: T:MagicOnion.Server.Diagnostics.MagicOnionServerLog
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog
+  nameWithType: MagicOnionServerLog
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition(ILogger)
+  name: BeginBuildServiceDefinition(ILogger)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginBuildServiceDefinition_ILogger_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition(ILogger)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition(ILogger)
+  nameWithType: MagicOnionServerLog.BeginBuildServiceDefinition(ILogger)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition*
   name: BeginBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginBuildServiceDefinition_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginBuildServiceDefinition
-  nameWithType: IMagicOnionLogger.BeginBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_ReadOnlyMemory_System_Byte__Type_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name.vb: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory<System.Byte>, Type)
-  fullName.vb: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory(Of System.Byte), Type)
-  nameWithType: IMagicOnionLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  nameWithType.vb: IMagicOnionLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginBuildServiceDefinition
+  nameWithType: MagicOnionServerLog.BeginBuildServiceDefinition
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger,MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
+  name: BeginInvokeHubMethod(ILogger, StreamingHubContext, ReadOnlyMemory<Byte>, Type)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeHubMethod_ILogger_MagicOnion_Server_Hubs_StreamingHubContext_ReadOnlyMemory_System_Byte__Type_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger,MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
+  name.vb: BeginInvokeHubMethod(ILogger, StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger, MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory<System.Byte>, Type)
+  fullName.vb: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger, MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory(Of System.Byte), Type)
+  nameWithType: MagicOnionServerLog.BeginInvokeHubMethod(ILogger, StreamingHubContext, ReadOnlyMemory<Byte>, Type)
+  nameWithType.vb: MagicOnionServerLog.BeginInvokeHubMethod(ILogger, StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger,System.String,System.Int32)
+  name: BeginInvokeHubMethod(ILogger, String, Int32)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeHubMethod_ILogger_System_String_System_Int32_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger,System.String,System.Int32)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod(ILogger, System.String, System.Int32)
+  nameWithType: MagicOnionServerLog.BeginInvokeHubMethod(ILogger, String, Int32)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod*
   name: BeginInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeHubMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeHubMethod
-  nameWithType: IMagicOnionLogger.BeginInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  name: BeginInvokeMethod(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginInvokeMethod_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: IMagicOnionLogger.BeginInvokeMethod(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeHubMethod
+  nameWithType: MagicOnionServerLog.BeginInvokeHubMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger,MagicOnion.Server.ServiceContext,Type)
+  name: BeginInvokeMethod(ILogger, ServiceContext, Type)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeMethod_ILogger_MagicOnion_Server_ServiceContext_Type_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger,MagicOnion.Server.ServiceContext,Type)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger, MagicOnion.Server.ServiceContext, Type)
+  nameWithType: MagicOnionServerLog.BeginInvokeMethod(ILogger, ServiceContext, Type)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger,System.String,System.String)
+  name: BeginInvokeMethod(ILogger, String, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeMethod_ILogger_System_String_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger,System.String,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod(ILogger, System.String, System.String)
+  nameWithType: MagicOnionServerLog.BeginInvokeMethod(ILogger, String, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod*
   name: BeginInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_BeginInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.BeginInvokeMethod
-  nameWithType: IMagicOnionLogger.BeginInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  name: EndBuildServiceDefinition(Double)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndBuildServiceDefinition_System_Double_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  nameWithType: IMagicOnionLogger.EndBuildServiceDefinition(Double)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginInvokeMethod
+  nameWithType: MagicOnionServerLog.BeginInvokeMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition(ILogger,System.Double)
+  name: EndBuildServiceDefinition(ILogger, Double)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndBuildServiceDefinition_ILogger_System_Double_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition(ILogger,System.Double)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition(ILogger, System.Double)
+  nameWithType: MagicOnionServerLog.EndBuildServiceDefinition(ILogger, Double)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition*
   name: EndBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndBuildServiceDefinition_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndBuildServiceDefinition
-  nameWithType: IMagicOnionLogger.EndBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name.vb: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable<Type>, System.Double, System.Boolean)
-  fullName.vb: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable(Of Type), System.Double, System.Boolean)
-  nameWithType: IMagicOnionLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  nameWithType.vb: IMagicOnionLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndBuildServiceDefinition
+  nameWithType: MagicOnionServerLog.EndBuildServiceDefinition
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger,MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
+  name: EndInvokeHubMethod(ILogger, StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeHubMethod_ILogger_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger,MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
+  name.vb: EndInvokeHubMethod(ILogger, StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger, MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable<Type>, System.Double, System.Boolean)
+  fullName.vb: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger, MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable(Of Type), System.Double, System.Boolean)
+  nameWithType: MagicOnionServerLog.EndInvokeHubMethod(ILogger, StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
+  nameWithType.vb: MagicOnionServerLog.EndInvokeHubMethod(ILogger, StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger,System.String,System.Int32,System.Double,System.String)
+  name: EndInvokeHubMethod(ILogger, String, Int32, Double, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeHubMethod_ILogger_System_String_System_Int32_System_Double_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger,System.String,System.Int32,System.Double,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod(ILogger, System.String, System.Int32, System.Double, System.String)
+  nameWithType: MagicOnionServerLog.EndInvokeHubMethod(ILogger, String, Int32, Double, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod*
   name: EndInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeHubMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeHubMethod
-  nameWithType: IMagicOnionLogger.EndInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  name: EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndInvokeMethod_MagicOnion_Server_ServiceContext_Type_System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext, Type, System.Double, System.Boolean)
-  nameWithType: IMagicOnionLogger.EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeHubMethod
+  nameWithType: MagicOnionServerLog.EndInvokeHubMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger,MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
+  name: EndInvokeMethod(ILogger, ServiceContext, Type, Double, Boolean)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeMethod_ILogger_MagicOnion_Server_ServiceContext_Type_System_Double_System_Boolean_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger,MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger, MagicOnion.Server.ServiceContext, Type, System.Double, System.Boolean)
+  nameWithType: MagicOnionServerLog.EndInvokeMethod(ILogger, ServiceContext, Type, Double, Boolean)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger,System.String,System.String,System.Double,System.String)
+  name: EndInvokeMethod(ILogger, String, String, Double, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeMethod_ILogger_System_String_System_String_System_Double_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger,System.String,System.String,System.Double,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod(ILogger, System.String, System.String, System.Double, System.String)
+  nameWithType: MagicOnionServerLog.EndInvokeMethod(ILogger, String, String, Double, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod*
   name: EndInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_EndInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_EndInvokeMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.EndInvokeMethod
-  nameWithType: IMagicOnionLogger.EndInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  name: Error(Exception, StreamingHubContext)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_Error_Exception_MagicOnion_Server_Hubs_StreamingHubContext_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception, MagicOnion.Server.Hubs.StreamingHubContext)
-  nameWithType: IMagicOnionLogger.Error(Exception, StreamingHubContext)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception,ServerCallContext)
-  name: Error(Exception, ServerCallContext)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_Error_Exception_ServerCallContext_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception,ServerCallContext)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error(Exception, ServerCallContext)
-  nameWithType: IMagicOnionLogger.Error(Exception, ServerCallContext)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.EndInvokeMethod
+  nameWithType: MagicOnionServerLog.EndInvokeMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger,Exception,MagicOnion.Server.Hubs.StreamingHubContext)
+  name: Error(ILogger, Exception, StreamingHubContext)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_Error_ILogger_Exception_MagicOnion_Server_Hubs_StreamingHubContext_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger,Exception,MagicOnion.Server.Hubs.StreamingHubContext)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger, Exception, MagicOnion.Server.Hubs.StreamingHubContext)
+  nameWithType: MagicOnionServerLog.Error(ILogger, Exception, StreamingHubContext)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger,Exception,ServerCallContext)
+  name: Error(ILogger, Exception, ServerCallContext)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_Error_ILogger_Exception_ServerCallContext_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger,Exception,ServerCallContext)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error(ILogger, Exception, ServerCallContext)
+  nameWithType: MagicOnionServerLog.Error(ILogger, Exception, ServerCallContext)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error*
   name: Error
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_Error_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_Error_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.Error
-  nameWithType: IMagicOnionLogger.Error
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  name: InvokeHubBroadcast(String, Int32, Int32)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_InvokeHubBroadcast_System_String_System_Int32_System_Int32_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast(System.String, System.Int32, System.Int32)
-  nameWithType: IMagicOnionLogger.InvokeHubBroadcast(String, Int32, Int32)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.Error
+  nameWithType: MagicOnionServerLog.Error
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod(ILogger,Exception,System.String)
+  name: ErrorOnHubMethod(ILogger, Exception, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ErrorOnHubMethod_ILogger_Exception_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod(ILogger,Exception,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod(ILogger, Exception, System.String)
+  nameWithType: MagicOnionServerLog.ErrorOnHubMethod(ILogger, Exception, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod*
+  name: ErrorOnHubMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ErrorOnHubMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnHubMethod
+  nameWithType: MagicOnionServerLog.ErrorOnHubMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod(ILogger,Exception,System.String)
+  name: ErrorOnServiceMethod(ILogger, Exception, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ErrorOnServiceMethod_ILogger_Exception_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod(ILogger,Exception,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod(ILogger, Exception, System.String)
+  nameWithType: MagicOnionServerLog.ErrorOnServiceMethod(ILogger, Exception, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod*
+  name: ErrorOnServiceMethod
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ErrorOnServiceMethod_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod
+  isSpec: "True"
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ErrorOnServiceMethod
+  nameWithType: MagicOnionServerLog.ErrorOnServiceMethod
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast(ILogger,System.String,System.Int32,System.Int32)
+  name: InvokeHubBroadcast(ILogger, String, Int32, Int32)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_ILogger_System_String_System_Int32_System_Int32_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast(ILogger,System.String,System.Int32,System.Int32)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast(ILogger, System.String, System.Int32, System.Int32)
+  nameWithType: MagicOnionServerLog.InvokeHubBroadcast(ILogger, String, Int32, Int32)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast*
   name: InvokeHubBroadcast
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_InvokeHubBroadcast_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.InvokeHubBroadcast
-  nameWithType: IMagicOnionLogger.InvokeHubBroadcast
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  name: ReadFromStream(ServiceContext, Type, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_ReadFromStream_MagicOnion_Server_ServiceContext_Type_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext, Type, System.Boolean)
-  nameWithType: IMagicOnionLogger.ReadFromStream(ServiceContext, Type, Boolean)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast
+  nameWithType: MagicOnionServerLog.InvokeHubBroadcast
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger,MagicOnion.Server.ServiceContext,Type,System.Boolean)
+  name: ReadFromStream(ILogger, ServiceContext, Type, Boolean)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ReadFromStream_ILogger_MagicOnion_Server_ServiceContext_Type_System_Boolean_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger,MagicOnion.Server.ServiceContext,Type,System.Boolean)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger, MagicOnion.Server.ServiceContext, Type, System.Boolean)
+  nameWithType: MagicOnionServerLog.ReadFromStream(ILogger, ServiceContext, Type, Boolean)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger,System.String,System.String,System.Boolean)
+  name: ReadFromStream(ILogger, String, String, Boolean)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ReadFromStream_ILogger_System_String_System_String_System_Boolean_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger,System.String,System.String,System.Boolean)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream(ILogger, System.String, System.String, System.Boolean)
+  nameWithType: MagicOnionServerLog.ReadFromStream(ILogger, String, String, Boolean)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream*
   name: ReadFromStream
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_ReadFromStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ReadFromStream_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.ReadFromStream
-  nameWithType: IMagicOnionLogger.ReadFromStream
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  name: WriteToStream(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_WriteToStream_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: IMagicOnionLogger.WriteToStream(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream*
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.ReadFromStream
+  nameWithType: MagicOnionServerLog.ReadFromStream
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger,MagicOnion.Server.ServiceContext,Type)
+  name: WriteToStream(ILogger, ServiceContext, Type)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_WriteToStream_ILogger_MagicOnion_Server_ServiceContext_Type_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger,MagicOnion.Server.ServiceContext,Type)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger, MagicOnion.Server.ServiceContext, Type)
+  nameWithType: MagicOnionServerLog.WriteToStream(ILogger, ServiceContext, Type)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger,System.String,System.String)
+  name: WriteToStream(ILogger, String, String)
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_WriteToStream_ILogger_System_String_System_String_
+  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger,System.String,System.String)
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream(ILogger, System.String, System.String)
+  nameWithType: MagicOnionServerLog.WriteToStream(ILogger, String, String)
+- uid: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream*
   name: WriteToStream
-  href: api/MagicOnion.Server.Diagnostics.IMagicOnionLogger.html#MagicOnion_Server_Diagnostics_IMagicOnionLogger_WriteToStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream
+  href: api/MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_WriteToStream_
+  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream
   isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.IMagicOnionLogger.WriteToStream
-  nameWithType: IMagicOnionLogger.WriteToStream
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger
-  name: MagicOnionLogToLogger
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html
-  commentId: T:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger
-  nameWithType: MagicOnionLogToLogger
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.#ctor(ILogger{MagicOnion.Server.Diagnostics.MagicOnionLogToLogger})
-  name: MagicOnionLogToLogger(ILogger<MagicOnionLogToLogger>)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger__ctor_ILogger_MagicOnion_Server_Diagnostics_MagicOnionLogToLogger__
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.#ctor(ILogger{MagicOnion.Server.Diagnostics.MagicOnionLogToLogger})
-  name.vb: MagicOnionLogToLogger(ILogger(Of MagicOnionLogToLogger))
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.MagicOnionLogToLogger(ILogger<MagicOnion.Server.Diagnostics.MagicOnionLogToLogger>)
-  fullName.vb: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.MagicOnionLogToLogger(ILogger(Of MagicOnion.Server.Diagnostics.MagicOnionLogToLogger))
-  nameWithType: MagicOnionLogToLogger.MagicOnionLogToLogger(ILogger<MagicOnionLogToLogger>)
-  nameWithType.vb: MagicOnionLogToLogger.MagicOnionLogToLogger(ILogger(Of MagicOnionLogToLogger))
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.#ctor*
-  name: MagicOnionLogToLogger
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger__ctor_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.MagicOnionLogToLogger
-  nameWithType: MagicOnionLogToLogger.MagicOnionLogToLogger
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition
-  name: BeginBuildServiceDefinition()
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginBuildServiceDefinition
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition()
-  nameWithType: MagicOnionLogToLogger.BeginBuildServiceDefinition()
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition*
-  name: BeginBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginBuildServiceDefinition
-  nameWithType: MagicOnionLogToLogger.BeginBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_ReadOnlyMemory_System_Byte__Type_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name.vb: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory<System.Byte>, Type)
-  fullName.vb: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory(Of System.Byte), Type)
-  nameWithType: MagicOnionLogToLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  nameWithType.vb: MagicOnionLogToLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod*
-  name: BeginInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeHubMethod
-  nameWithType: MagicOnionLogToLogger.BeginInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  name: BeginInvokeMethod(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginInvokeMethod_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: MagicOnionLogToLogger.BeginInvokeMethod(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod*
-  name: BeginInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_BeginInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.BeginInvokeMethod
-  nameWithType: MagicOnionLogToLogger.BeginInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition(System.Double)
-  name: EndBuildServiceDefinition(Double)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndBuildServiceDefinition_System_Double_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition(System.Double)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition(System.Double)
-  nameWithType: MagicOnionLogToLogger.EndBuildServiceDefinition(Double)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition*
-  name: EndBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndBuildServiceDefinition
-  nameWithType: MagicOnionLogToLogger.EndBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name.vb: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable<Type>, System.Double, System.Boolean)
-  fullName.vb: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable(Of Type), System.Double, System.Boolean)
-  nameWithType: MagicOnionLogToLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  nameWithType.vb: MagicOnionLogToLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod*
-  name: EndInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeHubMethod
-  nameWithType: MagicOnionLogToLogger.EndInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  name: EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndInvokeMethod_MagicOnion_Server_ServiceContext_Type_System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext, Type, System.Double, System.Boolean)
-  nameWithType: MagicOnionLogToLogger.EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod*
-  name: EndInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_EndInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.EndInvokeMethod
-  nameWithType: MagicOnionLogToLogger.EndInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  name: Error(Exception, StreamingHubContext)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_Error_Exception_MagicOnion_Server_Hubs_StreamingHubContext_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception, MagicOnion.Server.Hubs.StreamingHubContext)
-  nameWithType: MagicOnionLogToLogger.Error(Exception, StreamingHubContext)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception,ServerCallContext)
-  name: Error(Exception, ServerCallContext)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_Error_Exception_ServerCallContext_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception,ServerCallContext)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error(Exception, ServerCallContext)
-  nameWithType: MagicOnionLogToLogger.Error(Exception, ServerCallContext)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error*
-  name: Error
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_Error_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.Error
-  nameWithType: MagicOnionLogToLogger.Error
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  name: InvokeHubBroadcast(String, Int32, Int32)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_InvokeHubBroadcast_System_String_System_Int32_System_Int32_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast(System.String, System.Int32, System.Int32)
-  nameWithType: MagicOnionLogToLogger.InvokeHubBroadcast(String, Int32, Int32)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast*
-  name: InvokeHubBroadcast
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_InvokeHubBroadcast_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.InvokeHubBroadcast
-  nameWithType: MagicOnionLogToLogger.InvokeHubBroadcast
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  name: ReadFromStream(ServiceContext, Type, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_ReadFromStream_MagicOnion_Server_ServiceContext_Type_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream(MagicOnion.Server.ServiceContext, Type, System.Boolean)
-  nameWithType: MagicOnionLogToLogger.ReadFromStream(ServiceContext, Type, Boolean)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream*
-  name: ReadFromStream
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_ReadFromStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.ReadFromStream
-  nameWithType: MagicOnionLogToLogger.ReadFromStream
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  name: WriteToStream(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_WriteToStream_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: MagicOnionLogToLogger.WriteToStream(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream*
-  name: WriteToStream
-  href: api/MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.html#MagicOnion_Server_Diagnostics_MagicOnionLogToLogger_WriteToStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.MagicOnionLogToLogger.WriteToStream
-  nameWithType: MagicOnionLogToLogger.WriteToStream
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger
-  name: NullMagicOnionLogger
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html
-  commentId: T:MagicOnion.Server.Diagnostics.NullMagicOnionLogger
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger
-  nameWithType: NullMagicOnionLogger
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition
-  name: BeginBuildServiceDefinition()
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginBuildServiceDefinition
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition()
-  nameWithType: NullMagicOnionLogger.BeginBuildServiceDefinition()
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition*
-  name: BeginBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginBuildServiceDefinition
-  nameWithType: NullMagicOnionLogger.BeginBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_ReadOnlyMemory_System_Byte__Type_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,ReadOnlyMemory{System.Byte},Type)
-  name.vb: BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory<System.Byte>, Type)
-  fullName.vb: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, ReadOnlyMemory(Of System.Byte), Type)
-  nameWithType: NullMagicOnionLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory<Byte>, Type)
-  nameWithType.vb: NullMagicOnionLogger.BeginInvokeHubMethod(StreamingHubContext, ReadOnlyMemory(Of Byte), Type)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod*
-  name: BeginInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeHubMethod
-  nameWithType: NullMagicOnionLogger.BeginInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  name: BeginInvokeMethod(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginInvokeMethod_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: NullMagicOnionLogger.BeginInvokeMethod(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod*
-  name: BeginInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_BeginInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.BeginInvokeMethod
-  nameWithType: NullMagicOnionLogger.BeginInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  name: EndBuildServiceDefinition(Double)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndBuildServiceDefinition_System_Double_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition(System.Double)
-  nameWithType: NullMagicOnionLogger.EndBuildServiceDefinition(Double)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition*
-  name: EndBuildServiceDefinition
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndBuildServiceDefinition_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndBuildServiceDefinition
-  nameWithType: NullMagicOnionLogger.EndBuildServiceDefinition
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndInvokeHubMethod_MagicOnion_Server_Hubs_StreamingHubContext_System_Int32_System_Nullable_Type__System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext,System.Int32,System.Nullable{Type},System.Double,System.Boolean)
-  name.vb: EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable<Type>, System.Double, System.Boolean)
-  fullName.vb: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod(MagicOnion.Server.Hubs.StreamingHubContext, System.Int32, System.Nullable(Of Type), System.Double, System.Boolean)
-  nameWithType: NullMagicOnionLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable<Type>, Double, Boolean)
-  nameWithType.vb: NullMagicOnionLogger.EndInvokeHubMethod(StreamingHubContext, Int32, Nullable(Of Type), Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod*
-  name: EndInvokeHubMethod
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndInvokeHubMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeHubMethod
-  nameWithType: NullMagicOnionLogger.EndInvokeHubMethod
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  name: EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndInvokeMethod_MagicOnion_Server_ServiceContext_Type_System_Double_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext,Type,System.Double,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod(MagicOnion.Server.ServiceContext, Type, System.Double, System.Boolean)
-  nameWithType: NullMagicOnionLogger.EndInvokeMethod(ServiceContext, Type, Double, Boolean)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod*
-  name: EndInvokeMethod
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_EndInvokeMethod_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.EndInvokeMethod
-  nameWithType: NullMagicOnionLogger.EndInvokeMethod
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  name: Error(Exception, StreamingHubContext)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_Error_Exception_MagicOnion_Server_Hubs_StreamingHubContext_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception,MagicOnion.Server.Hubs.StreamingHubContext)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception, MagicOnion.Server.Hubs.StreamingHubContext)
-  nameWithType: NullMagicOnionLogger.Error(Exception, StreamingHubContext)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception,ServerCallContext)
-  name: Error(Exception, ServerCallContext)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_Error_Exception_ServerCallContext_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception,ServerCallContext)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error(Exception, ServerCallContext)
-  nameWithType: NullMagicOnionLogger.Error(Exception, ServerCallContext)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error*
-  name: Error
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_Error_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.Error
-  nameWithType: NullMagicOnionLogger.Error
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  name: InvokeHubBroadcast(String, Int32, Int32)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_InvokeHubBroadcast_System_String_System_Int32_System_Int32_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast(System.String,System.Int32,System.Int32)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast(System.String, System.Int32, System.Int32)
-  nameWithType: NullMagicOnionLogger.InvokeHubBroadcast(String, Int32, Int32)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast*
-  name: InvokeHubBroadcast
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_InvokeHubBroadcast_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.InvokeHubBroadcast
-  nameWithType: NullMagicOnionLogger.InvokeHubBroadcast
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  name: ReadFromStream(ServiceContext, Type, Boolean)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_ReadFromStream_MagicOnion_Server_ServiceContext_Type_System_Boolean_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext,Type,System.Boolean)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream(MagicOnion.Server.ServiceContext, Type, System.Boolean)
-  nameWithType: NullMagicOnionLogger.ReadFromStream(ServiceContext, Type, Boolean)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream*
-  name: ReadFromStream
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_ReadFromStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.ReadFromStream
-  nameWithType: NullMagicOnionLogger.ReadFromStream
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  name: WriteToStream(ServiceContext, Type)
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_WriteToStream_MagicOnion_Server_ServiceContext_Type_
-  commentId: M:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext,Type)
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream(MagicOnion.Server.ServiceContext, Type)
-  nameWithType: NullMagicOnionLogger.WriteToStream(ServiceContext, Type)
-- uid: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream*
-  name: WriteToStream
-  href: api/MagicOnion.Server.Diagnostics.NullMagicOnionLogger.html#MagicOnion_Server_Diagnostics_NullMagicOnionLogger_WriteToStream_
-  commentId: Overload:MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream
-  isSpec: "True"
-  fullName: MagicOnion.Server.Diagnostics.NullMagicOnionLogger.WriteToStream
-  nameWithType: NullMagicOnionLogger.WriteToStream
+  fullName: MagicOnion.Server.Diagnostics.MagicOnionServerLog.WriteToStream
+  nameWithType: MagicOnionServerLog.WriteToStream
 - uid: MagicOnion.Server.DuplexStreamingContext`2
   name: DuplexStreamingContext<TRequest, TResponse>
   href: api/MagicOnion.Server.DuplexStreamingContext-2.html
@@ -12174,12 +11924,12 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ConcurrentDictionaryGroup
   fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup
   nameWithType: ConcurrentDictionaryGroup
-- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: ConcurrentDictionaryGroup(String, IGroupRepository, IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroup__ctor_System_String_MagicOnion_Server_Hubs_IGroupRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.ConcurrentDictionaryGroup(System.String, MagicOnion.Server.Hubs.IGroupRepository, MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ConcurrentDictionaryGroup.ConcurrentDictionaryGroup(String, IGroupRepository, IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  name: ConcurrentDictionaryGroup(String, IGroupRepository, IMagicOnionSerializer, ILogger)
+  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroup__ctor_System_String_MagicOnion_Server_Hubs_IGroupRepository_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_
+  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.ConcurrentDictionaryGroup(System.String, MagicOnion.Server.Hubs.IGroupRepository, MagicOnion.Serialization.IMagicOnionSerializer, ILogger)
+  nameWithType: ConcurrentDictionaryGroup.ConcurrentDictionaryGroup(String, IGroupRepository, IMagicOnionSerializer, ILogger)
 - uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.#ctor*
   name: ConcurrentDictionaryGroup
   href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroup__ctor_
@@ -12359,12 +12109,12 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository
   fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository
   nameWithType: ConcurrentDictionaryGroupRepository
-- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: ConcurrentDictionaryGroupRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.ConcurrentDictionaryGroupRepository(MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ConcurrentDictionaryGroupRepository.ConcurrentDictionaryGroupRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  name: ConcurrentDictionaryGroupRepository(IMagicOnionSerializer, ILogger)
+  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_
+  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.ConcurrentDictionaryGroupRepository(MagicOnion.Serialization.IMagicOnionSerializer, ILogger)
+  nameWithType: ConcurrentDictionaryGroupRepository.ConcurrentDictionaryGroupRepository(IMagicOnionSerializer, ILogger)
 - uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.#ctor*
   name: ConcurrentDictionaryGroupRepository
   href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepository.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepository__ctor_
@@ -12420,12 +12170,28 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory
   fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory
   nameWithType: ConcurrentDictionaryGroupRepositoryFactory
-- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.#ctor(ILogger{MagicOnion.Server.Hubs.ConcurrentDictionaryGroup})
+  name: ConcurrentDictionaryGroupRepositoryFactory(ILogger<ConcurrentDictionaryGroup>)
+  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepositoryFactory__ctor_ILogger_MagicOnion_Server_Hubs_ConcurrentDictionaryGroup__
+  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.#ctor(ILogger{MagicOnion.Server.Hubs.ConcurrentDictionaryGroup})
+  name.vb: ConcurrentDictionaryGroupRepositoryFactory(ILogger(Of ConcurrentDictionaryGroup))
+  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory(ILogger<MagicOnion.Server.Hubs.ConcurrentDictionaryGroup>)
+  fullName.vb: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory(ILogger(Of MagicOnion.Server.Hubs.ConcurrentDictionaryGroup))
+  nameWithType: ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory(ILogger<ConcurrentDictionaryGroup>)
+  nameWithType.vb: ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory(ILogger(Of ConcurrentDictionaryGroup))
+- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.#ctor*
+  name: ConcurrentDictionaryGroupRepositoryFactory
+  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepositoryFactory__ctor_
+  commentId: Overload:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory
+  nameWithType: ConcurrentDictionaryGroupRepositoryFactory.ConcurrentDictionaryGroupRepositoryFactory
+- uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateRepository(IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: ConcurrentDictionaryGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
 - uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.CreateRepository*
   name: CreateRepository
   href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ConcurrentDictionaryGroupRepositoryFactory_CreateRepository_
@@ -12916,12 +12682,12 @@ references:
   commentId: T:MagicOnion.Server.Hubs.IGroupRepositoryFactory
   fullName: MagicOnion.Server.Hubs.IGroupRepositoryFactory
   nameWithType: IGroupRepositoryFactory
-- uid: MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.html#MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: IGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateRepository(IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.html#MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: IGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
 - uid: MagicOnion.Server.Hubs.IGroupRepositoryFactory.CreateRepository*
   name: CreateRepository
   href: api/MagicOnion.Server.Hubs.IGroupRepositoryFactory.html#MagicOnion_Server_Hubs_IGroupRepositoryFactory_CreateRepository_
@@ -13014,12 +12780,12 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ImmutableArrayGroup
   fullName: MagicOnion.Server.Hubs.ImmutableArrayGroup
   nameWithType: ImmutableArrayGroup
-- uid: MagicOnion.Server.Hubs.ImmutableArrayGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: ImmutableArrayGroup(String, IGroupRepository, IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroup.html#MagicOnion_Server_Hubs_ImmutableArrayGroup__ctor_System_String_MagicOnion_Server_Hubs_IGroupRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroup.ImmutableArrayGroup(System.String, MagicOnion.Server.Hubs.IGroupRepository, MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ImmutableArrayGroup.ImmutableArrayGroup(String, IGroupRepository, IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ImmutableArrayGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  name: ImmutableArrayGroup(String, IGroupRepository, IMagicOnionSerializer, ILogger)
+  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroup.html#MagicOnion_Server_Hubs_ImmutableArrayGroup__ctor_System_String_MagicOnion_Server_Hubs_IGroupRepository_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_
+  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroup.#ctor(System.String,MagicOnion.Server.Hubs.IGroupRepository,MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroup.ImmutableArrayGroup(System.String, MagicOnion.Server.Hubs.IGroupRepository, MagicOnion.Serialization.IMagicOnionSerializer, ILogger)
+  nameWithType: ImmutableArrayGroup.ImmutableArrayGroup(String, IGroupRepository, IMagicOnionSerializer, ILogger)
 - uid: MagicOnion.Server.Hubs.ImmutableArrayGroup.#ctor*
   name: ImmutableArrayGroup
   href: api/MagicOnion.Server.Hubs.ImmutableArrayGroup.html#MagicOnion_Server_Hubs_ImmutableArrayGroup__ctor_
@@ -13199,12 +12965,12 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ImmutableArrayGroupRepository
   fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository
   nameWithType: ImmutableArrayGroupRepository
-- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: ImmutableArrayGroupRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.ImmutableArrayGroupRepository(MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ImmutableArrayGroupRepository.ImmutableArrayGroupRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  name: ImmutableArrayGroupRepository(IMagicOnionSerializer, ILogger)
+  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_
+  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,ILogger)
+  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.ImmutableArrayGroupRepository(MagicOnion.Serialization.IMagicOnionSerializer, ILogger)
+  nameWithType: ImmutableArrayGroupRepository.ImmutableArrayGroupRepository(IMagicOnionSerializer, ILogger)
 - uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor*
   name: ImmutableArrayGroupRepository
   href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_
@@ -13260,12 +13026,28 @@ references:
   commentId: T:MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory
   fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory
   nameWithType: ImmutableArrayGroupRepositoryFactory
-- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: ImmutableArrayGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor(ILogger{MagicOnion.Server.Hubs.ImmutableArrayGroup})
+  name: ImmutableArrayGroupRepositoryFactory(ILogger<ImmutableArrayGroup>)
+  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory__ctor_ILogger_MagicOnion_Server_Hubs_ImmutableArrayGroup__
+  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor(ILogger{MagicOnion.Server.Hubs.ImmutableArrayGroup})
+  name.vb: ImmutableArrayGroupRepositoryFactory(ILogger(Of ImmutableArrayGroup))
+  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory(ILogger<MagicOnion.Server.Hubs.ImmutableArrayGroup>)
+  fullName.vb: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory(ILogger(Of MagicOnion.Server.Hubs.ImmutableArrayGroup))
+  nameWithType: ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory(ILogger<ImmutableArrayGroup>)
+  nameWithType.vb: ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory(ILogger(Of ImmutableArrayGroup))
+- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor*
+  name: ImmutableArrayGroupRepositoryFactory
+  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory__ctor_
+  commentId: Overload:MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory
+  nameWithType: ImmutableArrayGroupRepositoryFactory.ImmutableArrayGroupRepositoryFactory
+- uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateRepository(IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: ImmutableArrayGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
 - uid: MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository*
   name: CreateRepository
   href: api/MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_
@@ -14399,36 +14181,36 @@ references:
   commentId: T:MagicOnion.Server.MagicOnionEngine
   fullName: MagicOnion.Server.MagicOnionEngine
   nameWithType: MagicOnionEngine
-- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions, IMagicOnionLogger)
-  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name.vb: BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnionOptions, IMagicOnionLogger)
-  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnion.Server.MagicOnionOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName.vb: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnion.Server.MagicOnionOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions, IMagicOnionLogger)
-  nameWithType.vb: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnionOptions, IMagicOnionLogger)
-- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnionOptions, IMagicOnionLogger)
-  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name.vb: BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnionOptions, IMagicOnionLogger)
-  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnion.Server.MagicOnionOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName.vb: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnion.Server.MagicOnionOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnionOptions, IMagicOnionLogger)
-  nameWithType.vb: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnionOptions, IMagicOnionLogger)
-- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)
-  name: BuildServerServiceDefinition(IServiceProvider, IMagicOnionLogger, Boolean)
-  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_
-  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)
-  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, MagicOnion.Server.Diagnostics.IMagicOnionLogger, System.Boolean)
-  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IMagicOnionLogger, Boolean)
-- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions, IMagicOnionLogger)
-  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, MagicOnion.Server.MagicOnionOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions, IMagicOnionLogger)
+- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions)
+  name: BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions)
+  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_
+  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions)
+  name.vb: BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnionOptions)
+  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnion.Server.MagicOnionOptions)
+  fullName.vb: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnion.Server.MagicOnionOptions)
+  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions)
+  nameWithType.vb: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Assembly(), MagicOnionOptions)
+- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions)
+  name: BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnionOptions)
+  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_
+  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions)
+  name.vb: BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnionOptions)
+  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnion.Server.MagicOnionOptions)
+  fullName.vb: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnion.Server.MagicOnionOptions)
+  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable<Type>, MagicOnionOptions)
+  nameWithType.vb: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, IEnumerable(Of Type), MagicOnionOptions)
+- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions)
+  name: BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions)
+  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_
+  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions)
+  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, MagicOnion.Server.MagicOnionOptions)
+  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions)
+- uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,System.Boolean)
+  name: BuildServerServiceDefinition(IServiceProvider, Boolean)
+  href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_System_Boolean_
+  commentId: M:MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,System.Boolean)
+  fullName: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, System.Boolean)
+  nameWithType: MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider, Boolean)
 - uid: MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*
   name: BuildServerServiceDefinition
   href: api/MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_
@@ -14702,12 +14484,12 @@ references:
   commentId: T:MagicOnion.Server.MethodHandler
   fullName: MagicOnion.Server.MethodHandler
   nameWithType: MethodHandler
-- uid: MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)
-  name: MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, IMagicOnionLogger, Boolean)
-  href: api/MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_
-  commentId: M:MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)
-  fullName: MagicOnion.Server.MethodHandler.MethodHandler(Type, MethodInfo, System.String, MagicOnion.Server.MethodHandlerOptions, IServiceProvider, MagicOnion.Server.Diagnostics.IMagicOnionLogger, System.Boolean)
-  nameWithType: MethodHandler.MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, IMagicOnionLogger, Boolean)
+- uid: MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider,ILogger,System.Boolean)
+  name: MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, ILogger, Boolean)
+  href: api/MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler__ctor_Type_MethodInfo_System_String_MagicOnion_Server_MethodHandlerOptions_IServiceProvider_ILogger_System_Boolean_
+  commentId: M:MagicOnion.Server.MethodHandler.#ctor(Type,MethodInfo,System.String,MagicOnion.Server.MethodHandlerOptions,IServiceProvider,ILogger,System.Boolean)
+  fullName: MagicOnion.Server.MethodHandler.MethodHandler(Type, MethodInfo, System.String, MagicOnion.Server.MethodHandlerOptions, IServiceProvider, ILogger, System.Boolean)
+  nameWithType: MethodHandler.MethodHandler(Type, MethodInfo, String, MethodHandlerOptions, IServiceProvider, ILogger, Boolean)
 - uid: MagicOnion.Server.MethodHandler.#ctor*
   name: MethodHandler
   href: api/MagicOnion.Server.MethodHandler.html#MagicOnion_Server_MethodHandler__ctor_
@@ -15450,12 +15232,12 @@ references:
   commentId: T:MagicOnion.Server.Redis.RedisGroupRepository
   fullName: MagicOnion.Server.Redis.RedisGroupRepository
   nameWithType: RedisGroupRepository
-- uid: MagicOnion.Server.Redis.RedisGroupRepository.#ctor(IMagicOnionSerializer,MagicOnion.Server.Redis.RedisGroupOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Redis.RedisGroupRepository.html#MagicOnion_Server_Redis_RedisGroupRepository__ctor_IMagicOnionSerializer_MagicOnion_Server_Redis_RedisGroupOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Redis.RedisGroupRepository.#ctor(IMagicOnionSerializer,MagicOnion.Server.Redis.RedisGroupOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Redis.RedisGroupRepository.RedisGroupRepository(IMagicOnionSerializer, MagicOnion.Server.Redis.RedisGroupOptions, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: RedisGroupRepository.RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, IMagicOnionLogger)
+- uid: MagicOnion.Server.Redis.RedisGroupRepository.#ctor(IMagicOnionSerializer,MagicOnion.Server.Redis.RedisGroupOptions,ILogger)
+  name: RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, ILogger)
+  href: api/MagicOnion.Server.Redis.RedisGroupRepository.html#MagicOnion_Server_Redis_RedisGroupRepository__ctor_IMagicOnionSerializer_MagicOnion_Server_Redis_RedisGroupOptions_ILogger_
+  commentId: M:MagicOnion.Server.Redis.RedisGroupRepository.#ctor(IMagicOnionSerializer,MagicOnion.Server.Redis.RedisGroupOptions,ILogger)
+  fullName: MagicOnion.Server.Redis.RedisGroupRepository.RedisGroupRepository(IMagicOnionSerializer, MagicOnion.Server.Redis.RedisGroupOptions, ILogger)
+  nameWithType: RedisGroupRepository.RedisGroupRepository(IMagicOnionSerializer, RedisGroupOptions, ILogger)
 - uid: MagicOnion.Server.Redis.RedisGroupRepository.#ctor*
   name: RedisGroupRepository
   href: api/MagicOnion.Server.Redis.RedisGroupRepository.html#MagicOnion_Server_Redis_RedisGroupRepository__ctor_
@@ -15511,15 +15293,15 @@ references:
   commentId: T:MagicOnion.Server.Redis.RedisGroupRepositoryFactory
   fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory
   nameWithType: RedisGroupRepositoryFactory
-- uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.#ctor(IOptionsMonitor{MagicOnion.Server.Redis.RedisGroupOptions})
-  name: RedisGroupRepositoryFactory(IOptionsMonitor<RedisGroupOptions>)
-  href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory__ctor_IOptionsMonitor_MagicOnion_Server_Redis_RedisGroupOptions__
-  commentId: M:MagicOnion.Server.Redis.RedisGroupRepositoryFactory.#ctor(IOptionsMonitor{MagicOnion.Server.Redis.RedisGroupOptions})
-  name.vb: RedisGroupRepositoryFactory(IOptionsMonitor(Of RedisGroupOptions))
-  fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor<MagicOnion.Server.Redis.RedisGroupOptions>)
-  fullName.vb: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor(Of MagicOnion.Server.Redis.RedisGroupOptions))
-  nameWithType: RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor<RedisGroupOptions>)
-  nameWithType.vb: RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor(Of RedisGroupOptions))
+- uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.#ctor(IOptionsMonitor{MagicOnion.Server.Redis.RedisGroupOptions},ILogger{MagicOnion.Server.Redis.RedisGroup})
+  name: RedisGroupRepositoryFactory(IOptionsMonitor<RedisGroupOptions>, ILogger<RedisGroup>)
+  href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory__ctor_IOptionsMonitor_MagicOnion_Server_Redis_RedisGroupOptions__ILogger_MagicOnion_Server_Redis_RedisGroup__
+  commentId: M:MagicOnion.Server.Redis.RedisGroupRepositoryFactory.#ctor(IOptionsMonitor{MagicOnion.Server.Redis.RedisGroupOptions},ILogger{MagicOnion.Server.Redis.RedisGroup})
+  name.vb: RedisGroupRepositoryFactory(IOptionsMonitor(Of RedisGroupOptions), ILogger(Of RedisGroup))
+  fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor<MagicOnion.Server.Redis.RedisGroupOptions>, ILogger<MagicOnion.Server.Redis.RedisGroup>)
+  fullName.vb: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor(Of MagicOnion.Server.Redis.RedisGroupOptions), ILogger(Of MagicOnion.Server.Redis.RedisGroup))
+  nameWithType: RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor<RedisGroupOptions>, ILogger<RedisGroup>)
+  nameWithType.vb: RedisGroupRepositoryFactory.RedisGroupRepositoryFactory(IOptionsMonitor(Of RedisGroupOptions), ILogger(Of RedisGroup))
 - uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.#ctor*
   name: RedisGroupRepositoryFactory
   href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory__ctor_
@@ -15527,12 +15309,12 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.RedisGroupRepositoryFactory
   nameWithType: RedisGroupRepositoryFactory.RedisGroupRepositoryFactory
-- uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  name: CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
-  href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory_CreateRepository_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_
-  commentId: M:MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger)
-  nameWithType: RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)
+- uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
+  name: CreateRepository(IMagicOnionSerializer)
+  href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory_CreateRepository_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
+  fullName: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
+  nameWithType: RedisGroupRepositoryFactory.CreateRepository(IMagicOnionSerializer)
 - uid: MagicOnion.Server.Redis.RedisGroupRepositoryFactory.CreateRepository*
   name: CreateRepository
   href: api/MagicOnion.Server.Redis.RedisGroupRepositoryFactory.html#MagicOnion_Server_Redis_RedisGroupRepositoryFactory_CreateRepository_
@@ -15773,15 +15555,15 @@ references:
   commentId: T:MagicOnion.Server.ServiceContext
   fullName: MagicOnion.Server.ServiceContext
   nameWithType: ServiceContext
-- uid: MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger,MagicOnion.Server.MethodHandler,IServiceProvider)
-  name: ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)
-  href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_MagicOnion_Server_MethodHandler_IServiceProvider_
-  commentId: M:MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger,MagicOnion.Server.MethodHandler,IServiceProvider)
-  name.vb: ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)
-  fullName: MagicOnion.Server.ServiceContext.ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger, MagicOnion.Server.MethodHandler, IServiceProvider)
-  fullName.vb: MagicOnion.Server.ServiceContext.ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, MagicOnion.Serialization.IMagicOnionSerializer, MagicOnion.Server.Diagnostics.IMagicOnionLogger, MagicOnion.Server.MethodHandler, IServiceProvider)
-  nameWithType: ServiceContext.ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)
-  nameWithType.vb: ServiceContext.ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, IMagicOnionSerializer, IMagicOnionLogger, MethodHandler, IServiceProvider)
+- uid: MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,ILogger,MagicOnion.Server.MethodHandler,IServiceProvider)
+  name: ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)
+  href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_Type_MethodInfo_ILookup_Type_Attribute__MethodType_ServerCallContext_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_MagicOnion_Server_MethodHandler_IServiceProvider_
+  commentId: M:MagicOnion.Server.ServiceContext.#ctor(Type,MethodInfo,ILookup{Type,Attribute},MethodType,ServerCallContext,MagicOnion.Serialization.IMagicOnionSerializer,ILogger,MagicOnion.Server.MethodHandler,IServiceProvider)
+  name.vb: ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)
+  fullName: MagicOnion.Server.ServiceContext.ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, MagicOnion.Serialization.IMagicOnionSerializer, ILogger, MagicOnion.Server.MethodHandler, IServiceProvider)
+  fullName.vb: MagicOnion.Server.ServiceContext.ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, MagicOnion.Serialization.IMagicOnionSerializer, ILogger, MagicOnion.Server.MethodHandler, IServiceProvider)
+  nameWithType: ServiceContext.ServiceContext(Type, MethodInfo, ILookup<Type, Attribute>, MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)
+  nameWithType.vb: ServiceContext.ServiceContext(Type, MethodInfo, ILookup(Of Type, Attribute), MethodType, ServerCallContext, IMagicOnionSerializer, ILogger, MethodHandler, IServiceProvider)
 - uid: MagicOnion.Server.ServiceContext.#ctor*
   name: ServiceContext
   href: api/MagicOnion.Server.ServiceContext.html#MagicOnion_Server_ServiceContext__ctor_

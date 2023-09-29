@@ -110,28 +110,28 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_">BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions)</a>
         </td>
         <td class="markdown level1 summary"><p>Search MagicOnion service from target assemblies. ex: new[]{ typeof(Startup).GetTypeInfo().Assembly }</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">BuildServerServiceDefinition(IServiceProvider, IEnumerable&lt;Type&gt;, MagicOnionOptions, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_">BuildServerServiceDefinition(IServiceProvider, IEnumerable&lt;Type&gt;, MagicOnionOptions)</a>
         </td>
         <td class="markdown level1 summary"><p>Search MagicOnion service from target types.</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_">BuildServerServiceDefinition(IServiceProvider, IMagicOnionLogger, Boolean)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_">BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions)</a>
         </td>
         <td class="markdown level1 summary"><p>Search MagicOnion service from all assemblies.</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.MagicOnionEngine.html#MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_System_Boolean_">BuildServerServiceDefinition(IServiceProvider, Boolean)</a>
         </td>
         <td class="markdown level1 summary"><p>Search MagicOnion service from all assemblies.</p>
 </td>
@@ -143,13 +143,13 @@
   </h3>
   <section>
   <a id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions, IMagicOnionLogger)</h4>
+  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_Assembly___MagicOnion_Server_MagicOnionOptions_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,Assembly[],MagicOnion.Server.MagicOnionOptions)">BuildServerServiceDefinition(IServiceProvider, Assembly[], MagicOnionOptions)</h4>
   <div class="markdown level1 summary"><p>Search MagicOnion service from target assemblies. ex: new[]{ typeof(Startup).GetTypeInfo().Assembly }</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions options, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, Assembly[] searchAssemblies, MagicOnionOptions options)</code></pre>
   </div>
 
   <section>
@@ -164,9 +164,6 @@
     <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html">MagicOnionOptions</a></dt>
     <dd><p>The options for MagicOnion server</p>
 </dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
-    <dd><p>The logger for MagicOnion server</p>
-</dd>
   </dl>
   </section>
   
@@ -191,13 +188,13 @@
   </section>
   <section>
   <a id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">BuildServerServiceDefinition(IServiceProvider, IEnumerable&lt;Type&gt;, MagicOnionOptions, IMagicOnionLogger)</h4>
+  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_IEnumerable_Type__MagicOnion_Server_MagicOnionOptions_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,IEnumerable{Type},MagicOnion.Server.MagicOnionOptions)">BuildServerServiceDefinition(IServiceProvider, IEnumerable&lt;Type&gt;, MagicOnionOptions)</h4>
   <div class="markdown level1 summary"><p>Search MagicOnion service from target types.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable&lt;Type&gt; targetTypes, MagicOnionOptions options, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IEnumerable&lt;Type&gt; targetTypes, MagicOnionOptions options)</code></pre>
   </div>
 
   <section>
@@ -212,9 +209,6 @@
     <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html">MagicOnionOptions</a></dt>
     <dd><p>The options for MagicOnion server</p>
 </dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
-    <dd><p>The logger for MagicOnion server</p>
-</dd>
   </dl>
   </section>
   
@@ -239,58 +233,13 @@
   </section>
   <section>
   <a id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_Diagnostics_IMagicOnionLogger_System_Boolean_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.Diagnostics.IMagicOnionLogger,System.Boolean)">BuildServerServiceDefinition(IServiceProvider, IMagicOnionLogger, Boolean)</h4>
+  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions)">BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions)</h4>
   <div class="markdown level1 summary"><p>Search MagicOnion service from all assemblies.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isReturnExceptionStackTraceInErrorDetail = false)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
-    <dd><p>The service provider is used to resolve dependencies</p>
-</dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
-    <dd><p>The logger for MagicOnion server</p>
-</dd>
-    <dt><span class="parametername"><code>isReturnExceptionStackTraceInErrorDetail</code></span> <span class="xref">System.Boolean</span></dt>
-    <dd><p>If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</p>
-</dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html">MagicOnionServiceDefinition</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*"></a>
-  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_MagicOnion_Server_MagicOnionOptions_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,MagicOnion.Server.MagicOnionOptions,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">BuildServerServiceDefinition(IServiceProvider, MagicOnionOptions, IMagicOnionLogger)</h4>
-  <div class="markdown level1 summary"><p>Search MagicOnion service from all assemblies.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options)</code></pre>
   </div>
 
   <section>
@@ -302,8 +251,47 @@
     <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html">MagicOnionOptions</a></dt>
     <dd><p>The options for MagicOnion server</p>
 </dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
-    <dd><p>The logger for MagicOnion server</p>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Server.MagicOnionServiceDefinition.html">MagicOnionServiceDefinition</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionEngine_BuildServerServiceDefinition_IServiceProvider_System_Boolean_" data-uid="MagicOnion.Server.MagicOnionEngine.BuildServerServiceDefinition(IServiceProvider,System.Boolean)">BuildServerServiceDefinition(IServiceProvider, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Search MagicOnion service from all assemblies.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, bool isReturnExceptionStackTraceInErrorDetail = false)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>serviceProvider</code></span> <span class="xref">IServiceProvider</span></dt>
+    <dd><p>The service provider is used to resolve dependencies</p>
+</dd>
+    <dt><span class="parametername"><code>isReturnExceptionStackTraceInErrorDetail</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd><p>If true, when method body throws exception send to client exception.ToString message. It is useful for debugging.</p>
 </dd>
   </dl>
   </section>

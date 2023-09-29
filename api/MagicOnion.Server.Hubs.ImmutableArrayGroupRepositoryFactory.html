@@ -102,6 +102,24 @@
   
   
   <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory__ctor_ILogger_MagicOnion_Server_Hubs_ImmutableArrayGroup__">ImmutableArrayGroupRepositoryFactory(ILogger&lt;ImmutableArrayGroup&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
   <h4>Methods
   </h4>
   <table class="table table-condensed">
@@ -114,31 +132,61 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_">CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_">CreateRepository(IMagicOnionSerializer)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="methods">Methods
+  <h3 id="constructors">Constructors
   </h3>
   <section>
-  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository*"></a>
-  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_MagicOnion_Server_Diagnostics_IMagicOnionLogger_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer,MagicOnion.Server.Diagnostics.IMagicOnionLogger)">CreateRepository(IMagicOnionSerializer, IMagicOnionLogger)</h4>
+  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory__ctor_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor*"></a>
+  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory__ctor_ILogger_MagicOnion_Server_Hubs_ImmutableArrayGroup__" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.#ctor(ILogger{MagicOnion.Server.Hubs.ImmutableArrayGroup})">ImmutableArrayGroupRepositoryFactory(ILogger&lt;ImmutableArrayGroup&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer, IMagicOnionLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public ImmutableArrayGroupRepositoryFactory(ILogger&lt;ImmutableArrayGroup&gt; logger)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span>&lt;<a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroup.html">ImmutableArrayGroup</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository*"></a>
+  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepositoryFactory_CreateRepository_MagicOnion_Serialization_IMagicOnionSerializer_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepositoryFactory.CreateRepository(MagicOnion.Serialization.IMagicOnionSerializer)">CreateRepository(IMagicOnionSerializer)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IGroupRepository CreateRepository(IMagicOnionSerializer messageSerializer)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Server.Diagnostics.IMagicOnionLogger.html">IMagicOnionLogger</a></dt>
     <dd></dd>
   </dl>
   </section>
