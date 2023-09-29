@@ -5,20 +5,22 @@ using MagicOnion.Utils;
 using MessagePack;
 using StackExchange.Redis;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server.Redis;
 
 public class RedisGroupRepository : IGroupRepository
 {
-    IMagicOnionSerializer messageSerializer;
-    IMagicOnionLogger logger;
+    readonly IMagicOnionSerializer messageSerializer;
+    readonly ILogger logger;
+
     ConnectionMultiplexer connection;
     int db;
 
     readonly Func<string, IGroup> factory;
     ConcurrentDictionary<string, IGroup> dictionary = new ConcurrentDictionary<string, IGroup>();
 
-    public RedisGroupRepository(IMagicOnionSerializer messageSerializer, RedisGroupOptions redisGroupOptions, IMagicOnionLogger logger)
+    public RedisGroupRepository(IMagicOnionSerializer messageSerializer, RedisGroupOptions redisGroupOptions, ILogger logger)
     {
         this.messageSerializer = messageSerializer;
         this.logger = logger;

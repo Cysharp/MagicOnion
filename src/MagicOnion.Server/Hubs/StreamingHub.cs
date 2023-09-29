@@ -1,4 +1,5 @@
 using Grpc.Core;
+using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using MagicOnion.Utils;
 using Microsoft.AspNetCore.Connections;
@@ -177,7 +178,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 };
 
                 var isErrorOrInterrupted = false;
-                Context.MethodHandler.Logger.BeginInvokeHubMethod(context, context.Request, handler.RequestType);
+                MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, context, context.Request, handler.RequestType);
                 try
                 {
                     await handler.MethodBody.Invoke(context);
@@ -192,7 +193,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 catch (Exception ex)
                 {
                     isErrorOrInterrupted = true;
-                    Context.MethodHandler.Logger.Error(ex, context);
+                    MagicOnionServerLog.Error(Context.MethodHandler.Logger, ex, context);
 
                     if (hasResponse)
                     {
@@ -201,7 +202,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 }
                 finally
                 {
-                    Context.MethodHandler.Logger.EndInvokeHubMethod(context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                    MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
                 }
             }
             else

@@ -4,6 +4,7 @@ using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
@@ -44,7 +45,7 @@ internal class StreamingServiceContext<TRequest, TResponse> : ServiceContext, IS
         MethodType methodType,
         ServerCallContext context,
         IMagicOnionSerializer messageSerializer,
-        IMagicOnionLogger logger,
+        ILogger logger,
         MethodHandler methodHandler,
         IServiceProvider serviceProvider,
         IAsyncStreamReader<TRequest>? requestStream,

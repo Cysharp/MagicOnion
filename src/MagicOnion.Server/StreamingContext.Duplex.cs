@@ -1,6 +1,6 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
-using MessagePack;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
@@ -9,14 +9,14 @@ public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
     readonly StreamingServiceContext<TRequest, TResponse> context;
     readonly IAsyncStreamReader<TRequest> innerReader;
     readonly IAsyncStreamWriter<TResponse> innerWriter;
-    readonly IMagicOnionLogger logger;
+    readonly ILogger logger;
 
     internal DuplexStreamingContext(StreamingServiceContext<TRequest, TResponse> context)
     {
         this.context = context;
         this.innerReader = context.RequestStream!;
         this.innerWriter = context.ResponseStream!;
-        this.logger = context.MagicOnionLogger;
+        this.logger = context.Logger;
     }
 
     public ServiceContext ServiceContext => context;
@@ -38,13 +38,13 @@ public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
     {
         if (await innerReader.MoveNext(cancellationToken))
         {
-            logger.ReadFromStream(context, typeof(TRequest), false);
+            MagicOnionServerLog.ReadFromStream(logger, context, typeof(TRequest), false);
             this.Current = innerReader.Current;
             return true;
         }
         else
         {
-            logger.ReadFromStream(context, typeof(TRequest), true);
+            MagicOnionServerLog.ReadFromStream(logger, context, typeof(TRequest), true);
             return false;
         }
     }
@@ -60,7 +60,7 @@ public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
     /// </summary>
     public Task WriteAsync(TResponse message)
     {
-        logger.WriteToStream(context, typeof(TResponse));
+        MagicOnionServerLog.WriteToStream(logger, context, typeof(TResponse));
         return innerWriter.WriteAsync(message);
     }
 

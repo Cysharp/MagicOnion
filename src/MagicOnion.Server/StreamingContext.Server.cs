@@ -1,21 +1,21 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
-
 
 public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
 {
     readonly StreamingServiceContext<Nil /* Dummy */, TResponse> context;
     readonly IAsyncStreamWriter<TResponse> inner;
-    readonly IMagicOnionLogger logger;
+    readonly ILogger logger;
 
     internal ServerStreamingContext(StreamingServiceContext<Nil /* Dummy */, TResponse> context)
     {
         this.context = context;
         this.inner = context.ResponseStream!;
-        this.logger = context.MagicOnionLogger;
+        this.logger = context.Logger;
     }
 
     public ServiceContext ServiceContext => context;
@@ -28,7 +28,7 @@ public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
 
     public Task WriteAsync(TResponse message)
     {
-        logger.WriteToStream(context, typeof(TResponse));
+        MagicOnionServerLog.WriteToStream(logger, context, typeof(TResponse));
         return inner.WriteAsync(message);
     }
 

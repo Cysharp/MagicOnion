@@ -9,6 +9,7 @@ using MagicOnion.Server.Filters.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MagicOnion.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
 
@@ -36,7 +37,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     // options
     readonly bool enableCurrentContext;
 
-    internal IMagicOnionLogger Logger { get; }
+    internal ILogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
     public IMagicOnionSerializer MessageSerializer => messageSerializer;
 
@@ -52,7 +53,7 @@ public class MethodHandler : IEquatable<MethodHandler>
     public Type RequestType => metadata.RequestType;
     public Type UnwrappedResponseType => metadata.ResponseType;
 
-    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, IMagicOnionLogger logger, bool isStreamingHub)
+    public MethodHandler(Type classType, MethodInfo methodInfo, string methodName, MethodHandlerOptions handlerOptions, IServiceProvider serviceProvider, ILogger logger, bool isStreamingHub)
     {
         this.metadata = MethodHandlerMetadataFactory.CreateServiceMethodHandlerMetadata(classType, methodInfo);
         this.methodHandlerId = Interlocked.Increment(ref methodHandlerIdBuild);
@@ -233,7 +234,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         object? response = default(TResponse?);
         try
         {
-            Logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
+            MagicOnionServerLog.BeginInvokeMethod(Logger, serviceContext, typeof(TRequest));
             if (enableCurrentContext)
             {
                 ServiceContext.currentServiceContext.Value = serviceContext;
@@ -289,7 +290,7 @@ public class MethodHandler : IEquatable<MethodHandler>
                 var str = sb.ToString();
 
                 context.Status = new Status(StatusCode.Unknown, str);
-                Logger.Error(ex, context);
+                MagicOnionServerLog.Error(Logger, ex, context);
                 response = default;
             }
             else
@@ -299,7 +300,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            Logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            MagicOnionServerLog.EndInvokeMethod(Logger, serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
 
         return response;
@@ -327,7 +328,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         {
             using (requestStream as IDisposable)
             {
-                Logger.BeginInvokeMethod(serviceContext, typeof(Nil));
+                MagicOnionServerLog.BeginInvokeMethod(Logger, serviceContext, typeof(Nil));
                 if (enableCurrentContext)
                 {
                     ServiceContext.currentServiceContext.Value = serviceContext;
@@ -348,7 +349,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                Logger.Error(ex, context);
+                MagicOnionServerLog.Error(Logger, ex, context);
                 response = default;
             }
             else
@@ -358,7 +359,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            Logger.EndInvokeMethod(serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            MagicOnionServerLog.EndInvokeMethod(Logger, serviceContext, typeof(TResponse), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
 
         return response;
@@ -383,7 +384,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         serviceContext.SetRawRequest(request);
         try
         {
-            Logger.BeginInvokeMethod(serviceContext, typeof(TRequest));
+            MagicOnionServerLog.BeginInvokeMethod(Logger, serviceContext, typeof(TRequest));
             if (enableCurrentContext)
             {
                 ServiceContext.currentServiceContext.Value = serviceContext;
@@ -403,7 +404,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                Logger.Error(ex, context);
+                MagicOnionServerLog.Error(Logger, ex, context);
                 return;
             }
             else
@@ -413,7 +414,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            Logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            MagicOnionServerLog.EndInvokeMethod(Logger, serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
     }
 
@@ -435,7 +436,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         );
         try
         {
-            Logger.BeginInvokeMethod(serviceContext, typeof(Nil));
+            MagicOnionServerLog.BeginInvokeMethod(Logger, serviceContext, typeof(Nil));
             using (requestStream as IDisposable)
             {
                 if (enableCurrentContext)
@@ -459,7 +460,7 @@ public class MethodHandler : IEquatable<MethodHandler>
             if (IsReturnExceptionStackTraceInErrorDetail)
             {
                 context.Status = new Status(StatusCode.Unknown, ex.ToString());
-                Logger.Error(ex, context);
+                MagicOnionServerLog.Error(Logger, ex, context);
                 return;
             }
             else
@@ -469,7 +470,7 @@ public class MethodHandler : IEquatable<MethodHandler>
         }
         finally
         {
-            Logger.EndInvokeMethod(serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+            MagicOnionServerLog.EndInvokeMethod(Logger, serviceContext, typeof(Nil), (DateTime.UtcNow - serviceContext.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
         }
     }
 
