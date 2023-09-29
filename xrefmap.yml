@@ -956,6 +956,15 @@ references:
   fullName.vb: MagicOnion.Client.MagicOnionClient.Create(Of T)(ChannelBase, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IClientFilter())
   nameWithType: MagicOnionClient.Create<T>(ChannelBase, IMagicOnionSerializerProvider, IClientFilter[])
   nameWithType.vb: MagicOnionClient.Create(Of T)(ChannelBase, IMagicOnionSerializerProvider, IClientFilter())
+- uid: MagicOnion.Client.MagicOnionClient.Create``1(ChannelBase,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IClientFilter[],MagicOnion.Client.IMagicOnionClientFactoryProvider)
+  name: Create<T>(ChannelBase, IMagicOnionSerializerProvider, IClientFilter[], IMagicOnionClientFactoryProvider)
+  href: api/MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_ChannelBase_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IClientFilter___MagicOnion_Client_IMagicOnionClientFactoryProvider_
+  commentId: M:MagicOnion.Client.MagicOnionClient.Create``1(ChannelBase,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IClientFilter[],MagicOnion.Client.IMagicOnionClientFactoryProvider)
+  name.vb: Create(Of T)(ChannelBase, IMagicOnionSerializerProvider, IClientFilter(), IMagicOnionClientFactoryProvider)
+  fullName: MagicOnion.Client.MagicOnionClient.Create<T>(ChannelBase, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IClientFilter[], MagicOnion.Client.IMagicOnionClientFactoryProvider)
+  fullName.vb: MagicOnion.Client.MagicOnionClient.Create(Of T)(ChannelBase, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IClientFilter(), MagicOnion.Client.IMagicOnionClientFactoryProvider)
+  nameWithType: MagicOnionClient.Create<T>(ChannelBase, IMagicOnionSerializerProvider, IClientFilter[], IMagicOnionClientFactoryProvider)
+  nameWithType.vb: MagicOnionClient.Create(Of T)(ChannelBase, IMagicOnionSerializerProvider, IClientFilter(), IMagicOnionClientFactoryProvider)
 - uid: MagicOnion.Client.MagicOnionClient.Create``1(MagicOnion.Client.MagicOnionClientOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider)
   name: Create<T>(MagicOnionClientOptions, IMagicOnionSerializerProvider)
   href: api/MagicOnion.Client.MagicOnionClient.html#MagicOnion_Client_MagicOnionClient_Create__1_MagicOnion_Client_MagicOnionClientOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_
