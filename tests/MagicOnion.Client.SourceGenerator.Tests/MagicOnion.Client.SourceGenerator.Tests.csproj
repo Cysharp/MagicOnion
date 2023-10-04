@@ -34,5 +34,8 @@
     <Compile Remove="Resources\**\*.cs" />
     <EmbeddedResource Include="Resources\**\*.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
 
 </Project>

@@ -23,7 +23,7 @@ public class MagicOnionClientSourceGenerator : ISourceGenerator
         var outputs = compiler.GenerateAsync(context.Compilation, "MagicOnionClient.g.cs",
             disableAutoRegister: false,
             @namespace: @namespace,
-            userDefinedFormattersNamespace: "MessagePack.Formatter",
+            userDefinedFormattersNamespace: "MessagePack.Formatters",
             serializerType: SerializerType.MessagePack
         ).GetAwaiter().GetResult();
 

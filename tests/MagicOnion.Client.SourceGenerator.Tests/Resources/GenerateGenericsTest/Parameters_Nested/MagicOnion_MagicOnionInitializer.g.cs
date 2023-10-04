@@ -65,9 +65,9 @@ namespace MagicOnion
             {
                 object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
 
-                if (typeof(T) == typeof(global::MyNamespace.IMyService))
+                if (typeof(T) == typeof(global::TempProject.IMyService))
                 {
-                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MyNamespace.IMyService>)((x, y) => new MyNamespace.MyServiceClient(x, y)));
+                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::TempProject.IMyService>)((x, y) => new TempProject.MyServiceClient(x, y)));
                 }
                 Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
             }

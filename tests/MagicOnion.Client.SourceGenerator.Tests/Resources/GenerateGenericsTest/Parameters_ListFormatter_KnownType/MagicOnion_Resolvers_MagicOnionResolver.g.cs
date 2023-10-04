@@ -45,11 +45,10 @@ namespace MagicOnion.Resolvers
     
         static MagicOnionResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(3)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(2)
             {
-                {typeof(global::ILookup<global::System.String, global::System.String>), 0 },
-                {typeof(global::IReadOnlyList<global::System.Int32>), 1 },
-                {typeof(global::MagicOnion.DynamicArgumentTuple<global::Int32, global::IReadOnlyList<global::System.Int32>, global::FileMode, global::ILookup<global::System.String, global::System.String>, global::ClientCertificateOption, global::ApartmentState, global::TaskCreationOptions>), 2 },
+                {typeof(global::System.Collections.Generic.List<global::System.Int32>), 0 },
+                {typeof(global::System.Collections.Generic.List<global::System.String>), 1 },
             };
         }
         internal static object GetFormatter(Type t)
@@ -62,9 +61,8 @@ namespace MagicOnion.Resolvers
         
             switch (key)
             {
-                case 0: return new global::MessagePack.Formatter.ILookupFormatter<global::System.String, global::System.String>();
-                case 1: return new global::MessagePack.Formatter.IReadOnlyListFormatter<global::System.Int32>();
-                case 2: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::Int32, global::IReadOnlyList<global::System.Int32>, global::FileMode, global::ILookup<global::System.String, global::System.String>, global::ClientCertificateOption, global::ApartmentState, global::TaskCreationOptions>(default(global::Int32), default(global::IReadOnlyList<global::System.Int32>), default(global::FileMode), default(global::ILookup<global::System.String, global::System.String>), default(global::ClientCertificateOption), default(global::ApartmentState), default(global::TaskCreationOptions));
+                case 0: return new global::MessagePack.Formatters.ListFormatter<global::System.Int32>();
+                case 1: return new global::MessagePack.Formatters.ListFormatter<global::System.String>();
                 default: return null;
             }
         }
@@ -76,17 +74,11 @@ namespace MagicOnion.Resolvers
         [MagicOnion.Resolvers.Preserve]
         internal static void Register()
         {
-            _ = MagicOnionResolver.Instance.GetFormatter<global::ApartmentState>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::ClientCertificateOption>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::FileMode>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::ILookup<global::System.String, global::System.String>>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::Int32>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::IReadOnlyList<global::System.Int32>>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::Int32, global::IReadOnlyList<global::System.Int32>, global::FileMode, global::ILookup<global::System.String, global::System.String>, global::ClientCertificateOption, global::ApartmentState, global::TaskCreationOptions>>();
             _ = MagicOnionResolver.Instance.GetFormatter<global::MessagePack.Nil>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.Collections.Generic.List<global::System.Int32>>();
+            _ = MagicOnionResolver.Instance.GetFormatter<global::System.Collections.Generic.List<global::System.String>>();
             _ = MagicOnionResolver.Instance.GetFormatter<global::System.Int32>();
             _ = MagicOnionResolver.Instance.GetFormatter<global::System.String>();
-            _ = MagicOnionResolver.Instance.GetFormatter<global::TaskCreationOptions>();
         }
     }
 }
