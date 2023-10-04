@@ -10,6 +10,7 @@ using MagicOnion.Generator.Utils;
 using MagicOnion.Generator.CodeGen.Extensions;
 using MagicOnion.Generator.Internal;
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator;
 
@@ -41,16 +42,53 @@ public class MagicOnionCompiler
         string userDefinedFormattersNamespace,
         SerializerType serializerType)
     {
-        // Prepare args
-        var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
         var conditionalSymbols = conditionalSymbol?.Split(',') ?? Array.Empty<string>();
 
         // Generator Start...
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Input: {input}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Output: {output}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
+
+        var sw = Stopwatch.StartNew();
+        logger.Information("Project Compilation Start:" + input);
+        var compilation = await PseudoCompilation.CreateFromProjectAsync(new[] { input }, conditionalSymbols, logger, cancellationToken);
+        logger.Information("Project Compilation Complete:" + sw.Elapsed.ToString());
+
+        var outputs = await GenerateAsync(compilation, Path.GetFileName(output), disableAutoRegister, @namespace, userDefinedFormattersNamespace, serializerType);
+
+        sw.Restart();
+        logger.Information("Writing generated codes");
+        if (Path.GetExtension(output) == ".cs")
+        {
+            Output(output, outputs[0].Source);
+        }
+        else
+        {
+            foreach (var o in outputs)
+            {
+                Output(o.Path, o.Source);
+            }
+        }
+        logger.Information("Writing generated codes Complete:" + sw.Elapsed.ToString());
+    }
+
+    
+    public async Task<IReadOnlyList<(string Path, string Source)>> GenerateAsync(
+        Compilation compilation,
+        string generatedFileNameBase,
+        bool disableAutoRegister,
+        string @namespace,
+        string userDefinedFormattersNamespace,
+        SerializerType serializerType
+    )
+    {
+        var outputs = new List<(string Path, string Source)>();
+
+        // Prepare args
+        var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
+
+        // Generator Start...
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:DisableAutoRegister: {disableAutoRegister}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {@namespace}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedFormattersNamespace: {userDefinedFormattersNamespace}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:SerializerType: {serializerType}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Assembly version: {typeof(MagicOnionCompiler).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
@@ -84,23 +122,24 @@ public class MagicOnionCompiler
         };
 
         var sw = Stopwatch.StartNew();
-        logger.Information("Project Compilation Start:" + input);
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(new[] { input }, conditionalSymbols, logger, cancellationToken);
-        logger.Information("Project Compilation Complete:" + sw.Elapsed.ToString());
 
         sw.Restart();
         logger.Information("Collect services and methods Start");
-        var collector = new MethodCollector(logger);
+        var collector = new MethodCollector(logger, cancellationToken);
         var serviceCollection = collector.Collect(compilation);
         logger.Information("Collect services and methods Complete:" + sw.Elapsed.ToString());
-            
+
+        cancellationToken.ThrowIfCancellationRequested();
+
         sw.Restart();
         logger.Information("Collect serialization information Start");
         var serializationInfoCollector = new SerializationInfoCollector(logger, serialization.Mapper);
         var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection);
         logger.Information("Collect serialization information Complete:" + sw.Elapsed.ToString());
 
-        logger.Information("Output Generation Start");
+        cancellationToken.ThrowIfCancellationRequested();
+
+        logger.Information("Code Generation Start");
         sw.Restart();
         
         var registerTemplate = new RegisterTemplate
@@ -114,51 +153,27 @@ public class MagicOnionCompiler
         var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
         var resolverTexts = serialization.Generator.Build(formatterCodeGenContext);
 
-        if (Path.GetExtension(output) == ".cs")
+        cancellationToken.ThrowIfCancellationRequested();
+
+
+        outputs.Add((GeneratePathFromNamespaceAndTypeName(registerTemplate.Namespace, "MagicOnionInitializer"), WithAutoGenerated(registerTemplate.TransformText())));
+        outputs.Add((GeneratePathFromNamespaceAndTypeName(formatterCodeGenContext.Namespace, formatterCodeGenContext.InitializerName), WithAutoGenerated(resolverTexts)));
+
+        foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
         {
-            var enums = serializationInfoCollection.Enums
-                .GroupBy(x => x.Namespace)
-                .OrderBy(x => x.Key)
-                .ToArray();
-
-            var clientTexts = StaticMagicOnionClientGenerator.Build(serviceCollection.Services);
-            var hubTexts = StaticStreamingHubClientGenerator.Build(serviceCollection.Hubs);
-
-            var sb = new StringBuilder();
-            sb.AppendLine("// <auto-generated />");
-            sb.AppendLine(registerTemplate.TransformText());
-            sb.AppendLine(resolverTexts);
-            foreach (var item in enums)
-            {
-                sb.AppendLine(serialization.EnumFormatterGenerator(item));
-            }
-
-            sb.AppendLine(clientTexts);
-            sb.AppendLine(hubTexts);
-
-            Output(output, sb.ToString());
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(namespaceDot + "Formatters", enumSerializationInfo.FormatterName), WithAutoGenerated(serialization.EnumFormatterGenerator(new []{ enumSerializationInfo }))));
         }
-        else
+
+        foreach (var service in serviceCollection.Services)
         {
-            Output(NormalizePath(output, registerTemplate.Namespace, "MagicOnionInitializer"), WithAutoGenerated(registerTemplate.TransformText()));
-            Output(NormalizePath(output, formatterCodeGenContext.Namespace, formatterCodeGenContext.InitializerName), WithAutoGenerated(resolverTexts));
+            var x = StaticMagicOnionClientGenerator.Build(new[] { service });
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(service.ServiceType.Namespace, service.GetClientName()), WithAutoGenerated(x)));
+        }
 
-            foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
-            {
-                Output(NormalizePath(output, namespaceDot + "Formatters", enumSerializationInfo.FormatterName), WithAutoGenerated(serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
-            }
-
-            foreach (var service in serviceCollection.Services)
-            {
-                var x = StaticMagicOnionClientGenerator.Build(new[] { service });
-                Output(NormalizePath(output, service.ServiceType.Namespace, service.GetClientName()), WithAutoGenerated(x));
-            }
-
-            foreach (var hub in serviceCollection.Hubs)
-            {
-                var x = StaticStreamingHubClientGenerator.Build(new [] { hub });
-                Output(NormalizePath(output, hub.ServiceType.Namespace, hub.GetClientName()), WithAutoGenerated(x));
-            }
+        foreach (var hub in serviceCollection.Hubs)
+        {
+            var x = StaticStreamingHubClientGenerator.Build(new [] { hub });
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(hub.ServiceType.Namespace, hub.GetClientName()), WithAutoGenerated(x)));
         }
 
         if (serviceCollection.Services.Count == 0 && serviceCollection.Hubs.Count == 0)
@@ -166,12 +181,14 @@ public class MagicOnionCompiler
             logger.Information("Generated result is empty, unexpected result?");
         }
 
-        logger.Information("Output Generation Complete:" + sw.Elapsed.ToString());
+        logger.Information("Code Generation Complete:" + sw.Elapsed.ToString());
+
+        return outputs.OrderBy(x => x.Path).ToArray();
     }
 
-    static string NormalizePath(string dir, string ns, string className)
+    static string GeneratePathFromNamespaceAndTypeName(string ns, string className)
     {
-        return Path.Combine(dir, $"{ns}_{className}".Replace(".", "_").Replace("global::", string.Empty) + ".cs");
+        return $"{ns}_{className}".Replace(".", "_").Replace("global::", string.Empty) + ".cs";
     }
 
     static string WithAutoGenerated(string s)

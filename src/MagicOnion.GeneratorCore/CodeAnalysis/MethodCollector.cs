@@ -10,8 +10,9 @@ namespace MagicOnion.Generator.CodeAnalysis;
 public class MethodCollector
 {
     readonly IMagicOnionGeneratorLogger logger;
+    readonly CancellationToken cancellationToken;
 
-    public MethodCollector(IMagicOnionGeneratorLogger logger = null)
+    public MethodCollector(IMagicOnionGeneratorLogger logger = null, CancellationToken cancellationToken = default)
     {
         this.logger = logger ?? MagicOnionGeneratorNullLogger.Instance;
     }

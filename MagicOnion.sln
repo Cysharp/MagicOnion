@@ -101,7 +101,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Serialization.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Serialization.MemoryPack.Tests", "tests\MagicOnion.Serialization.MemoryPack.Tests\MagicOnion.Serialization.MemoryPack.Tests.csproj", "{A5A4ED92-71AD-410E-9310-A8BF48D32126}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Server.Redis.Tests", "tests\MagicOnion.Server.Redis.Tests\MagicOnion.Server.Redis.Tests.csproj", "{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.Redis.Tests", "tests\MagicOnion.Server.Redis.Tests\MagicOnion.Server.Redis.Tests.csproj", "{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.SourceGenerator", "src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj", "{7130EC5B-C987-487A-B319-E91B6D03F5BF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Tests", "tests\MagicOnion.Client.SourceGenerator.Tests\MagicOnion.Client.SourceGenerator.Tests.csproj", "{632C8D1B-3293-4D02-9ED1-0CB191619334}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -229,6 +233,14 @@ Global
 		{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7130EC5B-C987-487A-B319-E91B6D03F5BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7130EC5B-C987-487A-B319-E91B6D03F5BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7130EC5B-C987-487A-B319-E91B6D03F5BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7130EC5B-C987-487A-B319-E91B6D03F5BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -269,6 +281,8 @@ Global
 		{56C784C7-3F18-4443-B7B0-03607ED14308} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{A5A4ED92-71AD-410E-9310-A8BF48D32126} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{95C3B040-BD5A-4A80-B5D4-26CAA21B4829} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{7130EC5B-C987-487A-B319-E91B6D03F5BF} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{632C8D1B-3293-4D02-9ED1-0CB191619334} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}
