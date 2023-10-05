@@ -17,18 +17,13 @@ public class MagicOnionCompiler
     static readonly Encoding NoBomUtf8 = new UTF8Encoding(false);
 
     readonly IMagicOnionGeneratorLogger logger;
-    readonly CancellationToken cancellationToken;
 
-    public MagicOnionCompiler(IMagicOnionGeneratorLogger logger, CancellationToken cancellationToken)
+    public MagicOnionCompiler(IMagicOnionGeneratorLogger logger)
     {
         this.logger = logger;
-        this.cancellationToken = cancellationToken;
     }
     
-    public async Task<IReadOnlyList<(string Path, string Source)>> GenerateAsync(
-        Compilation compilation,
-        GeneratorOptions options
-    )
+    public IReadOnlyList<(string Path, string Source)> Generate(Compilation compilation, GeneratorOptions options, CancellationToken cancellationToken)
     {
         var outputs = new List<(string Path, string Source)>();
 

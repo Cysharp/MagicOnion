@@ -108,9 +108,9 @@ internal class MagicOnionSourceGeneratorVerifier
             return base.RunImplAsync(cancellationToken);
         }
 
-        protected override async Task<Compilation> GetProjectCompilationAsync(Project project, IVerifier verifier, CancellationToken cancellationToken)
+        protected override async Task<(Compilation compilation, ImmutableArray<Diagnostic> generatorDiagnostics)> GetProjectCompilationAsync(Project project, IVerifier verifier, CancellationToken cancellationToken)
         {
-            var compilation = await base.GetProjectCompilationAsync(project, verifier, cancellationToken);
+            var (compilation, diagnostics) = await base.GetProjectCompilationAsync(project, verifier, cancellationToken);
             var resourceDirectory = Path.Combine(Path.GetDirectoryName(testFile)!, "Resources", Path.GetFileNameWithoutExtension(testFile), testMethod);
 
             foreach (var syntaxTree in compilation.SyntaxTrees.Skip(project.DocumentIds.Count))
@@ -118,12 +118,13 @@ internal class MagicOnionSourceGeneratorVerifier
                 WriteTreeToDiskIfNecessary(syntaxTree, resourceDirectory, "");
             }
 
-            return compilation;
+            return (compilation, diagnostics);
         }
 
-        protected override IEnumerable<ISourceGenerator> GetSourceGenerators()
+
+        protected override IEnumerable<Type> GetSourceGenerators()
         {
-            yield return new MagicOnionClientSourceGenerator();
+            yield return typeof(MagicOnionClientSourceGenerator);
         }
 
         [Conditional("WRITE_EXPECTED")]
