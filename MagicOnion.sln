@@ -105,6 +105,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.SourceGen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Tests", "tests\MagicOnion.Client.SourceGenerator.Tests\MagicOnion.Client.SourceGenerator.Tests.csproj", "{632C8D1B-3293-4D02-9ED1-0CB191619334}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Generator", "src\MagicOnion.Generator\MagicOnion.Generator.csproj", "{1BE960DA-4F54-4128-AEAE-993960DB9455}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -235,6 +237,10 @@ Global
 		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{632C8D1B-3293-4D02-9ED1-0CB191619334}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BE960DA-4F54-4128-AEAE-993960DB9455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BE960DA-4F54-4128-AEAE-993960DB9455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BE960DA-4F54-4128-AEAE-993960DB9455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BE960DA-4F54-4128-AEAE-993960DB9455}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -276,6 +282,7 @@ Global
 		{95C3B040-BD5A-4A80-B5D4-26CAA21B4829} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{7130EC5B-C987-487A-B319-E91B6D03F5BF} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{632C8D1B-3293-4D02-9ED1-0CB191619334} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{1BE960DA-4F54-4128-AEAE-993960DB9455} = {1987061F-8970-4018-8D58-6932961C9EB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

@@ -17,6 +17,13 @@ public record GeneratorOptions
 {
     public const string JsonFileName = "MagicOnionClientGeneratorOptions.json";
 
+    static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+    {
+        AllowTrailingCommas = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+    };
+
     public static GeneratorOptions Default { get; } = new GeneratorOptions();
 
     /// <summary>
@@ -55,15 +62,13 @@ public record GeneratorOptions
             var content = optionsJsonFile.GetText(cancellationToken)?.ToString();
             if (content != null)
             {
-                options = JsonSerializer.Deserialize<GeneratorOptions>(content, new JsonSerializerOptions()
-                {
-                    AllowTrailingCommas = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                }) ?? Default;
+                options = JsonSerializer.Deserialize<GeneratorOptions>(content, jsonSerializerOptions) ?? Default;
             }
         }
 
         return options;
     }
+
+    public string ToJson()
+        => JsonSerializer.Serialize(this, jsonSerializerOptions);
 }

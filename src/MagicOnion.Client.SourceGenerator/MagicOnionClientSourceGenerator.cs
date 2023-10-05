@@ -15,7 +15,7 @@ public class MagicOnionClientSourceGenerator : ISourceGenerator
     public void Execute(GeneratorExecutionContext context)
     {
         var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance, context.CancellationToken);
-        var options = GeneratorOptions.Default;
+        var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
         var outputs = compiler.GenerateAsync(context.Compilation, options).GetAwaiter().GetResult();
 
         var syntaxReceiver = (SyntaxContextReceiver)context.SyntaxContextReceiver!;

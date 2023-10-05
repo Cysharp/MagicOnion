@@ -41,6 +41,12 @@ internal class MagicOnionSourceGeneratorVerifier
             {
             },
         };
+
+        if (options is not null)
+        {
+            test.TestState.AdditionalFiles.Add((GeneratorOptions.JsonFileName, options.ToJson()));
+        }
+
         test.TestState.Sources.AddRange(testSourceCodes.Select(x => (x.Path, SourceText.From(x.Content, Encoding.UTF8, SourceHashAlgorithm.Sha1))));
         await test.RunAsync();
     }
@@ -85,7 +91,7 @@ internal class MagicOnionSourceGeneratorVerifier
         {
             var prefix = $"{typeof(Test).Assembly.GetName().Name}.Resources.{Path.GetFileNameWithoutExtension(testFile)}.{testMethod}.";
 
-            foreach (var resName in typeof(Test).Assembly.GetManifestResourceNames())
+            foreach (var resName in typeof(Test).Assembly.GetManifestResourceNames().OrderBy(x => x))
             {
                 if (!resName.StartsWith(prefix)) continue;
 
