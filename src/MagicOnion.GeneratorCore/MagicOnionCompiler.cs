@@ -6,19 +6,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using MagicOnion.Generator.CodeAnalysis;
 using MagicOnion.Generator.CodeGen;
-using MagicOnion.Generator.Utils;
 using MagicOnion.Generator.CodeGen.Extensions;
 using MagicOnion.Generator.Internal;
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Generator;
-
-public enum SerializerType
-{
-    MessagePack,
-    MemoryPack,
-}
 
 public class MagicOnionCompiler
 {
@@ -32,65 +24,22 @@ public class MagicOnionCompiler
         this.logger = logger;
         this.cancellationToken = cancellationToken;
     }
-
-    public async Task GenerateFileAsync(
-        string input,
-        string output,
-        bool disableAutoRegister,
-        string @namespace,
-        string conditionalSymbol,
-        string userDefinedFormattersNamespace,
-        SerializerType serializerType)
-    {
-        var conditionalSymbols = conditionalSymbol?.Split(',') ?? Array.Empty<string>();
-
-        // Generator Start...
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Input: {input}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:ConditionalSymbol: {conditionalSymbol}");
-
-        var sw = Stopwatch.StartNew();
-        logger.Information("Project Compilation Start:" + input);
-        var compilation = await PseudoCompilation.CreateFromProjectAsync(new[] { input }, conditionalSymbols, logger, cancellationToken);
-        logger.Information("Project Compilation Complete:" + sw.Elapsed.ToString());
-
-        var outputs = await GenerateAsync(compilation, Path.GetFileName(output), disableAutoRegister, @namespace, userDefinedFormattersNamespace, serializerType);
-
-        sw.Restart();
-        logger.Information("Writing generated codes");
-        if (Path.GetExtension(output) == ".cs")
-        {
-            Output(output, outputs[0].Source);
-        }
-        else
-        {
-            foreach (var o in outputs)
-            {
-                Output(o.Path, o.Source);
-            }
-        }
-        logger.Information("Writing generated codes Complete:" + sw.Elapsed.ToString());
-    }
-
     
     public async Task<IReadOnlyList<(string Path, string Source)>> GenerateAsync(
         Compilation compilation,
-        string generatedFileNameBase,
-        bool disableAutoRegister,
-        string @namespace,
-        string userDefinedFormattersNamespace,
-        SerializerType serializerType
+        GeneratorOptions options
     )
     {
         var outputs = new List<(string Path, string Source)>();
 
         // Prepare args
-        var namespaceDot = string.IsNullOrWhiteSpace(@namespace) ? string.Empty : @namespace + ".";
+        var namespaceDot = string.IsNullOrWhiteSpace(options.Namespace) ? string.Empty : options.Namespace + ".";
 
         // Generator Start...
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:DisableAutoRegister: {disableAutoRegister}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {@namespace}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedFormattersNamespace: {userDefinedFormattersNamespace}");
-        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:SerializerType: {serializerType}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:DisableAutoRegister: {options.DisableAutoRegister}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:Namespace: {options.Namespace}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:UserDefinedFormattersNamespace: {options.MessagePackFormatterNamespace}");
+        logger.Trace($"[{nameof(MagicOnionCompiler)}] Option:SerializerType: {options.Serializer}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] Assembly version: {typeof(MagicOnionCompiler).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.OSDescription: {RuntimeInformation.OSDescription}");
         logger.Trace($"[{nameof(MagicOnionCompiler)}] RuntimeInformation.ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
@@ -98,17 +47,17 @@ public class MagicOnionCompiler
 
         // Configure serialization
         (ISerializationFormatterNameMapper Mapper, string Namespace, string InitializerName, ISerializerFormatterGenerator Generator, Func<IEnumerable<EnumSerializationInfo>, string> EnumFormatterGenerator)
-            serialization = serializerType switch
+            serialization = options.Serializer switch
         {
-            SerializerType.MemoryPack => (
+            GeneratorOptions.SerializerType.MemoryPack => (
                 Mapper: new MemoryPackFormatterNameMapper(),
-                Namespace: @namespace,
+                Namespace: options.Namespace,
                 InitializerName: "MagicOnionMemoryPackFormatterProvider",
                 Generator: new MemoryPackFormatterRegistrationGenerator(),
                 EnumFormatterGenerator: _ => string.Empty
             ),
-            SerializerType.MessagePack => (
-                Mapper: new MessagePackFormatterNameMapper(userDefinedFormattersNamespace),
+            GeneratorOptions.SerializerType.MessagePack => (
+                Mapper: new MessagePackFormatterNameMapper(options.MessagePackFormatterNamespace),
                 Namespace: namespaceDot + "Resolvers",
                 InitializerName: "MagicOnionResolver",
                 Generator: new MessagePackFormatterResolverGenerator(),
@@ -144,10 +93,10 @@ public class MagicOnionCompiler
         
         var registerTemplate = new RegisterTemplate
         {
-            Namespace = @namespace,
+            Namespace = options.Namespace,
             Services = serviceCollection.Services,
             Hubs = serviceCollection.Hubs,
-            DisableAutoRegisterOnInitialize = disableAutoRegister,
+            DisableAutoRegisterOnInitialize = options.DisableAutoRegister,
         };
 
         var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);

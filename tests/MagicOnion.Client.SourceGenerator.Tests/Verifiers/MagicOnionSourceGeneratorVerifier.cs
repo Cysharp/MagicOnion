@@ -3,11 +3,14 @@
 // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/develop/tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier%601%2BTest.cs
 // https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#unit-testing-of-generators
 
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using MagicOnion.Generator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
@@ -17,15 +20,16 @@ namespace MagicOnion.Client.SourceGenerator.Tests.Verifiers;
 
 internal class MagicOnionSourceGeneratorVerifier
 {
-    public static async Task RunAsync(string testSourceCode, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
+    public static async Task RunAsync(string testSourceCode, GeneratorOptions? options = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
     {
         if (string.IsNullOrEmpty(testSourceCode)) throw new ArgumentNullException(nameof(testSourceCode));
         if (string.IsNullOrEmpty(testFile)) throw new ArgumentNullException(nameof(testFile));
         if (string.IsNullOrEmpty(testMethod)) throw new ArgumentNullException(nameof(testMethod));
 
-        await RunAsync(new[] { ("Source.cs", testSourceCode) }, testFile, testMethod);
+        await RunAsync(new[] { ("Source.cs", testSourceCode) }, options, testFile, testMethod);
     }
-    public static async Task RunAsync(IEnumerable<(string Path, string Content)> testSourceCodes, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
+
+    public static async Task RunAsync(IEnumerable<(string Path, string Content)> testSourceCodes, GeneratorOptions? options = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
     {
         if (testSourceCodes is null) throw new ArgumentNullException(nameof(testSourceCodes));
         if (string.IsNullOrEmpty(testFile)) throw new ArgumentNullException(nameof(testFile));
@@ -50,6 +54,7 @@ internal class MagicOnionSourceGeneratorVerifier
         {
             this.testFile = testFile;
             this.testMethod = testMethod;
+
             this.ReferenceAssemblies = ReferenceAssemblies.Net.Net60;
             this.AddAdditionalReferences();
 
