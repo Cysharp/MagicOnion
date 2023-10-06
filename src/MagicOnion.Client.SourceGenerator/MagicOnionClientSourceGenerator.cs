@@ -35,7 +35,8 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var options = context.AdditionalTextsProvider.Collect().Select(static (x, cancellationToken) => GeneratorOptions.Create(x, cancellationToken));
+        var options = context.AdditionalTextsProvider.Collect().Select(static (x, cancellationToken) => GeneratorOptions.Create(x, cancellationToken)).WithTrackingName("GeneratorOptions");
+        var referenceSymbols = context.CompilationProvider.Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default).WithTrackingName("ReferenceSymbols");
 
         var compilationAndOptions = context.CompilationProvider.Combine(options);
 

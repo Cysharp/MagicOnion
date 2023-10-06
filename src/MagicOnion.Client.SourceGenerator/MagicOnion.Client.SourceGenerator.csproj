@@ -16,10 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.1" PrivateAssets="all" />
-    <PackageReference Include="PolySharp" Version="1.13.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="IsExternalInit" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

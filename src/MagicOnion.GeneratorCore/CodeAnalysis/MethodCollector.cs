@@ -292,7 +292,11 @@ public class MethodCollector
 
         public static MethodCollectorContext CreateFromCompilation(Compilation compilation, IMagicOnionGeneratorLogger logger)
         {
-            var typeReferences = new ReferenceSymbols(compilation, logger);
+            if (!ReferenceSymbols.TryCreate(compilation, out var typeReferences))
+            {
+                throw new InvalidOperationException();
+            }
+
             var serviceAndHubInterfaces = compilation.GetNamedTypeSymbols()
                 .Where(x => x.TypeKind == TypeKind.Interface)
                 .Where(x =>

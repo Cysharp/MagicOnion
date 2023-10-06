@@ -21,6 +21,9 @@ public static class CompilationHelper
             MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "System.Memory.dll")),
             MetadataReference.CreateFromFile(Path.Combine(refAsmDir, "netstandard.dll")),
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(MagicOnion.IService<>).Assembly.Location), // Abstractions
+            MetadataReference.CreateFromFile(typeof(MagicOnion.Client.MagicOnionClient).Assembly.Location), // Client
+            MetadataReference.CreateFromFile(typeof(MagicOnion.GrpcMethodHelper).Assembly.Location), // Shared
         };
         var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
