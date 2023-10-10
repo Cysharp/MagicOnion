@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 public interface ISerializationFormatterNameMapper
 {

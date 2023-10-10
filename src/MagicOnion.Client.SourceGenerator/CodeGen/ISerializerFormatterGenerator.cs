@@ -1,4 +1,4 @@
-﻿namespace MagicOnion.Generator.CodeGen;
+﻿namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 public interface ISerializerFormatterGenerator
 {

@@ -1,4 +1,4 @@
-using MagicOnion.Generator.Internal;
+using MagicOnion.Client.SourceGenerator.Internal;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Client.SourceGenerator.Tests;

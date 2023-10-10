@@ -1,8 +1,7 @@
 using System.Diagnostics;
-using MagicOnion.Generator.Internal;
-using static MagicOnion.Generator.CodeAnalysis.SerializationInfoCollector;
+using MagicOnion.Client.SourceGenerator.Internal;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 /// <summary>
 /// Provides logic for gathering information to determine required formatters (for enums, collections and user-defined generic types).

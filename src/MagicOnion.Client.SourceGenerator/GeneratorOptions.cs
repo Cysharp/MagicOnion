@@ -1,9 +1,8 @@
 using System.Collections.Immutable;
 using System.Text.Json;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace MagicOnion.Generator;
+namespace MagicOnion.Client.SourceGenerator;
 
 /*
 [Option("u", "Do not use UnityEngine's RuntimeInitializeOnLoadMethodAttribute on MagicOnionInitializer. (Same as --disable-auto-register)")]bool noUseUnityAttr = false,

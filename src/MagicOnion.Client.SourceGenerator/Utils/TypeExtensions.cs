@@ -1,7 +1,6 @@
-using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator.Utils;
+namespace MagicOnion.Client.SourceGenerator.Utils;
 
 internal static class TypeExtensions
 {

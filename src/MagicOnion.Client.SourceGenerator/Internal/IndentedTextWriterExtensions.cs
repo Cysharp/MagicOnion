@@ -1,6 +1,6 @@
 using System.CodeDom.Compiler;
 
-namespace MagicOnion.Generator.Internal;
+namespace MagicOnion.Client.SourceGenerator.Internal;
 
 internal static class IndentedTextWriterExtensions
 {

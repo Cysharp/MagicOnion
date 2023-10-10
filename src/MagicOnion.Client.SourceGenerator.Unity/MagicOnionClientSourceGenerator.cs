@@ -1,8 +1,6 @@
 using System.Collections.Immutable;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Internal;
-using MagicOnion.Generator;
-using MagicOnion.Generator.CodeAnalysis;
-using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.Unity;

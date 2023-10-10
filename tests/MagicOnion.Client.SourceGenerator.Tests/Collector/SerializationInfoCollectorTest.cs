@@ -1,4 +1,4 @@
-using MagicOnion.Generator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using Xunit.Abstractions;
 
 namespace MagicOnion.Client.SourceGenerator.Tests.Collector;

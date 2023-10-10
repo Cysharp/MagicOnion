@@ -1,4 +1,4 @@
-using MagicOnion.Generator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.Tests.Collector;

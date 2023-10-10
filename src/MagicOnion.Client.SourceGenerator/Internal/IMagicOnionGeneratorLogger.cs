@@ -1,4 +1,4 @@
-namespace MagicOnion.Generator.Internal;
+namespace MagicOnion.Client.SourceGenerator.Internal;
 
 public interface IMagicOnionGeneratorLogger
 {

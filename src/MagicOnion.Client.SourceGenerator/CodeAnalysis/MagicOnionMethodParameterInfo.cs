@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 [DebuggerDisplay("Parameter: {Name,nq} ({Type,nq})")]
 public class MagicOnionMethodParameterInfo

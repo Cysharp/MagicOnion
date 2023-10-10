@@ -40,12 +40,12 @@
 
   <ItemGroup>
     <None Update="CodeGen\EnumTemplate.tt">
-      <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
+      <CustomToolNamespace>MagicOnion.Client.SourceGenerator.CodeGen</CustomToolNamespace>
       <LastGenOutput>EnumTemplate.cs</LastGenOutput>
       <Generator>TextTemplatingFilePreprocessor</Generator>
     </None>
     <None Update="CodeGen\RegisterTemplate.tt">
-      <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
+      <CustomToolNamespace>MagicOnion.Client.SourceGenerator.CodeGen</CustomToolNamespace>
       <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
       <Generator>TextTemplatingFilePreprocessor</Generator>
     </None>

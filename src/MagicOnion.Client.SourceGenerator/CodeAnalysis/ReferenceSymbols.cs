@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 public record ReferenceSymbols(INamedTypeSymbol IServiceMarker, INamedTypeSymbol IService, INamedTypeSymbol IStreamingHubMarker, INamedTypeSymbol IStreamingHub)
 {

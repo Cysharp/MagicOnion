@@ -1,8 +1,8 @@
 using System.Diagnostics;
-using MagicOnion.Generator.Utils;
+using MagicOnion.Client.SourceGenerator.Utils;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 [DebuggerDisplay("{ToDisplayName(DisplayNameFormat.Short),nq}")]
 public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>

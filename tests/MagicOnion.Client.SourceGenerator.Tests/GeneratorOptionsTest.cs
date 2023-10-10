@@ -1,5 +1,4 @@
 using MagicOnion.Client.SourceGenerator.Tests.Verifiers;
-using MagicOnion.Generator;
 
 namespace MagicOnion.Client.SourceGenerator.Tests;
 

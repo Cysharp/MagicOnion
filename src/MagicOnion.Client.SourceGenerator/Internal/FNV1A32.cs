@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace MagicOnion.Generator.Internal;
+namespace MagicOnion.Client.SourceGenerator.Internal;
 
 internal static class FNV1A32
 {

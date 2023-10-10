@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace MagicOnion.Generator.Utils;
+namespace MagicOnion.Client.SourceGenerator.Utils;
 
 // Utility and Extension methods for Roslyn
 internal static class RoslynExtensions

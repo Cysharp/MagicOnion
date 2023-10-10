@@ -1,7 +1,7 @@
 using System.CodeDom.Compiler;
-using MagicOnion.Generator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 public class SerializationFormatterCodeGenContext
 {

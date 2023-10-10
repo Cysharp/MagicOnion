@@ -1,9 +1,9 @@
 using System.CodeDom.Compiler;
-using MagicOnion.Generator.CodeAnalysis;
-using MagicOnion.Generator.CodeGen.Extensions;
-using MagicOnion.Generator.Internal;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
+using MagicOnion.Client.SourceGenerator.Internal;
 
-namespace MagicOnion.Generator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 public class StaticMagicOnionClientGenerator
 {

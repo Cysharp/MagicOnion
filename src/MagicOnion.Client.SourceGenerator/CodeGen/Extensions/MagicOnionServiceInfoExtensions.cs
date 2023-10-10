@@ -1,7 +1,7 @@
-using MagicOnion.Generator.CodeAnalysis;
 using System.Text.RegularExpressions;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeGen.Extensions;
+namespace MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
 
 public static class MagicOnionServiceInfoExtensions
 {

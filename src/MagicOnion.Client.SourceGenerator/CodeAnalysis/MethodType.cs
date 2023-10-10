@@ -1,4 +1,4 @@
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 public enum MethodType
 {

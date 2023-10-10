@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
-using MagicOnion.Generator.Internal;
-using MagicOnion.Generator.Utils;
+using MagicOnion.Client.SourceGenerator.Internal;
+using MagicOnion.Client.SourceGenerator.Utils;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeAnalysis;
+namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 /// <summary>
 /// Provides logic to collect MagicOnion Services and StreamingHubs from a compilation.

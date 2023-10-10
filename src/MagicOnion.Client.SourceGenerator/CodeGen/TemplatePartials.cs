@@ -1,6 +1,6 @@
-using MagicOnion.Generator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 public partial class RegisterTemplate
 {

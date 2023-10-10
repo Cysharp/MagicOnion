@@ -1,17 +1,17 @@
 #pragma warning disable CS1998
 
 using System.Collections.Immutable;
-using System.Text;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MagicOnion.Generator.CodeAnalysis;
-using MagicOnion.Generator.CodeGen;
-using MagicOnion.Generator.CodeGen.Extensions;
-using MagicOnion.Generator.Internal;
+using System.Text;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeGen;
+using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
+using MagicOnion.Client.SourceGenerator.Internal;
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Generator;
+namespace MagicOnion.Client.SourceGenerator;
 
 public class MagicOnionCompiler
 {

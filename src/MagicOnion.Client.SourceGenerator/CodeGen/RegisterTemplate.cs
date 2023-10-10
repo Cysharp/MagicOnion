@@ -7,12 +7,12 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace MagicOnion.Generator.CodeGen
+namespace MagicOnion.Client.SourceGenerator.CodeGen
 {
     using System.Linq;
     using System.Text;
     using System.Collections.Generic;
-    using MagicOnion.Generator.CodeGen.Extensions;
+    using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
     using System;
     
     /// <summary>

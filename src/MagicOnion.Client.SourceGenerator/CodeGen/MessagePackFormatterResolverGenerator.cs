@@ -1,11 +1,6 @@
-using System;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Text;
-using MagicOnion.Generator.CodeAnalysis;
-using MagicOnion.Generator.Internal;
+using MagicOnion.Client.SourceGenerator.Internal;
 
-namespace MagicOnion.Generator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGenerator
 {

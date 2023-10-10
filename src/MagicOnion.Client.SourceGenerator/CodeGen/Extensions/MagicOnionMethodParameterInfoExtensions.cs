@@ -1,6 +1,6 @@
-using MagicOnion.Generator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
-namespace MagicOnion.Generator.CodeGen.Extensions;
+namespace MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
 
 public static class MagicOnionMethodParameterInfoExtensions
 {
