@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
 using MagicOnion.Generator;
 using MagicOnion.Generator.CodeAnalysis;
 using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MagicOnion.Client.SourceGenerator;
 
 #if LEGACY_SOURCE_GENERATOR
 [Generator(LanguageNames.CSharp)]
-public class MagicOnionClientSourceGenerator : ISourceGenerator
+public class MagicOnionClientSourceGeneratorRoslyn3 : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -20,18 +20,34 @@ public class MagicOnionClientSourceGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance);
-        var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
-        var outputs = compiler.Generate(context.Compilation, options, context.CancellationToken);
-
         var syntaxReceiver = (SyntaxContextReceiver)context.SyntaxContextReceiver!;
-
-        foreach (var output in outputs)
+        var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
+        if (ReferenceSymbols.TryCreate(context.Compilation, out var referenceSymbols))
         {
-            context.AddSource(output.Path, output.Source);
+            var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance);
+            var outputs = compiler.Generate(syntaxReceiver.Candidates.ToImmutableArray(), referenceSymbols, options, context.CancellationToken);
+            foreach (var output in outputs)
+            {
+                context.AddSource(output.Path, output.Source);
+            }
         }
     }
 }
+
+class SyntaxContextReceiver : ISyntaxContextReceiver
+{
+    public List<INamedTypeSymbol> Candidates { get; } = new();
+
+    public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
+    {
+        if (SyntaxHelper.IsCandidateInterface(context.Node))
+        {
+            Candidates.Add((INamedTypeSymbol)context.SemanticModel.GetDeclaredSymbol(context.Node)!);
+        }
+    }
+}
+
+
 #else
 [Generator(LanguageNames.CSharp)]
 public class MagicOnionClientSourceGenerator : IIncrementalGenerator
@@ -44,48 +60,35 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
         var referenceSymbols = context.CompilationProvider
             .Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default)
             .WithTrackingName("mo_ReferenceSymbols");
-        var interfaceSymbols = context.CompilationProvider
-            .SelectMany(static (x, cancellationToken) => GetNamedTypeSymbols(x))
-            .Where(x => x.TypeKind == TypeKind.Interface)
-            .WithComparer(SymbolEqualityComparer.Default)
+        var interfaces = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: (node, ct) => SyntaxHelper.IsCandidateInterface(node),
+            transform: (ctx, ct) => ctx.Node)
             .Collect()
-            .WithTrackingName("mo_InterfaceSymbols");
+            .WithTrackingName("mo_Interfaces");
 
         var source = options
-            .Combine(interfaceSymbols)
+            .Combine(interfaces)
             .Combine(referenceSymbols)
-            .WithTrackingName("mo_Combined");
+            .Combine(context.CompilationProvider)
+            .WithTrackingName("mo_Source");
 
         context.RegisterSourceOutput(source, static (sourceProductionContext, pair) =>
         {
-            var ((options, interfaceSymbols), referenceSymbols) = pair;
+            var (((options, interfaces), referenceSymbols), compilation) = pair;
             var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance);
-            var generated = compiler.Generate(interfaceSymbols, referenceSymbols, options, sourceProductionContext.CancellationToken);
+            var symbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
+            var generated = compiler.Generate(symbols, referenceSymbols, options, sourceProductionContext.CancellationToken);
             foreach (var (path, source) in generated)
             {
                 sourceProductionContext.AddSource(path, source);
             }
         });
     }
-
-    public static IEnumerable<INamedTypeSymbol> GetNamedTypeSymbols(Compilation compilation)
-    {
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            var semModel = compilation.GetSemanticModel(syntaxTree);
-
-            foreach (var item in syntaxTree.GetRoot()
-                         .DescendantNodes()
-                         .Select(x => semModel.GetDeclaredSymbol(x))
-                         .Where(x => x != null))
-            {
-                var namedType = item as INamedTypeSymbol;
-                if (namedType != null)
-                {
-                    yield return namedType;
-                }
-            }
-        }
-    }
 }
 #endif
+
+static class SyntaxHelper
+{
+    public static bool IsCandidateInterface(SyntaxNode node)
+        => node is InterfaceDeclarationSyntax interfaceDeclaration && (interfaceDeclaration.BaseList?.Types.Any() ?? false);
+}
