@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsing>enable</ImplicitUsing>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+
+    <!-- Source Generator / Roslyn Analyzer -->
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="IsExternalInit" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj" />
+  </ItemGroup>
+</Project>

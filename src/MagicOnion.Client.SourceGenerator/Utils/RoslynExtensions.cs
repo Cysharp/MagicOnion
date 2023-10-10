@@ -37,36 +37,34 @@ internal static class RoslynExtensions
         }
     }
 
-    public static AttributeData FindAttribute(this IEnumerable<AttributeData> attributeDataList, string typeName)
+    public static AttributeData? FindAttribute(this IEnumerable<AttributeData> attributeDataList, string typeName)
     {
-        return attributeDataList
-            .Where(x => x.AttributeClass.ToDisplayString() == typeName)
-            .FirstOrDefault();
+        return attributeDataList.FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == typeName);
     }
 
-    public static AttributeData FindAttributeShortName(this IEnumerable<AttributeData> attributeDataList,
+    public static AttributeData? FindAttributeShortName(this IEnumerable<AttributeData> attributeDataList,
         string typeName)
     {
-        return attributeDataList
-            .Where(x => x.AttributeClass.Name == typeName)
-            .FirstOrDefault();
+        return attributeDataList.FirstOrDefault(x => x.AttributeClass?.Name == typeName);
     }
 
-    public static AttributeData FindAttributeIncludeBasePropertyShortName(this IPropertySymbol property,
-        string typeName)
+    public static AttributeData? FindAttributeIncludeBasePropertyShortName(this IPropertySymbol property, string typeName)
     {
-        do
+        while (true)
         {
             var data = FindAttributeShortName(property.GetAttributes(), typeName);
             if (data != null) return data;
+            if (property.OverriddenProperty is null)
+            {
+                break;
+            }
             property = property.OverriddenProperty;
-        } while (property != null);
+        }
 
         return null;
     }
 
-    public static AttributeSyntax FindAttribute(this BaseTypeDeclarationSyntax typeDeclaration, SemanticModel model,
-        string typeName)
+    public static AttributeSyntax? FindAttribute(this BaseTypeDeclarationSyntax typeDeclaration, SemanticModel model, string typeName)
     {
         return typeDeclaration.AttributeLists
             .SelectMany(x => x.Attributes)
@@ -74,14 +72,14 @@ internal static class RoslynExtensions
             .FirstOrDefault();
     }
 
-    public static INamedTypeSymbol FindBaseTargetType(this ITypeSymbol symbol, string typeName)
+    public static INamedTypeSymbol? FindBaseTargetType(this ITypeSymbol symbol, string typeName)
     {
         return symbol.EnumerateBaseType()
             .Where(x => x.OriginalDefinition?.ToDisplayString() == typeName)
             .FirstOrDefault();
     }
 
-    public static object GetSingleNamedArgumentValue(this AttributeData attribute, string key)
+    public static object? GetSingleNamedArgumentValue(this AttributeData attribute, string key)
     {
         foreach (var item in attribute.NamedArguments)
         {

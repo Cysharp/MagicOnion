@@ -36,7 +36,7 @@ public class MagicOnionMethodParameterInfo
                 var l = ppp.Last();
                 if (l.Kind == SymbolDisplayPartKind.FieldName)
                 {
-                    return l.Symbol.ToDisplayString();
+                    return l.Symbol!.ToDisplayString();
                 }
                 else
                 {

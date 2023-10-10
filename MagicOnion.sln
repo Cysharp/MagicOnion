@@ -102,7 +102,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Serialization.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Server.Redis.Tests", "tests\MagicOnion.Server.Redis.Tests\MagicOnion.Server.Redis.Tests.csproj", "{95C3B040-BD5A-4A80-B5D4-26CAA21B4829}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.SourceGenerator", "src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj", "{7130EC5B-C987-487A-B319-E91B6D03F5BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator", "src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj", "{7130EC5B-C987-487A-B319-E91B6D03F5BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Tests", "tests\MagicOnion.Client.SourceGenerator.Tests\MagicOnion.Client.SourceGenerator.Tests.csproj", "{632C8D1B-3293-4D02-9ED1-0CB191619334}"
 EndProject

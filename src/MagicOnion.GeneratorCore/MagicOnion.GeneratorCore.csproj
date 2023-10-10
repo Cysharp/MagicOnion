@@ -17,31 +17,7 @@
         <PackageReference Include="IsExternalInit" Version="1.0.3" />
     </ItemGroup>
     <ItemGroup>
-      <None Update="CodeGen\EnumTemplate.tt">
-        <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
-        <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-        <Generator>TextTemplatingFilePreprocessor</Generator>
-      </None>
-      <None Update="CodeGen\RegisterTemplate.tt">
-        <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
-        <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
-        <Generator>TextTemplatingFilePreprocessor</Generator>
-      </None>
-    </ItemGroup>
-    <ItemGroup>
       <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="CodeGen\EnumTemplate.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>EnumTemplate.tt</DependentUpon>
-      </Compile>
-      <Compile Update="CodeGen\RegisterTemplate.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>RegisterTemplate.tt</DependentUpon>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>

@@ -1,9 +1,12 @@
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
 namespace MagicOnion.Generator.CodeAnalysis;
 
 public interface ISerializationFormatterNameMapper
 {
     IWellKnownSerializationTypes WellKnownTypes { get; }
-    bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs);
+    bool TryMapGeneric(MagicOnionTypeInfo type, [NotNullWhen(true)] out string? formatterName, [NotNullWhen(true)] out string? formatterConstructorArgs);
     (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type);
 }
 
@@ -30,7 +33,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         this.userDefinedFormatterNamespace = userDefinedFormatterNamespace;
     }
 
-    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs)
+    public bool TryMapGeneric(MagicOnionTypeInfo type, [NotNullWhen(true)] out string? formatterName, [NotNullWhen(true)] out string? formatterConstructorArgs)
     {
         formatterName = null;
         formatterConstructorArgs = null;
@@ -61,12 +64,13 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
 
     public (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type)
     {
+        Debug.Assert(type.ElementType is not null);
         return type.ArrayRank switch
         {
-            1 => ($"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType.FullName}>", "()"),
-            2 => ($"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
-            3 => ($"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
-            4 => ($"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            1 => ($"global::MessagePack.Formatters.ArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            2 => ($"global::MessagePack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            3 => ($"global::MessagePack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            4 => ($"global::MessagePack.Formatters.FourDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
             _ => throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})"),
         };
     }
@@ -186,7 +190,7 @@ public class MemoryPackFormatterNameMapper : ISerializationFormatterNameMapper
     {
     }
 
-    public bool TryMapGeneric(MagicOnionTypeInfo type, out string formatterName, out string formatterConstructorArgs)
+    public bool TryMapGeneric(MagicOnionTypeInfo type, [NotNullWhen(true)] out string? formatterName, [NotNullWhen(true)] out string? formatterConstructorArgs)
     {
         formatterName = null;
         formatterConstructorArgs = null;
@@ -211,12 +215,13 @@ public class MemoryPackFormatterNameMapper : ISerializationFormatterNameMapper
 
     public (string FormatterName, string FormatterConstructorArgs) MapArray(MagicOnionTypeInfo type)
     {
+        Debug.Assert(type.ElementType is not null);
         return type.ArrayRank switch
         {
-            1 => ($"global::MemoryPack.Formatters.ArrayFormatter<{type.ElementType.FullName}>", "()"),
-            2 => ($"global::MemoryPack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
-            3 => ($"global::MemoryPack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
-            4 => ($"global::MemoryPack.Formatters.FourDimensionalArrayFormatter<{type.ElementType.FullName}>", "()"),
+            1 => ($"global::MemoryPack.Formatters.ArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            2 => ($"global::MemoryPack.Formatters.TwoDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            3 => ($"global::MemoryPack.Formatters.ThreeDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
+            4 => ($"global::MemoryPack.Formatters.FourDimensionalArrayFormatter<{type.ElementType!.FullName}>", "()"),
             _ => throw new IndexOutOfRangeException($"An array of rank must be less than 5. ({type.FullName})"),
         };
     }

@@ -36,7 +36,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
 
     public bool IsArray => _subType == SubType.Array;
     public int ArrayRank { get; }
-    public MagicOnionTypeInfo ElementType { get; }
+    public MagicOnionTypeInfo? ElementType { get; }
 
     public string FullName
         => ToDisplayName(DisplayNameFormat.FullyQualified);
@@ -46,7 +46,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     public bool IsValueType => _subType == SubType.ValueType || _subType == SubType.Enum;
 
     public bool IsEnum => _subType == SubType.Enum;
-    public MagicOnionTypeInfo UnderlyingType { get; }
+    public MagicOnionTypeInfo? UnderlyingType { get; }
 
     [Flags]
     public enum DisplayNameFormat
@@ -67,7 +67,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         Array,
     }
 
-    private MagicOnionTypeInfo(string @namespace, string name, SubType subType = SubType.None, int arrayRank = 0, MagicOnionTypeInfo[] genericArguments = null, MagicOnionTypeInfo elementType = null, MagicOnionTypeInfo underlyingType = null)
+    private MagicOnionTypeInfo(string @namespace, string name, SubType subType = SubType.None, int arrayRank = 0, MagicOnionTypeInfo[]? genericArguments = null, MagicOnionTypeInfo? elementType = null, MagicOnionTypeInfo? underlyingType = null)
     {
         _subType = subType;
         Namespace = @namespace;
@@ -80,7 +80,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
 
     public string ToDisplayName(DisplayNameFormat format = DisplayNameFormat.Short)
         => IsArray
-            ? $"{ElementType.ToDisplayName(format)}[{(ArrayRank > 1 ? new string(',', ArrayRank - 1) : "")}]"
+            ? $"{ElementType!.ToDisplayName(format)}[{(ArrayRank > 1 ? new string(',', ArrayRank - 1) : "")}]"
             : $"{(format.HasFlag(DisplayNameFormat.Global) ? "global::" : "")}{(format.HasFlag(DisplayNameFormat.Namespace) && !string.IsNullOrWhiteSpace(Namespace) ? Namespace + "." : "")}{Name}{((!format.HasFlag(DisplayNameFormat.WithoutGenericArguments) || format.HasFlag(DisplayNameFormat.OpenGenerics)) && GenericArguments.Any() ? "<" + (format.HasFlag(DisplayNameFormat.OpenGenerics) ? new string(',', GenericArguments.Count - 1) : string.Join(", ", GenericArguments.Select(x => x.ToDisplayName(format)))) + ">" : "")}";
 
     public IEnumerable<MagicOnionTypeInfo> EnumerateDependentTypes(bool includesSelf = false)
@@ -92,8 +92,9 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
 
         if (IsArray)
         {
-            yield return ElementType;
-            foreach (var t in ElementType.EnumerateDependentTypes())
+            Debug.Assert(ElementType is not null);
+            yield return ElementType!;
+            foreach (var t in ElementType!.EnumerateDependentTypes())
             {
                 yield return t;
             }
@@ -193,7 +194,8 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
             MagicOnionTypeInfo type;
             if (finalSymbol.TypeKind == TypeKind.Enum)
             {
-                type =  CreateEnum(@namespace, name, CreateFromSymbol(namedTypeSymbol.EnumUnderlyingType));
+                Debug.Assert(namedTypeSymbol.EnumUnderlyingType is not null);
+                type =  CreateEnum(@namespace, name, CreateFromSymbol(namedTypeSymbol.EnumUnderlyingType!));
             }
             else
             {
@@ -227,10 +229,11 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
+
         return FullName == other.FullName && /* Namespace + Name + GenericArguments + ArrayRank + ElementType */
                _subType == other._subType &&
-               ElementType == other.ElementType &&
-               UnderlyingType == other.UnderlyingType;
+               ElementType! == other.ElementType! &&
+               UnderlyingType! == other.UnderlyingType!;
     }
 
     public override bool Equals(object obj)

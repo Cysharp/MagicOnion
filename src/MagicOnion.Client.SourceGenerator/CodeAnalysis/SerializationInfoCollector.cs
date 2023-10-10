@@ -95,18 +95,20 @@ public class SerializationInfoCollector
 
             if (type.IsEnum)
             {
+                Debug.Assert(type.UnderlyingType is not null);
                 logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Enum type '{type.FullName}'");
                 context.Enums.Add(new EnumSerializationInfo(
                     type.Namespace,
                     type.Name,
                     type.FullName,
-                    type.UnderlyingType.Name,
+                    type.UnderlyingType!.Name,
                     typeWithDirectives.IfDirectives
                 ));
             }
             else if (type.IsArray)
             {
-                if (mapper.WellKnownTypes.BuiltInArrayElementTypes.Contains(type.ElementType.FullName))
+                Debug.Assert(type.ElementType is not null);
+                if (mapper.WellKnownTypes.BuiltInArrayElementTypes.Contains(type.ElementType!.FullName))
                 {
                     logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'. Skip this because an array element type is supported by serializer built-in.");
                     continue;

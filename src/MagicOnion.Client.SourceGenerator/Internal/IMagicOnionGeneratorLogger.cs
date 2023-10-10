@@ -4,7 +4,7 @@ public interface IMagicOnionGeneratorLogger
 {
     void Trace(string message);
     void Information(string message);
-    void Error(string message, Exception exception = null);
+    void Error(string message, Exception? exception = null);
 }
 
 public class MagicOnionGeneratorNullLogger : IMagicOnionGeneratorLogger
@@ -19,7 +19,7 @@ public class MagicOnionGeneratorNullLogger : IMagicOnionGeneratorLogger
     {
     }
 
-    public void Error(string message, Exception exception = null)
+    public void Error(string message, Exception? exception = null)
     {
     }
 }
@@ -46,7 +46,7 @@ public class MagicOnionGeneratorConsoleLogger : IMagicOnionGeneratorLogger
         Console.WriteLine(message);
     }
 
-    public void Error(string message, Exception exception = null)
+    public void Error(string message, Exception? exception = null)
     {
         Console.Error.WriteLine(message);
     }

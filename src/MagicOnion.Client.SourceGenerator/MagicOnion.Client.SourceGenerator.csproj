@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
 
     <LangVersion>latest</LangVersion>
-    <ImplicitUsing>enable</ImplicitUsing>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
 
@@ -16,11 +16,43 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.1" PrivateAssets="all" />
-    <PackageReference Include="IsExternalInit" Version="1.0.3" />
+    <PackageReference Include="PolySharp" Version="1.13.1" />
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj" />
+    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="CodeGen\EnumTemplate.cs">
+      <DependentUpon>EnumTemplate.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="CodeGen\RegisterTemplate.cs">
+      <DependentUpon>RegisterTemplate.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CodeGen\EnumTemplate.tt">
+      <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
+      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+    <None Update="CodeGen\RegisterTemplate.tt">
+      <CustomToolNamespace>MagicOnion.Generator.CodeGen</CustomToolNamespace>
+      <LastGenOutput>RegisterTemplate.cs</LastGenOutput>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

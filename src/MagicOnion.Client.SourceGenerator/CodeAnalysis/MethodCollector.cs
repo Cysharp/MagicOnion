@@ -13,9 +13,10 @@ public class MethodCollector
     readonly IMagicOnionGeneratorLogger logger;
     readonly CancellationToken cancellationToken;
 
-    public MethodCollector(IMagicOnionGeneratorLogger logger = null, CancellationToken cancellationToken = default)
+    public MethodCollector(IMagicOnionGeneratorLogger? logger = null, CancellationToken cancellationToken = default)
     {
         this.logger = logger ?? MagicOnionGeneratorNullLogger.Instance;
+        this.cancellationToken = cancellationToken;
     }
 
     public MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
@@ -52,6 +53,7 @@ public class MethodCollector
                         return CreateHubMethodInfoFromMethodSymbol(serviceType, symbol);
                     })
                     .Where(x => x is not null)
+                    .Cast<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>()
                     .ToArray();
 
                 var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
@@ -67,6 +69,7 @@ public class MethodCollector
                 return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, ifDirective);
             })
             .Where(x => x is not null)
+            .Cast<MagicOnionStreamingHubInfo>()
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
     }
@@ -162,11 +165,13 @@ public class MethodCollector
                         return CreateServiceMethodInfoFromMethodSymbol(serviceType, symbol);
                     })
                     .Where(x => x is not null)
+                    .Cast<MagicOnionServiceInfo.MagicOnionServiceMethodInfo>()
                     .ToArray();
 
                 return new MagicOnionServiceInfo(serviceType, methods, ifDirective);
             })
             .Where(x => x is not null)
+            .Cast<MagicOnionServiceInfo>()
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
     }
