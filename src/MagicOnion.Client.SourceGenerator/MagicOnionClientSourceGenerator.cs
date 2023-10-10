@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using MagicOnion.Generator;
 using MagicOnion.Generator.CodeAnalysis;
@@ -35,20 +38,54 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var options = context.AdditionalTextsProvider.Collect().Select(static (x, cancellationToken) => GeneratorOptions.Create(x, cancellationToken)).WithTrackingName("GeneratorOptions");
-        var referenceSymbols = context.CompilationProvider.Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default).WithTrackingName("ReferenceSymbols");
+        var options = context.AdditionalTextsProvider.Collect()
+            .Select(static (x, cancellationToken) => GeneratorOptions.Create(x, cancellationToken))
+            .WithTrackingName("mo_GeneratorOptions");
+        var referenceSymbols = context.CompilationProvider
+            .Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default)
+            .WithTrackingName("mo_ReferenceSymbols");
+        var interfaceSymbols = context.CompilationProvider
+            .SelectMany(static (x, cancellationToken) => GetNamedTypeSymbols(x))
+            .Where(x => x.TypeKind == TypeKind.Interface)
+            .WithComparer(SymbolEqualityComparer.Default)
+            .Collect()
+            .WithTrackingName("mo_InterfaceSymbols");
 
-        var compilationAndOptions = context.CompilationProvider.Combine(options);
+        var source = options
+            .Combine(interfaceSymbols)
+            .Combine(referenceSymbols)
+            .WithTrackingName("mo_Combined");
 
-        context.RegisterSourceOutput(compilationAndOptions, static (sourceProductionContext, pair) =>
+        context.RegisterSourceOutput(source, static (sourceProductionContext, pair) =>
         {
+            var ((options, interfaceSymbols), referenceSymbols) = pair;
             var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance);
-            var generated = compiler.Generate(pair.Item1, pair.Item2, sourceProductionContext.CancellationToken);
+            var generated = compiler.Generate(interfaceSymbols, referenceSymbols, options, sourceProductionContext.CancellationToken);
             foreach (var (path, source) in generated)
             {
                 sourceProductionContext.AddSource(path, source);
             }
         });
+    }
+
+    public static IEnumerable<INamedTypeSymbol> GetNamedTypeSymbols(Compilation compilation)
+    {
+        foreach (var syntaxTree in compilation.SyntaxTrees)
+        {
+            var semModel = compilation.GetSemanticModel(syntaxTree);
+
+            foreach (var item in syntaxTree.GetRoot()
+                         .DescendantNodes()
+                         .Select(x => semModel.GetDeclaredSymbol(x))
+                         .Where(x => x != null))
+            {
+                var namedType = item as INamedTypeSymbol;
+                if (namedType != null)
+                {
+                    yield return namedType;
+                }
+            }
+        }
     }
 }
 #endif

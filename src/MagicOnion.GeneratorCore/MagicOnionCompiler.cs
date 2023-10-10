@@ -1,5 +1,6 @@
 #pragma warning disable CS1998
 
+using System.Collections.Immutable;
 using System.Text;
 using System.Diagnostics;
 using System.Reflection;
@@ -22,8 +23,8 @@ public class MagicOnionCompiler
     {
         this.logger = logger;
     }
-    
-    public IReadOnlyList<(string Path, string Source)> Generate(Compilation compilation, GeneratorOptions options, CancellationToken cancellationToken)
+
+    public IReadOnlyList<(string Path, string Source)> Generate(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, GeneratorOptions options, CancellationToken cancellationToken)
     {
         var outputs = new List<(string Path, string Source)>();
 
@@ -70,7 +71,7 @@ public class MagicOnionCompiler
         sw.Restart();
         logger.Information("Collect services and methods Start");
         var collector = new MethodCollector(logger, cancellationToken);
-        var serviceCollection = collector.Collect(compilation);
+        var serviceCollection = collector.Collect(interfaceSymbols, referenceSymbols);
         logger.Information("Collect services and methods Complete:" + sw.Elapsed.ToString());
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -85,7 +86,7 @@ public class MagicOnionCompiler
 
         logger.Information("Code Generation Start");
         sw.Restart();
-        
+
         var registerTemplate = new RegisterTemplate
         {
             Namespace = options.Namespace,

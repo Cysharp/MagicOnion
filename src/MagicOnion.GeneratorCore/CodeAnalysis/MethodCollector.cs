@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using MagicOnion.Generator.Internal;
 using MagicOnion.Generator.Utils;
 using Microsoft.CodeAnalysis;
@@ -17,9 +18,9 @@ public class MethodCollector
         this.logger = logger ?? MagicOnionGeneratorNullLogger.Instance;
     }
 
-    public MagicOnionServiceCollection Collect(Compilation compilation)
+    public MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
     {
-        var ctx = MethodCollectorContext.CreateFromCompilation(compilation, logger);
+        var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols, logger);
 
         return new MagicOnionServiceCollection(GetStreamingHubs(ctx), GetServices(ctx));
     }
@@ -169,7 +170,7 @@ public class MethodCollector
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
     }
-        
+
     MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
     {
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -239,7 +240,7 @@ public class MethodCollector
             ifDirective
         );
     }
-        
+
     static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
         => methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
 
@@ -290,19 +291,14 @@ public class MethodCollector
             HubInterfaces = hubInterfaces.ToArray();
         }
 
-        public static MethodCollectorContext CreateFromCompilation(Compilation compilation, IMagicOnionGeneratorLogger logger)
+        public static MethodCollectorContext CreateFromCompilation(Compilation compilation, ReferenceSymbols referenceSymbols, IMagicOnionGeneratorLogger logger)
         {
-            if (!ReferenceSymbols.TryCreate(compilation, out var typeReferences))
-            {
-                throw new InvalidOperationException();
-            }
-
             var serviceAndHubInterfaces = compilation.GetNamedTypeSymbols()
                 .Where(x => x.TypeKind == TypeKind.Interface)
                 .Where(x =>
                 {
                     var all = x.AllInterfaces;
-                    if (all.Any(y => y.ApproximatelyEqual(typeReferences.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(typeReferences.IStreamingHubMarker)))
+                    if (all.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
                     {
                         return true;
                     }
@@ -310,7 +306,25 @@ public class MethodCollector
                 })
                 .ToArray();
 
-            return new MethodCollectorContext(typeReferences, serviceAndHubInterfaces, logger);
+            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces, logger);
+        }
+
+        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, IMagicOnionGeneratorLogger logger)
+        {
+            var serviceAndHubInterfaces = interfaceSymbols
+                .Where(x => x.TypeKind == TypeKind.Interface)
+                .Where(x =>
+                {
+                    var all = x.AllInterfaces;
+                    if (all.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
+                    {
+                        return true;
+                    }
+                    return false;
+                })
+                .ToArray();
+
+            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces, logger);
         }
     }
 }

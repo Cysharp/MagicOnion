@@ -9,19 +9,48 @@ namespace MagicOnion.Client.SourceGenerator.Tests;
 public class RunTest
 {
     [Fact]
-    public async Task RunTest1()
+    public async Task RunAndGenerate()
     {
-        var (compilation, semanticModel) = CompilationHelper.Create("""
-            using System;
-            using MagicOnion;
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+                using System;
+                using MagicOnion;
 
-            namespace TempProject;
+                namespace TempProject;
 
-            public interface IMyService : IService<IMyService>
-            {
-                UnaryResult<string> HelloAsync(string name, int age);
-            }
-            """);
+                public interface IMyService : IService<IMyService>
+                {
+                    UnaryResult<string> HelloAsync(string name, int age);
+                }
+                """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator for the first time.
+        driver = driver.RunGenerators(compilation);
+        var results = driver.GetRunResult().Results;
+        var generatedTrees = driver.GetRunResult().GeneratedTrees;
+    }
+
+    [Fact]
+    public async Task UnchangedTest_1()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+                using System;
+                using MagicOnion;
+
+                namespace TempProject;
+
+                public interface IMyService : IService<IMyService>
+                {
+                    UnaryResult<string> HelloAsync(string name, int age);
+                }
+                """);
         var sourceGenerator = new MagicOnionClientSourceGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(
