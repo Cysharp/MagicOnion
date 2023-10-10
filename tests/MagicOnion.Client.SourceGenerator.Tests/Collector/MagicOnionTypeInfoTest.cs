@@ -170,6 +170,7 @@ public class MagicOnionTypeInfoTest
         typeInfo.IsEnum.Should().BeFalse();
         typeInfo.UnderlyingType.Should().BeNull();
         typeInfo.IsArray.Should().BeTrue();
+        Assert.NotNull(typeInfo.ElementType);
         typeInfo.ElementType.Should().Be(MagicOnionTypeInfo.CreateEnum("System", "DayOfWeek", MagicOnionTypeInfo.CreateValueType("System", "Int32")));
         typeInfo.ElementType.IsEnum.Should().BeTrue();
         typeInfo.ElementType.IsArray.Should().BeFalse();

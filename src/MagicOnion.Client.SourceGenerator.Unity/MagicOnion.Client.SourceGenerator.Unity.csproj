@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   
     <LangVersion>latest</LangVersion>
-    <ImplicitUsing>enable</ImplicitUsing>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
 
@@ -15,11 +15,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" PrivateAssets="all" />
-    <PackageReference Include="IsExternalInit" Version="1.0.3" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeAnalysis\**\*.cs" LinkBase="CodeAnalysis" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeGen\**\*.cs" LinkBase="CodeGen" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\Internal\**\*.cs" LinkBase="Internal" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\Utils\**\*.cs" LinkBase="Utils" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\GeneratorOptions.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionCompiler.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MagicOnion.GeneratorCore\MagicOnion.GeneratorCore.csproj" />
+    <PackageReference Include="PolySharp" Version="1.13.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
   </ItemGroup>
 </Project>

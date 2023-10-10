@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
+using MagicOnion.Client.SourceGenerator.Internal;
 using MagicOnion.Generator;
 using MagicOnion.Generator.CodeAnalysis;
 using MagicOnion.Generator.Internal;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MagicOnion.Client.SourceGenerator;
 
@@ -46,10 +44,4 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             }
         });
     }
-}
-
-static class SyntaxHelper
-{
-    public static bool IsCandidateInterface(SyntaxNode node)
-        => node is InterfaceDeclarationSyntax interfaceDeclaration && (interfaceDeclaration.BaseList?.Types.Any() ?? false);
 }
