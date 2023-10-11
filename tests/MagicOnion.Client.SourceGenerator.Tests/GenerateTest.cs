@@ -5,7 +5,7 @@ namespace MagicOnion.Client.SourceGenerator.Tests;
 public class GenerateTest
 {
     [Fact]
-    public async Task Test1()
+    public async Task Generate()
     {
         var source = """
         using MagicOnion;
