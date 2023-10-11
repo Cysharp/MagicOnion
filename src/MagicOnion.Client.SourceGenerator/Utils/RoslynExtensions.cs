@@ -137,21 +137,4 @@ internal static class RoslynExtensions
             return SymbolEqualityComparer.Default.Equals(left, right);
         }
     }
-
-    public static string GetDefinedGenerateIfCondition(this ISymbol symbol)
-    {
-        var attrs = symbol.GetAttributes();
-        if (attrs.FindAttributeShortName("GenerateDefineDebugAttribute") != null)
-        {
-            return "DEBUG";
-        }
-
-        var defineIfAttr = attrs.FindAttributeShortName("GenerateIfDirectiveAttribute");
-        if (defineIfAttr != null)
-        {
-            return defineIfAttr.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
-        }
-
-        return string.Empty;
-    }
 }

@@ -31,11 +31,6 @@ namespace MagicOnion.Client.SourceGenerator.CodeGen
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             this.Write("\r\n{\r\n    using System;\r\n    using MessagePack;\r\n\r\n");
  foreach (var info in EnumSerializationInfos) { 
-   if (info.HasIfDirectiveConditions) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(string.Join(" || ", info.IfDirectiveConditions.Select(y => $"({y})"))));
-            this.Write("\r\n");
-   } 
             this.Write("    public sealed class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FormatterName));
             this.Write(" : global::MessagePack.Formatters.IMessagePackFormatter<");
@@ -53,9 +48,6 @@ namespace MagicOnion.Client.SourceGenerator.CodeGen
             this.Write(")reader.Read");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.UnderlyingType));
             this.Write("();\r\n        }\r\n    }\r\n");
-   if (info.HasIfDirectiveConditions) { 
-            this.Write("#endif\r\n");
-   } 
  } 
             this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 219\r\n#pragma warning " +
                     "restore 414\r\n#pragma warning restore 612\r\n#pragma warning restore 618\r\n");

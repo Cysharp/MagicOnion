@@ -19,11 +19,9 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject"), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject"), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject"), new string[] { "CONST_2 || DEBUG"}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject"), new string[] { "CONST_3" }),
+            MagicOnionTypeInfo.CreateFromType<int>(),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject"),
+            MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject"),
         };
 
         // Act
@@ -43,8 +41,8 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject")), new string[] { }),
+            MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")),
+            MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject")),
         };
 
         // Act
@@ -60,43 +58,14 @@ public class SerializationInfoCollectorTest
     }
 
     [Fact]
-    public void Generics_MergeIfDirectives()
-    {
-        // Arrange
-        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
-        var types = new[]
-        {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { "CONST_2 || DEBUG"}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "YetAnotherGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { "CONST_3" }),
-        };
-
-        // Act
-        var serializationInfoCollection = collector.Collect(types);
-
-        // Assert
-        serializationInfoCollection.Should().NotBeNull();
-        serializationInfoCollection.Generics.Should().HaveCount(2);
-        serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs().Should().Be("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()");
-        // NOTE: If there is a type without `if` condition, then merged if condition is always empty. (The type is always required by consumers)
-        serializationInfoCollection.Generics[0].IfDirectiveConditions.Should().BeEmpty();
-        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MessagePack.Formatters.MyNamespace.YetAnotherGenericObjectFormatter<global::System.String>()");
-        serializationInfoCollection.Generics[1].IfDirectiveConditions.Should().HaveCount(2);
-        serializationInfoCollection.Generics[1].IfDirectiveConditions.Should().BeEquivalentTo("CONST_2 || DEBUG", "CONST_3");
-        serializationInfoCollection.TypeHints.Should().HaveCount(4); // int, string, MyGenericObject<string>, YetAnotherGenericObject<string>
-    }
-
-    [Fact]
     public void Generics_ManyTypeArguments()
     {
         // Arrange
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<int>()), new string[] { "CONST_1" }),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<int>()),
         };
 
         // Act
@@ -117,11 +86,11 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<int>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnumConditional", MagicOnionTypeInfo.CreateFromType<int>()), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<int>())), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnumConditional", MagicOnionTypeInfo.CreateFromType<int>())), new string[] { "CONST_2" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "YetAnotherEnum", MagicOnionTypeInfo.CreateFromType<int>())), new string[] { }),
+            MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<int>()),
+            MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnumConditional", MagicOnionTypeInfo.CreateFromType<int>()),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<int>())),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnumConditional", MagicOnionTypeInfo.CreateFromType<int>())),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateEnum("MyNamespace", "YetAnotherEnum", MagicOnionTypeInfo.CreateFromType<int>())),
         };
 
         // Act
@@ -134,15 +103,12 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Enums[0].Namespace.Should().Be("MyNamespace");
         serializationInfoCollection.Enums[0].Name.Should().Be("MyEnum");
         serializationInfoCollection.Enums[0].GetFormatterNameWithConstructorArgs().Should().Be("MyEnumFormatter()");
-        serializationInfoCollection.Enums[0].HasIfDirectiveConditions.Should().BeFalse();
         serializationInfoCollection.Enums[1].Namespace.Should().Be("MyNamespace");
         serializationInfoCollection.Enums[1].Name.Should().Be("MyEnumConditional");
         serializationInfoCollection.Enums[1].GetFormatterNameWithConstructorArgs().Should().Be("MyEnumConditionalFormatter()");
-        serializationInfoCollection.Enums[1].IfDirectiveConditions.Should().BeEquivalentTo("CONST_1", "CONST_2");
         serializationInfoCollection.Enums[2].Namespace.Should().Be("MyNamespace");
         serializationInfoCollection.Enums[2].Name.Should().Be("YetAnotherEnum");
         serializationInfoCollection.Enums[2].GetFormatterNameWithConstructorArgs().Should().Be("YetAnotherEnumFormatter()");
-        serializationInfoCollection.Enums[2].HasIfDirectiveConditions.Should().BeFalse();
         serializationInfoCollection.TypeHints.Should().HaveCount(6); // MyEnum, MyEnumConditional, YetAnotherEnum, MyGenericObject<MyEnum>, MyGenericObject<MyEnumConditional>, MyGenericObject<YetAnotherEnum>
     }
         
@@ -153,8 +119,8 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ArraySegment<byte>>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ArraySegment<byte>?>(), new string[] {}),
+            MagicOnionTypeInfo.CreateFromType<ArraySegment<byte>>(),
+            MagicOnionTypeInfo.CreateFromType<ArraySegment<byte>?>(),
         };
 
         // Act
@@ -173,29 +139,29 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<byte[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<short[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<long[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<sbyte[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ushort[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<uint[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ulong[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<string[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<decimal[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<float[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<double[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Guid[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<char[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<DateTime[]>(), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MessagePack", "Nil")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector2")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector3")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector4")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Quaternion")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Color")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Bounds")), new string[] {}),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Rect")), new string[] {}),
+            MagicOnionTypeInfo.CreateFromType<byte[]>(),
+            MagicOnionTypeInfo.CreateFromType<short[]>(),
+            MagicOnionTypeInfo.CreateFromType<int[]>(),
+            MagicOnionTypeInfo.CreateFromType<long[]>(),
+            MagicOnionTypeInfo.CreateFromType<sbyte[]>(),
+            MagicOnionTypeInfo.CreateFromType<ushort[]>(),
+            MagicOnionTypeInfo.CreateFromType<uint[]>(),
+            MagicOnionTypeInfo.CreateFromType<ulong[]>(),
+            MagicOnionTypeInfo.CreateFromType<string[]>(),
+            MagicOnionTypeInfo.CreateFromType<decimal[]>(),
+            MagicOnionTypeInfo.CreateFromType<float[]>(),
+            MagicOnionTypeInfo.CreateFromType<double[]>(),
+            MagicOnionTypeInfo.CreateFromType<Guid[]>(),
+            MagicOnionTypeInfo.CreateFromType<char[]>(),
+            MagicOnionTypeInfo.CreateFromType<DateTime[]>(),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MessagePack", "Nil")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector2")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector3")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Vector4")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Quaternion")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Color")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Bounds")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("UnityEngine", "Rect")),
         };
 
         // Act
@@ -214,10 +180,10 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 2), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 3), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 4), new string[] { "CONST_1" }),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 2),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 3),
+            MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject"), arrayRank: 4),
         };
 
         // Act
@@ -240,18 +206,18 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "List",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IList",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyList",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "Dictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IDictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyDictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "ICollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyCollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "IEnumerable",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "KeyValuePair",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Linq", "ILookup",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Linq", "IGrouping",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "List",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IList",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyList",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "Dictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IDictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyDictionary",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "ICollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IReadOnlyCollection",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "IEnumerable",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Collections.Generic", "KeyValuePair",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Linq", "ILookup",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
+            MagicOnionTypeInfo.Create("System.Linq", "IGrouping",MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.Create("MyNamespace", "MyObject")),
         };
 
         // Act
@@ -282,19 +248,19 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<short?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<long?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<byte?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ushort?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<uint?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ulong?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<sbyte?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<bool?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<char?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Guid?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<DateTime?>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<TimeSpan?>(), new string[] { }),
+            MagicOnionTypeInfo.CreateFromType<short?>(),
+            MagicOnionTypeInfo.CreateFromType<int?>(),
+            MagicOnionTypeInfo.CreateFromType<long?>(),
+            MagicOnionTypeInfo.CreateFromType<byte?>(),
+            MagicOnionTypeInfo.CreateFromType<ushort?>(),
+            MagicOnionTypeInfo.CreateFromType<uint?>(),
+            MagicOnionTypeInfo.CreateFromType<ulong?>(),
+            MagicOnionTypeInfo.CreateFromType<sbyte?>(),
+            MagicOnionTypeInfo.CreateFromType<bool?>(),
+            MagicOnionTypeInfo.CreateFromType<char?>(),
+            MagicOnionTypeInfo.CreateFromType<Guid?>(),
+            MagicOnionTypeInfo.CreateFromType<DateTime?>(),
+            MagicOnionTypeInfo.CreateFromType<TimeSpan?>(),
         };
 
         // Act
@@ -314,14 +280,14 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short, Guid>>(), new string[] { }),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short>>(),
+            MagicOnionTypeInfo.CreateFromType<ValueTuple<int, string, long, float, bool, byte, short, Guid>>(),
         };
 
         // Act
@@ -348,14 +314,14 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short>>(), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short, Guid>>(), new string[] { }),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short>>(),
+            MagicOnionTypeInfo.CreateFromType<Tuple<int, string, long, float, bool, byte, short, Guid>>(),
         };
 
         // Act
@@ -381,8 +347,8 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<int>()), new string[] { "CONST_1" }),
+            MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()),
+            MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<int>()),
         };
 
         // Act
@@ -404,9 +370,9 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(userDefinedMessagePackFormattersNamespace));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { }),
+            MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")),
+            MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()),
         };
 
         // Act
@@ -428,9 +394,9 @@ public class SerializationInfoCollectorTest
         var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
-            new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()), new string[] { }),
+            MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")),
+            MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()),
+            MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>()),
         };
 
         // Act

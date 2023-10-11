@@ -73,16 +73,10 @@ namespace <#= Namespace #>
                 object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
 
 <# foreach(var serviceInfo in Services) { #>
-<# if(serviceInfo.HasIfDirectiveCondition) { #>
-#if <#= serviceInfo.IfDirectiveCondition #>
-<# } #>
                 if (typeof(T) == typeof(<#= serviceInfo.ServiceType.FullName #>))
                 {
                     factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<<#= serviceInfo.ServiceType.FullName #>>)((x, y) => new <#= serviceInfo.GetClientFullName() #>(x, y)));
                 }
-<# if(serviceInfo.HasIfDirectiveCondition) { #>
-#endif
-<# } #>
 <# } // foreach #>
                 Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
             }
@@ -97,16 +91,10 @@ namespace <#= Namespace #>
                 object factory = default(global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>);
 
 <# foreach(var hubInfo in Hubs) { #>
-<# if(hubInfo.HasIfDirectiveCondition) { #>
-#if <#= hubInfo.IfDirectiveCondition #>
-<# } #>
                 if (typeof(TStreamingHub) == typeof(<#= hubInfo.ServiceType.FullName #>) && typeof(TReceiver) == typeof(<#= hubInfo.Receiver.ReceiverType.FullName #>))
                 {
                     factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<<#= hubInfo.ServiceType.FullName #>, <#= hubInfo.Receiver.ReceiverType.FullName #>>)((a, _, b, c, d, e) => new <#= hubInfo.GetClientFullName() #>(a, b, c, d, e)));
                 }
-<# if(hubInfo.HasIfDirectiveCondition) { #>
-#endif
-<# } #>
 <# } // foreach #>
 
                 Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;

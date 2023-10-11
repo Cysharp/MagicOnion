@@ -61,12 +61,9 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
         {
             foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
             {
-                using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
-                {
-                    ctx.TextWriter.WriteLines($$"""
-                    global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}});
-                    """);
-                }
+                ctx.TextWriter.WriteLines($$"""
+                global::MemoryPack.MemoryPackFormatterProvider.Register(new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}});
+                """);
             }
         }
         ctx.TextWriter.WriteLines($$"""

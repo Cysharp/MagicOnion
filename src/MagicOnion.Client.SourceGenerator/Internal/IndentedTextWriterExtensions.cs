@@ -34,33 +34,4 @@ internal static class IndentedTextWriterExtensions
             textWriter.Indent -= depth;
         }
     }
-
-    public static IfBlock IfDirective(this IndentedTextWriter textWriter, string conditions)
-    {
-        if (!string.IsNullOrWhiteSpace(conditions))
-        {
-            textWriter.WriteLineNoTabs($"#if {conditions}");
-        }
-        return new IfBlock(textWriter, conditions);
-    }
-
-    public readonly struct IfBlock : IDisposable
-    {
-        readonly IndentedTextWriter textWriter;
-        readonly string conditions;
-
-        public IfBlock(IndentedTextWriter textWriter, string conditions)
-        {
-            this.textWriter = textWriter;
-            this.conditions = conditions;
-        }
-
-        public void Dispose()
-        {
-            if (!string.IsNullOrWhiteSpace(conditions))
-            {
-                textWriter.WriteLineNoTabs($"#endif // {conditions}");
-            }
-        }
-    }
 }

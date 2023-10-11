@@ -30,7 +30,6 @@ public class MethodCollector
             .Select(x =>
             {
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
-                var ifDirective = x.GetDefinedGenerateIfCondition();
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
@@ -58,9 +57,9 @@ public class MethodCollector
                     .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, y))
                     .ToArray();
 
-                var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods, receiverInterfaceSymbol.GetDefinedGenerateIfCondition());
+                var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods);
 
-                return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, ifDirective);
+                return new MagicOnionStreamingHubInfo(serviceType, methods, receiver);
             })
             .Where(x => x is not null)
             .Cast<MagicOnionStreamingHubInfo>()
@@ -78,7 +77,6 @@ public class MethodCollector
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
-        var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         switch (methodReturnType.FullNameOpenType)
@@ -101,8 +99,7 @@ public class MethodCollector
             methodParameters,
             methodReturnType,
             requestType,
-            responseType,
-            ifDirective
+            responseType
         );
     }
     MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol)
@@ -110,7 +107,6 @@ public class MethodCollector
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
-        var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
@@ -124,8 +120,7 @@ public class MethodCollector
             methodParameters,
             methodReturnType,
             requestType,
-            responseType,
-            ifDirective
+            responseType
         );
     }
 
@@ -135,7 +130,6 @@ public class MethodCollector
             .Select(x =>
             {
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
-                var ifDirective = x.GetDefinedGenerateIfCondition();
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
@@ -156,7 +150,7 @@ public class MethodCollector
                     .Cast<MagicOnionServiceInfo.MagicOnionServiceMethodInfo>()
                     .ToArray();
 
-                return new MagicOnionServiceInfo(serviceType, methods, ifDirective);
+                return new MagicOnionServiceInfo(serviceType, methods);
             })
             .Where(x => x is not null)
             .Cast<MagicOnionServiceInfo>()
@@ -168,7 +162,6 @@ public class MethodCollector
     {
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
-        var ifDirective = methodSymbol.GetDefinedGenerateIfCondition();
         var methodType = MethodType.Other;
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
@@ -228,8 +221,7 @@ public class MethodCollector
             methodParameters,
             methodReturnType,
             requestType,
-            responseType,
-            ifDirective
+            responseType
         );
     }
 

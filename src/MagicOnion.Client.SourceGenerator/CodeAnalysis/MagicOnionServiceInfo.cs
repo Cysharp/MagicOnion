@@ -8,18 +8,14 @@ public class MagicOnionServiceInfo : IMagicOnionServiceInfo
     public MagicOnionTypeInfo ServiceType { get; }
     public IReadOnlyList<MagicOnionServiceMethodInfo> Methods { get; }
 
-    public string IfDirectiveCondition { get; }
-    public bool HasIfDirectiveCondition => !string.IsNullOrEmpty(IfDirectiveCondition);
-
-    public MagicOnionServiceInfo(MagicOnionTypeInfo serviceType, IReadOnlyList<MagicOnionServiceMethodInfo> methods, string ifDirectiveCondition)
+    public MagicOnionServiceInfo(MagicOnionTypeInfo serviceType, IReadOnlyList<MagicOnionServiceMethodInfo> methods)
     {
         ServiceType = serviceType;
         Methods = methods;
-        IfDirectiveCondition = ifDirectiveCondition;
     }
 
     [DebuggerDisplay("ServiceMethod: {MethodName,nq} ({MethodType,nq} {Path,nq}); MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}")]
-    public class MagicOnionServiceMethodInfo : IMagicOnionCompileDirectiveTarget
+    public class MagicOnionServiceMethodInfo
     {
         public MethodType MethodType { get; }
         public string ServiceName { get; }
@@ -70,9 +66,6 @@ public class MagicOnionServiceInfo : IMagicOnionServiceInfo
         /// </summary>
         public MagicOnionTypeInfo ResponseType { get; }
 
-        public string IfDirectiveCondition { get; }
-        public bool HasIfDirectiveCondition => !string.IsNullOrEmpty(IfDirectiveCondition);
-
         public MagicOnionServiceMethodInfo(
             MethodType methodType,
             string serviceName,
@@ -81,8 +74,7 @@ public class MagicOnionServiceInfo : IMagicOnionServiceInfo
             IReadOnlyList<MagicOnionMethodParameterInfo> parameters,
             MagicOnionTypeInfo methodReturnType,
             MagicOnionTypeInfo requestType,
-            MagicOnionTypeInfo responseType,
-            string ifDirectiveCondition)
+            MagicOnionTypeInfo responseType)
         {
             MethodType = methodType;
             ServiceName = serviceName;
@@ -92,7 +84,6 @@ public class MagicOnionServiceInfo : IMagicOnionServiceInfo
             MethodReturnType = methodReturnType;
             RequestType = requestType;
             ResponseType = responseType;
-            IfDirectiveCondition = ifDirectiveCondition;
         }
     }
 }

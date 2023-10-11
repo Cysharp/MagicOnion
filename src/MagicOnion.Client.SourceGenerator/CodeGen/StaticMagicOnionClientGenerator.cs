@@ -31,12 +31,9 @@ public class StaticMagicOnionClientGenerator
         {
             var buildContext = new ServiceClientBuildContext(serviceInfo, textWriter);
 
-            using (textWriter.IfDirective(serviceInfo.IfDirectiveCondition)) // #if ...
-            {
-                EmitPreamble(buildContext);
-                EmitServiceClientClass(buildContext);
-                EmitPostscript(buildContext);
-            } // #endif
+            EmitPreamble(buildContext);
+            EmitServiceClientClass(buildContext);
+            EmitPostscript(buildContext);
         }
 
         return baseWriter.ToString();
@@ -162,26 +159,23 @@ public class StaticMagicOnionClientGenerator
         //     => this.core.MethodName.InvokeDuplexStreaming(this, "ServiceName/MethodName");
         foreach (var method in ctx.Service.Methods)
         {
-            using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
+            var invokeRequestParameters = method.Parameters.Count switch
             {
-                var invokeRequestParameters = method.Parameters.Count switch
-                {
-                    // Invoker for ClientStreaming, DuplexStreaming method has no request parameter.
-                    _ when (method.MethodType != MethodType.Unary && method.MethodType != MethodType.ServerStreaming) => $"",
-                    // Nil.Default
-                    0 => $", global::MessagePack.Nil.Default",
-                    // arg0
-                    1 => $", {method.Parameters[0].Name}",
-                    // new DynamicArgumentTuple(arg1, arg2, ...)
-                    _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
-                };
-                var hasNonGenericUnaryResult = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.MagicOnion_UnaryResult;
+                // Invoker for ClientStreaming, DuplexStreaming method has no request parameter.
+                _ when (method.MethodType != MethodType.Unary && method.MethodType != MethodType.ServerStreaming) => $"",
+                // Nil.Default
+                0 => $", global::MessagePack.Nil.Default",
+                // arg0
+                1 => $", {method.Parameters[0].Name}",
+                // new DynamicArgumentTuple(arg1, arg2, ...)
+                _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
+            };
+            var hasNonGenericUnaryResult = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.MagicOnion_UnaryResult;
 
-                ctx.TextWriter.WriteLines($"""
-                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                    => this.core.{method.MethodName}.Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}(this, "{method.Path}"{invokeRequestParameters});
-                """);
-            } // #endif
+            ctx.TextWriter.WriteLines($"""
+            public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                => this.core.{method.MethodName}.Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}(this, "{method.Path}"{invokeRequestParameters});
+            """);
         }
     }
 
@@ -208,10 +202,7 @@ public class StaticMagicOnionClientGenerator
             // public RawMethodInvoker<TRequest, TResponse> MethodName;
             foreach (var method in ctx.Service.Methods)
             {
-                using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
-                {
-                    ctx.TextWriter.WriteLine($"public global::MagicOnion.Client.Internal.RawMethodInvoker<{method.RequestType.FullName}, {method.ResponseType.FullName}> {method.MethodName};");
-                } // #endif
+                ctx.TextWriter.WriteLine($"public global::MagicOnion.Client.Internal.RawMethodInvoker<{method.RequestType.FullName}, {method.ResponseType.FullName}> {method.MethodName};");
             }
 
             // public ClientCore(IMagicOnionSerializerProvider serializerProvider) {
@@ -222,11 +213,8 @@ public class StaticMagicOnionClientGenerator
                 // MethodName = RawMethodInvoker.Create_XXXType_XXXType<TRequest, TResponse>(MethodType, ServiceName, MethodName, serializerProvider);
                 foreach (var method in ctx.Service.Methods)
                 {
-                    using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
-                    {
-                        var createMethodVariant = $"{(method.RequestType.IsValueType ? "Value" : "Ref")}Type_{(method.ResponseType.IsValueType ? "Value" : "Ref")}Type";
-                        ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", serializerProvider);");
-                    } // #endif
+                    var createMethodVariant = $"{(method.RequestType.IsValueType ? "Value" : "Ref")}Type_{(method.ResponseType.IsValueType ? "Value" : "Ref")}Type";
+                    ctx.TextWriter.WriteLine($"this.{method.MethodName} = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_{createMethodVariant}<{method.RequestType.FullName}, {method.ResponseType.FullName}>(global::Grpc.Core.MethodType.{method.MethodType}, \"{method.ServiceName}\", \"{method.MethodName}\", serializerProvider);");
                 }
             }
             ctx.TextWriter.WriteLine("}");

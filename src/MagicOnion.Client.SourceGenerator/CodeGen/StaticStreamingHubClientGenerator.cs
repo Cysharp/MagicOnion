@@ -31,12 +31,9 @@ public class StaticStreamingHubClientGenerator
         {
             var buildContext = new StreamingHubClientBuildContext(hubInfo, textWriter);
 
-            using (textWriter.IfDirective(hubInfo.IfDirectiveCondition)) // #if ...
-            {
-                EmitPreamble(buildContext);
-                EmitHubClientClass(buildContext);
-                EmitPostscript(buildContext);
-            } // #endif
+            EmitPreamble(buildContext);
+            EmitHubClientClass(buildContext);
+            EmitPostscript(buildContext);
         }
 
         return baseWriter.ToString();
@@ -160,43 +157,40 @@ public class StaticStreamingHubClientGenerator
         //     => WriteMessageWithResponseAsync<DynamicArgumentTuple<int, string>, int>(FNV1A32.GetHashCode(nameof(MethodParameter_Many)), new DynamicArgumentTuple<int, string>(arg0, arg1));
         foreach (var method in ctx.Hub.Methods)
         {
-            using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition)) // #if ...
+            var writeMessageParameters = method.Parameters.Count switch
             {
-                var writeMessageParameters = method.Parameters.Count switch
-                {
-                    // Nil.Default
-                    0 => $", global::MessagePack.Nil.Default",
-                    // arg0
-                    1 => $", {method.Parameters[0].Name}",
-                    // new DynamicArgumentTuple(arg1, arg2, ...)
-                    _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
-                };
+                // Nil.Default
+                0 => $", global::MessagePack.Nil.Default",
+                // arg0
+                1 => $", {method.Parameters[0].Name}",
+                // new DynamicArgumentTuple(arg1, arg2, ...)
+                _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
+            };
 
-                if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
-                {
-                    // ValueTask
-                    ctx.TextWriter.WriteLines($"""
-                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                        => new global::System.Threading.Tasks.ValueTask({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
-                    """);
-                }
-                else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
-                {
-                    // ValueTask<T>
-                    ctx.TextWriter.WriteLines($"""
-                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                        => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
-                    """);
-                }
-                else
-                {
-                    // Task, Task<T>
-                    ctx.TextWriter.WriteLines($"""
-                    public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
-                        => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
-                    """);
-                }
-            } // #endif
+            if (method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
+            {
+                // ValueTask
+                ctx.TextWriter.WriteLines($"""
+                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                    => new global::System.Threading.Tasks.ValueTask({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                """);
+            }
+            else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
+            {
+                // ValueTask<T>
+                ctx.TextWriter.WriteLines($"""
+                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                    => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                """);
+            }
+            else
+            {
+                // Task, Task<T>
+                ctx.TextWriter.WriteLines($"""
+                public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                    => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+                """);
+            }
         }
 
         ctx.TextWriter.WriteLine();
@@ -214,24 +208,21 @@ public class StaticStreamingHubClientGenerator
             {
                 foreach (var method in ctx.Hub.Receiver.Methods)
                 {
-                    using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition))
+                    var methodArgs = method.Parameters.Count switch
                     {
-                        var methodArgs = method.Parameters.Count switch
-                        {
-                            0 => "",
-                            1 => "value",
-                            _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
-                        };
+                        0 => "",
+                        1 => "value",
+                        _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
+                    };
 
-                        ctx.TextWriter.WriteLines($$"""
-                        case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                            {
-                                var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
-                                receiver.{{method.MethodName}}({{methodArgs}});
-                            }
-                            break;
-                        """);
-                    }
+                    ctx.TextWriter.WriteLines($$"""
+                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                        {
+                            var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+                            receiver.{{method.MethodName}}({{methodArgs}});
+                        }
+                        break;
+                    """);
                 }
             }
             ctx.TextWriter.WriteLine("}");
@@ -252,14 +243,11 @@ public class StaticStreamingHubClientGenerator
             {
                 foreach (var method in ctx.Hub.Methods)
                 {
-                    using (ctx.TextWriter.IfDirective(method.IfDirectiveCondition))
-                    {
-                        ctx.TextWriter.WriteLines($$"""
-                        case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                            base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
-                            break;
-                        """);
-                    }
+                    ctx.TextWriter.WriteLines($$"""
+                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                        base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
+                        break;
+                    """);
                 }
             }
             ctx.TextWriter.WriteLine("}");

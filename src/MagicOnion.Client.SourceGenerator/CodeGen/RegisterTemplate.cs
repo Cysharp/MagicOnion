@@ -92,11 +92,6 @@ namespace ");
                     "       object factory = default(global::MagicOnion.Client.MagicOnionClientFactor" +
                     "yDelegate<T>);\r\n\r\n");
  foreach(var serviceInfo in Services) { 
- if(serviceInfo.HasIfDirectiveCondition) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.IfDirectiveCondition));
-            this.Write("\r\n");
- } 
             this.Write("                if (typeof(T) == typeof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.ServiceType.FullName));
             this.Write("))\r\n                {\r\n                    factory = ((global::MagicOnion.Client." +
@@ -105,9 +100,6 @@ namespace ");
             this.Write(">)((x, y) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(serviceInfo.GetClientFullName()));
             this.Write("(x, y)));\r\n                }\r\n");
- if(serviceInfo.HasIfDirectiveCondition) { 
-            this.Write("#endif\r\n");
- } 
  } // foreach 
             this.Write(@"                Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
             }
@@ -123,11 +115,6 @@ namespace ");
 
 ");
  foreach(var hubInfo in Hubs) { 
- if(hubInfo.HasIfDirectiveCondition) { 
-            this.Write("#if ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.IfDirectiveCondition));
-            this.Write("\r\n");
- } 
             this.Write("                if (typeof(TStreamingHub) == typeof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.ServiceType.FullName));
             this.Write(") && typeof(TReceiver) == typeof(");
@@ -140,9 +127,6 @@ namespace ");
             this.Write(">)((a, _, b, c, d, e) => new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubInfo.GetClientFullName()));
             this.Write("(a, b, c, d, e)));\r\n                }\r\n");
- if(hubInfo.HasIfDirectiveCondition) { 
-            this.Write("#endif\r\n");
- } 
  } // foreach 
             this.Write(@"
                 Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;

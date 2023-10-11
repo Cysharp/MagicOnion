@@ -102,12 +102,9 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
                 {
                     foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
                     {
-                        using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
-                        {
-                            ctx.TextWriter.WriteLines($$"""
-                            {typeof({{resolverInfo.FullName}}), {{index}} },
-                            """);
-                        }
+                        ctx.TextWriter.WriteLines($$"""
+                        {typeof({{resolverInfo.FullName}}), {{index}} },
+                        """);
                     }
                 } // lookup = new ...
                 ctx.TextWriter.WriteLine("};");
@@ -132,12 +129,9 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
                 {
                     foreach (var (resolverInfo, index) in ctx.FormatterRegistrations.Select((x, i) => (x, i)))
                     {
-                        using (ctx.TextWriter.IfDirective(string.Join(" || ", resolverInfo.IfDirectiveConditions.Select(y => $"({y})"))))
-                        {
-                            ctx.TextWriter.WriteLines($$"""
-                            case {{index}}: return new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}};
-                            """);
-                        }
+                        ctx.TextWriter.WriteLines($$"""
+                        case {{index}}: return new {{(resolverInfo.FormatterName.StartsWith("global::") || string.IsNullOrWhiteSpace(ctx.FormatterNamespace) ? "" : ctx.FormatterNamespace + ".") + resolverInfo.FormatterName}}{{resolverInfo.FormatterConstructorArgs}};
+                        """);
                     }
                     ctx.TextWriter.WriteLine("default: return null;");
                 } // switch (key)
@@ -165,12 +159,9 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
             {
                 foreach (var typeHint in ctx.TypeHints)
                 {
-                    using (ctx.TextWriter.IfDirective(string.Join(" || ", typeHint.IfDirectiveConditions.Select(y => $"({y})"))))
-                    {
-                        ctx.TextWriter.WriteLines($$"""
-                        _ = {{ctx.InitializerName}}.Instance.GetFormatter<{{typeHint.FullName}}>();
-                        """);
-                    }
+                    ctx.TextWriter.WriteLines($$"""
+                    _ = {{ctx.InitializerName}}.Instance.GetFormatter<{{typeHint.FullName}}>();
+                    """);
                 }
             }
         }
