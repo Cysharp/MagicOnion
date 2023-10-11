@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MagicOnion.Generator": {
-      "commandName": "Project",
-      "commandLineArgs": "-c \"NON_UNITY\" -i \"C:\\GitHubRepositories\\MagicOnion\\sandbox\\Sandbox.NetCoreServer\\Sandbox.NetCoreServer.csproj\" -o \"C:\\GitHubRepositories\\MagicOnion\\sandbox\\Sandbox.NetCoreServer\\MagicOnionGenerated.cs\""
-    }
-  }
-}
