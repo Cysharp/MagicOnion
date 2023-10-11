@@ -36,11 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CodeGen\EnumTemplate.cs">
-      <DependentUpon>EnumTemplate.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
     <Compile Update="CodeGen\RegisterTemplate.cs">
       <DependentUpon>RegisterTemplate.tt</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -49,11 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CodeGen\EnumTemplate.tt">
-      <CustomToolNamespace>MagicOnion.Client.SourceGenerator.CodeGen</CustomToolNamespace>
-      <LastGenOutput>EnumTemplate.cs</LastGenOutput>
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-    </None>
     <None Update="CodeGen\RegisterTemplate.tt">
       <CustomToolNamespace>MagicOnion.Client.SourceGenerator.CodeGen</CustomToolNamespace>
       <LastGenOutput>RegisterTemplate.cs</LastGenOutput>

@@ -35,11 +35,7 @@ public class MagicOnionCompiler
                 Namespace: namespaceDot + "Resolvers",
                 InitializerName: "MagicOnionResolver",
                 Generator: new MessagePackFormatterResolverGenerator(),
-                EnumFormatterGenerator: x => new EnumTemplate()
-                {
-                    Namespace = namespaceDot + "Formatters",
-                    EnumSerializationInfos = x.ToArray()
-                }.TransformText()
+                EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(namespaceDot + "Formatters", x)
             ),
             _ => throw new NotImplementedException(),
         };
