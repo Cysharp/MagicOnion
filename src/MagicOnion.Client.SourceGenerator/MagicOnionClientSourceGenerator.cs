@@ -17,8 +17,8 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             .Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default)
             .WithTrackingName("mo_ReferenceSymbols");
         var interfaces = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: (node, ct) => SyntaxHelper.IsCandidateInterface(node),
-            transform: (ctx, ct) => ctx.Node)
+                predicate: (node, ct) => SyntaxHelper.IsCandidateInterface(node),
+                transform: (ctx, ct) => ctx.Node)
             .Collect()
             .WithTrackingName("mo_Interfaces");
 

@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <AdditionalFiles Include="MagicOnionClientGeneratorOptions.json" Condition="Exists('MagicOnionClientGeneratorOptions.json')" />
+  </ItemGroup>
+</Project>

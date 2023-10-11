@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": "object",
+  "properties": {
+    "disableAutoRegister": {
+      "description": "Disable automatically calling MagicOnionInitializer during start-up. (Automatic registration requires .NET 5+ or Unity)",
+      "type": "boolean"
+    },
+    "namespace": {
+      "description": "The namespace of clients to generate.",
+      "type": "string"
+    },
+    "messagePackFormatterNamespace": {
+      "description": "the namespace of pre-generated MessagePackFormatters.",
+      "type": "string"
+    },
+    "serializer": {
+      "description": "The serializer used for message serialization.",
+      "type": "string",
+      "enum": [
+        "MessagePack",
+        "MemoryPack"
+      ]
+    }
+  }
+}

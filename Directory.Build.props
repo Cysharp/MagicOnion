@@ -22,6 +22,12 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
+  <!-- Expose package path to the solution (e.g. $(PkgSystem_Text_Json))-->
+  <!-- https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#generatepathproperty -->
+  <ItemDefinitionGroup>
+    <PackageReference GeneratePathProperty="true" />
+  </ItemDefinitionGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all"/>
   </ItemGroup>

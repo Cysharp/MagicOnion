@@ -1,0 +1,5 @@
+{
+  "$schema": "../../MagicOnionClientGeneratorOptions.schema.json",
+  "disableAutoRegister": true,
+  "namespace": "MagicOnion.Integration.Tests.Generated"
+}
