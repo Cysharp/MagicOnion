@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit requires .NET 6 (`ReferenceAssemblies.Net.Net60`) -->
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="MemoryPack" Version="1.9.16" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -34,6 +35,7 @@
     <ProjectReference Include="..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Resources\**\*.cs" />

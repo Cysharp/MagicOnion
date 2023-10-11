@@ -17,18 +17,23 @@ using VerifyCS = MagicOnion.Client.SourceGenerator.Tests.Verifiers.MagicOnionSou
 
 namespace MagicOnion.Client.SourceGenerator.Tests.Verifiers;
 
+internal record VerifierOptions(bool UseMemoryPack)
+{
+    public static VerifierOptions Default { get; } = new VerifierOptions(UseMemoryPack: false);
+}
+
 internal class MagicOnionSourceGeneratorVerifier
 {
-    public static async Task RunAsync(string testSourceCode, GeneratorOptions? options = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
+    public static async Task RunAsync(string testSourceCode, GeneratorOptions? options = null, VerifierOptions? verifierOptions = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
     {
         if (string.IsNullOrEmpty(testSourceCode)) throw new ArgumentNullException(nameof(testSourceCode));
         if (string.IsNullOrEmpty(testFile)) throw new ArgumentNullException(nameof(testFile));
         if (string.IsNullOrEmpty(testMethod)) throw new ArgumentNullException(nameof(testMethod));
 
-        await RunAsync(new[] { ("Source.cs", testSourceCode) }, options, testFile, testMethod);
+        await RunAsync(new[] { ("Source.cs", testSourceCode) }, options, verifierOptions, testFile, testMethod);
     }
 
-    public static async Task RunAsync(IEnumerable<(string Path, string Content)> testSourceCodes, GeneratorOptions? options = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
+    public static async Task RunAsync(IEnumerable<(string Path, string Content)> testSourceCodes, GeneratorOptions? options = null, VerifierOptions? verifierOptions = null, [CallerFilePath]string? testFile = null, [CallerMemberName]string? testMethod = null)
     {
         if (testSourceCodes is null) throw new ArgumentNullException(nameof(testSourceCodes));
         if (string.IsNullOrEmpty(testFile)) throw new ArgumentNullException(nameof(testFile));
@@ -44,6 +49,17 @@ internal class MagicOnionSourceGeneratorVerifier
         if (options is not null)
         {
             test.TestState.AdditionalFiles.Add((GeneratorOptions.JsonFileName, options.ToJson()));
+        }
+
+        if (verifierOptions is not null)
+        {
+            if (verifierOptions.UseMemoryPack)
+            {
+                // MemoryPack.Core
+                test.TestState.AdditionalReferences.Add(typeof(MemoryPack.IMemoryPackFormatter).Assembly);
+                // MagicOnion.Serialization.MemoryPack
+                test.TestState.AdditionalReferences.Add(typeof(MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter).Assembly);
+            }
         }
 
         test.TestState.Sources.AddRange(testSourceCodes.Select(x => (x.Path, SourceText.From(x.Content, Encoding.UTF8, SourceHashAlgorithm.Sha1))));

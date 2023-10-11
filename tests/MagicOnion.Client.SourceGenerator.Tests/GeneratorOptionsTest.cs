@@ -99,6 +99,10 @@ public class GeneratorOptionsTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, options: GeneratorOptions.Default with { Serializer = GeneratorOptions.SerializerType.MemoryPack });
+        await MagicOnionSourceGeneratorVerifier.RunAsync(
+            source,
+            options: GeneratorOptions.Default with { Serializer = GeneratorOptions.SerializerType.MemoryPack },
+            verifierOptions: VerifierOptions.Default with { UseMemoryPack = true }
+        );
     }
 }
