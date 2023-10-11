@@ -1,8 +1,5 @@
-#pragma warning disable CS1998
-
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Text;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.CodeGen;
 using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
@@ -16,8 +13,10 @@ public class MagicOnionCompiler
     {
         var outputs = new List<(string Path, string Source)>();
 
-        // Prepare args
+        // <Namespace>.
         var namespaceDot = string.IsNullOrWhiteSpace(options.Namespace) ? string.Empty : options.Namespace + ".";
+        // <Namespace>.Formatters
+        var formattersNamespace = namespaceDot + "Formatters";
 
         // Configure serialization
         (ISerializationFormatterNameMapper Mapper, string Namespace, string InitializerName, ISerializerFormatterGenerator Generator, Func<IEnumerable<EnumSerializationInfo>, string> EnumFormatterGenerator)
@@ -35,28 +34,22 @@ public class MagicOnionCompiler
                 Namespace: namespaceDot + "Resolvers",
                 InitializerName: "MagicOnionResolver",
                 Generator: new MessagePackFormatterResolverGenerator(),
-                EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(namespaceDot + "Formatters", x)
+                EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(formattersNamespace, x)
             ),
             _ => throw new NotImplementedException(),
         };
 
-        var sw = Stopwatch.StartNew();
-
-        sw.Restart();
         var collector = new MethodCollector(cancellationToken);
         var serviceCollection = collector.Collect(interfaceSymbols, referenceSymbols);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        sw.Restart();
         var serializationInfoCollector = new SerializationInfoCollector(serialization.Mapper);
         var serializationInfoCollection = serializationInfoCollector.Collect(serviceCollection);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        sw.Restart();
-
-        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, namespaceDot + "Formatters", serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
+        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, formattersNamespace, serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
         var resolverTexts = serialization.Generator.Build(formatterCodeGenContext);
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -66,7 +59,7 @@ public class MagicOnionCompiler
 
         foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
         {
-            outputs.Add((GeneratePathFromNamespaceAndTypeName(namespaceDot + "Formatters", enumSerializationInfo.FormatterName), serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(formattersNamespace, enumSerializationInfo.FormatterName), serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
         }
 
         foreach (var service in serviceCollection.Services)
