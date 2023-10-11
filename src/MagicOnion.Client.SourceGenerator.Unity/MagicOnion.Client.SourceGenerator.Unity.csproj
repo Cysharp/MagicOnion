@@ -20,7 +20,7 @@
     <Compile Include="..\MagicOnion.Client.SourceGenerator\Internal\**\*.cs" LinkBase="Internal" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\Utils\**\*.cs" LinkBase="Utils" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\GeneratorOptions.cs" />
-    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionCompiler.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientGenerator.cs" />
   </ItemGroup>
 
   <ItemGroup>

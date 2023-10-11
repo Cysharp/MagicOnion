@@ -19,11 +19,10 @@ public class MagicOnionClientSourceGeneratorRoslyn3 : ISourceGenerator
         var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
         if (ReferenceSymbols.TryCreate(context.Compilation, out var referenceSymbols))
         {
-            var compiler = new MagicOnionCompiler();
             var interfaceSymbols = syntaxReceiver.Candidates
                 .Select(x => (INamedTypeSymbol)context.Compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!)
                 .ToImmutableArray();
-            var outputs = compiler.Generate(interfaceSymbols, referenceSymbols, options, context.CancellationToken);
+            var outputs = MagicOnionClientGenerator.Generate(interfaceSymbols, referenceSymbols, options, context.CancellationToken);
             foreach (var output in outputs)
             {
                 context.AddSource(output.Path, output.Source);

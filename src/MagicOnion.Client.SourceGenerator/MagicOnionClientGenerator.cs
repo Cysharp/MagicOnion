@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Diagnostics;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.CodeGen;
 using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
@@ -7,9 +6,9 @@ using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator;
 
-public class MagicOnionCompiler
+public static class MagicOnionClientGenerator
 {
-    public IReadOnlyList<(string Path, string Source)> Generate(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, GeneratorOptions options, CancellationToken cancellationToken)
+    public static IReadOnlyList<(string Path, string Source)> Generate(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, GeneratorOptions options, CancellationToken cancellationToken)
     {
         var outputs = new List<(string Path, string Source)>();
 
