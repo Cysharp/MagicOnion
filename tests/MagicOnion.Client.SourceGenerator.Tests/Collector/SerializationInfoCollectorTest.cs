@@ -16,7 +16,7 @@ public class SerializationInfoCollectorTest
     public void NonGenerics()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int>(), new string[] { }),
@@ -40,7 +40,7 @@ public class SerializationInfoCollectorTest
     public void Nullable()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
@@ -63,7 +63,7 @@ public class SerializationInfoCollectorTest
     public void Generics_MergeIfDirectives()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<int>(), new string[] { }),
@@ -92,7 +92,7 @@ public class SerializationInfoCollectorTest
     public void Generics_ManyTypeArguments()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
@@ -114,7 +114,7 @@ public class SerializationInfoCollectorTest
     public void Enum()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateEnum("MyNamespace", "MyEnum", MagicOnionTypeInfo.CreateFromType<int>()), new string[] { }),
@@ -150,7 +150,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_SkipBuiltInGenericTypes()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ArraySegment<byte>>(), new string[] {}),
@@ -170,7 +170,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_Array_SkipBuiltInTypes()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<byte[]>(), new string[] {}),
@@ -211,7 +211,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_Array_NonBuiltIn()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateArray(MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
@@ -237,7 +237,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_Generics()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System.Collections.Generic", "List",MagicOnionTypeInfo.Create("MyNamespace", "MyObject")), new string[] { "CONST_1" }),
@@ -279,7 +279,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_Nullable()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<short?>(), new string[] { }),
@@ -311,7 +311,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_ValueTuple()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<ValueTuple<int>>(), new string[] { }),
@@ -345,7 +345,7 @@ public class SerializationInfoCollectorTest
     public void KnownTypes_Tuple()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.CreateFromType<Tuple<int>>(), new string[] { }),
@@ -378,7 +378,7 @@ public class SerializationInfoCollectorTest
     public void DynamicArgumentTuple()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("MagicOnion", "DynamicArgumentTuple", MagicOnionTypeInfo.CreateFromType<string>(), MagicOnionTypeInfo.CreateFromType<long>()), new string[] { }),
@@ -401,7 +401,7 @@ public class SerializationInfoCollectorTest
     {
         // Arrange
         var userDefinedMessagePackFormattersNamespace = "MyFormatters";
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(userDefinedMessagePackFormattersNamespace));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(userDefinedMessagePackFormattersNamespace));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),
@@ -425,7 +425,7 @@ public class SerializationInfoCollectorTest
     public void UserDefinedMessagePackSerializerFormattersNamespace_NotSpecified()
     {
         // Arrange
-        var collector = new SerializationInfoCollector(new MagicOnionGeneratorTestOutputLogger(testOutputHelper), new MessagePackFormatterNameMapper(string.Empty));
+        var collector = new SerializationInfoCollector(new MessagePackFormatterNameMapper(string.Empty));
         var types = new[]
         {
             new SerializationInfoCollector.TypeWithIfDirectives(MagicOnionTypeInfo.Create("System", "Nullable", MagicOnionTypeInfo.Create("MyNamespace", "MyGenericObject")), new string[] { }),

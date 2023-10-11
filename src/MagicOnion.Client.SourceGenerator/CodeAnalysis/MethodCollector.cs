@@ -10,18 +10,16 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 /// </summary>
 public class MethodCollector
 {
-    readonly IMagicOnionGeneratorLogger logger;
     readonly CancellationToken cancellationToken;
 
-    public MethodCollector(IMagicOnionGeneratorLogger? logger = null, CancellationToken cancellationToken = default)
+    public MethodCollector(CancellationToken cancellationToken = default)
     {
-        this.logger = logger ?? MagicOnionGeneratorNullLogger.Instance;
         this.cancellationToken = cancellationToken;
     }
 
     public MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
     {
-        var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols, logger);
+        var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols);
 
         return new MagicOnionServiceCollection(GetStreamingHubs(ctx), GetServices(ctx));
     }
@@ -36,10 +34,8 @@ public class MethodCollector
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
-                    logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub type '{serviceType.FullName}' (HasIgnore; Skipped)");
                     return null;
                 }
-                logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub type '{serviceType.FullName}' (IfDirective={ifDirective})");
 
                 var methods = x.GetMembers()
                     .OfType<IMethodSymbol>()
@@ -47,7 +43,6 @@ public class MethodCollector
                     {
                         if (HasIgnoreAttribute(symbol))
                         {
-                            logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{symbol.Name}' in type '{serviceType.FullName}'. (HasIgnore; Skipped)");
                             return null;
                         }
                         return CreateHubMethodInfoFromMethodSymbol(serviceType, symbol);
@@ -63,7 +58,6 @@ public class MethodCollector
                     .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, y))
                     .ToArray();
 
-                logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub Receiver type '{receiverType.FullName}'");
                 var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods, receiverInterfaceSymbol.GetDefinedGenerateIfCondition());
 
                 return new MagicOnionStreamingHubInfo(serviceType, methods, receiver, ifDirective);
@@ -101,7 +95,6 @@ public class MethodCollector
                 throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified)}'.");
         }
 
-        logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
         return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
             hubId,
             methodSymbol.Name,
@@ -125,7 +118,6 @@ public class MethodCollector
             throw new InvalidOperationException($"StreamingHub receiver method '{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
         }
 
-        logger.Trace($"[{nameof(MethodCollectorContext)}] StreamingHub receiver method '{methodSymbol.Name}' in type '{interfaceType.FullName}'");
         return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
             hubId,
             methodSymbol.Name,
@@ -147,11 +139,8 @@ public class MethodCollector
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
-                    logger.Trace($"[{nameof(MethodCollectorContext)}] Service type '{serviceType.FullName}' (HasIgnore; Skipped)");
                     return null;
                 }
-
-                logger.Trace($"[{nameof(MethodCollectorContext)}] Service type '{serviceType.FullName}' (IfDirective={ifDirective})");
 
                 var methods = x.GetMembers()
                     .OfType<IMethodSymbol>()
@@ -159,7 +148,6 @@ public class MethodCollector
                     {
                         if (HasIgnoreAttribute(symbol))
                         {
-                            logger.Trace($"[{nameof(MethodCollectorContext)}] Service method '{symbol.Name}' in type '{serviceType.FullName}'. (HasIgnore; Skipped)");
                             return null;
                         }
                         return CreateServiceMethodInfoFromMethodSymbol(serviceType, symbol);
@@ -232,7 +220,6 @@ public class MethodCollector
             throw new InvalidOperationException($"ClientStreaming and DuplexStreaming must have no parameters. ({serviceType.FullName}.{methodSymbol.Name})");
         }
 
-        logger.Trace($"[{nameof(MethodCollectorContext)}] Service method '{methodSymbol.Name}' ({methodType}) in type '{serviceType.FullName}' (IfDirective={ifDirective})");
         return new MagicOnionServiceInfo.MagicOnionServiceMethodInfo(
             methodType,
             serviceType.Name,
@@ -262,13 +249,11 @@ public class MethodCollector
         public IReadOnlyList<INamedTypeSymbol> ServiceAndHubInterfaces { get; }
         public IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; }
         public IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; }
-        public IMagicOnionGeneratorLogger Logger { get; }
 
-        public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces, IMagicOnionGeneratorLogger logger)
+        public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces)
         {
             ReferenceSymbols = referenceSymbols;
             ServiceAndHubInterfaces = serviceAndHubInterfaces;
-            Logger = logger;
 
             var serviceInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
             var hubInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
@@ -296,7 +281,7 @@ public class MethodCollector
             HubInterfaces = hubInterfaces.ToArray();
         }
 
-        public static MethodCollectorContext CreateFromCompilation(Compilation compilation, ReferenceSymbols referenceSymbols, IMagicOnionGeneratorLogger logger)
+        public static MethodCollectorContext CreateFromCompilation(Compilation compilation, ReferenceSymbols referenceSymbols)
         {
             var serviceAndHubInterfaces = compilation.GetNamedTypeSymbols()
                 .Where(x => x.TypeKind == TypeKind.Interface)
@@ -311,10 +296,10 @@ public class MethodCollector
                 })
                 .ToArray();
 
-            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces, logger);
+            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces);
         }
 
-        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, IMagicOnionGeneratorLogger logger)
+        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
         {
             var serviceAndHubInterfaces = interfaceSymbols
                 .Where(x => x.TypeKind == TypeKind.Interface)
@@ -329,7 +314,7 @@ public class MethodCollector
                 })
                 .ToArray();
 
-            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces, logger);
+            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces);
         }
     }
 }

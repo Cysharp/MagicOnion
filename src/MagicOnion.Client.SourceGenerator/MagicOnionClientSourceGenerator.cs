@@ -33,7 +33,7 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             var (((options, interfaces), referenceSymbols), compilation) = values;
             if (referenceSymbols is null) return;
 
-            var compiler = new MagicOnionCompiler(MagicOnionGeneratorNullLogger.Instance);
+            var compiler = new MagicOnionCompiler();
             var symbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
             var generated = compiler.Generate(symbols, referenceSymbols, options, sourceProductionContext.CancellationToken);
             foreach (var (path, source) in generated)

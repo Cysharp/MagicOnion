@@ -8,12 +8,10 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 /// </summary>
 public class SerializationInfoCollector
 {
-    readonly IMagicOnionGeneratorLogger logger;
     readonly ISerializationFormatterNameMapper serializationFormatterNameMapper;
 
-    public SerializationInfoCollector(IMagicOnionGeneratorLogger logger, ISerializationFormatterNameMapper serializationFormatterNameMapper)
+    public SerializationInfoCollector(ISerializationFormatterNameMapper serializationFormatterNameMapper)
     {
-        this.logger = logger;
         this.serializationFormatterNameMapper = serializationFormatterNameMapper;
     }
 
@@ -88,14 +86,12 @@ public class SerializationInfoCollector
             var type = typeWithDirectives.Type;
             if (mapper.WellKnownTypes.BuiltInTypes.Contains(type.FullName))
             {
-                logger.Trace($"[{nameof(SerializationInfoCollector)}] Found type '{type.FullName}'. Skip this because the type is supported by serializer built-in.");
                 continue;
             }
 
             if (type.IsEnum)
             {
                 Debug.Assert(type.UnderlyingType is not null);
-                logger.Trace($"[{nameof(SerializationInfoCollector)}] Found Enum type '{type.FullName}'");
                 context.Enums.Add(new EnumSerializationInfo(
                     type.Namespace,
                     type.Name,
@@ -109,11 +105,9 @@ public class SerializationInfoCollector
                 Debug.Assert(type.ElementType is not null);
                 if (mapper.WellKnownTypes.BuiltInArrayElementTypes.Contains(type.ElementType!.FullName))
                 {
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'. Skip this because an array element type is supported by serializer built-in.");
                     continue;
                 }
 
-                logger.Trace($"[{nameof(SerializationInfoCollector)}] Array type '{type.FullName}'");
 
                 var (formatterName, formatterConstructorArgs) = mapper.MapArray(type);
                 context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, formatterConstructorArgs, typeWithDirectives.IfDirectives));
@@ -123,13 +117,11 @@ public class SerializationInfoCollector
             {
                 if (type.FullNameOpenType == "global::System.Nullable<>" && mapper.WellKnownTypes.BuiltInNullableTypes.Contains(type.GenericArguments[0].FullName))
                 {
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}'. Skip this because it is nullable.");
                     continue;
                 }
 
                 if (mapper.TryMapGeneric(type, out var formatterName, out var formatterConstructorArgs))
                 {
-                    logger.Trace($"[{nameof(SerializationInfoCollector)}] Generic type '{type.FullName}' (IfDirectives={string.Join(", ", typeWithDirectives.IfDirectives)})");
                     context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, formatterConstructorArgs, typeWithDirectives.IfDirectives));
                 }
             }
