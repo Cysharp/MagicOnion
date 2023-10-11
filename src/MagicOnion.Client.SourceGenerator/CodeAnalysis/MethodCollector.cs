@@ -281,24 +281,6 @@ public class MethodCollector
             HubInterfaces = hubInterfaces.ToArray();
         }
 
-        public static MethodCollectorContext CreateFromCompilation(Compilation compilation, ReferenceSymbols referenceSymbols)
-        {
-            var serviceAndHubInterfaces = compilation.GetNamedTypeSymbols()
-                .Where(x => x.TypeKind == TypeKind.Interface)
-                .Where(x =>
-                {
-                    var all = x.AllInterfaces;
-                    if (all.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
-                    {
-                        return true;
-                    }
-                    return false;
-                })
-                .ToArray();
-
-            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces);
-        }
-
         public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
         {
             var serviceAndHubInterfaces = interfaceSymbols

@@ -183,12 +183,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
 
 public class MemoryPackFormatterNameMapper : ISerializationFormatterNameMapper
 {
-
     public IWellKnownSerializationTypes WellKnownTypes => MessagePackWellKnownSerializationTypes.Instance;
-
-    public MemoryPackFormatterNameMapper()
-    {
-    }
 
     public bool TryMapGeneric(MagicOnionTypeInfo type, [NotNullWhen(true)] out string? formatterName, [NotNullWhen(true)] out string? formatterConstructorArgs)
     {

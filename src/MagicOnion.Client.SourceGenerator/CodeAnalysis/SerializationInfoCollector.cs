@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using MagicOnion.Client.SourceGenerator.Internal;
 
 namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 

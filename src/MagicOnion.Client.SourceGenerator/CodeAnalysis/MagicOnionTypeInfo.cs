@@ -20,7 +20,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         // ReSharper restore InconsistentNaming
     }
 
-    readonly SubType _subType;
+    readonly SubType subType;
 
     public string Namespace { get; }
     public string Name { get; }
@@ -34,7 +34,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         return MagicOnionTypeInfo.Create(Namespace, Name, Array.Empty<MagicOnionTypeInfo>(), IsValueType);
     }
 
-    public bool IsArray => _subType == SubType.Array;
+    public bool IsArray => subType == SubType.Array;
     public int ArrayRank { get; }
     public MagicOnionTypeInfo? ElementType { get; }
 
@@ -43,9 +43,9 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     public string FullNameOpenType
         => ToDisplayName(DisplayNameFormat.FullyQualified | DisplayNameFormat.OpenGenerics);
 
-    public bool IsValueType => _subType == SubType.ValueType || _subType == SubType.Enum;
+    public bool IsValueType => subType == SubType.ValueType || subType == SubType.Enum;
 
-    public bool IsEnum => _subType == SubType.Enum;
+    public bool IsEnum => subType == SubType.Enum;
     public MagicOnionTypeInfo? UnderlyingType { get; }
 
     [Flags]
@@ -59,7 +59,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         FullyQualified = Namespace | Global,
     }
 
-    private enum SubType
+    enum SubType
     {
         None,
         ValueType,
@@ -67,9 +67,9 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         Array,
     }
 
-    private MagicOnionTypeInfo(string @namespace, string name, SubType subType = SubType.None, int arrayRank = 0, MagicOnionTypeInfo[]? genericArguments = null, MagicOnionTypeInfo? elementType = null, MagicOnionTypeInfo? underlyingType = null)
+    MagicOnionTypeInfo(string @namespace, string name, SubType subType = SubType.None, int arrayRank = 0, MagicOnionTypeInfo[]? genericArguments = null, MagicOnionTypeInfo? elementType = null, MagicOnionTypeInfo? underlyingType = null)
     {
-        _subType = subType;
+        this.subType = subType;
         Namespace = @namespace;
         Name = name;
         GenericArguments = genericArguments ?? Array.Empty<MagicOnionTypeInfo>();
@@ -231,7 +231,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         if (ReferenceEquals(this, other)) return true;
 
         return FullName == other.FullName && /* Namespace + Name + GenericArguments + ArrayRank + ElementType */
-               _subType == other._subType &&
+               subType == other.subType &&
                ElementType! == other.ElementType! &&
                UnderlyingType! == other.UnderlyingType!;
     }
@@ -247,5 +247,5 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     public static bool operator ==(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => a?.Equals(b) ?? (b is null);
     public static bool operator !=(MagicOnionTypeInfo a, MagicOnionTypeInfo b) => !(a == b);
 
-    public override int GetHashCode() => (FullName /* Namespace + Name + GenericArguments + ArrayRank + ElementType */, _subType, ElementType, UnderlyingType).GetHashCode();
+    public override int GetHashCode() => (FullName /* Namespace + Name + GenericArguments + ArrayRank + ElementType */, _subType: subType, ElementType, UnderlyingType).GetHashCode();
 }
