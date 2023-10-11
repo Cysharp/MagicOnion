@@ -9,7 +9,7 @@ namespace MagicOnion.Client.SourceGenerator.Tests;
 public class RunTest
 {
     [Fact]
-    public async Task RunAndGenerate()
+    public void RunAndGenerate()
     {
         var (compilation, semanticModel) = CompilationHelper.Create(
             """
@@ -34,6 +34,69 @@ public class RunTest
         driver = driver.RunGenerators(compilation);
         var results = driver.GetRunResult().Results;
         var generatedTrees = driver.GetRunResult().GeneratedTrees;
+    }
+
+    [Fact]
+    public void RunAndGenerate_Service()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+                using System;
+                using MagicOnion;
+
+                namespace TempProject;
+
+                public interface IMyService : IService<IMyService>
+                {
+                    UnaryResult<string> HelloAsync(string name, int age);
+                    UnaryResult<string?> HelloNullableAsync(string? name, int? age);
+                }
+                """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+
+        Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
+    }
+
+    [Fact]
+    public void RunAndGenerate_StreamingHub()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+                using System;
+                using System.Threading.Tasks;
+                using MagicOnion;
+
+                namespace TempProject;
+
+                public interface IMyStreamingHub : IStreamingHub<IMyStreamingHub, IMyStreamingHubReceiver>
+                {
+                    Task<string> HelloAsync(string name, int age);
+                    Task<string?> HelloNullableAsync(string? name, int? age);
+                }
+
+                public interface IMyStreamingHubReceiver
+                {
+                }
+                """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+
+        Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
     }
 
     //[Fact]
