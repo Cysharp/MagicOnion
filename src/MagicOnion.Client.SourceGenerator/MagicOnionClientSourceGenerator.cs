@@ -17,8 +17,8 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             .Select(static (x, cancellationToken) => ReferenceSymbols.TryCreate(x, out var rs) ? rs : default)
             .WithTrackingName("mo_ReferenceSymbols");
         var interfaces = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: (node, ct) => SyntaxHelper.IsCandidateInterface(node),
-                transform: (ctx, ct) => ctx.Node)
+                predicate: static (node, ct) => SyntaxHelper.IsCandidateInterface(node),
+                transform: static (ctx, ct) => ctx.Node)
             .Collect()
             .WithTrackingName("mo_Interfaces");
 
@@ -33,8 +33,10 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             var (((options, interfaces), referenceSymbols), compilation) = values;
             if (referenceSymbols is null) return;
 
-            var symbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
-            var generated = MagicOnionClientGenerator.Generate(symbols, referenceSymbols, options, sourceProductionContext.CancellationToken);
+            var interfaceSymbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
+            var serviceCollection = MethodCollector.Collect(interfaceSymbols, referenceSymbols, sourceProductionContext.CancellationToken);
+            var generated = MagicOnionClientGenerator.Generate(serviceCollection, options, sourceProductionContext.CancellationToken);
+
             foreach (var (path, source) in generated)
             {
                 sourceProductionContext.AddSource(path, source);

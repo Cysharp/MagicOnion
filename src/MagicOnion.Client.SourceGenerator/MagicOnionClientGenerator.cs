@@ -8,7 +8,7 @@ namespace MagicOnion.Client.SourceGenerator;
 
 public static class MagicOnionClientGenerator
 {
-    public static IReadOnlyList<(string Path, string Source)> Generate(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, GeneratorOptions options, CancellationToken cancellationToken)
+    public static IReadOnlyList<(string Path, string Source)> Generate(MagicOnionServiceCollection serviceCollection, GeneratorOptions options, CancellationToken cancellationToken)
     {
         var outputs = new List<(string Path, string Source)>();
 
@@ -37,9 +37,6 @@ public static class MagicOnionClientGenerator
             ),
             _ => throw new NotImplementedException(),
         };
-
-        var collector = new MethodCollector(cancellationToken);
-        var serviceCollection = collector.Collect(interfaceSymbols, referenceSymbols);
 
         cancellationToken.ThrowIfCancellationRequested();
 

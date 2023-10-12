@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Threading;
 using MagicOnion.Client.SourceGenerator.Internal;
 using MagicOnion.Client.SourceGenerator.Utils;
 using Microsoft.CodeAnalysis;
@@ -10,25 +11,20 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 /// </summary>
 public class MethodCollector
 {
-    readonly CancellationToken cancellationToken;
-
-    public MethodCollector(CancellationToken cancellationToken = default)
+    public static MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
     {
-        this.cancellationToken = cancellationToken;
+        var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols, cancellationToken);
+
+        return new MagicOnionServiceCollection(GetStreamingHubs(ctx, cancellationToken), GetServices(ctx, cancellationToken));
     }
 
-    public MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
-    {
-        var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols);
-
-        return new MagicOnionServiceCollection(GetStreamingHubs(ctx), GetServices(ctx));
-    }
-
-    IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx)
+    static IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx, CancellationToken cancellationToken)
     {
         return ctx.HubInterfaces
             .Select(x =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
@@ -72,7 +68,7 @@ public class MethodCollector
     static bool HasIgnoreAttribute(ISymbol symbol)
         => symbol.GetAttributes().FindAttributeShortName("IgnoreAttribute") is not null;
 
-    MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+    static MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -102,7 +98,7 @@ public class MethodCollector
             responseType
         );
     }
-    MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol)
+    static MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -123,12 +119,13 @@ public class MethodCollector
             responseType
         );
     }
-
-    IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx)
+    static IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx, CancellationToken cancellationToken)
     {
         return ctx.ServiceInterfaces
             .Select(x =>
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
@@ -158,7 +155,7 @@ public class MethodCollector
             .ToArray();
     }
 
-    MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
+    static MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
     {
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
@@ -273,8 +270,10 @@ public class MethodCollector
             HubInterfaces = hubInterfaces.ToArray();
         }
 
-        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols)
+        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var serviceAndHubInterfaces = interfaceSymbols
                 .Where(x => x.TypeKind == TypeKind.Interface)
                 .Where(x =>

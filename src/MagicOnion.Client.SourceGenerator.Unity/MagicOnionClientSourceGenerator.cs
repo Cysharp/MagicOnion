@@ -22,10 +22,12 @@ public class MagicOnionClientSourceGeneratorRoslyn3 : ISourceGenerator
             var interfaceSymbols = syntaxReceiver.Candidates
                 .Select(x => (INamedTypeSymbol)context.Compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!)
                 .ToImmutableArray();
-            var outputs = MagicOnionClientGenerator.Generate(interfaceSymbols, referenceSymbols, options, context.CancellationToken);
-            foreach (var output in outputs)
+            var serviceCollection = MethodCollector.Collect(interfaceSymbols, referenceSymbols, context.CancellationToken);
+            var generated = MagicOnionClientGenerator.Generate(serviceCollection, options, context.CancellationToken);
+
+            foreach (var (path, source) in generated)
             {
-                context.AddSource(output.Path, output.Source);
+                context.AddSource(path, source);
             }
         }
     }
