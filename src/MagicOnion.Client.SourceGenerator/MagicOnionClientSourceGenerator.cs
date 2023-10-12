@@ -34,9 +34,13 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             if (referenceSymbols is null) return;
 
             var interfaceSymbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
-            var serviceCollection = MethodCollector.Collect(interfaceSymbols, referenceSymbols, sourceProductionContext.CancellationToken);
+            var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, sourceProductionContext.CancellationToken);
             var generated = MagicOnionClientGenerator.Generate(serviceCollection, options, sourceProductionContext.CancellationToken);
 
+            foreach (var diagnostic in diagnostics)
+            {
+                sourceProductionContext.ReportDiagnostic(diagnostic);
+            }
             foreach (var (path, source) in generated)
             {
                 sourceProductionContext.AddSource(path, source);

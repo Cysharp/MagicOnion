@@ -1,4 +1,7 @@
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Tests.Verifiers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace MagicOnion.Client.SourceGenerator.Tests;
 
@@ -12,7 +15,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -33,7 +36,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -54,7 +57,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -75,7 +78,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -96,7 +99,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -106,7 +109,12 @@ public class GenerateServiceTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 
     [Fact]
@@ -117,7 +125,7 @@ public class GenerateServiceTest
         using MessagePack;
         using MagicOnion;
         using System.Threading.Tasks;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -140,7 +148,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -150,7 +158,12 @@ public class GenerateServiceTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 
     [Fact]
@@ -161,7 +174,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -171,7 +184,12 @@ public class GenerateServiceTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 
     [Fact]
@@ -182,7 +200,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
@@ -194,6 +212,16 @@ public class GenerateServiceTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[]
+            {
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+            }
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 }

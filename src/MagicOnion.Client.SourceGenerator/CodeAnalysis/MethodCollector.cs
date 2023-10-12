@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using MagicOnion.Client.SourceGenerator.Internal;
 using MagicOnion.Client.SourceGenerator.Utils;
@@ -11,11 +12,11 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 /// </summary>
 public class MethodCollector
 {
-    public static MagicOnionServiceCollection Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
+    public static (MagicOnionServiceCollection ServiceCollection, IReadOnlyList<Diagnostic> Diagnostics) Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
     {
         var ctx = MethodCollectorContext.CreateFromInterfaceSymbols(interfaceSymbols, referenceSymbols, cancellationToken);
 
-        return new MagicOnionServiceCollection(GetStreamingHubs(ctx, cancellationToken), GetServices(ctx, cancellationToken));
+        return (new MagicOnionServiceCollection(GetStreamingHubs(ctx, cancellationToken), GetServices(ctx, cancellationToken)), ctx.ReportDiagnostics);
     }
 
     static IReadOnlyList<MagicOnionStreamingHubInfo> GetStreamingHubs(MethodCollectorContext ctx, CancellationToken cancellationToken)
@@ -32,26 +33,51 @@ public class MethodCollector
                     return null;
                 }
 
-                var methods = x.GetMembers()
-                    .OfType<IMethodSymbol>()
-                    .Select(symbol =>
+                var hasError = false;
+                var methods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
+                foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (HasIgnoreAttribute(methodSymbol)) continue;
+                    if (TryCreateHubMethodInfoFromMethodSymbol(serviceType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
-                        if (HasIgnoreAttribute(symbol))
+                        methods.Add(methodInfo);
+                    }
+
+                    if (diagnostic is not null)
+                    {
+                        ctx.ReportDiagnostics.Add(diagnostic);
+                        if (diagnostic.Severity == DiagnosticSeverity.Error)
                         {
-                            return null;
+                            hasError = true;
                         }
-                        return CreateHubMethodInfoFromMethodSymbol(serviceType, symbol);
-                    })
-                    .Where(x => x is not null)
-                    .Cast<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>()
-                    .ToArray();
+                    }
+                }
 
                 var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
                 var receiverType = MagicOnionTypeInfo.CreateFromSymbol(receiverInterfaceSymbol);
-                var receiverMethods = receiverInterfaceSymbol.GetMembers()
-                    .OfType<IMethodSymbol>()
-                    .Select(y => CreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, y))
-                    .ToArray();
+
+                var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
+                foreach (var methodSymbol in receiverInterfaceSymbol.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (TryCreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
+                    {
+                        receiverMethods.Add(methodInfo);
+                    }
+
+                    if (diagnostic is not null)
+                    {
+                        ctx.ReportDiagnostics.Add(diagnostic);
+                        if (diagnostic.Severity == DiagnosticSeverity.Error)
+                        {
+                            hasError = true;
+                        }
+                    }
+                }
+
+                if (hasError)
+                {
+                    return null;
+                }
 
                 var receiver = new MagicOnionStreamingHubInfo.MagicOnionStreamingHubReceiverInfo(receiverType, receiverMethods);
 
@@ -68,7 +94,7 @@ public class MethodCollector
     static bool HasIgnoreAttribute(ISymbol symbol)
         => symbol.GetAttributes().FindAttributeShortName("IgnoreAttribute") is not null;
 
-    static MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol)
+    static bool TryCreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -86,10 +112,15 @@ public class MethodCollector
                 responseType = methodReturnType.GenericArguments[0];
                 break;
             default:
-                throw new InvalidOperationException($"StreamingHub method '{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified)}'.");
+                methodInfo = null;
+                diagnostic = Diagnostic.Create(
+                    MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType,
+                    methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                    $"{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified));
+                return false;
         }
 
-        return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
+        methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
             hubId,
             methodSymbol.Name,
             methodParameters,
@@ -97,8 +128,10 @@ public class MethodCollector
             requestType,
             responseType
         );
+        diagnostic = null;
+        return true;
     }
-    static MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo CreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol)
+    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
@@ -107,10 +140,15 @@ public class MethodCollector
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
         {
-            throw new InvalidOperationException($"StreamingHub receiver method '{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}' has unsupported return type '{methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}'.");
+            methodInfo = null;
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType,
+                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                $"{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace));
+            return false;
         }
 
-        return new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
+        methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
             hubId,
             methodSymbol.Name,
             methodParameters,
@@ -118,6 +156,8 @@ public class MethodCollector
             requestType,
             responseType
         );
+        diagnostic = null;
+        return true;
     }
     static IReadOnlyList<MagicOnionServiceInfo> GetServices(MethodCollectorContext ctx, CancellationToken cancellationToken)
     {
@@ -133,19 +173,30 @@ public class MethodCollector
                     return null;
                 }
 
-                var methods = x.GetMembers()
-                    .OfType<IMethodSymbol>()
-                    .Select(symbol =>
+                var methods = new List<MagicOnionServiceInfo.MagicOnionServiceMethodInfo>();
+                var hasError = false;
+                foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (HasIgnoreAttribute(methodSymbol)) continue;
+                    if (TryCreateServiceMethodInfoFromMethodSymbol(serviceType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
-                        if (HasIgnoreAttribute(symbol))
+                        methods.Add(methodInfo);
+                    }
+
+                    if (diagnostic is not null)
+                    {
+                        ctx.ReportDiagnostics.Add(diagnostic);
+                        if (diagnostic.Severity == DiagnosticSeverity.Error)
                         {
-                            return null;
+                            hasError = true;
                         }
-                        return CreateServiceMethodInfoFromMethodSymbol(serviceType, symbol);
-                    })
-                    .Where(x => x is not null)
-                    .Cast<MagicOnionServiceInfo.MagicOnionServiceMethodInfo>()
-                    .ToArray();
+                    }
+                }
+
+                if (hasError)
+                {
+                    return null;
+                }
 
                 return new MagicOnionServiceInfo(serviceType, methods);
             })
@@ -155,7 +206,7 @@ public class MethodCollector
             .ToArray();
     }
 
-    static MagicOnionServiceInfo.MagicOnionServiceMethodInfo CreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol)
+    static bool TryCreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionServiceInfo.MagicOnionServiceMethodInfo? serviceMethodInfo, out Diagnostic? diagnostic)
     {
         var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
@@ -199,18 +250,34 @@ public class MethodCollector
         // Validates
         if (methodType == MethodType.Other)
         {
-            throw new InvalidOperationException($"Unsupported return type '{methodReturnType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType,
+                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                methodReturnType.FullName, $"{serviceType.FullName}.{methodSymbol.Name}");
+            serviceMethodInfo = null;
+            return false;
         }
         if (methodType == MethodType.Unary && responseType.Namespace == "MagicOnion" && (responseType.Name is "ClientStreamingResult" or "ServerStreamingResult" or "DuplexStreamingResult"))
         {
-            throw new InvalidOperationException($"Unary methods can not return '{responseType.FullName}' ({serviceType.FullName}.{methodSymbol.Name})");
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType,
+                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                responseType.FullName, $"{serviceType.FullName}.{methodSymbol.Name}");
+            serviceMethodInfo = null;
+            return false;
         }
         if ((methodType == MethodType.ClientStreaming || methodType == MethodType.DuplexStreaming) && methodParameters.Any())
         {
-            throw new InvalidOperationException($"ClientStreaming and DuplexStreaming must have no parameters. ({serviceType.FullName}.{methodSymbol.Name})");
+            diagnostic = Diagnostic.Create(
+                MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters,
+                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                $"{serviceType.FullName}.{methodSymbol.Name}");
+            serviceMethodInfo = null;
+            return false;
         }
 
-        return new MagicOnionServiceInfo.MagicOnionServiceMethodInfo(
+        diagnostic = null;
+        serviceMethodInfo = new MagicOnionServiceInfo.MagicOnionServiceMethodInfo(
             methodType,
             serviceType.Name,
             methodSymbol.Name,
@@ -220,6 +287,7 @@ public class MethodCollector
             requestType,
             responseType
         );
+        return true;
     }
 
     static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
@@ -237,6 +305,7 @@ public class MethodCollector
         public required ReferenceSymbols ReferenceSymbols { get; init; }
         public required IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; init; }
         public required IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; init; }
+        public List<Diagnostic> ReportDiagnostics { get; } = new();
 
         public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
         {

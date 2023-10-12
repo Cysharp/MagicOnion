@@ -17,9 +17,16 @@ using VerifyCS = MagicOnion.Client.SourceGenerator.Tests.Verifiers.MagicOnionSou
 
 namespace MagicOnion.Client.SourceGenerator.Tests.Verifiers;
 
-internal record VerifierOptions(bool UseMemoryPack)
+internal record VerifierOptions
 {
-    public static VerifierOptions Default { get; } = new VerifierOptions(UseMemoryPack: false);
+    public bool UseMemoryPack { get; init; }
+    public TestBehaviors? TestBehaviorsOverride { get; init; }
+    public IReadOnlyList<DiagnosticResult>? ExpectedDiagnostics { get; init; }
+
+    public static VerifierOptions Default { get; } = new VerifierOptions
+    {
+        UseMemoryPack = false,
+    };
 }
 
 internal class MagicOnionSourceGeneratorVerifier
@@ -53,6 +60,16 @@ internal class MagicOnionSourceGeneratorVerifier
 
         if (verifierOptions is not null)
         {
+            if (verifierOptions.ExpectedDiagnostics is not null)
+            {
+                test.ExpectedDiagnostics.AddRange(verifierOptions.ExpectedDiagnostics);
+            }
+
+            if (verifierOptions.TestBehaviorsOverride is not null)
+            {
+                test.TestBehaviors = verifierOptions.TestBehaviorsOverride.Value;
+            }
+
             if (verifierOptions.UseMemoryPack)
             {
                 // MemoryPack.Core

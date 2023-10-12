@@ -1,4 +1,7 @@
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Tests.Verifiers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace MagicOnion.Client.SourceGenerator.Tests;
 
@@ -12,7 +15,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -20,7 +23,7 @@ public class GenerateStreamingHubTest
                 void OnMessage();
                 void OnMessage2(MyObject a);
                 void OnMessage3(MyObject a, string b, int c);
-        
+
             }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
@@ -30,7 +33,7 @@ public class GenerateStreamingHubTest
                 Task D(MyObject a, string b, int c);
                 Task<int> E(MyObject a, string b, int c);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -49,7 +52,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -60,7 +63,7 @@ public class GenerateStreamingHubTest
             {
                 Task A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -79,7 +82,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -90,7 +93,7 @@ public class GenerateStreamingHubTest
             {
                 Task A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -109,7 +112,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -120,7 +123,7 @@ public class GenerateStreamingHubTest
             {
                 Task A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -139,7 +142,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -147,7 +150,7 @@ public class GenerateStreamingHubTest
             {
                 Task A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -166,7 +169,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -174,7 +177,7 @@ public class GenerateStreamingHubTest
             {
                 Task<MyObject> A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -193,7 +196,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -201,7 +204,7 @@ public class GenerateStreamingHubTest
             {
                 ValueTask A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -220,7 +223,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -228,7 +231,7 @@ public class GenerateStreamingHubTest
             {
                 ValueTask<MyObject> A(MyObject a);
             }
-        
+
             [MessagePackObject]
             public class MyObject
             {
@@ -247,7 +250,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -258,7 +261,15 @@ public class GenerateStreamingHubTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[]
+            {
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+            }
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 
     [Fact]
@@ -269,7 +280,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -282,7 +293,15 @@ public class GenerateStreamingHubTest
         }
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[]
+            {
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id, DiagnosticSeverity.Error),
+            }
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
 
     [Fact]
@@ -293,7 +312,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -315,7 +334,7 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-        
+
         namespace TempProject
         {
             public interface IMyHubReceiver { }
