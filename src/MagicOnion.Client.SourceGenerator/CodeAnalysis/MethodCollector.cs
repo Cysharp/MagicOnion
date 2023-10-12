@@ -232,62 +232,45 @@ public class MethodCollector
                 ? parameters[0].Type
                 : MagicOnionTypeInfo.CreateValueType("MagicOnion", "DynamicArgumentTuple", parameters.Select(x => x.Type).ToArray());
 
-    class MethodCollectorContext
+    record MethodCollectorContext
     {
-        public ReferenceSymbols ReferenceSymbols { get; }
-        public IReadOnlyList<INamedTypeSymbol> ServiceAndHubInterfaces { get; }
-        public IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; }
-        public IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; }
+        public required ReferenceSymbols ReferenceSymbols { get; init; }
+        public required IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; init; }
+        public required IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; init; }
 
-        public MethodCollectorContext(ReferenceSymbols referenceSymbols, IReadOnlyList<INamedTypeSymbol> serviceAndHubInterfaces)
+        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
         {
-            ReferenceSymbols = referenceSymbols;
-            ServiceAndHubInterfaces = serviceAndHubInterfaces;
-
             var serviceInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
             var hubInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-            foreach (var type in serviceAndHubInterfaces)
+
+            foreach (var interfaceSymbol in interfaceSymbols)
             {
-                if (type.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
+                cancellationToken.ThrowIfCancellationRequested();
+
+                foreach (var implInterfaceSymbol in interfaceSymbol.AllInterfaces)
                 {
-                    // StreamingHub
-                    if (!type.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
+                    if (implInterfaceSymbol.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker) &&
+                        !interfaceSymbol.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
                     {
-                        hubInterfaces.Add(type);
+                        // StreamingHub
+                        hubInterfaces.Add(interfaceSymbol);
                     }
-                }
-                else if (type.AllInterfaces.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)))
-                {
-                    // Service
-                    if (!type.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IService))
+                    else if (implInterfaceSymbol.ApproximatelyEqual(referenceSymbols.IServiceMarker) &&
+                             !interfaceSymbol.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IService) &&
+                             !hubInterfaces.Contains(interfaceSymbol) /* IStreamingHub also implements IService */)
                     {
-                        serviceInterfaces.Add(type);
+                        // Service
+                        serviceInterfaces.Add(interfaceSymbol);
                     }
                 }
             }
 
-            ServiceInterfaces = serviceInterfaces.ToArray();
-            HubInterfaces = hubInterfaces.ToArray();
-        }
-
-        public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var serviceAndHubInterfaces = interfaceSymbols
-                .Where(x => x.TypeKind == TypeKind.Interface)
-                .Where(x =>
-                {
-                    var all = x.AllInterfaces;
-                    if (all.Any(y => y.ApproximatelyEqual(referenceSymbols.IServiceMarker)) || all.Any(y => y.ApproximatelyEqual(referenceSymbols.IStreamingHubMarker)))
-                    {
-                        return true;
-                    }
-                    return false;
-                })
-                .ToArray();
-
-            return new MethodCollectorContext(referenceSymbols, serviceAndHubInterfaces);
+            return new MethodCollectorContext
+            {
+                HubInterfaces = hubInterfaces.ToArray(),
+                ServiceInterfaces = serviceInterfaces.ToArray(),
+                ReferenceSymbols = referenceSymbols,
+            };
         }
     }
 }
