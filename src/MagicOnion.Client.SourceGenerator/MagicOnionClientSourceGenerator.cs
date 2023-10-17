@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 namespace MagicOnion.Client.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
-public class MagicOnionClientSourceGenerator : IIncrementalGenerator
+public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -33,18 +33,7 @@ public class MagicOnionClientSourceGenerator : IIncrementalGenerator
             var (((options, interfaces), referenceSymbols), compilation) = values;
             if (referenceSymbols is null) return;
 
-            var interfaceSymbols = interfaces.Select(x => (INamedTypeSymbol)compilation.GetSemanticModel(x.SyntaxTree).GetDeclaredSymbol(x)!).ToImmutableArray();
-            var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, sourceProductionContext.CancellationToken);
-            var generated = MagicOnionClientGenerator.Generate(serviceCollection, options, sourceProductionContext.CancellationToken);
-
-            foreach (var diagnostic in diagnostics)
-            {
-                sourceProductionContext.ReportDiagnostic(diagnostic);
-            }
-            foreach (var (path, source) in generated)
-            {
-                sourceProductionContext.AddSource(path, source);
-            }
+            Generate(interfaces, compilation, referenceSymbols, sourceProductionContext, options);
         });
     }
 }

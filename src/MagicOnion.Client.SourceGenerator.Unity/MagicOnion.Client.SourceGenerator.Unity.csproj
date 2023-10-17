@@ -11,6 +11,7 @@
     <!-- Source Generator / Roslyn Analyzer -->
     <IsRoslynComponent>true</IsRoslynComponent>
     <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <RootNamespace>MagicOnion.Client.SourceGenerator</RootNamespace>
 
   </PropertyGroup>
 
@@ -21,6 +22,7 @@
     <Compile Include="..\MagicOnion.Client.SourceGenerator\Utils\**\*.cs" LinkBase="Utils" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\GeneratorOptions.cs" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientGenerator.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Emit.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +30,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" PrivateAssets="all" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" PrivateAssets="all" />
   </ItemGroup>

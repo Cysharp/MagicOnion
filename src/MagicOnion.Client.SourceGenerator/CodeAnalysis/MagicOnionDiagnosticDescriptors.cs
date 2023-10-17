@@ -2,6 +2,8 @@ using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
+#pragma warning disable RS2008 // Enable analyzer release tracking for the analyzer project containing rule '{0}'
+
 public static class MagicOnionDiagnosticDescriptors
 {
     public static readonly DiagnosticDescriptor StreamingHubUnsupportedReceiverMethodReturnType =
@@ -28,7 +30,7 @@ public static class MagicOnionDiagnosticDescriptors
         new DiagnosticDescriptor(
             id: "MOC1003",
             title: "Must be UnaryResult or Task of StreamingResult",
-            messageFormat: "Unsupported return type '{0}' ({1}). Allowed return types are UnaryResult and Task of StreamingResult",
+            messageFormat: "Unsupported return type '{0}' ({1}). Allowed return types are UnaryResult and Task of StreamingResult.",
             category: "Usage",
             description: "The service method has unsupported return type.",
             defaultSeverity: DiagnosticSeverity.Error,
