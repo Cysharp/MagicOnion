@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -24,13 +24,6 @@
 
   <ItemGroup>
     <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="build\**">
-      <Pack>true</Pack>
-      <PackagePath>build\</PackagePath>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
