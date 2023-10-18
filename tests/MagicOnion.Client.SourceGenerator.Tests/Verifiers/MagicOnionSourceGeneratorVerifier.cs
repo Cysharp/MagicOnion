@@ -1,4 +1,4 @@
-#define WRITE_EXPECTED
+//#define WRITE_EXPECTED
 
 // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/develop/tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier%601%2BTest.cs
 // https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#unit-testing-of-generators
