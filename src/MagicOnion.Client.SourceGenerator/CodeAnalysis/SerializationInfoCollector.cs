@@ -102,7 +102,6 @@ public class SerializationInfoCollector
                     continue;
                 }
 
-
                 var (formatterName, formatterConstructorArgs) = mapper.MapArray(type);
                 context.Generics.Add(new GenericSerializationInfo(type.FullName, formatterName, formatterConstructorArgs));
                 mapper.MapArray(type);

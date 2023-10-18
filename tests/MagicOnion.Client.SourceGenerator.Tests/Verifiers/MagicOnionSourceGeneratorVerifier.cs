@@ -1,15 +1,17 @@
-#define WRITE_EXPECTED
+//#define WRITE_EXPECTED
 
 // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/develop/tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier%601%2BTest.cs
 // https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#unit-testing-of-generators
 
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Rename;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
@@ -123,14 +125,24 @@ internal class MagicOnionSourceGeneratorVerifier
         {
             var prefix = $"{typeof(Test).Assembly.GetName().Name}.Resources.{Path.GetFileNameWithoutExtension(testFile)}.{testMethod}.";
 
-            foreach (var resName in typeof(Test).Assembly.GetManifestResourceNames().OrderBy(x => x))
-            {
-                if (!resName.StartsWith(prefix)) continue;
+            var referenceFiles = typeof(Test).Assembly.GetManifestResourceNames()
+                .Where(x => x.StartsWith(prefix))
+                .Select(resName =>
+                {
+                    using var stream = typeof(Test).Assembly.GetManifestResourceStream(resName) ?? throw new InvalidOperationException();
+                    using var reader = new StreamReader(stream);
+                    var source = reader.ReadToEnd();
+                    var fileNameWithIndex = resName.Substring(prefix.Length);
+                    var index = int.Parse(fileNameWithIndex.Substring(0, 4));
+                    var fileName = fileNameWithIndex.Substring(4 + 1);
 
-                using var stream = typeof(Test).Assembly.GetManifestResourceStream(resName) ?? throw new InvalidOperationException();
-                using var reader = new StreamReader(stream);
-                var source = reader.ReadToEnd();
-                TestState.GeneratedSources.Add((typeof(MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator), resName.Substring(prefix.Length), SourceText.From(source, Encoding.UTF8, SourceHashAlgorithm.Sha1)));
+                    return (Index: index, FileName: fileName, Source: source);
+                })
+                .OrderBy(x => x.Index);
+
+            foreach (var (_, fileName, source) in referenceFiles)
+            {
+                TestState.GeneratedSources.Add((typeof(MagicOnion.Client.SourceGenerator.MagicOnionClientSourceGenerator), fileName, SourceText.From(source, Encoding.UTF8, SourceHashAlgorithm.Sha1)));
             }
         }
 
@@ -145,9 +157,9 @@ internal class MagicOnionSourceGeneratorVerifier
             var (compilation, diagnostics) = await base.GetProjectCompilationAsync(project, verifier, cancellationToken);
             var resourceDirectory = Path.Combine(Path.GetDirectoryName(testFile)!, "Resources", Path.GetFileNameWithoutExtension(testFile), testMethod);
 
-            foreach (var syntaxTree in compilation.SyntaxTrees.Skip(project.DocumentIds.Count))
+            foreach (var (syntaxTree, index) in compilation.SyntaxTrees.Skip(project.DocumentIds.Count).Select((x, i) => (x, i)))
             {
-                WriteTreeToDiskIfNecessary(syntaxTree, resourceDirectory, "");
+                WriteTreeToDiskIfNecessary(syntaxTree, resourceDirectory, $"{index:0000}_");
             }
 
             return (compilation, diagnostics);

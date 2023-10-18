@@ -21,6 +21,7 @@ internal class MagicOnionInitializerGenerator
             {
             """);
         }
+
         writer.WriteLine($$"""
                 using global::System;
                 using global::System.Collections.Generic;
@@ -28,17 +29,19 @@ internal class MagicOnionInitializerGenerator
                 using global::MagicOnion;
                 using global::MagicOnion.Client;
 
+                partial class PreserveAttribute : global::System.Attribute {}
+            
                 partial class {{typeName}}
                 {
                     bool isRegistered = false;
                     readonly MagicOnionGeneratedClientFactoryProvider provider = new();
 
                     public static {{typeName}} Instance { get; } = new();
-            
-                    //public global::MessagePack.IFormatterResolver Resolver => core;
+
                     public global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
                     public global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
             """);
+
         if (!options.DisableAutoRegister)
         {
             writer.WriteLine($$"""

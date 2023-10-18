@@ -18,22 +18,20 @@ public static class MagicOnionClientGenerator
         var formattersNamespace = namespaceDot + "Formatters";
 
         // Configure serialization
-        (ISerializationFormatterNameMapper Mapper, string Namespace, string InitializerName, ISerializerFormatterGenerator Generator, Func<IEnumerable<EnumSerializationInfo>, string> EnumFormatterGenerator)
+        (ISerializationFormatterNameMapper Mapper, string Namespace, ISerializerFormatterGenerator Generator, Func<IEnumerable<EnumSerializationInfo>, string> EnumFormatterGenerator)
             serialization = options.Serializer switch
         {
             GeneratorOptions.SerializerType.MemoryPack => (
                 Mapper: new MemoryPackFormatterNameMapper(),
                 Namespace: options.Namespace,
-                InitializerName: "MagicOnionMemoryPackFormatterProvider",
                 Generator: new MemoryPackFormatterRegistrationGenerator(),
                 EnumFormatterGenerator: _ => string.Empty
             ),
             GeneratorOptions.SerializerType.MessagePack => (
                 Mapper: new MessagePackFormatterNameMapper(options.MessagePackFormatterNamespace),
                 Namespace: namespaceDot + "Resolvers",
-                InitializerName: "MagicOnionResolver",
                 Generator: new MessagePackFormatterResolverGenerator(),
-                EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(formattersNamespace, x)
+                EnumFormatterGenerator: x => MessagePackEnumFormatterGenerator.Build(context, x)
             ),
             _ => throw new NotImplementedException(),
         };
@@ -45,17 +43,17 @@ public static class MagicOnionClientGenerator
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(serialization.Namespace, formattersNamespace, serialization.InitializerName, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
-        var resolverTexts = serialization.Generator.Build(formatterCodeGenContext);
+        var formatterCodeGenContext = new SerializationFormatterCodeGenContext(formattersNamespace, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
+        var resolverTexts = serialization.Generator.Build(context, formatterCodeGenContext);
 
         cancellationToken.ThrowIfCancellationRequested();
 
         outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName), MagicOnionInitializerGenerator.Build(context.Namespace, context.InitializerPartialTypeName, options, serviceCollection)));
-        outputs.Add((GeneratePathFromNamespaceAndTypeName(formatterCodeGenContext.Namespace, formatterCodeGenContext.InitializerName), resolverTexts));
+        outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".Resolver"), resolverTexts));
 
         foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
         {
-            outputs.Add((GeneratePathFromNamespaceAndTypeName(formattersNamespace, enumSerializationInfo.FormatterName), serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".Formatters." + enumSerializationInfo.FormatterName), serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
         }
 
         foreach (var service in serviceCollection.Services)

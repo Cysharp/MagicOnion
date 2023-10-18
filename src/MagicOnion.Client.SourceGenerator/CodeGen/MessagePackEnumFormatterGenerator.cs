@@ -4,7 +4,7 @@ namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 internal class MessagePackEnumFormatterGenerator
 {
-    public static string Build(string @namespace, IEnumerable<EnumSerializationInfo> enumSerializationInfoSet)
+    public static string Build(GenerationContext context, IEnumerable<EnumSerializationInfo> enumSerializationInfoSet)
     {
         var writer = new StringWriter();
         writer.WriteLine($$"""
@@ -15,35 +15,53 @@ internal class MessagePackEnumFormatterGenerator
 
             """);
 
-        writer.WriteLine($$"""
-            namespace {{@namespace}}
-            """);
-        writer.WriteLine($$"""
+        if (!string.IsNullOrEmpty(context.Namespace))
+        {
+            writer.WriteLine($$"""
+            namespace {{context.Namespace}}
             {
+            """);
+        }
+
+        writer.WriteLine($$"""
                 using global::System;
                 using global::MessagePack;
 
+                partial class {{context.InitializerPartialTypeName}}
+                {
+                    static class MessagePackEnumFormatters
+                    {
             """);
+
         foreach (var info in enumSerializationInfoSet)
         {
             writer.WriteLine($$"""
-                public sealed class {{info.FormatterName}} : global::MessagePack.Formatters.IMessagePackFormatter<{{info.FullName}}>
-                {
-                    public void Serialize(ref global::MessagePack.MessagePackWriter writer, {{info.FullName}} value, global::MessagePack.MessagePackSerializerOptions options)
-                    {
-                        writer.Write(({{info.UnderlyingType}})value);
-                    }
-                    
-                    public {{info.FullName}} Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
-                    {
-                        return ({{info.FullName}})reader.Read{{info.UnderlyingType}}();
+                        public sealed class {{info.FormatterName}} : global::MessagePack.Formatters.IMessagePackFormatter<{{info.FullName}}>
+                        {
+                            public void Serialize(ref global::MessagePack.MessagePackWriter writer, {{info.FullName}} value, global::MessagePack.MessagePackSerializerOptions options)
+                            {
+                                writer.Write(({{info.UnderlyingType}})value);
+                            }
+                            
+                            public {{info.FullName}} Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+                            {
+                                return ({{info.FullName}})reader.Read{{info.UnderlyingType}}();
+                            }
+                        }
+            """);
+        }
+
+        writer.WriteLine($$"""
                     }
                 }
             """);
-        }
-        writer.WriteLine($$"""
+
+        if (!string.IsNullOrEmpty(context.Namespace))
+        {
+            writer.WriteLine($$"""
             }
             """);
+        }
 
         return writer.ToString();
     }
