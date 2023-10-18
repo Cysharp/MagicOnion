@@ -42,9 +42,9 @@ public static class MagicOnionClientGenerator
         outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName), MagicOnionInitializerGenerator.Build(context, serviceCollection)));
         outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".Resolver"), resolverTexts));
 
-        foreach (var enumSerializationInfo in serializationInfoCollection.Enums)
+        if (serializationInfoCollection.Enums.Any())
         {
-            outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".Formatters." + enumSerializationInfo.FormatterName), serialization.EnumFormatterGenerator(new []{ enumSerializationInfo })));
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".EnumFormatters"), serialization.EnumFormatterGenerator(serializationInfoCollection.Enums)));
         }
 
         foreach (var service in serviceCollection.Services)
