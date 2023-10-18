@@ -10,7 +10,8 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-        context.RegisterForSyntaxNotifications(() => new SyntaxContextReceiver());
+        context.RegisterForSyntaxNotifications(static () => new SyntaxContextReceiver());
+        context.RegisterForPostInitialization(static context => AddAttributeSources(context.AddSource));
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -19,7 +20,8 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
         var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
         if (ReferenceSymbols.TryCreate(context.Compilation, out var referenceSymbols))
         {
-            Generate(syntaxReceiver.Candidates.ToImmutableArray(), context.Compilation, referenceSymbols, new SourceProductionContext(context), options);
+            var generationContext = new GenerationContext(null, "MagicOnionInitializer", new SourceProductionContext(context));
+            Generate(generationContext, syntaxReceiver.Candidates.ToImmutableArray(), context.Compilation, referenceSymbols);
         }
     }
 }
@@ -37,7 +39,7 @@ class SyntaxContextReceiver : ISyntaxReceiver
     }
 }
 
-readonly struct SourceProductionContext
+public readonly struct SourceProductionContext
 {
     readonly GeneratorExecutionContext context;
 

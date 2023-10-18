@@ -11,6 +11,7 @@ public class GenerateEnumFormatterTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -23,6 +24,9 @@ public class GenerateEnumFormatterTest
             {
                 A, B, C
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -36,6 +40,7 @@ public class GenerateEnumFormatterTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -48,6 +53,9 @@ public class GenerateEnumFormatterTest
             {
                 A, B, C
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -61,6 +69,7 @@ public class GenerateEnumFormatterTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -73,6 +82,9 @@ public class GenerateEnumFormatterTest
             {
                 A, B, C
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -86,6 +98,7 @@ public class GenerateEnumFormatterTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -98,6 +111,9 @@ public class GenerateEnumFormatterTest
             {
                 A, B, C
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -111,6 +127,7 @@ public class GenerateEnumFormatterTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -126,6 +143,9 @@ public class GenerateEnumFormatterTest
                     A, B, C
                 }
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

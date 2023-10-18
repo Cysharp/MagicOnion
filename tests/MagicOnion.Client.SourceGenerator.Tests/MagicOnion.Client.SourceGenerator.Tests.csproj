@@ -36,10 +36,14 @@
     <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
+    <ProjectReference Include="..\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Resources\**\*.cs" />
     <EmbeddedResource Include="Resources\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

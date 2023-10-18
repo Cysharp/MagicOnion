@@ -15,7 +15,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -38,6 +39,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -52,7 +56,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -68,6 +73,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -82,7 +90,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -98,6 +107,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -112,7 +124,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -128,6 +141,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -142,7 +158,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -155,6 +172,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -169,7 +189,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -182,6 +203,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -196,7 +220,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -209,6 +234,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -223,7 +251,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -236,6 +265,9 @@ public class GenerateStreamingHubTest
             public class MyObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -250,7 +282,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -258,6 +291,9 @@ public class GenerateStreamingHubTest
             {
                 void A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -280,7 +316,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver
@@ -290,6 +327,9 @@ public class GenerateStreamingHubTest
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -312,7 +352,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -320,6 +361,9 @@ public class GenerateStreamingHubTest
             {
                 Task A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -334,7 +378,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -342,6 +387,9 @@ public class GenerateStreamingHubTest
             {
                 Task A(string arg0);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -356,7 +404,8 @@ public class GenerateStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyHubReceiver { }
@@ -364,6 +413,9 @@ public class GenerateStreamingHubTest
             {
                 Task A(string arg0, int arg1, bool arg2);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

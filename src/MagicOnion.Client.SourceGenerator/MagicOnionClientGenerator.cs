@@ -1,16 +1,16 @@
-using System.Collections.Immutable;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.CodeGen;
 using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
-using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator;
 
 public static class MagicOnionClientGenerator
 {
-    public static IReadOnlyList<(string Path, string Source)> Generate(MagicOnionServiceCollection serviceCollection, GeneratorOptions options, CancellationToken cancellationToken)
+    public static IReadOnlyList<(string Path, string Source)> Generate(GenerationContext context, MagicOnionServiceCollection serviceCollection, CancellationToken cancellationToken)
     {
         var outputs = new List<(string Path, string Source)>();
+
+        var options = GeneratorOptions.Default;
 
         // <Namespace>.
         var namespaceDot = string.IsNullOrWhiteSpace(options.Namespace) ? string.Empty : options.Namespace + ".";
@@ -50,7 +50,7 @@ public static class MagicOnionClientGenerator
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        outputs.Add((GeneratePathFromNamespaceAndTypeName(options.Namespace, "MagicOnionInitializer"), MagicOnionInitializerGenerator.Build(options, serviceCollection)));
+        outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName), MagicOnionInitializerGenerator.Build(context.Namespace, context.InitializerPartialTypeName, options, serviceCollection)));
         outputs.Add((GeneratePathFromNamespaceAndTypeName(formatterCodeGenContext.Namespace, formatterCodeGenContext.InitializerName), resolverTexts));
 
         foreach (var enumSerializationInfo in serializationInfoCollection.Enums)

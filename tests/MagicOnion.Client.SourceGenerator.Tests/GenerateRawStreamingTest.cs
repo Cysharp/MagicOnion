@@ -11,6 +11,7 @@ public class GenerateRawStreamingTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         using System.Threading.Tasks;
         
         namespace TempProject
@@ -21,6 +22,9 @@ public class GenerateRawStreamingTest
                 Task<ServerStreamingResult<string>> ServerStreamingAsync();
                 Task<DuplexStreamingResult<string, string>> DuplexStreamingAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

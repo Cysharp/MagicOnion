@@ -11,6 +11,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         using System.Collections.Generic;
         
         namespace TempProject
@@ -31,6 +32,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -54,6 +58,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -73,6 +78,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -96,6 +104,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -113,6 +122,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -137,6 +149,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -152,6 +165,9 @@ public class GenerateGenericsTest
             public class MyNestedGenericObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -177,6 +193,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -185,6 +202,9 @@ public class GenerateGenericsTest
                 UnaryResult<Nil> GetStringValuesAsync(List<string> arg0);
                 UnaryResult<Nil> GetIntValuesAsync(List<int> arg0);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -200,6 +220,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -210,6 +231,9 @@ public class GenerateGenericsTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -224,6 +248,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -235,6 +260,9 @@ public class GenerateGenericsTest
                 UnaryResult<Nil> GetSingleValuesAsync(float[] arg0);
                 UnaryResult<Nil> GetBooleanValuesAsync(bool[] arg0);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -249,6 +277,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -260,6 +289,9 @@ public class GenerateGenericsTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -273,6 +305,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -291,6 +324,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -314,6 +350,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -333,6 +370,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -356,6 +396,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -374,6 +415,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T1, T2>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -397,6 +441,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -414,6 +459,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -437,6 +485,7 @@ public class GenerateGenericsTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -454,6 +503,9 @@ public class GenerateGenericsTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -478,6 +530,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
 
         namespace TempProject
         {
@@ -493,6 +546,9 @@ public class GenerateGenericsTest
             public class MyNestedGenericObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
 
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -518,6 +574,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -526,6 +583,9 @@ public class GenerateGenericsTest
                 UnaryResult<List<string>> GetStringValuesAsync();
                 UnaryResult<List<int>> GetIntValuesAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -541,6 +601,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -551,6 +612,9 @@ public class GenerateGenericsTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -565,6 +629,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -576,6 +641,9 @@ public class GenerateGenericsTest
                 UnaryResult<float[]> GetSingleValuesAsync();
                 UnaryResult<bool[]> GetBooleanValuesAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -590,6 +658,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -601,6 +670,9 @@ public class GenerateGenericsTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -617,6 +689,7 @@ public class GenerateGenericsTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -640,6 +713,9 @@ public class GenerateGenericsTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

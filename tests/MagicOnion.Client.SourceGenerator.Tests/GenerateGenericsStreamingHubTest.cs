@@ -12,6 +12,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -31,6 +32,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -55,6 +59,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -74,6 +79,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T1, T2>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -98,6 +106,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -118,6 +127,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -142,6 +154,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -160,6 +173,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -184,6 +200,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -200,6 +217,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyNestedGenericObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -225,6 +245,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -234,6 +255,9 @@ public class GenerateGenericsStreamingHubTest
                 Task<Nil> GetStringValuesAsync(List<string> arg0);
                 Task<Nil> GetIntValuesAsync(List<int> arg0);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -249,6 +273,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -260,6 +285,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -274,6 +302,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -286,6 +315,9 @@ public class GenerateGenericsStreamingHubTest
                 Task<Nil> GetSingleValuesAsync(float[] arg0);
                 Task<Nil> GetBooleanValuesAsync(bool[] arg0);
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -300,6 +332,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -312,6 +345,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -326,6 +362,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -345,6 +382,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -355,7 +395,7 @@ public class GenerateGenericsStreamingHubTest
                 public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::TempProject.MyGenericObject<T> value, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
                 public global::TempProject.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
             }
-                }
+        }
         """;
 
         await MagicOnionSourceGeneratorVerifier.RunAsync(source);
@@ -369,6 +409,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -389,6 +430,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -413,6 +457,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -432,6 +477,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T1, T2>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -456,6 +504,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -474,6 +523,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -498,6 +550,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -516,6 +569,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -540,6 +596,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -556,6 +613,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyNestedGenericObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -581,6 +641,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -590,6 +651,9 @@ public class GenerateGenericsStreamingHubTest
                 Task<List<string>> GetStringValuesAsync();
                 Task<List<int>> GetIntValuesAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -605,6 +669,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -616,6 +681,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -630,6 +698,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -642,6 +711,9 @@ public class GenerateGenericsStreamingHubTest
                 Task<float[]> GetSingleValuesAsync();
                 Task<bool[]> GetBooleanValuesAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -656,6 +728,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -668,6 +741,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -682,6 +758,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -703,6 +780,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -727,6 +807,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -749,6 +830,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -773,6 +857,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -794,6 +879,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T1, T2>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -818,6 +906,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -838,6 +927,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -862,6 +954,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -882,6 +975,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyGenericObject<T>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -906,6 +1002,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -924,6 +1021,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyNestedGenericObject
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         
         // Pseudo generated MessagePackFormatter using mpc (MessagePack.Generator)
@@ -949,6 +1049,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -960,6 +1061,9 @@ public class GenerateGenericsStreamingHubTest
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -975,6 +1079,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -988,6 +1093,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -1002,6 +1110,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -1016,6 +1125,9 @@ public class GenerateGenericsStreamingHubTest
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -1030,6 +1142,7 @@ public class GenerateGenericsStreamingHubTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -1044,6 +1157,9 @@ public class GenerateGenericsStreamingHubTest
             public class MyResponse
             {
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

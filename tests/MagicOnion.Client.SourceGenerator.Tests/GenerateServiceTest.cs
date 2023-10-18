@@ -15,13 +15,17 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
             {
                 UnaryResult A();
             }
+
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -36,13 +40,17 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
             {
                 UnaryResult<int> A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -57,13 +65,17 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
             {
                 UnaryResult<long> A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -78,13 +90,17 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
             {
                 UnaryResult<string> A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -99,13 +115,17 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace TempProject
         {
             public interface IMyService : IService<IMyService>
             {
                 Task<UnaryResult<int>> A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -124,6 +144,7 @@ public class GenerateServiceTest
         using System;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         using System.Threading.Tasks;
 
         namespace TempProject
@@ -134,6 +155,9 @@ public class GenerateServiceTest
                 Task<ServerStreamingResult<string>> ServerStreamingAsync();
                 Task<DuplexStreamingResult<string, string>> DuplexStreamingAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -148,6 +172,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
 
         namespace TempProject
         {
@@ -155,6 +180,9 @@ public class GenerateServiceTest
             {
                 int A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -174,6 +202,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
 
         namespace TempProject
         {
@@ -181,6 +210,9 @@ public class GenerateServiceTest
             {
                 UnaryResult<ServerStreamingResult<int>> A();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -200,6 +232,7 @@ public class GenerateServiceTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
 
         namespace TempProject
         {
@@ -209,6 +242,9 @@ public class GenerateServiceTest
                 ServerStreamingResult<string> ServerStreamingAsync();
                 DuplexStreamingResult<string, string> DuplexStreamingAsync();
             }
+        
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 

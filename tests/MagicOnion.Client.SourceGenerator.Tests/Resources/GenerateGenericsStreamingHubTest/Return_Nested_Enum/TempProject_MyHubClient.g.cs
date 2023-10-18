@@ -2,6 +2,7 @@
 #pragma warning disable CS0618 // 'member' is obsolete: 'text'
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS0414 // The private field 'field' is assigned but its value is never used
+#pragma warning disable CS8019 // Unnecessary using directive.
 
 namespace TempProject
 {

@@ -25,4 +25,13 @@ internal static class RoslynExtensions
             return SymbolEqualityComparer.Default.Equals(left, right);
         }
     }
+
+    public static Location? GetLocation(this ISymbol typeSymbol)
+        => typeSymbol.Locations.Length > 0 ? typeSymbol.Locations[0] : null;
+
+    public static Location? GetLocation(this AttributeData attributeData)
+    {
+        SyntaxReference? reference = attributeData.ApplicationSyntaxReference;
+        return reference?.SyntaxTree.GetLocation(reference.Span);
+    }
 }

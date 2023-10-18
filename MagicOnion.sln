@@ -102,7 +102,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Tests", "tests\MagicOnion.Client.SourceGenerator.Tests\MagicOnion.Client.SourceGenerator.Tests.csproj", "{632C8D1B-3293-4D02-9ED1-0CB191619334}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.SourceGenerator.Unity", "src\MagicOnion.Client.SourceGenerator.Unity\MagicOnion.Client.SourceGenerator.Unity.csproj", "{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Unity", "src\MagicOnion.Client.SourceGenerator.Unity\MagicOnion.Client.SourceGenerator.Unity.csproj", "{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleServiceDefinitions", "tests\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj", "{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -230,6 +232,10 @@ Global
 		{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -270,6 +276,7 @@ Global
 		{7130EC5B-C987-487A-B319-E91B6D03F5BF} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{632C8D1B-3293-4D02-9ED1-0CB191619334} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 		{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA} = {B5617CC1-55FD-4F77-BA75-9450474C6527}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

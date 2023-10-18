@@ -12,6 +12,7 @@ public class GenerateWithIfDirectiveTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -30,6 +31,9 @@ public class GenerateWithIfDirectiveTest
                 Task A(int a);
             }
         #endif
+
+            [MagicOnionClientGeneration(typeof(IMyHub))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
@@ -44,6 +48,7 @@ public class GenerateWithIfDirectiveTest
         using System.Threading.Tasks;
         using MessagePack;
         using MagicOnion;
+        using MagicOnion.Client;
         
         namespace TempProject
         {
@@ -58,6 +63,9 @@ public class GenerateWithIfDirectiveTest
                 UnaryResult<int> A();
             }
         #endif
+
+            [MagicOnionClientGeneration(typeof(IMyService))]
+            partial class MagicOnionInitializer {}
         }
         """;
 
