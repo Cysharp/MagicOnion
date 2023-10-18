@@ -26,7 +26,7 @@ public class RunTest
                     UnaryResult<string> HelloAsync(string name, int age);
                 }
 
-                [MagicOnionClientGeneration(typeof(IMyService))]
+                [MagicOnion.Client.MagicOnionClientGeneration(typeof(IMyService))]
                 partial class MagicOnionInitializer {}
                 """);
         var sourceGenerator = new MagicOnionClientSourceGenerator();

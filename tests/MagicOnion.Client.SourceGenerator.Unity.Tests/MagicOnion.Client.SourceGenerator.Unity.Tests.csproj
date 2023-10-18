@@ -8,6 +8,8 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+    <RootNamespace>MagicOnion.Client.SourceGenerator.Tests</RootNamespace>
+    <AssemblyName>MagicOnion.Client.SourceGenerator.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,15 +35,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator.Unity\MagicOnion.Client.SourceGenerator.Unity.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
     <ProjectReference Include="..\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\MagicOnion.Client.SourceGenerator.Tests\CompilationHelper.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator.Tests\*Test.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator.Tests\Verifiers\**\*.cs" LinkBase="Verifiers" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Resources\**\*.cs" />
-    <EmbeddedResource Include="Resources\**\*.cs" />
+    <EmbeddedResource Include="..\MagicOnion.Client.SourceGenerator.Tests\Resources\**\*.cs" LinkBase="Resources" />
   </ItemGroup>
 
 </Project>

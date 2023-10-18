@@ -19,30 +19,5 @@ public enum SerializerType
 
 public record GenerationOptions(SerializerType Serializer, bool DisableAutoRegistration, string MessagePackFormatterNamespace)
 {
-    public static GenerationOptions Default { get; } = new GenerationOptions(SerializerType.MessagePack, false, "MessagePack.Formatters");
-
-    public static GenerationOptions Parse(AttributeData attr)
-    {
-        var options = GenerationOptions.Default;
-
-        foreach (var namedArg in attr.NamedArguments)
-        {
-            if (namedArg.Value.Kind is TypedConstantKind.Error or not TypedConstantKind.Primitive) continue;
-
-            switch (namedArg.Key)
-            {
-                case nameof(GenerationOptions.DisableAutoRegistration):
-                    options = options with { DisableAutoRegistration = (bool)namedArg.Value.Value! };
-                    break;
-                case nameof(GenerationOptions.Serializer):
-                    options = options with { Serializer = (SerializerType)(int)namedArg.Value.Value! };
-                    break;
-                case nameof(GenerationOptions.MessagePackFormatterNamespace):
-                    options = options with { MessagePackFormatterNamespace = (string)namedArg.Value.Value! };
-                    break;
-            }
-        }
-
-        return options;
-    }
+    public static GenerationOptions Default { get; } = new (SerializerType.MessagePack, false, "MessagePack.Formatters");
 }

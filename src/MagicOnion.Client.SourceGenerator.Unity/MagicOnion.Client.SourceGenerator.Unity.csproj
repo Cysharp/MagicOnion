@@ -23,6 +23,7 @@
     <Compile Include="..\MagicOnion.Client.SourceGenerator\GenerationContext.cs" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientGenerator.cs" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Emit.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Parse.cs" />
   </ItemGroup>
 
   <ItemGroup>
