@@ -30,7 +30,7 @@ public partial class MagicOnionClientSourceGenerator
                     public bool DisableAutoRegistration { get; init; }
 
                     /// <summary>
-                    /// Gets or set the serializer used for message serialization. The default value is <see cref="SerializerType.MessagePack"/>.
+                    /// Gets or set the serializer used for message serialization. The default value is <see cref="GenerateSerializerType.MessagePack"/>.
                     /// </summary>
                     public global::MagicOnion.Client.GenerateSerializerType Serializer { get; init; } = global::MagicOnion.Client.GenerateSerializerType.MessagePack;
 
