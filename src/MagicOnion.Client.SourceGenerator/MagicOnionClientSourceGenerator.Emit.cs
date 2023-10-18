@@ -27,17 +27,17 @@ public partial class MagicOnionClientSourceGenerator
                     /// <summary>
                     /// Gets or sets whether to disable automatically calling `Register` during start-up. (Automatic registration requires .NET 5+ or Unity)
                     /// </summary>
-                    public bool DisableAutoRegistration { get; init; }
+                    public bool DisableAutoRegistration { get; set; }
 
                     /// <summary>
                     /// Gets or set the serializer used for message serialization. The default value is <see cref="GenerateSerializerType.MessagePack"/>.
                     /// </summary>
-                    public global::MagicOnion.Client.GenerateSerializerType Serializer { get; init; } = global::MagicOnion.Client.GenerateSerializerType.MessagePack;
+                    public global::MagicOnion.Client.GenerateSerializerType Serializer { get; set; } = global::MagicOnion.Client.GenerateSerializerType.MessagePack;
 
                     /// <summary>
                     /// Gets or set the namespace of pre-generated MessagePackFormatters. The default value is <c>MessagePack.Formatters</c>.
                     /// </summary>
-                    public string MessagePackFormatterNamespace { get; init; } = "MessagePack.Formatters";
+                    public string MessagePackFormatterNamespace { get; set; } = "MessagePack.Formatters";
 
                     public global::System.Type[] TypesContainedInTargetAssembly { get; }
             
