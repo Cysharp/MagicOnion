@@ -79,6 +79,7 @@ public class RunTest
     {
         var (compilation, semanticModel) = CompilationHelper.Create(
             """
+                #nullable enable
                 using System;
                 using MagicOnion;
                 using MagicOnion.Client;
@@ -113,6 +114,7 @@ public class RunTest
     {
         var (compilation, semanticModel) = CompilationHelper.Create(
             """
+                #nullable enable
                 using System;
                 using System.Threading.Tasks;
                 using MagicOnion;
@@ -130,7 +132,7 @@ public class RunTest
                 {
                 }
                 
-                [MagicOnionClientGeneration(typeof(IMyService))]
+                [MagicOnionClientGeneration(typeof(IMyStreamingHub))]
                 partial class MagicOnionInitializer {}
                 """);
         var sourceGenerator = new MagicOnionClientSourceGenerator();

@@ -20,7 +20,8 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
             #pragma warning disable CS0618 // 'member' is obsolete: 'text'
             #pragma warning disable CS0612 // 'member' is obsolete
             #pragma warning disable CS8019 // Unnecessary using directive.
-
+            #pragma warning disable CS1522 // Empty switch block
+            
             """);
     }
 
@@ -149,7 +150,7 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
         ctx.TextWriter.WriteLine($$"""
                     /// <summary>Type hints for Ahead-of-Time compilation.</summary>
                     [Preserve]
-                    internal static class TypeHints
+                    static class TypeHints
                     {
                         [Preserve]
                         internal static void Register()

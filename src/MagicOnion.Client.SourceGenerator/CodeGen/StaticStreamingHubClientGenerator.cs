@@ -47,6 +47,7 @@ public class StaticStreamingHubClientGenerator
             #pragma warning disable CS0612 // 'member' is obsolete
             #pragma warning disable CS0414 // The private field 'field' is assigned but its value is never used
             #pragma warning disable CS8019 // Unnecessary using directive.
+            #pragma warning disable CS1522 // Empty switch block
 
             """);
     }
