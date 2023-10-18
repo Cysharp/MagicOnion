@@ -50,7 +50,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
 
             var initializerPartialTypeNamespace = initializerClassSymbol.ContainingNamespace.IsGlobalNamespace
                 ? null
-                : initializerClassSymbol.ContainingNamespace.Name;
+                : initializerClassSymbol.ContainingNamespace.ToDisplayString();
             var initializerPartialTypeName = initializerClassSymbol.Name;
 
             var generationContext = new GenerationContext(initializerPartialTypeNamespace, initializerPartialTypeName, sourceProductionContext);

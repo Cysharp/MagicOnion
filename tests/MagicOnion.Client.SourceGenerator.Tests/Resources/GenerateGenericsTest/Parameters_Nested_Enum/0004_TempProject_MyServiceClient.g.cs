@@ -11,35 +11,40 @@ namespace TempProject
     using global::MagicOnion.Client;
     using global::MessagePack;
 
-    [global::MagicOnion.Ignore]
-    public class MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
+    partial class MagicOnionInitializer
     {
-        class ClientCore
+        static partial class MagicOnionGeneratedClient
         {
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil> GetEnumAsync;
-            public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+            [global::MagicOnion.Ignore]
+            public class TempProject_MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
             {
-                this.GetEnumAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetEnumAsync", serializerProvider);
+                class ClientCore
+                {
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil> GetEnumAsync;
+                    public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+                    {
+                        this.GetEnumAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetEnumAsync", serializerProvider);
+                    }
+                 }
+
+                readonly ClientCore core;
+
+                public TempProject_MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
+                {
+                    this.core = new ClientCore(serializerProvider);
+                }
+
+                private TempProject_MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                {
+                    this.core = core;
+                }
+
+                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                    => new TempProject_MyServiceClient(options, core);
+
+                public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetEnumAsync(global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> arg0)
+                    => this.core.GetEnumAsync.InvokeUnary(this, "IMyService/GetEnumAsync", arg0);
             }
         }
-
-        readonly ClientCore core;
-
-        public MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
-        {
-            this.core = new ClientCore(serializerProvider);
-        }
-
-        private MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
-        {
-            this.core = core;
-        }
-
-        protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
-            => new MyServiceClient(options, core);
-
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetEnumAsync(global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> arg0)
-            => this.core.GetEnumAsync.InvokeUnary(this, "IMyService/GetEnumAsync", arg0);
     }
 }
-

@@ -14,21 +14,19 @@ namespace TempProject
 
     partial class MagicOnionInitializer
     {
-        bool isRegistered = false;
-        readonly MagicOnionGeneratedClientFactoryProvider provider = new();
+        static bool isRegistered = false;
+        readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
 
-        public static MagicOnionInitializer Instance { get; } = new();
-
-        public global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
-        public global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
+        public static global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
+        public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
 #if UNITY_2019_4_OR_NEWER
         [global::UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
 #elif NET5_0_OR_GREATER
         [global::System.Runtime.CompilerServices.ModuleInitializer]
 #endif
-        static void Register() => Instance.TryRegisterProviderFactory();
+        static void Register() => TryRegisterProviderFactory();
 
-        public bool TryRegisterProviderFactory()
+        public static bool TryRegisterProviderFactory()
         {
             if (isRegistered) return false;
             isRegistered = true;

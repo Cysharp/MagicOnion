@@ -1,7 +1,5 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
-using MagicOnion.Integration.Tests.Generated;
-using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
 using MagicOnionTestServer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -23,7 +21,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
         yield return new [] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
-        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientFactoryProvider.Instance)};
+        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientInitializer.StreamingHubClientFactoryProvider)};
     }
 
     [Theory]
@@ -41,7 +39,7 @@ public class SerializerStreamingHubTest : IClassFixture<MagicOnionApplicationFac
         // Assert
         result.Should().Be(123);
     }
-    
+
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task StreamingHub_Parameter_One(TestStreamingHubClientFactory clientFactory)

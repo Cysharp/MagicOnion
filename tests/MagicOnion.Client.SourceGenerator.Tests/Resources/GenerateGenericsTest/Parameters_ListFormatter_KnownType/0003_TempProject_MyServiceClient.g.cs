@@ -11,39 +11,44 @@ namespace TempProject
     using global::MagicOnion.Client;
     using global::MessagePack;
 
-    [global::MagicOnion.Ignore]
-    public class MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
+    partial class MagicOnionInitializer
     {
-        class ClientCore
+        static partial class MagicOnionGeneratedClient
         {
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil> GetStringValuesAsync;
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil> GetIntValuesAsync;
-            public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+            [global::MagicOnion.Ignore]
+            public class TempProject_MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
             {
-                this.GetStringValuesAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetStringValuesAsync", serializerProvider);
-                this.GetIntValuesAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetIntValuesAsync", serializerProvider);
+                class ClientCore
+                {
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil> GetStringValuesAsync;
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil> GetIntValuesAsync;
+                    public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+                    {
+                        this.GetStringValuesAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.Collections.Generic.List<global::System.String>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetStringValuesAsync", serializerProvider);
+                        this.GetIntValuesAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_ValueType<global::System.Collections.Generic.List<global::System.Int32>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "GetIntValuesAsync", serializerProvider);
+                    }
+                 }
+
+                readonly ClientCore core;
+
+                public TempProject_MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
+                {
+                    this.core = new ClientCore(serializerProvider);
+                }
+
+                private TempProject_MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                {
+                    this.core = core;
+                }
+
+                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                    => new TempProject_MyServiceClient(options, core);
+
+                public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetStringValuesAsync(global::System.Collections.Generic.List<global::System.String> arg0)
+                    => this.core.GetStringValuesAsync.InvokeUnary(this, "IMyService/GetStringValuesAsync", arg0);
+                public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetIntValuesAsync(global::System.Collections.Generic.List<global::System.Int32> arg0)
+                    => this.core.GetIntValuesAsync.InvokeUnary(this, "IMyService/GetIntValuesAsync", arg0);
             }
         }
-
-        readonly ClientCore core;
-
-        public MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
-        {
-            this.core = new ClientCore(serializerProvider);
-        }
-
-        private MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
-        {
-            this.core = core;
-        }
-
-        protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
-            => new MyServiceClient(options, core);
-
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetStringValuesAsync(global::System.Collections.Generic.List<global::System.String> arg0)
-            => this.core.GetStringValuesAsync.InvokeUnary(this, "IMyService/GetStringValuesAsync", arg0);
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> GetIntValuesAsync(global::System.Collections.Generic.List<global::System.Int32> arg0)
-            => this.core.GetIntValuesAsync.InvokeUnary(this, "IMyService/GetIntValuesAsync", arg0);
     }
 }
-

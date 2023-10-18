@@ -5,8 +5,6 @@ using MagicOnion.Server;
 using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
-using MagicOnion.Integration.Tests.Generated;
-using MagicOnion.Serialization;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -24,7 +22,7 @@ public class ClientFilterTest : IClassFixture<MagicOnionApplicationFactory<Clien
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
-        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientInitializer.ClientFactoryProvider) };
     }
 
     [Theory]

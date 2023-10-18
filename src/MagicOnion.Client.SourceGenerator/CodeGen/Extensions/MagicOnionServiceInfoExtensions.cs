@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
@@ -10,8 +9,13 @@ public static class MagicOnionServiceInfoExtensions
     // - IImportantService --> ImportantServiceClient
     // - I0123Service      --> I0123ServiceClient
     public static string GetClientName(this IMagicOnionServiceInfo serviceInfo)
-        => (Regex.IsMatch(serviceInfo.ServiceType.Name, "I[^a-z0-9]") ? serviceInfo.ServiceType.Name.Substring(1) : serviceInfo.ServiceType.Name) + "Client";
+    => (
+        serviceInfo.ServiceType.Name.Length > 1 && serviceInfo.ServiceType.Name.StartsWith("I") && !Char.IsNumber(serviceInfo.ServiceType.Name[1])
+            ? serviceInfo.ServiceType.Name.Substring(1)
+            : serviceInfo.ServiceType.Name
+        ) + "Client";
 
+    // - Foo.Bar.BazClient --> Foo_Bar_BazClient
     public static string GetClientFullName(this IMagicOnionServiceInfo serviceInfo)
-        => (serviceInfo.ServiceType.Namespace != null ? serviceInfo.ServiceType.Namespace + "." : "") + serviceInfo.GetClientName();
+        => ((serviceInfo.ServiceType.Namespace != null ? serviceInfo.ServiceType.Namespace + "." : "") + serviceInfo.GetClientName()).Replace(".", "_");
 }

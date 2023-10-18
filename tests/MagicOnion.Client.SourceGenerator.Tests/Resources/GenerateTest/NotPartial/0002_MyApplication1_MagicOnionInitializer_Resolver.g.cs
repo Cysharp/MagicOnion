@@ -10,7 +10,7 @@ namespace MyApplication1
 
     partial class MagicOnionInitializer
     {
-        public global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
+        public static global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
         class MessagePackGeneratedResolver : global::MessagePack.IFormatterResolver
         {
             public static readonly global::MessagePack.IFormatterResolver Instance = new MessagePackGeneratedResolver();

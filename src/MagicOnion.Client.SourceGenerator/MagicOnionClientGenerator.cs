@@ -58,13 +58,13 @@ public static class MagicOnionClientGenerator
 
         foreach (var service in serviceCollection.Services)
         {
-            var x = StaticMagicOnionClientGenerator.Build(new[] { service });
+            var x = StaticMagicOnionClientGenerator.Build(context, new[] { service });
             outputs.Add((GeneratePathFromNamespaceAndTypeName(service.ServiceType.Namespace, service.GetClientName()), x));
         }
 
         foreach (var hub in serviceCollection.Hubs)
         {
-            var x = StaticStreamingHubClientGenerator.Build(new [] { hub });
+            var x = StaticStreamingHubClientGenerator.Build(context, new [] { hub });
             outputs.Add((GeneratePathFromNamespaceAndTypeName(hub.ServiceType.Namespace, hub.GetClientName()), x));
         }
 

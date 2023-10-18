@@ -33,13 +33,11 @@ internal class MagicOnionInitializerGenerator
             
                 partial class {{typeName}}
                 {
-                    bool isRegistered = false;
-                    readonly MagicOnionGeneratedClientFactoryProvider provider = new();
+                    static bool isRegistered = false;
+                    readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
 
-                    public static {{typeName}} Instance { get; } = new();
-
-                    public global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
-                    public global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
+                    public static global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
+                    public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
             """);
 
         if (!options.DisableAutoRegister)
@@ -50,12 +48,12 @@ internal class MagicOnionInitializerGenerator
             #elif NET5_0_OR_GREATER
                     [global::System.Runtime.CompilerServices.ModuleInitializer]
             #endif
-                    static void Register() => Instance.TryRegisterProviderFactory();
+                    internal static void Register() => TryRegisterProviderFactory();
             """);
         }
         writer.WriteLine($$"""
 
-                    public bool TryRegisterProviderFactory()
+                    public static bool TryRegisterProviderFactory()
                     {
                         if (isRegistered) return false;
                         isRegistered = true;
@@ -96,7 +94,7 @@ internal class MagicOnionInitializerGenerator
            writer.WriteLine($$"""
                                 if (typeof(T) == typeof({{serviceInfo.ServiceType.FullName}}))
                                 {
-                                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<{{serviceInfo.ServiceType.FullName}}>)((x, y) => new {{serviceInfo.GetClientFullName()}}(x, y)));
+                                    factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<{{serviceInfo.ServiceType.FullName}}>)((x, y) => new MagicOnionGeneratedClient.{{serviceInfo.GetClientFullName()}}(x, y)));
                                 }
             """);
         }
@@ -120,7 +118,7 @@ internal class MagicOnionInitializerGenerator
             writer.WriteLine($$"""
                                 if (typeof(TStreamingHub) == typeof({{hubInfo.ServiceType.FullName}}) && typeof(TReceiver) == typeof({{hubInfo.Receiver.ReceiverType.FullName}}))
                                 {
-                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new {{hubInfo.GetClientFullName()}}(a, b, c, d, e)));
+                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, d, e)));
                                 }
             """);
         }

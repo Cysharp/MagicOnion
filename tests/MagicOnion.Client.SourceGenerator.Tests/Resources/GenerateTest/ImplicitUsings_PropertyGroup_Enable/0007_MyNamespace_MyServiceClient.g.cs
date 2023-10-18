@@ -11,35 +11,40 @@ namespace MyNamespace
     using global::MagicOnion.Client;
     using global::MessagePack;
 
-    [global::MagicOnion.Ignore]
-    public class MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::MyNamespace.IMyService>, global::MyNamespace.IMyService
+    partial class MagicOnionInitializer
     {
-        class ClientCore
+        static partial class MagicOnionGeneratedClient
         {
-            public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>, global::MessagePack.Nil> A;
-            public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+            [global::MagicOnion.Ignore]
+            public class MyNamespace_MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::MyNamespace.IMyService>, global::MyNamespace.IMyService
             {
-                this.A = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "A", serializerProvider);
+                class ClientCore
+                {
+                    public global::MagicOnion.Client.Internal.RawMethodInvoker<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>, global::MessagePack.Nil> A;
+                    public ClientCore(global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider)
+                    {
+                        this.A = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>, global::MessagePack.Nil>(global::Grpc.Core.MethodType.Unary, "IMyService", "A", serializerProvider);
+                    }
+                 }
+
+                readonly ClientCore core;
+
+                public MyNamespace_MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
+                {
+                    this.core = new ClientCore(serializerProvider);
+                }
+
+                private MyNamespace_MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                {
+                    this.core = core;
+                }
+
+                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                    => new MyNamespace_MyServiceClient(options, core);
+
+                public global::MagicOnion.UnaryResult<global::MessagePack.Nil> A(global::System.Int32 arg0, global::System.Collections.Generic.IReadOnlyList<global::System.Int32> arg1, global::System.IO.FileMode arg2, global::System.Linq.ILookup<global::System.String, global::System.String> arg3, global::System.Net.Http.ClientCertificateOption arg4, global::System.Threading.ApartmentState arg5, global::System.Threading.Tasks.TaskCreationOptions arg6)
+                    => this.core.A.InvokeUnary(this, "IMyService/A", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>(arg0, arg1, arg2, arg3, arg4, arg5, arg6));
             }
         }
-
-        readonly ClientCore core;
-
-        public MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
-        {
-            this.core = new ClientCore(serializerProvider);
-        }
-
-        private MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
-        {
-            this.core = core;
-        }
-
-        protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
-            => new MyServiceClient(options, core);
-
-        public global::MagicOnion.UnaryResult<global::MessagePack.Nil> A(global::System.Int32 arg0, global::System.Collections.Generic.IReadOnlyList<global::System.Int32> arg1, global::System.IO.FileMode arg2, global::System.Linq.ILookup<global::System.String, global::System.String> arg3, global::System.Net.Http.ClientCertificateOption arg4, global::System.Threading.ApartmentState arg5, global::System.Threading.Tasks.TaskCreationOptions arg6)
-            => this.core.A.InvokeUnary(this, "IMyService/A", new global::MagicOnion.DynamicArgumentTuple<global::System.Int32, global::System.Collections.Generic.IReadOnlyList<global::System.Int32>, global::System.IO.FileMode, global::System.Linq.ILookup<global::System.String, global::System.String>, global::System.Net.Http.ClientCertificateOption, global::System.Threading.ApartmentState, global::System.Threading.Tasks.TaskCreationOptions>(arg0, arg1, arg2, arg3, arg4, arg5, arg6));
     }
 }
-

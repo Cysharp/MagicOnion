@@ -39,7 +39,7 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
 
                 partial class {{generationContext.InitializerPartialTypeName}}
                 {
-                    public global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
+                    public static global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
             """);
 
         EmitResolver(ctx);

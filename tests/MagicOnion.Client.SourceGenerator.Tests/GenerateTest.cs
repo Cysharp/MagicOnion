@@ -73,6 +73,29 @@ public class GenerateTest
     }
 
     [Fact]
+    public async Task Generate_Namespace()
+    {
+        var source = """
+        using MagicOnion;
+        using MagicOnion.Client;
+        
+        namespace MyApplication1.Net.Remoting;
+
+        public interface IGreeterService : IService<IGreeterService>
+        {
+            UnaryResult<string> HelloAsync(string name, int age);
+            UnaryResult PingAsync();
+            UnaryResult<bool> CanGreetAsync();
+        }
+        
+        [MagicOnionClientGeneration(typeof(IGreeterService))]
+        partial class MagicOnionInitializer {}
+        """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
     public async Task ImplicitUsings_PropertyGroup_Enable()
     {
         var sources = new []
