@@ -3,7 +3,7 @@ using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.VisualBasic;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace MagicOnion.Client.SourceGenerator;
 
@@ -46,9 +46,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             }
 
             var initializerClassSymbol = semanticModel.GetDeclaredSymbol(initializerClassDecl) as INamedTypeSymbol;
-            if (initializerClassSymbol is null) return; // TODO: ReportDiagnostic
-
-            // TODO: ReportDiagnostic if the class is not partial.
+            if (initializerClassSymbol is null) return;
 
             if (initializerClassSymbol.IsValueType)
             {

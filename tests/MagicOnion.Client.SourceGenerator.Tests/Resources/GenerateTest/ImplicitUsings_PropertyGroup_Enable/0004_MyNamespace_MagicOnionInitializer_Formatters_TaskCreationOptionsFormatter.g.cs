@@ -10,7 +10,7 @@ namespace MyNamespace
 
     partial class MagicOnionInitializer
     {
-        static class MessagePackEnumFormatters
+        static partial class MessagePackEnumFormatters
         {
             public sealed class TaskCreationOptionsFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::System.Threading.Tasks.TaskCreationOptions>
             {

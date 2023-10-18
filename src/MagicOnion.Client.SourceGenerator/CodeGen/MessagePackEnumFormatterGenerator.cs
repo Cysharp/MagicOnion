@@ -29,7 +29,7 @@ internal class MessagePackEnumFormatterGenerator
 
                 partial class {{context.InitializerPartialTypeName}}
                 {
-                    static class MessagePackEnumFormatters
+                    static partial class MessagePackEnumFormatters
                     {
             """);
 

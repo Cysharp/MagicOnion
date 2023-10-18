@@ -10,7 +10,7 @@ namespace MyNamespace
 
     partial class MagicOnionInitializer
     {
-        static class MessagePackEnumFormatters
+        static partial class MessagePackEnumFormatters
         {
             public sealed class ClientCertificateOptionFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::System.Net.Http.ClientCertificateOption>
             {

@@ -10,7 +10,7 @@ namespace TempProject
 
     partial class MagicOnionInitializer
     {
-        static class MessagePackEnumFormatters
+        static partial class MessagePackEnumFormatters
         {
             public sealed class MyClass_MyEnumFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::TempProject.MyClass.MyEnum>
             {
