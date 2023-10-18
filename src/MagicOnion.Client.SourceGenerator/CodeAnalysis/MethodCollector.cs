@@ -115,7 +115,7 @@ public class MethodCollector
                 methodInfo = null;
                 diagnostic = Diagnostic.Create(
                     MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType,
-                    methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                    methodSymbol.Locations.FirstOrDefault(), null, null,
                     $"{interfaceType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.FullyQualified));
                 return false;
         }
@@ -143,7 +143,7 @@ public class MethodCollector
             methodInfo = null;
             diagnostic = Diagnostic.Create(
                 MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType,
-                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
                 $"{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace));
             return false;
         }
@@ -252,7 +252,7 @@ public class MethodCollector
         {
             diagnostic = Diagnostic.Create(
                 MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType,
-                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
                 methodReturnType.FullName, $"{serviceType.FullName}.{methodSymbol.Name}");
             serviceMethodInfo = null;
             return false;
@@ -261,7 +261,7 @@ public class MethodCollector
         {
             diagnostic = Diagnostic.Create(
                 MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType,
-                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
                 responseType.FullName, $"{serviceType.FullName}.{methodSymbol.Name}");
             serviceMethodInfo = null;
             return false;
@@ -270,7 +270,7 @@ public class MethodCollector
         {
             diagnostic = Diagnostic.Create(
                 MagicOnionDiagnosticDescriptors.StreamingMethodMustHaveNoParameters,
-                methodSymbol.Locations.FirstOrDefault(), methodSymbol.Locations, null,
+                methodSymbol.Locations.FirstOrDefault(), null, null,
                 $"{serviceType.FullName}.{methodSymbol.Name}");
             serviceMethodInfo = null;
             return false;

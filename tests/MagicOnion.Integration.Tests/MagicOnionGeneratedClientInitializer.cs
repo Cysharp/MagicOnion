@@ -2,6 +2,6 @@
 
 namespace MagicOnion.Integration.Tests;
 
-[MagicOnionClientGeneration(typeof(MagicOnionGeneratedClientInitializer), DisableAutoRegister = true)]
+[MagicOnionClientGeneration(typeof(MagicOnionGeneratedClientInitializer), DisableAutoRegistration = true)]
 public partial class MagicOnionGeneratedClientInitializer
 {}

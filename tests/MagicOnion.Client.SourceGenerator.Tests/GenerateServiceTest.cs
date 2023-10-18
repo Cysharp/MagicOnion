@@ -121,7 +121,7 @@ public class GenerateServiceTest
         {
             public interface IMyService : IService<IMyService>
             {
-                Task<UnaryResult<int>> A();
+                Task<UnaryResult<int>> {|#0:A|}();
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
@@ -132,7 +132,7 @@ public class GenerateServiceTest
         var verifierOptions = VerifierOptions.Default with
         {
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
-            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0)}
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
@@ -178,7 +178,7 @@ public class GenerateServiceTest
         {
             public interface IMyService : IService<IMyService>
             {
-                int A();
+                int {|#0:A|}();
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
@@ -189,7 +189,7 @@ public class GenerateServiceTest
         var verifierOptions = VerifierOptions.Default with
         {
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
-            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0)}
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
@@ -208,7 +208,7 @@ public class GenerateServiceTest
         {
             public interface IMyService : IService<IMyService>
             {
-                UnaryResult<ServerStreamingResult<int>> A();
+                UnaryResult<ServerStreamingResult<int>> {|#0:A|}();
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
@@ -219,7 +219,7 @@ public class GenerateServiceTest
         var verifierOptions = VerifierOptions.Default with
         {
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
-            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error)}
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.UnaryUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0)}
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
     }
@@ -238,9 +238,9 @@ public class GenerateServiceTest
         {
             public interface IMyService : IService<IMyService>
             {
-                ClientStreamingResult<string, string> ClientStreamingAsync();
-                ServerStreamingResult<string> ServerStreamingAsync();
-                DuplexStreamingResult<string, string> DuplexStreamingAsync();
+                ClientStreamingResult<string, string> {|#0:ClientStreamingAsync|}();
+                ServerStreamingResult<string> {|#1:ServerStreamingAsync|}();
+                DuplexStreamingResult<string, string> {|#2:DuplexStreamingAsync|}();
             }
         
             [MagicOnionClientGeneration(typeof(IMyService))]
@@ -253,9 +253,9 @@ public class GenerateServiceTest
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
             ExpectedDiagnostics = new[]
             {
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(1),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(2),
             }
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);

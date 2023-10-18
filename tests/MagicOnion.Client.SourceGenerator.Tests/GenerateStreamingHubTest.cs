@@ -289,7 +289,7 @@ public class GenerateStreamingHubTest
             public interface IMyHubReceiver { }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
-                void A();
+                void {|#0:A|}();
             }
         
             [MagicOnionClientGeneration(typeof(IMyHub))]
@@ -302,7 +302,7 @@ public class GenerateStreamingHubTest
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
             ExpectedDiagnostics = new[]
             {
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0),
             }
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
@@ -322,7 +322,7 @@ public class GenerateStreamingHubTest
         {
             public interface IMyHubReceiver
             {
-                Task B();
+                Task {|#0:B|}();
             }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
@@ -338,7 +338,7 @@ public class GenerateStreamingHubTest
             TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
             ExpectedDiagnostics = new[]
             {
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id, DiagnosticSeverity.Error),
+                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0),
             }
         };
         await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
