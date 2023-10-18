@@ -26,20 +26,20 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             if (referenceSymbols is null) return; // TODO: ReportDiagnostic
 
             var interfaceSymbols = new List<INamedTypeSymbol>();
-            foreach (var attr in attrs)
+            var attr = attrs.FirstOrDefault(x => x.AttributeClass?.Name == MagicOnionClientGenerationAttributeName);
+            if (attr is null) return; // TODO: ReportDiagnostic
+
+            // If the constructor has errors in the arguments, the first argument may be `Type` instead of `Array`. We need `Array` to proceed.
+            if (attr.ConstructorArguments[0].Kind != TypedConstantKind.Array) return; // TODO: ReportDiagnostic
+
+            foreach (var typeContainedInTargetAssembly in attr.ConstructorArguments[0].Values) // Type[] typesContainedInTargetAssembly
             {
-                // If the constructor has errors in the arguments, the first argument may be `Type` instead of `Array`. We need `Array` to proceed.
-                if (attr.ConstructorArguments[0].Kind != TypedConstantKind.Array) continue;
-
-                foreach (var typeContainedInTargetAssembly in attr.ConstructorArguments[0].Values) // Type[] typesContainedInTargetAssembly
+                if (typeContainedInTargetAssembly.Value is INamedTypeSymbol typeSymbolContainedInTargetAssembly)
                 {
-                    if (typeContainedInTargetAssembly.Value is INamedTypeSymbol typeSymbolContainedInTargetAssembly)
-                    {
-                        var scanTargetAssembly = typeSymbolContainedInTargetAssembly.ContainingAssembly;
-                        if (scanTargetAssembly is null) continue;
+                    var scanTargetAssembly = typeSymbolContainedInTargetAssembly.ContainingAssembly;
+                    if (scanTargetAssembly is null) continue;
 
-                        Traverse(scanTargetAssembly.GlobalNamespace, interfaceSymbols);
-                    }
+                    Traverse(scanTargetAssembly.GlobalNamespace, interfaceSymbols);
                 }
             }
 
@@ -53,7 +53,8 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
                 : initializerClassSymbol.ContainingNamespace.ToDisplayString();
             var initializerPartialTypeName = initializerClassSymbol.Name;
 
-            var generationContext = new GenerationContext(initializerPartialTypeNamespace, initializerPartialTypeName, sourceProductionContext);
+            var option = GenerationOptions.Parse(attr);
+            var generationContext = new GenerationContext(initializerPartialTypeNamespace, initializerPartialTypeName, sourceProductionContext, option);
             Generate(generationContext, interfaceSymbols.ToImmutableArray(), referenceSymbols);
 
             static void Traverse(INamespaceOrTypeSymbol rootNamespaceOrTypeSymbol, List<INamedTypeSymbol> interfaceSymbols)
@@ -72,4 +73,5 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             }
         });
     }
+
 }

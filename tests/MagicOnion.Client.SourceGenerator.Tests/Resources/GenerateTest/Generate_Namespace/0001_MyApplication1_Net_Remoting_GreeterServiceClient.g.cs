@@ -43,7 +43,7 @@ namespace MyApplication1.Net.Remoting
                     this.core = core;
                 }
 
-                protected override global::MagicOnion.Client.MagicOnionClientBase<IGreeterService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                protected override global::MagicOnion.Client.MagicOnionClientBase<global::MyApplication1.Net.Remoting.IGreeterService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                     => new MyApplication1_Net_Remoting_GreeterServiceClient(options, core);
 
                 public global::MagicOnion.UnaryResult<global::System.String> HelloAsync(global::System.String name, global::System.Int32 age)

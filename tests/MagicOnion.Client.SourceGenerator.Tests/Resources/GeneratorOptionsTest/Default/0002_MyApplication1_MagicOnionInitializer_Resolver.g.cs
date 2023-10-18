@@ -3,14 +3,14 @@
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS8019 // Unnecessary using directive.
 
-namespace Remoting
+namespace MyApplication1
 {
     using global::System;
     using global::MessagePack;
 
     partial class MagicOnionInitializer
     {
-        public global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
+        public static global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
         class MessagePackGeneratedResolver : global::MessagePack.IFormatterResolver
         {
             public static readonly global::MessagePack.IFormatterResolver Instance = new MessagePackGeneratedResolver();
@@ -68,8 +68,6 @@ namespace Remoting
             internal static void Register()
             {
                 _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32>>();
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::MessagePack.Nil>();
-                _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Boolean>();
                 _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.Int32>();
                 _ = MessagePackGeneratedResolver.Instance.GetFormatter<global::System.String>();
             }

@@ -9,59 +9,51 @@ public class GeneratorOptionsTest
     {
         var source = """
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace MyApplication1;
 
         public interface IGreeterService : IService<IGreeterService>
         {
             UnaryResult<string> HelloAsync(string name, int age);
         }
+        
+        [MagicOnionClientGeneration(typeof(IGreeterService))]
+        partial class MagicOnionInitializer {}
         """;
 
         await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
 
     [Fact]
-    public async Task DisableAutoRegister()
+    public async Task DisableAutoRegistration()
     {
         var source = """
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace MyApplication1;
 
         public interface IGreeterService : IService<IGreeterService>
         {
             UnaryResult<string> HelloAsync(string name, int age);
         }
+        
+        [MagicOnionClientGeneration(typeof(IGreeterService), DisableAutoRegistration = true)]
+        partial class MagicOnionInitializer {}
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, options: GeneratorOptions.Default with { DisableAutoRegister = true });
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
 
-    [Fact]
-    public async Task Namespace()
-    {
-        var source = """
-        using MagicOnion;
-
-        namespace MyApplication1;
-
-        public interface IGreeterService : IService<IGreeterService>
-        {
-            UnaryResult<string> HelloAsync(string name, int age);
-        }
-        """;
-
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, options: GeneratorOptions.Default with { Namespace = "__Generated__" });
-    }
-    
     [Fact]
     public async Task MessagePackFormatterNamespace()
     {
         var source = """
         using System;
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace MyApplication1
         {
             public interface IGreeterService : IService<IGreeterService>
@@ -80,9 +72,12 @@ public class GeneratorOptionsTest
                 public global::MyApplication1.MyGenericObject<T> Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options) => throw new NotImplementedException();
             }
         }
+        
+        [MagicOnionClientGeneration(typeof(MyApplication1.IGreeterService), MessagePackFormatterNamespace = "__UserDefined__.MessagePack.Formatters")]
+        partial class MagicOnionInitializer {}
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, options: GeneratorOptions.Default with { MessagePackFormatterNamespace = "__UserDefined__.MessagePack.Formatters" });
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
 
     [Fact]
@@ -90,18 +85,21 @@ public class GeneratorOptionsTest
     {
         var source = """
         using MagicOnion;
-
+        using MagicOnion.Client;
+        
         namespace MyApplication1;
 
         public interface IGreeterService : IService<IGreeterService>
         {
             UnaryResult<string> HelloAsync(string name, int age);
         }
+
+        [MagicOnionClientGeneration(typeof(IGreeterService), Serializer = GenerateSerializerType.MemoryPack)]
+        partial class MagicOnionInitializer {}
         """;
 
         await MagicOnionSourceGeneratorVerifier.RunAsync(
             source,
-            options: GeneratorOptions.Default with { Serializer = GeneratorOptions.SerializerType.MemoryPack },
             verifierOptions: VerifierOptions.Default with { UseMemoryPack = true }
         );
     }

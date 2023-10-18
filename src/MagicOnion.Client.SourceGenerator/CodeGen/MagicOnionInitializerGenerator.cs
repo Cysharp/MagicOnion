@@ -5,7 +5,7 @@ namespace MagicOnion.Client.SourceGenerator.CodeGen;
 
 internal class MagicOnionInitializerGenerator
 {
-    public static string Build(string? @namespace, string typeName, GeneratorOptions options, MagicOnionServiceCollection serviceCollection)
+    public static string Build(GenerationContext generationContext, MagicOnionServiceCollection serviceCollection)
     {
         var writer = new StringWriter();
         writer.WriteLine($$"""
@@ -14,10 +14,10 @@ internal class MagicOnionInitializerGenerator
             #pragma warning disable CS0612 // 'member' is obsolete
             #pragma warning disable CS8019 // Unnecessary using directive.
             """);
-        if (!string.IsNullOrEmpty(@namespace))
+        if (!string.IsNullOrEmpty(generationContext.Namespace))
         {
             writer.WriteLine($$"""
-            namespace {{@namespace}}
+            namespace {{generationContext.Namespace}}
             {
             """);
         }
@@ -31,7 +31,7 @@ internal class MagicOnionInitializerGenerator
 
                 partial class PreserveAttribute : global::System.Attribute {}
             
-                partial class {{typeName}}
+                partial class {{generationContext.InitializerPartialTypeName}}
                 {
                     static bool isRegistered = false;
                     readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
@@ -40,7 +40,7 @@ internal class MagicOnionInitializerGenerator
                     public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
             """);
 
-        if (!options.DisableAutoRegister)
+        if (!generationContext.Options.DisableAutoRegistration)
         {
             writer.WriteLine($$"""
             #if UNITY_2019_4_OR_NEWER
@@ -131,7 +131,7 @@ internal class MagicOnionInitializerGenerator
                     }
                 }
             """);
-        if (!string.IsNullOrEmpty(@namespace))
+        if (!string.IsNullOrEmpty(generationContext.Namespace))
         {
             writer.WriteLine($$"""
             }

@@ -119,7 +119,7 @@ public class StaticMagicOnionClientGenerator
     static void EmitClone(ServiceClientBuildContext ctx)
     {
         ctx.TextWriter.WriteLine($"""
-                            protected override global::MagicOnion.Client.MagicOnionClientBase<{ctx.Service.ServiceType.Name}> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                            protected override global::MagicOnion.Client.MagicOnionClientBase<{ctx.Service.ServiceType.FullName}> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                                 => new {ctx.Service.GetClientFullName()}(options, core);
             """);
         ctx.TextWriter.WriteLine();

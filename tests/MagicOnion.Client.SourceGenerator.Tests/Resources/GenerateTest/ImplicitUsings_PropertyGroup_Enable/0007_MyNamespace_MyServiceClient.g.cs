@@ -39,7 +39,7 @@ namespace MyNamespace
                     this.core = core;
                 }
 
-                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                protected override global::MagicOnion.Client.MagicOnionClientBase<global::MyNamespace.IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                     => new MyNamespace_MyServiceClient(options, core);
 
                 public global::MagicOnion.UnaryResult<global::MessagePack.Nil> A(global::System.Int32 arg0, global::System.Collections.Generic.IReadOnlyList<global::System.Int32> arg1, global::System.IO.FileMode arg2, global::System.Linq.ILookup<global::System.String, global::System.String> arg3, global::System.Net.Http.ClientCertificateOption arg4, global::System.Threading.ApartmentState arg5, global::System.Threading.Tasks.TaskCreationOptions arg6)

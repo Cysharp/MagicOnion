@@ -43,7 +43,7 @@ namespace MyApplication1
                     this.core = core;
                 }
 
-                protected override global::MagicOnion.Client.MagicOnionClientBase<IGreeterService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                protected override global::MagicOnion.Client.MagicOnionClientBase<global::MyApplication1.IGreeterService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                     => new MyApplication1_GreeterServiceClient(options, core);
 
                 public global::MagicOnion.UnaryResult<global::System.String> HelloAsync(global::System.String name, global::System.Int32 age)

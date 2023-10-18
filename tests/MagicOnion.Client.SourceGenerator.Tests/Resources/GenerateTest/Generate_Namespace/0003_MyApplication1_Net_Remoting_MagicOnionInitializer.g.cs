@@ -24,7 +24,7 @@ namespace MyApplication1.Net.Remoting
 #elif NET5_0_OR_GREATER
         [global::System.Runtime.CompilerServices.ModuleInitializer]
 #endif
-        static void Register() => TryRegisterProviderFactory();
+        internal static void Register() => TryRegisterProviderFactory();
 
         public static bool TryRegisterProviderFactory()
         {

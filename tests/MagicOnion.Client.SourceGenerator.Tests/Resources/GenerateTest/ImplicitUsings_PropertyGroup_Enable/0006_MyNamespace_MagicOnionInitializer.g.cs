@@ -24,7 +24,7 @@ namespace MyNamespace
 #elif NET5_0_OR_GREATER
         [global::System.Runtime.CompilerServices.ModuleInitializer]
 #endif
-        static void Register() => TryRegisterProviderFactory();
+        internal static void Register() => TryRegisterProviderFactory();
 
         public static bool TryRegisterProviderFactory()
         {

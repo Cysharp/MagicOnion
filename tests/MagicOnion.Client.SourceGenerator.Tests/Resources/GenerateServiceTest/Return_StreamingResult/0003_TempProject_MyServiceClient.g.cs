@@ -43,7 +43,7 @@ namespace TempProject
                     this.core = core;
                 }
 
-                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                protected override global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                     => new TempProject_MyServiceClient(options, core);
 
                 public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<global::System.String, global::System.String>> ClientStreamingAsync()

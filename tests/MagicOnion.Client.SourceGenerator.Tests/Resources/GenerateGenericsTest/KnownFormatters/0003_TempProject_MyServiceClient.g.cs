@@ -59,7 +59,7 @@ namespace TempProject
                     this.core = core;
                 }
 
-                protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
+                protected override global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
                     => new TempProject_MyServiceClient(options, core);
 
                 public global::MagicOnion.UnaryResult<global::System.Collections.Generic.List<global::TempProject.MyResponse>> MethodList(global::System.Collections.Generic.List<global::System.Int32> args)

@@ -17,7 +17,6 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
     public void Execute(GeneratorExecutionContext context)
     {
         var syntaxReceiver = (SyntaxContextReceiver)context.SyntaxReceiver!;
-        var options = GeneratorOptions.Create(context.AdditionalFiles, context.CancellationToken);
         if (ReferenceSymbols.TryCreate(context.Compilation, out var referenceSymbols))
         {
             var generationContext = new GenerationContext(null, "MagicOnionInitializer", new SourceProductionContext(context));

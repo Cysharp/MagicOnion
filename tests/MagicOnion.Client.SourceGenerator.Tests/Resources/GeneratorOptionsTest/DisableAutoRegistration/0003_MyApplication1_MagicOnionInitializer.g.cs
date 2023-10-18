@@ -2,7 +2,7 @@
 #pragma warning disable CS0618 // 'member' is obsolete: 'text'
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS8019 // Unnecessary using directive.
-namespace Remoting
+namespace MyApplication1
 {
     using global::System;
     using global::System.Collections.Generic;
@@ -14,21 +14,13 @@ namespace Remoting
 
     partial class MagicOnionInitializer
     {
-        bool isRegistered = false;
-        readonly MagicOnionGeneratedClientFactoryProvider provider = new();
+        static bool isRegistered = false;
+        readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
 
-        public static MagicOnionInitializer Instance { get; } = new();
+        public static global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
+        public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
 
-        public global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
-        public global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
-#if UNITY_2019_4_OR_NEWER
-        [global::UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
-#elif NET5_0_OR_GREATER
-        [global::System.Runtime.CompilerServices.ModuleInitializer]
-#endif
-        static void Register() => Instance.TryRegisterProviderFactory();
-
-        public bool TryRegisterProviderFactory()
+        public static bool TryRegisterProviderFactory()
         {
             if (isRegistered) return false;
             isRegistered = true;
@@ -62,9 +54,9 @@ namespace Remoting
                 {
                     object factory = default(global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>);
 
-                    if (typeof(T) == typeof(global::MyApplication1.Net.Remoting.IGreeterService))
+                    if (typeof(T) == typeof(global::MyApplication1.IGreeterService))
                     {
-                        factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MyApplication1.Net.Remoting.IGreeterService>)((x, y) => new MagicOnionGeneratedClient.MyApplication1_Net_Remoting_GreeterServiceClient(x, y)));
+                        factory = ((global::MagicOnion.Client.MagicOnionClientFactoryDelegate<global::MyApplication1.IGreeterService>)((x, y) => new MagicOnionGeneratedClient.MyApplication1_GreeterServiceClient(x, y)));
                     }
                     Factory = (global::MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)factory;
                 }
