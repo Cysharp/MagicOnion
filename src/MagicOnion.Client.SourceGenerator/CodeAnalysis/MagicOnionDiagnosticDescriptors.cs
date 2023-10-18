@@ -65,4 +65,14 @@ public static class MagicOnionDiagnosticDescriptors
             description: "An array of rank must be less than 5.",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor TypeSpecifyingClientGenerationAttributedMustBePartial =
+        new DiagnosticDescriptor(
+            id: "MOC1007",
+            title: "Must be partial class",
+            messageFormat: "The type specifying MagicOnionClientGeneration attribute must be partial class",
+            category: "Usage",
+            description: "The type specifying MagicOnionClientGeneration attribute must be partial class.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
 }

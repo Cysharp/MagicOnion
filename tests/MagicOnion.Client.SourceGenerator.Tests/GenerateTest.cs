@@ -1,4 +1,7 @@
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using MagicOnion.Client.SourceGenerator.Tests.Verifiers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace MagicOnion.Client.SourceGenerator.Tests;
 
@@ -43,11 +46,45 @@ public class GenerateTest
         }
 
         [MagicOnionClientGeneration(typeof(IGreeterService))]
-        class MagicOnionInitializer {}
+        class {|#0:MagicOnionInitializer|} {}
         """;
 
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+        var verifierOptions = VerifierOptions.Default with
+        {
+            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+            ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.TypeSpecifyingClientGenerationAttributedMustBePartial.Id, DiagnosticSeverity.Error).WithLocation(0)}
+        };
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions);
     }
+
+    // NOTE: MagicOnionClientGeneration has `AttributeUsage(AttributeTarget.Class)`
+    //[Fact]
+    //public async Task NotClass()
+    //{
+    //    var source = """
+    //    using MagicOnion;
+    //    using MagicOnion.Client;
+    //    
+    //    namespace MyApplication1;
+    //
+    //    public interface IGreeterService : IService<IGreeterService>
+    //    {
+    //        UnaryResult<string> HelloAsync(string name, int age);
+    //        UnaryResult PingAsync();
+    //        UnaryResult<bool> CanGreetAsync();
+    //    }
+    //
+    //    [MagicOnionClientGeneration(typeof(IGreeterService))]
+    //    struct {|#0:MagicOnionInitializer|} {}
+    //    """;
+    //
+    //    var verifierOptions = VerifierOptions.Default with
+    //    {
+    //        TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
+    //        ExpectedDiagnostics = new[] {new DiagnosticResult(MagicOnionDiagnosticDescriptors.TypeSpecifyingClientGenerationAttributedMustBePartial.Id, DiagnosticSeverity.Error).WithLocation(0)}
+    //    };
+    //    await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions);
+    //}
 
     [Fact]
     public async Task Generate()

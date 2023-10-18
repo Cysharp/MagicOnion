@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
+using MagicOnion.Client.SourceGenerator.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.VisualBasic;
 
 namespace MagicOnion.Client.SourceGenerator;
 
@@ -15,7 +17,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             .WithTrackingName("mo_ReferenceSymbols");
         var generationAttr = context.SyntaxProvider.ForAttributeWithMetadataName(
             MagicOnionClientGenerationAttributeFullName,
-            predicate: static (node, cancellationToken) => true,
+            predicate: static (node, cancellationToken) => node is ClassDeclarationSyntax,
             transform: static (ctx, cancellationToken) => ((ClassDeclarationSyntax)ctx.TargetNode, ctx.Attributes, ctx.SemanticModel));
 
         context.RegisterPostInitializationOutput(static context => AddAttributeSources(context.AddSource));
@@ -47,6 +49,17 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             if (initializerClassSymbol is null) return; // TODO: ReportDiagnostic
 
             // TODO: ReportDiagnostic if the class is not partial.
+
+            if (initializerClassSymbol.IsValueType)
+            {
+                sourceProductionContext.ReportDiagnostic(Diagnostic.Create(MagicOnionDiagnosticDescriptors.TypeSpecifyingClientGenerationAttributedMustBePartial, initializerClassSymbol.GetLocation()));
+                return;
+            }
+            if (!initializerClassDecl.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword)))
+            {
+                sourceProductionContext.ReportDiagnostic(Diagnostic.Create(MagicOnionDiagnosticDescriptors.TypeSpecifyingClientGenerationAttributedMustBePartial, initializerClassSymbol.GetLocation()));
+                return;
+            }
 
             var initializerPartialTypeNamespace = initializerClassSymbol.ContainingNamespace.IsGlobalNamespace
                 ? null
