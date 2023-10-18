@@ -31,7 +31,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" PrivateAssets="all" />
-    <PackageReference Include="System.CodeDom" Version="4.5.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" PrivateAssets="all" />
   </ItemGroup>
 </Project>
