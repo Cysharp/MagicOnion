@@ -3,7 +3,6 @@
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS8019 // Unnecessary using directive.
 
-
 namespace MyApplication1
 {
     using global::System;
@@ -11,7 +10,7 @@ namespace MyApplication1
     using global::MagicOnion;
     using global::MagicOnion.Client;
     using global::MessagePack;
-    
+
     [global::MagicOnion.Ignore]
     public class GreeterServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::MyApplication1.IGreeterService>, global::MyApplication1.IGreeterService
     {
@@ -27,22 +26,22 @@ namespace MyApplication1
                 this.CanGreetAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_ValueType<global::MessagePack.Nil, global::System.Boolean>(global::Grpc.Core.MethodType.Unary, "IGreeterService", "CanGreetAsync", serializerProvider);
             }
         }
-        
+
         readonly ClientCore core;
-        
+
         public GreeterServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
         {
             this.core = new ClientCore(serializerProvider);
         }
-        
+
         private GreeterServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
         {
             this.core = core;
         }
-        
+
         protected override global::MagicOnion.Client.MagicOnionClientBase<IGreeterService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
             => new GreeterServiceClient(options, core);
-        
+
         public global::MagicOnion.UnaryResult<global::System.String> HelloAsync(global::System.String name, global::System.Int32 age)
             => this.core.HelloAsync.InvokeUnary(this, "IGreeterService/HelloAsync", new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32>(name, age));
         public global::MagicOnion.UnaryResult PingAsync()

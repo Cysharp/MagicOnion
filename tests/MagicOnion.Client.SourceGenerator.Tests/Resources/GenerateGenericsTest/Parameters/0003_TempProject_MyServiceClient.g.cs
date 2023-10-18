@@ -3,7 +3,6 @@
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS8019 // Unnecessary using directive.
 
-
 namespace TempProject
 {
     using global::System;
@@ -11,7 +10,7 @@ namespace TempProject
     using global::MagicOnion;
     using global::MagicOnion.Client;
     using global::MessagePack;
-    
+
     [global::MagicOnion.Ignore]
     public class MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
     {
@@ -27,22 +26,22 @@ namespace TempProject
                 this.C = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_ValueType_RefType<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::System.Collections.Generic.IReadOnlyList<global::TempProject.MyObject>>>(global::Grpc.Core.MethodType.Unary, "IMyService", "C", serializerProvider);
             }
         }
-        
+
         readonly ClientCore core;
-        
+
         public MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
         {
             this.core = new ClientCore(serializerProvider);
         }
-        
+
         private MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
         {
             this.core = core;
         }
-        
+
         protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
             => new MyServiceClient(options, core);
-        
+
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> A(global::TempProject.MyGenericObject<global::System.Int32> a)
             => this.core.A.InvokeUnary(this, "IMyService/A", a);
         public global::MagicOnion.UnaryResult<global::MessagePack.Nil> B(global::TempProject.MyGenericObject<global::TempProject.MyObject> a)

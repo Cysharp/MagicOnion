@@ -3,7 +3,6 @@
 #pragma warning disable CS0612 // 'member' is obsolete
 #pragma warning disable CS8019 // Unnecessary using directive.
 
-
 namespace TempProject
 {
     using global::System;
@@ -11,7 +10,7 @@ namespace TempProject
     using global::MagicOnion;
     using global::MagicOnion.Client;
     using global::MessagePack;
-    
+
     [global::MagicOnion.Ignore]
     public class MyServiceClient : global::MagicOnion.Client.MagicOnionClientBase<global::TempProject.IMyService>, global::TempProject.IMyService
     {
@@ -27,22 +26,22 @@ namespace TempProject
                 this.DuplexStreamingAsync = global::MagicOnion.Client.Internal.RawMethodInvoker.Create_RefType_RefType<global::System.String, global::System.String>(global::Grpc.Core.MethodType.DuplexStreaming, "IMyService", "DuplexStreamingAsync", serializerProvider);
             }
         }
-        
+
         readonly ClientCore core;
-        
+
         public MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider) : base(options)
         {
             this.core = new ClientCore(serializerProvider);
         }
-        
+
         private MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
         {
             this.core = core;
         }
-        
+
         protected override global::MagicOnion.Client.MagicOnionClientBase<IMyService> Clone(global::MagicOnion.Client.MagicOnionClientOptions options)
             => new MyServiceClient(options, core);
-        
+
         public global::System.Threading.Tasks.Task<global::MagicOnion.ClientStreamingResult<global::System.String, global::System.String>> ClientStreamingAsync()
             => this.core.ClientStreamingAsync.InvokeClientStreaming(this, "IMyService/ClientStreamingAsync");
         public global::System.Threading.Tasks.Task<global::MagicOnion.ServerStreamingResult<global::System.String>> ServerStreamingAsync()
