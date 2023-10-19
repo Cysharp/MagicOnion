@@ -31,4 +31,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all"/>
   </ItemGroup>
+
+  <!-- Prevent local path leakage by artifacts -->
+  <PropertyGroup>
+      <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+      <PathMap>$(RepoRoot)=.</PathMap>
+  </PropertyGroup>
 </Project>

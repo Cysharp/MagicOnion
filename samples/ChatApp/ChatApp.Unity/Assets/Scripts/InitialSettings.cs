@@ -1,5 +1,6 @@
 using System.IO;
 using Grpc.Core;
+using MagicOnion.Client;
 #if USE_GRPC_NET_CLIENT
 using Grpc.Net.Client;
 #endif
@@ -10,6 +11,9 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
+    [MagicOnionClientGeneration(typeof(ChatApp.Shared.Services.IChatService))]
+    partial class MagicOnionClientInitializer {}
+
     class InitialSettings
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -17,7 +21,7 @@ namespace Assets.Scripts
         {
             // NOTE: Currently, CompositeResolver doesn't work on Unity IL2CPP build. Use StaticCompositeResolver instead of it.
             StaticCompositeResolver.Instance.Register(
-                MagicOnion.Resolvers.MagicOnionResolver.Instance,
+                MagicOnionClientInitializer.Resolver,
                 MessagePack.Resolvers.GeneratedResolver.Instance,
                 BuiltinResolver.Instance,
                 PrimitiveObjectResolver.Instance
