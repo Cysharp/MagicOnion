@@ -25,6 +25,11 @@
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
+    <ProjectReference Include="..\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\MagicOnion.Client.SourceGenerator\bin\$(Configuration)\netstandard2.0\MagicOnion.Client.SourceGenerator.dll" PackagePath="analyzers\dotnet\roslyn4.3\cs" Pack="true" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
