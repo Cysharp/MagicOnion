@@ -36,7 +36,14 @@ internal class MagicOnionInitializerGenerator
                     static bool isRegistered = false;
                     readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
 
+                    /// <summary>
+                    /// Gets the generated MagicOnionClientFactoryProvider.
+                    /// </summary>
                     public static global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
+
+                    /// <summary>
+                    /// Gets the generated StreamingHubClientFactoryProvider.
+                    /// </summary>
                     public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
             """);
 
@@ -53,6 +60,9 @@ internal class MagicOnionInitializerGenerator
         }
         writer.WriteLine($$"""
 
+                    /// <summary>
+                    /// Register the generated client factory providers if it's not registered yet. This method will register only once.
+                    /// </summary>
                     public static bool TryRegisterProviderFactory()
                     {
                         if (isRegistered) return false;

@@ -40,6 +40,9 @@ internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGener
 
                 partial class {{generationContext.InitializerPartialTypeName}}
                 {
+                    /// <summary>
+                    /// Gets the generated MessagePack formatter resolver.
+                    /// </summary>
                     public static global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
             """);
 

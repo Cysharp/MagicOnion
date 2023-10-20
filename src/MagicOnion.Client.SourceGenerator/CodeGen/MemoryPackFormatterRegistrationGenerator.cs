@@ -53,6 +53,9 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
         ctx.TextWriter.WriteLine($$"""
                 partial class {{generationContext.InitializerPartialTypeName}}
                 {
+                    /// <summary>
+                    /// Registers the generated MemoryPackFormatters.
+                    /// </summary>
                     public static void RegisterMemoryPackFormatters()
                     {
             """);

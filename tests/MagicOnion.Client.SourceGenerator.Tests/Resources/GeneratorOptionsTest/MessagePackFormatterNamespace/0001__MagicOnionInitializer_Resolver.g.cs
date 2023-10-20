@@ -9,6 +9,9 @@
 
     partial class MagicOnionInitializer
     {
+        /// <summary>
+        /// Gets the generated MessagePack formatter resolver.
+        /// </summary>
         public static global::MessagePack.IFormatterResolver Resolver => MessagePackGeneratedResolver.Instance;
         class MessagePackGeneratedResolver : global::MessagePack.IFormatterResolver
         {

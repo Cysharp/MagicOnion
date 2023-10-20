@@ -17,7 +17,14 @@ namespace MyApplication1
         static bool isRegistered = false;
         readonly static MagicOnionGeneratedClientFactoryProvider provider = new();
 
+        /// <summary>
+        /// Gets the generated MagicOnionClientFactoryProvider.
+        /// </summary>
         public static global::MagicOnion.Client.IMagicOnionClientFactoryProvider ClientFactoryProvider => provider;
+
+        /// <summary>
+        /// Gets the generated StreamingHubClientFactoryProvider.
+        /// </summary>
         public static global::MagicOnion.Client.IStreamingHubClientFactoryProvider StreamingHubClientFactoryProvider => provider;
 #if UNITY_2019_4_OR_NEWER
         [global::UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -26,6 +33,9 @@ namespace MyApplication1
 #endif
         internal static void Register() => TryRegisterProviderFactory();
 
+        /// <summary>
+        /// Register the generated client factory providers if it's not registered yet. This method will register only once.
+        /// </summary>
         public static bool TryRegisterProviderFactory()
         {
             if (isRegistered) return false;
