@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace MagicOnion.Client.SourceGenerator;
@@ -7,7 +8,18 @@ public readonly record struct GenerationContext(
     string InitializerPartialTypeName,
     SourceProductionContext SourceProductionContext,
     GenerationOptions Options
-);
+)
+{
+    readonly StringBuilder pooledStringBuilder = new();
+
+    public PooledStringBuilder GetPooledStringBuilder()
+        => new PooledStringBuilder(pooledStringBuilder);
+
+    public record struct PooledStringBuilder(StringBuilder Instance) : IDisposable
+    {
+        public void Dispose() => Instance.Clear();
+    }
+}
 
 
 // This enum must be mirror of generated `SerializerType` (MagicOnionClientSourceGenerator.Emit)
