@@ -24,7 +24,7 @@ public class MethodCollector
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
+                var serviceType = ctx.GetOrCreateTypeInfoFromSymbol(x);
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
@@ -36,7 +36,7 @@ public class MethodCollector
                 foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
                 {
                     if (HasIgnoreAttribute(methodSymbol)) continue;
-                    if (TryCreateHubMethodInfoFromMethodSymbol(serviceType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateHubMethodInfoFromMethodSymbol(ctx, serviceType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         methods.Add(methodInfo);
                     }
@@ -52,12 +52,12 @@ public class MethodCollector
                 }
 
                 var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
-                var receiverType = MagicOnionTypeInfo.CreateFromSymbol(receiverInterfaceSymbol);
+                var receiverType = ctx.GetOrCreateTypeInfoFromSymbol(receiverInterfaceSymbol);
 
                 var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
                 foreach (var methodSymbol in receiverInterfaceSymbol.GetMembers().OfType<IMethodSymbol>())
                 {
-                    if (TryCreateHubReceiverMethodInfoFromMethodSymbol(serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateHubReceiverMethodInfoFromMethodSymbol(ctx, serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         receiverMethods.Add(methodInfo);
                     }
@@ -92,11 +92,11 @@ public class MethodCollector
     static bool HasIgnoreAttribute(ISymbol symbol)
         => symbol.GetAttributes().FindAttributeShortName("IgnoreAttribute") is not null;
 
-    static bool TryCreateHubMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateHubMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
-        var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
-        var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+        var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
+        var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         switch (methodReturnType.FullNameOpenType)
@@ -129,11 +129,11 @@ public class MethodCollector
         diagnostic = null;
         return true;
     }
-    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
-        var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
-        var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+        var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
+        var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
@@ -164,7 +164,7 @@ public class MethodCollector
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var serviceType = MagicOnionTypeInfo.CreateFromSymbol(x);
+                var serviceType = ctx.GetOrCreateTypeInfoFromSymbol(x);
                 var hasIgnore = HasIgnoreAttribute(x);
                 if (hasIgnore)
                 {
@@ -176,7 +176,7 @@ public class MethodCollector
                 foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
                 {
                     if (HasIgnoreAttribute(methodSymbol)) continue;
-                    if (TryCreateServiceMethodInfoFromMethodSymbol(serviceType, methodSymbol, out var methodInfo, out var diagnostic))
+                    if (TryCreateServiceMethodInfoFromMethodSymbol(ctx, serviceType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
                         methods.Add(methodInfo);
                     }
@@ -204,10 +204,10 @@ public class MethodCollector
             .ToArray();
     }
 
-    static bool TryCreateServiceMethodInfoFromMethodSymbol(MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionServiceInfo.MagicOnionServiceMethodInfo? serviceMethodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateServiceMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo serviceType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionServiceInfo.MagicOnionServiceMethodInfo? serviceMethodInfo, out Diagnostic? diagnostic)
     {
-        var methodReturnType = MagicOnionTypeInfo.CreateFromSymbol(methodSymbol.ReturnType);
-        var methodParameters = CreateParameterInfoListFromMethodSymbol(methodSymbol);
+        var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
+        var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
         var methodType = MethodType.Other;
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.System_Void;
@@ -288,8 +288,8 @@ public class MethodCollector
         return true;
     }
 
-    static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(IMethodSymbol methodSymbol)
-        => methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromSymbol(x)).ToArray();
+    static IReadOnlyList<MagicOnionMethodParameterInfo> CreateParameterInfoListFromMethodSymbol(MethodCollectorContext ctx, IMethodSymbol methodSymbol)
+        => methodSymbol.Parameters.Select(x => MagicOnionMethodParameterInfo.CreateFromTypeInfoAndSymbol(ctx.GetOrCreateTypeInfoFromSymbol(x.Type), x)).ToArray();
 
     static MagicOnionTypeInfo CreateRequestTypeFromMethodParameters(IReadOnlyList<MagicOnionMethodParameterInfo> parameters)
         => (parameters.Count == 0)
@@ -304,6 +304,16 @@ public class MethodCollector
         public required IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; init; }
         public required IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; init; }
         public List<Diagnostic> ReportDiagnostics { get; } = new();
+        public Dictionary<ITypeSymbol, MagicOnionTypeInfo> TypeInfoCache { get; } = new (SymbolEqualityComparer.Default);
+
+        public MagicOnionTypeInfo GetOrCreateTypeInfoFromSymbol(ITypeSymbol symbol)
+        {
+            if (TypeInfoCache.TryGetValue(symbol, out var typeInfo))
+            {
+                return typeInfo;
+            }
+            return TypeInfoCache[symbol] = MagicOnionTypeInfo.CreateFromSymbol(symbol);
+        }
 
         public static MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
         {

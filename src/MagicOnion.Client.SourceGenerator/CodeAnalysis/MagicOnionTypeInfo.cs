@@ -20,6 +20,8 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     }
 
     readonly SubType subType;
+    string? fullName;
+    string? fullNameOpenType;
 
     public string Namespace { get; }
     public string Name { get; }
@@ -38,9 +40,9 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
     public MagicOnionTypeInfo? ElementType { get; }
 
     public string FullName
-        => ToDisplayName(DisplayNameFormat.FullyQualified);
+        => fullName ??= ToDisplayName(DisplayNameFormat.FullyQualified);
     public string FullNameOpenType
-        => ToDisplayName(DisplayNameFormat.FullyQualified | DisplayNameFormat.OpenGenerics);
+        => fullNameOpenType ??= ToDisplayName(DisplayNameFormat.FullyQualified | DisplayNameFormat.OpenGenerics);
 
     public bool IsValueType => subType == SubType.ValueType || subType == SubType.Enum;
 
@@ -229,7 +231,11 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
 
-        return FullName == other.FullName && /* Namespace + Name + GenericArguments + ArrayRank + ElementType */
+        /* Namespace + Name + GenericArguments + ArrayRank + ElementType */
+        return Namespace == other.Namespace &&
+               Name == other.Name &&
+               GenericArguments.SequenceEqual(other.GenericArguments) &&
+               ArrayRank == other.ArrayRank &&
                subType == other.subType &&
                ElementType! == other.ElementType! &&
                UnderlyingType! == other.UnderlyingType!;

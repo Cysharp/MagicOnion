@@ -104,9 +104,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Unity", "src\MagicOnion.Client.SourceGenerator.Unity\MagicOnion.Client.SourceGenerator.Unity.csproj", "{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleServiceDefinitions", "tests\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj", "{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleServiceDefinitions", "tests\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj", "{45EA8028-41C1-4DF6-9E0F-EEE8967799DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Client.SourceGenerator.Unity.Tests", "tests\MagicOnion.Client.SourceGenerator.Unity.Tests\MagicOnion.Client.SourceGenerator.Unity.Tests.csproj", "{AFB26C11-0833-459D-B071-7CA001BD7F01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Client.SourceGenerator.Unity.Tests", "tests\MagicOnion.Client.SourceGenerator.Unity.Tests\MagicOnion.Client.SourceGenerator.Unity.Tests.csproj", "{AFB26C11-0833-459D-B071-7CA001BD7F01}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGeneratorPerf", "SourceGeneratorPerf", "{E9E11DFE-29C4-4933-A21B-2222646D946E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGeneratorPerf", "perf\SourceGeneratorPerf\SourceGeneratorPerf\SourceGeneratorPerf.csproj", "{7F132098-0C1D-4F3A-B049-ACABF5E35973}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -242,6 +246,10 @@ Global
 		{AFB26C11-0833-459D-B071-7CA001BD7F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFB26C11-0833-459D-B071-7CA001BD7F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFB26C11-0833-459D-B071-7CA001BD7F01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F132098-0C1D-4F3A-B049-ACABF5E35973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F132098-0C1D-4F3A-B049-ACABF5E35973}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F132098-0C1D-4F3A-B049-ACABF5E35973}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F132098-0C1D-4F3A-B049-ACABF5E35973}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +292,8 @@ Global
 		{A817FC3D-5C8D-4F47-B082-DB6A8EE227FD} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{45EA8028-41C1-4DF6-9E0F-EEE8967799DA} = {B5617CC1-55FD-4F77-BA75-9450474C6527}
 		{AFB26C11-0833-459D-B071-7CA001BD7F01} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
+		{E9E11DFE-29C4-4933-A21B-2222646D946E} = {A0CED9FB-5B18-4EE3-859F-CE3A6F90A82A}
+		{7F132098-0C1D-4F3A-B049-ACABF5E35973} = {E9E11DFE-29C4-4933-A21B-2222646D946E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

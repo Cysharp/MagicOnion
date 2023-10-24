@@ -17,51 +17,42 @@ public class SerializationInfoCollector
     public MagicOnionSerializationInfoCollection Collect(MagicOnionServiceCollection serviceCollection)
         => Collect(EnumerateTypes(serviceCollection));
 
-    static IEnumerable<MagicOnionTypeInfo> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
+    static IReadOnlyList<MagicOnionTypeInfo> EnumerateTypes(MagicOnionServiceCollection serviceCollection)
     {
-        return Enumerable.Concat(
-            serviceCollection.Services.SelectMany(service =>
-            {
-                return service.Methods.SelectMany(method =>
-                {
-                    return Enumerable.Concat(
-                        EnumerateTypes(method.ResponseType),
-                        EnumerateTypes(method.RequestType)
-                    );
-                });
-            }),
-            serviceCollection.Hubs.SelectMany(hub =>
-            {
-                return Enumerable.Concat(
-                    hub.Receiver.Methods.SelectMany(method =>
-                    {
-                        return Enumerable.Concat(
-                            EnumerateTypes(method.ResponseType),
-                            EnumerateTypes(method.RequestType)
-                        );
-                    }),
-                    hub.Methods.SelectMany(method =>
-                    {
-                        return Enumerable.Concat(
-                            EnumerateTypes(method.ResponseType),
-                            EnumerateTypes(method.RequestType)
-                        );
-                    })
-                );
-            })
-        );
-    }
-    static IEnumerable<MagicOnionTypeInfo> EnumerateTypes(MagicOnionTypeInfo type)
-    {
-        yield return type;
+        var types = new HashSet<MagicOnionTypeInfo>();
 
-        if (type.HasGenericArguments)
+        foreach (var service in serviceCollection.Services)
         {
-            foreach (var genericTypeArg in type.GenericArguments)
+            foreach (var method in service.Methods)
             {
-                foreach (var t in EnumerateTypes(genericTypeArg))
+                EnumerateTypesCore(types, method.ResponseType);
+                EnumerateTypesCore(types, method.RequestType);
+            }
+        }
+        foreach (var hub in serviceCollection.Hubs)
+        {
+            foreach (var method in hub.Methods)
+            {
+                EnumerateTypesCore(types, method.ResponseType);
+                EnumerateTypesCore(types, method.RequestType);
+            }
+            foreach (var method in hub.Receiver.Methods)
+            {
+                EnumerateTypesCore(types, method.ResponseType);
+                EnumerateTypesCore(types, method.RequestType);
+            }
+        }
+
+        return types.ToArray();
+
+        static void EnumerateTypesCore(HashSet<MagicOnionTypeInfo> types, MagicOnionTypeInfo rootType)
+        {
+            types.Add(rootType);
+            if (rootType.HasGenericArguments)
+            {
+                foreach (var genericTypeArg in rootType.GenericArguments)
                 {
-                    yield return t;
+                    EnumerateTypesCore(types, genericTypeArg);
                 }
             }
         }

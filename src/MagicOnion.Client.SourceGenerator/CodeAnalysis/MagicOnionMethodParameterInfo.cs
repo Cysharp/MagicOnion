@@ -19,10 +19,9 @@ public class MagicOnionMethodParameterInfo
         DefaultValue = defaultValue;
     }
 
-    public static MagicOnionMethodParameterInfo CreateFromSymbol(IParameterSymbol parameterSymbol)
+    public static MagicOnionMethodParameterInfo CreateFromTypeInfoAndSymbol(MagicOnionTypeInfo typeInfo, IParameterSymbol parameterSymbol)
     {
-        var type = MagicOnionTypeInfo.CreateFromSymbol(parameterSymbol.Type);
-        return new MagicOnionMethodParameterInfo(parameterSymbol.Name, type, parameterSymbol.HasExplicitDefaultValue, GetDefaultValue(parameterSymbol));
+        return new MagicOnionMethodParameterInfo(parameterSymbol.Name, typeInfo, parameterSymbol.HasExplicitDefaultValue, GetDefaultValue(parameterSymbol));
     }
 
     static string GetDefaultValue(IParameterSymbol p)
