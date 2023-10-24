@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 
-namespace MagicOnion.Client.SourceGenerator.Utils;
+// ReSharper disable once CheckNamespace
+namespace MagicOnion.Client.SourceGenerator;
 
 internal static class TypeExtensions
 {

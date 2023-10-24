@@ -18,12 +18,12 @@
   <ItemGroup>
     <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeAnalysis\**\*.cs" LinkBase="CodeAnalysis" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeGen\**\*.cs" LinkBase="CodeGen" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\Helpers\**\*.cs" LinkBase="Helpers" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\Internal\**\*.cs" LinkBase="Internal" />
-    <Compile Include="..\MagicOnion.Client.SourceGenerator\Utils\**\*.cs" LinkBase="Utils" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\GenerationContext.cs" />
     <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientGenerator.cs" />
-    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Emit.cs" />
-    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Parse.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Emitter.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Parser.cs" />
   </ItemGroup>
 
   <ItemGroup>
