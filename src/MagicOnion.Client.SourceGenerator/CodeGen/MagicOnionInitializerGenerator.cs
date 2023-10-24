@@ -1,5 +1,4 @@
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
-using MagicOnion.Client.SourceGenerator.CodeGen.Extensions;
 
 namespace MagicOnion.Client.SourceGenerator.CodeGen;
 

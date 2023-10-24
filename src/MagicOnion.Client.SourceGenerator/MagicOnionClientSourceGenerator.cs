@@ -17,7 +17,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             predicate: static (node, cancellationToken) => node is ClassDeclarationSyntax,
             transform: static (ctx, cancellationToken) => ((ClassDeclarationSyntax)ctx.TargetNode, ctx.Attributes, ctx.SemanticModel));
 
-        context.RegisterPostInitializationOutput(static context => AddAttributeSources(context.AddSource));
+        context.RegisterPostInitializationOutput(static context => Emitter.AddAttributeSources(context.AddSource));
 
         context.RegisterSourceOutput(generationAttr.Combine(referenceSymbols), static (sourceProductionContext, value) =>
         {
@@ -34,7 +34,7 @@ public partial class MagicOnionClientSourceGenerator : IIncrementalGenerator
             }
 
             var generationContext = new GenerationContext(spec.InitializerPartialTypeNamespace, spec.InitializerPartialTypeName, sourceProductionContext, options);
-            Emit(generationContext, spec.InterfaceSymbols, referenceSymbols);
+            Emitter.Emit(generationContext, spec.InterfaceSymbols, referenceSymbols);
         });
     }
 }

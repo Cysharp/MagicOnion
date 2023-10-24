@@ -1,6 +1,4 @@
-using MagicOnion.Client.SourceGenerator.Internal;
-
-namespace MagicOnion.Client.SourceGenerator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen.MemoryPack;
 
 internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGenerator
 {

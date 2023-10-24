@@ -10,7 +10,7 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         context.RegisterForSyntaxNotifications(static () => new SyntaxContextReceiver());
-        context.RegisterForPostInitialization(static context => AddAttributeSources(context.AddSource));
+        context.RegisterForPostInitialization(static context => Emitter.AddAttributeSources(context.AddSource));
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -36,7 +36,7 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
                 }
 
                 var generationContext = new GenerationContext(spec.InitializerPartialTypeNamespace, spec.InitializerPartialTypeName, sourceProductionContext, options);
-                Emit(generationContext, spec.InterfaceSymbols, referenceSymbols);
+                Emitter.Emit(generationContext, spec.InterfaceSymbols, referenceSymbols);
             }
         }
     }

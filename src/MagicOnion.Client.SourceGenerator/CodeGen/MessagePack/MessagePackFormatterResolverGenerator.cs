@@ -1,6 +1,6 @@
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 
-namespace MagicOnion.Client.SourceGenerator.CodeGen;
+namespace MagicOnion.Client.SourceGenerator.CodeGen.MessagePack;
 
 internal class MessagePackFormatterResolverGenerator : ISerializerFormatterGenerator
 {
