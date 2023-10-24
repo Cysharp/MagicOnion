@@ -17,20 +17,17 @@ public class StaticStreamingHubClientGenerator
         public TextWriter TextWriter { get; }
     }
 
-    public static string Build(GenerationContext generationContext, IEnumerable<MagicOnionStreamingHubInfo> hubs)
+    public static string Build(GenerationContext generationContext, MagicOnionStreamingHubInfo hubInfo)
     {
         var textWriter = new StringWriter();
 
         EmitHeader(generationContext, textWriter);
 
-        foreach (var hubInfo in hubs)
-        {
-            var buildContext = new StreamingHubClientBuildContext(hubInfo, textWriter);
+        var buildContext = new StreamingHubClientBuildContext(hubInfo, textWriter);
 
-            EmitPreamble(generationContext, buildContext);
-            EmitHubClientClass(generationContext, buildContext);
-            EmitPostscript(generationContext, buildContext);
-        }
+        EmitPreamble(generationContext, buildContext);
+        EmitHubClientClass(generationContext, buildContext);
+        EmitPostscript(generationContext, buildContext);
 
         return textWriter.ToString();
     }

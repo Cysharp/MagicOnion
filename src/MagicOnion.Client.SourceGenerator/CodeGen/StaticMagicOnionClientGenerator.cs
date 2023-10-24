@@ -17,20 +17,17 @@ public class StaticMagicOnionClientGenerator
         public TextWriter TextWriter { get; }
     }
 
-    public static string Build(GenerationContext generationContext, IEnumerable<MagicOnionServiceInfo> services)
+    public static string Build(GenerationContext generationContext, MagicOnionServiceInfo serviceInfo)
     {
         var textWriter = new StringWriter();
 
         EmitHeader(generationContext, textWriter);
 
-        foreach (var serviceInfo in services)
-        {
-            var buildContext = new ServiceClientBuildContext(serviceInfo, textWriter);
+        var buildContext = new ServiceClientBuildContext(serviceInfo, textWriter);
 
-            EmitPreamble(generationContext, buildContext);
-            EmitServiceClientClass(generationContext, buildContext);
-            EmitPostscript(generationContext, buildContext);
-        }
+        EmitPreamble(generationContext, buildContext);
+        EmitServiceClientClass(generationContext, buildContext);
+        EmitPostscript(generationContext, buildContext);
 
         return textWriter.ToString();
     }
