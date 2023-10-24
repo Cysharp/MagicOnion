@@ -36,7 +36,7 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
                 }
 
                 var generationContext = new GenerationContext(spec.InitializerPartialTypeNamespace, spec.InitializerPartialTypeName, sourceProductionContext, options);
-                Generate(generationContext, spec.InterfaceSymbols, referenceSymbols);
+                Emit(generationContext, spec.InterfaceSymbols, referenceSymbols);
             }
         }
     }
