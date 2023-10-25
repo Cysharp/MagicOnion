@@ -1,6 +1,0 @@
-namespace: chatapp
-
-bases:
-  - ../namespace/
-  - ../app/
-  - ../service/

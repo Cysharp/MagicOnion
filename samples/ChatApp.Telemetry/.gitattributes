@@ -1,5 +1,0 @@
-*.sh    text    eol=lf
-*.yml   text    eol=lf
-*.yaml   text    eol=lf
-*.config   text    eol=lf
-*.rules   text    eol=lf
