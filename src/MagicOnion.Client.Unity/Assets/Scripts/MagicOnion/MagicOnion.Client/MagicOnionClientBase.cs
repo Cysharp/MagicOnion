@@ -8,12 +8,12 @@ namespace MagicOnion.Client
 {
     public readonly struct MagicOnionClientOptions
     {
-        public string Host { get; }
+        public string? Host { get; }
         public CallInvoker CallInvoker { get; }
         public IReadOnlyList<IClientFilter> Filters { get; }
         public CallOptions CallOptions { get; }
 
-        public MagicOnionClientOptions(CallInvoker callInvoker, string host, CallOptions callOptions, IReadOnlyList<IClientFilter> filters)
+        public MagicOnionClientOptions(CallInvoker callInvoker, string? host, CallOptions callOptions, IReadOnlyList<IClientFilter> filters)
         {
             Host = host;
             CallOptions = callOptions;
@@ -23,7 +23,7 @@ namespace MagicOnion.Client
 
         public MagicOnionClientOptions WithCallOptions(CallOptions callOptions)
             => new MagicOnionClientOptions(CallInvoker, Host, callOptions, Filters);
-        public MagicOnionClientOptions WithHost(string host)
+        public MagicOnionClientOptions WithHost(string? host)
             => new MagicOnionClientOptions(CallInvoker, host, CallOptions, Filters);
         public MagicOnionClientOptions WithFilters(IReadOnlyList<IClientFilter> filters)
             => new MagicOnionClientOptions(CallInvoker, Host, CallOptions, filters);

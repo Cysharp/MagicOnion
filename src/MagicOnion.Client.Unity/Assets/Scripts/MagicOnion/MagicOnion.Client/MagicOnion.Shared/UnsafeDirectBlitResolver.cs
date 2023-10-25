@@ -31,14 +31,14 @@ namespace MagicOnion
             formatters.Add(typeof(T[]), new UnsafeDirectBlitArrayFormatter<T>());
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
         }
 
         static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> formatter;
+            public static readonly IMessagePackFormatter<T>? formatter;
 
             static FormatterCache()
             {
@@ -46,7 +46,7 @@ namespace MagicOnion
 
                 var t = typeof(T);
 
-                object formatterObject;
+                object? formatterObject;
                 if (Instance.formatters.TryGetValue(t, out formatterObject))
                 {
                     formatter = (IMessagePackFormatter<T>)formatterObject;
@@ -55,7 +55,7 @@ namespace MagicOnion
         }
     }
 
-    public class UnsafeDirectBlitArrayFormatter<T> : IMessagePackFormatter<T[]>
+    public class UnsafeDirectBlitArrayFormatter<T> : IMessagePackFormatter<T[]?>
         where T : unmanaged
     {
         const int TypeCode = 45;
@@ -70,7 +70,7 @@ namespace MagicOnion
             this.StructLength = Unsafe.SizeOf<T>();
         }
 
-        public void Serialize(ref MessagePackWriter writer, T[] value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, T[]? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -101,7 +101,7 @@ namespace MagicOnion
             }
         }
 
-        public T[] Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public T[]? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.IsNil)
             {
@@ -115,7 +115,7 @@ namespace MagicOnion
             var isLittleEndian = extReader.ReadBoolean();
 
             // extReader.read
-            byte[] rentMemory = default;
+            byte[]? rentMemory = default;
             ReadOnlySpan<byte> span = default;
             try
             {

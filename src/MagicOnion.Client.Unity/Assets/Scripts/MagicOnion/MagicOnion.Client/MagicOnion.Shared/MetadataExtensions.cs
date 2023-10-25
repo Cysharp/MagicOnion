@@ -1,4 +1,4 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using System;
 
 namespace MagicOnion
@@ -10,7 +10,7 @@ namespace MagicOnion
         /// <summary>
         /// Get metdata entry. If does not exists, return null.
         /// </summary>
-        public static Metadata.Entry Get(this Metadata metadata, string key, bool ignoreCase = true)
+        public static Metadata.Entry? GetOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
         {
             for (int i = 0; i < metadata.Count; i++)
             {
@@ -36,7 +36,7 @@ namespace MagicOnion
         /// <summary>
         /// Get metdata string value. If does not exists, return null.
         /// </summary>
-        public static string GetValue(this Metadata metadata, string key, bool ignoreCase = true)
+        public static string? GetValueOrDefault(this Metadata metadata, string key, bool ignoreCase = true)
         {
             for (int i = 0; i < metadata.Count; i++)
             {

@@ -15,11 +15,7 @@ namespace MagicOnion.Serialization
         /// <param name="methodType">gRPC method type of the method.</param>
         /// <param name="methodInfo">A method info for an implementation of the service method. It is a hint that handling request parameters on the server, which may be passed null on the client.</param>
         /// <returns></returns>
-#if NET5_0_OR_GREATER
         IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo);
-#else
-        IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo);
-#endif
     }
 
     /// <summary>
@@ -27,13 +23,8 @@ namespace MagicOnion.Serialization
     /// </summary>
     public interface IMagicOnionSerializer
     {
-#if NET5_0_OR_GREATER
-        void Serialize<T>(IBufferWriter<byte> writer, in T? value);
-        T? Deserialize<T>(in ReadOnlySequence<byte> bytes);
-#else
         void Serialize<T>(IBufferWriter<byte> writer, in T value);
         T Deserialize<T>(in ReadOnlySequence<byte> bytes);
-#endif
     }
 
     /// <summary>

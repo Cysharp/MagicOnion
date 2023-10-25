@@ -15,9 +15,9 @@ namespace MagicOnion
     /// </summary>
     public struct ClientStreamingResult<TRequest, TResponse> : IDisposable
     {
-        internal readonly TResponse rawValue;
+        internal readonly TResponse? rawValue;
         internal readonly bool hasRawValue;
-        readonly IAsyncClientStreamingCallWrapper<TRequest, TResponse> inner;
+        readonly IAsyncClientStreamingCallWrapper<TRequest, TResponse>? inner;
 
         public ClientStreamingResult(TResponse rawValue)
         {
@@ -33,23 +33,26 @@ namespace MagicOnion
             this.inner = inner;
         }
 
+        IAsyncClientStreamingCallWrapper<TRequest, TResponse> GetRequiredInner()
+            => inner ?? throw new NotSupportedException("ClientStreamingResult has no inner stream.");
+
         /// <summary>
         /// Asynchronous call result.
         /// </summary>
         public Task<TResponse> ResponseAsync
-            => hasRawValue ? Task.FromResult(rawValue) : inner.ResponseAsync;
+            => hasRawValue ? Task.FromResult(rawValue!) : GetRequiredInner().ResponseAsync;
 
         /// <summary>
         /// Asynchronous access to response headers.
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync
-            => inner.ResponseHeadersAsync;
+            => GetRequiredInner().ResponseHeadersAsync;
 
         /// <summary>
         /// Async stream to send streaming requests.
         /// </summary>
         public IClientStreamWriter<TRequest> RequestStream
-            => inner?.RequestStream;
+            => GetRequiredInner().RequestStream;
 
         /// <summary>
         /// Allows awaiting this object directly.
@@ -65,14 +68,14 @@ namespace MagicOnion
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Status GetStatus()
-            => inner.GetStatus();
+            => GetRequiredInner().GetStatus();
 
         /// <summary>
         /// Gets the call trailing metadata if the call has already finished.
         /// Throws InvalidOperationException otherwise.
         /// </summary>
         public Metadata GetTrailers()
-            => inner.GetTrailers();
+            => GetRequiredInner().GetTrailers();
 
         /// <summary>
         /// Provides means to cleanup after the call.

@@ -197,7 +197,7 @@ public class DefaultInMemoryStorage<T> : IInMemoryStorage<T>
     }
 
     [return: MaybeNull]
-    public T Get(Guid id)
+    public T? Get(Guid id)
     {
         return storage.TryGetValue(id, out var value)
             ? value

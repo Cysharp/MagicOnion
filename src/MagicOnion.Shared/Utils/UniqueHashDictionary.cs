@@ -1,7 +1,8 @@
-﻿#if NON_UNITY
+#if NON_UNITY
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace MagicOnion.Utils
@@ -31,7 +32,9 @@ namespace MagicOnion.Utils
         public int Count => count;
         public int MaxConflict => maxConflict;
 
+#pragma warning disable CS8618 // NOTE: .NET Standard 2.1 doesn't have MemberNotNull. PolySharp is only enabled when targeting .NET Standard 2.0.
         public UniqueHashDictionary(params (int hashCode, T value)[] values)
+#pragma warning restore CS8618
         {
             CreateTable(values);
         }
@@ -78,7 +81,7 @@ namespace MagicOnion.Utils
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetValue(int hashCode, out T value)
+        public bool TryGetValue(int hashCode, [NotNullWhen(true)] out T? value)
         {
             ref var array = ref table[hashCode & indexFor];
             if (array == null)
@@ -90,7 +93,7 @@ namespace MagicOnion.Utils
             ref var v = ref array[0];
             if (v.hash == hashCode)
             {
-                value = v.value;
+                value = v.value!;
                 return true;
             }
 
@@ -98,14 +101,14 @@ namespace MagicOnion.Utils
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        bool TryGetValueSlow(ref (int, T)[] array, int hashCode, out T value)
+        bool TryGetValueSlow(ref (int, T)[] array, int hashCode, [NotNullWhen(true)] out T? value)
         {
             for (int i = 1; i < array.Length; i++) // 0 is already checked.
             {
                 ref var v = ref array[i];
                 if (v.Item1 == hashCode)
                 {
-                    value = v.Item2;
+                    value = v.Item2!;
                     return true;
                 }
             }

@@ -7,10 +7,10 @@ namespace MagicOnion.Client.DynamicClient
 {
     internal static class RawMethodInvokerTypes
     {
-        static readonly MethodInfo create_RefType_RefType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_RefType_RefType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo create_RefType_ValueType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_RefType_ValueType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo create_ValueType_RefType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_ValueType_RefType), BindingFlags.Static | BindingFlags.Public);
-        static readonly MethodInfo create_ValueType_ValueType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_ValueType_ValueType), BindingFlags.Static | BindingFlags.Public);
+        static readonly MethodInfo create_RefType_RefType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_RefType_RefType), BindingFlags.Static | BindingFlags.Public)!;
+        static readonly MethodInfo create_RefType_ValueType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_RefType_ValueType), BindingFlags.Static | BindingFlags.Public)!;
+        static readonly MethodInfo create_ValueType_RefType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_ValueType_RefType), BindingFlags.Static | BindingFlags.Public)!;
+        static readonly MethodInfo create_ValueType_ValueType = typeof(RawMethodInvoker).GetMethod(nameof(RawMethodInvoker.Create_ValueType_ValueType), BindingFlags.Static | BindingFlags.Public)!;
 
         public static MethodInfo GetMethodRawInvokerCreateMethod(Type requestType, Type responseType)
         {

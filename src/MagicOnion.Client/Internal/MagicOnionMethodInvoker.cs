@@ -109,7 +109,7 @@ namespace MagicOnion.Client.Internal
             readonly AsyncServerStreamingCall<TRawResponse> inner;
             readonly Func<TRawResponse, TResponse> fromRawResponse;
 
-            IAsyncStreamReader<TResponse> responseStream;
+            IAsyncStreamReader<TResponse>? responseStream;
 
             public AsyncServerStreamingCallWrapper(AsyncServerStreamingCall<TRawResponse> inner, Func<TRawResponse, TResponse> fromRawResponse)
             {
@@ -136,7 +136,7 @@ namespace MagicOnion.Client.Internal
             readonly AsyncClientStreamingCall<TRawRequest, TRawResponse> inner;
             readonly Func<TRequest, TRawRequest> toRawRequest;
             readonly Func<TRawResponse, TResponse> fromRawResponse;
-            IClientStreamWriter<TRequest> requestStream;
+            IClientStreamWriter<TRequest>? requestStream;
 
             public AsyncClientStreamingCallWrapper(AsyncClientStreamingCall<TRawRequest, TRawResponse> inner, Func<TRequest, TRawRequest> toRawRequest, Func<TRawResponse, TResponse> fromRawResponse)
             {
@@ -169,8 +169,8 @@ namespace MagicOnion.Client.Internal
             readonly AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner;
             readonly Func<TRequest, TRawRequest> toRawRequest;
             readonly Func<TRawResponse, TResponse> fromRawResponse;
-            IClientStreamWriter<TRequest> requestStream;
-            IAsyncStreamReader<TResponse> responseStream;
+            IClientStreamWriter<TRequest>? requestStream;
+            IAsyncStreamReader<TResponse>? responseStream;
 
             public AsyncDuplexStreamingCallWrapper(AsyncDuplexStreamingCall<TRawRequest, TRawResponse> inner, Func<TRequest, TRawRequest> toRawRequest, Func<TRawResponse, TResponse> fromRawResponse)
             {

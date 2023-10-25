@@ -20,9 +20,11 @@ namespace MagicOnion.Client.Tests.DynamicClient
             var receiverB = Substitute.For<MagicOnion.Client.Tests.DynamicClient.AreaB.IBazHubReceiver>();
 
             DynamicStreamingHubClientFactoryProvider.Instance.TryGetFactory<MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHub, MagicOnion.Client.Tests.DynamicClient.AreaA.IBazHubReceiver>(out var factoryA);
+            Assert.NotNull(factoryA);
             var clientA = factoryA(callInvoker, receiverA, "", default, MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
 
             DynamicStreamingHubClientFactoryProvider.Instance.TryGetFactory<MagicOnion.Client.Tests.DynamicClient.AreaB.IBazHub, MagicOnion.Client.Tests.DynamicClient.AreaB.IBazHubReceiver>(out var factoryB);
+            Assert.NotNull(factoryB);
             var clientB = factoryB(callInvoker, receiverB, "", default, MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
         }
     }

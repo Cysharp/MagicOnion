@@ -15,8 +15,8 @@ namespace MagicOnion
     public readonly struct UnaryResult
     {
         internal readonly bool hasRawValue;
-        internal readonly Task rawTaskValue;
-        internal readonly Task<IResponseContext<Nil>> response;
+        internal readonly Task? rawTaskValue;
+        internal readonly Task<IResponseContext<Nil>>? response;
 
         public UnaryResult(Nil nil)
         {
@@ -74,20 +74,24 @@ namespace MagicOnion
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync => UnwrapResponseHeaders();
 
+        Task<IResponseContext<Nil>> GetRequiredResponse()
+            => response ?? throw new InvalidOperationException("UnaryResult has no response.");
+
         async Task UnwrapResponse()
         {
-            var ctx = await response.ConfigureAwait(false);
+            var ctx = await GetRequiredResponse().ConfigureAwait(false);
             await ctx.ResponseAsync.ConfigureAwait(false);
         }
 
         async Task<Metadata> UnwrapResponseHeaders()
         {
-            var ctx = await response.ConfigureAwait(false);
+            var ctx = await GetRequiredResponse().ConfigureAwait(false);
             return await ctx.ResponseHeadersAsync.ConfigureAwait(false);
         }
 
         IResponseContext TryUnwrap()
         {
+            var response = GetRequiredResponse();
             if (!response.IsCompleted)
             {
                 throw new InvalidOperationException("UnaryResult request is not yet completed, please await before call this.");
@@ -128,13 +132,16 @@ namespace MagicOnion
         /// </remarks>
         public void Dispose()
         {
-            if (!response.IsCompleted)
+            if (response is not null)
             {
-                UnwrapDispose();
-            }
-            else
-            {
-                response.Result.Dispose();
+                if (!response.IsCompleted)
+                {
+                    UnwrapDispose();
+                }
+                else
+                {
+                    response.Result.Dispose();
+                }
             }
         }
         
@@ -142,7 +149,7 @@ namespace MagicOnion
         {
             try
             {
-                var ctx = await response.ConfigureAwait(false);
+                var ctx = await GetRequiredResponse().ConfigureAwait(false);
                 ctx.Dispose();
             }
             catch
@@ -182,10 +189,10 @@ namespace MagicOnion
     public readonly struct UnaryResult<TResponse>
     {
         internal readonly bool hasRawValue; // internal
-        internal readonly TResponse rawValue; // internal
-        internal readonly Task<TResponse> rawTaskValue; // internal
+        internal readonly TResponse? rawValue; // internal
+        internal readonly Task<TResponse>? rawTaskValue; // internal
 
-        readonly Task<IResponseContext<TResponse>> response;
+        readonly Task<IResponseContext<TResponse>>? response;
 
         public UnaryResult(TResponse rawValue)
         {
@@ -224,18 +231,18 @@ namespace MagicOnion
                     // So, we will return the default value of TResponse as Task.
                     if (response is null)
                     {
-                        return Task.FromResult(default(TResponse));
+                        return Task.FromResult(default(TResponse)!);
                     }
 
                     return UnwrapResponse();
                 }
-                else if (rawTaskValue != null)
+                else if (rawTaskValue is not null)
                 {
                     return rawTaskValue;
                 }
                 else
                 {
-                    return Task.FromResult(rawValue);
+                    return Task.FromResult(rawValue!);
                 }
             }
         }
@@ -245,15 +252,18 @@ namespace MagicOnion
         /// </summary>
         public Task<Metadata> ResponseHeadersAsync => UnwrapResponseHeaders();
 
+        Task<IResponseContext<TResponse>> GetRequiredResponse()
+            => response ?? throw new InvalidOperationException("UnaryResult has no response.");
+
         async Task<TResponse> UnwrapResponse()
         {
-            var ctx = await response.ConfigureAwait(false);
+            var ctx = await GetRequiredResponse().ConfigureAwait(false);
             return await ctx.ResponseAsync.ConfigureAwait(false);
         }
 
         async Task<Metadata> UnwrapResponseHeaders()
         {
-            var ctx = await response.ConfigureAwait(false);
+            var ctx = await GetRequiredResponse().ConfigureAwait(false);
             return await ctx.ResponseHeadersAsync.ConfigureAwait(false);
         }
 
@@ -261,7 +271,7 @@ namespace MagicOnion
         {
             try
             {
-                var ctx = await response.ConfigureAwait(false);
+                var ctx = await GetRequiredResponse().ConfigureAwait(false);
                 ctx.Dispose();
             }
             catch
@@ -271,6 +281,7 @@ namespace MagicOnion
 
         IResponseContext<TResponse> TryUnwrap()
         {
+            var response = GetRequiredResponse();
             if (!response.IsCompleted)
             {
                 throw new InvalidOperationException("UnaryResult request is not yet completed, please await before call this.");
@@ -311,13 +322,16 @@ namespace MagicOnion
         /// </remarks>
         public void Dispose()
         {
-            if (!response.IsCompleted)
+            if (response is not null)
             {
-                UnwrapDispose();
-            }
-            else
-            {
-                response.Result.Dispose();
+                if (!response.IsCompleted)
+                {
+                    UnwrapDispose();
+                }
+                else
+                {
+                    response.Result.Dispose();
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ public class ServiceClientDefinitionTest
     [Fact]
     public void Unary()
     {
-        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.Unary)));
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.Unary))!);
         methodInfo.Should().NotBeNull();
         methodInfo.MethodName.Should().Be(nameof(IDummyService.Unary));
         methodInfo.MethodReturnType.Should().Be<UnaryResult<int>>();
@@ -32,7 +32,7 @@ public class ServiceClientDefinitionTest
     [Fact]
     public void Unary_NonGeneric()
     {
-        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.UnaryNonGeneric)));
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.UnaryNonGeneric))!);
         methodInfo.Should().NotBeNull();
         methodInfo.MethodName.Should().Be(nameof(IDummyService.UnaryNonGeneric));
         methodInfo.MethodReturnType.Should().Be<UnaryResult>();
@@ -42,7 +42,7 @@ public class ServiceClientDefinitionTest
     [Fact]
     public void ClientStreaming()
     {
-        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ClientStreaming)));
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ClientStreaming))!);
         methodInfo.Should().NotBeNull();
         methodInfo.MethodName.Should().Be(nameof(IDummyService.ClientStreaming));
         methodInfo.MethodReturnType.Should().Be<Task<ClientStreamingResult<int, int>>>();
@@ -51,7 +51,7 @@ public class ServiceClientDefinitionTest
     [Fact]
     public void ServerStreaming()
     {
-        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ServerStreaming)));
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.ServerStreaming))!);
         methodInfo.Should().NotBeNull();
         methodInfo.MethodName.Should().Be(nameof(IDummyService.ServerStreaming));
         methodInfo.MethodReturnType.Should().Be<Task<ServerStreamingResult<int>>>();
@@ -60,7 +60,7 @@ public class ServiceClientDefinitionTest
     [Fact]
     public void DuplexStreaming()
     {
-        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.DuplexStreaming)));
+        var methodInfo = ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.DuplexStreaming))!);
         methodInfo.Should().NotBeNull();
         methodInfo.MethodName.Should().Be(nameof(IDummyService.DuplexStreaming));
         methodInfo.MethodReturnType.Should().Be<Task<DuplexStreamingResult<int, int>>>();
@@ -70,7 +70,7 @@ public class ServiceClientDefinitionTest
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
         {
-            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.TaskOfUnary)));
+            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.TaskOfUnary))!);
         });
 
         ex.Message.Should().Contain("The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'");
@@ -81,7 +81,7 @@ public class ServiceClientDefinitionTest
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
         {
-            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfClientStreamingResult)));
+            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfClientStreamingResult))!);
         });
 
         ex.Message.Should().Contain("The return type of a Streaming method must be 'Task<");
@@ -92,7 +92,7 @@ public class ServiceClientDefinitionTest
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
         {
-            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfServerStreamingResult)));
+            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfServerStreamingResult))!);
         });
 
         ex.Message.Should().Contain("The return type of a Streaming method must be 'Task<");
@@ -103,7 +103,7 @@ public class ServiceClientDefinitionTest
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
         {
-            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfDuplexStreamingResult)));
+            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.NonTaskOfDuplexStreamingResult))!);
         });
 
         ex.Message.Should().Contain("The return type of a Streaming method must be 'Task<");
@@ -114,7 +114,7 @@ public class ServiceClientDefinitionTest
     {
         var ex = Assert.Throws<InvalidOperationException>(() =>
         {
-            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.Unknown)));
+            ServiceClientDefinition.MagicOnionServiceMethodInfo.Create(typeof(IDummyService), typeof(IDummyService).GetMethod(nameof(IDummyService.Unknown))!);
         });
 
         ex.Message.Should().Contain("The method of a service must return 'UnaryResult<T>', 'Task<ClientStreamingResult<TRequest, TResponse>>'");

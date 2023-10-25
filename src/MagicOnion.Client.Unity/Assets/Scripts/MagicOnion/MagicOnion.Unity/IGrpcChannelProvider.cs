@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Grpc.Core;
 #if USE_GRPC_NET_CLIENT
 using Grpc.Net.Client;
@@ -41,7 +42,7 @@ namespace MagicOnion.Unity
         public GrpcChannelTarget Target { get; }
         public GrpcChannelOptionsBag ChannelOptions { get; }
 
-        public CreateGrpcChannelContext(IGrpcChannelProvider provider, GrpcChannelTarget target, object channelOptions = null)
+        public CreateGrpcChannelContext(IGrpcChannelProvider provider, GrpcChannelTarget target, object? channelOptions = null)
         {
             Provider = provider ?? throw new ArgumentNullException(nameof(provider));
             Target = target;
@@ -51,19 +52,19 @@ namespace MagicOnion.Unity
 
     public class GrpcChannelOptionsBag
     {
-        private readonly object _options;
+        private readonly object? _options;
 
-        public GrpcChannelOptionsBag(object options)
+        public GrpcChannelOptionsBag(object? options)
         {
             _options = options;
         }
 
-        public T Get<T>()
+        public T? GetOrDefault<T>()
         {
             return TryGet<T>(out var value) ? value : default;
         }
 
-        public bool TryGet<T>(out T value)
+        public bool TryGet<T>([NotNullWhen(true)] out T? value)
         {
             if (_options is T optionT)
             {

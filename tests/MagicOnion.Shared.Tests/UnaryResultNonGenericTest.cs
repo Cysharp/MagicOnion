@@ -31,7 +31,9 @@ public class UnaryResultNonGenericTest
         // Arrange
         var value = default(Task<Nil>);
         // Act
+#pragma warning disable CS8604
         var result = Record.Exception(() => new UnaryResult(value));
+#pragma warning restore CS8604
         // Assert
         result.Should().BeOfType<ArgumentNullException>();
     }
@@ -49,7 +51,9 @@ public class UnaryResultNonGenericTest
         // Arrange
         var value = default(Task<IResponseContext<Nil>>);
         // Act
+#pragma warning disable CS8604
         var result = Record.Exception(() => new UnaryResult(value));
+#pragma warning restore CS8604
         // Assert
         result.Should().BeOfType<ArgumentNullException>();
     }

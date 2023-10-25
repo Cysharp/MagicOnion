@@ -91,7 +91,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
             }
 
-            private static (MethodType MethodType, Type RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
+            private static (MethodType MethodType, Type? RequestType, Type ResponseType) GetMethodTypeAndResponseTypeFromMethod(MethodInfo methodInfo)
             {
                 const string UnsupportedReturnTypeErrorMessage =
                     "The method of a service must return 'UnaryResult<T>', 'Task<ClientStreamingResult<TRequest, TResponse>>', 'Task<ServerStreamingResult<T>>' or 'DuplexStreamingResult<TRequest, TResponse>'.";
@@ -103,7 +103,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
                 if (!returnType.IsGenericType)
                 {
-                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                 }
 
                 var isTaskOfT = false;
@@ -114,7 +114,7 @@ namespace MagicOnion.Client.DynamicClient
                     returnType = returnType.GetGenericArguments()[0];
                     if (!returnType.IsGenericType)
                     {
-                        throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     returnTypeOpen = returnType.GetGenericTypeDefinition();
                 }
@@ -123,7 +123,7 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     if (isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.Unary, null, typeof(Nil));
                 }
@@ -131,7 +131,7 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     if (isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of an Unary method must be 'UnaryResult' or 'UnaryResult<T>'. (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.Unary, null, returnType.GetGenericArguments()[0]);
                 }
@@ -139,7 +139,7 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     if (!isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.ClientStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
                 }
@@ -147,7 +147,7 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     if (!isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.ServerStreaming, null, returnType.GetGenericArguments()[0]); // Use method parameters as response type
                 }
@@ -155,13 +155,13 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     if (!isTaskOfT)
                     {
-                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                        throw new InvalidOperationException($"The return type of a Streaming method must be 'Task<T>'. (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                     }
                     return (MethodType.DuplexStreaming, returnType.GetGenericArguments()[0], returnType.GetGenericArguments()[1]);
                 }
                 else
                 {
-                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType.Name}.{methodInfo.Name})");
+                    throw new InvalidOperationException($"{UnsupportedReturnTypeErrorMessage} (Method: {methodInfo.DeclaringType!.Name}.{methodInfo.Name})");
                 }
             }
         }

@@ -42,11 +42,7 @@ namespace MagicOnion.Serialization
             return new MessagePackMagicOnionSerializerProvider(SerializerOptions, enableFallback);
         }
 
-#if NET5_0_OR_GREATER
         public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
-#else
-        public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
-#endif
         {
             var serializerOptions = EnableFallback && methodInfo != null ? WrapFallbackResolverIfNeeded(methodInfo.GetParameters()) : SerializerOptions;
             return new MessagePackMagicOnionSerializer(serializerOptions);
@@ -96,7 +92,7 @@ namespace MagicOnion.Serialization
                     }
                 }).ToArray();
 
-            var formatter = Activator.CreateInstance(formatterType, defaultValues);
+            var formatter = Activator.CreateInstance(formatterType, defaultValues)!;
 
             return SerializerOptions.WithResolver(new PriorityResolver(t, formatter, SerializerOptions.Resolver));
         }
@@ -111,7 +107,7 @@ namespace MagicOnion.Serialization
 
             public T Deserialize<T>(in ReadOnlySequence<byte> bytes)
                 => MessagePackSerializer.Deserialize<T>(bytes, serializerOptions);
-            public void Serialize<T>(IBufferWriter<byte> writer, in T value)
+            public void Serialize<T>(IBufferWriter<byte> writer, in T? value)
                 => MessagePackSerializer.Serialize(writer, value, serializerOptions);
         }
 

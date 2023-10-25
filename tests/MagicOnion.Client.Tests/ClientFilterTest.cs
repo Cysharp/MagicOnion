@@ -8,7 +8,7 @@ public class ClientFilterTest
         // Arrange
         var clientFilterMock = Substitute.For<IClientFilter>();
         clientFilterMock
-            .SendAsync(default, default)
+            .SendAsync(default!, default!)
             // NOTE: Mock IClientFilter returns a value immediately. (The filter will not call `next`)
             .ReturnsForAnyArgs(ValueTask.FromResult((ResponseContext)ResponseContext<string>.Create("Response", Status.DefaultSuccess, Metadata.Empty, Metadata.Empty)));
         var callInvokerMock = Substitute.For<CallInvoker>();
@@ -82,7 +82,7 @@ public class ClientFilterTest
         // Arrange
         var calledFilters = new List<string>();
         var clientFilterMockFirst = Substitute.For<IClientFilter>();
-        clientFilterMockFirst.SendAsync(default, default)
+        clientFilterMockFirst.SendAsync(default!, default!)
             .ReturnsForAnyArgs(x =>
             {
                 var context = x.Arg<RequestContext>();
@@ -92,7 +92,7 @@ public class ClientFilterTest
             });
 
         var clientFilterMockSecond = Substitute.For<IClientFilter>();
-        clientFilterMockSecond.SendAsync(default, default)
+        clientFilterMockSecond.SendAsync(default!, default!)
             .ReturnsForAnyArgs(x =>
             {
                 var context = x.Arg<RequestContext>();

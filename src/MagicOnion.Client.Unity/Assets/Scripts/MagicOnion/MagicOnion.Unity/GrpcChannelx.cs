@@ -443,7 +443,7 @@ namespace MagicOnion
             private class SerializationContextWrapper : SerializationContext, IBufferWriter<byte>
             {
                 private readonly SerializationContext _inner;
-                private IBufferWriter<byte> _bufferWriter;
+                private IBufferWriter<byte>? _bufferWriter;
                 public int Written { get; private set; }
 
                 public SerializationContextWrapper(SerializationContext inner)

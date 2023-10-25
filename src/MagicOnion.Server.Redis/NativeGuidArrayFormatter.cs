@@ -9,7 +9,7 @@ internal static class NativeGuidArrayFormatter
     static readonly IMessagePackFormatter<Guid> formatter = NativeGuidFormatter.Instance;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Serialize(ref MessagePackWriter writer, Guid[] value)
+    public static void Serialize(ref MessagePackWriter writer, Guid[]? value)
     {
         if (value == null)
         {
@@ -20,12 +20,12 @@ internal static class NativeGuidArrayFormatter
         writer.WriteArrayHeader(value.Length);
         for (int i = 0; i < value.Length; i++)
         {
-            formatter.Serialize(ref writer, value[i], null);
+            formatter.Serialize(ref writer, value[i], MessagePackSerializer.DefaultOptions);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Guid[] Deserialize(ref MessagePackReader reader)
+    public static Guid[]? Deserialize(ref MessagePackReader reader)
     {
         if (reader.TryReadNil())
         {
@@ -36,7 +36,7 @@ internal static class NativeGuidArrayFormatter
         var result = new Guid[len];
         for (int i = 0; i < len; i++)
         {
-            result[i] = formatter.Deserialize(ref reader, null);
+            result[i] = formatter.Deserialize(ref reader, MessagePackSerializer.DefaultOptions);
         }
 
         return result;

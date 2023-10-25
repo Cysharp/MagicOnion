@@ -1,5 +1,6 @@
 using MagicOnion.Serialization;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace MagicOnion.Client
@@ -33,7 +34,7 @@ namespace MagicOnion.Client
         /// <typeparam name="T">A MagicOnion service interface type.</typeparam>
         /// <param name="factory">A MagicOnionClient factory of specified service type.</param>
         /// <returns>The value indicates whether a factory was found or not.</returns>
-        bool TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T> factory) where T : IService<T>;
+        bool TryGetFactory<T>([NotNullWhen(true)] out MagicOnionClientFactoryDelegate<T>? factory) where T : IService<T>;
     }
     
     public class ImmutableMagicOnionClientFactoryProvider : IMagicOnionClientFactoryProvider
@@ -50,7 +51,7 @@ namespace MagicOnion.Client
             return new ImmutableMagicOnionClientFactoryProvider(providers.Append(provider).ToArray());
         }
 
-        public bool TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T> factory) where T : IService<T>
+        public bool TryGetFactory<T>([NotNullWhen(true)] out MagicOnionClientFactoryDelegate<T>? factory) where T : IService<T>
         {
             foreach (var provider in providers)
             {
@@ -71,7 +72,7 @@ namespace MagicOnion.Client
 
         DynamicNotSupportedMagicOnionClientFactoryProvider() { }
 
-        public bool TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T> factory) where T : IService<T>
+        public bool TryGetFactory<T>([NotNullWhen(true)] out MagicOnionClientFactoryDelegate<T>? factory) where T : IService<T>
         {
             throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(T)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
         }
@@ -87,7 +88,7 @@ namespace MagicOnion.Client
 
         DynamicMagicOnionClientFactoryProvider() { }
 
-        public bool TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T> factory) where T : IService<T>
+        public bool TryGetFactory<T>([NotNullWhen(true)] out MagicOnionClientFactoryDelegate<T>? factory) where T : IService<T>
         {
             factory = Cache<T>.Factory;
             return true;
@@ -96,7 +97,7 @@ namespace MagicOnion.Client
         static class Cache<T> where T : IService<T>
         {
             public static readonly MagicOnionClientFactoryDelegate<T> Factory
-                = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClient.DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider);
+                = (clientOptions, serializerProvider) => (T)Activator.CreateInstance(DynamicClient.DynamicClientBuilder<T>.ClientType, clientOptions, serializerProvider)!;
         }
     }
 #endif
