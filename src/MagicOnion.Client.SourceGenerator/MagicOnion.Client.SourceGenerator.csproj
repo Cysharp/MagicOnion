@@ -16,7 +16,7 @@
     <AnalyzerLanguage>cs</AnalyzerLanguage>
 
     <!-- We don't need to publish the package to NuGet. MagicOnion.Client.SourceGenerator.dll is bundled with MagicOnion.Client  -->
-    <Packable>false</Packable>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
