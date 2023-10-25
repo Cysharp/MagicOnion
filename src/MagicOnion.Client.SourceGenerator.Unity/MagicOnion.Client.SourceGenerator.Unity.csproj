@@ -13,6 +13,8 @@
     <AnalyzerLanguage>cs</AnalyzerLanguage>
     <RootNamespace>MagicOnion.Client.SourceGenerator</RootNamespace>
 
+    <!-- We don't need to publish the package to NuGet.  -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
