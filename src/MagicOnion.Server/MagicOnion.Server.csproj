@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.34.0" />
-    <PackageReference Include="Grpc.Core.Api" Version="2.35.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" />
+    <PackageReference Include="Grpc.Core.Api" />
   </ItemGroup>
 
   <ItemGroup>

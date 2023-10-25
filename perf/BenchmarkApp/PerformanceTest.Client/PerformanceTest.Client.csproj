@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConsoleAppFramework" Version="4.2.2" />
+    <PackageReference Include="ConsoleAppFramework" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseNuGetClient)' != ''">

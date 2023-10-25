@@ -31,6 +31,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{42EBB7E4-52D7-4E57-80AD-79FDD4900E13}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.Shared", "samples\ChatApp\ChatApp.Shared\ChatApp.Shared.csproj", "{5CDEE44D-8AC2-4E7C-90CC-669E336F2D15}"

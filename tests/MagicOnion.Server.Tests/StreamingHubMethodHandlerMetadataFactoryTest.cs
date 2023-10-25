@@ -199,7 +199,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyFirstAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute));
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
     }
 
@@ -215,7 +215,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyFirstAttribute), typeof(MySecondAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
     }
@@ -232,10 +232,10 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyFirstAttribute), typeof(MySecondAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyFirstAttribute), typeof(MySecondAttribute));
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().BeEquivalentTo(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(1);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyThirdAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute));
         metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
     }
 
@@ -266,7 +266,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(2);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyThirdAttribute), typeof(MyFirstAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute));
         metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
     }
@@ -283,7 +283,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
         metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(1);
@@ -301,11 +301,11 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
 
         // Assert
         metadata.AttributeLookup.Should().HaveCount(3);
-        metadata.AttributeLookup.Select(x => x.Key).Should().BeEquivalentTo(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
+        metadata.AttributeLookup.Select(x => x.Key).Should().Equal(typeof(MyThirdAttribute), typeof(MyFirstAttribute), typeof(MySecondAttribute));
         metadata.AttributeLookup[typeof(MyThirdAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MyFirstAttribute)].Should().HaveCount(1);
         metadata.AttributeLookup[typeof(MySecondAttribute)].Should().HaveCount(3);
-        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().BeEquivalentTo(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
+        metadata.AttributeLookup[typeof(MySecondAttribute)].Should().Equal(new MySecondAttribute(0), new MySecondAttribute(1), new MySecondAttribute(2));
     }
 
     [Fact]

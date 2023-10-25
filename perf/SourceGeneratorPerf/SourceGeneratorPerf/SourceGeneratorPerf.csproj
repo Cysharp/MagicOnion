@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.1" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Profiler.Api" />
+    <PackageReference Include="Microsoft.CodeAnalysis" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
