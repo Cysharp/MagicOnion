@@ -1,0 +1,474 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MethodCollector Class
+   | MagicOnion </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="MethodCollector Class
+   | MagicOnion ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/cysharp.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-default ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <div class="navbar-brand">
+                <a href="../">
+                  <img id="logo" src="../img/Icon.png" alt="">
+                  <span>MagicOnion</span>
+                </a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector">
+  
+  <h1 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector" class="text-break">MethodCollector Class
+  </h1>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.html">MagicOnion.Client.SourceGenerator.CodeAnalysis</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Client.SourceGenerator.Unity.dll</h6>
+  
+  <div class="markdown level0 summary"><p>Provides logic to collect MagicOnion Services and StreamingHubs from a compilation.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class MethodCollector : object</code></pre>
+  </div>
+
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">MethodCollector</span>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  <h3 id="members">Members</h3>
+  <h4>Properties
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_ReportDiagnostics">ReportDiagnostics</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_TypeInfoCache">TypeInfoCache</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Methods
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_Collect_ImmutableArray_INamedTypeSymbol__MagicOnion_Client_SourceGenerator_CodeAnalysis_ReferenceSymbols_CancellationToken_">Collect(ImmutableArray&lt;INamedTypeSymbol&gt;, ReferenceSymbols, CancellationToken)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_CreateFromInterfaceSymbols_ImmutableArray_INamedTypeSymbol__MagicOnion_Client_SourceGenerator_CodeAnalysis_ReferenceSymbols_CancellationToken_">CreateFromInterfaceSymbols(ImmutableArray&lt;INamedTypeSymbol&gt;, ReferenceSymbols, CancellationToken)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_GetOrCreateTypeInfoFromSymbol_ITypeSymbol_">GetOrCreateTypeInfoFromSymbol(ITypeSymbol)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList__1_HubInterfaces_">IReadOnlyList&lt;INamedTypeSymbol&gt;(HubInterfaces)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList__1_ServiceInterfaces_">IReadOnlyList&lt;INamedTypeSymbol&gt;(ServiceInterfaces)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3 id="properties">Properties
+  </h3>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_ReportDiagnostics_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_ReportDiagnostics" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics">ReportDiagnostics</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public List&lt;Diagnostic&gt; ReportDiagnostics { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">List</span>&lt;<span class="xref">Diagnostic</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_TypeInfoCache_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.TypeInfoCache*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_TypeInfoCache" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.TypeInfoCache">TypeInfoCache</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;ITypeSymbol, MagicOnionTypeInfo&gt; TypeInfoCache { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Dictionary</span>&lt;<span class="xref">ITypeSymbol</span>, <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionTypeInfo.html">MagicOnionTypeInfo</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="methods">Methods
+  </h3>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_Collect_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.Collect*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_Collect_ImmutableArray_INamedTypeSymbol__MagicOnion_Client_SourceGenerator_CodeAnalysis_ReferenceSymbols_CancellationToken_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.Collect(ImmutableArray{INamedTypeSymbol},MagicOnion.Client.SourceGenerator.CodeAnalysis.ReferenceSymbols,CancellationToken)">Collect(ImmutableArray&lt;INamedTypeSymbol&gt;, ReferenceSymbols, CancellationToken)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static (MagicOnionServiceCollection ServiceCollection, IReadOnlyList&lt;Diagnostic&gt; Diagnostics) Collect(ImmutableArray&lt;INamedTypeSymbol&gt; interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>interfaceSymbols</code></span> <span class="xref">ImmutableArray</span>&lt;<span class="xref">INamedTypeSymbol</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>referenceSymbols</code></span> <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.ReferenceSymbols.html">ReferenceSymbols</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>cancellationToken</code></span> <span class="xref">CancellationToken</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.ValueTuple</span>&lt;<a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionServiceCollection.html">MagicOnionServiceCollection</a>, <span class="xref">IReadOnlyList</span>&lt;<span class="xref">Diagnostic</span>&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_CreateFromInterfaceSymbols_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.CreateFromInterfaceSymbols*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_CreateFromInterfaceSymbols_ImmutableArray_INamedTypeSymbol__MagicOnion_Client_SourceGenerator_CodeAnalysis_ReferenceSymbols_CancellationToken_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.CreateFromInterfaceSymbols(ImmutableArray{INamedTypeSymbol},MagicOnion.Client.SourceGenerator.CodeAnalysis.ReferenceSymbols,CancellationToken)">CreateFromInterfaceSymbols(ImmutableArray&lt;INamedTypeSymbol&gt;, ReferenceSymbols, CancellationToken)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MethodCollector.MethodCollectorContext CreateFromInterfaceSymbols(ImmutableArray&lt;INamedTypeSymbol&gt; interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>interfaceSymbols</code></span> <span class="xref">ImmutableArray</span>&lt;<span class="xref">INamedTypeSymbol</span>&gt;</dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>referenceSymbols</code></span> <a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.ReferenceSymbols.html">ReferenceSymbols</a></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>cancellationToken</code></span> <span class="xref">CancellationToken</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.MethodCollectorContext</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_GetOrCreateTypeInfoFromSymbol_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.GetOrCreateTypeInfoFromSymbol*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_GetOrCreateTypeInfoFromSymbol_ITypeSymbol_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.GetOrCreateTypeInfoFromSymbol(ITypeSymbol)">GetOrCreateTypeInfoFromSymbol(ITypeSymbol)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MagicOnionTypeInfo GetOrCreateTypeInfoFromSymbol(ITypeSymbol symbol)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>symbol</code></span> <span class="xref">ITypeSymbol</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><a class="xref" href="MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionTypeInfo.html">MagicOnionTypeInfo</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.IReadOnlyList*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList__1_HubInterfaces_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.IReadOnlyList``1(HubInterfaces)">IReadOnlyList&lt;INamedTypeSymbol&gt;(HubInterfaces)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public required IReadOnlyList&lt;INamedTypeSymbol&gt;(HubInterfaces)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code></code></span> <span class="xref">HubInterfaces</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">required</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>INamedTypeSymbol</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.IReadOnlyList*"></a>
+  <h4 id="MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_IReadOnlyList__1_ServiceInterfaces_" data-uid="MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.IReadOnlyList``1(ServiceInterfaces)">IReadOnlyList&lt;INamedTypeSymbol&gt;(ServiceInterfaces)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public required IReadOnlyList&lt;INamedTypeSymbol&gt;(ServiceInterfaces)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code></code></span> <span class="xref">ServiceInterfaces</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">required</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>INamedTypeSymbol</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  
+  
+  
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            Copyright © <a href="https://cysharp.co.jp/">Cysharp</a>, Inc. | <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/docfx.override.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
