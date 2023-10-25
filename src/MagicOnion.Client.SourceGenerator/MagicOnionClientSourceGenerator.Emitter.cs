@@ -10,7 +10,8 @@ namespace MagicOnion.Client.SourceGenerator;
 public partial class MagicOnionClientSourceGenerator
 {
     public const string SourceGeneratorAttributesHintName = "MagicOnionClientSourceGeneratorAttributes.g.cs";
-    public const string MagicOnionClientGenerationAttributeName = "MagicOnionClientGenerationAttribute";
+    public const string MagicOnionClientGenerationAttributeShortName = "MagicOnionClientGeneration";
+    public const string MagicOnionClientGenerationAttributeName = $"{MagicOnionClientGenerationAttributeShortName}Attribute";
     public const string MagicOnionClientGenerationAttributeFullName = $"MagicOnion.Client.{MagicOnionClientGenerationAttributeName}";
 
     static class Emitter
@@ -122,12 +123,14 @@ public partial class MagicOnionClientSourceGenerator
 
             foreach (var service in serviceCollection.Services)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var x = StaticMagicOnionClientGenerator.Build(context, service);
                 outputs.Add((GeneratePathFromNamespaceAndTypeName(service.ServiceType.Namespace, service.GetClientName()), x));
             }
 
             foreach (var hub in serviceCollection.Hubs)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var x = StaticStreamingHubClientGenerator.Build(context, hub);
                 outputs.Add((GeneratePathFromNamespaceAndTypeName(hub.ServiceType.Namespace, hub.GetClientName()), x));
             }

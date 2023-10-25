@@ -1,5 +1,6 @@
 using MagicOnion.Client.SourceGenerator.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MagicOnion.Client.SourceGenerator;
@@ -22,7 +23,7 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
 
             foreach (var (initializerClassDecl, semanticModel) in syntaxReceiver.Candidates)
             {
-                var classSymbol = semanticModel.GetDeclaredSymbol(initializerClassDecl) as INamedTypeSymbol;
+                var classSymbol = semanticModel.GetDeclaredSymbol(initializerClassDecl);
                 if (classSymbol is null) continue;
 
                 var attrs = classSymbol.GetAttributes();
@@ -48,21 +49,21 @@ class SyntaxContextReceiver : ISyntaxContextReceiver
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        if (context.Node is ClassDeclarationSyntax classDeclSyntax)
+        if (context.Node is AttributeSyntax attrSyntax &&
+            attrSyntax.Parent is AttributeListSyntax &&
+            attrSyntax.Parent.Parent is ClassDeclarationSyntax classDeclSyntax)
         {
-            foreach (var attrList in classDeclSyntax.AttributeLists)
-            {
-                foreach (var attr in attrList.Attributes)
-                {
-                    var attrSymbol = context.SemanticModel.GetSymbolInfo(attr).Symbol as IMethodSymbol;
-                    if (attrSymbol is null) continue;
+            var attrName = attrSyntax.Name is QualifiedNameSyntax qualifiedName
+                ? qualifiedName.Right.Identifier.ValueText
+                : ((IdentifierNameSyntax)attrSyntax.Name).Identifier.ValueText;
 
-                    var attrContainingType = attrSymbol.ContainingType;
-                    if (attrContainingType.ToDisplayString() == MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeFullName)
-                    {
-                        Candidates.Add((classDeclSyntax,context.SemanticModel));
-                    }
-                }
+            if ((attrName.EndsWith("Attribute") && attrName == MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName) ||
+                (attrName == MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeName))
+            {
+                var attrSymbol = context.SemanticModel.GetSymbolInfo(attrSyntax).Symbol as IMethodSymbol;
+                if (attrSymbol is null) return;
+
+                Candidates.Add((classDeclSyntax, context.SemanticModel));
             }
         }
     }
