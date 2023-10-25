@@ -1,0 +1,51 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GrpcVersion>2.35.0</GrpcVersion>
+    <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
+    <MemoryPackVersion>1.9.7</MemoryPackVersion>
+    <MessagePackVersion>2.2.85</MessagePackVersion>
+    <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
+    <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Grpc" Version="$(GrpcCCoreVersion)" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.AspNetCore.Server" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.Core.Api" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
+    <PackageVersion Include="MemoryPack" Version="$(MemoryPackVersion)" />
+    <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
+
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageVersion Include="PolySharp" Version="1.13.2" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.0.601" />
+  </ItemGroup>
+
+  <!-- for tests -->
+  <ItemGroup>
+    <PackageVersion Include="coverlet.collector" Version="3.1.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.7.0" />
+    <!-- from https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.23163.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageVersion Include="NSubstitute" Version="5.0.0" />
+    <PackageVersion Include="Testcontainers" Version="2.3.0" />
+    <PackageVersion Include="xunit" Version="2.4.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+  </ItemGroup>
+
+  <!-- for samples/perf -->
+  <ItemGroup>
+    <PackageVersion Include="ConsoleAppFramework" Version="4.2.2" />
+    <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+  </ItemGroup>
+</Project>

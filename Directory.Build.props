@@ -29,6 +29,6 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all"/>
   </ItemGroup>
 </Project>
