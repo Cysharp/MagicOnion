@@ -55,7 +55,7 @@ dotnet_diagnostic.cs8614.severity = error
 # Lower language support for code shared with code for Unity
 csharp_style_namespace_declarations = block_scoped
 
-[*.csproj,*.props,*.targets]
+[*.{csproj,props,targets}]
 charset = utf-8
 indent_style = space
 indent_size = 2
