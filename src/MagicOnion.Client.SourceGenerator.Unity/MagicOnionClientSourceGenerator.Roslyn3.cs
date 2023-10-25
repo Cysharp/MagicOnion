@@ -27,7 +27,7 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
                 if (classSymbol is null) continue;
 
                 var attrs = classSymbol.GetAttributes();
-                var attr = attrs.FirstOrDefault(x => x.AttributeClass?.Name == MagicOnionClientGenerationAttributeName);
+                var attr = attrs.FirstOrDefault(x => string.Equals(x.AttributeClass?.Name, MagicOnionClientGenerationAttributeName, StringComparison.Ordinal));
                 if (attr is null) return; // TODO: ReportDiagnostic
 
                 var options = ParseClientGenerationOptions(attr);
@@ -45,10 +45,12 @@ public partial class MagicOnionClientSourceGenerator : ISourceGenerator
 
 class SyntaxContextReceiver : ISyntaxContextReceiver
 {
-    public List<(ClassDeclarationSyntax Node, SemanticModel SemanticModel)> Candidates { get; } = new();
+    public IReadOnlyList<(ClassDeclarationSyntax Node, SemanticModel SemanticModel)> Candidates { get; private set; } = Array.Empty<(ClassDeclarationSyntax Node, SemanticModel SemanticModel)>();
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
+        List<(ClassDeclarationSyntax Node, SemanticModel SemanticModel)>? candidates = default;
+
         if (context.Node is AttributeSyntax attrSyntax &&
             attrSyntax.Parent is AttributeListSyntax &&
             attrSyntax.Parent.Parent is ClassDeclarationSyntax classDeclSyntax)
@@ -57,14 +59,24 @@ class SyntaxContextReceiver : ISyntaxContextReceiver
                 ? qualifiedName.Right.Identifier.ValueText
                 : ((IdentifierNameSyntax)attrSyntax.Name).Identifier.ValueText;
 
-            if ((attrName.EndsWith("Attribute") && attrName == MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName) ||
-                (attrName == MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeName))
+            if (attrName.StartsWith(MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName, StringComparison.Ordinal))
             {
-                var attrSymbol = context.SemanticModel.GetSymbolInfo(attrSyntax).Symbol as IMethodSymbol;
-                if (attrSymbol is null) return;
+                if (string.Equals(attrName, MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName, StringComparison.Ordinal) ||
+                    string.Equals(attrName, MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeName, StringComparison.Ordinal))
+                {
+                    var attrSymbol = context.SemanticModel.GetSymbolInfo(attrSyntax).Symbol as IMethodSymbol;
+                    if (attrSymbol is null) return;
 
-                Candidates.Add((classDeclSyntax, context.SemanticModel));
+                    candidates ??= new List<(ClassDeclarationSyntax Node, SemanticModel SemanticModel)>();
+
+                    candidates.Add((classDeclSyntax, context.SemanticModel));
+                }
             }
+        }
+
+        if (candidates is not null)
+        {
+            Candidates = candidates;
         }
     }
 }
