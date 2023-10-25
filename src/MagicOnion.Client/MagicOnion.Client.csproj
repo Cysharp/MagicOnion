@@ -2,13 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
-
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
     <LangVersion>8.0</LangVersion>
     <!--<nullable>enable</nullable>-->
-
-    <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Client</PackageId>
@@ -30,10 +26,6 @@
 
   <ItemGroup>
     <None Include="..\MagicOnion.Client.SourceGenerator\bin\$(Configuration)\netstandard2.0\MagicOnion.Client.SourceGenerator.dll" PackagePath="analyzers\dotnet\roslyn4.3\cs" Pack="true" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <!-- Sync codes: MagicOnion.Client for Unity -->

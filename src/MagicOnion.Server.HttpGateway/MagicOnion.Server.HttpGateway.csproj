@@ -1,43 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <OutputType>Library</OutputType>
-        <LangVersion>default</LangVersion>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>NON_UNITY</DefineConstants>
-        <!--<nullable>enable</nullable>-->
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <LangVersion>default</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
 
-        <!-- NuGet -->
-        <PackageId>MagicOnion.Server.HttpGateway</PackageId>
-        <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
-    </PropertyGroup>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
+    <!--<nullable>enable</nullable>-->
 
-    <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" />
-    </ItemGroup>
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Server.HttpGateway</PackageId>
+    <Description>HTTP1 JSON Gateway and Swagger Integration for MagicOnion.</Description>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\MagicOnion.Client\MagicOnion.Client.csproj" />
-      <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Include="Swagger\SwaggerUI\*" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Client\MagicOnion.Client.csproj" />
+    <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Swagger\SwaggerUI\*" />
+  </ItemGroup>
+
 </Project>

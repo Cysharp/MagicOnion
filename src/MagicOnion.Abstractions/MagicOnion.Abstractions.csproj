@@ -3,9 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>NON_UNITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
     <PackageId>MagicOnion.Abstractions</PackageId>
     <Description>MagicOnion interfaces and abstractions for server and client.
@@ -19,10 +17,6 @@ MagicOnion.IgnoreAttribute</Description>
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" />
     <PackageReference Include="MessagePack" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <!-- Copy files for unity MagicOnion -->

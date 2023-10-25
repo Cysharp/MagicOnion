@@ -2,10 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
     <!--<nullable>enable</nullable>-->
-    <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
     <RootNamespace>MagicOnion</RootNamespace>
     <Description>Provides shared classes and interfaces used by MagicOnion server and client. $(MagicOnionPackageDescription)</Description>
@@ -18,10 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <!-- T4 -->

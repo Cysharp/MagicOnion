@@ -1,36 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <OutputType>Library</OutputType>
-        <LangVersion>default</LangVersion>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
-        <DefineConstants>NON_UNITY</DefineConstants>
-        <Company>Cysharp</Company>
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <LangVersion>default</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
-        <!-- NuGet -->
-        <PackageId>MagicOnion.Server.Redis</PackageId>
-        <Description>Redis backplane for MagicOnion.</Description>
-    </PropertyGroup>
+    <!-- NuGet -->
+    <PackageId>MagicOnion.Server.Redis</PackageId>
+    <Description>Redis backplane for MagicOnion.</Description>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="MessagePack" />
-        <PackageReference Include="StackExchange.Redis" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
-    </ItemGroup>
 </Project>

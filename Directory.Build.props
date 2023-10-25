@@ -3,8 +3,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <VersionPrefix>5.1.8</VersionPrefix>
+  </PropertyGroup>
 
-    <!-- NuGet Packaging -->
+  <!-- NuGet Packaging -->
+  <PropertyGroup>
     <PackageVersion>$(Version)</PackageVersion>
     <Company>Cysharp</Company>
     <Authors>Cysharp</Authors>
@@ -21,12 +23,6 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-
-  <!-- Expose package path to the solution (e.g. $(PkgSystem_Text_Json))-->
-  <!-- https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#generatepathproperty -->
-  <ItemDefinitionGroup>
-    <PackageReference GeneratePathProperty="true" />
-  </ItemDefinitionGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all"/>

@@ -1,9 +1,18 @@
 <Project>
   <Import Project="..\Directory.Build.props" />
 
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildProjectDirectory)\..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
   <!-- Prevent local path leakage by artifacts -->
   <PropertyGroup>
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
     <PathMap>$(RepoRoot)=.</PathMap>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)\..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
