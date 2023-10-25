@@ -33,15 +33,6 @@ jobs:
       - run: dotnet test -c Debug MagicOnion.sln
       - run: dotnet test -c Release MagicOnion.sln
 
-  build-dotnet-experimental:
-    name: "Build .NET Experimental libraries"
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup-dotnet
-      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c  ${{ env.BUILD_CONFIG }}
-
   build-unity:
     name: "Build Unity package"
     if: "((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"

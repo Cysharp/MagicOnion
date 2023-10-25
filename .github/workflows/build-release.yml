@@ -145,23 +145,6 @@ jobs:
           name: nuget
           path: ./publish/
 
-  build-dotnet-experimental:
-    needs: [update-packagejson]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: ./.github/actions/setup-dotnet
-      - run: echo ${{ needs.update-packagejson.outputs.sha }}
-      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c Release
-      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c Release --no-build -o ./publish
-      - uses: actions/upload-artifact@v1
-        with:
-          name: nuget-experimental
-          path: ./publish/
-
   build-unity:
     needs: [update-packagejson]
     strategy:
@@ -201,7 +184,7 @@ jobs:
   create-release:
     if: github.event.inputs.dry_run == 'false'
     needs:
-      [update-packagejson, update-sourcegenerator-unity, build-dotnet, build-dotnet-experimental, build-unity]
+      [update-packagejson, update-sourcegenerator-unity, build-dotnet, build-unity]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
