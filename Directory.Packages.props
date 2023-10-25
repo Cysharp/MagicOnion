@@ -4,10 +4,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <GrpcVersion>2.35.0</GrpcVersion>
+    <GrpcVersion>2.57.0</GrpcVersion>
     <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
-    <MemoryPackVersion>1.9.7</MemoryPackVersion>
-    <MessagePackVersion>2.2.85</MessagePackVersion>
+    <MemoryPackVersion>1.9.16</MemoryPackVersion>
+    <MessagePackVersion>2.5.129</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="MemoryPack" Version="$(MemoryPackVersion)" />
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
 
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
@@ -33,6 +32,7 @@
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="3.1.2" />
     <PackageVersion Include="FluentAssertions" Version="6.7.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" />
     <!-- from https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.23163.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />

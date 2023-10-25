@@ -11,7 +11,7 @@ class MockClientStreamWriter<T> : IClientStreamWriter<T>
         return Task.CompletedTask;
     }
 
-    public WriteOptions WriteOptions { get; set; } = WriteOptions.Default;
+    public WriteOptions? WriteOptions { get; set; } = WriteOptions.Default;
 
     public Task CompleteAsync()
     {

@@ -32,7 +32,7 @@ public class ClientStreamingTest
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default));
+                new object()));
         var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
@@ -64,7 +64,7 @@ public class ClientStreamingTest
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default));
+                new object()));
 
         var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
@@ -89,7 +89,7 @@ public class ClientStreamingTest
         var clientStreamWriterMock = new MockClientStreamWriter<Box<int>>();
         var callInvokerMock = Substitute.For<CallInvoker>();
         var response = "OK";
-        callInvokerMock.AsyncClientStreamingCall(default(Method<Box<int>, string>), default, default)
+        callInvokerMock.AsyncClientStreamingCall(default(Method<Box<int>, string>)!, default, default)
             .ReturnsForAnyArgs(new AsyncClientStreamingCall<Box<int>, string>(
                 clientStreamWriterMock,
                 Task.FromResult(response),
@@ -97,7 +97,7 @@ public class ClientStreamingTest
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default));
+                new object()));
         var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
@@ -121,7 +121,7 @@ public class ClientStreamingTest
         var clientStreamWriterMock = new MockClientStreamWriter<Tuple<string, string>>();
         var callInvokerMock = Substitute.For<CallInvoker>();
         var response = "OK";
-        callInvokerMock.AsyncClientStreamingCall(default(Method<Tuple<string, string>, string>), default, default)
+        callInvokerMock.AsyncClientStreamingCall(default(Method<Tuple<string, string>, string>)!, default, default)
             .ReturnsForAnyArgs(new AsyncClientStreamingCall<Tuple<string, string>, string>(
                 clientStreamWriterMock,
                 Task.FromResult(response),
@@ -129,7 +129,7 @@ public class ClientStreamingTest
                 _ => Status.DefaultSuccess,
                 _ => Metadata.Empty,
                 _ => { },
-                default));
+                new object()));
         var client = MagicOnionClient.Create<IClientStreamingTestService>(callInvokerMock);
 
         // Act
