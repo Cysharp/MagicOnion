@@ -2,11 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\MagicOnion\opensource.snk</AssemblyOriginatorKeyFile>
+
     <ImplicitUsings>enable</ImplicitUsings>
     <nullable>enable</nullable>
-    <DefineConstants>TRACE;NON_UNITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
     <LangVersion>default</LangVersion>
 
     <!-- NuGet -->
@@ -22,10 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\MagicOnion\Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>

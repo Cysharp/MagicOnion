@@ -1,26 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <OutputType>Library</OutputType>
-        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-        <AssemblyOriginatorKeyFile>opensource.snk</AssemblyOriginatorKeyFile>
-        <Company>Cysharp</Company>
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
-        <!-- NuGet -->
-        <PackageId>MagicOnion</PackageId>
-        <Description>$(MagicOnionPackageDescription) This package is meta package that includes MagicOnion.Server and MagicOnion.Client.</Description>
+    <!-- NuGet -->
+    <PackageId>MagicOnion</PackageId>
+    <Description>$(MagicOnionPackageDescription) This package is meta package that includes MagicOnion.Server and MagicOnion.Client.</Description>
 
-        <!-- This is only a metapackage -->
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <NoWarn>$(NoWarn);CS2008</NoWarn>
-    </PropertyGroup>
+    <!-- This is only a metapackage -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);CS2008</NoWarn>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="Icon.png" Pack="true" PackagePath="/" />
-        <None Include="lib\**\*.*" Pack="true" PackagePath="lib" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\**\*.*" Pack="true" PackagePath="lib" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
