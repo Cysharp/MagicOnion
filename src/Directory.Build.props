@@ -1,7 +1,9 @@
 <Project>
+  <Import Project="..\Directory.Build.props" />
+
   <!-- Prevent local path leakage by artifacts -->
   <PropertyGroup>
-      <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
-      <PathMap>$(RepoRoot)=.</PathMap>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+    <PathMap>$(RepoRoot)=.</PathMap>
   </PropertyGroup>
 </Project>
