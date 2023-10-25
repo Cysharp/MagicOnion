@@ -30,25 +30,8 @@ jobs:
           name: nuget
           path: ./publish/
 
-  canary-build-experimental:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup-dotnet
-      - run: echo "MAGICONION_VERSION=ci-$(date '+%Y%m%d-%H%M%S')+${GITHUB_SHA:0:6}" >> $GITHUB_ENV
-      - run: echo "MAGICONION_VERSION=${MAGICONION_VERSION}"
-      # build
-      - run: dotnet build ./src/MagicOnion.Server.OpenTelemetry/ -c ${{ env.BUILD_CONFIG }} -p:VersionSuffix=${MAGICONION_VERSION}
-      # test
-      - run: dotnet pack ./src/MagicOnion.Server.OpenTelemetry/MagicOnion.Server.OpenTelemetry.csproj -c ${{ env.BUILD_CONFIG }} --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
-      - uses: actions/upload-artifact@v1
-        with:
-          name: nuget-experimental
-          path: ./publish/
-
   canary-push:
-    needs: [canary-build, canary-build-experimental]
+    needs: [canary-build]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
