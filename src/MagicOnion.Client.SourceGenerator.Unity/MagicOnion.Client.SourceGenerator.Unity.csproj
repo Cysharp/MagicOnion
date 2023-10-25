@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+
+    <!-- Source Generator / Roslyn Analyzer -->
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <RootNamespace>MagicOnion.Client.SourceGenerator</RootNamespace>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeAnalysis\**\*.cs" LinkBase="CodeAnalysis" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\CodeGen\**\*.cs" LinkBase="CodeGen" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\Helpers\**\*.cs" LinkBase="Helpers" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\Internal\**\*.cs" LinkBase="Internal" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\GenerationContext.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Emitter.cs" />
+    <Compile Include="..\MagicOnion.Client.SourceGenerator\MagicOnionClientSourceGenerator.Parser.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.13.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

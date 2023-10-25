@@ -25,6 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Required for MSBuild (on Visual Studio) to load System.Text.Json -->
+    <!-- Inspired by https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/develop/tests/SourceGeneratorConsumer.props -->
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
+    <Analyzer Include="$(PkgSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" />
+    <Analyzer Include="$(PkgMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <Analyzer Include="$(PkgSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
     <ProjectReference Include="..\..\src\MagicOnion.Server\MagicOnion.Server.csproj" />
     <ProjectReference Include="..\samples\MagicOnionTestServer\MagicOnionTestServer.csproj" />

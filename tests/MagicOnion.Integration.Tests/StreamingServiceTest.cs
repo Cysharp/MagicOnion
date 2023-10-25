@@ -6,10 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
-using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Server;
-using MagicOnion.Serialization;
-using Google.Protobuf.WellKnownTypes;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -25,7 +22,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
-        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientInitializer.ClientFactoryProvider) };
     }
 
     [Theory]
@@ -161,7 +158,7 @@ public class StreamingServiceTest : IClassFixture<MagicOnionApplicationFactory<S
         // Assert
         sum.Should().Be(123 + 456 + 789 + 123 + 111 + 222);
     }
-    
+
     [Theory]
     [MemberData(nameof(EnumerateMagicOnionClientFactory))]
     public async Task ClientStreamingRefType_RequestResponseNull(TestMagicOnionClientFactory clientFactory)
@@ -339,7 +336,7 @@ public class StreamingTestService : ServiceBase<IStreamingTestService>, IStreami
         return context.Result();
     }
 
-    
+
     public async Task<ClientStreamingResult<MyStreamingRequest?, MyStreamingResponse?>> ClientStreamingRefTypeReturnsNull()
     {
         await Task.Yield();

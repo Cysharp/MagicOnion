@@ -1,0 +1,7 @@
+<Project>
+  <!-- Prevent local path leakage by artifacts -->
+  <PropertyGroup>
+      <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+      <PathMap>$(RepoRoot)=.</PathMap>
+  </PropertyGroup>
+</Project>

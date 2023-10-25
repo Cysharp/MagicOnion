@@ -47,7 +47,7 @@ jobs:
     if: "((github.event_name == 'push' && github.repository_owner == 'Cysharp') || startsWith(github.event.pull_request.head.label, 'Cysharp:'))"
     strategy:
       matrix:
-        unity: ["2020.3.33f1"]
+        unity: ["2021.3.0f1"]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

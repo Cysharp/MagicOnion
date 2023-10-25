@@ -1,14 +1,7 @@
 using Grpc.Net.Client;
-using MagicOnion.Serialization;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MagicOnion.Client;
 using MagicOnion.Server;
-using MagicOnion.Integration.Tests.Generated;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -24,7 +17,7 @@ public class UnaryServiceTest : IClassFixture<MagicOnionApplicationFactory<Unary
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
-        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientInitializer.ClientFactoryProvider) };
     }
 
     [Theory]

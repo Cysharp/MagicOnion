@@ -1,6 +1,5 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
-using MagicOnion.Integration.Tests.Generated;
 using MagicOnion.Serialization;
 using MagicOnion.Server;
 using MagicOnionTestServer;
@@ -21,11 +20,11 @@ public class SerializerUnaryTest : IClassFixture<MagicOnionApplicationFactory<Se
             x.MessageSerializer = XorMessagePackMagicOnionSerializerProvider.Instance;
         });
     }
-    
+
     public static IEnumerable<object[]> EnumerateMagicOnionClientFactory()
     {
         yield return new [] { new TestMagicOnionClientFactory("Dynamic", DynamicMagicOnionClientFactoryProvider.Instance) };
-        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientFactoryProvider.Instance) };
+        yield return new [] { new TestMagicOnionClientFactory("Generated", MagicOnionGeneratedClientInitializer.ClientFactoryProvider) };
     }
 
     [Theory]

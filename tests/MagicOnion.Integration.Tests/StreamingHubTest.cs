@@ -1,9 +1,6 @@
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
-using MagicOnion.Integration.Tests.Generated;
-using MagicOnion.Serialization;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +19,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
         yield return new [] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
-        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientFactoryProvider.Instance)};
+        yield return new [] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientInitializer.StreamingHubClientFactoryProvider)};
     }
 
     [Theory]
@@ -55,7 +52,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         await client.NoReturn_Parameter_One(12345);
     }
 
-    
+
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
@@ -70,7 +67,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Act & Assert
         await client.NoReturn_Parameter_Many(12345, "Hello✨", true);
     }
-    
+
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task Parameter_Zero(TestStreamingHubClientFactory clientFactory)
@@ -155,7 +152,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         await client.ValueTask_NoReturn_Parameter_One(12345);
     }
 
-    
+
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task ValueTask_NoReturn_Parameter_Many(TestStreamingHubClientFactory clientFactory)
@@ -170,7 +167,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Act & Assert
         await client.ValueTask_NoReturn_Parameter_Many(12345, "Hello✨", true);
     }
-    
+
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task ValueTask_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
@@ -576,12 +573,12 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         return new TaskCompletionSource().Task.WaitAsync(TimeSpan.FromMilliseconds(100));
     }
-    
+
     public Task<int> Never_With_Return()
     {
         return new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100));
     }
-    
+
     public ValueTask ValueTask_NoReturn_Parameter_Zero()
     {
         return default;
@@ -624,7 +621,7 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         return new ValueTask(new TaskCompletionSource().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
     }
-    
+
     public ValueTask<int> ValueTask_Never_With_Return()
     {
         return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));

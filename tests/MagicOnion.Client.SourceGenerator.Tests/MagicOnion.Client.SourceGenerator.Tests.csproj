@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit requires .NET 6 (`ReferenceAssemblies.Net.Net60`) -->
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="MemoryPack" Version="1.9.16" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.1" PrivateAssets="all" />
+    <!-- from https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.23163.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Client\MagicOnion.Client.csproj" />
+    <ProjectReference Include="..\..\src\MagicOnion.Serialization.MemoryPack\MagicOnion.Serialization.MemoryPack.csproj" />
+    <ProjectReference Include="..\samples\SampleServiceDefinitions\SampleServiceDefinitions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Resources\**\*.cs" />
+    <EmbeddedResource Include="Resources\**\*.cs" />
+  </ItemGroup>
+
+</Project>
