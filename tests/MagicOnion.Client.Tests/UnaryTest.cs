@@ -25,7 +25,7 @@ public class UnaryTest
         // Arrange
         var actualCallOptions = default(CallOptions);
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 // method, host, callOptions, request
@@ -70,7 +70,7 @@ public class UnaryTest
         var cts = new CancellationTokenSource();
         var actualCancellationToken = default(CancellationToken);
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 // method, host, callOptions, request
@@ -96,7 +96,7 @@ public class UnaryTest
         // Arrange
         var actualHeaders = default(Metadata);
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 // method, host, callOptions, request
@@ -122,7 +122,7 @@ public class UnaryTest
         // Arrange
         var serializedResponse = new ReadOnlyMemory<byte>();
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<Box<Nil>, Box<Nil>>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 // method, host, callOptions, request

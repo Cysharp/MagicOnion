@@ -25,7 +25,7 @@ public class ServerStreamingTest
         var callInvokerMock = Substitute.For<CallInvoker>();
         var arg1 = 123;
         var sendRequest = default(Box<int>);
-        callInvokerMock.AsyncServerStreamingCall(default(Method<Box<int>, Box<int>>)!, default, default, default)
+        callInvokerMock.AsyncServerStreamingCall(default(Method<Box<int>, Box<int>>)!, default, default, Box.Create(default(int)))
             .ReturnsForAnyArgs(x =>
             {
                 var request = x.ArgAt<Box<int>>(3);
@@ -36,7 +36,7 @@ public class ServerStreamingTest
                     _ => Status.DefaultSuccess,
                     _ => Metadata.Empty,
                     _ => { },
-                    default);
+                    new object());
             });
         var client = MagicOnionClient.Create<IServerStreamingTestService>(callInvokerMock);
 
@@ -67,7 +67,7 @@ public class ServerStreamingTest
         var callInvokerMock = Substitute.For<CallInvoker>();
         var arg1 = "FooBar";
         var sendRequest = default(string);
-        callInvokerMock.AsyncServerStreamingCall(default(Method<string, Box<int>>)!, default, default, default)
+        callInvokerMock.AsyncServerStreamingCall(default(Method<string, Box<int>>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 var request = x.ArgAt<string>(3);
@@ -78,7 +78,7 @@ public class ServerStreamingTest
                     _ => Status.DefaultSuccess,
                     _ => Metadata.Empty,
                     _ => { },
-                    default);
+                    new object());
             });
         var client = MagicOnionClient.Create<IServerStreamingTestService>(callInvokerMock);
 
@@ -109,7 +109,7 @@ public class ServerStreamingTest
         var callInvokerMock = Substitute.For<CallInvoker>();
         var arg1 = 123;
         var sendRequest = default(Box<int>);
-        callInvokerMock.AsyncServerStreamingCall(default(Method<Box<int>, string>)!, default, default, default)
+        callInvokerMock.AsyncServerStreamingCall(default(Method<Box<int>, string>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 var request = x.ArgAt<Box<int>>(3);
@@ -120,7 +120,7 @@ public class ServerStreamingTest
                     _ => Status.DefaultSuccess,
                     _ => Metadata.Empty,
                     _ => { },
-                    default);
+                    new object());
             });
         var client = MagicOnionClient.Create<IServerStreamingTestService>(callInvokerMock);
 
@@ -151,7 +151,7 @@ public class ServerStreamingTest
         var callInvokerMock = Substitute.For<CallInvoker>();
         var arg1 = "FooBar";
         var sendRequest = default(string);
-        callInvokerMock.AsyncServerStreamingCall(default(Method<string, string>)!, default, default, default)
+        callInvokerMock.AsyncServerStreamingCall(default(Method<string, string>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 var request = x.ArgAt<string>(3);
@@ -162,7 +162,7 @@ public class ServerStreamingTest
                     _ => Status.DefaultSuccess,
                     _ => Metadata.Empty,
                     _ => { },
-                    default);
+                    new object());
             });
         var client = MagicOnionClient.Create<IServerStreamingTestService>(callInvokerMock);
 

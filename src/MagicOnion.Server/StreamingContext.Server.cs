@@ -20,7 +20,7 @@ public class ServerStreamingContext<TResponse> : IAsyncStreamWriter<TResponse>
 
     public ServiceContext ServiceContext => context;
 
-    public WriteOptions WriteOptions
+    public WriteOptions? WriteOptions
     {
         get => inner.WriteOptions;
         set => inner.WriteOptions = value;

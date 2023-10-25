@@ -24,7 +24,7 @@ public class DuplexStreamingContext<TRequest, TResponse> : IAsyncStreamReader<TR
     /// <summary>
     /// IServerStreamWriter Methods.
     /// </summary>
-    public WriteOptions WriteOptions
+    public WriteOptions? WriteOptions
     {
         get => innerWriter.WriteOptions;
         set => innerWriter.WriteOptions = value;

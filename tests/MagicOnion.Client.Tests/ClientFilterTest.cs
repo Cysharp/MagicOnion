@@ -12,7 +12,7 @@ public class ClientFilterTest
             // NOTE: Mock IClientFilter returns a value immediately. (The filter will not call `next`)
             .ReturnsForAnyArgs(ValueTask.FromResult((ResponseContext)ResponseContext<string>.Create("Response", Status.DefaultSuccess, Metadata.Empty, Metadata.Empty)));
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default!)
             .Returns(new AsyncUnaryCall<string>(
                 Task.FromResult("Response"),
                 Task.FromResult(Metadata.Empty),
@@ -40,7 +40,7 @@ public class ClientFilterTest
         // Arrange
         var requestHeaders = default(Metadata);
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default!)
             .ReturnsForAnyArgs(x =>
             {
                 requestHeaders = x.Arg<CallOptions>().Headers;
@@ -70,8 +70,8 @@ public class ClientFilterTest
     {
         public ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
         {
-            context.CallOptions.Headers.Add("x-header-1", "valueA");
-            context.CallOptions.Headers.Add("x-header-2", "valueB");
+            context.CallOptions.Headers?.Add("x-header-1", "valueA");
+            context.CallOptions.Headers?.Add("x-header-2", "valueB");
             return next(context);
         }
     }
@@ -102,7 +102,7 @@ public class ClientFilterTest
             });
 
         var callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default)
+        callInvokerMock.AsyncUnaryCall(default(Method<string, string>)!, default, default, default!)
             .ReturnsForAnyArgs(new AsyncUnaryCall<string>(
                 Task.FromResult("Response"),
                 Task.FromResult(Metadata.Empty),
