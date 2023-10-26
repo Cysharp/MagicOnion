@@ -8,20 +8,14 @@ namespace MagicOnion
     {
         readonly SemaphoreSlim semaphore;
 
-#if NON_UNITY
         public static readonly ValueTask<LockReleaser> EmptyLock = new ValueTask<LockReleaser>(new LockReleaser(null));
-#endif
 
         public AsyncLock()
         {
             this.semaphore = new SemaphoreSlim(1, 1);
         }
 
-#if NON_UNITY
         public async ValueTask<LockReleaser> LockAsync()
-#else
-        public async Task<LockReleaser> LockAsync()
-#endif
         {
             await semaphore.WaitAsync().ConfigureAwait(false);
             return new LockReleaser(semaphore);

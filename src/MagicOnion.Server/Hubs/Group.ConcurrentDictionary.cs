@@ -153,7 +153,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 writeCount++;
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -176,7 +176,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 }
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -205,7 +205,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 continue;
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -223,7 +223,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 context.QueueResponseStreamWrite(message);
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, 1);
             }
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -246,7 +246,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 }
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -270,7 +270,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     writeCount++;
                 }
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
+                return Task.CompletedTask;
             }
             else
             {
@@ -290,7 +290,7 @@ public class ConcurrentDictionaryGroup : IGroup
                     continue;
                 }
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-                return TaskEx.CompletedTask;
+                return Task.CompletedTask;
             }
         }
         else
@@ -298,8 +298,6 @@ public class ConcurrentDictionaryGroup : IGroup
             throw new NotSupportedException("The write operation must be called with Fire and Forget option");
         }
     }
-
-
 
     public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
     {
@@ -323,7 +321,7 @@ public class ConcurrentDictionaryGroup : IGroup
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             }
 
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -342,15 +340,5 @@ public class ConcurrentDictionaryGroup : IGroup
             messageSerializer.Serialize(buffer, value);
             return buffer.WrittenSpan.ToArray();
         }
-    }
-
-    ValueTask ToPromise(ValueTask[] whenAll, int index)
-    {
-        var promise = new ReservedWhenAllPromise(index);
-        for (int i = 0; i < index; i++)
-        {
-            promise.Add(whenAll[i]);
-        }
-        return promise.AsValueTask();
     }
 }

@@ -153,7 +153,7 @@ public class ImmutableArrayGroup : IGroup
                 source[i].QueueResponseStreamWrite(message);
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, source.Length);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -178,7 +178,7 @@ public class ImmutableArrayGroup : IGroup
                 }
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -210,7 +210,7 @@ public class ImmutableArrayGroup : IGroup
                 continue;
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -237,7 +237,7 @@ public class ImmutableArrayGroup : IGroup
                 }
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -269,7 +269,7 @@ public class ImmutableArrayGroup : IGroup
                 continue;
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -313,7 +313,7 @@ public class ImmutableArrayGroup : IGroup
                 }
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
@@ -350,7 +350,7 @@ public class ImmutableArrayGroup : IGroup
 
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
             }
-            return TaskEx.CompletedTask;
+            return Task.CompletedTask;
         }
         else
         {
