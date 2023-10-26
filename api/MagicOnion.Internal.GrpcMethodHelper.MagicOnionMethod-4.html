@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>ReservedWhenAllPromise Class
+    <title>GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="ReservedWhenAllPromise Class
+    <meta name="title" content="GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,30 +71,43 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Utils.ReservedWhenAllPromise">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4">
   
-  <h1 id="MagicOnion_Utils_ReservedWhenAllPromise" data-uid="MagicOnion.Utils.ReservedWhenAllPromise" class="text-break">ReservedWhenAllPromise Class
+  <h1 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4" class="text-break">GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; Class
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Utils.html">MagicOnion.Utils</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Internal.html">MagicOnion.Internal</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Shared.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ReservedWhenAllPromise : IValueTaskSource</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; : object</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">ReservedWhenAllPromise</span>
+    <span class="xref">GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;</span>
   </div>
   
   
   
   
   
+  <section>
+  <h4 class="typeParameters">Type Parameters</h4>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TRawRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TRawResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   
   <h3 id="members">Members</h3>
@@ -110,7 +123,25 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise__ctor_System_Int32_">ReservedWhenAllPromise(Int32)</a>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4__ctor_Method__2__3__">MagicOnionMethod(Method&lt;TRawRequest, TRawResponse&gt;)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4>Properties
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_Method">Method</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -128,31 +159,25 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_Add_ValueTask_">Add(ValueTask)</a>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest__2_">FromRawRequest(TRawRequest)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_AsValueTask">AsValueTask()</a>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse__3_">FromRawResponse(TRawResponse)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetResult_System_Int16_">GetResult(Int16)</a>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest__0_">ToRawRequest(TRequest)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetStatus_System_Int16_">GetStatus(Int16)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_Action_System_Nullable_System_Object___System_Nullable_System_Object__System_Int16_ValueTaskSourceOnCompletedFlags_">OnCompleted(Action&lt;Nullable&lt;Object&gt;&gt;, Nullable&lt;Object&gt;, Int16, ValueTaskSourceOnCompletedFlags)</a>
+          <a class="xref" href="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse__1_">ToRawResponse(TResponse)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -162,19 +187,19 @@
   <h3 id="constructors">Constructors
   </h3>
   <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise__ctor_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.#ctor*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise__ctor_System_Int32_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.#ctor(System.Int32)">ReservedWhenAllPromise(Int32)</h4>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4__ctor_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4__ctor_Method__2__3__" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor(Method{`2,`3})">MagicOnionMethod(Method&lt;TRawRequest, TRawResponse&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ReservedWhenAllPromise(int reserveCount)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionMethod(Method&lt;TRawRequest, TRawResponse&gt; method)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>reserveCount</code></span> <span class="xref">System.Int32</span></dt>
+    <dt><span class="parametername"><code>method</code></span> <span class="xref">Method</span>&lt;TRawRequest, TRawResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -182,6 +207,38 @@
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <h3 id="properties">Properties
+  </h3>
+  <section>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_Method_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_Method" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method">Method</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Method&lt;TRawRequest, TRawResponse&gt; Method { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Method</span>&lt;TRawRequest, TRawResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   
   
@@ -194,109 +251,19 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise_Add_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.Add*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise_Add_ValueTask_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.Add(ValueTask)">Add(ValueTask)</h4>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest__2_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)">FromRawRequest(TRawRequest)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Add(ValueTask task)</code></pre>
+    <pre><code class="lang-csharp hljs">public TRequest FromRawRequest(TRawRequest obj)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>task</code></span> <span class="xref">ValueTask</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise_AsValueTask_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise_AsValueTask" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask">AsValueTask()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ValueTask AsValueTask()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ValueTask</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise_GetResult_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.GetResult*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise_GetResult_System_Int16_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.GetResult(System.Int16)">GetResult(Int16)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void GetResult(short token)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>token</code></span> <span class="xref">System.Int16</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise_GetStatus_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.GetStatus*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise_GetStatus_System_Int16_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.GetStatus(System.Int16)">GetStatus(Int16)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ValueTaskSourceStatus GetStatus(short token)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>token</code></span> <span class="xref">System.Int16</span></dt>
+    <dt><span class="parametername"><code>obj</code></span> <span class="xref">TRawRequest</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -304,7 +271,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ValueTaskSourceStatus</span></dt>
+    <dt><span class="xref">TRequest</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -321,29 +288,104 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted*"></a>
-  <h4 id="MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_Action_System_Nullable_System_Object___System_Nullable_System_Object__System_Int16_ValueTaskSourceOnCompletedFlags_" data-uid="MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Nullable{System.Object}},System.Nullable{System.Object},System.Int16,ValueTaskSourceOnCompletedFlags)">OnCompleted(Action&lt;Nullable&lt;Object&gt;&gt;, Nullable&lt;Object&gt;, Int16, ValueTaskSourceOnCompletedFlags)</h4>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse__3_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)">FromRawResponse(TRawResponse)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void OnCompleted(Action&lt;object?&gt; continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags)</code></pre>
+    <pre><code class="lang-csharp hljs">public TResponse FromRawResponse(TRawResponse obj)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>continuation</code></span> <span class="xref">Action</span>&lt;<span class="xref">System.Nullable</span>&lt;<span class="xref">System.Object</span>&gt;&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>state</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">System.Object</span>&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>token</code></span> <span class="xref">System.Int16</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>flags</code></span> <span class="xref">ValueTaskSourceOnCompletedFlags</span></dt>
+    <dt><span class="parametername"><code>obj</code></span> <span class="xref">TRawResponse</span></dt>
     <dd></dd>
   </dl>
   </section>
   
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TResponse</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest__0_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)">ToRawRequest(TRequest)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TRawRequest ToRawRequest(TRequest obj)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>obj</code></span> <span class="xref">TRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TRawRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse*"></a>
+  <h4 id="MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse__1_" data-uid="MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)">ToRawResponse(TResponse)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TRawResponse ToRawResponse(TResponse obj)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>obj</code></span> <span class="xref">TResponse</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TRawResponse</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   
   

@@ -7,79 +7,6 @@ references:
   commentId: N:MagicOnion
   fullName: MagicOnion
   nameWithType: MagicOnion
-- uid: MagicOnion.AsyncLock
-  name: AsyncLock
-  href: api/MagicOnion.AsyncLock.html
-  commentId: T:MagicOnion.AsyncLock
-  fullName: MagicOnion.AsyncLock
-  nameWithType: AsyncLock
-- uid: MagicOnion.AsyncLock.#ctor
-  name: AsyncLock()
-  href: api/MagicOnion.AsyncLock.html#MagicOnion_AsyncLock__ctor
-  commentId: M:MagicOnion.AsyncLock.#ctor
-  fullName: MagicOnion.AsyncLock.AsyncLock()
-  nameWithType: AsyncLock.AsyncLock()
-- uid: MagicOnion.AsyncLock.#ctor*
-  name: AsyncLock
-  href: api/MagicOnion.AsyncLock.html#MagicOnion_AsyncLock__ctor_
-  commentId: Overload:MagicOnion.AsyncLock.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.AsyncLock.AsyncLock
-  nameWithType: AsyncLock.AsyncLock
-- uid: MagicOnion.AsyncLock.EmptyLock
-  name: EmptyLock
-  href: api/MagicOnion.AsyncLock.html#MagicOnion_AsyncLock_EmptyLock
-  commentId: F:MagicOnion.AsyncLock.EmptyLock
-  fullName: MagicOnion.AsyncLock.EmptyLock
-  nameWithType: AsyncLock.EmptyLock
-- uid: MagicOnion.AsyncLock.LockAsync
-  name: LockAsync()
-  href: api/MagicOnion.AsyncLock.html#MagicOnion_AsyncLock_LockAsync
-  commentId: M:MagicOnion.AsyncLock.LockAsync
-  fullName: MagicOnion.AsyncLock.LockAsync()
-  nameWithType: AsyncLock.LockAsync()
-- uid: MagicOnion.AsyncLock.LockAsync*
-  name: LockAsync
-  href: api/MagicOnion.AsyncLock.html#MagicOnion_AsyncLock_LockAsync_
-  commentId: Overload:MagicOnion.AsyncLock.LockAsync
-  isSpec: "True"
-  fullName: MagicOnion.AsyncLock.LockAsync
-  nameWithType: AsyncLock.LockAsync
-- uid: MagicOnion.AsyncLock.LockReleaser
-  name: AsyncLock.LockReleaser
-  href: api/MagicOnion.AsyncLock.LockReleaser.html
-  commentId: T:MagicOnion.AsyncLock.LockReleaser
-  fullName: MagicOnion.AsyncLock.LockReleaser
-  nameWithType: AsyncLock.LockReleaser
-- uid: MagicOnion.AsyncLock.LockReleaser.#ctor(System.Nullable{SemaphoreSlim})
-  name: LockReleaser(Nullable<SemaphoreSlim>)
-  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser__ctor_System_Nullable_SemaphoreSlim__
-  commentId: M:MagicOnion.AsyncLock.LockReleaser.#ctor(System.Nullable{SemaphoreSlim})
-  name.vb: LockReleaser(Nullable(Of SemaphoreSlim))
-  fullName: MagicOnion.AsyncLock.LockReleaser.LockReleaser(System.Nullable<SemaphoreSlim>)
-  fullName.vb: MagicOnion.AsyncLock.LockReleaser.LockReleaser(System.Nullable(Of SemaphoreSlim))
-  nameWithType: AsyncLock.LockReleaser.LockReleaser(Nullable<SemaphoreSlim>)
-  nameWithType.vb: AsyncLock.LockReleaser.LockReleaser(Nullable(Of SemaphoreSlim))
-- uid: MagicOnion.AsyncLock.LockReleaser.#ctor*
-  name: LockReleaser
-  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser__ctor_
-  commentId: Overload:MagicOnion.AsyncLock.LockReleaser.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.AsyncLock.LockReleaser.LockReleaser
-  nameWithType: AsyncLock.LockReleaser.LockReleaser
-- uid: MagicOnion.AsyncLock.LockReleaser.Dispose
-  name: Dispose()
-  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser_Dispose
-  commentId: M:MagicOnion.AsyncLock.LockReleaser.Dispose
-  fullName: MagicOnion.AsyncLock.LockReleaser.Dispose()
-  nameWithType: AsyncLock.LockReleaser.Dispose()
-- uid: MagicOnion.AsyncLock.LockReleaser.Dispose*
-  name: Dispose
-  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser_Dispose_
-  commentId: Overload:MagicOnion.AsyncLock.LockReleaser.Dispose
-  isSpec: "True"
-  fullName: MagicOnion.AsyncLock.LockReleaser.Dispose
-  nameWithType: AsyncLock.LockReleaser.Dispose
 - uid: MagicOnion.Client
   name: MagicOnion.Client
   href: api/MagicOnion.Client.html
@@ -7071,180 +6998,6 @@ references:
   isSpec: "True"
   fullName: MagicOnion.GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute
   nameWithType: GenerateIfDirectiveAttribute.GenerateIfDirectiveAttribute
-- uid: MagicOnion.GrpcMethodHelper
-  name: GrpcMethodHelper
-  href: api/MagicOnion.GrpcMethodHelper.html
-  commentId: T:MagicOnion.GrpcMethodHelper
-  fullName: MagicOnion.GrpcMethodHelper
-  nameWithType: GrpcMethodHelper
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod*
-  name: CreateMethod
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.CreateMethod
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod
-  nameWithType: GrpcMethodHelper.CreateMethod
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
-  name: IgnoreNilMarshaller
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_IgnoreNilMarshaller
-  commentId: P:MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
-  fullName: MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
-  nameWithType: GrpcMethodHelper.IgnoreNilMarshaller
-- uid: MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller*
-  name: IgnoreNilMarshaller
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_IgnoreNilMarshaller_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
-  nameWithType: GrpcMethodHelper.IgnoreNilMarshaller
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4
-  name: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html
-  commentId: T:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4
-  name.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.#ctor(Method{`2,`3})
-  name: MagicOnionMethod(Method<TRawRequest, TRawResponse>)
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4__ctor_Method__2__3__
-  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.#ctor(Method{`2,`3})
-  name.vb: MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod(Method<TRawRequest, TRawResponse>)
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod(Method<TRawRequest, TRawResponse>)
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.#ctor*
-  name: MagicOnionMethod
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4__ctor_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
-  name: FromRawRequest(TRawRequest)
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest__2_
-  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest*
-  name: FromRawRequest
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
-  name: FromRawResponse(TRawResponse)
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse__3_
-  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse*
-  name: FromRawResponse
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.Method
-  name: Method
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_Method
-  commentId: P:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.Method
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.Method*
-  name: Method
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_Method_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.Method
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
-  name: ToRawRequest(TRequest)
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest__0_
-  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest*
-  name: ToRawRequest
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
-  name: ToRawResponse(TResponse)
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse__1_
-  commentId: M:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
-- uid: MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse*
-  name: ToRawResponse
-  href: api/MagicOnion.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse_
-  commentId: Overload:MagicOnion.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse
-  isSpec: "True"
-  fullName: MagicOnion.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
-  fullName.vb: MagicOnion.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
-  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
-  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
 - uid: MagicOnion.IgnoreAttribute
   name: IgnoreAttribute
   href: api/MagicOnion.IgnoreAttribute.html
@@ -7375,6 +7128,214 @@ references:
   fullName.vb: MagicOnion.Internal.Box(Of T).Value
   nameWithType: Box<T>.Value
   nameWithType.vb: Box(Of T).Value
+- uid: MagicOnion.Internal.BroadcasterHelper
+  name: BroadcasterHelper
+  href: api/MagicOnion.Internal.BroadcasterHelper.html
+  commentId: T:MagicOnion.Internal.BroadcasterHelper
+  fullName: MagicOnion.Internal.BroadcasterHelper
+  nameWithType: BroadcasterHelper
+- uid: MagicOnion.Internal.FNV1A32
+  name: FNV1A32
+  href: api/MagicOnion.Internal.FNV1A32.html
+  commentId: T:MagicOnion.Internal.FNV1A32
+  fullName: MagicOnion.Internal.FNV1A32
+  nameWithType: FNV1A32
+- uid: MagicOnion.Internal.FNV1A32.GetHashCode(System.Byte[])
+  name: GetHashCode(Byte[])
+  href: api/MagicOnion.Internal.FNV1A32.html#MagicOnion_Internal_FNV1A32_GetHashCode_System_Byte___
+  commentId: M:MagicOnion.Internal.FNV1A32.GetHashCode(System.Byte[])
+  name.vb: GetHashCode(Byte())
+  fullName: MagicOnion.Internal.FNV1A32.GetHashCode(System.Byte[])
+  fullName.vb: MagicOnion.Internal.FNV1A32.GetHashCode(System.Byte())
+  nameWithType: FNV1A32.GetHashCode(Byte[])
+  nameWithType.vb: FNV1A32.GetHashCode(Byte())
+- uid: MagicOnion.Internal.FNV1A32.GetHashCode(System.String)
+  name: GetHashCode(String)
+  href: api/MagicOnion.Internal.FNV1A32.html#MagicOnion_Internal_FNV1A32_GetHashCode_System_String_
+  commentId: M:MagicOnion.Internal.FNV1A32.GetHashCode(System.String)
+  fullName: MagicOnion.Internal.FNV1A32.GetHashCode(System.String)
+  nameWithType: FNV1A32.GetHashCode(String)
+- uid: MagicOnion.Internal.FNV1A32.GetHashCode*
+  name: GetHashCode
+  href: api/MagicOnion.Internal.FNV1A32.html#MagicOnion_Internal_FNV1A32_GetHashCode_
+  commentId: Overload:MagicOnion.Internal.FNV1A32.GetHashCode
+  isSpec: "True"
+  fullName: MagicOnion.Internal.FNV1A32.GetHashCode
+  nameWithType: FNV1A32.GetHashCode
+- uid: MagicOnion.Internal.GrpcMethodHelper
+  name: GrpcMethodHelper
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html
+  commentId: T:MagicOnion.Internal.GrpcMethodHelper
+  fullName: MagicOnion.Internal.GrpcMethodHelper
+  nameWithType: GrpcMethodHelper
+- uid: MagicOnion.Internal.GrpcMethodHelper.CreateMethod*
+  name: CreateMethod
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_CreateMethod_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.CreateMethod
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.CreateMethod
+  nameWithType: GrpcMethodHelper.CreateMethod
+- uid: MagicOnion.Internal.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
+- uid: MagicOnion.Internal.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+- uid: MagicOnion.Internal.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
+- uid: MagicOnion.Internal.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+- uid: MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller
+  name: IgnoreNilMarshaller
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_IgnoreNilMarshaller
+  commentId: P:MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller
+  fullName: MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller
+  nameWithType: GrpcMethodHelper.IgnoreNilMarshaller
+- uid: MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller*
+  name: IgnoreNilMarshaller
+  href: api/MagicOnion.Internal.GrpcMethodHelper.html#MagicOnion_Internal_GrpcMethodHelper_IgnoreNilMarshaller_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.IgnoreNilMarshaller
+  nameWithType: GrpcMethodHelper.IgnoreNilMarshaller
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4
+  name: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html
+  commentId: T:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4
+  name.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor(Method{`2,`3})
+  name: MagicOnionMethod(Method<TRawRequest, TRawResponse>)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4__ctor_Method__2__3__
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor(Method{`2,`3})
+  name.vb: MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod(Method<TRawRequest, TRawResponse>)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod(Method<TRawRequest, TRawResponse>)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod(Method(Of TRawRequest, TRawResponse))
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor*
+  name: MagicOnionMethod
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4__ctor_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.MagicOnionMethod
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).MagicOnionMethod
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
+  name: FromRawRequest(TRawRequest)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest__2_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest(`2)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest(TRawRequest)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest(TRawRequest)
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest*
+  name: FromRawRequest
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawRequest_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawRequest
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawRequest
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawRequest
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
+  name: FromRawResponse(TRawResponse)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse__3_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse(`3)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse(TRawResponse)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse(TRawResponse)
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse*
+  name: FromRawResponse
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_FromRawResponse_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.FromRawResponse
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.FromRawResponse
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).FromRawResponse
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method
+  name: Method
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_Method
+  commentId: P:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method*
+  name: Method
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_Method_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.Method
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.Method
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).Method
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
+  name: ToRawRequest(TRequest)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest__0_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest(`0)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest(TRequest)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest(TRequest)
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest*
+  name: ToRawRequest
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawRequest_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawRequest
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawRequest
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawRequest
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
+  name: ToRawResponse(TResponse)
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse__1_
+  commentId: M:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse(`1)
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse(TResponse)
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse(TResponse)
+- uid: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse*
+  name: ToRawResponse
+  href: api/MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod-4.html#MagicOnion_Internal_GrpcMethodHelper_MagicOnionMethod_4_ToRawResponse_
+  commentId: Overload:MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod`4.ToRawResponse
+  isSpec: "True"
+  fullName: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
+  fullName.vb: MagicOnion.Internal.GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
+  nameWithType: GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>.ToRawResponse
+  nameWithType.vb: GrpcMethodHelper.MagicOnionMethod(Of TRequest, TResponse, TRawRequest, TRawResponse).ToRawResponse
 - uid: MagicOnion.Internal.IAsyncClientStreamingCallWrapper`2
   name: IAsyncClientStreamingCallWrapper<TRequest, TResponse>
   href: api/MagicOnion.Internal.IAsyncClientStreamingCallWrapper-2.html
@@ -7532,6 +7493,34 @@ references:
   fullName.vb: MagicOnion.Internal.IAsyncServerStreamingCallWrapper(Of TResponse).ResponseStream
   nameWithType: IAsyncServerStreamingCallWrapper<TResponse>.ResponseStream
   nameWithType.vb: IAsyncServerStreamingCallWrapper(Of TResponse).ResponseStream
+- uid: MagicOnion.Internal.MagicOnionMarshallers
+  name: MagicOnionMarshallers
+  href: api/MagicOnion.Internal.MagicOnionMarshallers.html
+  commentId: T:MagicOnion.Internal.MagicOnionMarshallers
+  fullName: MagicOnion.Internal.MagicOnionMarshallers
+  nameWithType: MagicOnionMarshallers
+- uid: MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[],System.Object[])
+  name: InstantiateDynamicArgumentTuple(Type[], Object[])
+  href: api/MagicOnion.Internal.MagicOnionMarshallers.html#MagicOnion_Internal_MagicOnionMarshallers_InstantiateDynamicArgumentTuple_Type___System_Object___
+  commentId: M:MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[],System.Object[])
+  name.vb: InstantiateDynamicArgumentTuple(Type(), Object())
+  fullName: MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[], System.Object[])
+  fullName.vb: MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type(), System.Object())
+  nameWithType: MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[], Object[])
+  nameWithType.vb: MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type(), Object())
+- uid: MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple*
+  name: InstantiateDynamicArgumentTuple
+  href: api/MagicOnion.Internal.MagicOnionMarshallers.html#MagicOnion_Internal_MagicOnionMarshallers_InstantiateDynamicArgumentTuple_
+  commentId: Overload:MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple
+  isSpec: "True"
+  fullName: MagicOnion.Internal.MagicOnionMarshallers.InstantiateDynamicArgumentTuple
+  nameWithType: MagicOnionMarshallers.InstantiateDynamicArgumentTuple
+- uid: MagicOnion.Internal.MagicOnionMarshallers.ThroughMarshaller
+  name: ThroughMarshaller
+  href: api/MagicOnion.Internal.MagicOnionMarshallers.html#MagicOnion_Internal_MagicOnionMarshallers_ThroughMarshaller
+  commentId: F:MagicOnion.Internal.MagicOnionMarshallers.ThroughMarshaller
+  fullName: MagicOnion.Internal.MagicOnionMarshallers.ThroughMarshaller
+  nameWithType: MagicOnionMarshallers.ThroughMarshaller
 - uid: MagicOnion.Internal.RawBytesBox
   name: RawBytesBox
   href: api/MagicOnion.Internal.RawBytesBox.html
@@ -7733,34 +7722,6 @@ references:
   commentId: T:MagicOnion.IStreamingHubMarker
   fullName: MagicOnion.IStreamingHubMarker
   nameWithType: IStreamingHubMarker
-- uid: MagicOnion.MagicOnionMarshallers
-  name: MagicOnionMarshallers
-  href: api/MagicOnion.MagicOnionMarshallers.html
-  commentId: T:MagicOnion.MagicOnionMarshallers
-  fullName: MagicOnion.MagicOnionMarshallers
-  nameWithType: MagicOnionMarshallers
-- uid: MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[],System.Object[])
-  name: InstantiateDynamicArgumentTuple(Type[], Object[])
-  href: api/MagicOnion.MagicOnionMarshallers.html#MagicOnion_MagicOnionMarshallers_InstantiateDynamicArgumentTuple_Type___System_Object___
-  commentId: M:MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[],System.Object[])
-  name.vb: InstantiateDynamicArgumentTuple(Type(), Object())
-  fullName: MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[], System.Object[])
-  fullName.vb: MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type(), System.Object())
-  nameWithType: MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type[], Object[])
-  nameWithType.vb: MagicOnionMarshallers.InstantiateDynamicArgumentTuple(Type(), Object())
-- uid: MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple*
-  name: InstantiateDynamicArgumentTuple
-  href: api/MagicOnion.MagicOnionMarshallers.html#MagicOnion_MagicOnionMarshallers_InstantiateDynamicArgumentTuple_
-  commentId: Overload:MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple
-  isSpec: "True"
-  fullName: MagicOnion.MagicOnionMarshallers.InstantiateDynamicArgumentTuple
-  nameWithType: MagicOnionMarshallers.InstantiateDynamicArgumentTuple
-- uid: MagicOnion.MagicOnionMarshallers.ThroughMarshaller
-  name: ThroughMarshaller
-  href: api/MagicOnion.MagicOnionMarshallers.html#MagicOnion_MagicOnionMarshallers_ThroughMarshaller
-  commentId: F:MagicOnion.MagicOnionMarshallers.ThroughMarshaller
-  fullName: MagicOnion.MagicOnionMarshallers.ThroughMarshaller
-  nameWithType: MagicOnionMarshallers.ThroughMarshaller
 - uid: MagicOnion.MetadataExtensions
   name: MetadataExtensions
   href: api/MagicOnion.MetadataExtensions.html
@@ -10878,12 +10839,6 @@ references:
   commentId: N:MagicOnion.Server.Hubs
   fullName: MagicOnion.Server.Hubs
   nameWithType: MagicOnion.Server.Hubs
-- uid: MagicOnion.Server.Hubs.BroadcasterHelper
-  name: BroadcasterHelper
-  href: api/MagicOnion.Server.Hubs.BroadcasterHelper.html
-  commentId: T:MagicOnion.Server.Hubs.BroadcasterHelper
-  fullName: MagicOnion.Server.Hubs.BroadcasterHelper
-  nameWithType: BroadcasterHelper
 - uid: MagicOnion.Server.Hubs.ConcurrentDictionaryGroup
   name: ConcurrentDictionaryGroup
   href: api/MagicOnion.Server.Hubs.ConcurrentDictionaryGroup.html
@@ -12616,6 +12571,38 @@ references:
   commentId: N:MagicOnion.Server.Internal
   fullName: MagicOnion.Server.Internal
   nameWithType: MagicOnion.Server.Internal
+- uid: MagicOnion.Server.Internal.DuplicateKeyException
+  name: DuplicateKeyException
+  href: api/MagicOnion.Server.Internal.DuplicateKeyException.html
+  commentId: T:MagicOnion.Server.Internal.DuplicateKeyException
+  fullName: MagicOnion.Server.Internal.DuplicateKeyException
+  nameWithType: DuplicateKeyException
+- uid: MagicOnion.Server.Internal.DuplicateKeyException.#ctor(System.Int32)
+  name: DuplicateKeyException(Int32)
+  href: api/MagicOnion.Server.Internal.DuplicateKeyException.html#MagicOnion_Server_Internal_DuplicateKeyException__ctor_System_Int32_
+  commentId: M:MagicOnion.Server.Internal.DuplicateKeyException.#ctor(System.Int32)
+  fullName: MagicOnion.Server.Internal.DuplicateKeyException.DuplicateKeyException(System.Int32)
+  nameWithType: DuplicateKeyException.DuplicateKeyException(Int32)
+- uid: MagicOnion.Server.Internal.DuplicateKeyException.#ctor*
+  name: DuplicateKeyException
+  href: api/MagicOnion.Server.Internal.DuplicateKeyException.html#MagicOnion_Server_Internal_DuplicateKeyException__ctor_
+  commentId: Overload:MagicOnion.Server.Internal.DuplicateKeyException.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.DuplicateKeyException.DuplicateKeyException
+  nameWithType: DuplicateKeyException.DuplicateKeyException
+- uid: MagicOnion.Server.Internal.DuplicateKeyException.HashCode
+  name: HashCode
+  href: api/MagicOnion.Server.Internal.DuplicateKeyException.html#MagicOnion_Server_Internal_DuplicateKeyException_HashCode
+  commentId: P:MagicOnion.Server.Internal.DuplicateKeyException.HashCode
+  fullName: MagicOnion.Server.Internal.DuplicateKeyException.HashCode
+  nameWithType: DuplicateKeyException.HashCode
+- uid: MagicOnion.Server.Internal.DuplicateKeyException.HashCode*
+  name: HashCode
+  href: api/MagicOnion.Server.Internal.DuplicateKeyException.html#MagicOnion_Server_Internal_DuplicateKeyException_HashCode_
+  commentId: Overload:MagicOnion.Server.Internal.DuplicateKeyException.HashCode
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.DuplicateKeyException.HashCode
+  nameWithType: DuplicateKeyException.HashCode
 - uid: MagicOnion.Server.Internal.MethodHandlerMetadata
   name: MethodHandlerMetadata
   href: api/MagicOnion.Server.Internal.MethodHandlerMetadata.html
@@ -12894,6 +12881,119 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Server.Internal.StreamingHubMethodHandlerMetadata.StreamingHubInterfaceType
   nameWithType: StreamingHubMethodHandlerMetadata.StreamingHubInterfaceType
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1
+  name: UniqueHashDictionary<T>
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html
+  commentId: T:MagicOnion.Server.Internal.UniqueHashDictionary`1
+  name.vb: UniqueHashDictionary(Of T)
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T)
+  nameWithType: UniqueHashDictionary<T>
+  nameWithType.vb: UniqueHashDictionary(Of T)
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.#ctor(System.ValueTuple{System.Int32,`0}[])
+  name: UniqueHashDictionary((Int32 hashCode, T value)[])
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1__ctor_System_ValueTuple_System_Int32__0____
+  commentId: M:MagicOnion.Server.Internal.UniqueHashDictionary`1.#ctor(System.ValueTuple{System.Int32,`0}[])
+  name.vb: UniqueHashDictionary((hashCode As Int32, value As T)(Of Int32, T)())
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.UniqueHashDictionary(System.ValueTuple<System.Int32, T>[])
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).UniqueHashDictionary(System.ValueTuple(Of System.Int32, T)())
+  nameWithType: UniqueHashDictionary<T>.UniqueHashDictionary((Int32 hashCode, T value)[])
+  nameWithType.vb: UniqueHashDictionary(Of T).UniqueHashDictionary((hashCode As Int32, value As T)(Of Int32, T)())
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.#ctor*
+  name: UniqueHashDictionary
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1__ctor_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.#ctor
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.UniqueHashDictionary
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).UniqueHashDictionary
+  nameWithType: UniqueHashDictionary<T>.UniqueHashDictionary
+  nameWithType.vb: UniqueHashDictionary(Of T).UniqueHashDictionary
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.AllValues
+  name: AllValues()
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_AllValues
+  commentId: M:MagicOnion.Server.Internal.UniqueHashDictionary`1.AllValues
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.AllValues()
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).AllValues()
+  nameWithType: UniqueHashDictionary<T>.AllValues()
+  nameWithType.vb: UniqueHashDictionary(Of T).AllValues()
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.AllValues*
+  name: AllValues
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_AllValues_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.AllValues
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.AllValues
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).AllValues
+  nameWithType: UniqueHashDictionary<T>.AllValues
+  nameWithType.vb: UniqueHashDictionary(Of T).AllValues
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.Count
+  name: Count
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_Count
+  commentId: P:MagicOnion.Server.Internal.UniqueHashDictionary`1.Count
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.Count
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).Count
+  nameWithType: UniqueHashDictionary<T>.Count
+  nameWithType.vb: UniqueHashDictionary(Of T).Count
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.Count*
+  name: Count
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_Count_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.Count
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.Count
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).Count
+  nameWithType: UniqueHashDictionary<T>.Count
+  nameWithType.vb: UniqueHashDictionary(Of T).Count
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.MaxConflict
+  name: MaxConflict
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_MaxConflict
+  commentId: P:MagicOnion.Server.Internal.UniqueHashDictionary`1.MaxConflict
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.MaxConflict
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).MaxConflict
+  nameWithType: UniqueHashDictionary<T>.MaxConflict
+  nameWithType.vb: UniqueHashDictionary(Of T).MaxConflict
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.MaxConflict*
+  name: MaxConflict
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_MaxConflict_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.MaxConflict
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.MaxConflict
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).MaxConflict
+  nameWithType: UniqueHashDictionary<T>.MaxConflict
+  nameWithType.vb: UniqueHashDictionary(Of T).MaxConflict
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.ToString
+  name: ToString()
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_ToString
+  commentId: M:MagicOnion.Server.Internal.UniqueHashDictionary`1.ToString
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.ToString()
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).ToString()
+  nameWithType: UniqueHashDictionary<T>.ToString()
+  nameWithType.vb: UniqueHashDictionary(Of T).ToString()
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.ToString*
+  name: ToString
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_ToString_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.ToString
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.ToString
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).ToString
+  nameWithType: UniqueHashDictionary<T>.ToString
+  nameWithType.vb: UniqueHashDictionary(Of T).ToString
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.TryGetValue(System.Int32,`0@)
+  name: TryGetValue(Int32, out T)
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_TryGetValue_System_Int32__0__
+  commentId: M:MagicOnion.Server.Internal.UniqueHashDictionary`1.TryGetValue(System.Int32,`0@)
+  name.vb: TryGetValue(Int32, ByRef T)
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.TryGetValue(System.Int32, out T)
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).TryGetValue(System.Int32, ByRef T)
+  nameWithType: UniqueHashDictionary<T>.TryGetValue(Int32, out T)
+  nameWithType.vb: UniqueHashDictionary(Of T).TryGetValue(Int32, ByRef T)
+- uid: MagicOnion.Server.Internal.UniqueHashDictionary`1.TryGetValue*
+  name: TryGetValue
+  href: api/MagicOnion.Server.Internal.UniqueHashDictionary-1.html#MagicOnion_Server_Internal_UniqueHashDictionary_1_TryGetValue_
+  commentId: Overload:MagicOnion.Server.Internal.UniqueHashDictionary`1.TryGetValue
+  isSpec: "True"
+  fullName: MagicOnion.Server.Internal.UniqueHashDictionary<T>.TryGetValue
+  fullName.vb: MagicOnion.Server.Internal.UniqueHashDictionary(Of T).TryGetValue
+  nameWithType: UniqueHashDictionary<T>.TryGetValue
+  nameWithType.vb: UniqueHashDictionary(Of T).TryGetValue
 - uid: MagicOnion.Server.IServiceContext
   name: IServiceContext
   href: api/MagicOnion.Server.IServiceContext.html
@@ -15099,272 +15199,6 @@ references:
   fullName.vb: MagicOnion.UnsafeDirectBlitResolver.Register(Of T)()
   nameWithType: UnsafeDirectBlitResolver.Register<T>()
   nameWithType.vb: UnsafeDirectBlitResolver.Register(Of T)()
-- uid: MagicOnion.Utils
-  name: MagicOnion.Utils
-  href: api/MagicOnion.Utils.html
-  commentId: N:MagicOnion.Utils
-  fullName: MagicOnion.Utils
-  nameWithType: MagicOnion.Utils
-- uid: MagicOnion.Utils.DuplicateKeyException
-  name: DuplicateKeyException
-  href: api/MagicOnion.Utils.DuplicateKeyException.html
-  commentId: T:MagicOnion.Utils.DuplicateKeyException
-  fullName: MagicOnion.Utils.DuplicateKeyException
-  nameWithType: DuplicateKeyException
-- uid: MagicOnion.Utils.DuplicateKeyException.#ctor(System.Int32)
-  name: DuplicateKeyException(Int32)
-  href: api/MagicOnion.Utils.DuplicateKeyException.html#MagicOnion_Utils_DuplicateKeyException__ctor_System_Int32_
-  commentId: M:MagicOnion.Utils.DuplicateKeyException.#ctor(System.Int32)
-  fullName: MagicOnion.Utils.DuplicateKeyException.DuplicateKeyException(System.Int32)
-  nameWithType: DuplicateKeyException.DuplicateKeyException(Int32)
-- uid: MagicOnion.Utils.DuplicateKeyException.#ctor*
-  name: DuplicateKeyException
-  href: api/MagicOnion.Utils.DuplicateKeyException.html#MagicOnion_Utils_DuplicateKeyException__ctor_
-  commentId: Overload:MagicOnion.Utils.DuplicateKeyException.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Utils.DuplicateKeyException.DuplicateKeyException
-  nameWithType: DuplicateKeyException.DuplicateKeyException
-- uid: MagicOnion.Utils.DuplicateKeyException.HashCode
-  name: HashCode
-  href: api/MagicOnion.Utils.DuplicateKeyException.html#MagicOnion_Utils_DuplicateKeyException_HashCode
-  commentId: P:MagicOnion.Utils.DuplicateKeyException.HashCode
-  fullName: MagicOnion.Utils.DuplicateKeyException.HashCode
-  nameWithType: DuplicateKeyException.HashCode
-- uid: MagicOnion.Utils.DuplicateKeyException.HashCode*
-  name: HashCode
-  href: api/MagicOnion.Utils.DuplicateKeyException.html#MagicOnion_Utils_DuplicateKeyException_HashCode_
-  commentId: Overload:MagicOnion.Utils.DuplicateKeyException.HashCode
-  isSpec: "True"
-  fullName: MagicOnion.Utils.DuplicateKeyException.HashCode
-  nameWithType: DuplicateKeyException.HashCode
-- uid: MagicOnion.Utils.FNV1A32
-  name: FNV1A32
-  href: api/MagicOnion.Utils.FNV1A32.html
-  commentId: T:MagicOnion.Utils.FNV1A32
-  fullName: MagicOnion.Utils.FNV1A32
-  nameWithType: FNV1A32
-- uid: MagicOnion.Utils.FNV1A32.GetHashCode(System.Byte[])
-  name: GetHashCode(Byte[])
-  href: api/MagicOnion.Utils.FNV1A32.html#MagicOnion_Utils_FNV1A32_GetHashCode_System_Byte___
-  commentId: M:MagicOnion.Utils.FNV1A32.GetHashCode(System.Byte[])
-  name.vb: GetHashCode(Byte())
-  fullName: MagicOnion.Utils.FNV1A32.GetHashCode(System.Byte[])
-  fullName.vb: MagicOnion.Utils.FNV1A32.GetHashCode(System.Byte())
-  nameWithType: FNV1A32.GetHashCode(Byte[])
-  nameWithType.vb: FNV1A32.GetHashCode(Byte())
-- uid: MagicOnion.Utils.FNV1A32.GetHashCode(System.String)
-  name: GetHashCode(String)
-  href: api/MagicOnion.Utils.FNV1A32.html#MagicOnion_Utils_FNV1A32_GetHashCode_System_String_
-  commentId: M:MagicOnion.Utils.FNV1A32.GetHashCode(System.String)
-  fullName: MagicOnion.Utils.FNV1A32.GetHashCode(System.String)
-  nameWithType: FNV1A32.GetHashCode(String)
-- uid: MagicOnion.Utils.FNV1A32.GetHashCode*
-  name: GetHashCode
-  href: api/MagicOnion.Utils.FNV1A32.html#MagicOnion_Utils_FNV1A32_GetHashCode_
-  commentId: Overload:MagicOnion.Utils.FNV1A32.GetHashCode
-  isSpec: "True"
-  fullName: MagicOnion.Utils.FNV1A32.GetHashCode
-  nameWithType: FNV1A32.GetHashCode
-- uid: MagicOnion.Utils.ReservedWhenAllPromise
-  name: ReservedWhenAllPromise
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html
-  commentId: T:MagicOnion.Utils.ReservedWhenAllPromise
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise
-  nameWithType: ReservedWhenAllPromise
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.#ctor(System.Int32)
-  name: ReservedWhenAllPromise(Int32)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise__ctor_System_Int32_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.#ctor(System.Int32)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.ReservedWhenAllPromise(System.Int32)
-  nameWithType: ReservedWhenAllPromise.ReservedWhenAllPromise(Int32)
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.#ctor*
-  name: ReservedWhenAllPromise
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise__ctor_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.ReservedWhenAllPromise
-  nameWithType: ReservedWhenAllPromise.ReservedWhenAllPromise
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.Add(ValueTask)
-  name: Add(ValueTask)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_Add_ValueTask_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.Add(ValueTask)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.Add(ValueTask)
-  nameWithType: ReservedWhenAllPromise.Add(ValueTask)
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.Add*
-  name: Add
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_Add_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.Add
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.Add
-  nameWithType: ReservedWhenAllPromise.Add
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask
-  name: AsValueTask()
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_AsValueTask
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask()
-  nameWithType: ReservedWhenAllPromise.AsValueTask()
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask*
-  name: AsValueTask
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_AsValueTask_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.AsValueTask
-  nameWithType: ReservedWhenAllPromise.AsValueTask
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.GetResult(System.Int16)
-  name: GetResult(Int16)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetResult_System_Int16_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.GetResult(System.Int16)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.GetResult(System.Int16)
-  nameWithType: ReservedWhenAllPromise.GetResult(Int16)
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.GetResult*
-  name: GetResult
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetResult_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.GetResult
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.GetResult
-  nameWithType: ReservedWhenAllPromise.GetResult
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.GetStatus(System.Int16)
-  name: GetStatus(Int16)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetStatus_System_Int16_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.GetStatus(System.Int16)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.GetStatus(System.Int16)
-  nameWithType: ReservedWhenAllPromise.GetStatus(Int16)
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.GetStatus*
-  name: GetStatus
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_GetStatus_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.GetStatus
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.GetStatus
-  nameWithType: ReservedWhenAllPromise.GetStatus
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Nullable{System.Object}},System.Nullable{System.Object},System.Int16,ValueTaskSourceOnCompletedFlags)
-  name: OnCompleted(Action<Nullable<Object>>, Nullable<Object>, Int16, ValueTaskSourceOnCompletedFlags)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_Action_System_Nullable_System_Object___System_Nullable_System_Object__System_Int16_ValueTaskSourceOnCompletedFlags_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Nullable{System.Object}},System.Nullable{System.Object},System.Int16,ValueTaskSourceOnCompletedFlags)
-  name.vb: OnCompleted(Action(Of Nullable(Of Object)), Nullable(Of Object), Int16, ValueTaskSourceOnCompletedFlags)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action<System.Nullable<System.Object>>, System.Nullable<System.Object>, System.Int16, ValueTaskSourceOnCompletedFlags)
-  fullName.vb: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action(Of System.Nullable(Of System.Object)), System.Nullable(Of System.Object), System.Int16, ValueTaskSourceOnCompletedFlags)
-  nameWithType: ReservedWhenAllPromise.OnCompleted(Action<Nullable<Object>>, Nullable<Object>, Int16, ValueTaskSourceOnCompletedFlags)
-  nameWithType.vb: ReservedWhenAllPromise.OnCompleted(Action(Of Nullable(Of Object)), Nullable(Of Object), Int16, ValueTaskSourceOnCompletedFlags)
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted*
-  name: OnCompleted
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_
-  commentId: Overload:MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted
-  isSpec: "True"
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted
-  nameWithType: ReservedWhenAllPromise.OnCompleted
-- uid: MagicOnion.Utils.UniqueHashDictionary`1
-  name: UniqueHashDictionary<T>
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html
-  commentId: T:MagicOnion.Utils.UniqueHashDictionary`1
-  name.vb: UniqueHashDictionary(Of T)
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T)
-  nameWithType: UniqueHashDictionary<T>
-  nameWithType.vb: UniqueHashDictionary(Of T)
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.#ctor(System.ValueTuple{System.Int32,`0}[])
-  name: UniqueHashDictionary((Int32 hashCode, T value)[])
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1__ctor_System_ValueTuple_System_Int32__0____
-  commentId: M:MagicOnion.Utils.UniqueHashDictionary`1.#ctor(System.ValueTuple{System.Int32,`0}[])
-  name.vb: UniqueHashDictionary((hashCode As Int32, value As T)(Of Int32, T)())
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.UniqueHashDictionary(System.ValueTuple<System.Int32, T>[])
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).UniqueHashDictionary(System.ValueTuple(Of System.Int32, T)())
-  nameWithType: UniqueHashDictionary<T>.UniqueHashDictionary((Int32 hashCode, T value)[])
-  nameWithType.vb: UniqueHashDictionary(Of T).UniqueHashDictionary((hashCode As Int32, value As T)(Of Int32, T)())
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.#ctor*
-  name: UniqueHashDictionary
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1__ctor_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.#ctor
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.UniqueHashDictionary
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).UniqueHashDictionary
-  nameWithType: UniqueHashDictionary<T>.UniqueHashDictionary
-  nameWithType.vb: UniqueHashDictionary(Of T).UniqueHashDictionary
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.AllValues
-  name: AllValues()
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_AllValues
-  commentId: M:MagicOnion.Utils.UniqueHashDictionary`1.AllValues
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.AllValues()
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).AllValues()
-  nameWithType: UniqueHashDictionary<T>.AllValues()
-  nameWithType.vb: UniqueHashDictionary(Of T).AllValues()
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.AllValues*
-  name: AllValues
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_AllValues_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.AllValues
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.AllValues
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).AllValues
-  nameWithType: UniqueHashDictionary<T>.AllValues
-  nameWithType.vb: UniqueHashDictionary(Of T).AllValues
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.Count
-  name: Count
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_Count
-  commentId: P:MagicOnion.Utils.UniqueHashDictionary`1.Count
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.Count
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).Count
-  nameWithType: UniqueHashDictionary<T>.Count
-  nameWithType.vb: UniqueHashDictionary(Of T).Count
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.Count*
-  name: Count
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_Count_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.Count
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.Count
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).Count
-  nameWithType: UniqueHashDictionary<T>.Count
-  nameWithType.vb: UniqueHashDictionary(Of T).Count
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.MaxConflict
-  name: MaxConflict
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_MaxConflict
-  commentId: P:MagicOnion.Utils.UniqueHashDictionary`1.MaxConflict
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.MaxConflict
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).MaxConflict
-  nameWithType: UniqueHashDictionary<T>.MaxConflict
-  nameWithType.vb: UniqueHashDictionary(Of T).MaxConflict
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.MaxConflict*
-  name: MaxConflict
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_MaxConflict_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.MaxConflict
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.MaxConflict
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).MaxConflict
-  nameWithType: UniqueHashDictionary<T>.MaxConflict
-  nameWithType.vb: UniqueHashDictionary(Of T).MaxConflict
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.ToString
-  name: ToString()
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_ToString
-  commentId: M:MagicOnion.Utils.UniqueHashDictionary`1.ToString
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.ToString()
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).ToString()
-  nameWithType: UniqueHashDictionary<T>.ToString()
-  nameWithType.vb: UniqueHashDictionary(Of T).ToString()
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.ToString*
-  name: ToString
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_ToString_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.ToString
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.ToString
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).ToString
-  nameWithType: UniqueHashDictionary<T>.ToString
-  nameWithType.vb: UniqueHashDictionary(Of T).ToString
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.TryGetValue(System.Int32,`0@)
-  name: TryGetValue(Int32, out T)
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_TryGetValue_System_Int32__0__
-  commentId: M:MagicOnion.Utils.UniqueHashDictionary`1.TryGetValue(System.Int32,`0@)
-  name.vb: TryGetValue(Int32, ByRef T)
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.TryGetValue(System.Int32, out T)
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).TryGetValue(System.Int32, ByRef T)
-  nameWithType: UniqueHashDictionary<T>.TryGetValue(Int32, out T)
-  nameWithType.vb: UniqueHashDictionary(Of T).TryGetValue(Int32, ByRef T)
-- uid: MagicOnion.Utils.UniqueHashDictionary`1.TryGetValue*
-  name: TryGetValue
-  href: api/MagicOnion.Utils.UniqueHashDictionary-1.html#MagicOnion_Utils_UniqueHashDictionary_1_TryGetValue_
-  commentId: Overload:MagicOnion.Utils.UniqueHashDictionary`1.TryGetValue
-  isSpec: "True"
-  fullName: MagicOnion.Utils.UniqueHashDictionary<T>.TryGetValue
-  fullName.vb: MagicOnion.Utils.UniqueHashDictionary(Of T).TryGetValue
-  nameWithType: UniqueHashDictionary<T>.TryGetValue
-  nameWithType.vb: UniqueHashDictionary(Of T).TryGetValue
 - uid: Microsoft.AspNetCore.Builder
   name: Microsoft.AspNetCore.Builder
   href: api/Microsoft.AspNetCore.Builder.html
