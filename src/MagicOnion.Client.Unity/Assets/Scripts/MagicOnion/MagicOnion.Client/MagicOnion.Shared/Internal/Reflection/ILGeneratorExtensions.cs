@@ -4,7 +4,7 @@ using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace MagicOnion.Utils
+namespace MagicOnion.Internal.Reflection
 {
     // full list of can create optimize helper -> https://github.com/kevin-montrose/Sigil#automated-opcode-choice
 
@@ -161,7 +161,7 @@ namespace MagicOnion.Utils
 
         public static void EmitThrowNotimplemented(this ILGenerator il)
         {
-            il.Emit(OpCodes.Newobj, typeof(System.NotImplementedException).GetConstructor(Type.EmptyTypes)!);
+            il.Emit(OpCodes.Newobj, typeof(NotImplementedException).GetConstructor(Type.EmptyTypes)!);
             il.Emit(OpCodes.Throw);
         }
     }

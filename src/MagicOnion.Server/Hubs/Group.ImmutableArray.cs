@@ -1,11 +1,11 @@
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
-using MagicOnion.Utils;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using MagicOnion.Internal.Buffers;
 
 namespace MagicOnion.Server.Hubs;
 

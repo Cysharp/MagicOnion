@@ -1,8 +1,7 @@
 using System;
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 
-namespace MagicOnion.Utils
+namespace MagicOnion.Internal.Buffers
 {
     internal sealed class ArrayPoolBufferWriter : IBufferWriter<byte>, IDisposable
     {

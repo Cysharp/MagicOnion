@@ -1,12 +1,12 @@
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
-using MagicOnion.Utils;
 using MessagePack;
 using StackExchange.Redis;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using MagicOnion.Internal.Buffers;
 
 namespace MagicOnion.Server.Redis;
 

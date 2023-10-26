@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-namespace MagicOnion.Utils
+namespace MagicOnion.Internal.Reflection
 {
 #if ENABLE_SAVE_ASSEMBLY
     public
@@ -32,14 +32,14 @@ namespace MagicOnion.Utils
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
 #else
-            this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+            assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
+            moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
 #endif
 
             // HACK: Allow access to `internal` classes from dynamically generated assembly.
             // https://www.strathweb.com/2018/10/no-internalvisibleto-no-problem-bypassing-c-visibility-rules-with-roslyn/
-            this.assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) })!, new[] { "MagicOnion.Client" }));
-            this.assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) })!, new[] { "MagicOnion.Server" }));
+            assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) })!, new[] { "MagicOnion.Client" }));
+            assemblyBuilder.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoresAccessChecksToAttribute).GetConstructor(new[] { typeof(string) })!, new[] { "MagicOnion.Server" }));
         }
 
         // requires lock on mono environment(for example, UnityEditor). see: https://github.com/neuecc/MessagePack-CSharp/issues/161

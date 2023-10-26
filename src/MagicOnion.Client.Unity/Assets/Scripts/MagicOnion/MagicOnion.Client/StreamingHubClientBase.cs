@@ -4,7 +4,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using MagicOnion.Utils;
 using System.Threading;
 using System.Threading.Tasks;
 using MagicOnion.Server;
@@ -13,6 +12,7 @@ using System.Linq;
 using MagicOnion.Client.Internal;
 using MagicOnion.Client.Internal.Threading.Tasks;
 using MagicOnion.Serialization;
+using MagicOnion.Internal.Buffers;
 
 namespace MagicOnion.Client
 {

@@ -1,4 +1,4 @@
-using MagicOnion.Utils;
+using MagicOnion.Internal.Buffers;
 using MessagePack;
 using System.Collections.Concurrent;
 

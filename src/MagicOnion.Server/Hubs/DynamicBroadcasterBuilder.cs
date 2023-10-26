@@ -1,8 +1,8 @@
-using MagicOnion.Utils;
 using MessagePack;
 using System.Reflection;
 using System.Reflection.Emit;
 using Microsoft.Extensions.Logging;
+using MagicOnion.Internal.Reflection;
 
 namespace MagicOnion.Server.Hubs;
 #if ENABLE_SAVE_ASSEMBLY
