@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace MagicOnion.Utils
+namespace MagicOnion.Client.Internal.Threading.Tasks
 {
     internal interface ITaskCompletion
     {
