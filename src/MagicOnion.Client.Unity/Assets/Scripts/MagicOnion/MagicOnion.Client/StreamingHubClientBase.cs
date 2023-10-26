@@ -23,19 +23,20 @@ namespace MagicOnion.Client
         const string StreamingHubVersionHeaderValue = "2";
 #pragma warning restore IDE1006 // Naming Styles
 
-        readonly string host;
+        readonly string? host;
         readonly CallOptions option;
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
         readonly AsyncLock asyncLock = new AsyncLock();
 
-        IClientStreamWriter<byte[]> writer;
-        IAsyncStreamReader<byte[]> reader;
+        IClientStreamWriter<byte[]> writer = default!;
+        IAsyncStreamReader<byte[]> reader = default!;
 
-        protected TReceiver receiver;
-        Task subscription;
-        TaskCompletionSource<object> waitForDisconnect = new TaskCompletionSource<object>();
+        protected TReceiver receiver = default!;
+        Task subscription = default!;
+
+        TaskCompletionSource<bool> waitForDisconnect = new TaskCompletionSource<bool>();
 
         // {messageId, TaskCompletionSource}
         ConcurrentDictionary<int, ITaskCompletion> responseFutures = new ConcurrentDictionary<int, ITaskCompletion>();
@@ -43,7 +44,7 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         {
             this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;
@@ -65,7 +66,7 @@ namespace MagicOnion.Client
             this.receiver = receiver;
 
             // Establish StreamingHub connection between the client and the server.
-            Metadata.Entry messageVersion = default;
+            Metadata.Entry? messageVersion;
             try
             {
                 // The client can read the response headers before any StreamingHub's message.
@@ -120,7 +121,7 @@ namespace MagicOnion.Client
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
 
-        async Task StartSubscribe(SynchronizationContext syncContext, Task<bool> firstMoveNext)
+        async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
         {
             var reader = this.reader;
             try
@@ -138,7 +139,7 @@ namespace MagicOnion.Client
                         // log post on main thread.
                         if (syncContext != null)
                         {
-                            syncContext.Post(state => logger.Error((Exception)state, msg), ex);
+                            syncContext.Post(state => logger.Error((Exception)state!, msg), ex);
                         }
                         else
                         {
@@ -159,7 +160,7 @@ namespace MagicOnion.Client
                 // log post on main thread.
                 if (syncContext != null)
                 {
-                    syncContext.Post(state => logger.Error((Exception)state, msg), ex);
+                    syncContext.Post(state => logger.Error((Exception)state!, msg), ex);
                 }
                 else
                 {
@@ -182,7 +183,7 @@ namespace MagicOnion.Client
                 }
                 finally
                 {
-                    waitForDisconnect.TrySetResult(null);
+                    waitForDisconnect.TrySetResult(true);
                 }
             }
         }
@@ -191,7 +192,7 @@ namespace MagicOnion.Client
         // broadcast: [methodId, [argument]]
         // response:  [messageId, methodId, response]
         // error-response: [messageId, statusCode, detail, StringMessage]
-        void ConsumeData(SynchronizationContext syncContext, byte[] data)
+        void ConsumeData(SynchronizationContext? syncContext, byte[] data)
         {
             var messagePackReader = new MessagePackReader(data);
             var arrayLength = messagePackReader.ReadArrayHeader();
@@ -228,11 +229,11 @@ namespace MagicOnion.Client
                     var ex = default(RpcException);
                     if (string.IsNullOrWhiteSpace(error))
                     {
-                        ex = new RpcException(new Status((StatusCode)statusCode, detail));
+                        ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty));
                     }
                     else
                     {
-                        ex = new RpcException(new Status((StatusCode)statusCode, detail), detail + Environment.NewLine + error);
+                        ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty), detail + Environment.NewLine + error);
                     }
 
                     future.TrySetException(ex);
@@ -247,7 +248,7 @@ namespace MagicOnion.Client
                     var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
                     syncContext.Post(state =>
                     {
-                        var t = (Tuple<int, byte[], int, int>)state;
+                        var t = (Tuple<int, byte[], int, int>)state!;
                         OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
                     }, tuple);
                 }
@@ -281,7 +282,7 @@ namespace MagicOnion.Client
                 await writer.WriteAsync(v).ConfigureAwait(false);
             }
 
-            return default;
+            return default!;
         }
 
         protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
@@ -367,7 +368,7 @@ namespace MagicOnion.Client
                     }
 
                     // cleanup completion
-                    List<Exception> aggregateException = null;
+                    List<Exception>? aggregateException = null;
                     foreach (var item in responseFutures)
                     {
                         try
@@ -378,11 +379,8 @@ namespace MagicOnion.Client
                         {
                             if (!(ex is OperationCanceledException))
                             {
-                                if (aggregateException != null)
-                                {
-                                    aggregateException = new List<Exception>();
-                                    aggregateException.Add(ex);
-                                }
+                                aggregateException ??= new List<Exception>();
+                                aggregateException.Add(ex);
                             }
                         }
                     }

@@ -1,5 +1,6 @@
 using Grpc.Core;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MagicOnion.Serialization;
 
@@ -21,7 +22,7 @@ namespace MagicOnion.Client
 #endif
     }
 
-    public delegate TStreamingHub StreamingHubClientFactoryDelegate<out TStreamingHub, in TReceiver>(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+    public delegate TStreamingHub StreamingHubClientFactoryDelegate<out TStreamingHub, in TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>;
 
     /// <summary>
@@ -36,7 +37,7 @@ namespace MagicOnion.Client
         /// <typeparam name="TReceiver">A hub receiver interface type.</typeparam>
         /// <param name="factory">A StreamingHubClient factory of specified service type.</param>
         /// <returns>The value indicates whether a factory was found or not.</returns>
-        bool TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>;
+        bool TryGetFactory<TStreamingHub, TReceiver>([NotNullWhen(true)] out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>;
     }
 
     public class ImmutableStreamingHubClientFactoryProvider : IStreamingHubClientFactoryProvider
@@ -53,7 +54,7 @@ namespace MagicOnion.Client
             return new ImmutableStreamingHubClientFactoryProvider(providers.Append(provider).ToArray());
         }
 
-        public bool TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        public bool TryGetFactory<TStreamingHub, TReceiver>([NotNullWhen(true)] out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             foreach (var provider in providers)
             {
@@ -74,7 +75,7 @@ namespace MagicOnion.Client
 
         DynamicNotSupportedStreamingHubClientFactoryProvider() { }
 
-        public bool TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        public bool TryGetFactory<TStreamingHub, TReceiver>([NotNullWhen(true)] out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             throw new InvalidOperationException($"Unable to find a client factory of type '{typeof(TStreamingHub)}'. If the application is running on IL2CPP or AOT, dynamic code generation is not supported. Please use the code generator (moc).");
         }
@@ -87,7 +88,7 @@ namespace MagicOnion.Client
 
         DynamicStreamingHubClientFactoryProvider() { }
 
-        public bool TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        public bool TryGetFactory<TStreamingHub, TReceiver>([NotNullWhen(true)] out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>? factory) where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             factory = Cache<TStreamingHub, TReceiver>.Factory;
             return true;
@@ -97,7 +98,7 @@ namespace MagicOnion.Client
         {
             public static readonly StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory
                 = (callInvoker, receiver, host, callOptions, serializerProvider, logger)
-                    => (TStreamingHub)Activator.CreateInstance(DynamicClient.DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType, callInvoker, host, callOptions, serializerProvider, logger);
+                    => (TStreamingHub)Activator.CreateInstance(DynamicClient.DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType, callInvoker, host, callOptions, serializerProvider, logger)!;
         }
     }
 #endif

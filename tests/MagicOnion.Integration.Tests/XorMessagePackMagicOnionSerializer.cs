@@ -55,7 +55,7 @@ public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerP
         }
     }
 
-    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)
+    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
     {
         return new XorMessagePackMagicOnionSerializer(serializerOptions);
     }

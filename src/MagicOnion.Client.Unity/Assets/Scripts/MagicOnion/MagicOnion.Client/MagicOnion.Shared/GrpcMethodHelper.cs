@@ -40,11 +40,11 @@ namespace MagicOnion
             {
                 if (typeof(TRaw) == typeof(Box<T>))
                 {
-                    return ((Box<T>)(object)obj).Value;
+                    return ((Box<T>)(object)obj!).Value;
                 }
                 else
                 {
-                    return DangerousDummyNull.GetObjectOrDefault<T>(obj);
+                    return DangerousDummyNull.GetObjectOrDefault<T>(obj!);
                 }
             }
         }
@@ -53,7 +53,7 @@ namespace MagicOnion
         {
             return CreateMethod<TResponse, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
-        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)
+        public static MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse> CreateMethod<TResponse, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
         {
             // WORKAROUND: Prior to MagicOnion 5.0, the request type for the parameter-less method was byte[].
             //             DynamicClient sends byte[], but GeneratedClient sends Nil, which is incompatible,
@@ -76,7 +76,7 @@ namespace MagicOnion
         {
             return CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(methodType, serviceName, name, null, messageSerializer);
         }
-        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)
+        public static MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse> CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)
         {
             var isMethodRequestTypeBoxed = typeof(TRequest).IsValueType;
             var isMethodResponseTypeBoxed = typeof(TResponse).IsValueType;
@@ -120,7 +120,9 @@ namespace MagicOnion
             return new Marshaller<T>(
                 serializer: (obj, ctx) =>
                 {
+#pragma warning disable CS8602
                     if (obj.GetType() == typeof(RawBytesBox))
+#pragma warning restore CS8602
                     {
                         var rawBytesBox = (RawBytesBox)(object)obj;
                         var writer = ctx.GetBufferWriter();
@@ -134,7 +136,7 @@ namespace MagicOnion
                     }
                     ctx.Complete();
                 },
-                deserializer: (ctx) => DangerousDummyNull.GetObjectOrDummyNull(messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence())));
+                deserializer: (ctx) => DangerousDummyNull.GetObjectOrDummyNull(messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence()))!);
         }
 
         static Marshaller<Box<T>> CreateBoxedMarshaller<T>(IMagicOnionSerializer messageSerializer)
@@ -142,7 +144,9 @@ namespace MagicOnion
             return new Marshaller<Box<T>>(
                 serializer: (obj, ctx) =>
                 {
+#pragma warning disable CS8602
                     if (obj.GetType() == typeof(RawBytesBox))
+#pragma warning restore CS8602
                     {
                         var rawBytesBox = (RawBytesBox)(object)obj;
                         var writer = ctx.GetBufferWriter();
@@ -156,7 +160,7 @@ namespace MagicOnion
                     }
                     ctx.Complete();
                 },
-                deserializer: (ctx) => Box.Create(messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence()))
+                deserializer: (ctx) => Box.Create(messageSerializer.Deserialize<T>(ctx.PayloadAsReadOnlySequence())!)
             );
         }
 

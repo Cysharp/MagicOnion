@@ -4,9 +4,9 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
 
     <ImplicitUsings>enable</ImplicitUsings>
-    <nullable>enable</nullable>
+    <Nullable>enable</Nullable>
+
     <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
-    <LangVersion>default</LangVersion>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server</PackageId>

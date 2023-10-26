@@ -33,7 +33,7 @@ namespace MagicOnion.Client.DynamicClient
 
             EmitServiceClientClass(buildContext);
 
-            return buildContext.ServiceClientType.CreateTypeInfo();
+            return buildContext.ServiceClientType.CreateTypeInfo()!;
         }
 
         class ServiceClientBuildContext
@@ -45,13 +45,13 @@ namespace MagicOnion.Client.DynamicClient
 
             public ServiceClientDefinition Definition { get; }
 
-            public TypeBuilder ClientCoreType { get; set; } // {ServiceName}Client+ClientCore
-            public ConstructorBuilder ClientCoreConstructor { get; set; } // {ServiceName}Client+ClientCore..ctor
+            public TypeBuilder ClientCoreType { get; set; } = default!; // {ServiceName}Client+ClientCore
+            public ConstructorBuilder ClientCoreConstructor { get; set; } = default!; // {ServiceName}Client+ClientCore..ctor
 
-            public TypeBuilder ServiceClientType { get; set; } // {ServiceName}Client
-            public ConstructorBuilder ServiceClientConstructor { get; set; } // {ServiceName}Client..ctor
-            public ConstructorBuilder ServiceClientConstructorForClone { get; set; } // {ServiceName}Client..ctor
-            public FieldBuilder FieldCore { get; set; }
+            public TypeBuilder ServiceClientType { get; set; } = default!; // {ServiceName}Client
+            public ConstructorBuilder ServiceClientConstructor { get; set; } = default!; // {ServiceName}Client..ctor
+            public ConstructorBuilder ServiceClientConstructorForClone { get; set; } = default!; // {ServiceName}Client..ctor
+            public FieldBuilder FieldCore { get; set; } = default!;
 
             public Dictionary<string, (FieldBuilder Field, Type MethodInvokerType)> FieldAndMethodInvokerTypeByMethod { get; } = new Dictionary<string, (FieldBuilder Field, Type MethodInvokerType)>();
         }
@@ -65,7 +65,7 @@ namespace MagicOnion.Client.DynamicClient
             //
             ctx.ServiceClientType = DynamicClientAssemblyHolder.Assembly.DefineType($"MagicOnion.DynamicallyGeneratedClient.{ctx.Definition.ServiceInterfaceType.Namespace}.{ctx.Definition.ServiceInterfaceType.Name}Client", TypeAttributes.Public | TypeAttributes.Sealed, constructedBaseClientType, new[] { ctx.Definition.ServiceInterfaceType });
             // Set `IgnoreAttribute` to the generated client type. Hides generated-types from building MagicOnion service definitions.
-            ctx.ServiceClientType.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoreAttribute).GetConstructor(Type.EmptyTypes), Array.Empty<object>()));
+            ctx.ServiceClientType.SetCustomAttribute(new CustomAttributeBuilder(typeof(IgnoreAttribute).GetConstructor(Type.EmptyTypes)!, Array.Empty<object>()));
             {
                 // class ClientCore { ... }
                 EmitClientCore(ctx);
@@ -98,13 +98,13 @@ namespace MagicOnion.Client.DynamicClient
 
         static void EmitConstructor(ServiceClientBuildContext ctx)
         {
-            var baseCtor = ctx.ServiceClientType.BaseType.GetConstructor(
+            var baseCtor = ctx.ServiceClientType.BaseType!.GetConstructor(
                 BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
                 null,
                 CallingConventions.Standard,
                 new[] { typeof(MagicOnionClientOptions) },
                 Array.Empty<ParameterModifier>()
-            );
+            )!;
             // public {ServiceName}Client(MagicOnionClientOptions options, IMagicOnionSerializerProvider serializerProvider) {
             ctx.ServiceClientConstructor = ctx.ServiceClientType.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, KnownTypes.ClientConstructorParameters);
             {
@@ -165,7 +165,7 @@ namespace MagicOnion.Client.DynamicClient
             foreach (var method in ctx.Definition.Methods)
             {
                 var hasNonGenericUnaryResult = method.MethodReturnType == typeof(UnaryResult);
-                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}");
+                var methodInvokerInvokeMethod = ctx.FieldAndMethodInvokerTypeByMethod[method.MethodName].MethodInvokerType.GetMethod($"Invoke{method.MethodType}{(hasNonGenericUnaryResult ? "NonGeneric" : "")}")!;
                 var methodBuilder = ctx.ServiceClientType.DefineMethod(method.MethodName, MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual, methodInvokerInvokeMethod.ReturnType, method.ParameterTypes.ToArray());
                 var il = methodBuilder.GetILGenerator();
 
@@ -208,13 +208,13 @@ namespace MagicOnion.Client.DynamicClient
                                         break;
                                 }
                             }
-                            il.Emit(OpCodes.Newobj, method.RequestType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, method.ParameterTypes.ToArray(), Array.Empty<ParameterModifier>()));
+                            il.Emit(OpCodes.Newobj, method.RequestType.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, method.ParameterTypes.ToArray(), Array.Empty<ParameterModifier>())!);
                         }
                     }
                     else if (method.ParameterTypes.Count == 0)
                     {
                         // Nil.Default
-                        il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default", BindingFlags.Public | BindingFlags.Static));
+                        il.Emit(OpCodes.Ldsfld, typeof(Nil).GetField("Default", BindingFlags.Public | BindingFlags.Static)!);
                     }
                 }
                 else

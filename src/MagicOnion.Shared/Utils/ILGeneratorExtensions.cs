@@ -1,4 +1,4 @@
-﻿#if NON_UNITY || !NET_STANDARD_2_0
+#if NON_UNITY || !NET_STANDARD_2_0
 
 using System;
 using System.Reflection;
@@ -161,7 +161,7 @@ namespace MagicOnion.Utils
 
         public static void EmitThrowNotimplemented(this ILGenerator il)
         {
-            il.Emit(OpCodes.Newobj, typeof(System.NotImplementedException).GetConstructor(Type.EmptyTypes));
+            il.Emit(OpCodes.Newobj, typeof(System.NotImplementedException).GetConstructor(Type.EmptyTypes)!);
             il.Emit(OpCodes.Throw);
         }
     }

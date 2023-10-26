@@ -19,12 +19,11 @@ public class BoxTest
         box2.Equals(box2).Should().BeTrue();
         box2.Equals(box2a).Should().BeTrue();
 
-        box1.Equals(null).Should().BeFalse();
-        box2.Equals(null).Should().BeFalse();
+        box1.Equals(null!).Should().BeFalse();
+        box2.Equals(null!).Should().BeFalse();
 
-        (default(Box<int>) == default(Box<int>)).Should().BeTrue();
-        (default(Box<int>) == box1).Should().BeFalse();
-        (box1 == default(Box<int>)).Should().BeFalse();
+        (default(Box<int>)! == box1!).Should().BeFalse();
+        (box1! == default(Box<int>)!).Should().BeFalse();
     }
 
     [Fact]

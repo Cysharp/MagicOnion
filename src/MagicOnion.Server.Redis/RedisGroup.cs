@@ -5,6 +5,7 @@ using MagicOnion.Utils;
 using MessagePack;
 using StackExchange.Redis;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server.Redis;
@@ -39,7 +40,7 @@ public class RedisGroupRepository : IGroupRepository
         return new RedisGroup(groupName, messageSerializer, new ConcurrentDictionaryGroup(groupName, this, messageSerializer, logger), connection.GetSubscriber(), connection.GetDatabase(db));
     }
 
-    public bool TryGet(string groupName, out IGroup group)
+    public bool TryGet(string groupName, [NotNullWhen(true)] out IGroup? group)
     {
         return dictionary.TryGetValue(groupName, out group);
     }
@@ -120,13 +121,13 @@ public class RedisGroup : IGroup
             var isExcept = reader.ReadBoolean();
             if (isExcept)
             {
-                var excludes = NativeGuidArrayFormatter.Deserialize(ref reader);
+                var excludes = NativeGuidArrayFormatter.Deserialize(ref reader) ?? Array.Empty<Guid>();
                 var offset = (int)reader.Consumed;
                 return group.WriteExceptRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), excludes, fireAndForget: true);
             }
             else
             {
-                var includes = NativeGuidArrayFormatter.Deserialize(ref reader);
+                var includes = NativeGuidArrayFormatter.Deserialize(ref reader) ?? Array.Empty<Guid>();
                 var offset = (int)reader.Consumed;
                 return group.WriteToRawAsync(new ArraySegment<byte>(buffer, offset, buffer.Length - offset), includes, fireAndForget: true);
             }
@@ -152,7 +153,7 @@ public class RedisGroup : IGroup
         return subscriber.PublishAsync(channel, BuildMessage(methodId, value, new[] { connectionId }, true), flags);
     }
 
-    public Task WriteExceptAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+    public Task WriteExceptAsync<T>(int methodId, T value, Guid[]? connectionIds, bool fireAndForget)
     {
         var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
         return subscriber.PublishAsync(channel, BuildMessage(methodId, value, connectionIds, true), flags);
@@ -164,13 +165,13 @@ public class RedisGroup : IGroup
         return subscriber.PublishAsync(channel, BuildMessage(methodId, value, new[] { connectionId }, false), flags);
     }
 
-    public Task WriteToAsync<T>(int methodId, T value, Guid[] connectionIds, bool fireAndForget)
+    public Task WriteToAsync<T>(int methodId, T value, Guid[]? connectionIds, bool fireAndForget)
     {
         var flags = (fireAndForget) ? CommandFlags.FireAndForget : CommandFlags.None;
         return subscriber.PublishAsync(channel, BuildMessage(methodId, value, connectionIds, false), flags);
     }
 
-    byte[] BuildMessage<T>(int methodId, T value, Guid[] connectionIds, bool isExcept)
+    byte[] BuildMessage<T>(int methodId, T value, Guid[]? connectionIds, bool isExcept)
     {
         using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
         {
@@ -193,13 +194,13 @@ public class RedisGroup : IGroup
     }
 
 
-    public Task WriteExceptRawAsync(ArraySegment<byte> message, Guid[] exceptConnectionIds, bool fireAndForget)
+    public Task WriteExceptRawAsync(ArraySegment<byte> message, Guid[]? exceptConnectionIds, bool fireAndForget)
     {
         // only for the inmemory routing.
         throw new NotSupportedException();
     }
 
-    public Task WriteToRawAsync(ArraySegment<byte> message, Guid[] connectionIds, bool fireAndForget)
+    public Task WriteToRawAsync(ArraySegment<byte> message, Guid[]? connectionIds, bool fireAndForget)
     {
         // only for the inmemory routing.
         throw new NotSupportedException();

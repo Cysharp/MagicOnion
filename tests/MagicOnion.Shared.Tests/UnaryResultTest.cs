@@ -11,7 +11,7 @@ public class UnaryResultTest
         (await UnaryResult.FromResult("foo")).Should().Be("foo");
         (await UnaryResult.FromResult<string?>(default(string))).Should().BeNull();
 
-        Assert.Throws<ArgumentNullException>(() => UnaryResult.FromResult(default(Task<string>)));
+        Assert.Throws<ArgumentNullException>(() => UnaryResult.FromResult(default(Task<string>)!));
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class UnaryResultTest
         var result2 = new UnaryResult<string>(Task.FromResult("foo"));
         (await result2).Should().Be("foo");
 
-        Assert.Throws<ArgumentNullException>(() => new UnaryResult<string>(default(Task<string>)));
+        Assert.Throws<ArgumentNullException>(() => new UnaryResult<string?>(default(Task<string?>)!));
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class UnaryResultTest
         var result2 = new UnaryResult<string>(Task.FromResult(DummyResponseContext.Create("foo")));
         (await result2).Should().Be("foo");
 
-        Assert.Throws<ArgumentNullException>(() => new UnaryResult<string>(default(Task<IResponseContext<string>>)));
+        Assert.Throws<ArgumentNullException>(() => new UnaryResult<string?>(default(Task<IResponseContext<string?>>)!));
     }
 
     static class DummyResponseContext

@@ -18,7 +18,7 @@ namespace MagicOnion.Client
 
     public abstract class RequestContext
     {
-        Dictionary<string, object> items;
+        Dictionary<string, object>? items;
 
         public string MethodPath { get; }
         public CallOptions CallOptions { get; }

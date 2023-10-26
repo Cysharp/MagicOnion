@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,9 +29,9 @@ namespace MagicOnion
 
         public struct LockReleaser : IDisposable
         {
-            readonly SemaphoreSlim semaphore;
+            readonly SemaphoreSlim? semaphore;
 
-            public LockReleaser(SemaphoreSlim semaphore)
+            public LockReleaser(SemaphoreSlim? semaphore)
             {
                 this.semaphore = semaphore;
             }

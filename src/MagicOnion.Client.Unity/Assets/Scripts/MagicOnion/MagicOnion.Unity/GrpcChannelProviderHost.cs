@@ -24,7 +24,7 @@ namespace MagicOnion.Unity
     /// </example>
     public class GrpcChannelProviderHost : MonoBehaviour
     {
-        public IGrpcChannelProvider Provider { get; private set; }
+        public IGrpcChannelProvider? Provider { get; private set; }
 
         /// <summary>
         /// Initialize gRPC channel provider and the host.
@@ -56,12 +56,12 @@ namespace MagicOnion.Unity
 
         private void OnDestroy()
         {
-            Provider.ShutdownAllChannels();
+            Provider?.ShutdownAllChannels();
         }
 
         private void OnApplicationQuit()
         {
-            Provider.ShutdownAllChannels();
+            Provider?.ShutdownAllChannels();
         }
     }
 }

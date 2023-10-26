@@ -6,7 +6,7 @@ namespace MagicOnion
 {
     public class UnityDebugLogger : ILogger
     {
-        readonly Type forType;
+        readonly Type? forType;
         readonly string forTypeString;
         readonly bool errorToWarn = true; // default is true(gRPC internal log show to warn)
 
@@ -21,7 +21,7 @@ namespace MagicOnion
             this.errorToWarn = errorToWarn;
         }
 
-        protected UnityDebugLogger(Type forType)
+        protected UnityDebugLogger(Type? forType)
         {
             this.forType = forType;
             if (forType != null)
@@ -126,7 +126,7 @@ namespace MagicOnion
         }
 
         /// <summary>Gets the type associated with this logger.</summary>
-        protected Type AssociatedType
+        protected Type? AssociatedType
         {
             get { return forType; }
         }

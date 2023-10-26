@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <OutputType>Library</OutputType>
-    <LangVersion>default</LangVersion>
+
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
     <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
     <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 

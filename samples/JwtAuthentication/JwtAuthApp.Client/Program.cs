@@ -124,12 +124,12 @@ namespace JwtAuthApp.Client
 
                 AuthenticationTokenStorage.Current.Update(authResult.Token, authResult.Expiration); // NOTE: You can also read the token expiration date from JWT.
 
-                context.CallOptions.Headers.Remove(new Metadata.Entry("Authorization", string.Empty));
+                context.CallOptions.Headers?.Remove(new Metadata.Entry("Authorization", string.Empty));
             }
 
-            if (!context.CallOptions.Headers.Contains(new Metadata.Entry("Authorization", string.Empty)))
+            if (!context.CallOptions.Headers?.Contains(new Metadata.Entry("Authorization", string.Empty)) ?? false)
             {
-                context.CallOptions.Headers.Add("Authorization", "Bearer " + AuthenticationTokenStorage.Current.Token);
+                context.CallOptions.Headers?.Add("Authorization", "Bearer " + AuthenticationTokenStorage.Current.Token);
             }
 
             return await next(context);
@@ -144,7 +144,7 @@ namespace JwtAuthApp.Client
 
         private readonly object _syncObject = new object();
 
-        public string Token { get; private set; }
+        public string? Token { get; private set; }
         public DateTimeOffset Expiration { get; private set; }
 
         public bool IsExpired => Token == null || Expiration < DateTimeOffset.Now;

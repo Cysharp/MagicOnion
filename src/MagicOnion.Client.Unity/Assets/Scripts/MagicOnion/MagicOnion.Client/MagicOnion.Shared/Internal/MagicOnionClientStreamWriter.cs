@@ -18,7 +18,7 @@ namespace MagicOnion.Internal
         public Task WriteAsync(T message)
             => inner.WriteAsync(toRawMessage(message));
 
-        public WriteOptions WriteOptions
+        public WriteOptions? WriteOptions
         {
             get => inner.WriteOptions;
             set => inner.WriteOptions = value;

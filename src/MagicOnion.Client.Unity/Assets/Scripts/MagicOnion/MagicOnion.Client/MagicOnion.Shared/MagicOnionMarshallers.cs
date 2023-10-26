@@ -39,7 +39,7 @@ namespace MagicOnion
             }
             else if (parameters.Length >= 16)
             {
-                throw new InvalidOperationException($"The method '{parameters[0].Member.DeclaringType.FullName}.{parameters[0].Member.Name}' must have less than 16 parameters. (Length: {parameters.Length})");
+                throw new InvalidOperationException($"The method '{parameters[0].Member.DeclaringType!.FullName}.{parameters[0].Member.Name}' must have less than 16 parameters. (Length: {parameters.Length})");
             }
             else
             {
@@ -54,7 +54,7 @@ namespace MagicOnion
         {
             // start from T2
             var tupleTypeBase = dynamicArgumentTupleTypes[arguments.Length - 2];
-            return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments);
+            return Activator.CreateInstance(tupleTypeBase.MakeGenericType(typeParameters), arguments)!;
         }
     }
 

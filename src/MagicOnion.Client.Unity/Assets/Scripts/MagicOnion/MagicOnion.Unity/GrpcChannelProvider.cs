@@ -40,7 +40,7 @@ namespace MagicOnion.Unity
     /// </summary>
     public static class GrpcChannelProvider
     {
-        static IGrpcChannelProvider defaultProvider;
+        static IGrpcChannelProvider? defaultProvider;
 
         /// <summary>
         /// Gets a default channel provider. the provider will be initialized by <see cref="GrpcChannelProviderHost"/>.
@@ -208,7 +208,7 @@ namespace MagicOnion.Unity
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
             var address = new Uri((context.Target.IsInsecure ? "http" : "https") + $"://{context.Target.Host}:{context.Target.Port}");
-            var channelOptions = context.ChannelOptions.Get<GrpcChannelOptions>() ?? defaultChannelOptionsFactory();
+            var channelOptions = context.ChannelOptions.GetOrDefault<GrpcChannelOptions>() ?? defaultChannelOptionsFactory();
             var channel = GrpcChannel.ForAddress(address, channelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
@@ -251,7 +251,7 @@ namespace MagicOnion.Unity
         /// </summary>
         protected override GrpcChannelx CreateChannelCore(int id, CreateGrpcChannelContext context)
         {
-            var channelOptions = context.ChannelOptions.Get<GrpcCCoreChannelOptions>() ?? defaultChannelOptions;
+            var channelOptions = context.ChannelOptions.GetOrDefault<GrpcCCoreChannelOptions>() ?? defaultChannelOptions;
             var channel = new Channel(context.Target.Host, context.Target.Port, context.Target.IsInsecure ? ChannelCredentials.Insecure : channelOptions.ChannelCredentials, channelOptions.ChannelOptions);
             var channelHolder = new GrpcChannelx(
                 id,
@@ -270,7 +270,7 @@ namespace MagicOnion.Unity
         public IReadOnlyList<ChannelOption> ChannelOptions { get; set; }
         public ChannelCredentials ChannelCredentials { get; set; }
 
-        public GrpcCCoreChannelOptions(IReadOnlyList<ChannelOption> channelOptions = null, ChannelCredentials channelCredentials = null)
+        public GrpcCCoreChannelOptions(IReadOnlyList<ChannelOption>? channelOptions = null, ChannelCredentials? channelCredentials = null)
         {
             ChannelOptions = channelOptions ?? Array.Empty<ChannelOption>();
             ChannelCredentials = channelCredentials ?? new SslCredentials();

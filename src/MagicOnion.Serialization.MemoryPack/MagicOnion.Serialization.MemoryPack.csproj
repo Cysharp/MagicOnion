@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
+
     <ImplicitUsings>enable</ImplicitUsings>
-    <nullable>enable</nullable>
+    <Nullable>enable</Nullable>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Serialization.MemoryPack</PackageId>

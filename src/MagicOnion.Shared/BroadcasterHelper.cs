@@ -40,11 +40,7 @@ namespace MagicOnion.Server.Hubs
                     return true;
                 })
                 .Where(x => !x.IsSpecialName)
-                .Select(x => new MethodDefinition
-                {
-                    ReceiverType = interfaceType,
-                    MethodInfo = x,
-                })
+                .Select(x => new MethodDefinition(interfaceType, x, default))
                 .ToArray();
         }
 
@@ -74,9 +70,16 @@ namespace MagicOnion.Server.Hubs
         {
             public string Path => ReceiverType.Name + "/" + MethodInfo.Name;
 
-            public Type ReceiverType;
-            public MethodInfo MethodInfo;
-            public int MethodId;
+            public Type ReceiverType { get; set; }
+            public MethodInfo MethodInfo { get; set; }
+            public int MethodId { get; set; }
+
+            public MethodDefinition(Type receiverType, MethodInfo methodInfo, int methodId)
+            {
+                ReceiverType = receiverType;
+                MethodInfo = methodInfo;
+                MethodId = methodId;
+            }
         }
     }
 }

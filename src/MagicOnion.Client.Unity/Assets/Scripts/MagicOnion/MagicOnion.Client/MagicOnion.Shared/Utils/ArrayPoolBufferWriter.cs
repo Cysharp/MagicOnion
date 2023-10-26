@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MagicOnion.Utils
 {
     internal sealed class ArrayPoolBufferWriter : IBufferWriter<byte>, IDisposable
     {
         [ThreadStatic]
-        static ArrayPoolBufferWriter staticInstance;
+        static ArrayPoolBufferWriter? staticInstance;
 
         public static ArrayPoolBufferWriter RentThreadStaticWriter()
         {
@@ -20,7 +21,7 @@ namespace MagicOnion.Utils
 
         const int MinimumBufferSize = 32767; // use 32k buffer.
 
-        byte[] buffer;
+        byte[]? buffer;
         int index;
 
         void Prepare()
@@ -37,9 +38,9 @@ namespace MagicOnion.Utils
 
         public int WrittenCount => index;
 
-        public int Capacity => buffer.Length;
+        public int Capacity => buffer?.Length ?? throw new ObjectDisposedException(nameof(ArrayPoolBufferWriter));
 
-        public int FreeCapacity => buffer.Length - index;
+        public int FreeCapacity => Capacity - index;
 
         public void Advance(int count)
         {
@@ -61,6 +62,7 @@ namespace MagicOnion.Utils
 
         void CheckAndResizeBuffer(int sizeHint)
         {
+            if (buffer == null) throw new ObjectDisposedException(nameof(ArrayPoolBufferWriter));
             if (sizeHint < 0) throw new ArgumentException(nameof(sizeHint));
 
             if (sizeHint == 0)

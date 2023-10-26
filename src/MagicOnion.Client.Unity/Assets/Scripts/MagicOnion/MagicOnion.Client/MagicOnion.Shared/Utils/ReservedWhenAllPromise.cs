@@ -13,8 +13,8 @@ namespace MagicOnion.Utils
     {
         static class ContinuationSentinel
         {
-            public static readonly Action<object> AvailableContinuation = _ => { };
-            public static readonly Action<object> CompletedContinuation = _ => { };
+            public static readonly Action<object?> AvailableContinuation = _ => { };
+            public static readonly Action<object?> CompletedContinuation = _ => { };
         }
 
         static readonly ContextCallback execContextCallback = ExecutionContextCallback;
@@ -23,11 +23,11 @@ namespace MagicOnion.Utils
         int completedCount;
         readonly int resultCount;
 
-        ExceptionDispatchInfo exception;
-        Action<object> continuation = ContinuationSentinel.AvailableContinuation;
-        object state;
-        SynchronizationContext syncContext;
-        ExecutionContext execContext;
+        ExceptionDispatchInfo? exception;
+        Action<object?> continuation = ContinuationSentinel.AvailableContinuation;
+        object? state;
+        SynchronizationContext? syncContext;
+        ExecutionContext? execContext;
 
         public ReservedWhenAllPromise(int reserveCount)
         {
@@ -127,7 +127,7 @@ namespace MagicOnion.Utils
                 : ValueTaskSourceStatus.Pending;
         }
 
-        public void OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags)
+        public void OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags)
         {
             if (Interlocked.CompareExchange(ref this.continuation, continuation, ContinuationSentinel.AvailableContinuation) != ContinuationSentinel.AvailableContinuation)
             {
@@ -155,9 +155,11 @@ namespace MagicOnion.Utils
             }
         }
 
-        static void ExecutionContextCallback(object state)
+        static void ExecutionContextCallback(object? state)
         {
-            var t = (Tuple<Action<object>, ReservedWhenAllPromise>)state;
+            if (state is null) throw new ArgumentNullException(nameof(state));
+
+            var t = (Tuple<Action<object?>, ReservedWhenAllPromise>)state;
             var self = t.Item2;
             if (self.syncContext != null)
             {
@@ -171,9 +173,11 @@ namespace MagicOnion.Utils
             }
         }
 
-        static void SynchronizationContextCallback(object state)
+        static void SynchronizationContextCallback(object? state)
         {
-            var t = (Tuple<Action<object>, ReservedWhenAllPromise>)state;
+            if (state is null) throw new ArgumentNullException(nameof(state));
+
+            var t = (Tuple<Action<object?>, ReservedWhenAllPromise>)state;
             var self = t.Item2;
             var invokeState = self.state;
             self.state = null;
