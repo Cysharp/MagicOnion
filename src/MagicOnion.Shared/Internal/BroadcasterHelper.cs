@@ -1,15 +1,16 @@
-using MagicOnion.Utils;
+using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace MagicOnion.Server.Hubs
+namespace MagicOnion.Internal
 {
     public static class BroadcasterHelper
     {
-        internal static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
+        internal static Type[] DynamicArgumentTupleTypes { get; } = typeof(DynamicArgumentTuple<,>)
+            .GetTypeInfo()
+            .Assembly
             .GetTypes()
             .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
             .OrderBy(x => x.GetGenericArguments().Length)

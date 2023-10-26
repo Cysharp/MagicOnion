@@ -1,6 +1,6 @@
-﻿using System.Text;
+using System.Text;
 
-namespace MagicOnion.Utils
+namespace MagicOnion.Internal
 {
     public static class FNV1A32
     {

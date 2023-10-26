@@ -1,10 +1,10 @@
 #if NON_UNITY || ((!ENABLE_IL2CPP || UNITY_EDITOR) && !NET_STANDARD_2_0)
 
 using Grpc.Core;
+using MagicOnion.Internal;
 using MagicOnion.Internal.Reflection;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Hubs;
-using MagicOnion.Utils;
 using MessagePack;
 using System;
 using System.Collections.Generic;
@@ -373,7 +373,7 @@ namespace MagicOnion.Client.DynamicClient
                         }
                         else
                         {
-                            var deserializeType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2]
+                            var deserializeType = BroadcasterHelper.DynamicArgumentTupleTypes[parameters.Length - 2]
                                 .MakeGenericType(parameters.Select(x => x.ParameterType).ToArray());
                             var lc = il.DeclareLocal(deserializeType);
 

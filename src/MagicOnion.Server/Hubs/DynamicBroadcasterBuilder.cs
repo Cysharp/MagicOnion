@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Microsoft.Extensions.Logging;
 using MagicOnion.Internal.Reflection;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Server.Hubs;
 #if ENABLE_SAVE_ASSEMBLY
@@ -203,7 +204,7 @@ internal
             else
             {
                 // call new DynamicArgumentTuple<T>
-                callType = BroadcasterHelper.dynamicArgumentTupleTypes[parameters.Length - 2].MakeGenericType(parameters);
+                callType = BroadcasterHelper.DynamicArgumentTupleTypes[parameters.Length - 2].MakeGenericType(parameters);
                 il.Emit(OpCodes.Newobj, callType.GetConstructors().First());
             }
 
