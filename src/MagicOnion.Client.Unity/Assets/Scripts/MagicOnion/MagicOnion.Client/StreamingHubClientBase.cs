@@ -10,6 +10,7 @@ using MagicOnion.Server;
 using System.Buffers;
 using System.Linq;
 using MagicOnion.Client.Internal;
+using MagicOnion.Client.Internal.Threading;
 using MagicOnion.Client.Internal.Threading.Tasks;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;

@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MagicOnion
+namespace MagicOnion.Client.Internal.Threading
 {
-    public class AsyncLock
+    internal class AsyncLock
     {
         readonly SemaphoreSlim semaphore;
 
