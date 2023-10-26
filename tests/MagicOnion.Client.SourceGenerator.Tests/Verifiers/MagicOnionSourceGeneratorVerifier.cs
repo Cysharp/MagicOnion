@@ -1,3 +1,4 @@
+// NOTE: To generate the Verify reference source code, temporarily uncomment the following line and run the test.
 //#define WRITE_EXPECTED
 
 // https://github.com/MessagePack-CSharp/MessagePack-CSharp/blob/develop/tests/MessagePack.SourceGenerator.Tests/Verifiers/CSharpSourceGeneratorVerifier%601%2BTest.cs
