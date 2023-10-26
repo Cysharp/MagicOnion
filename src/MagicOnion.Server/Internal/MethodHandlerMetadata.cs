@@ -1,7 +1,7 @@
 using System.Reflection;
 using Grpc.Core;
+using MagicOnion.Internal;
 using MagicOnion.Server.Hubs;
-using MagicOnion.Utils;
 
 namespace MagicOnion.Server.Internal;
 

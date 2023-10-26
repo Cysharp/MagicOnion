@@ -1,4 +1,4 @@
-﻿using MagicOnion.Utils;
+using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Hubs;
 

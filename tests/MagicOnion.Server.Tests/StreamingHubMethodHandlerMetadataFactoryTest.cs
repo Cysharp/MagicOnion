@@ -1,6 +1,6 @@
+using MagicOnion.Internal;
 using MagicOnion.Server.Hubs;
 using MagicOnion.Server.Internal;
-using MagicOnion.Utils;
 using MessagePack;
 
 namespace MagicOnion.Server.Tests;

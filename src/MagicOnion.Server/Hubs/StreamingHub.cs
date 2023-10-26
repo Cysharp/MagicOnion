@@ -1,7 +1,6 @@
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
-using MagicOnion.Utils;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
 

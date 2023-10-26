@@ -38,13 +38,13 @@
   </ItemGroup>
 
   <!-- Sync codes: MagicOnion.Client for Unity -->
-  <PropertyGroup>
-    <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</DestinationRoot>
-  </PropertyGroup>
-  <ItemGroup>
-    <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</DestinationRoot>
+    </PropertyGroup>
+    <ItemGroup>
+      <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+    </ItemGroup>
     <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
   </Target>
 
