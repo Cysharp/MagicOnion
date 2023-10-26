@@ -1,13 +1,10 @@
 using Grpc.Core;
 using MessagePack;
-using MessagePack.Formatters;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace MagicOnion
+namespace MagicOnion.Internal
 {
     // invoke from dynamic methods so must be public
     public static class MagicOnionMarshallers

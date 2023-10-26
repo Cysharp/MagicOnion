@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using System.Text;
 using Grpc.Net.Client;
+using MagicOnion.Internal;
 using Newtonsoft.Json;
 using MessagePack;
 
