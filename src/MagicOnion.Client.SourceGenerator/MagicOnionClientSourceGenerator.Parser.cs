@@ -80,7 +80,7 @@ public partial class MagicOnionClientSourceGenerator
 
         foreach (var namedArg in attr.NamedArguments)
         {
-            if (namedArg.Value.Kind is TypedConstantKind.Error or not TypedConstantKind.Primitive) continue;
+            if (namedArg.Value.Kind is TypedConstantKind.Error or (not TypedConstantKind.Primitive and not TypedConstantKind.Enum)) continue;
 
             switch (namedArg.Key)
             {
