@@ -9,7 +9,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.AsyncLock.LockReleaser.html",
-          "hash": "3Y5k0ZOXM0TiMdQNwh2DfolWx9AkuKtj4ptS7zeMeGA="
+          "hash": "RbRBUgFwMUheZiWx7RQGY0TgEu2tdC/xc/OVWDV5I/c="
         }
       },
       "is_incremental": false,
@@ -297,7 +297,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.MagicOnionClientOptions.html",
-          "hash": "wu1rCKt9UtHAvbzpTmyg82wh8zs0KN4SBUNb0kZl2WQ="
+          "hash": "fHEWKSnv2Kb4vB5qezTIxvdB+G6K3lWuuZthAjNtBco="
         }
       },
       "is_incremental": false,
@@ -825,7 +825,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClient.html",
-          "hash": "Fnat0Yg9koJZxHXh+hJ0MbAHR6BKLZ6xZO6SrTDsAWQ="
+          "hash": "gkXuhEhef7rJn0SXN0uM8yBo845g52DsT9CtmC5R/zE="
         }
       },
       "is_incremental": false,
@@ -837,7 +837,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.html",
-          "hash": "umigfp7avCbwSmJFjjnxtZEkDCkLfYQRYA/nksOAJqg="
+          "hash": "m/m4AJtGg1wZO80V2x8IHcZDWMILb1ucBgvH3438a44="
         }
       },
       "is_incremental": false,
@@ -849,7 +849,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientFactoryDelegate-2.html",
-          "hash": "rMnnprNqtIdmvqqzHAP9NlAVpcEscsldxgShZuxvPLU="
+          "hash": "KaZfWPp9PNnC6cawM6TalsZfHzU4rmrVdWKu2wYtpko="
         }
       },
       "is_incremental": false,
@@ -1317,7 +1317,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.GrpcMethodHelper.html",
-          "hash": "HRrPfzpHXY7NV5qfQOwB2EkWqIJVZDN2V2Zdx1sARR0="
+          "hash": "ev4GbTF1zuFbRdG0oW88JF/5dCUYpm/o7pPnmpzMYVs="
         }
       },
       "is_incremental": false,
@@ -1497,7 +1497,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.MetadataExtensions.html",
-          "hash": "c9h6zhSaalAj+QHkxKVPEGPz6a7lXWuRcoxAH4NU5dU="
+          "hash": "0P5Tsysjakiv9kP7QmVa8LXuLxtC5+AohJrwQR7UeEQ="
         }
       },
       "is_incremental": false,
@@ -1533,7 +1533,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.IMagicOnionSerializerProvider.html",
-          "hash": "Ie64PfvvexRBHpt8ogPMyxgk6F4zq54gxnNFWoVF25w="
+          "hash": "TDYcOyabfY8sALEHWUeIoXvrNDhgmvnIrrb1u2OMZrY="
         }
       },
       "is_incremental": false,
@@ -1737,7 +1737,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html",
-          "hash": "cx7pABA/gP1oOFLW0lb+E6Eo2S08mbshvDL7100+530="
+          "hash": "mrTtdqRlP/mzcSFQeBeeV9f1U4nuEU8tNP+uFeLmZZU="
         }
       },
       "is_incremental": false,
@@ -1761,7 +1761,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.html",
-          "hash": "2BwBZS+otPBXKDPlIYidLLuR6yJdOEhBk8/7+5TLAfA="
+          "hash": "7mPMPttW/0f+HniWUiifMWwWD5P66kjBrnpCnq269rs="
         }
       },
       "is_incremental": false,
@@ -2757,7 +2757,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Server.Redis.RedisGroupOptions.html",
-          "hash": "EACEmKlsNaBaQcQ5nkr9v1sD3lYJvneoHL85SCyWIJ0="
+          "hash": "JShfIzDtIy9LPVnZ0hkWK2hgbVpvxncYBpPT0yZM3M8="
         }
       },
       "is_incremental": false,
@@ -2913,7 +2913,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.UnsafeDirectBlitResolver.html",
-          "hash": "VoRMLdevI5dISsKsWUG67ZcglqiWvdk6Dof/629nDQM="
+          "hash": "oFzPTHJem7mC0bmDb8KucP+bjfgog91TpF8r+TO8A8o="
         }
       },
       "is_incremental": false,
@@ -2949,7 +2949,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Utils.ReservedWhenAllPromise.html",
-          "hash": "bzr5YMFOEeCfaKdSMC/MfNl4P+YVXHkvTn1qEJeOT20="
+          "hash": "mX8o8GR1GOmignHSBn5so6V7pg1K0jt0PBrS3Qfe7Bc="
         }
       },
       "is_incremental": false,

@@ -128,14 +128,14 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_Get_Metadata_System_String_System_Boolean_">Get(Metadata, String, Boolean)</a>
+          <a class="xref" href="MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetOrDefault_Metadata_System_String_System_Boolean_">GetOrDefault(Metadata, String, Boolean)</a>
         </td>
         <td class="markdown level1 summary"><p>Get metdata entry. If does not exists, return null.</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValue_Metadata_System_String_System_Boolean_">GetValue(Metadata, String, Boolean)</a>
+          <a class="xref" href="MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValueOrDefault_Metadata_System_String_System_Boolean_">GetValueOrDefault(Metadata, String, Boolean)</a>
         </td>
         <td class="markdown level1 summary"><p>Get metdata string value. If does not exists, return null.</p>
 </td>
@@ -177,14 +177,14 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_MetadataExtensions_Get_" data-uid="MagicOnion.MetadataExtensions.Get*"></a>
-  <h4 id="MagicOnion_MetadataExtensions_Get_Metadata_System_String_System_Boolean_" data-uid="MagicOnion.MetadataExtensions.Get(Metadata,System.String,System.Boolean)">Get(Metadata, String, Boolean)</h4>
+  <a id="MagicOnion_MetadataExtensions_GetOrDefault_" data-uid="MagicOnion.MetadataExtensions.GetOrDefault*"></a>
+  <h4 id="MagicOnion_MetadataExtensions_GetOrDefault_Metadata_System_String_System_Boolean_" data-uid="MagicOnion.MetadataExtensions.GetOrDefault(Metadata,System.String,System.Boolean)">GetOrDefault(Metadata, String, Boolean)</h4>
   <div class="markdown level1 summary"><p>Get metdata entry. If does not exists, return null.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Metadata.Entry Get(this Metadata metadata, string key, bool ignoreCase = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public static Metadata.Entry? GetOrDefault(this Metadata metadata, string key, bool ignoreCase = true)</code></pre>
   </div>
 
   <section>
@@ -202,7 +202,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Metadata.Entry</span></dt>
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">Metadata.Entry</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -219,14 +219,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_MetadataExtensions_GetValue_" data-uid="MagicOnion.MetadataExtensions.GetValue*"></a>
-  <h4 id="MagicOnion_MetadataExtensions_GetValue_Metadata_System_String_System_Boolean_" data-uid="MagicOnion.MetadataExtensions.GetValue(Metadata,System.String,System.Boolean)">GetValue(Metadata, String, Boolean)</h4>
+  <a id="MagicOnion_MetadataExtensions_GetValueOrDefault_" data-uid="MagicOnion.MetadataExtensions.GetValueOrDefault*"></a>
+  <h4 id="MagicOnion_MetadataExtensions_GetValueOrDefault_Metadata_System_String_System_Boolean_" data-uid="MagicOnion.MetadataExtensions.GetValueOrDefault(Metadata,System.String,System.Boolean)">GetValueOrDefault(Metadata, String, Boolean)</h4>
   <div class="markdown level1 summary"><p>Get metdata string value. If does not exists, return null.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string GetValue(this Metadata metadata, string key, bool ignoreCase = true)</code></pre>
+    <pre><code class="lang-csharp hljs">public static string? GetValueOrDefault(this Metadata metadata, string key, bool ignoreCase = true)</code></pre>
   </div>
 
   <section>
@@ -244,7 +244,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">System.String</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>

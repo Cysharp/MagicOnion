@@ -134,7 +134,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_">CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType, String, String, MethodInfo, IMagicOnionSerializer)</a>
+          <a class="xref" href="MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_">CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType, String, String, Nullable&lt;MethodInfo&gt;, IMagicOnionSerializer)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -146,7 +146,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_">CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType, String, String, MethodInfo, IMagicOnionSerializer)</a>
+          <a class="xref" href="MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_">CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType, String, String, Nullable&lt;MethodInfo&gt;, IMagicOnionSerializer)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -241,12 +241,12 @@
   </section>
   <section>
   <a id="MagicOnion_GrpcMethodHelper_CreateMethod_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod*"></a>
-  <h4 id="MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)">CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType, String, String, MethodInfo, IMagicOnionSerializer)</h4>
+  <h4 id="MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)">CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType, String, String, Nullable&lt;MethodInfo&gt;, IMagicOnionSerializer)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static GrpcMethodHelper.MagicOnionMethod&lt;Nil, TResponse, Box&lt;Nil&gt;, TRawResponse&gt; CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)</code></pre>
+    <pre><code class="lang-csharp hljs">public static GrpcMethodHelper.MagicOnionMethod&lt;Nil, TResponse, Box&lt;Nil&gt;, TRawResponse&gt; CreateMethod&lt;TResponse, TRawResponse&gt;(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)</code></pre>
   </div>
 
   <section>
@@ -258,7 +258,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>name</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">MethodInfo</span></dt>
+    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">MethodInfo</span>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
     <dd></dd>
@@ -351,12 +351,12 @@
   </section>
   <section>
   <a id="MagicOnion_GrpcMethodHelper_CreateMethod_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod*"></a>
-  <h4 id="MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)">CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType, String, String, MethodInfo, IMagicOnionSerializer)</h4>
+  <h4 id="MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_" data-uid="MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)">CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType, String, String, Nullable&lt;MethodInfo&gt;, IMagicOnionSerializer)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType methodType, string serviceName, string name, MethodInfo methodInfo, IMagicOnionSerializer messageSerializer)</code></pre>
+    <pre><code class="lang-csharp hljs">public static GrpcMethodHelper.MagicOnionMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt; CreateMethod&lt;TRequest, TResponse, TRawRequest, TRawResponse&gt;(MethodType methodType, string serviceName, string name, MethodInfo? methodInfo, IMagicOnionSerializer messageSerializer)</code></pre>
   </div>
 
   <section>
@@ -368,7 +368,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>name</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">MethodInfo</span></dt>
+    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">MethodInfo</span>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
     <dd></dd>

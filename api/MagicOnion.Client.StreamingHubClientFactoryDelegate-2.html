@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate TStreamingHub StreamingHubClientFactoryDelegate&lt;out TStreamingHub, in TReceiver&gt;(CallInvoker callInvoker, TReceiver receiver, string host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+    <pre><code class="lang-csharp hljs">public delegate TStreamingHub StreamingHubClientFactoryDelegate&lt;out TStreamingHub, in TReceiver&gt;(CallInvoker callInvoker, TReceiver receiver, string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
     where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;;</code></pre>
   </div>
 
@@ -96,7 +96,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>receiver</code></span> <span class="xref">TReceiver</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>host</code></span> <span class="xref">System.String</span></dt>
+    <dt><span class="parametername"><code>host</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">System.String</span>&gt;</dt>
     <dd></dd>
     <dt><span class="parametername"><code>callOptions</code></span> <span class="xref">CallOptions</span></dt>
     <dd></dd>

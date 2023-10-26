@@ -51,12 +51,15 @@ references:
   commentId: T:MagicOnion.AsyncLock.LockReleaser
   fullName: MagicOnion.AsyncLock.LockReleaser
   nameWithType: AsyncLock.LockReleaser
-- uid: MagicOnion.AsyncLock.LockReleaser.#ctor(SemaphoreSlim)
-  name: LockReleaser(SemaphoreSlim)
-  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser__ctor_SemaphoreSlim_
-  commentId: M:MagicOnion.AsyncLock.LockReleaser.#ctor(SemaphoreSlim)
-  fullName: MagicOnion.AsyncLock.LockReleaser.LockReleaser(SemaphoreSlim)
-  nameWithType: AsyncLock.LockReleaser.LockReleaser(SemaphoreSlim)
+- uid: MagicOnion.AsyncLock.LockReleaser.#ctor(System.Nullable{SemaphoreSlim})
+  name: LockReleaser(Nullable<SemaphoreSlim>)
+  href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser__ctor_System_Nullable_SemaphoreSlim__
+  commentId: M:MagicOnion.AsyncLock.LockReleaser.#ctor(System.Nullable{SemaphoreSlim})
+  name.vb: LockReleaser(Nullable(Of SemaphoreSlim))
+  fullName: MagicOnion.AsyncLock.LockReleaser.LockReleaser(System.Nullable<SemaphoreSlim>)
+  fullName.vb: MagicOnion.AsyncLock.LockReleaser.LockReleaser(System.Nullable(Of SemaphoreSlim))
+  nameWithType: AsyncLock.LockReleaser.LockReleaser(Nullable<SemaphoreSlim>)
+  nameWithType.vb: AsyncLock.LockReleaser.LockReleaser(Nullable(Of SemaphoreSlim))
 - uid: MagicOnion.AsyncLock.LockReleaser.#ctor*
   name: LockReleaser
   href: api/MagicOnion.AsyncLock.LockReleaser.html#MagicOnion_AsyncLock_LockReleaser__ctor_
@@ -1177,15 +1180,15 @@ references:
   commentId: T:MagicOnion.Client.MagicOnionClientOptions
   fullName: MagicOnion.Client.MagicOnionClientOptions
   nameWithType: MagicOnionClientOptions
-- uid: MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.String,CallOptions,IReadOnlyList{MagicOnion.Client.IClientFilter})
-  name: MagicOnionClientOptions(CallInvoker, String, CallOptions, IReadOnlyList<IClientFilter>)
-  href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_String_CallOptions_IReadOnlyList_MagicOnion_Client_IClientFilter__
-  commentId: M:MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.String,CallOptions,IReadOnlyList{MagicOnion.Client.IClientFilter})
-  name.vb: MagicOnionClientOptions(CallInvoker, String, CallOptions, IReadOnlyList(Of IClientFilter))
-  fullName: MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, System.String, CallOptions, IReadOnlyList<MagicOnion.Client.IClientFilter>)
-  fullName.vb: MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, System.String, CallOptions, IReadOnlyList(Of MagicOnion.Client.IClientFilter))
-  nameWithType: MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, String, CallOptions, IReadOnlyList<IClientFilter>)
-  nameWithType.vb: MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, String, CallOptions, IReadOnlyList(Of IClientFilter))
+- uid: MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,IReadOnlyList{MagicOnion.Client.IClientFilter})
+  name: MagicOnionClientOptions(CallInvoker, Nullable<String>, CallOptions, IReadOnlyList<IClientFilter>)
+  href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_Nullable_System_String__CallOptions_IReadOnlyList_MagicOnion_Client_IClientFilter__
+  commentId: M:MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,IReadOnlyList{MagicOnion.Client.IClientFilter})
+  name.vb: MagicOnionClientOptions(CallInvoker, Nullable(Of String), CallOptions, IReadOnlyList(Of IClientFilter))
+  fullName: MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, System.Nullable<System.String>, CallOptions, IReadOnlyList<MagicOnion.Client.IClientFilter>)
+  fullName.vb: MagicOnion.Client.MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, System.Nullable(Of System.String), CallOptions, IReadOnlyList(Of MagicOnion.Client.IClientFilter))
+  nameWithType: MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, Nullable<String>, CallOptions, IReadOnlyList<IClientFilter>)
+  nameWithType.vb: MagicOnionClientOptions.MagicOnionClientOptions(CallInvoker, Nullable(Of String), CallOptions, IReadOnlyList(Of IClientFilter))
 - uid: MagicOnion.Client.MagicOnionClientOptions.#ctor*
   name: MagicOnionClientOptions
   href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions__ctor_
@@ -1274,12 +1277,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.MagicOnionClientOptions.WithFilters
   nameWithType: MagicOnionClientOptions.WithFilters
-- uid: MagicOnion.Client.MagicOnionClientOptions.WithHost(System.String)
-  name: WithHost(String)
-  href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions_WithHost_System_String_
-  commentId: M:MagicOnion.Client.MagicOnionClientOptions.WithHost(System.String)
-  fullName: MagicOnion.Client.MagicOnionClientOptions.WithHost(System.String)
-  nameWithType: MagicOnionClientOptions.WithHost(String)
+- uid: MagicOnion.Client.MagicOnionClientOptions.WithHost(System.Nullable{System.String})
+  name: WithHost(Nullable<String>)
+  href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions_WithHost_System_Nullable_System_String__
+  commentId: M:MagicOnion.Client.MagicOnionClientOptions.WithHost(System.Nullable{System.String})
+  name.vb: WithHost(Nullable(Of String))
+  fullName: MagicOnion.Client.MagicOnionClientOptions.WithHost(System.Nullable<System.String>)
+  fullName.vb: MagicOnion.Client.MagicOnionClientOptions.WithHost(System.Nullable(Of System.String))
+  nameWithType: MagicOnionClientOptions.WithHost(Nullable<String>)
+  nameWithType.vb: MagicOnionClientOptions.WithHost(Nullable(Of String))
 - uid: MagicOnion.Client.MagicOnionClientOptions.WithHost*
   name: WithHost
   href: api/MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions_WithHost_
@@ -3979,24 +3985,24 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.StreamingHubClient.Connect
   nameWithType: StreamingHubClient.Connect
-- uid: MagicOnion.Client.StreamingHubClient.Connect``2(CallInvoker,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  name: Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_CallInvoker___1_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_
-  commentId: M:MagicOnion.Client.StreamingHubClient.Connect``2(CallInvoker,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  name.vb: Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  fullName: MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-- uid: MagicOnion.Client.StreamingHubClient.Connect``2(ChannelBase,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  name: Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_ChannelBase___1_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_
-  commentId: M:MagicOnion.Client.StreamingHubClient.Connect``2(ChannelBase,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  name.vb: Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  fullName: MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
-  nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+- uid: MagicOnion.Client.StreamingHubClient.Connect``2(CallInvoker,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name: Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_CallInvoker___1_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_
+  commentId: M:MagicOnion.Client.StreamingHubClient.Connect``2(CallInvoker,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name.vb: Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  fullName: MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(CallInvoker, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+- uid: MagicOnion.Client.StreamingHubClient.Connect``2(ChannelBase,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name: Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_Connect__2_ChannelBase___1_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_
+  commentId: M:MagicOnion.Client.StreamingHubClient.Connect``2(ChannelBase,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name.vb: Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  fullName: MagicOnion.Client.StreamingHubClient.Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  nameWithType: StreamingHubClient.Connect<TStreamingHub, TReceiver>(ChannelBase, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
+  nameWithType.vb: StreamingHubClient.Connect(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger)
 - uid: MagicOnion.Client.StreamingHubClient.ConnectAsync*
   name: ConnectAsync
   href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync_
@@ -4004,24 +4010,24 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync
   nameWithType: StreamingHubClient.ConnectAsync
-- uid: MagicOnion.Client.StreamingHubClient.ConnectAsync``2(CallInvoker,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
-  name: ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_CallInvoker___1_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_
-  commentId: M:MagicOnion.Client.StreamingHubClient.ConnectAsync``2(CallInvoker,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
-  name.vb: ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
-  fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
-  nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-- uid: MagicOnion.Client.StreamingHubClient.ConnectAsync``2(ChannelBase,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
-  name: ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_ChannelBase___1_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_
-  commentId: M:MagicOnion.Client.StreamingHubClient.ConnectAsync``2(ChannelBase,``1,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
-  name.vb: ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
-  fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
-  nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
-  nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, String, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+- uid: MagicOnion.Client.StreamingHubClient.ConnectAsync``2(CallInvoker,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name: ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_CallInvoker___1_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_
+  commentId: M:MagicOnion.Client.StreamingHubClient.ConnectAsync``2(CallInvoker,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name.vb: ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(CallInvoker, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(CallInvoker, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+- uid: MagicOnion.Client.StreamingHubClient.ConnectAsync``2(ChannelBase,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name: ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  href: api/MagicOnion.Client.StreamingHubClient.html#MagicOnion_Client_StreamingHubClient_ConnectAsync__2_ChannelBase___1_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IStreamingHubClientFactoryProvider_MagicOnion_Client_IMagicOnionClientLogger_CancellationToken_
+  commentId: M:MagicOnion.Client.StreamingHubClient.ConnectAsync``2(ChannelBase,``1,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IStreamingHubClientFactoryProvider,MagicOnion.Client.IMagicOnionClientLogger,CancellationToken)
+  name.vb: ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  fullName: MagicOnion.Client.StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  fullName.vb: MagicOnion.Client.StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IStreamingHubClientFactoryProvider, MagicOnion.Client.IMagicOnionClientLogger, CancellationToken)
+  nameWithType: StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(ChannelBase, TReceiver, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
+  nameWithType.vb: StreamingHubClient.ConnectAsync(Of TStreamingHub, TReceiver)(ChannelBase, TReceiver, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IStreamingHubClientFactoryProvider, IMagicOnionClientLogger, CancellationToken)
 - uid: MagicOnion.Client.StreamingHubClientBase`2
   name: StreamingHubClientBase<TStreamingHub, TReceiver>
   href: api/MagicOnion.Client.StreamingHubClientBase-2.html
@@ -4031,14 +4037,15 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver)
   nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>
   nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver)
-- uid: MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  name: StreamingHubClientBase(CallInvoker, String, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_String_CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_
-  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.String,CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase(CallInvoker, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase(CallInvoker, System.String, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase(CallInvoker, String, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase(CallInvoker, String, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name: StreamingHubClientBase(CallInvoker, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)
+  name.vb: StreamingHubClientBase(CallInvoker, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase(CallInvoker, System.Nullable<System.String>, CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase(CallInvoker, System.Nullable(Of System.String), CallOptions, MagicOnion.Serialization.IMagicOnionSerializerProvider, MagicOnion.Client.IMagicOnionClientLogger)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.StreamingHubClientBase(CallInvoker, Nullable<String>, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).StreamingHubClientBase(CallInvoker, Nullable(Of String), CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)
 - uid: MagicOnion.Client.StreamingHubClientBase`2.#ctor*
   name: StreamingHubClientBase
   href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_
@@ -7086,15 +7093,15 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
   nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
   nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, MethodInfo, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, MethodInfo, MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
+- uid: MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__2_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``2(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TResponse, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TResponse, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
 - uid: MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MagicOnion.Serialization.IMagicOnionSerializer)
   name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
   href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MagicOnion_Serialization_IMagicOnionSerializer_
@@ -7104,15 +7111,15 @@ references:
   fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, MagicOnion.Serialization.IMagicOnionSerializer)
   nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, IMagicOnionSerializer)
   nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, IMagicOnionSerializer)
-- uid: MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)
-  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_MethodInfo_MagicOnion_Serialization_IMagicOnionSerializer_
-  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,MethodInfo,MagicOnion.Serialization.IMagicOnionSerializer)
-  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, MethodInfo, MagicOnion.Serialization.IMagicOnionSerializer)
-  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, MethodInfo, MagicOnion.Serialization.IMagicOnionSerializer)
-  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
-  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, MethodInfo, IMagicOnionSerializer)
+- uid: MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name: CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_CreateMethod__4_MethodType_System_String_System_String_System_Nullable_MethodInfo__MagicOnion_Serialization_IMagicOnionSerializer_
+  commentId: M:MagicOnion.GrpcMethodHelper.CreateMethod``4(MethodType,System.String,System.String,System.Nullable{MethodInfo},MagicOnion.Serialization.IMagicOnionSerializer)
+  name.vb: CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
+  fullName: MagicOnion.GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, System.String, System.String, System.Nullable<MethodInfo>, MagicOnion.Serialization.IMagicOnionSerializer)
+  fullName.vb: MagicOnion.GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, System.String, System.String, System.Nullable(Of MethodInfo), MagicOnion.Serialization.IMagicOnionSerializer)
+  nameWithType: GrpcMethodHelper.CreateMethod<TRequest, TResponse, TRawRequest, TRawResponse>(MethodType, String, String, Nullable<MethodInfo>, IMagicOnionSerializer)
+  nameWithType.vb: GrpcMethodHelper.CreateMethod(Of TRequest, TResponse, TRawRequest, TRawResponse)(MethodType, String, String, Nullable(Of MethodInfo), IMagicOnionSerializer)
 - uid: MagicOnion.GrpcMethodHelper.IgnoreNilMarshaller
   name: IgnoreNilMarshaller
   href: api/MagicOnion.GrpcMethodHelper.html#MagicOnion_GrpcMethodHelper_IgnoreNilMarshaller
@@ -7766,32 +7773,32 @@ references:
   commentId: F:MagicOnion.MetadataExtensions.BinarySuffix
   fullName: MagicOnion.MetadataExtensions.BinarySuffix
   nameWithType: MetadataExtensions.BinarySuffix
-- uid: MagicOnion.MetadataExtensions.Get(Metadata,System.String,System.Boolean)
-  name: Get(Metadata, String, Boolean)
-  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_Get_Metadata_System_String_System_Boolean_
-  commentId: M:MagicOnion.MetadataExtensions.Get(Metadata,System.String,System.Boolean)
-  fullName: MagicOnion.MetadataExtensions.Get(Metadata, System.String, System.Boolean)
-  nameWithType: MetadataExtensions.Get(Metadata, String, Boolean)
-- uid: MagicOnion.MetadataExtensions.Get*
-  name: Get
-  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_Get_
-  commentId: Overload:MagicOnion.MetadataExtensions.Get
+- uid: MagicOnion.MetadataExtensions.GetOrDefault(Metadata,System.String,System.Boolean)
+  name: GetOrDefault(Metadata, String, Boolean)
+  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetOrDefault_Metadata_System_String_System_Boolean_
+  commentId: M:MagicOnion.MetadataExtensions.GetOrDefault(Metadata,System.String,System.Boolean)
+  fullName: MagicOnion.MetadataExtensions.GetOrDefault(Metadata, System.String, System.Boolean)
+  nameWithType: MetadataExtensions.GetOrDefault(Metadata, String, Boolean)
+- uid: MagicOnion.MetadataExtensions.GetOrDefault*
+  name: GetOrDefault
+  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetOrDefault_
+  commentId: Overload:MagicOnion.MetadataExtensions.GetOrDefault
   isSpec: "True"
-  fullName: MagicOnion.MetadataExtensions.Get
-  nameWithType: MetadataExtensions.Get
-- uid: MagicOnion.MetadataExtensions.GetValue(Metadata,System.String,System.Boolean)
-  name: GetValue(Metadata, String, Boolean)
-  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValue_Metadata_System_String_System_Boolean_
-  commentId: M:MagicOnion.MetadataExtensions.GetValue(Metadata,System.String,System.Boolean)
-  fullName: MagicOnion.MetadataExtensions.GetValue(Metadata, System.String, System.Boolean)
-  nameWithType: MetadataExtensions.GetValue(Metadata, String, Boolean)
-- uid: MagicOnion.MetadataExtensions.GetValue*
-  name: GetValue
-  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValue_
-  commentId: Overload:MagicOnion.MetadataExtensions.GetValue
+  fullName: MagicOnion.MetadataExtensions.GetOrDefault
+  nameWithType: MetadataExtensions.GetOrDefault
+- uid: MagicOnion.MetadataExtensions.GetValueOrDefault(Metadata,System.String,System.Boolean)
+  name: GetValueOrDefault(Metadata, String, Boolean)
+  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValueOrDefault_Metadata_System_String_System_Boolean_
+  commentId: M:MagicOnion.MetadataExtensions.GetValueOrDefault(Metadata,System.String,System.Boolean)
+  fullName: MagicOnion.MetadataExtensions.GetValueOrDefault(Metadata, System.String, System.Boolean)
+  nameWithType: MetadataExtensions.GetValueOrDefault(Metadata, String, Boolean)
+- uid: MagicOnion.MetadataExtensions.GetValueOrDefault*
+  name: GetValueOrDefault
+  href: api/MagicOnion.MetadataExtensions.html#MagicOnion_MetadataExtensions_GetValueOrDefault_
+  commentId: Overload:MagicOnion.MetadataExtensions.GetValueOrDefault
   isSpec: "True"
-  fullName: MagicOnion.MetadataExtensions.GetValue
-  nameWithType: MetadataExtensions.GetValue
+  fullName: MagicOnion.MetadataExtensions.GetValueOrDefault
+  nameWithType: MetadataExtensions.GetValueOrDefault
 - uid: MagicOnion.ReturnStatusException
   name: ReturnStatusException
   href: api/MagicOnion.ReturnStatusException.html
@@ -7900,12 +7907,15 @@ references:
   commentId: T:MagicOnion.Serialization.IMagicOnionSerializerProvider
   fullName: MagicOnion.Serialization.IMagicOnionSerializerProvider
   nameWithType: IMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  name: Create(MethodType, MethodInfo)
-  href: api/MagicOnion.Serialization.IMagicOnionSerializerProvider.html#MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_MethodInfo_
-  commentId: M:MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  fullName: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
-  nameWithType: IMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
+- uid: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name: Create(MethodType, Nullable<MethodInfo>)
+  href: api/MagicOnion.Serialization.IMagicOnionSerializerProvider.html#MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
+  commentId: M:MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name.vb: Create(MethodType, Nullable(Of MethodInfo))
+  fullName: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
+  fullName.vb: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
+  nameWithType: IMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
+  nameWithType.vb: IMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
 - uid: MagicOnion.Serialization.IMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.IMagicOnionSerializerProvider.html#MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_
@@ -8593,12 +8603,15 @@ references:
   commentId: T:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider
   nameWithType: MemoryPackMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  name: Create(MethodType, MethodInfo)
-  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_MethodInfo_
-  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
-  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
+- uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name: Create(MethodType, Nullable<MethodInfo>)
+  href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
+  commentId: M:MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name.vb: Create(MethodType, Nullable(Of MethodInfo))
+  fullName: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
+  fullName.vb: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
+  nameWithType: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
+  nameWithType.vb: MemoryPackMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
 - uid: MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.MemoryPack.MemoryPackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MemoryPack_MemoryPackMagicOnionSerializerProvider_Create_
@@ -8651,12 +8664,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.MessagePackMagicOnionSerializerProvider
   nameWithType: MessagePackMagicOnionSerializerProvider.MessagePackMagicOnionSerializerProvider
-- uid: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  name: Create(MethodType, MethodInfo)
-  href: api/MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MessagePackMagicOnionSerializerProvider_Create_MethodType_MethodInfo_
-  commentId: M:MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType,MethodInfo)
-  fullName: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
-  nameWithType: MessagePackMagicOnionSerializerProvider.Create(MethodType, MethodInfo)
+- uid: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name: Create(MethodType, Nullable<MethodInfo>)
+  href: api/MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MessagePackMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__
+  commentId: M:MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})
+  name.vb: Create(MethodType, Nullable(Of MethodInfo))
+  fullName: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType, System.Nullable<MethodInfo>)
+  fullName.vb: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create(MethodType, System.Nullable(Of MethodInfo))
+  nameWithType: MessagePackMagicOnionSerializerProvider.Create(MethodType, Nullable<MethodInfo>)
+  nameWithType.vb: MessagePackMagicOnionSerializerProvider.Create(MethodType, Nullable(Of MethodInfo))
 - uid: MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.Create*
   name: Create
   href: api/MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider.html#MagicOnion_Serialization_MessagePackMagicOnionSerializerProvider_Create_
@@ -15220,15 +15236,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Utils.ReservedWhenAllPromise.GetStatus
   nameWithType: ReservedWhenAllPromise.GetStatus
-- uid: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Object},System.Object,System.Int16,ValueTaskSourceOnCompletedFlags)
-  name: OnCompleted(Action<Object>, Object, Int16, ValueTaskSourceOnCompletedFlags)
-  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_Action_System_Object__System_Object_System_Int16_ValueTaskSourceOnCompletedFlags_
-  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Object},System.Object,System.Int16,ValueTaskSourceOnCompletedFlags)
-  name.vb: OnCompleted(Action(Of Object), Object, Int16, ValueTaskSourceOnCompletedFlags)
-  fullName: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action<System.Object>, System.Object, System.Int16, ValueTaskSourceOnCompletedFlags)
-  fullName.vb: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action(Of System.Object), System.Object, System.Int16, ValueTaskSourceOnCompletedFlags)
-  nameWithType: ReservedWhenAllPromise.OnCompleted(Action<Object>, Object, Int16, ValueTaskSourceOnCompletedFlags)
-  nameWithType.vb: ReservedWhenAllPromise.OnCompleted(Action(Of Object), Object, Int16, ValueTaskSourceOnCompletedFlags)
+- uid: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Nullable{System.Object}},System.Nullable{System.Object},System.Int16,ValueTaskSourceOnCompletedFlags)
+  name: OnCompleted(Action<Nullable<Object>>, Nullable<Object>, Int16, ValueTaskSourceOnCompletedFlags)
+  href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_Action_System_Nullable_System_Object___System_Nullable_System_Object__System_Int16_ValueTaskSourceOnCompletedFlags_
+  commentId: M:MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action{System.Nullable{System.Object}},System.Nullable{System.Object},System.Int16,ValueTaskSourceOnCompletedFlags)
+  name.vb: OnCompleted(Action(Of Nullable(Of Object)), Nullable(Of Object), Int16, ValueTaskSourceOnCompletedFlags)
+  fullName: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action<System.Nullable<System.Object>>, System.Nullable<System.Object>, System.Int16, ValueTaskSourceOnCompletedFlags)
+  fullName.vb: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted(Action(Of System.Nullable(Of System.Object)), System.Nullable(Of System.Object), System.Int16, ValueTaskSourceOnCompletedFlags)
+  nameWithType: ReservedWhenAllPromise.OnCompleted(Action<Nullable<Object>>, Nullable<Object>, Int16, ValueTaskSourceOnCompletedFlags)
+  nameWithType.vb: ReservedWhenAllPromise.OnCompleted(Action(Of Nullable(Of Object)), Nullable(Of Object), Int16, ValueTaskSourceOnCompletedFlags)
 - uid: MagicOnion.Utils.ReservedWhenAllPromise.OnCompleted*
   name: OnCompleted
   href: api/MagicOnion.Utils.ReservedWhenAllPromise.html#MagicOnion_Utils_ReservedWhenAllPromise_OnCompleted_

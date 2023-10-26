@@ -106,7 +106,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html#MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_MethodInfo_">Create(MethodType, MethodInfo)</a>
+          <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html#MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__">Create(MethodType, Nullable&lt;MethodInfo&gt;)</a>
         </td>
         <td class="markdown level1 summary"><p>Create a serializer for the service method.</p>
 </td>
@@ -118,13 +118,13 @@
   </h3>
   <section>
   <a id="MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_" data-uid="MagicOnion.Serialization.IMagicOnionSerializerProvider.Create*"></a>
-  <h4 id="MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_MethodInfo_" data-uid="MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,MethodInfo)">Create(MethodType, MethodInfo)</h4>
+  <h4 id="MagicOnion_Serialization_IMagicOnionSerializerProvider_Create_MethodType_System_Nullable_MethodInfo__" data-uid="MagicOnion.Serialization.IMagicOnionSerializerProvider.Create(MethodType,System.Nullable{MethodInfo})">Create(MethodType, Nullable&lt;MethodInfo&gt;)</h4>
   <div class="markdown level1 summary"><p>Create a serializer for the service method.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IMagicOnionSerializer Create(MethodType methodType, MethodInfo methodInfo)</code></pre>
+    <pre><code class="lang-csharp hljs">IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)</code></pre>
   </div>
 
   <section>
@@ -133,7 +133,7 @@
     <dt><span class="parametername"><code>methodType</code></span> <span class="xref">MethodType</span></dt>
     <dd><p>gRPC method type of the method.</p>
 </dd>
-    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">MethodInfo</span></dt>
+    <dt><span class="parametername"><code>methodInfo</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">MethodInfo</span>&gt;</dt>
     <dd><p>A method info for an implementation of the service method. It is a hint that handling request parameters on the server, which may be passed null on the client.</p>
 </dd>
   </dl>
