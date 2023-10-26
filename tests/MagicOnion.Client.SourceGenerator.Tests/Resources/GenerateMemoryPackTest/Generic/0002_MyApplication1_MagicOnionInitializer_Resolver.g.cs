@@ -15,6 +15,7 @@ namespace MyApplication1
         public static void RegisterMemoryPackFormatters()
         {
             global::MemoryPack.MemoryPackFormatterProvider.Register(new global::MagicOnion.Serialization.MemoryPack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>());
+            global::MemoryPack.MemoryPackFormatterProvider.Register(new global::MemoryPack.Formatters.ValueTupleFormatter<global::System.String, global::System.Int32>());
         }
     }
 }
