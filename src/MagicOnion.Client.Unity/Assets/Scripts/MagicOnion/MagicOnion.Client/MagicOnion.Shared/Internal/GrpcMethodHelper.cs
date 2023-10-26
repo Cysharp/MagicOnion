@@ -2,11 +2,10 @@ using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Grpc.Core;
-using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MessagePack;
 
-namespace MagicOnion
+namespace MagicOnion.Internal
 {
     public static class GrpcMethodHelper
     {
@@ -60,7 +59,7 @@ namespace MagicOnion
             //             so as a special case we do not serialize/deserialize and always convert to a fixed values.
             var isMethodResponseTypeBoxed = typeof(TResponse).IsValueType;
             var responseMarshaller = isMethodResponseTypeBoxed
-                ? (object)CreateBoxedMarshaller<TResponse>(messageSerializer)
+                ? CreateBoxedMarshaller<TResponse>(messageSerializer)
                 : (object)CreateMarshaller<TResponse>(messageSerializer);
 
             return new MagicOnionMethod<Nil, TResponse, Box<Nil>, TRawResponse>(new Method<Box<Nil>, TRawResponse>(
@@ -82,10 +81,10 @@ namespace MagicOnion
             var isMethodResponseTypeBoxed = typeof(TResponse).IsValueType;
 
             var requestMarshaller = isMethodRequestTypeBoxed
-                ? (object)CreateBoxedMarshaller<TRequest>(messageSerializer)
+                ? CreateBoxedMarshaller<TRequest>(messageSerializer)
                 : (object)CreateMarshaller<TRequest>(messageSerializer);
             var responseMarshaller = isMethodResponseTypeBoxed
-                ? (object)CreateBoxedMarshaller<TResponse>(messageSerializer)
+                ? CreateBoxedMarshaller<TResponse>(messageSerializer)
                 : (object)CreateMarshaller<TResponse>(messageSerializer);
 
             return new MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>(new Method<TRawRequest, TRawResponse>(
@@ -103,7 +102,7 @@ namespace MagicOnion
         public static Marshaller<Box<Nil>> IgnoreNilMarshaller { get; } = new Marshaller<Box<Nil>>(
                 serializer: (obj, ctx) =>
                 {
-                    ReadOnlySpan<byte> unsafeNilBytes = new [] { MessagePackCode.Nil };
+                    ReadOnlySpan<byte> unsafeNilBytes = new[] { MessagePackCode.Nil };
 
                     var writer = ctx.GetBufferWriter();
                     var buffer = writer.GetSpan(unsafeNilBytes.Length); // Write `Nil` as `byte[]` to the buffer.

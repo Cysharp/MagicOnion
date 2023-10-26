@@ -103,7 +103,7 @@ internal class MagicOnionSourceGeneratorVerifier
             // MagicOnion.Client
             this.TestState.AdditionalReferences.Add(typeof(MagicOnion.Client.MagicOnionClient).Assembly);
             // MagicOnion.Shared
-            this.TestState.AdditionalReferences.Add(typeof(MagicOnion.MagicOnionMarshallers).Assembly);
+            this.TestState.AdditionalReferences.Add(typeof(MagicOnion.Internal.GrpcMethodHelper).Assembly);
             // MessagePack
             this.TestState.AdditionalReferences.Add(typeof(MessagePack.Formatters.IMessagePackFormatter).Assembly);
             // MessagePack.Annotations
