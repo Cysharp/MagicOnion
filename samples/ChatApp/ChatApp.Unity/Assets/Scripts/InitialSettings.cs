@@ -1,7 +1,8 @@
 using System.IO;
-using Grpc.Core;
 using MagicOnion.Client;
-#if USE_GRPC_NET_CLIENT
+#if USE_GRPC_CCORE
+using Grpc.Core;
+#else
 using Grpc.Net.Client;
 #endif
 using MagicOnion.Unity;
@@ -34,6 +35,18 @@ namespace Assets.Scripts
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void OnRuntimeInitialize()
         {
+#if !USE_GRPC_CCORE
+            // Use Grpc.Net.Client instead of C-core gRPC library.
+            GrpcChannelProviderHost.Initialize(
+                new GrpcNetClientGrpcChannelProvider(() => new GrpcChannelOptions()
+                {
+                    HttpHandler = new Cysharp.Net.Http.YetAnotherHttpHandler()
+                    {
+                        Http2Only = true,
+                    }
+                }));
+#endif
+#if USE_GRPC_CCORE
             // Initialize gRPC channel provider when the application is loaded.
             GrpcChannelProviderHost.Initialize(new DefaultGrpcChannelProvider(new GrpcCCoreChannelOptions(new[]
             {
@@ -46,9 +59,7 @@ namespace Assets.Scripts
             // NOTE: If you want to use self-signed certificate for SSL/TLS connection
             //var cred = new SslCredentials(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "server.crt")));
             //GrpcChannelProviderHost.Initialize(new DefaultGrpcChannelProvider(new GrpcCCoreChannelOptions(channelCredentials: cred)));
-
-            // Use Grpc.Net.Client instead of C-core gRPC library.
-            //GrpcChannelProviderHost.Initialize(new GrpcNetClientGrpcChannelProvider(new GrpcChannelOptions() { HttpHandler = ... }));
+#endif
         }
     }
 }
