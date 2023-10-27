@@ -38,7 +38,13 @@ namespace Assets.Scripts
 #if !USE_GRPC_CCORE
             // Use Grpc.Net.Client instead of C-core gRPC library.
             GrpcChannelProviderHost.Initialize(
-                new GrpcNetClientGrpcChannelProvider(() => new GrpcChannelOptions() { HttpHandler = new Cysharp.Net.Http.YetAnotherHttpHandler()  }));
+                new GrpcNetClientGrpcChannelProvider(() => new GrpcChannelOptions()
+                {
+                    HttpHandler = new Cysharp.Net.Http.YetAnotherHttpHandler()
+                    {
+                        Http2Only = true,
+                    }
+                }));
 #endif
 #if USE_GRPC_CCORE
             // Initialize gRPC channel provider when the application is loaded.
