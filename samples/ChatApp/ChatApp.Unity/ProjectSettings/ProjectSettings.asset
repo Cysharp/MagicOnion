@@ -793,7 +793,8 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: USE_GRPC_CCORE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 #if MAGICONION_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
-using Channel = Grpc.Core.Channel;
 #endif
-using Grpc.Core;
-#if USE_GRPC_NET_CLIENT
+#if USE_GRPC_CCORE
+using Channel = Grpc.Core.Channel;
+#else
 using Grpc.Net.Client;
 #endif
 using MagicOnion.Client;
@@ -73,7 +73,7 @@ namespace MagicOnion.Unity.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-#if !USE_GRPC_NET_CLIENT_ONLY
+#if USE_GRPC_CCORE
                         if (diagInfo.UnderlyingChannel is Channel grpcCCoreChannel)
                         {
                             EditorGUILayout.LabelField($"Channel:  {channel.Id} ({channel.Target}; State={grpcCCoreChannel.State})", EditorStyles.boldLabel);

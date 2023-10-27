@@ -8,12 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 #if MAGICONION_UNITASK_SUPPORT
 using Cysharp.Threading.Tasks;
-#if !USE_GRPC_NET_CLIENT_ONLY
-using Channel = Grpc.Core.Channel;
-#endif
 #endif
 using Grpc.Core;
-#if USE_GRPC_NET_CLIENT
+#if USE_GRPC_CCORE
+using Channel = Grpc.Core.Channel;
+#else
 using Grpc.Net.Client;
 #endif
 using MagicOnion.Client;
@@ -147,11 +146,13 @@ namespace MagicOnion
 #if MAGICONION_UNITASK_SUPPORT
         public async UniTask ConnectAsync(DateTime? deadline = null)
 #else
+#pragma warning disable CS1998
         public async Task ConnectAsync(DateTime? deadline = null)
+#pragma warning restore CS1998
 #endif
         {
             ThrowIfDisposed();
-#if !USE_GRPC_NET_CLIENT_ONLY
+#if USE_GRPC_CCORE
             if (_channel is Channel grpcCChannel)
             {
                 await grpcCChannel.ConnectAsync(deadline);
@@ -387,31 +388,31 @@ namespace MagicOnion
                     _baseCallInvoker = callInvoker;
                 }
 
-                public override TResponse BlockingUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options, TRequest request)
+                public override TResponse BlockingUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string? host, CallOptions options, TRequest request)
                 {
                     //Debug.Log($"Unary(Blocking): {method.FullName}");
                     return _baseCallInvoker.BlockingUnaryCall(WrapMethod(method), host, options, request);
                 }
 
-                public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options, TRequest request)
+                public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string? host, CallOptions options, TRequest request)
                 {
                     //Debug.Log($"Unary: {method.FullName}");
                     return _baseCallInvoker.AsyncUnaryCall(WrapMethod(method), host, options, request);
                 }
 
-                public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options, TRequest request)
+                public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string? host, CallOptions options, TRequest request)
                 {
                     //Debug.Log($"ServerStreaming: {method.FullName}");
                     return _baseCallInvoker.AsyncServerStreamingCall(WrapMethod(method), host, options, request);
                 }
 
-                public override AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options)
+                public override AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string? host, CallOptions options)
                 {
                     //Debug.Log($"ClientStreaming: {method.FullName}");
                     return _baseCallInvoker.AsyncClientStreamingCall(WrapMethod(method), host, options);
                 }
 
-                public override AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options)
+                public override AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string? host, CallOptions options)
                 {
                     //Debug.Log($"DuplexStreaming: {method.FullName}");
                     return _baseCallInvoker.AsyncDuplexStreamingCall(WrapMethod(method), host, options);
