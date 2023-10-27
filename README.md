@@ -27,15 +27,15 @@ MagicOnion can be adopted or replaced in the following use cases:
 MagicOnion uses [MessagePack for C#](https://github.com/neuecc/MessagePack-CSharp) to serialize call arguments and return values. NET primitives and other complex types that can be serialized into MessagePack objects. See MessagePack for C# for details about serialization.
 
 ## Requirements
-MagicOnion server requires NET Core 3.1 or .NET 5.0+.
+MagicOnion server requires .NET 6.0+.
 
-MagicOnion client supports a wide range of platforms, including .NET Framework 4.6.1 to .NET 5.0 as well as Unity.
+MagicOnion client supports a wide range of platforms, including .NET Framework 4.6.1 to .NET 7 as well as Unity.
 
 - Server-side (MagicOnion.Server)
     - .NET 6.0+
 - Client-side (MagicOnion.Client)
-    - .NET Standard 2.1 (.NET Core 3.x+, .NET 5.0+, Xamarin)
-    - .NET Standard 2.0 (.NET Framework 4.6.1+, Universal Windows Platform, .NET Core 2.x)
+    - .NET 6+
+    - .NET Standard 2.1, 2.0
     - Unity 2021.3 (LTS) or newer
 
 ## Quick Start
@@ -92,23 +92,21 @@ namespace MyApp.Shared
 Add a class that implements the interface `IMyFirstService`. The client calls this class.
 
 ```csharp
-using System;
 using MagicOnion;
 using MagicOnion.Server;
 using MyApp.Shared;
 
-namespace MyApp.Services
+namespace MyApp.Services;
+
+// Implements RPC service in the server project.
+// The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
+public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
-    // Implements RPC service in the server project.
-    // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-    public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+    // `UnaryResult<T>` allows the method to be treated as `async` method.
+    public async UnaryResult<int> SumAsync(int x, int y)
     {
-        // `UnaryResult<T>` allows the method to be treated as `async` method.
-        public async UnaryResult<int> SumAsync(int x, int y)
-        {
-            Console.WriteLine($"Received:{x}, {y}");
-            return x + y;
-        }
+        Console.WriteLine($"Received:{x}, {y}");
+        return x + y;
     }
 }
 ```
@@ -190,14 +188,10 @@ dotnet add package MagicOnion
     - [ExceptionHandling and StatusCode](#exceptionhandling-and-statuscode)
     - [Group and GroupConfiguration](#group-and-groupconfiguration)
     - [Dependency Injection](#dependency-injection)
-    - [Project Structure](#project-structure)
+    - [Project structure recommendation](#project-structure-recommendation)
 - Client
     - [Ahead-of-Time compilation support with Source Generator](#ahead-of-time-compilation-support-with-source-generator)
     - [Support for Unity client](#support-for-unity-client)
-        - [iOS build with gRPC](#ios-build-with-grpc)
-        - [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca)
-        - [Stripping debug symbols from libgrpc_csharp_ext.so](#stripping-debug-symbols-from-libgrpc_csharp_extso)
-        - [Workaround for il2cpp + Windows/Linux Build failure](#workaround-for-il2cpp--windowslinux-build-failure)
     - [gRPC Keepalive](#grpc-keepalive)
 - [HTTPS (TLS)](#https-tls)
 - [Deployment](#deployment)
@@ -205,11 +199,10 @@ dotnet add package MagicOnion
     - [Swagger](#swagger)
 - Advanced
     - [MagicOnionOption](#magiconionoption)
-    - [Internal Logging](#internal-logging)
     - [Raw gRPC APIs](#raw-grpc-apis)
     - [Zero deserialization mapping](#zero-deserialization-mapping)
-- Experimentals
-    - [OpenTelemetry](#opentelemetry)
+    - [Customizing message serialization and encryption](#customizing-message-serialization-and-encryption)
+    - [MemoryPack support](#memorypack-support)
 - [License](#license)
 
 ## Fundamentals
@@ -243,23 +236,22 @@ using MagicOnion;
 using MagicOnion.Server;
 using MyApp.Shared;
 
-namespace MyApp.Services
-{
-    // Implements RPC service in the server project.
-    // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-    public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
-    {
-        // `UnaryResult<T>` allows the method to be treated as `async` method.
-        public async UnaryResult<int> SumAsync(int x, int y)
-        {
-            Console.WriteLine($"Received:{x}, {y}");
-            return x + y;
-        }
+namespace MyApp.Services;
 
-        public async UnaryResult DoWorkAsync()
-        {
-            // Something to do ...
-        }
+// Implements RPC service in the server project.
+// The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
+public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+{
+    // `UnaryResult<T>` allows the method to be treated as `async` method.
+    public async UnaryResult<int> SumAsync(int x, int y)
+    {
+        Console.WriteLine($"Received:{x}, {y}");
+        return x + y;
+    }
+
+    public async UnaryResult DoWorkAsync()
+    {
+        // Something to do ...
     }
 }
 ```
@@ -927,32 +919,20 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 ```
 
 
-### Project Structure
-If creates Server-Client project, I recommend make three projects. `Server`, `ServerDefinition`, `Client`.
+### Project structure recommendation
+The recommended structure for a solution using MagicOnion is as follows:
 
-![image](https://cloud.githubusercontent.com/assets/46207/21081857/e0f6dfce-c012-11e6-850d-358c5b928a82.png)
+- **Client** (WPF, Console, etc ...)
+- **Server** (ASP.NET Core Application)
+- **Shared** (Class library)
 
-ServerDefinition is only defined interface(`IService<>`, `IStreamingHub<,>`)(and some share request/response types).
+The **Shared** project is a library project with interface definitions like Service or Hub and types of requests/responses, shared between the **Server** and **Client**.
 
-If debugging, We recommend use [SwitchStartupProject](https://marketplace.visualstudio.com/items?itemName=vs-publisher-141975.SwitchStartupProjectforVS2017) extension of VisualStudio and launch both Server and Client.
+When developing using Unity, shared code can be placed within the Unity project and referenced by source link (`<Compile Include="..." />`) from .NET project, or the library project can be referenced as a Unity package.
 
-```json
-"MultiProjectConfigurations": {
-    "Server + Client": {
-        "Projects": {
-            "FooService": {},
-            "FooClient": {}
-        }
-    }
-}
-```
+It's only necessary that the interface name and member name and types match, so it's not always necessary to reference the same assembly.
 
-It can step-in/out seamlessly in server and client.
-
-for Unity, you can't share by DLL(because can't share `IServer<>` because it is different reference both Unity and Server). It is slightly complex so we provides sample project and explanation.
-
-see: [samples](https://github.com/Cysharp/MagicOnion/tree/master/samples) page and ReadMe.
-
+For more details on package referencing, please refer to [the source code of the sample project](https://github.com/Cysharp/MagicOnion/tree/master/samples).
 
 
 # Clients
@@ -1291,11 +1271,6 @@ Open `http://localhost:5000`, you can see swagger view.
 | `bool` IsReturnExceptionStackTraceInErrorDetail | If true, MagicOnion handles exception ownself and send to message. If false, propagate to gRPC engine. Default is false. |
 | `MessagePackSerializerOptions` SerializerOptions | MessagePack serialization resolver. Default is used ambient default(MessagePackSerializer.DefaultOptions). |
 
-### Internal Logging
-`IMagicOnionLogger` is structured logger of MagicOnion internal information.
-
- Implements your custom logging code and append it, default is `NullMagicOnionLogger`(do nothing). MagicOnion has some built in logger, `MagicOnionLogToLogger` that structured log to string log and send to `Microsoft.Extensions.Logging.ILogger`.
-
 ### Raw gRPC APIs
 MagicOnion can define and use primitive gRPC APIs(ClientStreaming, ServerStreaming, DuplexStreaming). Especially DuplexStreaming is used underlying StreamingHub. If there is no reason, we recommend using StreamingHub.
 
@@ -1313,22 +1288,11 @@ public interface IMyFirstService : IService<IMyFirstService>
 // Server
 public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 {
-    // VisualStudio 2017(C# 7.0), Unity 2018.3+ supports return `async UnaryResult` directly
-    // I recommend disable async-warning on project level. <NoWarn>1998</NoWarn>
     public async UnaryResult<string> SumAsync(int x, int y)
     {
         Logger.Debug($"Called SumAsync - x:{x} y:{y}");
 
         return (x + y).ToString();
-    }
-
-    // VS2015(C# 6.0), Unity 2018.2 use Task
-    public async Task<UnaryResult<string>> SumLegacyTaskAsync(int x, int y)
-    {
-        Logger.Debug($"Called SumAsync - x:{x} y:{y}");
-
-        // use UnaryResult method.
-        return UnaryResult((x + y).ToString());
     }
 
     public async Task<ClientStreamingResult<int, string>> ClientStreamingSampleAsync()
@@ -1395,16 +1359,6 @@ public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
 Client sample.
 
 ```csharp
-static async Task UnaryRun(IMyFirstService client)
-{
-    // await(C# 7.0, Unity 2018.3+)
-    var vvvvv = await client.SumAsync(10, 20);
-    Console.WriteLine("SumAsync:" + vvvvv);
-
-    // if use Task<UnaryResult>(Unity 2018.2), use await await
-    var vvvv2 = await await client.SumLegacyTaskAsync(10, 20);
-}
-
 static async Task ClientStreamRun(IMyFirstService client)
 {
     var stream = await client.ClientStreamingSampleAsync();
@@ -1485,7 +1439,7 @@ Nothing needs to be processed here, so it promises the best performance theoreti
 
 I believe that this can be easily and effectively applied to sending a large number of Transforms, such as an array of Vector3 variables.
 
-### Customizing message serialization
+### Customizing message serialization and encryption
 MagicOnion uses MessagePack for serialization by default, but it also provides extension points to customize serialization.
 
 It allows for customization, such as encryption and the using of serializers other than MessagePack.
@@ -1517,6 +1471,63 @@ public static class MagicOnionSerializerProvider
 }
 ```
 
+The following code is a simple example of performing XOR encryption:
+
+```csharp
+public class XorMessagePackMagicOnionSerializerProvider : IMagicOnionSerializerProvider
+{
+    const int MagicNumber = 0x11;
+
+    readonly MessagePackSerializerOptions serializerOptions;
+
+    public static IMagicOnionSerializerProvider Instance { get; } = new XorMessagePackMagicOnionSerializerProvider(MessagePackSerializer.DefaultOptions);
+
+    XorMessagePackMagicOnionSerializerProvider(MessagePackSerializerOptions serializerOptions)
+        => this.serializerOptions = serializerOptions;
+
+    class XorMessagePackMagicOnionSerializer : IMagicOnionSerializer
+    {
+        readonly MessagePackSerializerOptions serializerOptions;
+
+        public XorMessagePackMagicOnionSerializer(MessagePackSerializerOptions serializerOptions)
+        {
+            this.serializerOptions = serializerOptions;
+        }
+
+        public T Deserialize<T>(in ReadOnlySequence<byte> bytes)
+        {
+            var array = ArrayPool<byte>.Shared.Rent((int)bytes.Length);
+            try
+            {
+                bytes.CopyTo(array);
+                for (var i = 0; i < bytes.Length; i++)
+                {
+                    array[i] ^= MagicNumber;
+                }
+                return MessagePackSerializer.Deserialize<T>(array.AsMemory(0, (int)bytes.Length), serializerOptions);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(array);
+            }
+        }
+
+        public void Serialize<T>(IBufferWriter<byte> writer, in T value)
+        {
+            var serialized = MessagePackSerializer.Serialize(value, serializerOptions);
+            for (var i = 0; i < serialized.Length; i++)
+            {
+                serialized[i] ^= MagicNumber;
+            }
+            writer.Write(serialized);
+        }
+    }
+
+    public IMagicOnionSerializer Create(MethodType methodType, MethodInfo? methodInfo)
+        => new XorMessagePackMagicOnionSerializer(serializerOptions);
+}
+```
+
 #### MemoryPack support
 MagicOnion also supports MemoryPack as a message serializer. (preview)
 
@@ -1535,15 +1546,9 @@ await StreamingHubClient.ConnectAsync<IMyHub, IMyHubReceiver>(channel, receiver,
 MagicOnionClient.Create<IMyService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
 ```
 
-If you want to use MagicOnion.Generator (moc), you need to specify `--serializer MemoryPack` as an option. The generated code will use MemoryPack instead of MessagePack.
+If you want to use MagicOnion.Client.SourceGenerator, you need to specify `Serializer = GenerateSerializerType.MemoryPack` to the attribute. The generated code will use MemoryPack instead of MessagePack.
 
 The application must also call `MagicOnionMemoryPackFormatterProvider.RegisterFormatters()` on startup.
-
-## Experimentals
-### OpenTelemetry
-MagicOnion.OpenTelemetry is implementation of [open\-telemetry/opentelemetry\-dotnet: OpenTelemetry \.NET SDK](https://github.com/open-telemetry/opentelemetry-dotnet), so you can use any OpenTelemetry exporter, like [Jaeger](https://www.jaegertracing.io/), [Zipkin](https://zipkin.io/), [StackDriver](https://cloud.google.com/stackdriver) and others.
-
-See details at [MagicOnion.Server.OpenTelemetry](src/MagicOnion.Server.OpenTelemetry)
 
 ## License
 This library is under the MIT License.
