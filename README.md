@@ -1018,28 +1018,40 @@ MagicOnion supports from Unity version 2021.3.0f1 (LTS) and above, which is avai
 
 Using MagicOnion with Unity client requires the following things:
 
-- MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
-- gRPC library for Unity client (gRPC official)
+- gRPC library
 - MessagePack for C#
+- MagicOnion.Client for Unity
 
-### MagicOnion.Client.Unity.package (Unity asset package for MagicOnion library)
+### Install gRPC library
+There are two ways to use the gRPC library in Unity:
+
+- Using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) and grpc-dotnet (recommended)
+- Using gRPC's C-core (not recommended)
+
+Since the maintenance of the C-core based library has ended in the gRPC project, we recommend using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) . Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions.
+
+If you are using the C-core gRPC library, please define `USE_GRPC_CCORE` symbol in "Scripting Define Symbols".
+
+### Install MessagePack for C#
+MessagePack for C# is not included in MagicOnion package. You need to download and install separately.
+
+See [MessagePack for C# installation for Unity](https://github.com/MessagePack-CSharp/MessagePack-CSharp#unity) for details.
+
+### Install MagicOnion.Client
+There are two methods to install the MagicOnion.Client package:
+
+- Using the Unity package manager from git (recommended)
+- Using a .unitypackage.
+
+To install using the Unity package manager, please specify the following URL in "Add package from git URL...". Specify the version tag as needed.
+
+```
+https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion#6.0.0
+```
+
 `MagicOnion.Client.Unity.package` is available for download from [Releases](https://github.com/cysharp/MagicOnion/releases) page of this repository.
 
 The package contains the code to use MagicOnion with Unity. It consists of several extensions for Unity in addition to MagicOnion.Client NuGet package.
-
-### gRPC library for Unity client (gRPC official)
-gRPC library is not included in MagicOnion package. You need to download and install separately.
-
-gRPC library can be found at [gRPC daily builds](https://packages.grpc.io/), click `Build ID`, then click `grpc_unity_package.*.*.*-dev.zip` to download the library. See [gRPC C# - experimental support for Unity](https://github.com/grpc/grpc/tree/master/src/csharp/experimental#unity) for details.
-
-> **NOTE**: If you encounter error about `Google.Protobuf.dll`, you can remove the library. MagicOnion does not depend `Google.Protobuf.dll`. ([Issue#296](https://github.com/Cysharp/MagicOnion/issues/296))
-
-> **NOTE**: gRPC native library for iOS has a file size of over 100MB, which may cause problems when pushing to GitHub or others. For more information on solutions, see [Stripping debug symbols from ios/libgrpc.a](#stripping-debug-symbols-from-ioslibgrpca).
-
-### MessagePack for C#
-MessagePack for C# is not included in MagicOnion package. You need to download and install separately.
-
-See [MessagePack for C# installation for Unity](https://github.com/neuecc/MessagePack-CSharp#unity) for details.
 
 ### Works with IL2CPP
 
@@ -1110,151 +1122,11 @@ var hubClient = StreamingHubClient.ConnectAsync<IGreeterHub, IGreeterHubReceiver
 ![image](https://user-images.githubusercontent.com/9012/111585700-0d0a7280-8803-11eb-8ce3-3b8f9d968c13.png)
 
 
-## iOS build with gRPC
-gRPC iOS build require two additional operation on build.
-
-1. Disable Bitcode
-1. Add libz.tbd
-
-We introduce OnPostProcessingBuild sample [BuildIos.cs](https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/BuildeIos.cs) for ChatApp.Unity to automate these steps.
-
-```csharp
-#if UNITY_IPHONE
-using System.IO;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.Callbacks;
-using UnityEditor.iOS.Xcode;
-
-public class BuildIos
-{
-    /// <summary>
-    /// Handle libgrpc project settings.
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="path"></param>
-    [PostProcessBuild(1)]
-    public static void OnPostProcessBuild(BuildTarget target, string path)
-    {
-        var projectPath = PBXProject.GetPBXProjectPath(path);
-        var project = new PBXProject();
-        project.ReadFromString(File.ReadAllText(projectPath));
-        var targetGuid = project.TargetGuidByName(PBXProject.GetUnityTargetName());
-
-        // libz.tbd for grpc ios build
-        project.AddFrameworkToProject(targetGuid, "libz.tbd", false);
-
-        // libgrpc_csharp_ext missing bitcode. as BITCODE exand binary size to 250MB.
-        project.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
-
-        File.WriteAllText(projectPath, project.WriteToString());
-    }
-}
-#endif
-```
-
-## Stripping debug symbols from ios/libgrpc.a
-When you download gRPC daily build and extract Native Libraries for Unity, you will find file size of Plugins/Grpc.Core/runtime/ios/libgrpc.a beyonds 100MB. GitHub will reject commit when file size is over 100MB, therefore libgrpc.a often become unwelcome for gif-low.
-The reason of libgrpc.a file size is because it includes debug symbols for 3 architectures, arm64, armv7 and x86_64.
-
-We introduce strip debug symbols and generate reduced size `libgrpc_stripped.a`, it's about 17MB.
-This may useful for whom want commit `libgrpc.a` to GitHub, and understanding stripped library missing debug symbols.
-
-**How to strip**
-
-Download gRPC lib `grpc_unity_package.*.*.*-dev.zip` from [gRPC daily builds](https://packages.grpc.io/) and extract it, copy Plugins folder to Unity's Assets path.
-
-Open terminal on `Plugins/Grpc.Core/runtimes/ios/` and execute following will generate `libgrpc_stripped.a` and replace original libgrpc.a with stripped version.
-
-```shell
-$ cd ${UNITY_PATH}/Plugins/Grpc.Core/runtimes/ios
-$ strip -S -x libgrpc.a -o libgrpc_stripped.a
-$ rm libgrpc.a && mv libgrpc_stripped.a libgrpc.a
-```
-
-Make sure you can build app with iOS and works fine.
-
-## Stripping debug symbols from libgrpc_csharp_ext.so
-Plugins/Grpc.Core/runtime/android/[arch]/libgrpc_csharp_ext.so file size is big because its includes debug symbols.
-
-You can reduce its size using strip (this command is includes in the NDK).
-
-```shell
-$ cd ${UNITY_PATH}/Plugins/Grpc.Core/runtime/android/${TARGET_ARCH}
-$ strip.exe libgrpc_csharp_ext.so
-```
-
-## Workaround for il2cpp + Windows/Linux Build failure
-If you do a Windows/Linux il2cpp build with the gRPC daily build, the build may fail with following error messages.
-
-```
-20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlopen referenced in function Mono_dlopen_m7F2DE2CD0870AB15EEA4E0A0BA6C47044E74BB67
-20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlerror referenced in function Mono_dlerror_m359ABCFD23D0EB5314DE2DFF8AB58CFE949BBABD
-20AAB1A42EE7F9CA535031CD347327DE.obj : error LNK2019: unresolved external symbol dlsym referenced in function Mono_dlsym_m31A00C09F598C9D552A94628C2C28B3C7B04C2DD
-C:\Path\To\MyProject\Library\il2cpp_cache\linkresult_C1E926E002526A4D380E4B12B6BD0522\GameAssembly.dll : fatal error LNK1120: 3 unresolved externals
-```
-
-The reason is because some native function (but not nessessary at the runtime) not found on Windows il2cpp build.
-You can avoid this problem by adding the following code to `Assets/Pugins/Grpc.Core/runtimes/grpc_csharp_ext_dummy_stubs.c`. Then enable platform you needed, `Windows x86/x64` and/or `Linux x64`.
-
-```c
-void* dlopen(const char* filename, int flags) {
-  fprintf(stderr, "Should never reach here");
-  abort();
-}
-char* dlerror(void) {
-  fprintf(stderr, "Should never reach here");
-  abort();
-}
-void* dlsym(void* handle, const char* symbol) {
-  fprintf(stderr, "Should never reach here");
-  abort();
-}
-```
-
 ## gRPC Keepalive
 When you want detect network termination on Client or vice-versa, you can configure gRPC Keepalive.
 
-### Applied to .NET Standard 2.1 platforms (Grpc.Net.Client)
+### Applied to .NET Standard 2.1 or .NET 6+ platforms (Grpc.Net.Client)
 See [keep alive pings | Performance best practices with gRPC | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/performance?view=aspnetcore-5.0#keep-alive-pings) for information on setting up keepalive for Grpc.Net.Client.
-
-### Applied to .NET Standard 2.0 or Unity platforms (Grpc.Core)
-Follow to the [Keepalive UserGuide for gRPC Core](https://github.com/grpc/grpc/blob/master/doc/keepalive.md) but let's see how in actual.
-
-**ChannelOption**
-
-ChannelOptions is primitive way to configure options.
-Below uses `ChannelOption` and offer keepalive for every 10 second even RPC is not called.
-
-```csharp
-// If you want configure KEEP_ALIVE interval, then....
-// * set same value for `grpc.keepalive_time_ms` and `grpc.http2.min_time_between_pings_ms`
-// * keep `grpc.http2.min_ping_interval_without_data_ms < grpc.http2.min_time_between_pings_ms`
-var options = new[]
-{
-    // send keepalive ping every 10 second, default is 2 hours
-    new ChannelOption("grpc.keepalive_time_ms", 10000),
-    // keepalive ping time out after 5 seconds, default is 20 seconds
-    new ChannelOption("grpc.keepalive_timeout_ms", 5000),
-    // allow grpc pings from client every 10 seconds
-    new ChannelOption("grpc.http2.min_time_between_pings_ms", 10000),
-    // allow unlimited amount of keepalive pings without data
-    new ChannelOption("grpc.http2.max_pings_without_data", 0),
-    // allow keepalive pings when there's no gRPC calls
-    new ChannelOption("grpc.keepalive_permit_without_calls", 1),
-    // allow grpc pings from client without data every 5 seconds
-    new ChannelOption("grpc.http2.min_ping_interval_without_data_ms", 5000),
-};
-```
-
-Pass this options to Channel on Client will configure Keepalive.
-
-```csharp
-// Client
-this.channel = new Channel("localhost", 12345, ChannelCredentials.Insecure, options);
-```
-
-Now you can detect client network disconnection on serverside, let's override `OnDisconnected` and set debugger, disconnect Client network and wait for interval sec!
 
 ## HTTPS (TLS)
 MagicOnion supports TLS encrypted connection.
@@ -1267,12 +1139,12 @@ In general, HTTPS encryption settings on the server follow ASP.NET Core. For mor
 ### Client-side
 Depending on whether the client supports .NET Standard 2.1 or .NET Standard 2.1 (including Unity), the configuration is different.
 
-#### .NET Standard 2.1 (.NET Core 3.x, .NET 5, Xamarin)
+#### .NET Standard 2.1 or .NET 6+
 If the client supports .NET Standard 2.1 or newer, MagicOnion uses `Grpc.Net.Client` (a pure C# implementation) for gRPC connection.
 
 Grpc.Net.Client uses `HttpClient` internally, so it handles certificates the same way as `HttpClient`. For example, on Windows, it uses Windows's certificate store to validate certificates.
 
-#### .NET Standard 2.0 (.NET Core 2.x, .NET Framework 4.6.1+) / Unity
+#### .NET Standard 2.0 (.NET Framework 4.6.1+)
 If the client supports .NET Standard 2.0, MagicOnion uses `Grpc.Core` (C-library binding) for gRPC connection.
 
 Grpc.Core has its [own certificate store built into the library](https://github.com/grpc/grpc/blob/master/etc/roots.pem) and uses it unless you specify a certificate. This certificate store contains common CAs and is rarely a problem in production environment.
@@ -1333,28 +1205,14 @@ webBuilder
     .UseStartup<Startup>();
 ```
 
-#### Client-side (.NET Standard 2.1; Grpc.Net.Client)
+#### Client-side (.NET Standard 2.1 or .NET 6+; Grpc.Net.Client)
 When calling `GrpcChannel.ForAddress`, change the URL scheme to HTTP and the port to an unencrypted port.
 
 ```csharp
 var channel = GrpcChannel.ForAddress("http://localhost:5000");
 ```
 
-Enable AppSwitch to allow HTTP/2 without encryption.
-
-```csharp
-// WORKAROUND: Use insecure HTTP/2 connections during development.
-AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-```
-
 See also [Call insecure gRPC services with .NET Core client | Troubleshoot gRPC on .NET Core | Microsoft Docs](https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client) for details.
-
-#### Client-side (.NET Standard 2.0/Unity; Grpc.Core)
-When creating `Channel`, specify the unencrypted port and pass `ChannelCredentials.Insecure`.
-
-```csharp
-var channel = new Channel("localhost", 5000, ChannelCredentials.Insecure);
-```
 
 #### Limitations
 If unencrypted HTTP/2 connection is accepted, HTTP/1 and HTTP/2 cannot be served on the same port.
