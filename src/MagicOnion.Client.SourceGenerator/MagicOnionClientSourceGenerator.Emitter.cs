@@ -109,12 +109,12 @@ public partial class MagicOnionClientSourceGenerator
             cancellationToken.ThrowIfCancellationRequested();
 
             var formatterCodeGenContext = new SerializationFormatterCodeGenContext(context.Namespace ?? string.Empty, serializationInfoCollection.RequireRegistrationFormatters, serializationInfoCollection.TypeHints);
-            var resolverTexts = serialization.Generator.Build(context, formatterCodeGenContext);
+            var (serializerHintNameSuffix, serializationSource) = serialization.Generator.Build(context, formatterCodeGenContext);
 
             cancellationToken.ThrowIfCancellationRequested();
 
             outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName), MagicOnionInitializerGenerator.Build(context, serviceCollection)));
-            outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + ".Resolver"), resolverTexts));
+            outputs.Add((GeneratePathFromNamespaceAndTypeName(context.Namespace ?? string.Empty, context.InitializerPartialTypeName + serializerHintNameSuffix), serializationSource));
 
             if (serializationInfoCollection.Enums.Any())
             {

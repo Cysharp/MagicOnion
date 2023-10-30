@@ -4,7 +4,7 @@ namespace MagicOnion.Client.SourceGenerator.CodeGen.MemoryPack;
 
 internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGenerator
 {
-    public string Build(GenerationContext generationContext, SerializationFormatterCodeGenContext ctx)
+    public (string HintNameSuffix, string Source) Build(GenerationContext generationContext, SerializationFormatterCodeGenContext ctx)
     {
         using var pooledStringBuilder = generationContext.GetPooledStringBuilder();
         var writer = pooledStringBuilder.Instance;
@@ -13,7 +13,7 @@ internal class MemoryPackFormatterRegistrationGenerator : ISerializerFormatterGe
         EmitBody(generationContext, ctx, writer);
         EmitPostscript(generationContext, ctx, writer);
 
-        return writer.ToString();
+        return (".MemoryPack", writer.ToString());
     }
 
     static void EmitPreamble(GenerationContext generationContext, SerializationFormatterCodeGenContext ctx, StringBuilder writer)
