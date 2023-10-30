@@ -1,22 +1,17 @@
 {
-    "name": "MagicOnion.Client",
-    "rootNamespace": "",
+    "name": "MagicOnion.Shared",
     "references": [
         "MagicOnion.Abstractions",
-        "MagicOnion.Shared",
-        "MessagePack",
-        "MessagePack.Annotations"
+        "MagicOnion.Serialization.MessagePack"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [
-        "Grpc.Core.dll",
         "Grpc.Core.Api.dll"
     ],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "defineConstraints": []
 }

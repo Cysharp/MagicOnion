@@ -4,6 +4,7 @@
     "projects": [
       "src\\MagicOnion.Abstractions\\MagicOnion.Abstractions.csproj",
       "src\\MagicOnion.Client\\MagicOnion.Client.csproj",
+      "src\\MagicOnion.Serialization.MessagePack\\MagicOnion.Serialization.MessagePack.csproj",
       "src\\MagicOnion.Serialization.MemoryPack\\MagicOnion.Serialization.MemoryPack.csproj",
       "src\\MagicOnion.Server.HttpGateway\\MagicOnion.Server.HttpGateway.csproj",
       "src\\MagicOnion.Server.Redis\\MagicOnion.Server.Redis.csproj",

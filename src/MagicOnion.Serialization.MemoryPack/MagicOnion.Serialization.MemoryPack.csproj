@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
+    <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
