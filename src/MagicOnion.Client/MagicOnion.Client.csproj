@@ -13,6 +13,10 @@
     <Description>MagicOnion client-side runtime library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**;**\obj\**" LinkBase="Internal.Shared" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
     <PackageReference Include="Grpc.Net.Client" />
   </ItemGroup>
@@ -29,8 +33,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
-    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
     <ProjectReference Include="..\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
+    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

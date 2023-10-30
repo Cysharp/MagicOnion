@@ -12,6 +12,7 @@ using System.Linq;
 using MagicOnion.Client.Internal;
 using MagicOnion.Client.Internal.Threading;
 using MagicOnion.Client.Internal.Threading.Tasks;
+using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
 
@@ -113,6 +114,8 @@ namespace MagicOnion.Client
         }
 
         // Helper methods to make building clients easy.
+        protected Marshaller<byte[]> ThroughMarshaller
+            => MagicOnionMarshallers.ThroughMarshaller;
         protected void SetResultForResponse<TResponse>(object taskCompletionSource, ArraySegment<byte> data)
             => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
         protected void Serialize<T>(IBufferWriter<byte> writer, in T value)

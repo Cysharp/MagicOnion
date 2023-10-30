@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace MagicOnion.Internal
 {
-    public static class BroadcasterHelper
+    internal static class BroadcasterHelper
     {
         internal static Type[] DynamicArgumentTupleTypes { get; } = typeof(DynamicArgumentTuple<,>)
             .GetTypeInfo()

@@ -7,7 +7,7 @@ using MessagePack;
 
 namespace MagicOnion.Internal
 {
-    public static class GrpcMethodHelper
+    internal static class GrpcMethodHelper
     {
         public sealed class MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>
         {

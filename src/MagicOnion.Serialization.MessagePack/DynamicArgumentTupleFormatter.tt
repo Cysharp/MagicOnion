@@ -22,24 +22,6 @@ namespace MagicOnion
     var defaultArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("T{0} default{0}", x)));
     var itemArgs = string.Join(", ", Enumerable.Range(1, i).Select(x => string.Format("item{0}", x)));
  #>
-    
-    [MessagePackObject]
-    [StructLayout(LayoutKind.Auto)]
-    public struct DynamicArgumentTuple<<#= typeArgs #>>
-    {
-<# for(var j = 1; j <= i; j++) { #>
-        [Key(<#= j - 1  #>)]
-        public readonly T<#= j#> Item<#= j #>;
-<# } #>
-
-        [SerializationConstructor]
-        public DynamicArgumentTuple(<#= methodArgs #>)
-        {
-<# for(var j = 1; j <= i; j++) { #>
-            Item<#= j#> = item<#= j #>;
-<# } #>
-        }
-    }
 
     public class DynamicArgumentTupleFormatter<<#= typeArgs #>> : IMessagePackFormatter<DynamicArgumentTuple<<#= typeArgs #>>>
     {

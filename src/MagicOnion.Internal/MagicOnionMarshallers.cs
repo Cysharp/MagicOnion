@@ -7,17 +7,11 @@ using System.Reflection;
 namespace MagicOnion.Internal
 {
     // invoke from dynamic methods so must be public
-    public static class MagicOnionMarshallers
+    internal static class MagicOnionMarshallers
     {
         static readonly Type[] dynamicArgumentTupleTypes = typeof(DynamicArgumentTuple<,>).GetTypeInfo().Assembly
             .GetTypes()
             .Where(x => x.Name.StartsWith("DynamicArgumentTuple") && !x.Name.Contains("Formatter"))
-            .OrderBy(x => x.GetGenericArguments().Length)
-            .ToArray();
-
-        static readonly Type[] dynamicArgumentTupleFormatterTypes = typeof(DynamicArgumentTupleFormatter<,,>).GetTypeInfo().Assembly
-            .GetTypes()
-            .Where(x => x.Name.StartsWith("DynamicArgumentTupleFormatter"))
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 

@@ -25,8 +25,7 @@ namespace TempProject
                 public TempProject_MyHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
                     : base(callInvoker, host, options, serializerProvider, logger)
                 {
-                    var marshaller = global::MagicOnion.Internal.MagicOnionMarshallers.ThroughMarshaller;
-                    DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "IMyHub", "Connect", marshaller, marshaller);
+                    DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "IMyHub", "Connect", ThroughMarshaller, ThroughMarshaller);
                 }
 
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::System.Int32>> A()

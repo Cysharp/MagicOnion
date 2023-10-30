@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\MagicOnion.Internal\Buffers\ArrayPoolBufferWriter.cs" LinkBase="Internal.Shared\Buffers" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Server\MagicOnion.Server.csproj" />
   </ItemGroup>
 

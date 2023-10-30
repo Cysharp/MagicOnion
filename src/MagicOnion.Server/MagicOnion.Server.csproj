@@ -14,12 +14,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**;**\obj\**" LinkBase="Internal.Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore.Server" />
     <PackageReference Include="Grpc.Core.Api" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+    <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
   </ItemGroup>
 

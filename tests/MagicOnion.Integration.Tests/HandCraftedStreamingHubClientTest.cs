@@ -66,8 +66,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
             : base(callInvoker, host, option, messageSerializer, logger)
         {
-            var marshaller = MagicOnionMarshallers.ThroughMarshaller;
-            DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, nameof(IHandCraftedStreamingHubClientTestHub), "Connect", marshaller, marshaller);
+            DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, nameof(IHandCraftedStreamingHubClientTestHub), "Connect", ThroughMarshaller, ThroughMarshaller);
         }
 
         public Task ConnectAsync(IHandCraftedStreamingHubClientTestHubReceiver receiver)

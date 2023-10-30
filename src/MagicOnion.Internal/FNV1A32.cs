@@ -2,7 +2,7 @@ using System.Text;
 
 namespace MagicOnion.Internal
 {
-    public static class FNV1A32
+    internal static class FNV1A32
     {
         public static int GetHashCode(string str)
         {
