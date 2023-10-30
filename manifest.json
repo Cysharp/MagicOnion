@@ -1253,6 +1253,30 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.GenerateDefineDebugAttribute.html",
+          "hash": "QyCMHnX8I9wHZYrswpgqeXQ8GoSnFgHvgliQlMb7nFQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.GenerateIfDirectiveAttribute.html",
+          "hash": "pOz1RskQQf9SztgK0YIpI5pU/4C2s6sCsqXZYQzrQJE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/MagicOnion.IService-1.yml",
       "output": {
         ".html": {
@@ -2913,7 +2937,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.html",
-          "hash": "pgoHUGEBpAl+SfOL17lSZckgm4up1+2dNGD2t+NLdCk="
+          "hash": "731PW5rSOfdhxUKZJRMR5JSkYj1bcC/fQqmM8ofZAd8="
         }
       },
       "is_incremental": false,
@@ -2997,7 +3021,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "fTgoB0SRHlsB1Lms2LQ7xboHYlhKi+JcPqjDXo9n8jI="
+          "hash": "0Jv/3A6J5KSUdbM3OlIgPwCyRYnD1q9KroUKH0b9aYc="
         }
       },
       "is_incremental": false,
@@ -3084,7 +3108,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 249,
+          "total_file_count": 251,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
