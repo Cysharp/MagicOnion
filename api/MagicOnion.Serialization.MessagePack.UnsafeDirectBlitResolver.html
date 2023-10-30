@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>DynamicArgumentTupleFormatter&lt;T1, T2, T3, T4, T5&gt; Class
+    <title>UnsafeDirectBlitResolver Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="DynamicArgumentTupleFormatter&lt;T1, T2, T3, T4, T5&gt; Class
+    <meta name="title" content="UnsafeDirectBlitResolver Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,49 +71,34 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver">
   
-  <h1 id="MagicOnion_DynamicArgumentTupleFormatter_5" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5" class="text-break">DynamicArgumentTupleFormatter&lt;T1, T2, T3, T4, T5&gt; Class
+  <h1 id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver" class="text-break">UnsafeDirectBlitResolver Class
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.html">MagicOnion</a></h6>
-  <h6><strong>Assembly</strong>: MagicOnion.Shared.dll</h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Serialization.MessagePack.html">MagicOnion.Serialization.MessagePack</a></h6>
+  <h6><strong>Assembly</strong>: MagicOnion.Serialization.MessagePack.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class DynamicArgumentTupleFormatter&lt;T1, T2, T3, T4, T5&gt; : IMessagePackFormatter&lt;DynamicArgumentTuple&lt;T1, T2, T3, T4, T5&gt;&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class UnsafeDirectBlitResolver : IFormatterResolver</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">DynamicArgumentTupleFormatter&lt;T1, T2, T3, T4, T5&gt;</span>
+    <span class="xref">UnsafeDirectBlitResolver</span>
   </div>
   
   
   
   
   
-  <section>
-  <h4 class="typeParameters">Type Parameters</h4>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>T1</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>T2</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>T3</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>T4</code></span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>T5</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   
   <h3 id="members">Members</h3>
-  <h4>Constructors
+  <h4>Fields
   </h4>
   <table class="table table-condensed">
     <thead>
@@ -125,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.DynamicArgumentTupleFormatter-5.html#MagicOnion_DynamicArgumentTupleFormatter_5__ctor__0__1__2__3__4_">DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5)</a>
+          <a class="xref" href="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.html#MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_Instance">Instance</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -143,49 +128,40 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.DynamicArgumentTupleFormatter-5.html#MagicOnion_DynamicArgumentTupleFormatter_5_Deserialize_MessagePackReader__MessagePackSerializerOptions_">Deserialize(ref MessagePackReader, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.html#MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_GetFormatter__1">GetFormatter&lt;T&gt;()</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.DynamicArgumentTupleFormatter-5.html#MagicOnion_DynamicArgumentTupleFormatter_5_Serialize_MessagePackWriter__MagicOnion_DynamicArgumentTuple__0__1__2__3__4__MessagePackSerializerOptions_">Serialize(ref MessagePackWriter, DynamicArgumentTuple&lt;T1, T2, T3, T4, T5&gt;, MessagePackSerializerOptions)</a>
+          <a class="xref" href="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.html#MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_Register__1">Register&lt;T&gt;()</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="constructors">Constructors
+  <h3 id="fields">Fields
   </h3>
   <section>
-  <a id="MagicOnion_DynamicArgumentTupleFormatter_5__ctor_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.#ctor*"></a>
-  <h4 id="MagicOnion_DynamicArgumentTupleFormatter_5__ctor__0__1__2__3__4_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.#ctor(`0,`1,`2,`3,`4)">DynamicArgumentTupleFormatter(T1, T2, T3, T4, T5)</h4>
+  <h4 id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_Instance" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.Instance">Instance</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DynamicArgumentTupleFormatter(T1 default1, T2 default2, T3 default3, T4 default4, T5 default5)</code></pre>
+    <pre><code class="lang-csharp hljs">public static readonly UnsafeDirectBlitResolver Instance</code></pre>
   </div>
 
+  
+  
+  
   <section>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="fieldValue">Field Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>default1</code></span> <span class="xref">T1</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>default2</code></span> <span class="xref">T2</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>default3</code></span> <span class="xref">T3</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>default4</code></span> <span class="xref">T4</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>default5</code></span> <span class="xref">T5</span></dt>
+    <dt><a class="xref" href="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.html">UnsafeDirectBlitResolver</a></dt>
     <dd></dd>
   </dl>
   </section>
-  
-  
-  
   
   
   
@@ -199,29 +175,28 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_DynamicArgumentTupleFormatter_5_Deserialize_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.Deserialize*"></a>
-  <h4 id="MagicOnion_DynamicArgumentTupleFormatter_5_Deserialize_MessagePackReader__MessagePackSerializerOptions_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.Deserialize(MessagePackReader@,MessagePackSerializerOptions)">Deserialize(ref MessagePackReader, MessagePackSerializerOptions)</h4>
+  <a id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_GetFormatter_" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.GetFormatter*"></a>
+  <h4 id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_GetFormatter__1" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.GetFormatter``1">GetFormatter&lt;T&gt;()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DynamicArgumentTuple&lt;T1, T2, T3, T4, T5&gt; Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)</code></pre>
+    <pre><code class="lang-csharp hljs">public IMessagePackFormatter&lt;T&gt;? GetFormatter&lt;T&gt;()</code></pre>
   </div>
 
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>reader</code></span> <span class="xref">MessagePackReader</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>options</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.DynamicArgumentTuple-5.html">DynamicArgumentTuple</a>&lt;T1, T2, T3, T4, T5&gt;</dt>
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">IMessagePackFormatter</span>&lt;T&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>T</code></span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -235,31 +210,27 @@
   
   
   
-  
   </section>
   <section>
-  <a id="MagicOnion_DynamicArgumentTupleFormatter_5_Serialize_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.Serialize*"></a>
-  <h4 id="MagicOnion_DynamicArgumentTupleFormatter_5_Serialize_MessagePackWriter__MagicOnion_DynamicArgumentTuple__0__1__2__3__4__MessagePackSerializerOptions_" data-uid="MagicOnion.DynamicArgumentTupleFormatter`5.Serialize(MessagePackWriter@,MagicOnion.DynamicArgumentTuple{`0,`1,`2,`3,`4},MessagePackSerializerOptions)">Serialize(ref MessagePackWriter, DynamicArgumentTuple&lt;T1, T2, T3, T4, T5&gt;, MessagePackSerializerOptions)</h4>
+  <a id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_Register_" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.Register*"></a>
+  <h4 id="MagicOnion_Serialization_MessagePack_UnsafeDirectBlitResolver_Register__1" data-uid="MagicOnion.Serialization.MessagePack.UnsafeDirectBlitResolver.Register``1">Register&lt;T&gt;()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Serialize(ref MessagePackWriter writer, DynamicArgumentTuple&lt;T1, T2, T3, T4, T5&gt; value, MessagePackSerializerOptions options)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Register&lt;T&gt;()
+    where T : struct</code></pre>
   </div>
 
+  
+  
   <section>
-  <h5 class="parameters">Parameters</h5>
+  <h5 class="typeParameters">Type Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>writer</code></span> <span class="xref">MessagePackWriter</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>value</code></span> <a class="xref" href="MagicOnion.DynamicArgumentTuple-5.html">DynamicArgumentTuple</a>&lt;T1, T2, T3, T4, T5&gt;</dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>options</code></span> <span class="xref">MessagePackSerializerOptions</span></dt>
+    <dt><span class="parametername"><code>T</code></span></dt>
     <dd></dd>
   </dl>
   </section>
-  
-  
   
   
   

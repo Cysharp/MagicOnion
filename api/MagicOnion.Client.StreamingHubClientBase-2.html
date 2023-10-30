@@ -119,7 +119,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_">StreamingHubClientBase(CallInvoker, Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2__ctor_System_String_CallInvoker_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_">StreamingHubClientBase(String, CallInvoker, Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -144,24 +144,6 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_receiver">receiver</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
-  <h4>Properties
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_DuplexStreamingAsyncMethod">DuplexStreamingAsyncMethod</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -244,17 +226,19 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_StreamingHubClientBase_2__ctor_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2__ctor_CallInvoker_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)">StreamingHubClientBase(CallInvoker, Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</h4>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2__ctor_System_String_CallInvoker_System_Nullable_System_String__CallOptions_MagicOnion_Serialization_IMagicOnionSerializerProvider_MagicOnion_Client_IMagicOnionClientLogger_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.#ctor(System.String,CallInvoker,System.Nullable{System.String},CallOptions,MagicOnion.Serialization.IMagicOnionSerializerProvider,MagicOnion.Client.IMagicOnionClientLogger)">StreamingHubClientBase(String, CallInvoker, Nullable&lt;String&gt;, CallOptions, IMagicOnionSerializerProvider, IMagicOnionClientLogger)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected StreamingHubClientBase(CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">protected StreamingHubClientBase(string serviceName, CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>serviceName</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
     <dt><span class="parametername"><code>callInvoker</code></span> <span class="xref">CallInvoker</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>host</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">System.String</span>&gt;</dt>
@@ -331,38 +315,6 @@
   </dl>
   </section>
   
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <h3 id="properties">Properties
-  </h3>
-  <section>
-  <a id="MagicOnion_Client_StreamingHubClientBase_2_DuplexStreamingAsyncMethod_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.DuplexStreamingAsyncMethod*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_DuplexStreamingAsyncMethod" data-uid="MagicOnion.Client.StreamingHubClientBase`2.DuplexStreamingAsyncMethod">DuplexStreamingAsyncMethod</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected abstract Method&lt;byte[], byte[]&gt; DuplexStreamingAsyncMethod { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Method</span>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   
   
