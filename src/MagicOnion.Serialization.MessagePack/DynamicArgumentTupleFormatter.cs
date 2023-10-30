@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace MagicOnion
+namespace MagicOnion.Serialization.MessagePack
 {
     // T2 ~ T15
     // NOTE: Blazor WebAssembly (AOT) does not support more than 16 generic type parameters.

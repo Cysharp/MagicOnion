@@ -5,6 +5,7 @@ using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
+using MagicOnion.Serialization.MessagePack;
 using PerformanceTest.Shared;
 
 var app = ConsoleApp.Create(args);

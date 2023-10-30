@@ -29,7 +29,7 @@ public static class CompilationHelper
             MetadataReference.CreateFromFile(typeof(MagicOnion.IService<>).Assembly.Location), // MagicOnion.Abstractions
             MetadataReference.CreateFromFile(typeof(MagicOnion.Client.MagicOnionClient).Assembly.Location), // MagicOnion.Client
             MetadataReference.CreateFromFile(typeof(MagicOnion.Serialization.MagicOnionSerializerProvider).Assembly.Location), // MagicOnion.Shared
-            MetadataReference.CreateFromFile(typeof(MagicOnion.Serialization.MessagePackMagicOnionSerializerProvider).Assembly.Location), // MagicOnion.Serialization.MessagePack
+            MetadataReference.CreateFromFile(typeof(MagicOnion.Serialization.MessagePack.MessagePackMagicOnionSerializerProvider).Assembly.Location), // MagicOnion.Serialization.MessagePack
             MetadataReference.CreateFromFile(typeof(IGreeterService).Assembly.Location), // SampleServiceDefinitions
         };
         var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);

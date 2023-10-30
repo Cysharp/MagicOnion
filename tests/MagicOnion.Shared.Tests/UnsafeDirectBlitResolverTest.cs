@@ -1,3 +1,4 @@
+using MagicOnion.Serialization.MessagePack;
 using MessagePack.Resolvers;
 
 namespace MagicOnion.Shared.Tests;

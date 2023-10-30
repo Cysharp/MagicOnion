@@ -6,7 +6,7 @@ using Grpc.Core;
 using MessagePack;
 using MessagePack.Formatters;
 
-namespace MagicOnion.Serialization
+namespace MagicOnion.Serialization.MessagePack
 {
     /// <summary>
     /// Provides a <see cref="IMagicOnionSerializerProvider"/> using MessagePack.

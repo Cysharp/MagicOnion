@@ -43,7 +43,7 @@ public class MessagePackFormatterNameMapper : ISerializationFormatterNameMapper
         {
             // MagicOnion.DynamicArgumentTuple
             var ctorArguments = string.Join(", ", type.GenericArguments.Select(x => $"default({x.FullName})"));
-            formatterName = $"global::MagicOnion.DynamicArgumentTupleFormatter<{genericTypeArgs}>";
+            formatterName = $"global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<{genericTypeArgs}>";
             formatterConstructorArgs = $"({ctorArguments})";
         }
         else if (MessagePackWellKnownSerializationTypes.Instance.GenericFormattersMap.TryGetValue(type.FullNameOpenType, out var mappedFormatterName))

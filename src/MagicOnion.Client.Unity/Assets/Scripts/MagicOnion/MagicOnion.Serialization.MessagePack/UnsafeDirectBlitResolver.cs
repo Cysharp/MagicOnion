@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace MagicOnion
+namespace MagicOnion.Serialization.MessagePack
 {
     public class UnsafeDirectBlitResolver : IFormatterResolver
     {
