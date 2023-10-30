@@ -57,12 +57,6 @@ public class StaticStreamingHubClientGenerator
             """);
         }
         ctx.Writer.AppendLineWithFormat($$"""
-                using global::System;
-                using global::Grpc.Core;
-                using global::MagicOnion;
-                using global::MagicOnion.Client;
-                using global::MessagePack;
-
                 partial class {{generationContext.InitializerPartialTypeName}}
                 {
                     static partial class MagicOnionGeneratedClient
@@ -106,19 +100,14 @@ public class StaticStreamingHubClientGenerator
 
     static void EmitProperties(StreamingHubClientBuildContext ctx)
     {
-        ctx.Writer.AppendLine("""
-                            protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
-
-            """);
     }
     
     static void EmitConstructor(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
-                                : base(callInvoker, host, options, serializerProvider, logger)
+                                : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
                             {
-                                DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "{{ctx.Hub.ServiceType.Name}}", "Connect", ThroughMarshaller, ThroughMarshaller);
                             }
             """);
         ctx.Writer.AppendLine();

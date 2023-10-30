@@ -5,12 +5,6 @@
 
 namespace MyNamespace
 {
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-
     partial class MagicOnionInitializer
     {
         static partial class MagicOnionGeneratedClient
@@ -34,7 +28,7 @@ namespace MyNamespace
                     this.core = new ClientCore(serializerProvider);
                 }
 
-                private MyNamespace_MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                private MyNamespace_MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, ClientCore core) : base(options)
                 {
                     this.core = core;
                 }

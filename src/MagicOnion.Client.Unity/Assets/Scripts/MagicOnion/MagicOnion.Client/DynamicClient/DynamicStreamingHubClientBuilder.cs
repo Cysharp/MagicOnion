@@ -53,9 +53,6 @@ namespace MagicOnion.Client.DynamicClient
         public static readonly Type ClientType;
         // static readonly Type ClientFireAndForgetType;
 
-        static readonly Type bytesMethod = typeof(Method<,>).MakeGenericType(new[] { typeof(byte[]), typeof(byte[]) });
-        static readonly FieldInfo throughMarshaller = typeof(MagicOnionMarshallers).GetField("ThroughMarshaller", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
-
         static readonly ConstructorInfo notSupportedException = typeof(NotSupportedException).GetConstructor(Type.EmptyTypes)!;
 
         static DynamicStreamingHubClientBuilder()
@@ -81,9 +78,8 @@ namespace MagicOnion.Client.DynamicClient
                 DefineMethodsFireAndForget(typeBuilderEx, t, fireAndForgetField, typeBuilder, methodDefinitions);
                 typeBuilderEx.CreateTypeInfo(); // ok to create nested type.
 
-                var methodField = DefineStaticConstructor(typeBuilder, t);
                 var clientField = DefineConstructor(typeBuilder, t, typeof(TReceiver), fireAndForgetClientCtor);
-                DefineMethods(typeBuilder, t, typeof(TReceiver), methodField, clientField, methodDefinitions);
+                DefineMethods(typeBuilder, t, typeof(TReceiver), clientField, methodDefinitions);
             }
 
             ClientType = typeBuilder.CreateTypeInfo()!.AsType();
@@ -150,27 +146,6 @@ namespace MagicOnion.Client.DynamicClient
             }
         }
 
-        static FieldInfo DefineStaticConstructor(TypeBuilder typeBuilder, Type interfaceType)
-        {
-            //  static readonly Method<byte[], byte[]> method = new Method<byte[], byte[]>(MethodType.DuplexStreaming, "IFoo", "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
-            var field = typeBuilder.DefineField("method", bytesMethod, FieldAttributes.Private | FieldAttributes.Static);
-
-            var cctor = typeBuilder.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, Type.EmptyTypes);
-            var il = cctor.GetILGenerator();
-
-            il.EmitLdc_I4((int)MethodType.DuplexStreaming);
-            il.Emit(OpCodes.Ldstr, interfaceType.Name);
-            il.Emit(OpCodes.Ldstr, "Connect");
-            il.Emit(OpCodes.Ldsfld, throughMarshaller);
-            il.Emit(OpCodes.Ldsfld, throughMarshaller);
-            il.Emit(OpCodes.Newobj, bytesMethod.GetConstructors()[0]);
-            il.Emit(OpCodes.Stsfld, field);
-
-            il.Emit(OpCodes.Ret);
-
-            return field;
-        }
-
         static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
             // .ctor(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger) :base(...)
@@ -179,7 +154,9 @@ namespace MagicOnion.Client.DynamicClient
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 
+                // base(serviceName, callInvoker, host, option, serializerProvider, logger);
                 il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldstr, interfaceType.Name);
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_3);
@@ -223,23 +200,11 @@ namespace MagicOnion.Client.DynamicClient
             }
         }
 
-        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, FieldInfo methodField, FieldInfo clientField, MethodDefinition[] definitions)
+        static void DefineMethods(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, FieldInfo clientField, MethodDefinition[] definitions)
         {
             var baseType = typeof(StreamingHubClientBase<,>).MakeGenericType(interfaceType, receiverType);
-            var serializerOptionsField = baseType.GetField("serializerOptions", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
             var receiverField = baseType.GetField("receiver", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
 
-            // protected abstract Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
-            {
-                var method = typeBuilder.DefineMethod("get_DuplexStreamingAsyncMethod", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                    bytesMethod,
-                    Type.EmptyTypes);
-                var il = method.GetILGenerator();
-
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldfld, methodField);
-                il.Emit(OpCodes.Ret);
-            }
             {
                 // Task DisposeAsync();
                 {

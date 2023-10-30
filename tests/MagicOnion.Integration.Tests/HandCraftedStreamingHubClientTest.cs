@@ -64,9 +64,8 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
     class __HandCraftedClient__IHandCraftedStreamingHubClientTestHub : StreamingHubClientBase<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>, IHandCraftedStreamingHubClientTestHub
     {
         public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
-            : base(callInvoker, host, option, messageSerializer, logger)
+            : base(nameof(IHandCraftedStreamingHubClientTestHub), callInvoker, host, option, messageSerializer, logger)
         {
-            DuplexStreamingAsyncMethod = new Method<byte[], byte[]>(MethodType.DuplexStreaming, nameof(IHandCraftedStreamingHubClientTestHub), "Connect", ThroughMarshaller, ThroughMarshaller);
         }
 
         public Task ConnectAsync(IHandCraftedStreamingHubClientTestHubReceiver receiver)
@@ -74,7 +73,6 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
             return __ConnectAndSubscribeAsync(receiver, CancellationToken.None);
         }
 
-        protected override Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
         protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
         {
             if (FNV1A32.GetHashCode(nameof(MethodParameterless)) == methodId)

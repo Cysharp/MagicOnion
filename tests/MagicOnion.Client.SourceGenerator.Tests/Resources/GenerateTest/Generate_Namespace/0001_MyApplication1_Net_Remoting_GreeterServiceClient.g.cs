@@ -5,12 +5,6 @@
 
 namespace MyApplication1.Net.Remoting
 {
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-
     partial class MagicOnionInitializer
     {
         static partial class MagicOnionGeneratedClient
@@ -38,7 +32,7 @@ namespace MyApplication1.Net.Remoting
                     this.core = new ClientCore(serializerProvider);
                 }
 
-                private MyApplication1_Net_Remoting_GreeterServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                private MyApplication1_Net_Remoting_GreeterServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, ClientCore core) : base(options)
                 {
                     this.core = core;
                 }

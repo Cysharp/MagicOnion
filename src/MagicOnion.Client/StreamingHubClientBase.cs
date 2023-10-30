@@ -1,20 +1,17 @@
-using Grpc.Core;
-using MessagePack;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MagicOnion.Server;
 using System.Buffers;
 using System.Linq;
-using MagicOnion.Client.Internal;
+using Grpc.Core;
 using MagicOnion.Client.Internal.Threading;
 using MagicOnion.Client.Internal.Threading.Tasks;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
+using MessagePack;
 
 namespace MagicOnion.Client
 {
@@ -32,6 +29,7 @@ namespace MagicOnion.Client
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
         readonly AsyncLock asyncLock = new AsyncLock();
+        readonly Method<byte[], byte[]> duplexStreamingConnectMethod;
 
         IClientStreamWriter<byte[]> writer = default!;
         IAsyncStreamReader<byte[]> reader = default!;
@@ -47,8 +45,9 @@ namespace MagicOnion.Client
         int messageId = 0;
         bool disposed;
 
-        protected StreamingHubClientBase(CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(string serviceName, CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         {
+            this.duplexStreamingConnectMethod = CreateConnectMethod(serviceName);
             this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
             this.host = host;
             this.option = option;
@@ -56,13 +55,11 @@ namespace MagicOnion.Client
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 
-        protected abstract Method<byte[], byte[]> DuplexStreamingAsyncMethod { get; }
-
         // call immediately after create.
         public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
-            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(DuplexStreamingAsyncMethod, host, option);
+            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(duplexStreamingConnectMethod, host, option);
 
             this.writer = callResult.RequestStream;
             this.reader = callResult.ResponseStream;
@@ -91,7 +88,7 @@ namespace MagicOnion.Client
             }
             catch (RpcException e)
             {
-                throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{DuplexStreamingAsyncMethod.ServiceName}'. ({e.Status})");
+                throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
             }
 
             var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
@@ -114,8 +111,6 @@ namespace MagicOnion.Client
         }
 
         // Helper methods to make building clients easy.
-        protected Marshaller<byte[]> ThroughMarshaller
-            => MagicOnionMarshallers.ThroughMarshaller;
         protected void SetResultForResponse<TResponse>(object taskCompletionSource, ArraySegment<byte> data)
             => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
         protected void Serialize<T>(IBufferWriter<byte> writer, in T value)
@@ -125,6 +120,9 @@ namespace MagicOnion.Client
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+
+        static Method<byte[], byte[]> CreateConnectMethod(string serviceName)
+            => new Method<byte[], byte[]>(MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
         {

@@ -5,12 +5,6 @@
 
 namespace TempProject
 {
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-
     partial class MagicOnionInitializer
     {
         static partial class MagicOnionGeneratedClient
@@ -36,7 +30,7 @@ namespace TempProject
                     this.core = new ClientCore(serializerProvider);
                 }
 
-                private TempProject_MyServiceClient(MagicOnionClientOptions options, ClientCore core) : base(options)
+                private TempProject_MyServiceClient(global::MagicOnion.Client.MagicOnionClientOptions options, ClientCore core) : base(options)
                 {
                     this.core = core;
                 }

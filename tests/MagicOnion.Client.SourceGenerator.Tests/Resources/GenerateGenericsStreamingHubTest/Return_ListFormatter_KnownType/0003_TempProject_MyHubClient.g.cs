@@ -7,12 +7,6 @@
 
 namespace TempProject
 {
-    using global::System;
-    using global::Grpc.Core;
-    using global::MagicOnion;
-    using global::MagicOnion.Client;
-    using global::MessagePack;
-
     partial class MagicOnionInitializer
     {
         static partial class MagicOnionGeneratedClient
@@ -20,12 +14,9 @@ namespace TempProject
             [global::MagicOnion.Ignore]
             public class TempProject_MyHubClient : global::MagicOnion.Client.StreamingHubClientBase<global::TempProject.IMyHub, global::TempProject.IMyHubReceiver>, global::TempProject.IMyHub
             {
-                protected override global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]> DuplexStreamingAsyncMethod { get; }
-
                 public TempProject_MyHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
-                    : base(callInvoker, host, options, serializerProvider, logger)
+                    : base("IMyHub", callInvoker, host, options, serializerProvider, logger)
                 {
-                    DuplexStreamingAsyncMethod = new global::Grpc.Core.Method<global::System.Byte[], global::System.Byte[]>(global::Grpc.Core.MethodType.DuplexStreaming, "IMyHub", "Connect", ThroughMarshaller, ThroughMarshaller);
                 }
 
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::System.String>> GetStringValuesAsync()
