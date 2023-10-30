@@ -111,9 +111,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGeneratorPerf", "Sour
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorPerf", "perf\SourceGeneratorPerf\SourceGeneratorPerf\SourceGeneratorPerf.csproj", "{7F132098-0C1D-4F3A-B049-ACABF5E35973}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Serialization.MessagePack", "src\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj", "{6C34E9BF-4E05-4A73-B439-75F3369B88A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Serialization.MessagePack", "src\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj", "{6C34E9BF-4E05-4A73-B439-75F3369B88A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Internal", "src\MagicOnion.Internal\MagicOnion.Internal.csproj", "{2996029B-D329-499F-8525-69614A820135}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagicOnion.Internal", "src\MagicOnion.Internal\MagicOnion.Internal.csproj", "{2996029B-D329-499F-8525-69614A820135}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicOnion.Serialization.MessagePack.Tests", "tests\MagicOnion.Serialization.MessagePack.Tests\MagicOnion.Serialization.MessagePack.Tests.csproj", "{701E193F-587D-4C20-8970-6E215B0634F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -257,6 +259,10 @@ Global
 		{2996029B-D329-499F-8525-69614A820135}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2996029B-D329-499F-8525-69614A820135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2996029B-D329-499F-8525-69614A820135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701E193F-587D-4C20-8970-6E215B0634F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701E193F-587D-4C20-8970-6E215B0634F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701E193F-587D-4C20-8970-6E215B0634F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701E193F-587D-4C20-8970-6E215B0634F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -302,6 +308,7 @@ Global
 		{7F132098-0C1D-4F3A-B049-ACABF5E35973} = {E9E11DFE-29C4-4933-A21B-2222646D946E}
 		{6C34E9BF-4E05-4A73-B439-75F3369B88A8} = {1987061F-8970-4018-8D58-6932961C9EB4}
 		{2996029B-D329-499F-8525-69614A820135} = {1987061F-8970-4018-8D58-6932961C9EB4}
+		{701E193F-587D-4C20-8970-6E215B0634F8} = {7ACC27E8-8FBE-4807-B91F-B89AF3CFF7E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B2E7E3-B727-40A1-BE68-7BAC9B9DE2FE}

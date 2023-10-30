@@ -1,7 +1,8 @@
-using MagicOnion.Serialization.MessagePack;
+using FluentAssertions;
+using MessagePack;
 using MessagePack.Resolvers;
 
-namespace MagicOnion.Shared.Tests;
+namespace MagicOnion.Serialization.MessagePack.Tests;
 
 public class UnsafeDirectBlitResolverTest
 {
