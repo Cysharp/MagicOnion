@@ -1,6 +1,6 @@
 using MagicOnion.Internal;
 
-namespace MagicOnion.Shared.Tests;
+namespace MagicOnion.Abstractions.Tests;
 
 public class BoxTest
 {

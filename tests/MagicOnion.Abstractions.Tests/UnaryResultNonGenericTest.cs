@@ -1,6 +1,6 @@
 using MagicOnion.Client;
 
-namespace MagicOnion.Shared.Tests;
+namespace MagicOnion.Abstractions.Tests;
 
 public class UnaryResultNonGenericTest
 {
