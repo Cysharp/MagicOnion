@@ -357,8 +357,8 @@ public class SerializationInfoCollectorTest
         // Assert
         serializationInfoCollection.Should().NotBeNull();
         serializationInfoCollection.Generics.Should().HaveCount(2);
-        serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
-        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32))");
+        serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
+        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32))");
         serializationInfoCollection.TypeHints.Should().HaveCount(5); // string, long, int, DynamicArgumentTuple<string, long>, DynamicArgumentTuple<string, int>
     }
 
@@ -383,7 +383,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Enums.Should().BeEmpty();
         serializationInfoCollection.Generics.Should().HaveCount(3);
         serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs().Should().Be("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()");
-        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
+        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
         serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs().Should().Be("global::MyFormatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()");
     }
 
@@ -407,7 +407,7 @@ public class SerializationInfoCollectorTest
         serializationInfoCollection.Enums.Should().BeEmpty();
         serializationInfoCollection.Generics.Should().HaveCount(3);
         serializationInfoCollection.Generics[0].GetFormatterNameWithConstructorArgs().Should().Be("global::MessagePack.Formatters.NullableFormatter<global::MyNamespace.MyGenericObject>()");
-        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
+        serializationInfoCollection.Generics[1].GetFormatterNameWithConstructorArgs().Should().Be("global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int64>(default(global::System.String), default(global::System.Int64))");
         serializationInfoCollection.Generics[2].GetFormatterNameWithConstructorArgs().Should().Be("global::MessagePack.Formatters.MyNamespace.MyGenericObjectFormatter<global::System.String>()");
     }
 }
