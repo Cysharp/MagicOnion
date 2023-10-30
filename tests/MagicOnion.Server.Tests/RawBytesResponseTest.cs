@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization;
+using MagicOnion.Serialization.MessagePack;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc.Testing;
 

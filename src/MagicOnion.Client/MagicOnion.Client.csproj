@@ -13,6 +13,10 @@
     <Description>MagicOnion client-side runtime library. $(MagicOnionPackageDescription)</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**;**\obj\**" LinkBase="Internal.Shared" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
     <PackageReference Include="Grpc.Net.Client" />
   </ItemGroup>
@@ -29,23 +33,39 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
-    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
     <ProjectReference Include="..\MagicOnion.Client.SourceGenerator\MagicOnion.Client.SourceGenerator.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
+    <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\MagicOnion.Client.SourceGenerator\bin\$(Configuration)\netstandard2.0\MagicOnion.Client.SourceGenerator.dll" PackagePath="analyzers\dotnet\roslyn4.3\cs" Pack="true" Visible="false" />
   </ItemGroup>
 
-  <!-- Sync codes: MagicOnion.Client for Unity -->
+  <!-- Sync codes: MagicOnion for Unity -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</DestinationRoot>
+      <CodeSyncClientDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\</CodeSyncClientDestinationRoot>
+      <CodeSyncInternalDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Client\Internal.Shared\</CodeSyncInternalDestinationRoot>
+      <CodeSyncAbstractionsDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Abstractions\</CodeSyncAbstractionsDestinationRoot>
+      <CodeSyncSharedDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Shared\</CodeSyncSharedDestinationRoot>
+      <CodeSyncSerializationMessagePackDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Serialization.MessagePack\</CodeSyncSerializationMessagePackDestinationRoot>
+      <CodeSyncSerializationMemoryPackDestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Serialization.MemoryPack\</CodeSyncSerializationMemoryPackDestinationRoot>
     </PropertyGroup>
     <ItemGroup>
-      <TargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncClientTargetFiles Include="$(ProjectDir)**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncInternalTargetFiles Include="$(ProjectDir)\..\MagicOnion.Internal\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncAbstractionsTargetFiles Include="$(ProjectDir)\..\MagicOnion.Abstractions\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncSharedTargetFiles Include="$(ProjectDir)\..\MagicOnion.Shared\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncSerializationMessagePackTargetFiles Include="$(ProjectDir)\..\MagicOnion.Serialization.MessagePack\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
+      <CodeSyncSerializationMemoryPackTargetFiles Include="$(ProjectDir)\..\MagicOnion.Serialization.MemoryPack\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncClientTargetFiles)" DestinationFiles="$(CodeSyncClientDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncInternalTargetFiles)" DestinationFiles="$(CodeSyncInternalDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncAbstractionsTargetFiles)" DestinationFiles="$(CodeSyncAbstractionsDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncSharedTargetFiles)" DestinationFiles="$(CodeSyncSharedDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncSerializationMessagePackTargetFiles)" DestinationFiles="$(CodeSyncSerializationMessagePackDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CodeSyncSerializationMemoryPackTargetFiles)" DestinationFiles="$(CodeSyncSerializationMemoryPackDestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
   </Target>
 
   <ItemGroup>

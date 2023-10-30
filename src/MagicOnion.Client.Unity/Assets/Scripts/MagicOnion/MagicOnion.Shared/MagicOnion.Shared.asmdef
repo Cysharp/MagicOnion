@@ -1,0 +1,17 @@
+{
+    "name": "MagicOnion.Shared",
+    "references": [
+        "MagicOnion.Abstractions",
+        "MagicOnion.Serialization.MessagePack"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Grpc.Core.Api.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

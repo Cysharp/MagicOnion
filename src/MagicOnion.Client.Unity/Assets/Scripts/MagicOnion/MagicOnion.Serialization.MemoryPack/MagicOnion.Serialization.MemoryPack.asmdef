@@ -1,0 +1,27 @@
+{
+    "name": "MagicOnion.Serialization.MemoryPack",
+    "rootNamespace": "",
+    "references": [
+        "MagicOnion.Abstractions",
+        "MemoryPack"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Grpc.Core.Api.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "USE_MAGICONION_MEMORYPACK"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.memorypack",
+            "expression": "",
+            "define": "USE_MAGICONION_MEMORYPACK"
+        }
+    ],
+    "noEngineReferences": false
+}

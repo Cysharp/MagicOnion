@@ -58,7 +58,7 @@
             
                 switch (key)
                 {
-                    case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32));
+                    case 0: return new global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::System.String, global::System.Int32>(default(global::System.String), default(global::System.Int32));
                     case 1: return new global::__UserDefined__.MessagePack.Formatters.MyApplication1.MyGenericObjectFormatter<global::System.String>();
                     default: return null;
                 }

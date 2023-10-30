@@ -1,0 +1,18 @@
+{
+    "name": "MagicOnion.Serialization.MessagePack",
+    "references": [
+        "MagicOnion.Abstractions",
+        "MessagePack",
+        "MessagePack.Annotations"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Grpc.Core.Api.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

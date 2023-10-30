@@ -1,11 +1,12 @@
 {
     "name": "MagicOnion.Client",
+    "rootNamespace": "",
     "references": [
         "MagicOnion.Abstractions",
+        "MagicOnion.Shared",
         "MessagePack",
         "MessagePack.Annotations"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -15,5 +16,7 @@
         "Grpc.Core.Api.dll"
     ],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

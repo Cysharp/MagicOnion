@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+
+    <LangVersion>$(_LangVersionUnityBaseline)</LangVersion>
+    <Nullable>enable</Nullable>
+    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
+
+    <RootNamespace>MagicOnion</RootNamespace>
+
+    <!-- WARN: DO NOT SHIP this project as a package. -->
+    <IsPackable>false</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.Core.Api" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="PolySharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -59,7 +59,7 @@ namespace TempProject
             
                 switch (key)
                 {
-                    case 0: return new global::MagicOnion.DynamicArgumentTupleFormatter<global::TempProject.MyObject, global::System.Int32, global::System.String>(default(global::TempProject.MyObject), default(global::System.Int32), default(global::System.String));
+                    case 0: return new global::MagicOnion.Serialization.MessagePack.DynamicArgumentTupleFormatter<global::TempProject.MyObject, global::System.Int32, global::System.String>(default(global::TempProject.MyObject), default(global::System.Int32), default(global::System.String));
                     default: return null;
                 }
             }

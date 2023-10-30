@@ -1,6 +1,7 @@
 using System.Buffers;
 using Grpc.Core;
 using MagicOnion.Serialization;
+using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server.Hubs;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;

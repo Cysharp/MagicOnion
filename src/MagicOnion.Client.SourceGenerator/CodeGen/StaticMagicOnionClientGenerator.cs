@@ -55,12 +55,6 @@ public class StaticMagicOnionClientGenerator
             """);
         }
         ctx.Writer.AppendLineWithFormat($$"""
-                using global::System;
-                using global::Grpc.Core;
-                using global::MagicOnion;
-                using global::MagicOnion.Client;
-                using global::MessagePack;
-
                 partial class {{generationContext.InitializerPartialTypeName}}
                 {
                     static partial class MagicOnionGeneratedClient
@@ -129,7 +123,7 @@ public class StaticMagicOnionClientGenerator
                                 this.core = new ClientCore(serializerProvider);
                             }
 
-                            private {{ctx.Service.GetClientFullName()}}(MagicOnionClientOptions options, ClientCore core) : base(options)
+                            private {{ctx.Service.GetClientFullName()}}(global::MagicOnion.Client.MagicOnionClientOptions options, ClientCore core) : base(options)
                             {
                                 this.core = core;
                             }

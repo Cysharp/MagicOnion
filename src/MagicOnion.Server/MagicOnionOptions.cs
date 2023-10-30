@@ -1,6 +1,7 @@
 using MessagePack;
 using MagicOnion.Server.Filters;
 using MagicOnion.Serialization;
+using MagicOnion.Serialization.MessagePack;
 
 namespace MagicOnion.Server;
 
