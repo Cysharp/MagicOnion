@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit requires .NET 6 (`ReferenceAssemblies.Net.Net60`) -->
@@ -41,10 +41,6 @@
   <ItemGroup>
     <Compile Remove="Resources\**\*.cs" />
     <EmbeddedResource Include="Resources\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\GenerateNullableTest\" />
   </ItemGroup>
 
 </Project>
