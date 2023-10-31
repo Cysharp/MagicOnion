@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 #endif
 using Grpc.Core;
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
 using Channel = Grpc.Core.Channel;
 #else
 using Grpc.Net.Client;
@@ -152,7 +152,7 @@ namespace MagicOnion
 #endif
         {
             ThrowIfDisposed();
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
             if (_channel is Channel grpcCChannel)
             {
                 await grpcCChannel.ConnectAsync(deadline);

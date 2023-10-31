@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
 using Grpc.Core;
 #else
 using Grpc.Net.Client;
@@ -12,7 +12,7 @@ namespace MagicOnion.Unity
     /// <summary>
     /// Provide and manage gRPC channels for MagicOnion.
     /// </summary>
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
     public class DefaultGrpcChannelProvider : GrpcCCoreGrpcChannelProvider
     {
         public DefaultGrpcChannelProvider() : base() { }

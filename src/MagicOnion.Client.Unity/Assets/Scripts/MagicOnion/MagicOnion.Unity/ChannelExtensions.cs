@@ -1,4 +1,4 @@
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
 using Grpc.Core;
 using System;
 using System.Collections.Generic;

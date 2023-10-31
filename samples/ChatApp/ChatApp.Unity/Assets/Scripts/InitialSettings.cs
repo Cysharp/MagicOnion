@@ -1,6 +1,6 @@
 using System.IO;
 using MagicOnion.Client;
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
 using Grpc.Core;
 #else
 using Grpc.Net.Client;
@@ -35,7 +35,7 @@ namespace Assets.Scripts
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void OnRuntimeInitialize()
         {
-#if !USE_GRPC_CCORE
+#if !MAGICONION_USE_GRPC_CCORE
             // Use Grpc.Net.Client instead of C-core gRPC library.
             GrpcChannelProviderHost.Initialize(
                 new GrpcNetClientGrpcChannelProvider(() => new GrpcChannelOptions()
@@ -46,7 +46,7 @@ namespace Assets.Scripts
                     }
                 }));
 #endif
-#if USE_GRPC_CCORE
+#if MAGICONION_USE_GRPC_CCORE
             // Initialize gRPC channel provider when the application is loaded.
             GrpcChannelProviderHost.Initialize(new DefaultGrpcChannelProvider(new GrpcCCoreChannelOptions(new[]
             {
