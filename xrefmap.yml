@@ -13,144 +13,150 @@ references:
   commentId: N:MagicOnion.Client
   fullName: MagicOnion.Client
   nameWithType: MagicOnion.Client
-- uid: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider
+- uid: MagicOnion.Client.DynamicClient
+  name: MagicOnion.Client.DynamicClient
+  href: api/MagicOnion.Client.DynamicClient.html
+  commentId: N:MagicOnion.Client.DynamicClient
+  fullName: MagicOnion.Client.DynamicClient
+  nameWithType: MagicOnion.Client.DynamicClient
+- uid: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider
   name: DynamicMagicOnionClientFactoryProvider
-  href: api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html
-  commentId: T:MagicOnion.Client.DynamicMagicOnionClientFactoryProvider
-  fullName: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider
+  href: api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html
+  commentId: T:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider
+  fullName: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider
   nameWithType: DynamicMagicOnionClientFactoryProvider
-- uid: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance
+- uid: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
   name: Instance
-  href: api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicMagicOnionClientFactoryProvider_Instance
-  commentId: P:MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance
-  fullName: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicMagicOnionClientFactoryProvider_Instance
+  commentId: P:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
   nameWithType: DynamicMagicOnionClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance*
+- uid: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance*
   name: Instance
-  href: api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicMagicOnionClientFactoryProvider_Instance_
-  commentId: Overload:MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicMagicOnionClientFactoryProvider_Instance_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.Instance
   nameWithType: DynamicMagicOnionClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory*
+- uid: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory*
   name: TryGetFactory
-  href: api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicMagicOnionClientFactoryProvider_TryGetFactory_
-  commentId: Overload:MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory
+  href: api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicMagicOnionClientFactoryProvider_TryGetFactory_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory
+  fullName: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory
   nameWithType: DynamicMagicOnionClientFactoryProvider.TryGetFactory
-- uid: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
+- uid: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
   name: TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T>)
-  href: api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicMagicOnionClientFactoryProvider_TryGetFactory__1_MagicOnion_Client_MagicOnionClientFactoryDelegate___0___
-  commentId: M:MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
+  href: api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicMagicOnionClientFactoryProvider_TryGetFactory__1_MagicOnion_Client_MagicOnionClientFactoryDelegate___0___
+  commentId: M:MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
   name.vb: TryGetFactory(Of T)(ByRef MagicOnionClientFactoryDelegate(Of T))
-  fullName: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)
-  fullName.vb: MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnion.Client.MagicOnionClientFactoryDelegate(Of T))
+  fullName: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)
+  fullName.vb: MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnion.Client.MagicOnionClientFactoryDelegate(Of T))
   nameWithType: DynamicMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T>)
   nameWithType.vb: DynamicMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnionClientFactoryDelegate(Of T))
-- uid: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider
   name: DynamicNotSupportedMagicOnionClientFactoryProvider
-  href: api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html
-  commentId: T:MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider
-  fullName: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html
+  commentId: T:MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider
   nameWithType: DynamicNotSupportedMagicOnionClientFactoryProvider
-- uid: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
   name: Instance
-  href: api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedMagicOnionClientFactoryProvider_Instance
-  commentId: P:MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
-  fullName: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedMagicOnionClientFactoryProvider_Instance
+  commentId: P:MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
   nameWithType: DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance*
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance*
   name: Instance
-  href: api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedMagicOnionClientFactoryProvider_Instance_
-  commentId: Overload:MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedMagicOnionClientFactoryProvider_Instance_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
   nameWithType: DynamicNotSupportedMagicOnionClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory*
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory*
   name: TryGetFactory
-  href: api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedMagicOnionClientFactoryProvider_TryGetFactory_
-  commentId: Overload:MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedMagicOnionClientFactoryProvider_TryGetFactory_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory
   nameWithType: DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory
-- uid: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
   name: TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T>)
-  href: api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedMagicOnionClientFactoryProvider_TryGetFactory__1_MagicOnion_Client_MagicOnionClientFactoryDelegate___0___
-  commentId: M:MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedMagicOnionClientFactoryProvider_TryGetFactory__1_MagicOnion_Client_MagicOnionClientFactoryDelegate___0___
+  commentId: M:MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory``1(MagicOnion.Client.MagicOnionClientFactoryDelegate{``0}@)
   name.vb: TryGetFactory(Of T)(ByRef MagicOnionClientFactoryDelegate(Of T))
-  fullName: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)
-  fullName.vb: MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnion.Client.MagicOnionClientFactoryDelegate(Of T))
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnion.Client.MagicOnionClientFactoryDelegate<T>)
+  fullName.vb: MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnion.Client.MagicOnionClientFactoryDelegate(Of T))
   nameWithType: DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory<T>(out MagicOnionClientFactoryDelegate<T>)
   nameWithType.vb: DynamicNotSupportedMagicOnionClientFactoryProvider.TryGetFactory(Of T)(ByRef MagicOnionClientFactoryDelegate(Of T))
-- uid: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider
   name: DynamicNotSupportedStreamingHubClientFactoryProvider
-  href: api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html
-  commentId: T:MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider
-  fullName: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html
+  commentId: T:MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider
   nameWithType: DynamicNotSupportedStreamingHubClientFactoryProvider
-- uid: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
   name: Instance
-  href: api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedStreamingHubClientFactoryProvider_Instance
-  commentId: P:MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
-  fullName: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedStreamingHubClientFactoryProvider_Instance
+  commentId: P:MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
   nameWithType: DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance*
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance*
   name: Instance
-  href: api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedStreamingHubClientFactoryProvider_Instance_
-  commentId: Overload:MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedStreamingHubClientFactoryProvider_Instance_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
   nameWithType: DynamicNotSupportedStreamingHubClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory*
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory*
   name: TryGetFactory
-  href: api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedStreamingHubClientFactoryProvider_TryGetFactory_
-  commentId: Overload:MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedStreamingHubClientFactoryProvider_TryGetFactory_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory
   nameWithType: DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory
-- uid: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
+- uid: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
   name: TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
-  href: api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicNotSupportedStreamingHubClientFactoryProvider_TryGetFactory__2_MagicOnion_Client_StreamingHubClientFactoryDelegate___0___1___
-  commentId: M:MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
+  href: api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicNotSupportedStreamingHubClientFactoryProvider_TryGetFactory__2_MagicOnion_Client_StreamingHubClientFactoryDelegate___0___1___
+  commentId: M:MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
   name.vb: TryGetFactory(Of TStreamingHub, TReceiver)(ByRef StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
-  fullName: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
-  fullName.vb: MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef MagicOnion.Client.StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
+  fullName: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
+  fullName.vb: MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef MagicOnion.Client.StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
   nameWithType: DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
   nameWithType.vb: DynamicNotSupportedStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
-- uid: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider
+- uid: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider
   name: DynamicStreamingHubClientFactoryProvider
-  href: api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html
-  commentId: T:MagicOnion.Client.DynamicStreamingHubClientFactoryProvider
-  fullName: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider
+  href: api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html
+  commentId: T:MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider
+  fullName: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider
   nameWithType: DynamicStreamingHubClientFactoryProvider
-- uid: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance
+- uid: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
   name: Instance
-  href: api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicStreamingHubClientFactoryProvider_Instance
-  commentId: P:MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance
-  fullName: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicStreamingHubClientFactoryProvider_Instance
+  commentId: P:MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
   nameWithType: DynamicStreamingHubClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance*
+- uid: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance*
   name: Instance
-  href: api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicStreamingHubClientFactoryProvider_Instance_
-  commentId: Overload:MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance
+  href: api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicStreamingHubClientFactoryProvider_Instance_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.Instance
+  fullName: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.Instance
   nameWithType: DynamicStreamingHubClientFactoryProvider.Instance
-- uid: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory*
+- uid: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory*
   name: TryGetFactory
-  href: api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicStreamingHubClientFactoryProvider_TryGetFactory_
-  commentId: Overload:MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory
+  href: api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicStreamingHubClientFactoryProvider_TryGetFactory_
+  commentId: Overload:MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory
   isSpec: "True"
-  fullName: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory
+  fullName: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory
   nameWithType: DynamicStreamingHubClientFactoryProvider.TryGetFactory
-- uid: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
+- uid: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
   name: TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
-  href: api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicStreamingHubClientFactoryProvider_TryGetFactory__2_MagicOnion_Client_StreamingHubClientFactoryDelegate___0___1___
-  commentId: M:MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
+  href: api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html#MagicOnion_Client_DynamicClient_DynamicStreamingHubClientFactoryProvider_TryGetFactory__2_MagicOnion_Client_StreamingHubClientFactoryDelegate___0___1___
+  commentId: M:MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory``2(MagicOnion.Client.StreamingHubClientFactoryDelegate{``0,``1}@)
   name.vb: TryGetFactory(Of TStreamingHub, TReceiver)(ByRef StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
-  fullName: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
-  fullName.vb: MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef MagicOnion.Client.StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
+  fullName: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
+  fullName.vb: MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef MagicOnion.Client.StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
   nameWithType: DynamicStreamingHubClientFactoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)
   nameWithType.vb: DynamicStreamingHubClientFactoryProvider.TryGetFactory(Of TStreamingHub, TReceiver)(ByRef StreamingHubClientFactoryDelegate(Of TStreamingHub, TReceiver))
 - uid: MagicOnion.Client.IClientFilter

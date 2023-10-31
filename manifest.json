@@ -5,11 +5,11 @@
   "files": [
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.yml",
+      "source_relative_path": "api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Client.DynamicMagicOnionClientFactoryProvider.html",
-          "hash": "ukloyviiffbojYTQBXbtfg/0iGn03AFo6Bw4PGyfoIU="
+          "relative_path": "api/MagicOnion.Client.DynamicClient.DynamicMagicOnionClientFactoryProvider.html",
+          "hash": "SPgGfA3xszHWE4TrmRLU6WVsNO3Pcu0ZX521g9dtXtE="
         }
       },
       "is_incremental": false,
@@ -17,11 +17,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.yml",
+      "source_relative_path": "api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Client.DynamicNotSupportedMagicOnionClientFactoryProvider.html",
-          "hash": "7cux0X1bD+lgrW4ErCsleE6F2j5cXi0Sm36A4bdrlXo="
+          "relative_path": "api/MagicOnion.Client.DynamicClient.DynamicNotSupportedMagicOnionClientFactoryProvider.html",
+          "hash": "UoO+ekvyFeoJqprQ+AbFG3RM6EXn53Lx4J1bq/Z2U4k="
         }
       },
       "is_incremental": false,
@@ -29,11 +29,11 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.yml",
+      "source_relative_path": "api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Client.DynamicNotSupportedStreamingHubClientFactoryProvider.html",
-          "hash": "xNeDtBMNZl+r9Aina8Qq11k3H866WkPAMRJ4fNbREF0="
+          "relative_path": "api/MagicOnion.Client.DynamicClient.DynamicNotSupportedStreamingHubClientFactoryProvider.html",
+          "hash": "p6Q+jWiHcHbjcYioKoads4bMdjJ4CW2gl7ECuKheRbM="
         }
       },
       "is_incremental": false,
@@ -41,11 +41,23 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.yml",
+      "source_relative_path": "api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.yml",
       "output": {
         ".html": {
-          "relative_path": "api/MagicOnion.Client.DynamicStreamingHubClientFactoryProvider.html",
-          "hash": "lKPAi1NizHNQjEZxXL4RZnEI3II5l0iRqZW7oce6irg="
+          "relative_path": "api/MagicOnion.Client.DynamicClient.DynamicStreamingHubClientFactoryProvider.html",
+          "hash": "ECIig9WfMII0o5sYEwFSxWVmQwk2R5o4oeeR1qWDSTk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/MagicOnion.Client.DynamicClient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/MagicOnion.Client.DynamicClient.html",
+          "hash": "iy7CNfs2UegVT0o8NHvC8xgwlRaSXLzteNARfC+XZlU="
         }
       },
       "is_incremental": false,
@@ -849,7 +861,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.html",
-          "hash": "UVq9PBbs9vtltSmnq3jGsFthWQ2ydo+DwTZmnrtM/yE="
+          "hash": "t1aDYROP/8uhFUmcqlPBTahuxirTD/UKCfjbaK43/5s="
         }
       },
       "is_incremental": false,
@@ -2973,7 +2985,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "p8MZ7pHm9ngAClWalOjrfiD2abAnBCkVBKTxOPicswU="
+          "hash": "1J5AgB9bzMyzW18vWSOHgSnHx1YbcHeLV6+R5tfidNQ="
         }
       },
       "is_incremental": false,
@@ -3060,7 +3072,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 247,
+          "total_file_count": 248,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
