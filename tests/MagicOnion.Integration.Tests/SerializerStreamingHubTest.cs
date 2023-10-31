@@ -1,5 +1,6 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server.Hubs;
 using MagicOnionTestServer;
 using Microsoft.AspNetCore.Mvc.Testing;

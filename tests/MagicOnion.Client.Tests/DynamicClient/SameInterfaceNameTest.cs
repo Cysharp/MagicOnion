@@ -1,3 +1,4 @@
+using MagicOnion.Client.DynamicClient;
 using MagicOnion.Serialization;
 
 namespace MagicOnion.Client.Tests.DynamicClient

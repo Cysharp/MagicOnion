@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using Xunit.Abstractions;
 using System.Diagnostics;
 using Grpc.Net.Client;
+using MagicOnion.Client.DynamicClient;
 
 namespace MagicOnion.Integration.Tests;
 

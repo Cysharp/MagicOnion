@@ -1,5 +1,6 @@
 using MagicOnion.Client;
 using Grpc.Net.Client;
+using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server;
 
 namespace MagicOnion.Integration.Tests;
