@@ -22,16 +22,6 @@ MagicOnion.IgnoreAttribute</Description>
     <PackageReference Include="MessagePack" />
   </ItemGroup>
 
-  <!-- Copy files for unity MagicOnion -->
-   <PropertyGroup>
-     <DestinationRoot>$(ProjectDir)..\MagicOnion.Client.Unity\Assets\Scripts\MagicOnion\MagicOnion.Abstractions\</DestinationRoot>
-   </PropertyGroup>
-   <ItemGroup>
-     <TargetFiles Include="$(ProjectDir)\**\*.cs" Exclude="**\bin\**\*.*;**\obj\**\*.*;InternalsVisibleTo.cs" />
-   </ItemGroup>
-   <ItemGroup>
-     <TargetFiles Remove="InternalsVisibleTo.cs" />
-   </ItemGroup>
    <ItemGroup>
      <None Update="DynamicArgumentTuple.tt">
        <LastGenOutput>DynamicArgumentTuple.cs</LastGenOutput>
@@ -48,8 +38,5 @@ MagicOnion.IgnoreAttribute</Description>
        <DependentUpon>DynamicArgumentTuple.tt</DependentUpon>
      </Compile>
    </ItemGroup>
-   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-     <Copy SourceFiles="@(TargetFiles)" DestinationFiles="$(DestinationRoot)\%(RecursiveDir)%(Filename)%(Extension)" SkipUnchangedFiles="true" />
-   </Target>
 
 </Project>

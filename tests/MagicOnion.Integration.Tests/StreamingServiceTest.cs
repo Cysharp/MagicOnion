@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MagicOnion.Client;
+using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server;
 
 namespace MagicOnion.Integration.Tests;

@@ -1,5 +1,6 @@
 using Grpc.Net.Client;
 using MagicOnion.Client;
+using MagicOnion.Client.DynamicClient;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server;
