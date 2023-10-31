@@ -14,6 +14,38 @@ public static class MagicOnionEngine
     const string LoggerNameMagicOnionEngine = "MagicOnion.Server.MagicOnionEngine";
     const string LoggerNameMethodHandler = "MagicOnion.Server.MethodHandler";
 
+    static readonly string[] wellKnownIgnoreAssemblies = new[]
+    {
+        "netstandard",
+        "mscorlib",
+        "Microsoft.AspNetCore.*",
+        "Microsoft.CSharp.*",
+        "Microsoft.CodeAnalysis.*",
+        "Microsoft.Extensions.*",
+        "Microsoft.Win32.*",
+        "NuGet.*",
+        "System.*",
+        "Newtonsoft.Json",
+        "Microsoft.Identity.*",
+        "Microsoft.IdentityModel.*",
+        "StackExchange.Redis.*",
+        // gRPC
+        "Grpc.*",
+        // WPF
+        "Accessibility",
+        "PresentationFramework",
+        "PresentationCore",
+        "WindowsBase",
+        // MessagePack, MemoryPack
+        "MessagePack.*",
+        "MemoryPack.*",
+        // MagicOnion
+        "MagicOnion.Server.*",
+        "MagicOnion.Client.*", // MagicOnion.Client.DynamicClient (MagicOnionClient.Create<T>)
+        "MagicOnion.Abstractions",
+        "MagicOnion.Shared",
+    };
+
     /// <summary>
     /// Search MagicOnion service from all assemblies.
     /// </summary>
@@ -33,53 +65,8 @@ public static class MagicOnionEngine
     public static MagicOnionServiceDefinition BuildServerServiceDefinition(IServiceProvider serviceProvider, MagicOnionOptions options)
     {
         // NOTE: Exclude well-known system assemblies from automatic discovery of services.
-        var wellKnownIgnoreAssemblies = new[]
-        {
-            "netstandard",
-            "mscorlib",
-            "Microsoft.AspNetCore.*",
-            "Microsoft.CSharp.*",
-            "Microsoft.CodeAnalysis.*",
-            "Microsoft.Extensions.*",
-            "Microsoft.Win32.*",
-            "NuGet.*",
-            "System.*",
-            "Newtonsoft.Json",
-            "Microsoft.Identity.*",
-            "Microsoft.IdentityModel.*",
-            "StackExchange.Redis.*",
-            // gRPC
-            "Grpc.*",
-            // WPF
-            "Accessibility",
-            "PresentationFramework",
-            "PresentationCore",
-            "WindowsBase",
-            // MessagePack, MemoryPack
-            "MessagePack.*",
-            "MemoryPack.*",
-            // MagicOnion
-            "MagicOnion.Server.*",
-            "MagicOnion.Client.*", // MagicOnion.Client.DynamicClient (MagicOnionClient.Create<T>)
-            "MagicOnion.Abstractions",
-            "MagicOnion.Shared",
-        };
-
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(x =>
-            {
-                return !wellKnownIgnoreAssemblies.Any(y =>
-                {
-                    if (y.EndsWith(".*"))
-                    {
-                        return x.GetName().Name!.StartsWith(y.Substring(0, y.Length - 2));
-                    }
-                    else
-                    {
-                        return x.GetName().Name == y;
-                    }
-                });
-            })
+            .Where(x => !ShouldIgnoreAssembly(x.GetName().Name!))
             .ToArray();
 
         return BuildServerServiceDefinition(serviceProvider, assemblies, options);
@@ -263,5 +250,21 @@ public static class MagicOnionEngine
         {
             throw new InvalidOperationException($"Type '{type.FullName}' is generic type definition. A service type must be plain or constructed-generic class.");
         }
+    }
+
+    internal static bool ShouldIgnoreAssembly(string name)
+    {
+        return wellKnownIgnoreAssemblies.Any(y =>
+        {
+            if (y.EndsWith(".*"))
+            {
+                return name.StartsWith(y.Substring(0, y.Length - 1)) || // Starts with 'MagicOnion.Client.'
+                       name == y.Substring(0, y.Length - 2); // Exact match 'MagicOnion.Client' (w/o last dot)
+            }
+            else
+            {
+                return name == y;
+            }
+        });
     }
 }

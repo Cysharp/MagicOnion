@@ -325,4 +325,23 @@ public class MagicOnionEngineTest
         public UnaryResult<Nil> MethodA() => default;
         public UnaryResult<Nil> MethodB() => default;
     }
+
+    [Fact]
+    public void ShouldIgnoreAssembly()
+    {
+        MagicOnionEngine.ShouldIgnoreAssembly("mscorlib").Should().BeTrue();
+        MagicOnionEngine.ShouldIgnoreAssembly("System.Private.CoreLib").Should().BeTrue();
+        MagicOnionEngine.ShouldIgnoreAssembly("Grpc.Net.Client").Should().BeTrue();
+        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client").Should().BeTrue();
+        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Client._DynamicClient_").Should().BeTrue();
+        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnion.Server").Should().BeTrue();
+
+        MagicOnionEngine.ShouldIgnoreAssembly("").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("A").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("AspNetCoreSample").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("GrpcSample").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("MyGrpc.Net").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("MyApp.System.Net").Should().BeFalse();
+        MagicOnionEngine.ShouldIgnoreAssembly("MagicOnionSample").Should().BeFalse();
+    }
 }
