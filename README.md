@@ -1010,7 +1010,7 @@ There are two ways to use the gRPC library in Unity:
 
 Since the maintenance of the C-core based library has ended in the gRPC project, we recommend using [YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) . Please refer to the [README of YetAnotherHttpHandler](https://github.com/Cysharp/YetAnotherHttpHandler) for installation instructions.
 
-If you are using the C-core gRPC library, please define `USE_GRPC_CCORE` symbol in "Scripting Define Symbols".
+If you are using the C-core gRPC library, please define `MAGICONION_USE_GRPC_CCORE` symbol in "Scripting Define Symbols".
 
 ### Install MessagePack for C#
 MessagePack for C# is not included in MagicOnion package. You need to download and install separately.
