@@ -82,7 +82,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: ./.github/actions/setup-dotnet
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - name: Publish MagicOnion.Client.SourceGenerator.Unity
         run: dotnet publish -c ${{ env.BUILD_CONFIG }} -c Release ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
       - name: Remove .deps.json and .pdbs
@@ -136,7 +136,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: ./.github/actions/setup-dotnet
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
       # pack nuget
       - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf  --include-symbols --include-source --no-build -o ./publish
@@ -190,7 +190,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: ./.github/actions/setup-dotnet
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       # Create Release
       - uses: actions/create-release@v1
         id: create_release
