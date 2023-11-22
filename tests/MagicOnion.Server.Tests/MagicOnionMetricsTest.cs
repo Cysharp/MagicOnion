@@ -147,7 +147,8 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         values[0].Tags["error.type"].Should().Be("System.InvalidOperationException");
     }
 
-    class Receiver : IMagicOnionMetricsTestHubReceiver;
+    class Receiver : IMagicOnionMetricsTestHubReceiver
+    {}
 }
 
 public class MagicOnionMetricsTestHub : StreamingHubBase<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>, IMagicOnionMetricsTestHub
