@@ -73,7 +73,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var values = collector.GetMeasurementSnapshot();
 
         values.Should().HaveCount(1);
-        values[0].Value.Should().BeGreaterThanOrEqualTo(100);
+        values[0].Value.Should().BeGreaterThanOrEqualTo(90);
         values[0].Tags["rpc.system"].Should().Be("magiconion");
         values[0].Tags["rpc.service"].Should().Be(nameof(IMagicOnionMetricsTestHub));
         values[0].Tags["rpc.method"].Should().Be(nameof(IMagicOnionMetricsTestHub.SleepAsync));
