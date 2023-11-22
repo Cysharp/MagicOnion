@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Grpc.Core;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
@@ -96,6 +98,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     public async Task<DuplexStreamingResult<byte[], byte[]>> Connect()
     {
+        Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
+
         var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
 
         var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
@@ -130,6 +134,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
         finally
         {
+            Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.MethodHandler.ServiceName);
+
             StreamingServiceContext.CompleteStreamingHub();
             await OnDisconnected();
             await this.Group.DisposeAsync();
@@ -176,6 +182,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     Timestamp = DateTime.UtcNow
                 };
 
+                var methodStartingTimestamp = Stopwatch.GetTimestamp();
                 var isErrorOrInterrupted = false;
                 MagicOnionServerLog.BeginInvokeHubMethod(Context.MethodHandler.Logger, context, context.Request, handler.RequestType);
                 try
@@ -193,6 +200,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 {
                     isErrorOrInterrupted = true;
                     MagicOnionServerLog.Error(Context.MethodHandler.Logger, ex, context);
+                    Metrics.StreamingHubException(Context.Metrics, handler, ex);
 
                     if (hasResponse)
                     {
@@ -201,7 +209,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 }
                 finally
                 {
-                    MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.responseSize, context.responseType, (DateTime.UtcNow - context.Timestamp).TotalMilliseconds, isErrorOrInterrupted);
+                    var methodEndingTimestamp = Stopwatch.GetTimestamp();
+                    MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.responseSize, context.responseType, StopwatchHelper.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
+                    Metrics.StreamingHubMethodCompleted(Context.Metrics, handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
                 }
             }
             else

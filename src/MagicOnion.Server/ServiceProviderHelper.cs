@@ -1,3 +1,4 @@
+using MagicOnion.Server.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server;
@@ -10,6 +11,7 @@ internal static class ServiceProviderHelper
     {
         var instance = ActivatorUtilities.CreateInstance<TServiceBase>(context.ServiceProvider);
         instance.Context = context;
+        instance.Metrics = context.ServiceProvider.GetRequiredService<MagicOnionMetrics>();
         return instance;
     }
 }
