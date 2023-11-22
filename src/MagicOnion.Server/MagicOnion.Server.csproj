@@ -5,6 +5,7 @@
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
 
     <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
 
@@ -20,6 +21,11 @@
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore.Server" />
     <PackageReference Include="Grpc.Core.Api" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics" />
   </ItemGroup>
 
   <ItemGroup>

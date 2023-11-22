@@ -4,6 +4,7 @@ using MagicOnion.Server.Diagnostics;
 using System.Collections.Concurrent;
 using System.Reflection;
 using MagicOnion.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
@@ -82,6 +83,7 @@ public class ServiceContext : IServiceContext
     internal object? Result { get; set; }
     internal ILogger Logger { get; }
     internal MethodHandler MethodHandler { get; }
+    internal MetricsContext Metrics { get; }
 
     public ServiceContext(
         Type serviceType,
@@ -106,6 +108,8 @@ public class ServiceContext : IServiceContext
         this.Logger = logger;
         this.MethodHandler = methodHandler;
         this.ServiceProvider = serviceProvider;
+
+        this.Metrics = serviceProvider.GetRequiredService<MagicOnionMetrics>().CreateContext();
     }
 
     /// <summary>Gets a request object.</summary>

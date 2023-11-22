@@ -1,6 +1,7 @@
 using System.Reflection;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
+using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Glue;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,9 @@ public static class MagicOnionServicesExtensions
 
         services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
         services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
+
+        services.AddMetrics();
+        services.TryAddSingleton<MagicOnionMetrics>();
 
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
