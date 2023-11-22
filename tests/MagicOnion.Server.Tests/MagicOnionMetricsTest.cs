@@ -68,6 +68,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
 
         await client.SleepAsync();
+        await Task.Delay(100);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -87,6 +88,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         var client = await StreamingHubClient.ConnectAsync<IMagicOnionMetricsTestHub, IMagicOnionMetricsTestHubReceiver>(channel, receiver, serializerProvider: MessagePackMagicOnionSerializerProvider.Default);
 
         await client.MethodAsync();
+        await Task.Delay(100);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -112,6 +114,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         }
         catch
         { }
+        await Task.Delay(100);
 
         var values = collector.GetMeasurementSnapshot();
 
@@ -136,6 +139,7 @@ public class MagicOnionMetricsTest : IClassFixture<MagicOnionApplicationFactory<
         }
         catch
         { }
+        await Task.Delay(100);
 
         var values = collector.GetMeasurementSnapshot();
 
