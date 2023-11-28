@@ -2,11 +2,7 @@ name: Setup .NET SDKs
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: |
-          6.0.x
-          7.0.x
+    - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
     - name: "Prepare Environment Variables (.NET SDK)"
       shell: bash
       run: |
