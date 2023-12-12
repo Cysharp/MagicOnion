@@ -1,55 +1,11 @@
-#if FALSE
-using MagicOnion.Generator.CodeAnalysis;
+using System.Collections.Immutable;
+using MagicOnion.Client.SourceGenerator.CodeAnalysis;
+using MessagePack;
 
 namespace MagicOnion.Client.SourceGenerator.Tests.Collector;
 
 public class MethodCollectorStreamingHubsTest
 {
-    [Fact]
-    public void FileScopedNamespace()
-    {
-        // Arrange
-        var source = @"
-using System;
-using System.Threading.Tasks;
-using MagicOnion;
-using MessagePack;
-
-namespace MyNamespace;
-
-public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
-{
-    Task MethodA();
-}
-
-public interface IMyHubReceiver
-{
-    void EventA();
-}
-";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
-
-        // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
-
-        // Assert
-        serviceCollection.Should().NotBeNull();
-        serviceCollection.Hubs.Should().HaveCount(1);
-        serviceCollection.Services.Should().BeEmpty();
-        serviceCollection.Hubs[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyHub"));
-        serviceCollection.Hubs[0].HasIfDirectiveCondition.Should().BeFalse();
-        serviceCollection.Hubs[0].Methods.Should().HaveCount(1);
-        // Task MethodA();
-        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
-        serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
-        serviceCollection.Hubs[0].Methods[0].Parameters.Should().BeEmpty();
-        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task>());
-    }
-
     [Fact]
     public void Ignore_Method()
     {
@@ -77,25 +33,23 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Should().NotBeNull();
         serviceCollection.Hubs.Should().HaveCount(1);
         serviceCollection.Services.Should().BeEmpty();
         serviceCollection.Hubs[0].ServiceType.Should().Be(MagicOnionTypeInfo.Create("MyNamespace", "IMyHub"));
-        serviceCollection.Hubs[0].HasIfDirectiveCondition.Should().BeFalse();
         serviceCollection.Hubs[0].Methods.Should().HaveCount(2);
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
         serviceCollection.Hubs[0].Methods[1].MethodName.Should().Be("MethodC");
     }
-    
+
     [Fact]
     public void Ignore_Interface()
     {
@@ -119,13 +73,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Should().NotBeNull();
@@ -156,13 +109,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         // Task MethodA();
@@ -170,7 +122,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<Nil>());
         serviceCollection.Hubs[0].Methods[0].Parameters.Should().BeEmpty();
     }
-    
+
     [Fact]
     public void Parameter_One()
     {
@@ -193,13 +145,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         // Task MethodA();
@@ -211,7 +162,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods[0].Parameters[0].HasExplicitDefaultValue.Should().BeFalse();
         serviceCollection.Hubs[0].Methods[0].Parameters[0].DefaultValue.Should().Be("default(int)");
     }
-    
+
     [Fact]
     public void Parameter_Many()
     {
@@ -234,13 +185,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         // Task MethodA();
@@ -257,7 +207,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Methods[0].Parameters[1].DefaultValue.Should().Be("default(string)");
     }
 
-        
+
     [Fact]
     public void Parameter_HasDefaultValue()
     {
@@ -280,13 +230,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         // Task MethodA();
@@ -325,13 +274,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Should().NotBeNull();
@@ -344,7 +292,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Receiver.Methods[0].MethodName.Should().Be("EventA");
         serviceCollection.Hubs[0].Receiver.Methods[0].HubId.Should().Be(842297178);
     }
-    
+
     [Fact]
     public void HubId_Explicit()
     {
@@ -371,13 +319,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Should().NotBeNull();
@@ -390,7 +337,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Receiver.Methods[0].MethodName.Should().Be("EventA");
         serviceCollection.Hubs[0].Receiver.Methods[0].HubId.Should().Be(67890);
     }
-           
+
     [Fact]
     public void ReturnType_NotSupported_Void()
     {
@@ -413,15 +360,18 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
-        // Act & Assert
-        var collector = new MethodCollector();
-        var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id);
     }
-               
+
     [Fact]
     public void ReturnType_NotSupported_NotTaskOfT()
     {
@@ -444,13 +394,16 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
-        // Act & Assert
-        var collector = new MethodCollector();
-        var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id);
     }
 
     [Fact]
@@ -475,13 +428,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
@@ -511,13 +463,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
@@ -547,13 +498,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
@@ -583,13 +533,12 @@ public interface IMyHubReceiver
     void EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
@@ -621,13 +570,12 @@ public interface IMyHubReceiver
     void EventC(string arg1, int arg2);
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
         serviceCollection.Should().NotBeNull();
@@ -654,7 +602,7 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Receiver.Methods[2].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[2].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
     }
-           
+
     [Fact]
     public void Receiver_NonVoidReturnType()
     {
@@ -677,107 +625,15 @@ public interface IMyHubReceiver
     int EventA();
 }
 ";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
-
-        // Act & Assert
-        var collector = new MethodCollector();
-        var ex = Assert.Throws<InvalidOperationException>(() => collector.Collect(compilation));
-    }
-    
-    [Fact]
-    public void IfDirectives()
-    {
-        // Arrange
-        var source = @"
-using System;
-using System.Threading.Tasks;
-using MagicOnion;
-using MessagePack;
-
-namespace MyNamespace;
-
-[GenerateIfDirective(""DEBUG || CONST_1 || CONST_2"")]
-public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
-{
-    [GenerateDefineDebug]
-    Task MethodA();
-    [GenerateIfDirective(""CONST_3"")]
-    Task MethodB();
-    Task MethodC();
-}
-
-public interface IMyHubReceiver
-{
-    void EventA();
-    void EventB(Nil nil);
-    void EventC(string arg1, int arg2);
-}
-";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
 
         // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
 
         // Assert
-        serviceCollection.Hubs[0].HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].IfDirectiveCondition.Should().Be("DEBUG || CONST_1 || CONST_2");
-        serviceCollection.Hubs[0].Methods[0].HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].Methods[0].IfDirectiveCondition.Should().Be("DEBUG");
-        serviceCollection.Hubs[0].Methods[1].HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].Methods[1].IfDirectiveCondition.Should().Be("CONST_3");
-        serviceCollection.Hubs[0].Methods[2].HasIfDirectiveCondition.Should().BeFalse();
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id);
     }
-
-    [Fact]
-    public void IfDirectives_Receiver()
-    {
-        // Arrange
-        var source = @"
-using System;
-using System.Threading.Tasks;
-using MagicOnion;
-using MessagePack;
-
-namespace MyNamespace;
-
-public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
-{
-    Task MethodA();
-    Task MethodB();
-    Task MethodC();
 }
-
-[GenerateIfDirective(""DEBUG || CONST_1 || CONST_2"")]
-public interface IMyHubReceiver
-{
-    [GenerateDefineDebug]
-    void EventA();
-    [GenerateIfDirective(""CONST_3"")]
-    void EventB(Nil nil);
-    void EventC(string arg1, int arg2);
-}
-";
-        using var tempWorkspace = TemporaryProjectWorkarea.Create();
-        tempWorkspace.AddFileToProject("IMyHub.cs", source);
-        var compilation = tempWorkspace.GetOutputCompilation().Compilation;
-
-        // Act
-        var collector = new MethodCollector();
-        var serviceCollection = collector.Collect(compilation);
-
-        // Assert
-        serviceCollection.Hubs[0].Receiver.HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].Receiver.IfDirectiveCondition.Should().Be("DEBUG || CONST_1 || CONST_2");
-        serviceCollection.Hubs[0].Receiver.Methods[0].HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].Receiver.Methods[0].IfDirectiveCondition.Should().Be("DEBUG");
-        serviceCollection.Hubs[0].Receiver.Methods[1].HasIfDirectiveCondition.Should().BeTrue();
-        serviceCollection.Hubs[0].Receiver.Methods[1].IfDirectiveCondition.Should().Be("CONST_3");
-        serviceCollection.Hubs[0].Receiver.Methods[2].HasIfDirectiveCondition.Should().BeFalse();
-    }     
-}
-#endif

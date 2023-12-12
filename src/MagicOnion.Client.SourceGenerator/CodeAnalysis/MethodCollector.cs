@@ -8,7 +8,7 @@ namespace MagicOnion.Client.SourceGenerator.CodeAnalysis;
 /// <summary>
 /// Provides logic to collect MagicOnion Services and StreamingHubs from a compilation.
 /// </summary>
-public class MethodCollector
+public static class MethodCollector
 {
     public static (MagicOnionServiceCollection ServiceCollection, IReadOnlyList<Diagnostic> Diagnostics) Collect(ImmutableArray<INamedTypeSymbol> interfaceSymbols, ReferenceSymbols referenceSymbols, CancellationToken cancellationToken)
     {
