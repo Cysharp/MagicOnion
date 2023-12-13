@@ -421,4 +421,79 @@ public class GenerateStreamingHubTest
 
         await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
+
+    [Fact]
+    public async Task InterfaceInheritance()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver { }
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>, IExtraMethods2
+                         {
+                             Task A();
+                         }
+                         
+                         public interface IExtraMethods
+                         {
+                             Task B();
+                         }
+                         
+                         public interface IExtraMethods2 : IExtraMethods
+                         {
+                             Task C();
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task InterfaceInheritance_Receiver()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver : IExtraReceiverMethods2
+                         {
+                             void A();
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                         
+                         public interface IExtraReceiverMethods
+                         {
+                             void B();
+                         }
+                         
+                         public interface IExtraReceiverMethods2 : IExtraReceiverMethods
+                         {
+                             void C();
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
 }
