@@ -75,4 +75,14 @@ public static class MagicOnionDiagnosticDescriptors
             description: "The type specifying MagicOnionClientGeneration attribute must be partial class.",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor StreamingHubInterfaceHasTwoOrMoreIStreamingHub =
+        new DiagnosticDescriptor(
+            id: "MOC1008",
+            title: "StreamingHub interface must have single interface",
+            messageFormat: "The interface '{0}' has two or more IStreamingHub<THub, THubReceiver> interfaces",
+            category: "Usage",
+            description: "The interface '{0}' has two or more IStreamingHub<THub, THubReceiver> interfaces.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
 }

@@ -636,4 +636,130 @@ public interface IMyHubReceiver
         diagnostics.Should().HaveCount(1);
         diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id);
     }
+
+    [Fact]
+    public void StreamingHubInterfaces_TwoOrMore()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>, IStreamingHub<IMyHub2, IMyHubReceiver>
+{
+    Task MethodA();
+}
+
+public interface IMyHub2 : IStreamingHub<IMyHub2, IMyHubReceiver>
+{
+    Task MethodB();
+}
+
+public interface IMyHubReceiver
+{
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub.Id);
+    }
+
+    [Fact]
+    public void InterfaceInheritance()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>, IExtraMethods
+{
+    Task MethodA();
+}
+
+public interface IExtraMethods : IExtraMethods2
+{
+    Task MethodExA();
+}
+
+public interface IExtraMethods2
+{
+    Task MethodExB();
+}
+
+public interface IMyHubReceiver
+{
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().HaveCount(1);
+        serviceCollection.Hubs[0].Methods.Should().HaveCount(3);
+    }
+    
+    [Fact]
+    public void InterfaceInheritance_Receiver()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+}
+
+public interface IMyHubReceiver : IExtraReceiverMethods
+{
+    void MethodA();
+}
+
+public interface IExtraReceiverMethods : IExtraReceiverMethods2
+{
+    void MethodExA();
+}
+
+public interface IExtraReceiverMethods2
+{
+    void MethodExB();
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().HaveCount(1);
+        serviceCollection.Hubs[0].Receiver.Methods.Should().HaveCount(3);
+    }
 }

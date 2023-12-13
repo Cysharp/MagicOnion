@@ -33,12 +33,16 @@ public static class MethodCollector
 
                 var hasError = false;
                 var methods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
-                foreach (var methodSymbol in x.GetMembers().OfType<IMethodSymbol>())
+                foreach (var methodSymbol in GetAllMethods(x, ctx.ReferenceSymbols))
                 {
                     if (HasIgnoreAttribute(methodSymbol)) continue;
                     if (TryCreateHubMethodInfoFromMethodSymbol(ctx, serviceType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
-                        methods.Add(methodInfo);
+                        // When a method with the same name has already been registered, it is ignored.
+                        if (!methods.Any(x => x.MethodName == methodInfo.MethodName))
+                        {
+                            methods.Add(methodInfo);
+                        }
                     }
 
                     if (diagnostic is not null)
@@ -55,11 +59,15 @@ public static class MethodCollector
                 var receiverType = ctx.GetOrCreateTypeInfoFromSymbol(receiverInterfaceSymbol);
 
                 var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
-                foreach (var methodSymbol in receiverInterfaceSymbol.GetMembers().OfType<IMethodSymbol>())
+                foreach (var methodSymbol in GetAllMethods(receiverInterfaceSymbol, ctx.ReferenceSymbols))
                 {
                     if (TryCreateHubReceiverMethodInfoFromMethodSymbol(ctx, serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
                     {
-                        receiverMethods.Add(methodInfo);
+                        // When a method with the same name has already been registered, it is ignored.
+                        if (!receiverMethods.Any(x => x.MethodName == methodInfo.MethodName))
+                        {
+                            receiverMethods.Add(methodInfo);
+                        }
                     }
 
                     if (diagnostic is not null)
@@ -85,6 +93,17 @@ public static class MethodCollector
             .Cast<MagicOnionStreamingHubInfo>()
             .OrderBy(x => x.ServiceType.FullName)
             .ToArray();
+    }
+
+    static IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol typeSymbol, ReferenceSymbols referenceSymbols)
+    {
+        return typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Concat(
+                typeSymbol.AllInterfaces
+                    .Where(x => !x.OriginalDefinition.ApproximatelyEqual(referenceSymbols.IStreamingHub))
+                    .SelectMany(x => GetAllMethods(x, referenceSymbols))
+            );
     }
 
     static int GetHubMethodIdFromMethodSymbol(IMethodSymbol methodSymbol)
@@ -303,7 +322,7 @@ public static class MethodCollector
         public required ReferenceSymbols ReferenceSymbols { get; init; }
         public required IReadOnlyList<INamedTypeSymbol> ServiceInterfaces { get; init; }
         public required IReadOnlyList<INamedTypeSymbol> HubInterfaces { get; init; }
-        public List<Diagnostic> ReportDiagnostics { get; } = new();
+        public required List<Diagnostic> ReportDiagnostics { get; init; }
         public Dictionary<ITypeSymbol, MagicOnionTypeInfo> TypeInfoCache { get; } = new (SymbolEqualityComparer.Default);
 
         public MagicOnionTypeInfo GetOrCreateTypeInfoFromSymbol(ITypeSymbol symbol)
@@ -319,6 +338,7 @@ public static class MethodCollector
         {
             var serviceInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
             var hubInterfaces = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            var diagnostics = new List<Diagnostic>();
 
             foreach (var interfaceSymbol in interfaceSymbols)
             {
@@ -330,6 +350,16 @@ public static class MethodCollector
                         !interfaceSymbol.ConstructedFrom.ApproximatelyEqual(referenceSymbols.IStreamingHub))
                     {
                         // StreamingHub
+                        // Report a diagnostic as an error when the interface has one or more IStreamingHub<T, TReceiver> interface.
+                        if (interfaceSymbol.Interfaces.Count(x => x.OriginalDefinition.ApproximatelyEqual(referenceSymbols.IStreamingHub)) > 1)
+                        {
+                            var diagnostic = Diagnostic.Create(
+                                MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub,
+                                interfaceSymbol.Locations.FirstOrDefault(), null, null,
+                                interfaceSymbol.ToDisplayString());
+                            diagnostics.Add(diagnostic);
+                            break;
+                        }
                         hubInterfaces.Add(interfaceSymbol);
                     }
                     else if (implInterfaceSymbol.ApproximatelyEqual(referenceSymbols.IServiceMarker) &&
@@ -344,6 +374,7 @@ public static class MethodCollector
 
             return new MethodCollectorContext
             {
+                ReportDiagnostics = diagnostics,
                 HubInterfaces = hubInterfaces.ToArray(),
                 ServiceInterfaces = serviceInterfaces.ToArray(),
                 ReferenceSymbols = referenceSymbols,
