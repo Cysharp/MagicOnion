@@ -71,17 +71,17 @@ public class StreamingHubInheritanceTestHub : StreamingHubBase<IStreamingHubInhe
     }
 }
 
-public interface IStreamingHubInheritanceTestHubReceiver : IIStreamingHubInheritanceTestHubReceiverEx2
+public interface IStreamingHubInheritanceTestHubReceiver : IStreamingHubInheritanceTestHubReceiverEx2
 {
     void Receiver_MethodA();
 }
 
-public interface IIStreamingHubInheritanceTestHubReceiverEx2 : IIStreamingHubInheritanceTestHubReceiverEx
+public interface IStreamingHubInheritanceTestHubReceiverEx2 : IStreamingHubInheritanceTestHubReceiverEx
 {
     void Receiver_MethodC();
 }
 
-public interface IIStreamingHubInheritanceTestHubReceiverEx
+public interface IStreamingHubInheritanceTestHubReceiverEx
 {
     void Receiver_MethodB();
 }
