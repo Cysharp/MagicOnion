@@ -2019,6 +2019,12 @@ references:
   commentId: F:MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType
   fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType
   nameWithType: MagicOnionDiagnosticDescriptors.ServiceUnsupportedMethodReturnType
+- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub
+  name: StreamingHubInterfaceHasTwoOrMoreIStreamingHub
+  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MagicOnionDiagnosticDescriptors_StreamingHubInterfaceHasTwoOrMoreIStreamingHub
+  commentId: F:MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub
+  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub
+  nameWithType: MagicOnionDiagnosticDescriptors.StreamingHubInterfaceHasTwoOrMoreIStreamingHub
 - uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType
   name: StreamingHubUnsupportedMethodReturnType
   href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MagicOnionDiagnosticDescriptors.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MagicOnionDiagnosticDescriptors_StreamingHubUnsupportedMethodReturnType
@@ -3341,19 +3347,22 @@ references:
   fullName.vb: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.IReadOnlyList(Of INamedTypeSymbol)(ServiceInterfaces)
   nameWithType: MethodCollector.IReadOnlyList<INamedTypeSymbol>(ServiceInterfaces)
   nameWithType.vb: MethodCollector.IReadOnlyList(Of INamedTypeSymbol)(ServiceInterfaces)
-- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics
-  name: ReportDiagnostics
-  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_ReportDiagnostics
-  commentId: P:MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics
-  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics
-  nameWithType: MethodCollector.ReportDiagnostics
-- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics*
-  name: ReportDiagnostics
-  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_ReportDiagnostics_
-  commentId: Overload:MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics
+- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List*
+  name: List
+  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_List_
+  commentId: Overload:MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List
   isSpec: "True"
-  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.ReportDiagnostics
-  nameWithType: MethodCollector.ReportDiagnostics
+  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List
+  nameWithType: MethodCollector.List
+- uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List``1(ReportDiagnostics)
+  name: List<Diagnostic>(ReportDiagnostics)
+  href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_List__1_ReportDiagnostics_
+  commentId: M:MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List``1(ReportDiagnostics)
+  name.vb: List(Of Diagnostic)(ReportDiagnostics)
+  fullName: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List<Diagnostic>(ReportDiagnostics)
+  fullName.vb: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.List(Of Diagnostic)(ReportDiagnostics)
+  nameWithType: MethodCollector.List<Diagnostic>(ReportDiagnostics)
+  nameWithType.vb: MethodCollector.List(Of Diagnostic)(ReportDiagnostics)
 - uid: MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.TypeInfoCache
   name: TypeInfoCache
   href: api/MagicOnion.Client.SourceGenerator.CodeAnalysis.MethodCollector.html#MagicOnion_Client_SourceGenerator_CodeAnalysis_MethodCollector_TypeInfoCache
