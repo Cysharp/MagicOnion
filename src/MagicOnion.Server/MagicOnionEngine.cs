@@ -5,6 +5,7 @@ using System.Runtime.ExceptionServices;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
+using MagicOnion.Server.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace MagicOnion.Server;
@@ -193,14 +194,6 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
-                    if (!handlers.Add(connectHandler))
-                    {
-                        throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
-                    }
-
-                    streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-                    StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
                     IGroupRepositoryFactory factory;
                     var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                     if (attr != null)
@@ -211,7 +204,13 @@ public static class MagicOnionEngine
                     {
                         factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
                     }
-                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
+                    var groupRepository = factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null));
+
+                    var connectHandler = new StreamingHubConnectMethodHandler(classType, methodHandlerOptions, tempStreamingHubHandlers!.ToArray(), groupRepository, serviceProvider, loggerMethodHandler);
+                    if (!handlers.Add(connectHandler))
+                    {
+                        throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
+                    }
                 }
             }
         }

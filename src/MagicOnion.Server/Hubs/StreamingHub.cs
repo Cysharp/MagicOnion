@@ -72,7 +72,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
         return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId })!;
     }
-
+        
     [Ignore]
     protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)
     {
@@ -102,7 +102,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
 
-        var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
+        var streamingHubConnectMethodHandler = (StreamingHubConnectMethodHandler)Context.MethodHandler;
+        var group = streamingHubConnectMethodHandler.GroupRepository;
         this.Group = new HubGroupRepository(this.Context, group);
         try
         {
@@ -158,7 +159,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
         await writer.WriteAsync(MarkerResponseBytes);
 
-        var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
+        var streamingHubConnectMethodHandler = (StreamingHubConnectMethodHandler)Context.MethodHandler;
+        var handlers = streamingHubConnectMethodHandler.StreamingHubMethodHandlers;
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
