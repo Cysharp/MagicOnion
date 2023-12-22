@@ -55,9 +55,11 @@ class SyntaxContextReceiver : ISyntaxContextReceiver
             attrSyntax.Parent is AttributeListSyntax &&
             attrSyntax.Parent.Parent is ClassDeclarationSyntax classDeclSyntax)
         {
-            var attrName = attrSyntax.Name is QualifiedNameSyntax qualifiedName
+            var attrName = attrSyntax.Name is QualifiedNameSyntax qualifiedName /* Foo.Bar.AttrName */
                 ? qualifiedName.Right.Identifier.ValueText
-                : ((IdentifierNameSyntax)attrSyntax.Name).Identifier.ValueText;
+                : attrSyntax.Name is AliasQualifiedNameSyntax aliasQualifiedName /* foo::AttrName */
+                    ? aliasQualifiedName.Name.Identifier.ValueText
+                    : ((IdentifierNameSyntax)attrSyntax.Name).Identifier.ValueText; /* AttrName */
 
             if (attrName.StartsWith(MagicOnionClientSourceGenerator.MagicOnionClientGenerationAttributeShortName, StringComparison.Ordinal))
             {
