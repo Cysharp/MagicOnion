@@ -187,4 +187,52 @@ public class RunTest
     //    var allOutputReason = result.TrackedOutputSteps.SelectMany(x => x.Value).SelectMany(x => x.Outputs);
     //    Assert.Collection(allOutputReason, x => Assert.Equal(IncrementalStepRunReason.Unchanged, x.Reason));
     //}
+    
+    [Fact]
+    public void RunAndGenerate_ParseAttributeName()
+    {
+        var (compilation, semanticModel) = CompilationHelper.Create(
+            """
+            using MagicOnion.Client;
+            
+            using moc = global::MagicOnion.Client;
+            
+            [MagicOnionClientGeneration]
+            partial class IdentifierOnly {}
+            
+            [MagicOnion.Client.MagicOnionClientGeneration]
+            partial class FullyQualified {}
+            
+            [global::MagicOnion.Client.MagicOnionClientGeneration]
+            partial class FullyQualifiedWithGlobal {}
+            
+            [moc::MagicOnionClientGeneration]
+            partial class AliasQualified {}
+            
+            
+            [MagicOnionClientGenerationAttribute]
+            partial class FullName_IdentifierOnly {}
+            
+            [MagicOnion.Client.MagicOnionClientGenerationAttribute]
+            partial class FullName_FullyQualified {}
+            
+            [global::MagicOnion.Client.MagicOnionClientGenerationAttribute]
+            partial class FullName_FullyQualifiedWithGlobal {}
+            
+            [moc::MagicOnionClientGenerationAttribute]
+            partial class FullName_AliasQualified {}
+            """);
+        var sourceGenerator = new MagicOnionClientSourceGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: new[] { sourceGenerator.AsSourceGenerator() },
+            driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true)
+        );
+
+        // Run generator and update compilation
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
+
+        Assert.DoesNotContain(diagnostics, x => x.Severity > DiagnosticSeverity.Info);
+        Assert.DoesNotContain(newCompilation.GetDiagnostics(), x => x.Severity > DiagnosticSeverity.Info);
+    }
 }
