@@ -1,11 +1,11 @@
 {
     "name": "MagicOnion.Unity",
+    "rootNamespace": "",
     "references": [
         "MagicOnion.Abstractions",
         "MagicOnion.Client",
         "UniTask"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -16,11 +16,6 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.cysharp.unitask",
-            "expression": "",
-            "define": "MAGICONION_UNITASK_SUPPORT"
-        }
-    ]
+    "versionDefines": [],
+    "noEngineReferences": false
 }

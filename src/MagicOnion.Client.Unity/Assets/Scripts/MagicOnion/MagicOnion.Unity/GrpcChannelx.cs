@@ -6,9 +6,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-#if MAGICONION_UNITASK_SUPPORT
-using Cysharp.Threading.Tasks;
-#endif
 using Grpc.Core;
 #if MAGICONION_USE_GRPC_CCORE
 using Channel = Grpc.Core.Channel;
@@ -27,9 +24,6 @@ namespace MagicOnion
     public sealed partial class GrpcChannelx : ChannelBase, IMagicOnionAwareGrpcChannel, IDisposable
 #if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
         , IGrpcChannelxDiagnosticsInfo
-#endif
-#if MAGICONION_UNITASK_SUPPORT
-        , IUniTaskAsyncDisposable
 #endif
     {
         private readonly Action<GrpcChannelx> _onDispose;
@@ -130,11 +124,7 @@ namespace MagicOnion
 
         protected override async Task ShutdownAsyncCore()
         {
-#if MAGICONION_UNITASK_SUPPORT
-            await ShutdownInternalAsync();
-#else
             await ShutdownInternalAsync().ConfigureAwait(false);
-#endif
         }
 
         /// <summary>
@@ -143,13 +133,9 @@ namespace MagicOnion
         /// <param name="deadline"></param>
         /// <returns></returns>
         [Obsolete]
-#if MAGICONION_UNITASK_SUPPORT
-        public async UniTask ConnectAsync(DateTime? deadline = null)
-#else
 #pragma warning disable CS1998
         public async Task ConnectAsync(DateTime? deadline = null)
 #pragma warning restore CS1998
-#endif
         {
             ThrowIfDisposed();
 #if MAGICONION_USE_GRPC_CCORE
@@ -181,11 +167,7 @@ namespace MagicOnion
             }
         }
 
-#if MAGICONION_UNITASK_SUPPORT
-        private async UniTask WaitForDisconnectAndDisposeAsync(IStreamingHubMarker streamingHub, Task waitForDisconnect)
-#else
         private async Task WaitForDisconnectAndDisposeAsync(IStreamingHubMarker streamingHub, Task waitForDisconnect)
-#endif
         {
             await waitForDisconnect;
             DisposeStreamingHubClient(streamingHub);
@@ -250,11 +232,7 @@ namespace MagicOnion
             }
         }
 
-#if MAGICONION_UNITASK_SUPPORT
-        public async UniTask DisposeAsync()
-#else
         public async Task DisposeAsync()
-#endif
         {
             if (_disposed) return;
 
@@ -270,11 +248,7 @@ namespace MagicOnion
             }
         }
 
-#if MAGICONION_UNITASK_SUPPORT
-        private async UniTask ShutdownInternalAsync()
-#else
         private async Task ShutdownInternalAsync()
-#endif
         {
             if (_shutdownRequested) return;
             _shutdownRequested = true;
@@ -286,11 +260,6 @@ namespace MagicOnion
         {
             if (_disposed) throw new ObjectDisposedException(nameof(GrpcChannelx));
         }
-
-#if MAGICONION_UNITASK_SUPPORT
-        private static async void Forget(UniTask t)
-            => t.Forget();
-#endif
 
         private static async void Forget(Task t)
         {
