@@ -92,7 +92,8 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     {
         // Array[3][messageId (int), methodId (int), request body...]
         var messagePackReader = new MessagePackReader(payload);
-        Debug.Assert(messagePackReader.ReadArrayHeader() == 3);
+        var arraySize = messagePackReader.ReadArrayHeader();
+        Debug.Assert(arraySize == 3);
         var messageId = messagePackReader.ReadInt32();
         var methodId = messagePackReader.ReadInt32();
         return (messageId, methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
@@ -102,7 +103,8 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     {
         // Array[2][methodId (int), request body...]
         var messagePackReader = new MessagePackReader(payload);
-        Debug.Assert(messagePackReader.ReadArrayHeader() == 2);
+        var arraySize = messagePackReader.ReadArrayHeader();
+        Debug.Assert(arraySize == 2);
         var methodId = messagePackReader.ReadInt32();
         return (methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
     }
