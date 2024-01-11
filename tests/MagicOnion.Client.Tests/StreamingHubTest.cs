@@ -91,7 +91,7 @@ public class StreamingHubTest
         Assert.Equal("Hello", requestBody.Item2);
         Assert.Equal(456, result);
     }
-    
+
     [Fact]
     public async Task Task_Parameter_Many()
     {
@@ -118,6 +118,74 @@ public class StreamingHubTest
         Assert.Equal(12.345, requestBody.Item6);
         Assert.Equal('X', requestBody.Item7);
         Assert.Equal(456, result);
+    }
+
+    [Fact]
+    public async Task Task_Forget_NoReturnValue_Parameter_Zero()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.NoReturnValue_Parameter_Zero().WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<Nil>();
+
+        // Wait for hub method completion.
+        await t;
+
+        Assert.Equal(Nil.Default, requestBody);
+    }
+
+    [Fact]
+    public async Task Task_Forget_Parameter_Zero()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.Parameter_Zero().WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<Nil>();
+
+        // Wait for hub method completion.
+        var result = await t;
+
+        Assert.Equal(Nil.Default, requestBody);
+        Assert.Equal(default, result);
+    }
+
+    [Fact]
+    public async Task Task_Forget_Parameter_One()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.Parameter_One(123).WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<int>();
+
+        // Wait for hub method completion.
+        var result = await t;
+
+        Assert.Equal(123, requestBody);
+        Assert.Equal(default, result);
     }
 
     [Fact]
@@ -207,7 +275,7 @@ public class StreamingHubTest
         Assert.Equal("Hello", requestBody.Item2);
         Assert.Equal(456, result);
     }
-    
+
     [Fact]
     public async Task ValueTask_Parameter_Many()
     {
@@ -234,6 +302,74 @@ public class StreamingHubTest
         Assert.Equal(12.345, requestBody.Item6);
         Assert.Equal('X', requestBody.Item7);
         Assert.Equal(456, result);
+    }
+    
+    [Fact]
+    public async Task ValueTask_Forget_NoReturnValue_Parameter_Zero()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.ValueTask_NoReturnValue_Parameter_Zero().AsTask().WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<Nil>();
+
+        // Wait for hub method completion.
+        await t;
+
+        Assert.Equal(Nil.Default, requestBody);
+    }
+
+    [Fact]
+    public async Task ValueTask_Forget_Parameter_Zero()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.ValueTask_Parameter_Zero().AsTask().WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<Nil>();
+
+        // Wait for hub method completion.
+        var result = await t;
+
+        Assert.Equal(Nil.Default, requestBody);
+        Assert.Equal(default, result);
+    }
+
+    [Fact]
+    public async Task ValueTask_Forget_Parameter_One()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        var t = client.ValueTask_Parameter_One(123).AsTask().WaitAsync(timeout.Token);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<int>();
+
+        // Wait for hub method completion.
+        var result = await t;
+
+        Assert.Equal(123, requestBody);
+        Assert.Equal(default, result);
     }
 }
 

@@ -65,11 +65,17 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         return ReadRequestPayload<T>(requestPayload);
     }
 
+    public async Task<(int MethodId, T Requst)> ReadFireAndForgetRequestAsync<T>()
+    {
+        var requestPayload = await requestChannel.Reader.ReadAsync();
+        return ReadFireAndForgetRequestPayload<T>(requestPayload);
+    }
+
     public void WriteResponse<T>(int messageId, int methodId, T response)
     {
         responseChannel.Writer.TryWrite(BuildResponsePayload(messageId, methodId, response));
     }
-        
+
     static byte[] BuildResponsePayload<T>(int messageId, int methodId, T response)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -90,5 +96,14 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         var messageId = messagePackReader.ReadInt32();
         var methodId = messagePackReader.ReadInt32();
         return (messageId, methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
+    }
+
+    static (int MethodId, T Body) ReadFireAndForgetRequestPayload<T>(ReadOnlyMemory<byte> payload)
+    {
+        // Array[2][methodId (int), request body...]
+        var messagePackReader = new MessagePackReader(payload);
+        Debug.Assert(messagePackReader.ReadArrayHeader() == 2);
+        var methodId = messagePackReader.ReadInt32();
+        return (methodId, MessagePackSerializer.Deserialize<T>(ref messagePackReader));
     }
 }
