@@ -8,7 +8,9 @@ namespace AuthSample;
 
 public class FakeAuthenticationHandler : AuthenticationHandler<FakeAuthenticationHandlerOptions>
 {
+#pragma warning disable CS0618 // Type or member is obsolete
     public FakeAuthenticationHandler(IOptionsMonitor<FakeAuthenticationHandlerOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
     }
 
