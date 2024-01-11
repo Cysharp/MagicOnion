@@ -117,7 +117,7 @@ namespace MagicOnion
 #if UNITY_EDITOR || MAGICONION_ENABLE_CHANNEL_DIAGNOSTICS
             return new ChannelStats.WrappedCallInvoker(((IGrpcChannelxDiagnosticsInfo)this).Stats, channel.CreateCallInvoker());
 #else
-            return _channel.CreateCallInvoker();
+            return channel.CreateCallInvoker();
 #endif
         }
 
@@ -138,7 +138,7 @@ namespace MagicOnion
         {
             ThrowIfDisposed();
 #if MAGICONION_USE_GRPC_CCORE
-            if (_channel is Channel grpcCChannel)
+            if (channel is Channel grpcCChannel)
             {
                 await grpcCChannel.ConnectAsync(deadline);
             }
