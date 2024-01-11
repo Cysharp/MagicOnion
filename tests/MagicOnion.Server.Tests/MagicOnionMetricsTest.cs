@@ -161,7 +161,7 @@ public class MagicOnionMetricsTestHub : StreamingHubBase<IMagicOnionMetricsTestH
         => Task.CompletedTask;
     public async Task SleepAsync()
         => await Task.Delay(100);
-    public async Task ThrowAsync()
+    public Task ThrowAsync()
         => throw new InvalidOperationException();
 }
 
