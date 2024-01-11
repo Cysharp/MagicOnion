@@ -427,7 +427,7 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     il.Emit(OpCodes.Newobj, typeof(ValueTask).GetConstructor(new [] { typeof(Task) })!);
                 }
-                else if (def.MethodInfo.IsGenericMethod && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
+                else if (def.MethodInfo.ReturnType.IsGenericType && def.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>))
                 {
                     var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                     il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
