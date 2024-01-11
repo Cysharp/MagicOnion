@@ -84,7 +84,7 @@ jobs:
           ref: ${{ needs.update-packagejson.outputs.sha }}
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - name: Publish MagicOnion.Client.SourceGenerator.Unity
-        run: dotnet publish -c ${{ env.BUILD_CONFIG }} -c Release ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
+        run: dotnet publish -c ${{ env.BUILD_CONFIG }} ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
       - name: Remove .deps.json and .pdbs
         run: |
           rm -f ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity/*.deps.json
