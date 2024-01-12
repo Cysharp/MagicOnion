@@ -143,7 +143,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.GIT_TAG }}
-          release_name: Ver.${{ env.GIT_TAG }}
+          release_name: ${{ env.GIT_TAG }}
           commitish: ${{ needs.update-packagejson.outputs.sha }}
           draft: true
           prerelease: false
