@@ -64,6 +64,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\build-docs.yml = .github\workflows\build-docs.yml
 		.github\workflows\build-release.yml = .github\workflows\build-release.yml
 		.github\workflows\build-update-sourcegenerator-for-unity.yml = .github\workflows\build-update-sourcegenerator-for-unity.yml
+		.github\workflows\prevent-github-change.yml = .github\workflows\prevent-github-change.yml
+		.github\workflows\stale.yml = .github\workflows\stale.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B5617CC1-55FD-4F77-BA75-9450474C6527}"

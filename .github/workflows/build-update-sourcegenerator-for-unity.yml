@@ -1,4 +1,4 @@
-name: build-update-sourcegenerator-for-unity
+name: Update pre-built SourceGenerator for Unity
 
 on:
   push:
