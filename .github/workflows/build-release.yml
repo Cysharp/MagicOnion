@@ -129,7 +129,7 @@ jobs:
   create-release:
     if: github.event.inputs.dry_run == 'false'
     needs:
-      [update-packagejson, update-sourcegenerator-unity, build-dotnet, build-unity]
+      [update-packagejson, build-dotnet, build-unity]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
