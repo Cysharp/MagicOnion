@@ -1,0 +1,73 @@
+name: build-update-sourcegenerator-for-unity
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/MagicOnion.Client.SourceGenerator/**
+      - src/MagicOnion.Client.SourceGenerator.Unity/**
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "dry_run: true will never push changes"
+        required: true
+        default: "false"
+
+env:
+  GIT_TAG: ${{ github.event.inputs.tag }}
+  DRY_RUN: ${{ github.event.inputs.dry_run }}
+  DRY_RUN_BRANCH_PREFIX: "test_release"
+  BUILD_CONFIG: Release
+
+jobs:
+  update-sourcegenerator-unity:
+    name: Update MagicOnion.Client.SourceGenerator.Unity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      - name: Publish MagicOnion.Client.SourceGenerator.Unity
+        run: dotnet publish -c ${{ env.BUILD_CONFIG }} ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
+      - name: Remove .deps.json and .pdbs
+        run: |
+          rm -f ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity/*.deps.json
+          rm -f ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity/*.pdb
+
+      - name: Check update
+        id: check_update
+        run: |
+          git diff --exit-code || echo "::set-output name=changed::1"
+
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "feat: Update MagicOnion.Client.SourceGenerator.Unity" -a
+          echo "::set-output name=sha::$(git rev-parse HEAD)"
+
+      - name: Check sha
+        run: echo "SHA ${SHA}"
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+
+      - name: Create Tag
+        if: steps.check_update.outputs.changed == '1'
+        run: git tag ${{ env.GIT_TAG }}
+
+      - name: Push changes
+        if: env.DRY_RUN == 'false' && steps.check_update.outputs.changed == '1'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+      - name: Push changes (dry_run)
+        if: env.DRY_RUN == 'true' && steps.check_update.outputs.changed == '1'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.GIT_TAG }}
+          tags: false
