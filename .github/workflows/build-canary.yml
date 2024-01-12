@@ -7,7 +7,7 @@ on:
     tags:
       - "!*" # not a tag push
     paths-ignore:
-      - **.md
+      - '**.md'
       - .github/**
       - docs/**
       - samples/**
