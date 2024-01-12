@@ -6,6 +6,11 @@ on:
       - main
     tags:
       - "!*" # not a tag push
+    paths-ignore:
+      - **.md
+      - .github/**
+      - docs/**
+      - samples/**
   workflow_dispatch:
 
 env:
