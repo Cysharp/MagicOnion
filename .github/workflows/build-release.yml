@@ -1,4 +1,4 @@
-name: build-release
+name: Release
 
 on:
   workflow_dispatch:
@@ -45,61 +45,6 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "feat: Update package.json to ${{ env.GIT_TAG }}" -a
-          echo "::set-output name=sha::$(git rev-parse HEAD)"
-
-      - name: Check sha
-        run: echo "SHA ${SHA}"
-        env:
-          SHA: ${{ steps.commit.outputs.sha }}
-
-      - name: Create Tag
-        if: steps.check_update.outputs.changed == '1'
-        run: git tag ${{ env.GIT_TAG }}
-
-      - name: Push changes
-        if: env.DRY_RUN == 'false' && steps.check_update.outputs.changed == '1'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-          tags: true
-
-      - name: Push changes (dry_run)
-        if: env.DRY_RUN == 'true' && steps.check_update.outputs.changed == '1'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.DRY_RUN_BRANCH_PREFIX }}-${{ env.GIT_TAG }}
-          tags: false
-
-  update-sourcegenerator-unity:
-    name: Update MagicOnion.Client.SourceGenerator.Unity
-    needs: [update-packagejson]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - run: echo ${{ needs.update-packagejson.outputs.sha }}
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ needs.update-packagejson.outputs.sha }}
-      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
-      - name: Publish MagicOnion.Client.SourceGenerator.Unity
-        run: dotnet publish -c ${{ env.BUILD_CONFIG }} ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
-      - name: Remove .deps.json and .pdbs
-        run: |
-          rm -f ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity/*.deps.json
-          rm -f ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity/*.pdb
-
-      - name: Check update
-        id: check_update
-        run: |
-          git diff --exit-code || echo "::set-output name=changed::1"
-
-      - name: Commit files
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git commit -m "feat: Update MagicOnion.Client.SourceGenerator.Unity" -a
           echo "::set-output name=sha::$(git rev-parse HEAD)"
 
       - name: Check sha

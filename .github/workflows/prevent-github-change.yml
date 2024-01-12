@@ -1,4 +1,4 @@
-name: Prevent github change
+name: Prevent .github change
 on:
   pull_request:
     paths:
