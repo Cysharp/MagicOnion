@@ -1027,8 +1027,11 @@ There are two methods to install the MagicOnion.Client package:
 To install using the Unity package manager, please specify the following URL in "Add package from git URL...". Specify the version tag as needed.
 
 ```
-https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion#6.0.0
+https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion#{Version}
 ```
+
+> ![NOTE]
+> Please replace `{Version}` with the version number you want to install (e.g. `6.0.1`).
 
 `MagicOnion.Client.Unity.package` is available for download from [Releases](https://github.com/cysharp/MagicOnion/releases) page of this repository.
 
@@ -1209,7 +1212,7 @@ See [docs/articles/deployment/](docs/articles/deployment/) for information on de
 ## Integrations
 
 ### Metrics
-MagicOnion server supports metrics related to StreamingHub using System.Diagnostics.Metrics. 
+MagicOnion server supports metrics related to StreamingHub using System.Diagnostics.Metrics.
 
 - see: https://learn.microsoft.com/en-us/dotnet/core/diagnostics/metrics
 
