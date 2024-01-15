@@ -8,16 +8,12 @@
     <None Remove="**\package.json" />
     <None Remove="**\*.asmdef" />
     <None Remove="**\*.meta" />
-    
-	<Compile Remove="bin\**;obj\**" />
-	<EmbeddedResource Remove="bin\**;obj\**" />
-	<None Remove="bin\**;obj\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
-  
+
   <Target Name="RestoreLocalTools" BeforeTargets="GenerateMessagePack">
     <Exec Command="dotnet tool restore" />
   </Target>
