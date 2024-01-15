@@ -1030,7 +1030,7 @@ To install using the Unity package manager, please specify the following URL in 
 https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion#{Version}
 ```
 
-> ![NOTE]
+> [!NOTE]
 > Please replace `{Version}` with the version number you want to install (e.g. `6.0.1`).
 
 `MagicOnion.Client.Unity.package` is available for download from [Releases](https://github.com/cysharp/MagicOnion/releases) page of this repository.
