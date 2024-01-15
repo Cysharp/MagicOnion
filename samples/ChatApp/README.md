@@ -47,7 +47,7 @@ Additionally, to ignore obj and bin in Unity, please place a [Directory.Build.pr
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
   </PropertyGroup>
 </Project>
-```f
+```
 
 Finally, add the following line to the [Shared csproj](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Shared/ChatApp.Shared.csproj) to ignore the files for Unity from the server project.
 
