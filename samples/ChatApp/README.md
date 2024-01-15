@@ -15,122 +15,77 @@ To run simple ChatApp.Server,
 ### ChatApp.Server
 
 This is Sample Serverside MagicOnion.
-You can lanunch via Visual Studio 2019, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
+You can lanunch via Visual Studio 2022 with .NET 8, open `MagicOnion.sln` > samples > set `ChatApp.Server` project as start up and Start Debug.
 
 ### ChatApp.Unity
 
 Sample Clientside Unity.
-You can ran with Unity from 2018.4.5f1 and higher then start on unity editor.
-
-> TIPS: confirmed run on 2019.1.10f1
-
-Now unity client automatically connect to MagicOnion Server, try chat app!
-
-> TIPS: ChatApp.Unity contains a gRPCs library in the repository that are required for MagicOnion operation. If you want other version of gRPC lib, go [gRPC Packages](https://packages.grpc.io/), select the latest build ID from the link below, download the Unity support library for gRPC, and import it into Unity will replace existing.
+You can ran with Unity from 2021.3 and higher then start on unity editor. Now unity client automatically connect to MagicOnion Server, try chat app!
 
 ## Solution configuration
 
-![image](https://user-images.githubusercontent.com/38392460/71507978-a3ced480-28c9-11ea-9090-8f4ef4ffc306.png)
-Create a Shared folder in the Unity project, and store the source code that you want to share with Server.  
+We will place the C# code (Service, Hub interfaces, Request/Response objects, Logic) common to both the server and client in a Shared Project(.NET Standard class library).
 
-Create a Shared project for common code reference and reference the source code that exists on the Unity side with a code link.  
-The Server project simply references the Shared project directly.  
-  
-※1 Code link  
-Add the following specification to `ChatApp.Shared.csproj`.
+This project will be referenced from Unity as a local package of UPM.
+
+First, to reference it from Unity, place a [package.json](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Shared/package.json) and an [asmdef](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Shared/ChatApp.Shared.Unity.asmdef) inside the Shared Project.
+
+Additionally, to ignore obj and bin in Unity, please place a [Directory.Build.props](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Shared/Directory.Build.props) file with the following content and change the output directories for obj and bin.
+
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!--
+      prior to .NET 8
+      <BaseIntermediateOutputPath>.artifacts\obj\</BaseIntermediateOutputPath>
+		  <BaseOutputPath>.artifacts\bin\</BaseOutputPath>
+    -->
+
+    <!-- after .NET 8: https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output -->
+    <!-- Unity ignores . prefix folder -->
+    <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
+  </PropertyGroup>
+</Project>
+```f
+
+Finally, add the following line to the [Shared csproj](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Shared/ChatApp.Shared.csproj) to ignore the files for Unity from the server project.
+
+```csharp
 <ItemGroup>
-  <Compile Include="..\ChatApp.Unity\Assets\Scripts\ServerShared\**\*.cs" />
+  <None Remove="**\package.json" />
+  <None Remove="**\*.asmdef" />
+  <None Remove="**\*.meta" />
 </ItemGroup>
 ```
 
+https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Unity/Packages/manifest.json
+
+In the Unity project, specify the Shared project as a file reference in [Packages/manifest.json](https://github.com/Cysharp/MagicOnion/blob/main/samples/ChatApp/ChatApp.Unity/Packages/manifest.json). Since setting it up through the GUI results in a full path, it is necessary to manually change it to a relative path.
+
+```json
+{
+  "dependencies": {
+    "com.cysharp.magiconion.samples.chatapp.shared.unity": "file:../../ChatApp.Shared",
+  }
+}
+```
 
 ## Code generate
-In order to use MagicOnion, a dedicated Formatter for each MessagePackObject implemented is required.  
-I will explain how each is generated.  
-  
-The package reference and build tasks for automatic code generation are shown in  
-Add to the Shared project and automatically generate code.  
+
+MagicOnion Client is Source Generator based but still MessagePack needs generate code by command line tool.
   
 Add the following specification to `ChatApp.Shared.csproj`.
+
 ```xml
-<ItemGroup>
-  <PackageReference Include="MagicOnion.Abstractions" Version="3.0.0" />
-  <PackageReference Include="MagicOnion.MSBuild.Tasks" Version="3.0.0" PrivateAssets="All" />
-  <PackageReference Include="MessagePack.MSBuild.Tasks" Version="2.0.323" PrivateAssets="All" />
-</ItemGroup>
-
-<Target Name="GenerateMessagePack" AfterTargets="Compile">
-  <MessagePackGenerator Input=".\ChatApp.Shared.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MessagePack.Generated.cs" />
+<Target Name="RestoreLocalTools" BeforeTargets="GenerateMessagePack">
+  <Exec Command="dotnet tool restore" />
 </Target>
-<Target Name="GenerateMagicOnion" AfterTargets="Compile">
-  <MagicOnionGenerator Input=".\ChatApp.Shared.csproj" Output="..\ChatApp.Unity\Assets\Scripts\Generated\MagicOnion.Generated.cs" />
+
+<Target Name="GenerateMessagePack" AfterTargets="Build">
+  <PropertyGroup>
+    <_MessagePackGeneratorArguments>-i ./ChatApp.Shared.csproj -o ../ChatApp.Unity/Assets/Scripts/Generated/MessagePack.Generated.cs</_MessagePackGeneratorArguments>
+  </PropertyGroup>
+  <Exec Command="dotnet tool run mpc $(_MessagePackGeneratorArguments)" />
 </Target>
 ```
-
-
-## Registration of Resolver
-When using MagicOnion, it is necessary to perform Resolver registration processing in advance when the application is started on the Unity side.  
-In the sample, a method using the attribute of RuntimeInitializeOnLoadMethod is prepared, and registration processing is performed.  
-```csharp
-[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-static void RegisterResolvers()
-{
-    CompositeResolver.RegisterAndSetAsDefault
-    (
-        MagicOnion.Resolvers.MagicOnionResolver.Instance,
-        MessagePack.Resolvers.GeneratedResolver.Instance,
-        BuiltinResolver.Instance,
-        PrimitiveObjectResolver.Instance
-    );
-}
-```
-
-## Cleaning up Hub and Channel
-Hubs and Channels that are no longer needed need to be released.  
-In the sample, processing is performed at the end of Scene.  
-```csharp
-async void OnDestroy()
-{
-    // Clean up Hub and channel
-    await this.streamingClient.DisposeAsync();
-    await this.channel.ShutdownAsync();
-}
-```
-
-## Detecting a disconnect
-You can detect a disconnect by waiting for `WaitForDisconnect` in the instance method of `ISteamingHub`.  
-  
-In the example, a separate thread waits for WaitForDisconnect to detect a disconnect on the client side.
-```csharp
-void Start()
-{
-    var channel = new Channel("localhost", 12345, ChannelCredentials.Insecure);
-    var streamingClient = StreamingHubClient.Connect<IChatHub, IChatHubReceiver>(this.channel, this);
-    
-    RegisterDisconnectEvent(streamingClient);
-}
-
-private async void RegisterDisconnectEvent(IChatHub streamingClient)
-{
-    try
-    {
-        // you can wait disconnected event
-        await streamingClient.WaitForDisconnect();
-    }
-    finally
-    {
-        // try-to-reconnect? logging event? close? etc...
-        Debug.Log("disconnected server.");
-    }
-}
-```
-
-## Dynamic coexistence of Server and Unity project files.
-The Server project is removed every time Unity regenerates a solution file.  
-With a class that extends `AssetPostprocessor` and a method of `OnGeneratedSlnSolution`
-An arbitrary project file is automatically included when a solution file is generated.  
-This ensures that the Server and Unity project files co-exist.  
-  
-The Sample implementation is as follows:.
-https://github.com/Cysharp/MagicOnion/blob/master/samples/ChatApp/ChatApp.Unity/Assets/Editor/SolutionFileProcessor.cs

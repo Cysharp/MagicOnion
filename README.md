@@ -929,12 +929,7 @@ The recommended structure for a solution using MagicOnion is as follows:
 
 The **Shared** project is a library project with interface definitions like Service or Hub and types of requests/responses, shared between the **Server** and **Client**.
 
-When developing using Unity, shared code can be placed within the Unity project and referenced by source link (`<Compile Include="..." />`) from .NET project, or the library project can be referenced as a Unity package.
-
-It's only necessary that the interface name and member name and types match, so it's not always necessary to reference the same assembly.
-
-For more details on package referencing, please refer to [the source code of the sample project](https://github.com/Cysharp/MagicOnion/tree/master/samples).
-
+When developing using Unity, recommended way is use UPM local file reference. For more details on package referencing, please refer to [the document of the sample project](https://github.com/Cysharp/MagicOnion/tree/main/samples/ChatApp).
 
 # Clients
 
