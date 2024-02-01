@@ -23,7 +23,8 @@ namespace MagicOnion.Unity
     public class DefaultGrpcChannelProvider : GrpcNetClientGrpcChannelProvider
     {
         public DefaultGrpcChannelProvider() : base() {}
-        public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) {}
+        [Obsolete("Use constructor with a GrpcChannelOptions factory overload instead. If you pass a GrpcChannelOptions directly, HttpClient/HttpHandler may be reused unintentionally.")]
+        public DefaultGrpcChannelProvider(GrpcChannelOptions channelOptions) : base(channelOptions) { }
         public DefaultGrpcChannelProvider(Func<GrpcChannelOptions> channelOptionsFactory) : base(channelOptionsFactory) {}
     }
 #endif
