@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="**\package.json" />
-    <None Remove="**\*.asmdef" />
-    <None Remove="**\*.meta" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\src\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
   </ItemGroup>
 
