@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Hide Unity-specific files from Visual Studio and .NET SDK -->
+  <ItemGroup>
+    <None Remove="**\package.json" />
+    <None Remove="**\*.asmdef" />
+    <None Remove="**\*.meta" />
+  </ItemGroup>
+
+  <!-- Hide build artifacts from Visual Studio and .NET SDK -->
+  <ItemGroup>
+    <None Remove=".artifacts\**\**.*" />
+    <None Remove="obj\**\*.*;bin\**\*.*" />
+    <Compile Remove=".artifacts\**\**.*" />
+    <Compile Remove="bin\**\*.*;obj\**\*.*" />
+    <EmbeddedResource Remove=".artifacts\**\**.*" />
+    <EmbeddedResource Remove="bin\**\*.*;obj\**\*.*" />
+  </ItemGroup>
+</Project>

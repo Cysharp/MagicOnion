@@ -10,7 +10,6 @@ on:
       - '**.md'
       - .github/**
       - docs/**
-      - samples/**
   pull_request:
     branches:
       - main
@@ -18,7 +17,6 @@ on:
       - '**.md'
       - .github/**
       - docs/**
-      - samples/**
 
 env:
   BUILD_CONFIG: Debug

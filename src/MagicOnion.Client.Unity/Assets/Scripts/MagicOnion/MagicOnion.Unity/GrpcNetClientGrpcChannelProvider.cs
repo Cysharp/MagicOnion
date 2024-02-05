@@ -13,10 +13,11 @@ namespace MagicOnion.Client
     {
         readonly Func<GrpcChannelOptions> defaultChannelOptionsFactory;
         public GrpcNetClientGrpcChannelProvider()
-            : this(new GrpcChannelOptions())
+            : this(() => new GrpcChannelOptions())
         {
         }
 
+        [Obsolete("Use constructor with a GrpcChannelOptions factory overload instead. If you pass a GrpcChannelOptions directly, HttpClient/HttpHandler may be reused unintentionally.")]
         public GrpcNetClientGrpcChannelProvider(GrpcChannelOptions options)
             : this(() => options)
         {

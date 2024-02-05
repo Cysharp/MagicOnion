@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <!--
-      prior to .NET 8
-      <BaseIntermediateOutputPath>.artifacts\obj\</BaseIntermediateOutputPath>
-		  <BaseOutputPath>.artifacts\bin\</BaseOutputPath>
-    -->
-
-    <!-- after .NET 8: https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output -->
-    <!-- Unity ignores . prefix folder -->
+    Override the output path of build artifacts.
+    This is necessary to change the path to one with a dot(.) prefix to hide generated items from Unity.
+  -->
+  <PropertyGroup>
+    <!-- Using .NET 8 and later, use ArtifactsPath property. -->
+    <!-- https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output -->
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
+    <!-- Using .NET 7 and ealier, use BaseIntermediateOutputPath and BaseOutputPath property instead. -->
+    <!-- NOTE: Currently, even if .NET 8 SDK is installed, MessagePack.Generator still requires these properties to be set. -->
+    <BaseIntermediateOutputPath>.artifacts\obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>.artifacts\bin\</BaseOutputPath>
   </PropertyGroup>
 </Project>
