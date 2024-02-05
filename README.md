@@ -1072,6 +1072,7 @@ public static void OnRuntimeInitialize()
         {
             Http2Only = true,
         },
+        DisposeHttpClient = true,
     }));
 }
 ```
