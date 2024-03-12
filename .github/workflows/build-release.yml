@@ -86,6 +86,7 @@ jobs:
       nuget-push: true
       release-upload: true
       release-asset-path: ./MagicOnion.Client.Unity.unitypackage/MagicOnion.Client.Unity.unitypackage
+      release-format: '{0}'
     secrets: inherit
 
   cleanup:
