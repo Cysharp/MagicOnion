@@ -29,7 +29,7 @@ public enum SerializerType
     MemoryPack = 1,
 }
 
-public record GenerationOptions(SerializerType Serializer, bool DisableAutoRegistration, string MessagePackFormatterNamespace)
+public record GenerationOptions(SerializerType Serializer, bool DisableAutoRegistration, string MessagePackFormatterNamespace, bool EnableStreamingHubDiagnosticHandler)
 {
-    public static GenerationOptions Default { get; } = new (SerializerType.MessagePack, false, "MessagePack.Formatters");
+    public static GenerationOptions Default { get; } = new (SerializerType.MessagePack, false, "MessagePack.Formatters", false);
 }
