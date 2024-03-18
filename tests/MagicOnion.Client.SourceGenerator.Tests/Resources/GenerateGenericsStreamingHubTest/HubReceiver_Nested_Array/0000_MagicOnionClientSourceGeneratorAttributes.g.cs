@@ -24,6 +24,11 @@ namespace MagicOnion.Client
         /// </summary>
         public string MessagePackFormatterNamespace { get; set; } = "MessagePack.Formatters";
 
+        /// <summary>
+        /// Gets or set whether to enable the StreamingHandler diagnostic handler. This is for debugging purpose. The default value is <see langword="false" />.
+        /// </summary>
+        public bool EnableStreamingHubDiagnosticHandler { get; set; } = false;
+
         public global::System.Type[] TypesContainedInTargetAssembly { get; }
 
         /// <param name="typesContainedInTargetAssembly">Types contained in the scan target assembly</param>
