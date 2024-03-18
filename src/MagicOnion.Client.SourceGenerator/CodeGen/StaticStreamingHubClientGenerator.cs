@@ -82,6 +82,17 @@ public class StaticStreamingHubClientGenerator
         }
     }
 
+    static void EmitProperties(StreamingHubClientBuildContext ctx)
+    {
+        if (ctx.EnableStreamingHubDiagnosticHandler)
+        {
+            ctx.Writer.AppendLineWithFormat($"""
+                            readonly global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler;
+            """);
+            ctx.Writer.AppendLine();
+        }
+    }
+
     static void EmitHubClientClass(GenerationContext generationContext, StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLineWithFormat($$"""
@@ -102,39 +113,30 @@ public class StaticStreamingHubClientGenerator
         // }
     }
 
-    static void EmitProperties(StreamingHubClientBuildContext ctx)
-    {
-        if (ctx.EnableStreamingHubDiagnosticHandler)
-        {
-            ctx.Writer.AppendLineWithFormat($"""
-                                readonly global::MagicOnion.Client.IStreamingHubDiagnosticHandler? diagnosticHandler;
-            """);
-        }
-    }
-
     static void EmitHelperMethods(StreamingHubClientBuildContext ctx)
     {
         if (ctx.EnableStreamingHubDiagnosticHandler)
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                                async Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [CallerMemberName] string callerMemberName = default!)
-                                {
-                                    var requestId = Guid.NewGuid();
-                                    diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: false);
-                                    var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                                    diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
-                                    return result;
-                                }
-                                
-                                async Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [CallerMemberName] string callerMemberName = default!)
-                                {
-                                    var requestId = Guid.NewGuid();
-                                    diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: true);
-                                    var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                                    diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
-                                    return result;
-                                }
+                            async global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                var requestId = global::System.Guid.NewGuid();
+                                diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: false);
+                                var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                                diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
+                                return result;
+                            }
+                            
+                            async global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                var requestId = global::System.Guid.NewGuid();
+                                diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: true);
+                                var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                                diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
+                                return result;
+                            }
             """);
+            ctx.Writer.AppendLine();
         }
     }
 
@@ -143,7 +145,7 @@ public class StaticStreamingHubClientGenerator
         if (ctx.EnableStreamingHubDiagnosticHandler)
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                            public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger, global::MagicOnion.Client.IStreamingHubDiagnosticHandler? diagnosticHandler)
+                            public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
                                 : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
                             {
                                 this.diagnosticHandler = diagnosticHandler;

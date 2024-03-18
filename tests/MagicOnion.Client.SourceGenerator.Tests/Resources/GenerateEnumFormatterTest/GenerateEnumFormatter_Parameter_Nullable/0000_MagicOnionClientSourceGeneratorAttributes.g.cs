@@ -28,6 +28,8 @@ namespace MagicOnion.Client
         /// Gets or set whether to enable the StreamingHandler diagnostic handler. This is for debugging purpose. The default value is <see langword="false" />.
         /// </summary>
         public bool EnableStreamingHubDiagnosticHandler { get; set; } = false;
+        
+        public string GenerateFileHintNamePrefix { get; set; } = string.Empty;
 
         public global::System.Type[] TypesContainedInTargetAssembly { get; }
 

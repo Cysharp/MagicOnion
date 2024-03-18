@@ -66,7 +66,7 @@ internal class MagicOnionInitializerGenerator
                     /// <summary>
                     /// Gets or sets a diagnostic handler for the StreamingHub.
                     /// </summary>
-                    public static global::MagicOnion.Client.IStreamingHubDiagnosticHandler? StreamingHubDiagnosticHandler { get; set; }
+                    public static global::MagicOnion.Client.IStreamingHubDiagnosticHandler StreamingHubDiagnosticHandler { get; set; }
             """);
         }
 

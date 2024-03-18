@@ -49,6 +49,8 @@ public partial class MagicOnionClientSourceGenerator
                         /// Gets or set whether to enable the StreamingHandler diagnostic handler. This is for debugging purpose. The default value is <see langword="false" />.
                         /// </summary>
                         public bool EnableStreamingHubDiagnosticHandler { get; set; } = false;
+                        
+                        public string GenerateFileHintNamePrefix { get; set; } = string.Empty;
 
                         public global::System.Type[] TypesContainedInTargetAssembly { get; }
                 
@@ -81,7 +83,7 @@ public partial class MagicOnionClientSourceGenerator
 
             foreach (var (path, source) in generated)
             {
-                context.SourceProductionContext.AddSource(path, source);
+                context.SourceProductionContext.AddSource(context.Options.GenerateFileHintNamePrefix + path, source);
             }
         }
 
