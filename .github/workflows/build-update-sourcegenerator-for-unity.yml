@@ -38,14 +38,14 @@ jobs:
       - name: Check update
         id: check_update
         run: |
-          git diff --exit-code || echo "::set-output name=changed::1"
+          git diff --exit-code || (echo "changed=1" >> "$GITHUB_OUTPUT")
 
       - name: Commit files
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "feat: Update MagicOnion.Client.SourceGenerator.Unity" -a
-          echo "::set-output name=sha::$(git rev-parse HEAD)"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Check sha
         run: echo "SHA ${SHA}"
