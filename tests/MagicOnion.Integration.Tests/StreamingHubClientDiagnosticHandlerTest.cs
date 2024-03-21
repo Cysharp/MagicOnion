@@ -38,7 +38,6 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         Assert.Equal(nameof(IStreamingHubTestHub.Parameter_Many), beginEvent.MethodName);
         Assert.Equal(nameof(IStreamingHubTestHub.Parameter_Many), endEvent.MethodName);
-        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
         Assert.Equal(new DynamicArgumentTuple<int, string, bool>(12345, "Hello✨", true), beginEvent.Request);
         Assert.Equal(result, endEvent.Response);
     }
@@ -69,7 +68,6 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         Assert.Equal(nameof(IStreamingHubTestHub.Parameter_Zero), beginEvent.MethodName);
         Assert.Equal(nameof(IStreamingHubTestHub.Parameter_Zero), endEvent.MethodName);
-        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
         Assert.Equal(Nil.Default, beginEvent.Request);
         Assert.Equal(result, endEvent.Response);
     }
@@ -100,7 +98,6 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         Assert.Equal(nameof(IStreamingHubTestHub.NoReturn_Parameter_Many), beginEvent.MethodName);
         Assert.Equal(nameof(IStreamingHubTestHub.NoReturn_Parameter_Many), endEvent.MethodName);
-        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
         Assert.Equal(new DynamicArgumentTuple<int, string, bool>(12345, "Hello✨", true), beginEvent.Request);
         Assert.Equal(Nil.Default, endEvent.Response);
     }
@@ -131,9 +128,8 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         Assert.Equal(nameof(IStreamingHubTestHub.Throw), beginEvent.MethodName);
         Assert.Equal(nameof(IStreamingHubTestHub.Throw), endEvent.MethodName);
-        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
         Assert.Equal(Nil.Default, beginEvent.Request);
-        Assert.Equal(Nil.Default, endEvent.Response);
+        Assert.Null(endEvent.Response);
         Assert.Equal(ex, endEvent.Exception);
     }
 
@@ -168,7 +164,6 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
 
         Assert.Equal(nameof(IStreamingHubTestHub.CallReceiver_Parameter_Many), beginEvent.MethodName);
         Assert.Equal(nameof(IStreamingHubTestHub.CallReceiver_Parameter_Many), endEvent.MethodName);
-        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
         Assert.Equal(new DynamicArgumentTuple<int, string, bool>(12345, "Hello✨", true), beginEvent.Request);
         Assert.Null(beginEvent.Response);
 
@@ -185,21 +180,27 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
             OnBroadcastEvent,
         }
 
-        public List<(EventType EventType, object HubInstance, Guid RequestId, string MethodName, object? Request, object? Response, Exception? Exception)> Events { get; } = new ();
+        public List<(EventType EventType, object HubInstance, string MethodName, object? Request, object? Response, Exception? Exception)> Events { get; } = new ();
 
-        public void OnRequestBegin<THub, TRequest>(THub hubInstance, Guid requestId, string methodName, TRequest request, bool isFireAndForget)
+        public async Task<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse> invokeMethod)
         {
-            Events.Add((EventType.OnRequestBegin, hubInstance!, requestId, methodName, request, default, default));
-        }
-
-        public void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception)
-        {
-            Events.Add((EventType.OnRequestEnd, hubInstance!, requestId, methodName, default, response, exception));
+            Events.Add((EventType.OnRequestBegin, hubInstance!, methodName, request, default, default));
+            try
+            {
+                var result = await invokeMethod(methodId, request).ConfigureAwait(false);
+                Events.Add((EventType.OnRequestEnd, hubInstance!, methodName, default, result, default));
+                return result;
+            }
+            catch (Exception e)
+            {
+                Events.Add((EventType.OnRequestEnd, hubInstance!, methodName, default, default, e));
+                throw;
+            }
         }
 
         public void OnBroadcastEvent<THub, T>(THub hubInstance, string methodName, T value)
         {
-            Events.Add((EventType.OnBroadcastEvent, hubInstance!, Guid.Empty, methodName, default, value, default));
+            Events.Add((EventType.OnBroadcastEvent, hubInstance!, methodName, default, value, default));
         }
     }
 }

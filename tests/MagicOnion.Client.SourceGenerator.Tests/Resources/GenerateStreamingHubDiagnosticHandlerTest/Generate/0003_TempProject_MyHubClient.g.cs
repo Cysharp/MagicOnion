@@ -22,38 +22,24 @@ namespace TempProject
                     this.diagnosticHandler = diagnosticHandler;
                 }
 
-                async global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
-                    var requestId = global::System.Guid.NewGuid();
-                    diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: false);
-                    try
+                    if (diagnosticHandler is null)
                     {
-                        var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result, default);
-                        return result;
+                        return base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message);
                     }
-                    catch (global::System.Exception e)
-                    {
-                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, default(TResponse), e);
-                        throw;
-                    }
+
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseAsync<TRequest, TResponse>);
                 }
-                
-                async global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+
+                global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
-                    var requestId = global::System.Guid.NewGuid();
-                    diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: true);
-                    try
+                    if (diagnosticHandler is null)
                     {
-                        var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result, default);
-                        return result;
+                        return base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message);
                     }
-                    catch (global::System.Exception e)
-                    {
-                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, default(TResponse), e);
-                        throw;
-                    }
+
+                    return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetAsync<TRequest, TResponse>);
                 }
 
                 public global::System.Threading.Tasks.Task MethodA()

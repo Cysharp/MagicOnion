@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace MagicOnion.Client
 {
@@ -7,29 +8,21 @@ namespace MagicOnion.Client
     /// </summary>
     public interface IStreamingHubDiagnosticHandler
     {
+        public delegate Task<TResponse> InvokeMethodDelegate<TRequest, TResponse>(int methodId, TRequest value);
+
         /// <summary>
         /// The callback method at the beginning of a Hub method request. This API may change in the future.
         /// </summary>
         /// <typeparam name="THub"></typeparam>
         /// <typeparam name="TRequest"></typeparam>
+        /// <typeparam name="TResponse"></typeparam>
         /// <param name="hubInstance"></param>
-        /// <param name="requestId"></param>
+        /// <param name="methodId"></param>
         /// <param name="methodName"></param>
         /// <param name="request"></param>
         /// <param name="isFireAndForget"></param>
-        void OnRequestBegin<THub, TRequest>(THub hubInstance, Guid requestId, string methodName, TRequest request, bool isFireAndForget);
-
-        /// <summary>
-        /// [Preview] The callback method at the end of a Hub method request. This API may change in the future.
-        /// </summary>
-        /// <typeparam name="THub"></typeparam>
-        /// <typeparam name="TResponse"></typeparam>
-        /// <param name="hubInstance"></param>
-        /// <param name="requestId"></param>
-        /// <param name="methodName"></param>
-        /// <param name="response"></param>
-        /// <param name="exception"></param>
-        void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception);
+        /// <param name="invokeMethod"></param>
+        Task<TResponse> OnMethodInvoke<THub, TRequest, TResponse>(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, InvokeMethodDelegate<TRequest, TResponse> invokeMethod);
 
         /// <summary>
         /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
