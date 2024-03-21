@@ -113,16 +113,9 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestBegin__2___0_Guid_System_String___1_System_Boolean_">OnRequestBegin&lt;THub, TRequest&gt;(THub, Guid, String, TRequest, Boolean)</a>
+          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke__3___0_System_Int32_System_String___1_System_Boolean_MagicOnion_Client_IStreamingHubDiagnosticHandler_InvokeMethodDelegate___1___2__">OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt;)</a>
         </td>
         <td class="markdown level1 summary"><p>The callback method at the beginning of a Hub method request. This API may change in the future.</p>
-</td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse, Nullable&lt;Exception&gt;)</a>
-        </td>
-        <td class="markdown level1 summary"><p>[Preview] The callback method at the end of a Hub method request. This API may change in the future.</p>
 </td>
       </tr>
     </tbody>
@@ -175,14 +168,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestBegin_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin*"></a>
-  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestBegin__2___0_Guid_System_String___1_System_Boolean_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin``2(``0,Guid,System.String,``1,System.Boolean)">OnRequestBegin&lt;THub, TRequest&gt;(THub, Guid, String, TRequest, Boolean)</h4>
+  <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke*"></a>
+  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke__3___0_System_Int32_System_String___1_System_Boolean_MagicOnion_Client_IStreamingHubDiagnosticHandler_InvokeMethodDelegate___1___2__" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke``3(``0,System.Int32,System.String,``1,System.Boolean,MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate{``1,``2})">OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt;)</h4>
   <div class="markdown level1 summary"><p>The callback method at the beginning of a Hub method request. This API may change in the future.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void OnRequestBegin&lt;THub, TRequest&gt;(THub hubInstance, Guid requestId, string methodName, TRequest request, bool isFireAndForget)</code></pre>
+    <pre><code class="lang-csharp hljs">Task&lt;TResponse&gt; OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt; invokeMethod)</code></pre>
   </div>
 
   <section>
@@ -190,7 +183,7 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>hubInstance</code></span> <span class="xref">THub</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>requestId</code></span> <span class="xref">Guid</span></dt>
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>methodName</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
@@ -198,9 +191,18 @@
     <dd></dd>
     <dt><span class="parametername"><code>isFireAndForget</code></span> <span class="xref">System.Boolean</span></dt>
     <dd></dd>
+    <dt><span class="parametername"><code>invokeMethod</code></span> <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate-2.html">IStreamingHubDiagnosticHandler.InvokeMethodDelegate</a>&lt;TRequest, TResponse&gt;</dt>
+    <dd></dd>
   </dl>
   </section>
   
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
   
   <section>
   <h5 class="typeParameters">Type Parameters</h5>
@@ -208,52 +210,6 @@
     <dt><span class="parametername"><code>THub</code></span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>TRequest</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd*"></a>
-  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse, Nullable&lt;Exception&gt;)</h4>
-  <div class="markdown level1 summary"><p>[Preview] The callback method at the end of a Hub method request. This API may change in the future.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void OnRequestEnd&lt;THub, TResponse&gt;(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>hubInstance</code></span> <span class="xref">THub</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>requestId</code></span> <span class="xref">Guid</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>methodName</code></span> <span class="xref">System.String</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>response</code></span> <span class="xref">TResponse</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>exception</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Exception</span>&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  <section>
-  <h5 class="typeParameters">Type Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>THub</code></span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>TResponse</code></span></dt>
     <dd></dd>

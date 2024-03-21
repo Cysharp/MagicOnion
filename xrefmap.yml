@@ -804,6 +804,15 @@ references:
   commentId: T:MagicOnion.Client.IStreamingHubDiagnosticHandler
   fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler
   nameWithType: IStreamingHubDiagnosticHandler
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate`2
+  name: IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate-2.html
+  commentId: T:MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate`2
+  name.vb: IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse)
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>
+  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse)
+  nameWithType: IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>
+  nameWithType.vb: IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse)
 - uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEvent*
   name: OnBroadcastEvent
   href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnBroadcastEvent_
@@ -820,38 +829,22 @@ references:
   fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnBroadcastEvent(Of THub, T)(THub, System.String, T)
   nameWithType: IStreamingHubDiagnosticHandler.OnBroadcastEvent<THub, T>(THub, String, T)
   nameWithType.vb: IStreamingHubDiagnosticHandler.OnBroadcastEvent(Of THub, T)(THub, String, T)
-- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin*
-  name: OnRequestBegin
-  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestBegin_
-  commentId: Overload:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke*
+  name: OnMethodInvoke
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke_
+  commentId: Overload:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke
   isSpec: "True"
-  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin
-  nameWithType: IStreamingHubDiagnosticHandler.OnRequestBegin
-- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin``2(``0,Guid,System.String,``1,System.Boolean)
-  name: OnRequestBegin<THub, TRequest>(THub, Guid, String, TRequest, Boolean)
-  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestBegin__2___0_Guid_System_String___1_System_Boolean_
-  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin``2(``0,Guid,System.String,``1,System.Boolean)
-  name.vb: OnRequestBegin(Of THub, TRequest)(THub, Guid, String, TRequest, Boolean)
-  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin<THub, TRequest>(THub, Guid, System.String, TRequest, System.Boolean)
-  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestBegin(Of THub, TRequest)(THub, Guid, System.String, TRequest, System.Boolean)
-  nameWithType: IStreamingHubDiagnosticHandler.OnRequestBegin<THub, TRequest>(THub, Guid, String, TRequest, Boolean)
-  nameWithType.vb: IStreamingHubDiagnosticHandler.OnRequestBegin(Of THub, TRequest)(THub, Guid, String, TRequest, Boolean)
-- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd*
-  name: OnRequestEnd
-  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd_
-  commentId: Overload:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd
-  isSpec: "True"
-  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd
-  nameWithType: IStreamingHubDiagnosticHandler.OnRequestEnd
-- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})
-  name: OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse, Nullable<Exception>)
-  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__
-  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})
-  name.vb: OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse, Nullable(Of Exception))
-  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, System.String, TResponse, System.Nullable<Exception>)
-  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, System.String, TResponse, System.Nullable(Of Exception))
-  nameWithType: IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse, Nullable<Exception>)
-  nameWithType.vb: IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse, Nullable(Of Exception))
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke
+  nameWithType: IStreamingHubDiagnosticHandler.OnMethodInvoke
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke``3(``0,System.Int32,System.String,``1,System.Boolean,MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate{``1,``2})
+  name: OnMethodInvoke<THub, TRequest, TResponse>(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>)
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnMethodInvoke__3___0_System_Int32_System_String___1_System_Boolean_MagicOnion_Client_IStreamingHubDiagnosticHandler_InvokeMethodDelegate___1___2__
+  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke``3(``0,System.Int32,System.String,``1,System.Boolean,MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate{``1,``2})
+  name.vb: OnMethodInvoke(Of THub, TRequest, TResponse)(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse))
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke<THub, TRequest, TResponse>(THub, System.Int32, System.String, TRequest, System.Boolean, MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>)
+  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnMethodInvoke(Of THub, TRequest, TResponse)(THub, System.Int32, System.String, TRequest, System.Boolean, MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse))
+  nameWithType: IStreamingHubDiagnosticHandler.OnMethodInvoke<THub, TRequest, TResponse>(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate<TRequest, TResponse>)
+  nameWithType.vb: IStreamingHubDiagnosticHandler.OnMethodInvoke(Of THub, TRequest, TResponse)(THub, Int32, String, TRequest, Boolean, IStreamingHubDiagnosticHandler.InvokeMethodDelegate(Of TRequest, TResponse))
 - uid: MagicOnion.Client.MagicOnionClient
   name: MagicOnionClient
   href: api/MagicOnion.Client.MagicOnionClient.html
