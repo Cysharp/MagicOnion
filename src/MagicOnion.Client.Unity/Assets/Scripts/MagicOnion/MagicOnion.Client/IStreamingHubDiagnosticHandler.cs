@@ -28,7 +28,8 @@ namespace MagicOnion.Client
         /// <param name="requestId"></param>
         /// <param name="methodName"></param>
         /// <param name="response"></param>
-        void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response);
+        /// <param name="exception"></param>
+        void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception);
 
         /// <summary>
         /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.

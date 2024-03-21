@@ -26,18 +26,34 @@ namespace TempProject
                 {
                     var requestId = global::System.Guid.NewGuid();
                     diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: false);
-                    var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                    diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
-                    return result;
+                    try
+                    {
+                        var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result, default);
+                        return result;
+                    }
+                    catch (global::System.Exception e)
+                    {
+                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, default(TResponse), e);
+                        throw;
+                    }
                 }
                 
                 async global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                 {
                     var requestId = global::System.Guid.NewGuid();
                     diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: true);
-                    var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
-                    diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
-                    return result;
+                    try
+                    {
+                        var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result, default);
+                        return result;
+                    }
+                    catch (global::System.Exception e)
+                    {
+                        diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, default(TResponse), e);
+                        throw;
+                    }
                 }
 
                 public global::System.Threading.Tasks.Task MethodA()
