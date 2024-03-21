@@ -12135,6 +12135,23 @@ references:
   fullName.vb: MagicOnion.Server.Hubs.StreamingHubBase(Of THubInterface, TReceiver).NilTask
   nameWithType: StreamingHubBase<THubInterface, TReceiver>.NilTask
   nameWithType.vb: StreamingHubBase(Of THubInterface, TReceiver).NilTask
+- uid: MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected
+  name: OnConnected()
+  href: api/MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected
+  commentId: M:MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected
+  fullName: MagicOnion.Server.Hubs.StreamingHubBase<THubInterface, TReceiver>.OnConnected()
+  fullName.vb: MagicOnion.Server.Hubs.StreamingHubBase(Of THubInterface, TReceiver).OnConnected()
+  nameWithType: StreamingHubBase<THubInterface, TReceiver>.OnConnected()
+  nameWithType.vb: StreamingHubBase(Of THubInterface, TReceiver).OnConnected()
+- uid: MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected*
+  name: OnConnected
+  href: api/MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected_
+  commentId: Overload:MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected
+  isSpec: "True"
+  fullName: MagicOnion.Server.Hubs.StreamingHubBase<THubInterface, TReceiver>.OnConnected
+  fullName.vb: MagicOnion.Server.Hubs.StreamingHubBase(Of THubInterface, TReceiver).OnConnected
+  nameWithType: StreamingHubBase<THubInterface, TReceiver>.OnConnected
+  nameWithType.vb: StreamingHubBase(Of THubInterface, TReceiver).OnConnected
 - uid: MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnecting
   name: OnConnecting()
   href: api/MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnecting

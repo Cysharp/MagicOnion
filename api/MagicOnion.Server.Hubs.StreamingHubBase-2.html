@@ -223,6 +223,14 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected">OnConnected()</a>
+        </td>
+        <td class="markdown level1 summary"><p>Called after connect (headers and marker have been sent).
+Allow the server send message to the client or broadcast to group.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnecting">OnConnecting()</a>
         </td>
         <td class="markdown level1 summary"><p>Called before connect, instead of constructor.</p>
@@ -662,6 +670,38 @@
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.DuplexStreamingResult-2.html">DuplexStreamingResult</a>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected*"></a>
+  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected">OnConnected()</h4>
+  <div class="markdown level1 summary"><p>Called after connect (headers and marker have been sent).
+Allow the server send message to the client or broadcast to group.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual ValueTask OnConnected()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span></dt>
     <dd></dd>
   </dl>
   </section>
