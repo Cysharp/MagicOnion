@@ -17,7 +17,7 @@ namespace MagicOnion.Client
         /// <summary>
         /// Gets or set the serializer used for message serialization. The default value is <see cref="GenerateSerializerType.MessagePack"/>.
         /// </summary>
-        public global::MagicOnion.Client.GenerateSerializerType Serializer { get; set; } = global::MagicOnion.Client.GenerateSerializerType.MessagePack;
+        public global::MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType Serializer { get; set; } = global::MagicOnion.Client.MagicOnionClientGenerationAttribute.GenerateSerializerType.MessagePack;
 
         /// <summary>
         /// Gets or set the namespace of pre-generated MessagePackFormatters. The default value is <c>MessagePack.Formatters</c>.
@@ -28,7 +28,7 @@ namespace MagicOnion.Client
         /// Gets or set whether to enable the StreamingHandler diagnostic handler. This is for debugging purpose. The default value is <see langword="false" />.
         /// </summary>
         public bool EnableStreamingHubDiagnosticHandler { get; set; } = false;
-        
+
         public string GenerateFileHintNamePrefix { get; set; } = string.Empty;
 
         public global::System.Type[] TypesContainedInTargetAssembly { get; }
@@ -38,12 +38,12 @@ namespace MagicOnion.Client
         {
             TypesContainedInTargetAssembly = typesContainedInTargetAssembly;
         }
-    }
 
-    // This enum must be mirror of `SerializerType` (MagicOnionClientSourceGenerator)
-    internal enum GenerateSerializerType
-    {
-        MessagePack = 0,
-        MemoryPack = 1,
+        // This enum must be mirror of `SerializerType` (MagicOnionClientSourceGenerator)
+        internal enum GenerateSerializerType
+        {
+            MessagePack = 0,
+            MemoryPack = 1,
+        }
     }
 }
