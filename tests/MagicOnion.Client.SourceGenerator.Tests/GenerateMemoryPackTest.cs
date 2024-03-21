@@ -22,7 +22,7 @@ public class GenerateMemoryPackTest
         [MemoryPackable]
         public class MyGenericObject<T> {}
         
-        [MagicOnionClientGeneration(typeof(IGreeterService), Serializer = GenerateSerializerType.MemoryPack)]
+        [MagicOnionClientGeneration(typeof(IGreeterService), Serializer = MagicOnionClientGenerationAttribute.GenerateSerializerType.MemoryPack)]
         partial class MagicOnionInitializer {}
         """;
 

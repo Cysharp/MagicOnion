@@ -38,34 +38,34 @@ public partial class MagicOnionClientSourceGenerator
                         /// <summary>
                         /// Gets or set the serializer used for message serialization. The default value is <see cref="GenerateSerializerType.MessagePack"/>.
                         /// </summary>
-                        public global::MagicOnion.Client.GenerateSerializerType Serializer { get; set; } = global::MagicOnion.Client.GenerateSerializerType.MessagePack;
+                        public global::MagicOnion.Client.{{MagicOnionClientGenerationAttributeName}}.GenerateSerializerType Serializer { get; set; } = global::MagicOnion.Client.{{MagicOnionClientGenerationAttributeName}}.GenerateSerializerType.MessagePack;
 
                         /// <summary>
                         /// Gets or set the namespace of pre-generated MessagePackFormatters. The default value is <c>MessagePack.Formatters</c>.
                         /// </summary>
                         public string MessagePackFormatterNamespace { get; set; } = "MessagePack.Formatters";
-                
+
                         /// <summary>
                         /// Gets or set whether to enable the StreamingHandler diagnostic handler. This is for debugging purpose. The default value is <see langword="false" />.
                         /// </summary>
                         public bool EnableStreamingHubDiagnosticHandler { get; set; } = false;
-                        
+
                         public string GenerateFileHintNamePrefix { get; set; } = string.Empty;
 
                         public global::System.Type[] TypesContainedInTargetAssembly { get; }
-                
+
                         /// <param name="typesContainedInTargetAssembly">Types contained in the scan target assembly</param>
                         public {{MagicOnionClientGenerationAttributeName}}(params global::System.Type[] typesContainedInTargetAssembly)
                         {
                             TypesContainedInTargetAssembly = typesContainedInTargetAssembly;
                         }
-                    }
 
-                    // This enum must be mirror of `SerializerType` (MagicOnionClientSourceGenerator)
-                    internal enum GenerateSerializerType
-                    {
-                        MessagePack = 0,
-                        MemoryPack = 1,
+                        // This enum must be mirror of `SerializerType` (MagicOnionClientSourceGenerator)
+                        internal enum GenerateSerializerType
+                        {
+                            MessagePack = 0,
+                            MemoryPack = 1,
+                        }
                     }
                 }
                 """);

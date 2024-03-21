@@ -94,7 +94,7 @@ public class GeneratorOptionsTest
             UnaryResult<string> HelloAsync(string name, int age);
         }
 
-        [MagicOnionClientGeneration(typeof(IGreeterService), Serializer = GenerateSerializerType.MemoryPack)]
+        [MagicOnionClientGeneration(typeof(IGreeterService), Serializer = MagicOnionClientGenerationAttribute.GenerateSerializerType.MemoryPack)]
         partial class MagicOnionInitializer {}
         """;
 
