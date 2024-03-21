@@ -3,12 +3,12 @@ using System;
 namespace MagicOnion.Client
 {
     /// <summary>
-    /// The interface of the handler for StreamingHub diagnostics.
+    /// [Preview] The interface of the handler for StreamingHub diagnostics. This API may change in the future.
     /// </summary>
     public interface IStreamingHubDiagnosticHandler
     {
         /// <summary>
-        /// The callback method at the beginning of a Hub method request.
+        /// The callback method at the beginning of a Hub method request. This API may change in the future.
         /// </summary>
         /// <typeparam name="THub"></typeparam>
         /// <typeparam name="TRequest"></typeparam>
@@ -20,7 +20,7 @@ namespace MagicOnion.Client
         void OnRequestBegin<THub, TRequest>(THub hubInstance, Guid requestId, string methodName, TRequest request, bool isFireAndForget);
 
         /// <summary>
-        /// The callback method at the end of a Hub method request.
+        /// [Preview] The callback method at the end of a Hub method request. This API may change in the future.
         /// </summary>
         /// <typeparam name="THub"></typeparam>
         /// <typeparam name="TResponse"></typeparam>
@@ -31,7 +31,7 @@ namespace MagicOnion.Client
         void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response);
 
         /// <summary>
-        /// The callback method when a method of HubReceiver is invoked.
+        /// [Preview] The callback method when a method of HubReceiver is invoked. This API may change in the future.
         /// </summary>
         /// <typeparam name="THub"></typeparam>
         /// <typeparam name="T"></typeparam>
