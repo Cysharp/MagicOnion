@@ -89,6 +89,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     }
 
     /// <summary>
+    /// Called after connect (headers and marker have been sent).
+    /// Allow the server send message to the client or broadcast to group.
+    /// </summary>
+    protected virtual ValueTask OnConnected()
+    {
+        return CompletedTask;
+    }
+
+    /// <summary>
     /// Called after disconnect.
     /// </summary>
     protected virtual ValueTask OnDisconnected()
@@ -157,6 +166,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
         await writer.WriteAsync(MarkerResponseBytes);
+
+        // Call OnConnected after sending the headers and marker.
+        // The server can send messages or broadcast to client after OnConnected.
+        // eg: Send the current game state to the client.
+        await OnConnected();
 
         var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
 

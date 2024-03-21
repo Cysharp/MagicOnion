@@ -11,6 +11,7 @@ namespace MagicOnion.Server.Tests;
 
 public interface IMessageReceiver
 {
+    void VoidOnConnected(int x, string y, double z);
     //Task ZeroArgument();
     //Task OneArgument(int x);
     //Task MoreArgument(int x, string y, double z);
@@ -58,6 +59,11 @@ public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
     protected override async ValueTask OnConnecting()
     {
         group = await Group.AddAsync("global");
+    }
+
+    protected override async ValueTask OnConnected()
+    {
+        BroadcastToSelf(group).VoidOnConnected(123, "foo", 12.3f);
     }
 
     protected override async ValueTask OnDisconnected()
@@ -132,6 +138,15 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     {
         this.logger = logger;
         this.channel = server.DefaultChannel;
+    }
+
+    [Fact]
+    public async Task OnConnected()
+    {
+        client = await StreamingHubClient.ConnectAsync<ITestHub, IMessageReceiver>(channel, this);
+        var x = await voidOnConnectedTask.Task;
+        x.Should().Be((123, "foo", 12.3f));
+        await client.DisposeAsync();
     }
 
     [Fact]
@@ -327,6 +342,13 @@ public class BasicStreamingHubTest : IMessageReceiver, IDisposable, IClassFixtur
     //    one3Task.TrySetResult(x);
     //}
 
+    TaskCompletionSource<(int, string, double)> voidOnConnectedTask = new TaskCompletionSource<(int, string, double)>();
+    void IMessageReceiver.VoidOnConnected(int x, string y, double z)
+    {
+        voidOnConnectedTask.TrySetResult((x, y, z));
+    }
+
+
     TaskCompletionSource<(int, string, double)> voidmoreTask = new TaskCompletionSource<(int, string, double)>();
     void IMessageReceiver.VoidMoreArgument(int x, string y, double z)
     {
@@ -399,7 +421,7 @@ public class MoreCheckHub : StreamingHubBase<IMoreCheckHub, IEmptyReceiver>, IMo
     [StreamingHubTestFilter]
     public async Task FilterCheckAsync()
     {
-            
+
     }
 }
 
@@ -415,7 +437,7 @@ public class StreamingHubTestFilterAttribute : StreamingHubFilterAttribute
         context.Items["HubFilter1_BF"] = "AfterOK";
     }
 }
-    
+
 public class MoreCheckHubTest : IEmptyReceiver, IDisposable, IClassFixture<ServerFixture<MoreCheckHub>>
 {
     ITestOutputHelper logger;
