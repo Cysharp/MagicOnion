@@ -34,6 +34,7 @@ jobs:
       - run: dotnet build -c Release ./MagicOnion.sln
       # pack nuget
       - run: dotnet pack -c Release ./MagicOnion.Packaging.slnf  --include-symbols --include-source --no-build -o ./publish
+      - run: cd ./publish/ && ls . | grep -P 'MagicOnion\.\d+\.\d+\.\d+\.snupkg' | xargs rm
       - uses: actions/upload-artifact@v1
         with:
           name: nuget
