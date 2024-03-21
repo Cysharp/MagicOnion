@@ -106,6 +106,38 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
     }
 
     [Fact]
+    public async Task Request_Throw()
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var diagnosticHandler = new DiagnosticHandler();
+
+        MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubDiagnosticHandler = diagnosticHandler;
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(
+            channel, receiver,
+            factoryProvider: MagicOnionGeneratedClientInitializerStreamingHubDiagnosticHandler.StreamingHubClientFactoryProvider);
+
+        // Act
+        var ex = await Record.ExceptionAsync(async () => await client.Throw());
+
+        // Assert
+        Assert.Equal([DiagnosticHandler.EventType.OnRequestBegin, DiagnosticHandler.EventType.OnRequestEnd], diagnosticHandler.Events.Select(x => x.EventType));
+
+        var beginEvent = diagnosticHandler.Events.Single(x => x.EventType == DiagnosticHandler.EventType.OnRequestBegin);
+        var endEvent = diagnosticHandler.Events.Single(x => x.EventType == DiagnosticHandler.EventType.OnRequestEnd);
+
+        Assert.Equal(nameof(IStreamingHubTestHub.Throw), beginEvent.MethodName);
+        Assert.Equal(nameof(IStreamingHubTestHub.Throw), endEvent.MethodName);
+        Assert.Equal(beginEvent.RequestId, endEvent.RequestId);
+        Assert.Equal(Nil.Default, beginEvent.Request);
+        Assert.Equal(Nil.Default, endEvent.Response);
+        Assert.Equal(ex, endEvent.Exception);
+    }
+
+    [Fact]
     public async Task Receiver()
     {
         // Arrange
@@ -153,21 +185,21 @@ public class StreamingHubClientDiagnosticHandlerTest : IClassFixture<MagicOnionA
             OnBroadcastEvent,
         }
 
-        public List<(EventType EventType, object HubInstance, Guid RequestId, string MethodName, object? Request, object? Response)> Events { get; } = new ();
+        public List<(EventType EventType, object HubInstance, Guid RequestId, string MethodName, object? Request, object? Response, Exception? Exception)> Events { get; } = new ();
 
         public void OnRequestBegin<THub, TRequest>(THub hubInstance, Guid requestId, string methodName, TRequest request, bool isFireAndForget)
         {
-            Events.Add((EventType.OnRequestBegin, hubInstance!, requestId, methodName, request, default));
+            Events.Add((EventType.OnRequestBegin, hubInstance!, requestId, methodName, request, default, default));
         }
 
-        public void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response)
+        public void OnRequestEnd<THub, TResponse>(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception)
         {
-            Events.Add((EventType.OnRequestEnd, hubInstance!, requestId, methodName, default, response));
+            Events.Add((EventType.OnRequestEnd, hubInstance!, requestId, methodName, default, response, exception));
         }
 
         public void OnBroadcastEvent<THub, T>(THub hubInstance, string methodName, T value)
         {
-            Events.Add((EventType.OnBroadcastEvent, hubInstance!, Guid.Empty, methodName, default, value));
+            Events.Add((EventType.OnBroadcastEvent, hubInstance!, Guid.Empty, methodName, default, value, default));
         }
     }
 }
