@@ -93,6 +93,12 @@ public partial class MagicOnionClientSourceGenerator
                 case nameof(GenerationOptions.MessagePackFormatterNamespace):
                     options = options with { MessagePackFormatterNamespace = (string)namedArg.Value.Value! };
                     break;
+                case nameof(GenerationOptions.EnableStreamingHubDiagnosticHandler):
+                    options = options with { EnableStreamingHubDiagnosticHandler = (bool)namedArg.Value.Value! };
+                    break;
+                case nameof(GenerationOptions.GenerateFileHintNamePrefix):
+                    options = options with { GenerateFileHintNamePrefix = (string)namedArg.Value.Value! };
+                    break;
             }
         }
 

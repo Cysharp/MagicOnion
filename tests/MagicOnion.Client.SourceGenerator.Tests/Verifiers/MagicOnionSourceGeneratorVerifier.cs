@@ -88,7 +88,7 @@ internal class MagicOnionSourceGeneratorVerifier
             this.testFile = testFile;
             this.testMethod = testMethod;
 
-            this.ReferenceAssemblies = ReferenceAssemblies.Net.Net60;
+            this.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
             this.AddAdditionalReferences();
 
 #if WRITE_EXPECTED

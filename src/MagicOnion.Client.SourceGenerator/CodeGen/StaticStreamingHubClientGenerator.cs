@@ -7,15 +7,18 @@ public class StaticStreamingHubClientGenerator
 {
     class StreamingHubClientBuildContext
     {
-        public StreamingHubClientBuildContext(MagicOnionStreamingHubInfo hub, StringBuilder writer)
+        public StreamingHubClientBuildContext(MagicOnionStreamingHubInfo hub, StringBuilder writer, bool enableStreamingHubDiagnosticHandler)
         {
             Hub = hub;
             Writer = writer;
+            EnableStreamingHubDiagnosticHandler = enableStreamingHubDiagnosticHandler;
         }
 
         public MagicOnionStreamingHubInfo Hub { get; }
 
         public StringBuilder Writer { get; }
+
+        public bool EnableStreamingHubDiagnosticHandler { get; }
     }
 
     public static string Build(GenerationContext generationContext, MagicOnionStreamingHubInfo hubInfo)
@@ -25,7 +28,7 @@ public class StaticStreamingHubClientGenerator
 
         EmitHeader(generationContext, writer);
 
-        var buildContext = new StreamingHubClientBuildContext(hubInfo, writer);
+        var buildContext = new StreamingHubClientBuildContext(hubInfo, writer, generationContext.Options.EnableStreamingHubDiagnosticHandler);
 
         EmitPreamble(generationContext, buildContext);
         EmitHubClientClass(generationContext, buildContext);
@@ -79,6 +82,17 @@ public class StaticStreamingHubClientGenerator
         }
     }
 
+    static void EmitProperties(StreamingHubClientBuildContext ctx)
+    {
+        if (ctx.EnableStreamingHubDiagnosticHandler)
+        {
+            ctx.Writer.AppendLineWithFormat($"""
+                            readonly global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler;
+            """);
+            ctx.Writer.AppendLine();
+        }
+    }
+
     static void EmitHubClientClass(GenerationContext generationContext, StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLineWithFormat($$"""
@@ -88,6 +102,7 @@ public class StaticStreamingHubClientGenerator
             """);
         EmitProperties(ctx);
         EmitConstructor(ctx);
+        EmitHelperMethods(ctx);
         EmitHubMethods(ctx, isFireAndForget: false);
         EmitFireAndForget(ctx);
         EmitOnBroadcastEvent(ctx);
@@ -98,18 +113,54 @@ public class StaticStreamingHubClientGenerator
         // }
     }
 
-    static void EmitProperties(StreamingHubClientBuildContext ctx)
+    static void EmitHelperMethods(StreamingHubClientBuildContext ctx)
     {
+        if (ctx.EnableStreamingHubDiagnosticHandler)
+        {
+            ctx.Writer.AppendLineWithFormat($$"""
+                            async global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                var requestId = global::System.Guid.NewGuid();
+                                diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: false);
+                                var result = await base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                                diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
+                                return result;
+                            }
+                            
+                            async global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                var requestId = global::System.Guid.NewGuid();
+                                diagnosticHandler?.OnRequestBegin(this, requestId, callerMemberName, message, isFireAndForget: true);
+                                var result = await base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message).ConfigureAwait(false);
+                                diagnosticHandler?.OnRequestEnd(this, requestId, callerMemberName, result);
+                                return result;
+                            }
+            """);
+            ctx.Writer.AppendLine();
+        }
     }
-    
+
     static void EmitConstructor(StreamingHubClientBuildContext ctx)
     {
-        ctx.Writer.AppendLineWithFormat($$"""
+        if (ctx.EnableStreamingHubDiagnosticHandler)
+        {
+            ctx.Writer.AppendLineWithFormat($$"""
+                            public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
+                                : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
+                            {
+                                this.diagnosticHandler = diagnosticHandler;
+                            }
+            """);
+        }
+        else
+        {
+            ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
                                 : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
                             {
                             }
             """);
+        }
         ctx.Writer.AppendLine();
     }
 
@@ -160,6 +211,13 @@ public class StaticStreamingHubClientGenerator
                 // new DynamicArgumentTuple(arg1, arg2, ...)
                 _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
             };
+            var writeMessageAsync = ctx.EnableStreamingHubDiagnosticHandler
+                ? isFireAndForget
+                    ? "parent.WriteMessageFireAndForgetDiagnosticAsync"
+                    : "this.WriteMessageWithResponseDiagnosticAsync"
+                : isFireAndForget
+                    ? "parent.WriteMessageFireAndForgetAsync"
+                    : "base.WriteMessageWithResponseAsync";
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""
@@ -171,21 +229,21 @@ public class StaticStreamingHubClientGenerator
             {
                 // ValueTask
                 ctx.Writer.AppendLineWithFormat($"""
-                                => new global::System.Threading.Tasks.ValueTask({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                                => new global::System.Threading.Tasks.ValueTask({writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
             """);
             }
             else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
             {
                 // ValueTask<T>
                 ctx.Writer.AppendLineWithFormat($"""
-                                => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                                => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
             """);
             }
             else
             {
                 // Task, Task<T>
                 ctx.Writer.AppendLineWithFormat($"""
-                                => {(isFireAndForget ? "parent.WriteMessageFireAndForgetAsync" : "base.WriteMessageWithResponseAsync")}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+                                => {writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
         }
@@ -210,7 +268,21 @@ public class StaticStreamingHubClientGenerator
                 _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
             };
 
-            ctx.Writer.AppendLineWithFormat($$"""
+            if (ctx.EnableStreamingHubDiagnosticHandler)
+            {
+                ctx.Writer.AppendLineWithFormat($$"""
+                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                                        {
+                                            var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+                                            diagnosticHandler?.OnBroadcastEvent(this, "{{method.MethodName}}", value);
+                                            receiver.{{method.MethodName}}({{methodArgs}});
+                                        }
+                                        break;
+            """);
+            }
+            else
+            {
+                ctx.Writer.AppendLineWithFormat($$"""
                                     case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                         {
                                             var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
@@ -218,6 +290,7 @@ public class StaticStreamingHubClientGenerator
                                         }
                                         break;
             """);
+            }
         }
         ctx.Writer.AppendLine("""
                                 }

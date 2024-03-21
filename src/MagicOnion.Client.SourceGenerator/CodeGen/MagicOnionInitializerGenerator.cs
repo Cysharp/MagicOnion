@@ -59,6 +59,17 @@ internal class MagicOnionInitializerGenerator
                     internal static void Register() => TryRegisterProviderFactory();
             """);
         }
+
+        if (generationContext.Options.EnableStreamingHubDiagnosticHandler)
+        {
+            writer.AppendLineWithFormat($$"""
+                    /// <summary>
+                    /// Gets or sets a diagnostic handler for the StreamingHub.
+                    /// </summary>
+                    public static global::MagicOnion.Client.IStreamingHubDiagnosticHandler StreamingHubDiagnosticHandler { get; set; }
+            """);
+        }
+
         writer.AppendLineWithFormat($$"""
 
                     /// <summary>
@@ -126,12 +137,24 @@ internal class MagicOnionInitializerGenerator
             """);
         foreach (var hubInfo in serviceCollection.Hubs)
         {
-            writer.AppendLineWithFormat($$"""
+            if (generationContext.Options.EnableStreamingHubDiagnosticHandler)
+            {
+                writer.AppendLineWithFormat($$"""
+                                if (typeof(TStreamingHub) == typeof({{hubInfo.ServiceType.FullName}}) && typeof(TReceiver) == typeof({{hubInfo.Receiver.ReceiverType.FullName}}))
+                                {
+                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, d, e, StreamingHubDiagnosticHandler)));
+                                }
+            """);
+            }
+            else
+            {
+                writer.AppendLineWithFormat($$"""
                                 if (typeof(TStreamingHub) == typeof({{hubInfo.ServiceType.FullName}}) && typeof(TReceiver) == typeof({{hubInfo.Receiver.ReceiverType.FullName}}))
                                 {
                                     factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, d, e)));
                                 }
             """);
+            }
         }
 
         writer.AppendLineWithFormat($$$"""
