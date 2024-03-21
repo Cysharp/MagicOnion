@@ -843,15 +843,15 @@ references:
   isSpec: "True"
   fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd
   nameWithType: IStreamingHubDiagnosticHandler.OnRequestEnd
-- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1)
-  name: OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse)
-  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_
-  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1)
-  name.vb: OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse)
-  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, System.String, TResponse)
-  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, System.String, TResponse)
-  nameWithType: IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse)
-  nameWithType.vb: IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse)
+- uid: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})
+  name: OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse, Nullable<Exception>)
+  href: api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__
+  commentId: M:MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})
+  name.vb: OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse, Nullable(Of Exception))
+  fullName: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, System.String, TResponse, System.Nullable<Exception>)
+  fullName.vb: MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, System.String, TResponse, System.Nullable(Of Exception))
+  nameWithType: IStreamingHubDiagnosticHandler.OnRequestEnd<THub, TResponse>(THub, Guid, String, TResponse, Nullable<Exception>)
+  nameWithType.vb: IStreamingHubDiagnosticHandler.OnRequestEnd(Of THub, TResponse)(THub, Guid, String, TResponse, Nullable(Of Exception))
 - uid: MagicOnion.Client.MagicOnionClient
   name: MagicOnionClient
   href: api/MagicOnion.Client.MagicOnionClient.html

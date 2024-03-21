@@ -120,7 +120,7 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse)</a>
+          <a class="xref" href="MagicOnion.Client.IStreamingHubDiagnosticHandler.html#MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse, Nullable&lt;Exception&gt;)</a>
         </td>
         <td class="markdown level1 summary"><p>[Preview] The callback method at the end of a Hub method request. This API may change in the future.</p>
 </td>
@@ -224,13 +224,13 @@
   </section>
   <section>
   <a id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd*"></a>
-  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1)">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse)</h4>
+  <h4 id="MagicOnion_Client_IStreamingHubDiagnosticHandler_OnRequestEnd__2___0_Guid_System_String___1_System_Nullable_Exception__" data-uid="MagicOnion.Client.IStreamingHubDiagnosticHandler.OnRequestEnd``2(``0,Guid,System.String,``1,System.Nullable{Exception})">OnRequestEnd&lt;THub, TResponse&gt;(THub, Guid, String, TResponse, Nullable&lt;Exception&gt;)</h4>
   <div class="markdown level1 summary"><p>[Preview] The callback method at the end of a Hub method request. This API may change in the future.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void OnRequestEnd&lt;THub, TResponse&gt;(THub hubInstance, Guid requestId, string methodName, TResponse response)</code></pre>
+    <pre><code class="lang-csharp hljs">void OnRequestEnd&lt;THub, TResponse&gt;(THub hubInstance, Guid requestId, string methodName, TResponse response, Exception? exception)</code></pre>
   </div>
 
   <section>
@@ -243,6 +243,8 @@
     <dt><span class="parametername"><code>methodName</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>response</code></span> <span class="xref">TResponse</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>exception</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">Exception</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
