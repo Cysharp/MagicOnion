@@ -25,7 +25,11 @@ namespace MagicOnion
     
     [MessagePackObject]
     [StructLayout(LayoutKind.Auto)]
+#if MAGICONION_USE_REFTYPE_DYNAMICARGUMENTTUPLE
+    public sealed class DynamicArgumentTuple<<#= typeArgs #>>
+#else
     public struct DynamicArgumentTuple<<#= typeArgs #>>
+#endif
     {
 <# for(var j = 1; j <= i; j++) { #>
         [Key(<#= j - 1  #>)]
