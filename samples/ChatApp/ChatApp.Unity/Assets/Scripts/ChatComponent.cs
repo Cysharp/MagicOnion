@@ -54,7 +54,7 @@ namespace Assets.Scripts
         {
             // Clean up Hub and channel
             shutdownCancellation.Cancel();
-            
+
             if (this.streamingClient != null) await this.streamingClient.DisposeAsync();
             if (this.channel != null) await this.channel.ShutdownAsync();
         }
@@ -64,7 +64,7 @@ namespace Assets.Scripts
         {
             // Initialize the Hub
             // NOTE: If you want to use SSL/TLS connection, see InitialSettings.OnRuntimeInitialize method.
-            this.channel = GrpcChannelx.ForAddress("http://localhost:5000");
+            this.channel = GrpcChannelx.ForAddress(SystemConstants.ServerUrl);
 
             while (!shutdownCancellation.IsCancellationRequested)
             {
