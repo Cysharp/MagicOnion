@@ -122,6 +122,7 @@ public static class MethodCollector
         {
             case "global::System.Threading.Tasks.Task":
             case "global::System.Threading.Tasks.ValueTask":
+            case "global::System.Void":
                 //responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
                 break;
             case "global::System.Threading.Tasks.Task<>":

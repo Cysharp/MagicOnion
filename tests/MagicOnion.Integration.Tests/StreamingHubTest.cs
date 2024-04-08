@@ -503,6 +503,63 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         ex.Message.Should().Contain("Something went wrong.");
         ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_Zero();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_Zero();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_One(12345);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_One(12345);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_Many(12345, "Hello✨", true);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_Many(12345, "Hello✨", true);
+    }
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
@@ -628,6 +685,25 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
     }
 
+    public void Void_Parameter_Zero()
+    {
+        Broadcast(group).Receiver_Test_Void_Parameter_Zero();
+    }
+
+    public void Void_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        Broadcast(group).Receiver_Test_Void_Parameter_One(arg0);
+    }
+
+    public void Void_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        Broadcast(group).Receiver_Test_Void_Parameter_Many(arg0, arg1, arg2);
+    }
+
     public Task<MyStreamingResponse> RefType(MyStreamingRequest request)
     {
         return Task.FromResult(new MyStreamingResponse(request.Argument0 + request.Argument1));
@@ -681,6 +757,10 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_RefType(MyStreamingResponse request);
     void Receiver_RefType_Null(MyStreamingResponse? request);
     void Receiver_Delay();
+
+    void Receiver_Test_Void_Parameter_Zero();
+    void Receiver_Test_Void_Parameter_One(int arg0);
+    void Receiver_Test_Void_Parameter_Many(int arg0, string arg1, bool arg2);
 }
 
 public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
@@ -710,6 +790,10 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     ValueTask ValueTask_Never();
     ValueTask<int> ValueTask_Never_With_Return();
+
+    void Void_Parameter_Zero();
+    void Void_Parameter_One(int arg0);
+    void Void_Parameter_Many(int arg0, string arg1, bool arg2);
 
     Task<MyStreamingResponse> RefType(MyStreamingRequest request);
     Task<MyStreamingResponse?> RefType_Null(MyStreamingRequest? request);

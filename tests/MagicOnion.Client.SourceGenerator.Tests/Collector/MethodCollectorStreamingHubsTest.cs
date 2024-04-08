@@ -547,6 +547,41 @@ public interface IMyHubReceiver
     }
 
     [Fact]
+    public void ReturnType_Void()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    void MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
+    }
+
+    [Fact]
     public void Receiver()
     {
         // Arrange

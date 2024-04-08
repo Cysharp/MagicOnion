@@ -41,7 +41,7 @@ public class StreamingHubContext
     // helper for reflection
     internal async ValueTask WriteResponseMessageNil(ValueTask value)
     {
-        if (MessageId == -1) // don't write.
+        if (MessageId == -1) // No need to write a response. We do not write response.
         {
             return;
         }
@@ -72,7 +72,7 @@ public class StreamingHubContext
 
     internal async ValueTask WriteResponseMessage<T>(ValueTask<T> value)
     {
-        if (MessageId == -1) // don't write.
+        if (MessageId == -1) // No need to write a response. We do not write response.
         {
             return;
         }

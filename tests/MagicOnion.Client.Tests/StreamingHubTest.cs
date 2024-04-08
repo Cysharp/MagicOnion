@@ -303,7 +303,7 @@ public class StreamingHubTest
         Assert.Equal('X', requestBody.Item7);
         Assert.Equal(456, result);
     }
-    
+
     [Fact]
     public async Task ValueTask_Forget_NoReturnValue_Parameter_Zero()
     {
@@ -371,6 +371,68 @@ public class StreamingHubTest
         Assert.Equal(123, requestBody);
         Assert.Equal(default, result);
     }
+
+    [Fact]
+    public async Task Void_Parameter_Zero()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        client.Void_Parameter_Zero();
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<Nil>();
+
+        Assert.Equal(Nil.Default, requestBody);
+    }
+
+    [Fact]
+    public async Task Void_Parameter_One()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Use Fire-and-forget client
+        client = client.FireAndForget();
+
+        // Invoke Hub Method
+        client.Void_Parameter_One(123);
+
+        // Read a hub method request payload
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<int>();
+
+        Assert.Equal(123, requestBody);
+    }
+
+    [Fact]
+    public async Task Void_Parameter_Many()
+    {
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var client = await helper.ConnectAsync(timeout.Token);
+
+        // Invoke Hub Method
+        client.Void_Parameter_Many(12345, "Hello", 0xfffffff1L, true, 128, 12.345, 'X');
+
+        // Read a hub method request payload
+        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<DynamicArgumentTuple<int, string, long, bool, byte, double, char>>();
+        // Write a response to the stream
+        helper.WriteResponse(messageId, methodId, 456);
+
+        Assert.Equal(12345, requestBody.Item1);
+        Assert.Equal("Hello", requestBody.Item2);
+        Assert.Equal(0xfffffff1L, requestBody.Item3);
+        Assert.True(requestBody.Item4);
+        Assert.Equal(128, requestBody.Item5);
+        Assert.Equal(12.345, requestBody.Item6);
+        Assert.Equal('X', requestBody.Item7);
+    }
 }
 
 public interface IGreeterHubReceiver
@@ -387,4 +449,7 @@ public interface IGreeterHub : IStreamingHub<IGreeterHub, IGreeterHubReceiver>
     ValueTask<int> ValueTask_Parameter_One(int arg0);
     ValueTask<int> ValueTask_Parameter_Two(int arg0, string arg1);
     ValueTask<int> ValueTask_Parameter_Many(int arg0, string arg1, long arg2, bool arg3, byte arg4, double arg5, char arg6);
+    void Void_Parameter_Zero();
+    void Void_Parameter_One(int arg0);
+    void Void_Parameter_Many(int arg0, string arg1, long arg2, bool arg3, byte arg4, double arg5, char arg6);
 }
