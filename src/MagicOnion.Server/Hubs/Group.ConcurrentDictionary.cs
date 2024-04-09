@@ -3,6 +3,7 @@ using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using MagicOnion.Internal;
 using Microsoft.Extensions.Logging;
 using MagicOnion.Internal.Buffers;
 
@@ -71,7 +72,7 @@ public class ConcurrentDictionaryGroup : IGroup
     readonly IMagicOnionSerializer messageSerializer;
     readonly ILogger logger;
 
-    ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>> members;
+    ConcurrentDictionary<Guid, IServiceContextWithResponseStream<StreamingHubPayload>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
@@ -82,7 +83,7 @@ public class ConcurrentDictionaryGroup : IGroup
         this.parent = parent;
         this.messageSerializer = messageSerializer;
         this.logger = logger;
-        this.members = new ConcurrentDictionary<Guid, IServiceContextWithResponseStream<byte[]>>();
+        this.members = new ConcurrentDictionary<Guid, IServiceContextWithResponseStream<StreamingHubPayload>>();
     }
 
     public ValueTask<int> GetMemberCountAsync()
@@ -110,7 +111,7 @@ public class ConcurrentDictionaryGroup : IGroup
 
     public ValueTask AddAsync(ServiceContext context)
     {
-        if (members.TryAdd(context.ContextId, (IServiceContextWithResponseStream<byte[]>)context))
+        if (members.TryAdd(context.ContextId, (IServiceContextWithResponseStream<StreamingHubPayload>)context))
         {
             Interlocked.Increment(ref approximatelyLength);
         }
@@ -149,7 +150,8 @@ public class ConcurrentDictionaryGroup : IGroup
             var writeCount = 0;
             foreach (var item in members)
             {
-                item.Value.QueueResponseStreamWrite(message);
+                var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                item.Value.QueueResponseStreamWrite(payload);
                 writeCount++;
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
@@ -171,7 +173,8 @@ public class ConcurrentDictionaryGroup : IGroup
             {
                 if (item.Value.ContextId != connectionId)
                 {
-                    item.Value.QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                    item.Value.QueueResponseStreamWrite(payload);
                     writeCount++;
                 }
             }
@@ -199,7 +202,8 @@ public class ConcurrentDictionaryGroup : IGroup
                         goto NEXT;
                     }
                 }
-                item.Value.QueueResponseStreamWrite(message);
+                var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                item.Value.QueueResponseStreamWrite(payload);
                 writeCount++;
                 NEXT:
                 continue;
@@ -220,7 +224,8 @@ public class ConcurrentDictionaryGroup : IGroup
         {
             if (members.TryGetValue(connectionId, out var context))
             {
-                context.QueueResponseStreamWrite(message);
+                var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                context.QueueResponseStreamWrite(payload);
                 MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, 1);
             }
             return Task.CompletedTask;
@@ -241,7 +246,8 @@ public class ConcurrentDictionaryGroup : IGroup
             {
                 if (members.TryGetValue(item, out var context))
                 {
-                    context.QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                    context.QueueResponseStreamWrite(payload);
                     writeCount++;
                 }
             }
@@ -256,9 +262,6 @@ public class ConcurrentDictionaryGroup : IGroup
 
     public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
     {
-        // oh, copy is bad but current gRPC interface only accepts byte[]...
-        var message = new byte[msg.Count];
-        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
         if (fireAndForget)
         {
             if (exceptConnectionIds == null)
@@ -266,10 +269,11 @@ public class ConcurrentDictionaryGroup : IGroup
                 var writeCount = 0;
                 foreach (var item in members)
                 {
-                    item.Value.QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
+                    item.Value.QueueResponseStreamWrite(payload);
                     writeCount++;
                 }
-                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, msg.Count, writeCount);
                 return Task.CompletedTask;
             }
             else
@@ -284,12 +288,13 @@ public class ConcurrentDictionaryGroup : IGroup
                             goto NEXT;
                         }
                     }
-                    item.Value.QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
+                    item.Value.QueueResponseStreamWrite(payload);
                     writeCount++;
                     NEXT:
                     continue;
                 }
-                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, msg.Count, writeCount);
                 return Task.CompletedTask;
             }
         }
@@ -301,9 +306,6 @@ public class ConcurrentDictionaryGroup : IGroup
 
     public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
     {
-        // oh, copy is bad but current gRPC interface only accepts byte[]...
-        var message = new byte[msg.Count];
-        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
         if (fireAndForget)
         {
             if (connectionIds != null)
@@ -313,12 +315,13 @@ public class ConcurrentDictionaryGroup : IGroup
                 {
                     if (members.TryGetValue(item, out var context))
                     {
-                        context.QueueResponseStreamWrite(message);
+                        var payload = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
+                        context.QueueResponseStreamWrite(payload);
                         writeCount++;
                     }
                 }
 
-                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, msg.Count, writeCount);
             }
 
             return Task.CompletedTask;
@@ -329,7 +332,7 @@ public class ConcurrentDictionaryGroup : IGroup
         }
     }
 
-    byte[] BuildMessage<T>(int methodId, T value)
+    ReadOnlyMemory<byte> BuildMessage<T>(int methodId, T value)
     {
         using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
         {

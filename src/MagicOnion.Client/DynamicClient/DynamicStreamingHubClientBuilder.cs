@@ -241,10 +241,10 @@ namespace MagicOnion.Client.DynamicClient
 
             // receiver types borrow from DynamicBroadcastBuilder
             {
-                // protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
+                // protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
                 {
                     var method = typeBuilder.DefineMethod("OnResponseEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                        null, new[] { typeof(int), typeof(object), typeof(ArraySegment<byte>) });
+                        null, new[] { typeof(int), typeof(object), typeof(ReadOnlyMemory<byte>) });
                     var il = method.GetILGenerator();
 
                     var labels = definitions
@@ -288,13 +288,13 @@ namespace MagicOnion.Client.DynamicClient
                         il.Emit(OpCodes.Ret);
                     }
                 }
-                // protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+                // protected abstract void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data);
                 {
                     var methodDefinitions = BroadcasterHelper.SearchDefinitions(receiverType);
                     BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
 
                     var method = typeBuilder.DefineMethod("OnBroadcastEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                        typeof(void), new[] { typeof(int), typeof(ArraySegment<byte>) });
+                        typeof(void), new[] { typeof(int), typeof(ReadOnlyMemory<byte>) });
                     var il = method.GetILGenerator();
 
                     var labels = methodDefinitions

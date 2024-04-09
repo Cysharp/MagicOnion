@@ -5,6 +5,7 @@ using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -485,23 +486,63 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
     }
 
-    [Fact]
-    public async Task Throw_WithServerStackTrace()
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Concurrency(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
-        var factory = this.factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.Configure<MagicOnionOptions>(options => options.IsReturnExceptionStackTraceInErrorDetail = true)));
-        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
-        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var cts = new CancellationTokenSource();
+        var tasks = Enumerable.Range(0, 10).Select(async x =>
+        {
+            var httpClient = factory.CreateDefaultClient();
+            var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+            var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+            var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+            await tcs.Task;
+
+            var semaphore = new SemaphoreSlim(0);
+            var results = new List<(int Index, (int Arg0, string Arg1, bool Arg2) Request, (int Arg0, string Arg1, bool Arg2) Response)>();
+            var receiverResults = new List<(int Arg0, string Arg1, bool Arg2)>();
+            receiver.When(x => x.Receiver_Concurrent(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<bool>()))
+                .Do(x =>
+                {
+                    receiverResults.Add((x.ArgAt<int>(0), x.ArgAt<string>(1), x.ArgAt<bool>(2)));
+                    semaphore.Release();
+                });
+
+            var count = 0;
+            while (!cts.IsCancellationRequested)
+            {
+                var response = await client.Concurrent((x * 100) + count, $"Task{x}-{count}", x % 2 == 0);
+                results.Add((Index: count, Request: ((x * 100) + count, $"Task{x}-{count}", x % 2 == 0), Response: response));
+                await semaphore.WaitAsync();
+
+                count++;
+            }
+
+            await Task.Delay(1000);
+
+            return (Sequence: x, Results: results, ReceiverResults: receiverResults);
+        });
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+        tcs.TrySetResult();
+        cts.CancelAfter(TimeSpan.FromSeconds(5));
+        var allResults = await Task.WhenAll(tasks);
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Internal);
-        ex.Message.Should().Contain("Something went wrong.");
-        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+        Assert.All(allResults, x =>
+        {
+            Assert.Equal(x.Results.Count, x.ReceiverResults.Count);
+            Assert.All(x.Results, y => Assert.Equal((y.Request.Arg0 * 100, y.Request.Arg1 + "-Result", !y.Request.Arg2), y.Response));
+            for (var i = 0; i < x.ReceiverResults.Count; i++)
+            {
+                var request = x.Results[i];
+                Assert.Equal((request.Request.Arg0 * 10, request.Request.Arg1 + "-Receiver", !request.Request.Arg2), x.ReceiverResults[i]);
+            }
+        });
     }
 
     [Theory]
@@ -561,7 +602,6 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         receiver.Received().Receiver_Test_Void_Parameter_Many(12345, "Hello✨", true);
     }
 }
-
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
 {
     IGroup group = default!;
@@ -747,6 +787,13 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         throw new InvalidOperationException("Something went wrong.");
     }
+
+    public async Task<(int, string, bool)> Concurrent(int arg0, string arg1, bool arg2)
+    {
+        Broadcast(group).Receiver_Concurrent(arg0 * 10, arg1 + "-Receiver", !arg2);
+        await Task.Yield();
+        return (arg0 * 100, arg1 + "-Result", !arg2);
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -757,6 +804,7 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_RefType(MyStreamingResponse request);
     void Receiver_RefType_Null(MyStreamingResponse? request);
     void Receiver_Delay();
+    void Receiver_Concurrent(int arg0, string arg1, bool arg2);
 
     void Receiver_Test_Void_Parameter_Zero();
     void Receiver_Test_Void_Parameter_One(int arg0);
@@ -804,4 +852,6 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     Task ThrowReturnStatusException();
     Task Throw();
+
+    Task<(int Arg0, string Arg1, bool Arg2)> Concurrent(int arg0, string arg1, bool arg2);
 }

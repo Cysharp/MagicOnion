@@ -1,9 +1,11 @@
+using System.Buffers;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
 using MessagePack;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using MagicOnion.Internal;
 using Microsoft.Extensions.Logging;
 using MagicOnion.Internal.Buffers;
 
@@ -67,7 +69,7 @@ public class ImmutableArrayGroup : IGroup
     readonly IMagicOnionSerializer messageSerializer;
     readonly ILogger logger;
 
-    ImmutableArray<IServiceContextWithResponseStream<byte[]>> members;
+    ImmutableArray<IServiceContextWithResponseStream<StreamingHubPayload>> members;
     IInMemoryStorage? inmemoryStorage;
 
     public string GroupName { get; }
@@ -78,7 +80,7 @@ public class ImmutableArrayGroup : IGroup
         this.parent = parent;
         this.messageSerializer = messageSerializer;
         this.logger = logger;
-        this.members = ImmutableArray<IServiceContextWithResponseStream<byte[]>>.Empty;
+        this.members = ImmutableArray<IServiceContextWithResponseStream<StreamingHubPayload>>.Empty;
     }
 
     public ValueTask<int> GetMemberCountAsync()
@@ -108,7 +110,7 @@ public class ImmutableArrayGroup : IGroup
     {
         lock (gate)
         {
-            members = members.Add((IServiceContextWithResponseStream<byte[]>)context);
+            members = members.Add((IServiceContextWithResponseStream<StreamingHubPayload>)context);
         }
         return default(ValueTask);
     }
@@ -119,7 +121,7 @@ public class ImmutableArrayGroup : IGroup
         {
             if (!members.IsEmpty)
             {
-                members = members.Remove((IServiceContextWithResponseStream<byte[]>)context);
+                members = members.Remove((IServiceContextWithResponseStream<StreamingHubPayload>)context);
                 if (inmemoryStorage != null)
                 {
                     inmemoryStorage.Remove(context.ContextId);
@@ -150,7 +152,8 @@ public class ImmutableArrayGroup : IGroup
         {
             for (int i = 0; i < source.Length; i++)
             {
-                source[i].QueueResponseStreamWrite(message);
+                var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                source[i].QueueResponseStreamWrite(payload);
             }
             MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, source.Length);
             return Task.CompletedTask;
@@ -173,7 +176,8 @@ public class ImmutableArrayGroup : IGroup
             {
                 if (source[i].ContextId != connectionId)
                 {
-                    source[i].QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                    source[i].QueueResponseStreamWrite(payload);
                     writeCount++;
                 }
             }
@@ -204,7 +208,8 @@ public class ImmutableArrayGroup : IGroup
                     }
                 }
 
-                source[i].QueueResponseStreamWrite(message);
+                var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                source[i].QueueResponseStreamWrite(payload);
                 writeCount++;
                 NEXT:
                 continue;
@@ -231,7 +236,8 @@ public class ImmutableArrayGroup : IGroup
             {
                 if (source[i].ContextId == connectionId)
                 {
-                    source[i].QueueResponseStreamWrite(message);
+                    var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                    source[i].QueueResponseStreamWrite(payload);
                     writeCount++;
                     break;
                 }
@@ -259,7 +265,8 @@ public class ImmutableArrayGroup : IGroup
                 {
                     if (source[i].ContextId == item)
                     {
-                        source[i].QueueResponseStreamWrite(message);
+                        var payload = StreamingHubPayloadPool.Shared.RentOrCreate(message);
+                        source[i].QueueResponseStreamWrite(payload);
                         writeCount++;
                         goto NEXT;
                     }
@@ -279,10 +286,6 @@ public class ImmutableArrayGroup : IGroup
 
     public Task WriteExceptRawAsync(ArraySegment<byte> msg, Guid[] exceptConnectionIds, bool fireAndForget)
     {
-        // oh, copy is bad but current gRPC interface only accepts byte[]...
-        var message = new byte[msg.Count];
-        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
-
         var source = members;
         if (fireAndForget)
         {
@@ -291,7 +294,8 @@ public class ImmutableArrayGroup : IGroup
             {
                 for (int i = 0; i < source.Length; i++)
                 {
-                    source[i].QueueResponseStreamWrite(message);
+                    var messagePayload = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
+                    source[i].QueueResponseStreamWrite(messagePayload);
                     writeCount++;
                 }
             }
@@ -306,13 +310,14 @@ public class ImmutableArrayGroup : IGroup
                             goto NEXT;
                         }
                     }
-                    source[i].QueueResponseStreamWrite(message);
+                    var messagePayload = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
+                    source[i].QueueResponseStreamWrite(messagePayload);
                     writeCount++;
                     NEXT:
                     continue;
                 }
             }
-            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
+            MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, msg.Count, writeCount);
             return Task.CompletedTask;
         }
         else
@@ -323,10 +328,6 @@ public class ImmutableArrayGroup : IGroup
 
     public Task WriteToRawAsync(ArraySegment<byte> msg, Guid[] connectionIds, bool fireAndForget)
     {
-        // oh, copy is bad but current gRPC interface only accepts byte[]...
-        var message = new byte[msg.Count];
-        Array.Copy(msg.Array!, msg.Offset, message, 0, message.Length);
-
         var source = members;
         if (fireAndForget)
         {
@@ -342,13 +343,15 @@ public class ImmutableArrayGroup : IGroup
                             goto NEXT;
                         }
                     }
+
+                    var message = StreamingHubPayloadPool.Shared.RentOrCreate(msg.AsMemory());
                     source[i].QueueResponseStreamWrite(message);
                     writeCount++;
                     NEXT:
                     continue;
                 }
 
-                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, message.Length, writeCount);
+                MagicOnionServerLog.InvokeHubBroadcast(logger, GroupName, msg.Count, writeCount);
             }
             return Task.CompletedTask;
         }
@@ -358,7 +361,7 @@ public class ImmutableArrayGroup : IGroup
         }
     }
 
-    byte[] BuildMessage<T>(int methodId, T value)
+    ReadOnlyMemory<byte> BuildMessage<T>(int methodId, T value)
     {
         using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
         {
@@ -367,7 +370,11 @@ public class ImmutableArrayGroup : IGroup
             writer.WriteInt32(methodId);
             writer.Flush();
             messageSerializer.Serialize(buffer, value);
-            return buffer.WrittenSpan.ToArray();
+
+            var rentBuffer = ArrayPool<byte>.Shared.Rent(buffer.WrittenCount);
+            buffer.WrittenSpan.CopyTo(rentBuffer);
+
+            return buffer.WrittenSpan.ToArray().AsMemory();
         }
     }
 }

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
-    <DefineConstants>$(DefineConstants);NON_UNITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NON_UNITY;USE_OBJECTPOOL_STREAMINGHUBPAYLOADPOOL</DefineConstants>
 
     <!-- NuGet -->
     <PackageId>MagicOnion.Server</PackageId>
