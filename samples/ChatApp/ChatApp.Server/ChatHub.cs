@@ -28,15 +28,20 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 
     public async Task LeaveAsync()
     {
-        await this.room.RemoveAsync(this.Context);
-
-        this.Broadcast(this.room).OnLeave(this.myName);
+        if (this.room is not null)
+        {
+            await this.room.RemoveAsync(this.Context);
+            this.Broadcast(this.room).OnLeave(this.myName);
+        }
     }
 
     public async Task SendMessageAsync(string message)
     {
-        var response = new MessageResponse { UserName = this.myName, Message = message };
-        this.Broadcast(this.room).OnSendMessage(response);
+        if (this.room is not null)
+        {
+            var response = new MessageResponse { UserName = this.myName, Message = message };
+            this.Broadcast(this.room).OnSendMessage(response);
+        }
 
         await Task.CompletedTask;
     }
