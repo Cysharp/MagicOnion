@@ -30,7 +30,7 @@ jobs:
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
       # pack
       - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: nuget
           path: ./publish/
