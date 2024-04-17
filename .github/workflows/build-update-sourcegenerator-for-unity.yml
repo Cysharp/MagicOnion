@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - name: Publish MagicOnion.Client.SourceGenerator.Unity
         run: dotnet publish -c ${{ env.BUILD_CONFIG }} ./src/MagicOnion.Client.SourceGenerator.Unity -o ./src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion/MagicOnion.Client/MagicOnion.Client.SourceGenerator.Unity
