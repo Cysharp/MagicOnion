@@ -1,6 +1,0 @@
-version: 1
-
-update_configs:
-  - package_manager: "dotnet:nuget"
-    directory: "/"
-    update_schedule: "live"
