@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -10,6 +11,7 @@ using MessagePack.Formatters;
 using MessagePack.Internal;
 using MessagePack.Resolvers;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1403 // File may only contain a single namespace
 #pragma warning disable SA1509 // Opening braces should not be preceded by blank line
 
@@ -26,19 +28,19 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
                 // Reduce IL2CPP code generate size(don't write long code in <T>)
-                Formatter = (IMessagePackFormatter<T>)BuiltinResolverGetFormatterHelper.GetFormatter(typeof(T));
+                Formatter = (IMessagePackFormatter<T>?)BuiltinResolverGetFormatterHelper.GetFormatter(typeof(T));
             }
         }
     }
@@ -63,9 +65,13 @@ namespace MessagePack.Internal
             { typeof(byte), ByteFormatter.Instance },
             { typeof(sbyte), SByteFormatter.Instance },
             { typeof(DateTime), DateTimeFormatter.Instance },
+#if NET6_0_OR_GREATER
+            { typeof(DateOnly), DateOnlyFormatter.Instance },
+            { typeof(TimeOnly), TimeOnlyFormatter.Instance },
+#endif
             { typeof(char), CharFormatter.Instance },
 
-            // Nulllable Primitive
+            // Nullable Primitive
             { typeof(Int16?), NullableInt16Formatter.Instance },
             { typeof(Int32?), NullableInt32Formatter.Instance },
             { typeof(Int64?), NullableInt64Formatter.Instance },
@@ -94,6 +100,7 @@ namespace MessagePack.Internal
             { typeof(Version), VersionFormatter.Instance },
             { typeof(StringBuilder), StringBuilderFormatter.Instance },
             { typeof(BitArray), BitArrayFormatter.Instance },
+            { typeof(Type), TypeFormatter<Type>.Instance },
 
             // special primitive
             { typeof(byte[]), ByteArrayFormatter.Instance },
@@ -102,7 +109,7 @@ namespace MessagePack.Internal
             { typeof(Nil), NilFormatter.Instance },
             { typeof(Nil?), NullableNilFormatter.Instance },
 
-            // otpmitized primitive array formatter
+            // optimized primitive array formatter
             { typeof(Int16[]), Int16ArrayFormatter.Instance },
             { typeof(Int32[]), Int32ArrayFormatter.Instance },
             { typeof(Int64[]), Int64ArrayFormatter.Instance },
@@ -136,6 +143,12 @@ namespace MessagePack.Internal
             { typeof(object[]), new ArrayFormatter<object>() },
             { typeof(List<object>), new ListFormatter<object>() },
 
+            { typeof(Memory<byte>), ByteMemoryFormatter.Instance },
+            { typeof(Memory<byte>?), new StaticNullableFormatter<Memory<byte>>(ByteMemoryFormatter.Instance) },
+            { typeof(ReadOnlyMemory<byte>), ByteReadOnlyMemoryFormatter.Instance },
+            { typeof(ReadOnlyMemory<byte>?), new StaticNullableFormatter<ReadOnlyMemory<byte>>(ByteReadOnlyMemoryFormatter.Instance) },
+            { typeof(ReadOnlySequence<byte>), ByteReadOnlySequenceFormatter.Instance },
+            { typeof(ReadOnlySequence<byte>?), new StaticNullableFormatter<ReadOnlySequence<byte>>(ByteReadOnlySequenceFormatter.Instance) },
             { typeof(ArraySegment<byte>), ByteArraySegmentFormatter.Instance },
             { typeof(ArraySegment<byte>?), new StaticNullableFormatter<ArraySegment<byte>>(ByteArraySegmentFormatter.Instance) },
 
@@ -143,14 +156,22 @@ namespace MessagePack.Internal
             { typeof(System.Numerics.BigInteger?), new StaticNullableFormatter<System.Numerics.BigInteger>(BigIntegerFormatter.Instance) },
             { typeof(System.Numerics.Complex), ComplexFormatter.Instance },
             { typeof(System.Numerics.Complex?), new StaticNullableFormatter<System.Numerics.Complex>(ComplexFormatter.Instance) },
+
+#if NET5_0_OR_GREATER
+            { typeof(System.Half), HalfFormatter.Instance },
+#endif
         };
 
-        internal static object GetFormatter(Type t)
+        internal static object? GetFormatter(Type t)
         {
-            object formatter;
-            if (FormatterMap.TryGetValue(t, out formatter))
+            if (FormatterMap.TryGetValue(t, out object? formatter))
             {
                 return formatter;
+            }
+
+            if (typeof(Type).IsAssignableFrom(t))
+            {
+                return typeof(TypeFormatter<>).MakeGenericType(t).GetField(nameof(TypeFormatter<Type>.Instance))!.GetValue(null);
             }
 
             return null;

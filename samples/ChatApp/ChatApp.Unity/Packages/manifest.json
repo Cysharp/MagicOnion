@@ -2,7 +2,8 @@
   "dependencies": {
     "com.cysharp.magiconion": "file:../../../../src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion",
     "com.cysharp.magiconion.samples.chatapp.shared.unity": "file:../../ChatApp.Shared",
-    "com.cysharp.yetanotherhttphandler": "https://github.com/Cysharp/YetAnotherHttpHandler.git?path=src/YetAnotherHttpHandler#v0.1.0",
+    "com.cysharp.yetanotherhttphandler": "https://github.com/Cysharp/YetAnotherHttpHandler.git?path=src/YetAnotherHttpHandler#1.2.0",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "3.7.5",

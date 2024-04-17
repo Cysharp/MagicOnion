@@ -21,7 +21,7 @@ namespace MessagePack
     {
         private readonly Stream stream;
         private readonly bool leaveOpen;
-        private SequencePool.Rental sequenceRental = SequencePool.Shared.Rent();
+        private SequencePool.Rental sequenceRental;
         private SequencePosition? endOfLastMessage;
 
         /// <summary>
@@ -39,9 +39,26 @@ namespace MessagePack
         /// <param name="stream">The stream to read from.</param>
         /// <param name="leaveOpen">If true, leaves the stream open after this <see cref="MessagePackStreamReader"/> is disposed; otherwise, false.</param>
         public MessagePackStreamReader(Stream stream, bool leaveOpen)
+            : this(stream, leaveOpen, SequencePool.Shared)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessagePackStreamReader"/> class.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <param name="leaveOpen">If true, leaves the stream open after this <see cref="MessagePackStreamReader"/> is disposed; otherwise, false.</param>
+        /// <param name="sequencePool">The pool to rent a <see cref="Sequence{T}"/> object from.</param>
+        public MessagePackStreamReader(Stream stream, bool leaveOpen, SequencePool sequencePool)
+        {
+            if (sequencePool == null)
+            {
+                throw new ArgumentNullException(nameof(sequencePool));
+            }
+
             this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
             this.leaveOpen = leaveOpen;
+            this.sequenceRental = sequencePool.Rent();
         }
 
         /// <summary>
@@ -59,12 +76,12 @@ namespace MessagePack
         /// </summary>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>
-        /// A task whose result is the next whole data structure from the stream, or <c>null</c> if the stream ends.
+        /// A task whose result is the next whole data structure from the stream, or <see langword="null"/> if the stream ends.
         /// The returned sequence is valid until this <see cref="MessagePackStreamReader"/> is disposed or
         /// until this method is called again, whichever comes first.
         /// </returns>
         /// <remarks>
-        /// When <c>null</c> is the result of the returned task,
+        /// When <see langword="null"/> is the result of the returned task,
         /// any extra bytes read (between the last complete message and the end of the stream) will be available via the <see cref="RemainingBytes"/> property.
         /// </remarks>
         public async ValueTask<ReadOnlySequence<byte>?> ReadAsync(CancellationToken cancellationToken)
@@ -107,13 +124,26 @@ namespace MessagePack
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (!this.leaveOpen)
-            {
-                this.stream.Dispose();
-            }
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            this.sequenceRental.Dispose();
-            this.sequenceRental = default;
+        /// <summary>
+        /// Disposes of managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> if this instance is being disposed; <see langword="false"/> if it is being finalized.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!this.leaveOpen)
+                {
+                    this.stream.Dispose();
+                }
+
+                this.sequenceRental.Dispose();
+                this.sequenceRental = default;
+            }
         }
 
         /// <summary>
@@ -133,7 +163,7 @@ namespace MessagePack
         /// Read more data from the stream into the <see cref="ReadData"/> buffer.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns><c>true</c> if more data was read; <c>false</c> if the end of the stream had already been reached.</returns>
+        /// <returns><see langword="true"/> if more data was read; <see langword="false"/> if the end of the stream had already been reached.</returns>
         private async Task<bool> TryReadMoreDataAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -155,7 +185,7 @@ namespace MessagePack
         /// Checks whether the content in <see cref="ReadData"/> include a complete messagepack structure.
         /// </summary>
         /// <param name="completeMessage">Receives the sequence of the first complete data structure found, if any.</param>
-        /// <returns><c>true</c> if a complete data structure was found; <c>false</c> otherwise.</returns>
+        /// <returns><see langword="true"/> if a complete data structure was found; <see langword="false"/> otherwise.</returns>
         private bool TryReadNextMessage(out ReadOnlySequence<byte> completeMessage)
         {
             if (this.ReadData.Length > 0)

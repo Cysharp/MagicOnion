@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using MessagePack.Formatters;
 using MessagePack.Internal;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1403 // File may only contain a single namespace
 
 namespace MessagePack.Resolvers
@@ -26,18 +28,18 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
-                Formatter = (IMessagePackFormatter<T>)DynamicGenericResolverGetFormatterHelper.GetFormatter(typeof(T));
+                Formatter = (IMessagePackFormatter<T>?)DynamicGenericResolverGetFormatterHelper.GetFormatter(typeof(T));
             }
         }
     }
@@ -69,6 +71,9 @@ namespace MessagePack.Internal
               { typeof(IReadOnlyList<>), typeof(InterfaceReadOnlyListFormatter<>) },
               { typeof(IReadOnlyCollection<>), typeof(InterfaceReadOnlyCollectionFormatter<>) },
               { typeof(ISet<>), typeof(InterfaceSetFormatter<>) },
+#if NET5_0_OR_GREATER
+              { typeof(IReadOnlySet<>), typeof(InterfaceReadOnlySetFormatter<>) },
+#endif
               { typeof(System.Collections.Concurrent.ConcurrentBag<>), typeof(ConcurrentBagFormatter<>) },
               { typeof(System.Collections.Concurrent.ConcurrentQueue<>), typeof(ConcurrentQueueFormatter<>) },
               { typeof(System.Collections.Concurrent.ConcurrentStack<>), typeof(ConcurrentStackFormatter<>) },
@@ -79,7 +84,7 @@ namespace MessagePack.Internal
         };
 
         // Reduce IL2CPP code generate size(don't write long code in <T>)
-        internal static object GetFormatter(Type t)
+        internal static object? GetFormatter(Type t)
         {
             TypeInfo ti = t.GetTypeInfo();
 
@@ -94,19 +99,19 @@ namespace MessagePack.Internal
                         return ByteArrayFormatter.Instance;
                     }
 
-                    return Activator.CreateInstance(typeof(ArrayFormatter<>).MakeGenericType(t.GetElementType()));
+                    return Activator.CreateInstance(typeof(ArrayFormatter<>).MakeGenericType(t.GetElementType()!));
                 }
                 else if (rank == 2)
                 {
-                    return Activator.CreateInstance(typeof(TwoDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()));
+                    return Activator.CreateInstance(typeof(TwoDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()!));
                 }
                 else if (rank == 3)
                 {
-                    return Activator.CreateInstance(typeof(ThreeDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()));
+                    return Activator.CreateInstance(typeof(ThreeDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()!));
                 }
                 else if (rank == 4)
                 {
-                    return Activator.CreateInstance(typeof(FourDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()));
+                    return Activator.CreateInstance(typeof(FourDimensionalArrayFormatter<>).MakeGenericType(t.GetElementType()!));
                 }
                 else
                 {
@@ -118,7 +123,7 @@ namespace MessagePack.Internal
                 Type genericType = ti.GetGenericTypeDefinition();
                 TypeInfo genericTypeInfo = genericType.GetTypeInfo();
                 var isNullable = genericTypeInfo.IsNullable();
-                Type nullableElementType = isNullable ? ti.GenericTypeArguments[0] : null;
+                Type? nullableElementType = isNullable ? ti.GenericTypeArguments[0] : null;
 
                 if (genericType == typeof(KeyValuePair<,>))
                 {
@@ -126,9 +131,9 @@ namespace MessagePack.Internal
                 }
 
                 // Tuple
-                else if (ti.FullName.StartsWith("System.Tuple"))
+                else if (ti.FullName?.StartsWith("System.Tuple") is true)
                 {
-                    Type tupleFormatterType = null;
+                    Type? tupleFormatterType = null;
                     switch (ti.GenericTypeArguments.Length)
                     {
                         case 1:
@@ -156,16 +161,16 @@ namespace MessagePack.Internal
                             tupleFormatterType = typeof(TupleFormatter<,,,,,,,>);
                             break;
                         default:
-                            break;
+                            throw new MessagePackSerializationException("Unsupported arity for Tuple generic type: " + ti.Name);
                     }
 
                     return CreateInstance(tupleFormatterType, ti.GenericTypeArguments);
                 }
 
                 // ValueTuple
-                else if (ti.FullName.StartsWith("System.ValueTuple"))
+                else if (ti.FullName?.StartsWith("System.ValueTuple") is true)
                 {
-                    Type tupleFormatterType = null;
+                    Type? tupleFormatterType = null;
                     switch (ti.GenericTypeArguments.Length)
                     {
                         case 1:
@@ -193,13 +198,13 @@ namespace MessagePack.Internal
                             tupleFormatterType = typeof(ValueTupleFormatter<,,,,,,,>);
                             break;
                         default:
-                            break;
+                            throw new MessagePackSerializationException("Unsupported arity for ValueTuple generic type: " + ti.Name);
                     }
 
                     return CreateInstance(tupleFormatterType, ti.GenericTypeArguments);
                 }
 
-                // ArraySegement
+                // ArraySegment
                 else if (genericType == typeof(ArraySegment<>))
                 {
                     if (ti.GenericTypeArguments[0] == typeof(byte))
@@ -212,38 +217,57 @@ namespace MessagePack.Internal
                     }
                 }
 
+                // Memory
+                else if (genericType == typeof(Memory<>))
+                {
+                    if (ti.GenericTypeArguments[0] == typeof(byte))
+                    {
+                        return ByteMemoryFormatter.Instance;
+                    }
+                    else
+                    {
+                        return CreateInstance(typeof(MemoryFormatter<>), ti.GenericTypeArguments);
+                    }
+                }
+
+                // ReadOnlyMemory
+                else if (genericType == typeof(ReadOnlyMemory<>))
+                {
+                    if (ti.GenericTypeArguments[0] == typeof(byte))
+                    {
+                        return ByteReadOnlyMemoryFormatter.Instance;
+                    }
+                    else
+                    {
+                        return CreateInstance(typeof(ReadOnlyMemoryFormatter<>), ti.GenericTypeArguments);
+                    }
+                }
+
+                // ReadOnlySequence
+                else if (genericType == typeof(ReadOnlySequence<>))
+                {
+                    if (ti.GenericTypeArguments[0] == typeof(byte))
+                    {
+                        return ByteReadOnlySequenceFormatter.Instance;
+                    }
+                    else
+                    {
+                        return CreateInstance(typeof(ReadOnlySequenceFormatter<>), ti.GenericTypeArguments);
+                    }
+                }
+
                 // Standard Nullable
                 else if (isNullable)
                 {
-                    return CreateInstance(typeof(NullableFormatter<>), new[] { nullableElementType });
+                    return CreateInstance(typeof(NullableFormatter<>), new[] { nullableElementType! });
                 }
 
                 // Mapped formatter
                 else
                 {
-                    Type formatterType;
-                    if (FormatterMap.TryGetValue(genericType, out formatterType))
+                    if (FormatterMap.TryGetValue(genericType, out Type? formatterType))
                     {
                         return CreateInstance(formatterType, ti.GenericTypeArguments);
-                    }
-
-                    // generic collection
-                    else if (ti.GenericTypeArguments.Length == 1
-                          && ti.ImplementedInterfaces.Any(x => x.GetTypeInfo().IsConstructedGenericType() && x.GetGenericTypeDefinition() == typeof(ICollection<>))
-                          && ti.DeclaredConstructors.Any(x => x.GetParameters().Length == 0))
-                    {
-                        Type elemType = ti.GenericTypeArguments[0];
-                        return CreateInstance(typeof(GenericCollectionFormatter<,>), new[] { elemType, t });
-                    }
-
-                    // generic dictionary
-                    else if (ti.GenericTypeArguments.Length == 2
-                          && ti.ImplementedInterfaces.Any(x => x.GetTypeInfo().IsConstructedGenericType() && x.GetGenericTypeDefinition() == typeof(IDictionary<,>))
-                          && ti.DeclaredConstructors.Any(x => x.GetParameters().Length == 0))
-                    {
-                        Type keyType = ti.GenericTypeArguments[0];
-                        Type valueType = ti.GenericTypeArguments[1];
-                        return CreateInstance(typeof(GenericDictionaryFormatter<,,>), new[] { keyType, valueType, t });
                     }
                 }
             }
@@ -254,7 +278,15 @@ namespace MessagePack.Internal
             else
             {
                 // NonGeneric Collection
-                if (t == typeof(IList))
+                if (t == typeof(IEnumerable))
+                {
+                    return NonGenericInterfaceEnumerableFormatter.Instance;
+                }
+                else if (t == typeof(ICollection))
+                {
+                    return NonGenericInterfaceCollectionFormatter.Instance;
+                }
+                else if (t == typeof(IList))
                 {
                     return NonGenericInterfaceListFormatter.Instance;
                 }
@@ -273,10 +305,71 @@ namespace MessagePack.Internal
                 }
             }
 
+            // check inherited types(e.g. Foo : ICollection<>, Bar<T> : ICollection<T>)
+            {
+                // generic dictionary
+                var dictionaryDef = ti.ImplementedInterfaces.FirstOrDefault(x => x.GetTypeInfo().IsConstructedGenericType() && x.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+                if (dictionaryDef != null && ti.DeclaredConstructors.Any(x => !x.IsStatic && x.GetParameters().Length == 0))
+                {
+                    Type keyType = dictionaryDef.GenericTypeArguments[0];
+                    Type valueType = dictionaryDef.GenericTypeArguments[1];
+                    return CreateInstance(typeof(GenericDictionaryFormatter<,,>), new[] { keyType, valueType, t });
+                }
+
+                // generic dictionary with collection ctor
+                var dictionaryInterfaceDef = ti.ImplementedInterfaces.FirstOrDefault(x => x.GetTypeInfo().IsConstructedGenericType() &&
+                    (x.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)));
+                if (dictionaryInterfaceDef != null)
+                {
+                    Type keyType = dictionaryInterfaceDef.GenericTypeArguments[0];
+                    Type valueType = dictionaryInterfaceDef.GenericTypeArguments[1];
+                    Type[] allowedParameterTypes = new Type[]
+                    {
+                        typeof(IDictionary<,>).MakeGenericType(keyType, valueType),
+                        typeof(IReadOnlyDictionary<,>).MakeGenericType(keyType, valueType),
+                        typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(keyType, valueType)),
+                    };
+                    foreach (var constructor in ti.DeclaredConstructors)
+                    {
+                        ParameterInfo[] parameters = constructor.GetParameters();
+                        if (parameters.Length == 1 &&
+                            allowedParameterTypes.Any(allowedType => parameters[0].ParameterType.IsAssignableFrom(allowedType)))
+                        {
+                            return CreateInstance(typeof(GenericReadOnlyDictionaryFormatter<,,>), new[] { keyType, valueType, t });
+                        }
+                    }
+                }
+
+                // generic collection
+                var collectionDef = ti.ImplementedInterfaces.FirstOrDefault(x => x.GetTypeInfo().IsConstructedGenericType() && x.GetGenericTypeDefinition() == typeof(ICollection<>));
+                if (collectionDef != null && ti.DeclaredConstructors.Any(x => !x.IsStatic && x.GetParameters().Length == 0))
+                {
+                    Type elemType = collectionDef.GenericTypeArguments[0];
+                    return CreateInstance(typeof(GenericCollectionFormatter<,>), new[] { elemType, t });
+                }
+
+                // generic IEnumerable collection
+                // looking for combination of IEnumerable<T> and constructor that takes
+                // enumeration of the same type
+                foreach (var enumerableCollectionDef in ti.ImplementedInterfaces.Where(x => x.GetTypeInfo().IsConstructedGenericType() && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                {
+                    Type elemType = enumerableCollectionDef.GenericTypeArguments[0];
+                    Type paramInterface = typeof(IEnumerable<>).MakeGenericType(elemType);
+                    foreach (var constructor in ti.DeclaredConstructors)
+                    {
+                        var parameters = constructor.GetParameters();
+                        if (parameters.Length == 1 && parameters[0].ParameterType.IsAssignableFrom(paramInterface))
+                        {
+                            return CreateInstance(typeof(GenericEnumerableFormatter<,>), new[] { elemType, t });
+                        }
+                    }
+                }
+            }
+
             return null;
         }
 
-        private static object CreateInstance(Type genericType, Type[] genericTypeArguments, params object[] arguments)
+        private static object? CreateInstance(Type genericType, Type[] genericTypeArguments, params object?[] arguments)
         {
             return Activator.CreateInstance(genericType.MakeGenericType(genericTypeArguments), arguments);
         }

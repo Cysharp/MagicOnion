@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Nerdbank.Streams;
 
 namespace MessagePack
 {
@@ -15,13 +16,13 @@ namespace MessagePack
     public class MessagePackSerializerOptions
     {
         // see:http://msdn.microsoft.com/en-us/library/w3f99sx1.aspx
-        internal static readonly Regex AssemblyNameVersionSelectorRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=[\w-]+, PublicKeyToken=(?:null|[a-f0-9]{16})$", RegexOptions.Compiled);
+        internal static readonly Regex AssemblyNameVersionSelectorRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=[\w-]+, PublicKeyToken=(?:null|[a-f0-9]{16})", RegexOptions.Compiled);
 
         /// <summary>
         /// A collection of known dangerous types that are not expected in a typical MessagePack stream,
         /// and thus are rejected by the default implementation of <see cref="ThrowIfDeserializingTypeIsDisallowed(Type)"/>.
         /// </summary>
-        private static readonly HashSet<string> BlacklistCheck = new HashSet<string>
+        private static readonly HashSet<string> DisallowedTypes = new HashSet<string>
         {
             "System.CodeDom.Compiler.TempFileCollection",
             "System.Management.IWbemClassObjectFreeThreaded",
@@ -37,7 +38,7 @@ namespace MessagePack
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagePackSerializerOptions"/> class.
         /// </summary>
-        protected internal MessagePackSerializerOptions(IFormatterResolver resolver)
+        public MessagePackSerializerOptions(IFormatterResolver resolver)
         {
             this.Resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
@@ -56,17 +57,20 @@ namespace MessagePack
 
             this.Resolver = copyFrom.Resolver;
             this.Compression = copyFrom.Compression;
+            this.CompressionMinLength = copyFrom.CompressionMinLength;
+            this.SuggestedContiguousMemorySize = copyFrom.SuggestedContiguousMemorySize;
             this.OldSpec = copyFrom.OldSpec;
             this.OmitAssemblyVersion = copyFrom.OmitAssemblyVersion;
             this.AllowAssemblyVersionMismatch = copyFrom.AllowAssemblyVersionMismatch;
             this.Security = copyFrom.Security;
+            this.SequencePool = copyFrom.SequencePool;
         }
 
         /// <summary>
         /// Gets the resolver to use for complex types.
         /// </summary>
-        /// <value>An instance of <see cref="IFormatterResolver"/>. Never <c>null</c>.</value>
-        /// <exception cref="ArgumentNullException">Thrown if an attempt is made to set this property to <c>null</c>.</exception>
+        /// <value>An instance of <see cref="IFormatterResolver"/>. Never <see langword="null"/>.</value>
+        /// <exception cref="ArgumentNullException">Thrown if an attempt is made to set this property to <see langword="null"/>.</exception>
         public IFormatterResolver Resolver { get; private set; }
 
         /// <summary>
@@ -78,6 +82,26 @@ namespace MessagePack
         /// and serialization may not compress if msgpack sequences are short enough that compression would not likely be advantageous.
         /// </remarks>
         public MessagePackCompression Compression { get; private set; }
+
+        /// <summary>
+        /// Gets the length a serialized msgpack result must equal or exceed before <see cref="Compression"/> is applied.
+        /// </summary>
+        /// <value>The default value is 64.</value>
+        /// <remarks>
+        /// When compression is <em>not</em> applied due to a short serialized result, deserialization will still succeed
+        /// even if <see cref="Compression"/> is set to something other than <see cref="MessagePackCompression.None"/>.
+        /// </remarks>
+        public int CompressionMinLength { get; private set; } = 64;
+
+        /// <summary>
+        /// Gets the size of contiguous memory blocks in bytes that may be allocated for buffering purposes.
+        /// </summary>
+        /// <value>The default value is 1MB.</value>
+        /// <remarks>
+        /// Larger values may perform a bit faster, but may result in adding a runtime perf tax due to using the
+        /// <see href="https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap">Large Object Heap</see>.
+        /// </remarks>
+        public int SuggestedContiguousMemorySize { get; private set; } = 1024 * 1024;
 
         /// <summary>
         /// Gets a value indicating whether to serialize with <see cref="MessagePackWriter.OldSpec"/> set to some value
@@ -96,13 +120,13 @@ namespace MessagePack
         /// <summary>
         /// Gets a value indicating whether serialization should omit assembly version, culture and public key token metadata when using the typeless formatter.
         /// </summary>
-        /// <value>The default value is <c>false</c>.</value>
+        /// <value>The default value is <see langword="false"/>.</value>
         public bool OmitAssemblyVersion { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether deserialization may instantiate types from an assembly with a different version if a matching version cannot be found.
         /// </summary>
-        /// <value>The default value is <c>false</c>.</value>
+        /// <value>The default value is <see langword="false"/>.</value>
         public bool AllowAssemblyVersionMismatch { get; private set; }
 
         /// <summary>
@@ -114,13 +138,19 @@ namespace MessagePack
         public MessagePackSecurity Security { get; private set; } = MessagePackSecurity.TrustedData;
 
         /// <summary>
+        /// Gets a thread-safe pool of reusable <see cref="Sequence{T}"/> objects.
+        /// </summary>
+        /// <value>The default value is the <see cref="SequencePool.Shared"/> instance.</value>
+        public SequencePool SequencePool { get; private set; } = SequencePool.Shared;
+
+        /// <summary>
         /// Gets a type given a string representation of the type.
         /// </summary>
         /// <param name="typeName">The name of the type to load. This is typically the <see cref="Type.AssemblyQualifiedName"/> but may use the assembly's simple name.</param>
-        /// <returns>The loaded type or <c>null</c> if no matching type could be found.</returns>
-        public virtual Type LoadType(string typeName)
+        /// <returns>The loaded type or <see langword="null"/> if no matching type could be found.</returns>
+        public virtual Type? LoadType(string typeName)
         {
-            Type result = Type.GetType(typeName, false);
+            Type? result = Type.GetType(typeName, false);
             if (result == null && this.AllowAssemblyVersionMismatch)
             {
                 string shortenedName = AssemblyNameVersionSelectorRegex.Replace(typeName, string.Empty);
@@ -146,9 +176,9 @@ namespace MessagePack
         /// </remarks>
         public virtual void ThrowIfDeserializingTypeIsDisallowed(Type type)
         {
-            if (BlacklistCheck.Contains(type.FullName))
+            if (type.FullName is string fullName && DisallowedTypes.Contains(fullName))
             {
-                throw new MessagePackSerializationException("Deserialization attempted to create the type " + type.FullName + " which is not allowed.");
+                throw new MessagePackSerializationException($"Deserialization attempted to create the type {fullName} which is not allowed.");
             }
         }
 
@@ -183,6 +213,50 @@ namespace MessagePack
 
             var result = this.Clone();
             result.Compression = compression;
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a copy of these options with the <see cref="CompressionMinLength"/> property set to a new value.
+        /// </summary>
+        /// <param name="compressionMinLength">The new value for the <see cref="CompressionMinLength"/> property. Must be a positive integer.</param>
+        /// <returns>The new instance; or the original if the value is unchanged.</returns>
+        public MessagePackSerializerOptions WithCompressionMinLength(int compressionMinLength)
+        {
+            if (this.CompressionMinLength == compressionMinLength)
+            {
+                return this;
+            }
+
+            if (compressionMinLength <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(compressionMinLength));
+            }
+
+            var result = this.Clone();
+            result.CompressionMinLength = compressionMinLength;
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a copy of these options with the <see cref="SuggestedContiguousMemorySize"/> property set to a new value.
+        /// </summary>
+        /// <param name="suggestedContiguousMemorySize">The new value for the <see cref="SuggestedContiguousMemorySize"/> property. Must be at least 256.</param>
+        /// <returns>The new instance; or the original if the value is unchanged.</returns>
+        public MessagePackSerializerOptions WithSuggestedContiguousMemorySize(int suggestedContiguousMemorySize)
+        {
+            if (this.SuggestedContiguousMemorySize == suggestedContiguousMemorySize)
+            {
+                return this;
+            }
+
+            if (suggestedContiguousMemorySize < 256)
+            {
+                throw new ArgumentOutOfRangeException(nameof(suggestedContiguousMemorySize), "This should be at least 256");
+            }
+
+            var result = this.Clone();
+            result.SuggestedContiguousMemorySize = suggestedContiguousMemorySize;
             return result;
         }
 
@@ -256,6 +330,28 @@ namespace MessagePack
 
             var result = this.Clone();
             result.Security = security;
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a copy of these options with the <see cref="SequencePool"/> property set to a new value.
+        /// </summary>
+        /// <param name="pool">The new value for the <see cref="SequencePool"/> property.</param>
+        /// <returns>The new instance.</returns>
+        public MessagePackSerializerOptions WithPool(SequencePool pool)
+        {
+            if (pool is null)
+            {
+                throw new ArgumentNullException(nameof(pool));
+            }
+
+            if (this.SequencePool == pool)
+            {
+                return this;
+            }
+
+            var result = this.Clone();
+            result.SequencePool = pool;
             return result;
         }
 

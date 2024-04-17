@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using MessagePack.Formatters;
 using MessagePack.Internal;
 
+#pragma warning disable SA1402 // File may only contain a single type
+
 namespace MessagePack.Resolvers
 {
 #if !UNITY_2018_3_OR_NEWER
@@ -33,24 +35,37 @@ namespace MessagePack.Resolvers
         }
 
         /// <inheritdoc />
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
-            if (typeof(T) == typeof(object))
+            return Cache<T>.Formatter!;
+        }
+
+        private static class Cache<T>
+        {
+            public static readonly IMessagePackFormatter<T?>? Formatter;
+
+            static Cache()
             {
-                return (IMessagePackFormatter<T>)TypelessFormatter.Instance;
-            }
-            else
-            {
-                foreach (IFormatterResolver item in Resolvers)
+                if (typeof(T).IsAbstract || typeof(T).IsInterface)
                 {
-                    IMessagePackFormatter<T> f = item.GetFormatter<T>();
-                    if (f != null)
-                    {
-                        return f;
-                    }
+                    Formatter = new ForceTypelessFormatter<T>();
                 }
 
-                return null;
+                if (typeof(T) == typeof(object))
+                {
+                    Formatter = (IMessagePackFormatter<T?>)TypelessFormatter.Instance;
+                }
+                else
+                {
+                    foreach (var item in Resolvers)
+                    {
+                        var f = item.GetFormatter<T?>();
+                        if (f != null)
+                        {
+                            Formatter = f;
+                        }
+                    }
+                }
             }
         }
     }
@@ -79,18 +94,18 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
-                Formatter = (IMessagePackFormatter<T>)Helper.GetFormatter(typeof(T));
+                Formatter = (IMessagePackFormatter<T>?)Helper.GetFormatter(typeof(T));
             }
         }
 
@@ -128,10 +143,9 @@ namespace MessagePack.Resolvers
                 { typeof(SByte[]), ForceSByteBlockArrayFormatter.Instance },
             };
 
-            public static object GetFormatter(Type type)
+            public static object? GetFormatter(Type type)
             {
-                object formatter;
-                return FormatterMap.TryGetValue(type, out formatter)
+                return FormatterMap.TryGetValue(type, out object? formatter)
                     ? formatter
                     : null;
             }

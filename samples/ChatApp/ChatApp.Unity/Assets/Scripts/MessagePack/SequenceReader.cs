@@ -5,10 +5,12 @@
  * The .NET Foundation licenses this file to you under the MIT license.
  * See the LICENSE file in the project root for more information. */
 
+using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace System.Buffers
+namespace MessagePack
 {
     internal ref partial struct SequenceReader<T>
         where T : unmanaged, IEquatable<T>
@@ -389,7 +391,7 @@ namespace System.Buffers
         /// Move the reader ahead the specified number of items
         /// if there are enough elements remaining in the sequence.
         /// </summary>
-        /// <returns><c>true</c> if there were enough elements to advance; otherwise <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if there were enough elements to advance; otherwise <see langword="false"/>.</returns>
         internal bool TryAdvance(long count)
         {
             if (this.Remaining < count)

@@ -1,11 +1,15 @@
 ﻿// Copyright (c) All contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#pragma warning disable SA1402 // File may only contain a single type
+
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
+using System.Runtime.Serialization;
 using MessagePack.Formatters;
 using MessagePack.Internal;
 
@@ -20,8 +24,8 @@ namespace MessagePack
         /// Gets an <see cref="IMessagePackFormatter{T}"/> instance that can serialize or deserialize some type <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of value to be serialized or deserialized.</typeparam>
-        /// <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <c>null</c>.</returns>
-        IMessagePackFormatter<T> GetFormatter<T>();
+        /// <returns>A formatter, if this resolver supplies one for type <typeparamref name="T"/>; otherwise <see langword="null"/>.</returns>
+        IMessagePackFormatter<T>? GetFormatter<T>();
     }
 
     public static class FormatterResolverExtensions
@@ -34,7 +38,7 @@ namespace MessagePack
                 throw new ArgumentNullException(nameof(resolver));
             }
 
-            IMessagePackFormatter<T> formatter;
+            IMessagePackFormatter<T>? formatter;
             try
             {
                 formatter = resolver.GetFormatter<T>();
@@ -56,11 +60,14 @@ namespace MessagePack
             return formatter;
         }
 
+        [DoesNotReturn]
         private static void Throw(TypeInitializationException ex)
         {
             ExceptionDispatchInfo.Capture(ex.InnerException ?? ex).Throw();
+            throw null!; // unreachable
         }
 
+        [DoesNotReturn]
         private static void Throw(Type t, IFormatterResolver resolver)
         {
             throw new FormatterNotRegisteredException(t.FullName + " is not registered in resolver: " + resolver.GetType());
@@ -69,9 +76,9 @@ namespace MessagePack
         private static readonly ThreadsafeTypeKeyHashTable<Func<IFormatterResolver, IMessagePackFormatter>> FormatterGetters =
             new ThreadsafeTypeKeyHashTable<Func<IFormatterResolver, IMessagePackFormatter>>();
 
-        private static readonly MethodInfo GetFormatterRuntimeMethod = typeof(IFormatterResolver).GetRuntimeMethod(nameof(IFormatterResolver.GetFormatter), Type.EmptyTypes);
+        private static readonly MethodInfo GetFormatterRuntimeMethod = typeof(IFormatterResolver).GetRuntimeMethod(nameof(IFormatterResolver.GetFormatter), Type.EmptyTypes) ?? throw new Exception("Unable to find our own method.");
 
-        public static object GetFormatterDynamic(this IFormatterResolver resolver, Type type)
+        public static object? GetFormatterDynamic(this IFormatterResolver resolver, Type type)
         {
             if (resolver is null)
             {
@@ -107,10 +114,16 @@ namespace MessagePack
         }
     }
 
+    [Serializable]
     public class FormatterNotRegisteredException : MessagePackSerializationException
     {
-        public FormatterNotRegisteredException(string message)
+        public FormatterNotRegisteredException(string? message)
             : base(message)
+        {
+        }
+
+        protected FormatterNotRegisteredException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

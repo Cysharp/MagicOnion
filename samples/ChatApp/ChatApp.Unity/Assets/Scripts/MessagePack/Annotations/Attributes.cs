@@ -3,6 +3,7 @@
 
 using System;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack
@@ -23,7 +24,7 @@ namespace MessagePack
     {
         public int? IntKey { get; private set; }
 
-        public string StringKey { get; private set; }
+        public string? StringKey { get; private set; }
 
         public KeyAttribute(int x)
         {
@@ -32,7 +33,7 @@ namespace MessagePack
 
         public KeyAttribute(string x)
         {
-            this.StringKey = x;
+            this.StringKey = x ?? throw new ArgumentNullException(nameof(x));
         }
     }
 
@@ -44,14 +45,36 @@ namespace MessagePack
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class UnionAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the distinguishing value that identifies a particular subtype.
+        /// </summary>
         public int Key { get; private set; }
 
+        /// <summary>
+        /// Gets the derived or implementing type.
+        /// </summary>
         public Type SubType { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnionAttribute"/> class.
+        /// </summary>
+        /// <param name="key">The distinguishing value that identifies a particular subtype.</param>
+        /// <param name="subType">The derived or implementing type.</param>
         public UnionAttribute(int key, Type subType)
         {
             this.Key = key;
-            this.SubType = subType;
+            this.SubType = subType ?? throw new ArgumentNullException(nameof(subType));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnionAttribute"/> class.
+        /// </summary>
+        /// <param name="key">The distinguishing value that identifies a particular subtype.</param>
+        /// <param name="subType">The full name (should be assembly qualified) of the derived or implementing type.</param>
+        public UnionAttribute(int key, string subType)
+        {
+            this.Key = key;
+            this.SubType = Type.GetType(subType, throwOnError: true);
         }
     }
 
@@ -65,16 +88,16 @@ namespace MessagePack
     {
         public Type FormatterType { get; private set; }
 
-        public object[] Arguments { get; private set; }
+        public object?[]? Arguments { get; private set; }
 
         public MessagePackFormatterAttribute(Type formatterType)
         {
-            this.FormatterType = formatterType;
+            this.FormatterType = formatterType ?? throw new ArgumentNullException(nameof(formatterType));
         }
 
-        public MessagePackFormatterAttribute(Type formatterType, params object[] arguments)
+        public MessagePackFormatterAttribute(Type formatterType, params object?[]? arguments)
         {
-            this.FormatterType = formatterType;
+            this.FormatterType = formatterType ?? throw new ArgumentNullException(nameof(formatterType));
             this.Arguments = arguments;
         }
     }

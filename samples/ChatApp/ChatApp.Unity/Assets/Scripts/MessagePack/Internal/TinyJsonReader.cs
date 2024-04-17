@@ -4,8 +4,10 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack
@@ -39,10 +41,16 @@ namespace MessagePack
         String,
     }
 
+    [Serializable]
     public class TinyJsonException : MessagePackSerializationException
     {
         public TinyJsonException(string message)
             : base(message)
+        {
+        }
+
+        protected TinyJsonException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }
@@ -51,7 +59,7 @@ namespace MessagePack
     {
         private readonly TextReader reader;
         private readonly bool disposeInnerReader;
-        private StringBuilder reusableBuilder;
+        private StringBuilder? reusableBuilder;
 
         public TinyJsonToken TokenType { get; private set; }
 
@@ -65,7 +73,7 @@ namespace MessagePack
 
         public decimal DecimalValue { get; private set; }
 
-        public string StringValue { get; private set; }
+        public string? StringValue { get; private set; }
 
         public TinyJsonReader(TextReader reader, bool disposeInnerReader = true)
         {

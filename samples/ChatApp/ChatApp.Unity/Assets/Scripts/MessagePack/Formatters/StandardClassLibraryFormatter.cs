@@ -9,14 +9,18 @@ using System.Globalization;
 using System.Text;
 using MessagePack.Internal;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack.Formatters
 {
     // NET40 -> BigInteger, Complex, Tuple
 
-    // byte[] is special. represents bin type.
-    public sealed class ByteArrayFormatter : IMessagePackFormatter<byte[]>
+    /// <summary>
+    /// Serializes a <see cref="byte"/> array as a bin type.
+    /// Deserializes a bin type or an array of byte-sized integers into a <see cref="byte"/> array.
+    /// </summary>
+    public sealed class ByteArrayFormatter : IMessagePackFormatter<byte[]?>
     {
         public static readonly ByteArrayFormatter Instance = new ByteArrayFormatter();
 
@@ -24,18 +28,46 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, byte[] value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, byte[]? value, MessagePackSerializerOptions options)
         {
             writer.Write(value);
         }
 
-        public byte[] Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public byte[]? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            return reader.ReadBytes()?.ToArray();
+            if (reader.NextMessagePackType == MessagePackType.Array)
+            {
+                int len = reader.ReadArrayHeader();
+                if (len == 0)
+                {
+                    return Array.Empty<byte>();
+                }
+
+                byte[] array = new byte[len];
+                options.Security.DepthStep(ref reader);
+                try
+                {
+                    for (int i = 0; i < len; i++)
+                    {
+                        reader.CancellationToken.ThrowIfCancellationRequested();
+                        array[i] = reader.ReadByte();
+                    }
+                }
+                finally
+                {
+                    reader.Depth--;
+                }
+
+                return array;
+            }
+            else
+            {
+                return reader.ReadBytes()?.ToArray();
+            }
         }
     }
 
-    public sealed class NullableStringFormatter : IMessagePackFormatter<String>
+    public sealed class NullableStringFormatter : IMessagePackFormatter<string?>
     {
         public static readonly NullableStringFormatter Instance = new NullableStringFormatter();
 
@@ -43,18 +75,18 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, string value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, string? value, MessagePackSerializerOptions options)
         {
             writer.Write(value);
         }
 
-        public string Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public string? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             return reader.ReadString();
         }
     }
 
-    public sealed class NullableStringArrayFormatter : IMessagePackFormatter<String[]>
+    public sealed class NullableStringArrayFormatter : IMessagePackFormatter<string?[]?>
     {
         public static readonly NullableStringArrayFormatter Instance = new NullableStringArrayFormatter();
 
@@ -62,7 +94,7 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, String[] value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, string?[]? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -78,23 +110,26 @@ namespace MessagePack.Formatters
             }
         }
 
-        public String[] Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public string?[]? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
                 return null;
             }
-            else
-            {
-                var len = reader.ReadArrayHeader();
-                var array = new String[len];
-                for (int i = 0; i < array.Length; i++)
-                {
-                    array[i] = reader.ReadString();
-                }
 
-                return array;
+            var len = reader.ReadArrayHeader();
+            if (len == 0)
+            {
+                return Array.Empty<string?>();
             }
+
+            var array = new string?[len];
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = reader.ReadString();
+            }
+
+            return array;
         }
     }
 
@@ -259,7 +294,7 @@ namespace MessagePack.Formatters
 
         public Guid Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            ReadOnlySequence<byte> segment = reader.ReadStringSequence().Value;
+            ReadOnlySequence<byte> segment = reader.ReadStringSequence() ?? throw MessagePackSerializationException.ThrowUnexpectedNilWhileDeserializing<Guid>();
             if (segment.Length != 36)
             {
                 throw new MessagePackSerializationException("Unexpected length of string.");
@@ -281,15 +316,15 @@ namespace MessagePack.Formatters
         }
     }
 
-    public sealed class UriFormatter : IMessagePackFormatter<Uri>
+    public sealed class UriFormatter : IMessagePackFormatter<Uri?>
     {
-        public static readonly IMessagePackFormatter<Uri> Instance = new UriFormatter();
+        public static readonly IMessagePackFormatter<Uri?> Instance = new UriFormatter();
 
         private UriFormatter()
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, Uri value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, Uri? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -297,32 +332,27 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.Write(value.ToString());
+                writer.Write(value.OriginalString);
             }
         }
 
-        public Uri Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public Uri? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            if (reader.TryReadNil())
-            {
-                return null;
-            }
-            else
-            {
-                return new Uri(reader.ReadString(), UriKind.RelativeOrAbsolute);
-            }
+            return reader.ReadString() is string value
+                ? new Uri(value, UriKind.RelativeOrAbsolute)
+                : null;
         }
     }
 
-    public sealed class VersionFormatter : IMessagePackFormatter<Version>
+    public sealed class VersionFormatter : IMessagePackFormatter<Version?>
     {
-        public static readonly IMessagePackFormatter<Version> Instance = new VersionFormatter();
+        public static readonly IMessagePackFormatter<Version?> Instance = new VersionFormatter();
 
         private VersionFormatter()
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, Version value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, Version? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -334,16 +364,11 @@ namespace MessagePack.Formatters
             }
         }
 
-        public Version Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public Version? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            if (reader.TryReadNil())
-            {
-                return null;
-            }
-            else
-            {
-                return new Version(reader.ReadString());
-            }
+            return reader.ReadString() is string value
+                ? new Version(value)
+                : null;
         }
     }
 
@@ -382,15 +407,15 @@ namespace MessagePack.Formatters
         }
     }
 
-    public sealed class StringBuilderFormatter : IMessagePackFormatter<StringBuilder>
+    public sealed class StringBuilderFormatter : IMessagePackFormatter<StringBuilder?>
     {
-        public static readonly IMessagePackFormatter<StringBuilder> Instance = new StringBuilderFormatter();
+        public static readonly IMessagePackFormatter<StringBuilder?> Instance = new StringBuilderFormatter();
 
         private StringBuilderFormatter()
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, StringBuilder value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, StringBuilder? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -402,7 +427,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public StringBuilder Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public StringBuilder? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
@@ -415,15 +440,15 @@ namespace MessagePack.Formatters
         }
     }
 
-    public sealed class BitArrayFormatter : IMessagePackFormatter<BitArray>
+    public sealed class BitArrayFormatter : IMessagePackFormatter<BitArray?>
     {
-        public static readonly IMessagePackFormatter<BitArray> Instance = new BitArrayFormatter();
+        public static readonly IMessagePackFormatter<BitArray?> Instance = new BitArrayFormatter();
 
         private BitArrayFormatter()
         {
         }
 
-        public void Serialize(ref MessagePackWriter writer, BitArray value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, BitArray? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -442,7 +467,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public BitArray Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public BitArray? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
@@ -473,7 +498,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, System.Numerics.BigInteger value, MessagePackSerializerOptions options)
         {
-#if NETCOREAPP2_1
+#if NETCOREAPP
             if (!writer.OldSpec)
             {
                 // try to get bin8 buffer.
@@ -500,8 +525,8 @@ namespace MessagePack.Formatters
 
         public System.Numerics.BigInteger Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
-            ReadOnlySequence<byte> bytes = reader.ReadBytes().Value;
-#if NETCOREAPP2_1
+            ReadOnlySequence<byte> bytes = reader.ReadBytes() ?? throw MessagePackSerializationException.ThrowUnexpectedNilWhileDeserializing<System.Numerics.BigInteger>();
+#if NETCOREAPP
             if (bytes.IsSingleSegment)
             {
                 return new System.Numerics.BigInteger(bytes.First.Span);
@@ -558,9 +583,9 @@ namespace MessagePack.Formatters
         }
     }
 
-    public sealed class LazyFormatter<T> : IMessagePackFormatter<Lazy<T>>
+    public sealed class LazyFormatter<T> : IMessagePackFormatter<Lazy<T>?>
     {
-        public void Serialize(ref MessagePackWriter writer, Lazy<T> value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, Lazy<T>? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -573,7 +598,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public Lazy<T> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public Lazy<T>? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
@@ -596,4 +621,61 @@ namespace MessagePack.Formatters
             }
         }
     }
+
+    /// <summary>
+    /// Serializes any instance of <see cref="Type"/> by its <see cref="Type.AssemblyQualifiedName"/> value.
+    /// </summary>
+    /// <typeparam name="T">The <see cref="Type"/> class itself or a derived type.</typeparam>
+    public sealed class TypeFormatter<T> : IMessagePackFormatter<T?>
+        where T : Type
+    {
+        public static readonly IMessagePackFormatter<T?> Instance = new TypeFormatter<T>();
+
+        private TypeFormatter()
+        {
+        }
+
+        public void Serialize(ref MessagePackWriter writer, T? value, MessagePackSerializerOptions options)
+        {
+            if (value is null)
+            {
+                writer.WriteNil();
+            }
+            else
+            {
+                writer.Write(value.AssemblyQualifiedName);
+            }
+        }
+
+        public T? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return reader.ReadString() is string value
+                ? (T?)Type.GetType(value, throwOnError: true)
+                : null;
+        }
+    }
+
+#if NET5_0_OR_GREATER
+
+    public sealed class HalfFormatter : IMessagePackFormatter<Half>
+    {
+        public static readonly IMessagePackFormatter<Half> Instance = new HalfFormatter();
+
+        private HalfFormatter()
+        {
+        }
+
+        public void Serialize(ref MessagePackWriter writer, Half value, MessagePackSerializerOptions options)
+        {
+            writer.Write((float)value);
+        }
+
+        public Half Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return (Half)reader.ReadSingle();
+        }
+    }
+
+#endif
+
 }

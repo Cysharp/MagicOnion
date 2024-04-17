@@ -1,11 +1,16 @@
 ﻿// Copyright (c) All contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#if !(MESSAGEPACK_FORCE_AOT || ENABLE_IL2CPP)
+#define DYNAMIC_GENERATION
+#endif
+
 using System.Linq;
 using MessagePack.Formatters;
 using MessagePack.Internal;
 using MessagePack.Resolvers;
 
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1403 // File may only contain a single namespace
 
 namespace MessagePack.Resolvers
@@ -27,7 +32,7 @@ namespace MessagePack.Resolvers
 
         private static readonly IFormatterResolver[] Resolvers = StandardResolverHelper.DefaultResolvers.Concat(new IFormatterResolver[]
         {
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#if DYNAMIC_GENERATION && !NET_STANDARD_2_0
             DynamicObjectResolver.Instance, // Try Object
 #endif
         }).ToArray();
@@ -42,21 +47,21 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
                 if (typeof(T) == typeof(object))
                 {
                     // final fallback
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
                     Formatter = (IMessagePackFormatter<T>)DynamicObjectTypeFallbackFormatter.Instance;
 #else
                     Formatter = PrimitiveObjectResolver.Instance.GetFormatter<T>();
@@ -66,7 +71,7 @@ namespace MessagePack.Resolvers
                 {
                     foreach (IFormatterResolver item in Resolvers)
                     {
-                        IMessagePackFormatter<T> f = item.GetFormatter<T>();
+                        IMessagePackFormatter<T>? f = item.GetFormatter<T>();
                         if (f != null)
                         {
                             Formatter = f;
@@ -92,7 +97,7 @@ namespace MessagePack.Resolvers
 
         private static readonly IFormatterResolver[] Resolvers = StandardResolverHelper.DefaultResolvers.Concat(new IFormatterResolver[]
         {
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#if DYNAMIC_GENERATION && !NET_STANDARD_2_0
             DynamicObjectResolver.Instance, // Try Object
             DynamicContractlessObjectResolver.Instance, // Serializes keys as strings
 #endif
@@ -108,21 +113,21 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
                 if (typeof(T) == typeof(object))
                 {
                     // final fallback
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
                     Formatter = (IMessagePackFormatter<T>)DynamicObjectTypeFallbackFormatter.Instance;
 #else
                     Formatter = PrimitiveObjectResolver.Instance.GetFormatter<T>();
@@ -132,7 +137,7 @@ namespace MessagePack.Resolvers
                 {
                     foreach (IFormatterResolver item in Resolvers)
                     {
-                        IMessagePackFormatter<T> f = item.GetFormatter<T>();
+                        IMessagePackFormatter<T>? f = item.GetFormatter<T>();
                         if (f != null)
                         {
                             Formatter = f;
@@ -158,7 +163,7 @@ namespace MessagePack.Resolvers
 
         private static readonly IFormatterResolver[] Resolvers = StandardResolverHelper.DefaultResolvers.Concat(new IFormatterResolver[]
         {
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#if DYNAMIC_GENERATION && !NET_STANDARD_2_0
             DynamicObjectResolverAllowPrivate.Instance, // Try Object
 #endif
         }).ToArray();
@@ -173,21 +178,21 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
                 if (typeof(T) == typeof(object))
                 {
                     // final fallback
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
                     Formatter = (IMessagePackFormatter<T>)DynamicObjectTypeFallbackFormatter.Instance;
 #else
                     Formatter = PrimitiveObjectResolver.Instance.GetFormatter<T>();
@@ -197,7 +202,7 @@ namespace MessagePack.Resolvers
                 {
                     foreach (IFormatterResolver item in Resolvers)
                     {
-                        IMessagePackFormatter<T> f = item.GetFormatter<T>();
+                        IMessagePackFormatter<T>? f = item.GetFormatter<T>();
                         if (f != null)
                         {
                             Formatter = f;
@@ -223,7 +228,7 @@ namespace MessagePack.Resolvers
 
         private static readonly IFormatterResolver[] Resolvers = StandardResolverHelper.DefaultResolvers.Concat(new IFormatterResolver[]
         {
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#if DYNAMIC_GENERATION && !NET_STANDARD_2_0
             DynamicObjectResolverAllowPrivate.Instance, // Try Object
             DynamicContractlessObjectResolverAllowPrivate.Instance, // Serializes keys as strings
 #endif
@@ -239,21 +244,21 @@ namespace MessagePack.Resolvers
         {
         }
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
                 if (typeof(T) == typeof(object))
                 {
                     // final fallback
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
                     Formatter = (IMessagePackFormatter<T>)DynamicObjectTypeFallbackFormatter.Instance;
 #else
                     Formatter = PrimitiveObjectResolver.Instance.GetFormatter<T>();
@@ -263,7 +268,7 @@ namespace MessagePack.Resolvers
                 {
                     foreach (IFormatterResolver item in Resolvers)
                     {
-                        IMessagePackFormatter<T> f = item.GetFormatter<T>();
+                        IMessagePackFormatter<T>? f = item.GetFormatter<T>();
                         if (f != null)
                         {
                             Formatter = f;
@@ -287,17 +292,16 @@ namespace MessagePack.Internal
 
 #if UNITY_2018_3_OR_NEWER
             MessagePack.Unity.UnityResolver.Instance,
+#else
+            ImmutableCollection.ImmutableCollectionResolver.Instance,
+            CompositeResolver.Create(ExpandoObjectFormatter.Instance),
 #endif
 
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
-            DynamicEnumResolver.Instance, // Try Enum
-#endif
-
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
             DynamicGenericResolver.Instance, // Try Array, Tuple, Collection, Enum(Generic Fallback)
 #endif
 
-#if !ENABLE_IL2CPP && !NET_STANDARD_2_0
+#if DYNAMIC_GENERATION && !NET_STANDARD_2_0
             DynamicUnionResolver.Instance, // Try Union(Interface)
 #endif
         };

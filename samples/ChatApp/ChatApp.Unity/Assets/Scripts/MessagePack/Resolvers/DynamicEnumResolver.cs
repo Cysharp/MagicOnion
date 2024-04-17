@@ -25,7 +25,7 @@ namespace MessagePack.Resolvers
 
         private const string ModuleName = "MessagePack.Resolvers.DynamicEnumResolver";
 
-        private static readonly DynamicAssembly DynamicAssembly;
+        private static readonly Lazy<DynamicAssembly> DynamicAssembly;
 
         private static int nameSequence = 0;
 
@@ -35,24 +35,24 @@ namespace MessagePack.Resolvers
 
         static DynamicEnumResolver()
         {
-            DynamicAssembly = new DynamicAssembly(ModuleName);
+            DynamicAssembly = new Lazy<DynamicAssembly>(() => new DynamicAssembly(ModuleName));
         }
 
 #if NETFRAMEWORK
         public AssemblyBuilder Save()
         {
-            return DynamicAssembly.Save();
+            return DynamicAssembly.Value.Save();
         }
 #endif
 
-        public IMessagePackFormatter<T> GetFormatter<T>()
+        public IMessagePackFormatter<T>? GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
         }
 
         private static class FormatterCache<T>
         {
-            public static readonly IMessagePackFormatter<T> Formatter;
+            public static readonly IMessagePackFormatter<T>? Formatter;
 
             static FormatterCache()
             {
@@ -72,7 +72,7 @@ namespace MessagePack.Resolvers
                         return;
                     }
 
-                    Formatter = (IMessagePackFormatter<T>)Activator.CreateInstance(typeof(StaticNullableFormatter<>).MakeGenericType(ti.AsType()), new object[] { innerFormatter });
+                    Formatter = (IMessagePackFormatter<T>?)Activator.CreateInstance(typeof(StaticNullableFormatter<>).MakeGenericType(ti.AsType()), new object[] { innerFormatter });
                     return;
                 }
                 else if (!ti.IsEnum)
@@ -81,7 +81,7 @@ namespace MessagePack.Resolvers
                 }
 
                 TypeInfo formatterTypeInfo = BuildType(typeof(T));
-                Formatter = (IMessagePackFormatter<T>)Activator.CreateInstance(formatterTypeInfo.AsType());
+                Formatter = (IMessagePackFormatter<T>?)Activator.CreateInstance(formatterTypeInfo.AsType());
             }
         }
 
@@ -90,38 +90,41 @@ namespace MessagePack.Resolvers
             Type underlyingType = Enum.GetUnderlyingType(enumType);
             Type formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(enumType);
 
-            TypeBuilder typeBuilder = DynamicAssembly.DefineType("MessagePack.Formatters." + enumType.FullName.Replace(".", "_") + "Formatter" + Interlocked.Increment(ref nameSequence), TypeAttributes.Public | TypeAttributes.Sealed, null, new[] { formatterType });
-
-            // void Serialize(ref MessagePackWriter writer, T value, MessagePackSerializerOptions options);
+            using (MonoProtection.EnterRefEmitLock())
             {
-                MethodBuilder method = typeBuilder.DefineMethod(
-                    "Serialize",
-                    MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                    null,
-                    new Type[] { typeof(MessagePackWriter).MakeByRefType(), enumType, typeof(MessagePackSerializerOptions) });
+                TypeBuilder typeBuilder = DynamicAssembly.Value.DefineType("MessagePack.Formatters." + enumType.FullName!.Replace(".", "_") + "Formatter" + Interlocked.Increment(ref nameSequence), TypeAttributes.Public | TypeAttributes.Sealed, null, new[] { formatterType });
 
-                ILGenerator il = method.GetILGenerator();
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.Write), new[] { underlyingType }));
-                il.Emit(OpCodes.Ret);
+                // void Serialize(ref MessagePackWriter writer, T value, MessagePackSerializerOptions options);
+                {
+                    MethodBuilder method = typeBuilder.DefineMethod(
+                        "Serialize",
+                        MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        null,
+                        new Type[] { typeof(MessagePackWriter).MakeByRefType(), enumType, typeof(MessagePackSerializerOptions) });
+
+                    ILGenerator il = method.GetILGenerator();
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Ldarg_2);
+                    il.Emit(OpCodes.Call, typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.Write), new[] { underlyingType })!);
+                    il.Emit(OpCodes.Ret);
+                }
+
+                // T Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options);
+                {
+                    MethodBuilder method = typeBuilder.DefineMethod(
+                        "Deserialize",
+                        MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                        enumType,
+                        new Type[] { typeof(MessagePackReader).MakeByRefType(), typeof(MessagePackSerializerOptions) });
+
+                    ILGenerator il = method.GetILGenerator();
+                    il.Emit(OpCodes.Ldarg_1);
+                    il.Emit(OpCodes.Call, typeof(MessagePackReader).GetRuntimeMethod("Read" + underlyingType.Name, Type.EmptyTypes)!);
+                    il.Emit(OpCodes.Ret);
+                }
+
+                return typeBuilder.CreateTypeInfo()!;
             }
-
-            // T Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options);
-            {
-                MethodBuilder method = typeBuilder.DefineMethod(
-                    "Deserialize",
-                    MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                    enumType,
-                    new Type[] { typeof(MessagePackReader).MakeByRefType(), typeof(MessagePackSerializerOptions) });
-
-                ILGenerator il = method.GetILGenerator();
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Call, typeof(MessagePackReader).GetRuntimeMethod("Read" + underlyingType.Name, Type.EmptyTypes));
-                il.Emit(OpCodes.Ret);
-            }
-
-            return typeBuilder.CreateTypeInfo();
         }
     }
 }

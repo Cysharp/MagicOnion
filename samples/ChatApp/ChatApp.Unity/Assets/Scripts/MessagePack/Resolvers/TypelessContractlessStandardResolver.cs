@@ -2,6 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #if !UNITY_2018_3_OR_NEWER
+
+#if !(MESSAGEPACK_FORCE_AOT || ENABLE_IL2CPP)
+#define DYNAMIC_GENERATION
+#endif
+
 using System;
 using System.Collections.Generic;
 using MessagePack.Formatters;
@@ -35,7 +40,7 @@ namespace MessagePack.Resolvers
             ForceSizePrimitiveObjectResolver.Instance, // Preserve particular integer types
             BuiltinResolver.Instance, // Try Builtin
             AttributeFormatterResolver.Instance, // Try use [MessagePackFormatter]
-#if !ENABLE_IL2CPP
+#if DYNAMIC_GENERATION
             DynamicEnumResolver.Instance, // Try Enum
             DynamicGenericResolver.Instance, // Try Array, Tuple, Collection
             DynamicUnionResolver.Instance, // Try Union(Interface)
@@ -53,7 +58,7 @@ namespace MessagePack.Resolvers
 
         private readonly ResolverCache resolverCache = new ResolverCache(Resolvers);
 
-        public IMessagePackFormatter<T> GetFormatter<T>() => this.resolverCache.GetFormatter<T>();
+        public IMessagePackFormatter<T>? GetFormatter<T>() => this.resolverCache.GetFormatter<T>();
 
         private class ResolverCache : CachingFormatterResolver
         {
@@ -64,11 +69,11 @@ namespace MessagePack.Resolvers
                 this.resolvers = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
             }
 
-            protected override IMessagePackFormatter<T> GetFormatterCore<T>()
+            protected override IMessagePackFormatter<T>? GetFormatterCore<T>()
             {
                 foreach (IFormatterResolver item in this.resolvers)
                 {
-                    IMessagePackFormatter<T> f = item.GetFormatter<T>();
+                    IMessagePackFormatter<T>? f = item.GetFormatter<T>();
                     if (f != null)
                     {
                         return f;

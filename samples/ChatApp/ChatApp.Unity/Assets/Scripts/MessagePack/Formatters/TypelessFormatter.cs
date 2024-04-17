@@ -13,13 +13,35 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using MessagePack.Internal;
+using Nerdbank.Streams;
+
+#pragma warning disable SA1402 // File may only contain a single type
+#pragma warning disable SA1649 // File name should match first type name
 
 namespace MessagePack.Formatters
 {
     /// <summary>
+    /// Force serialize object as typeless.
+    /// </summary>
+    public sealed class ForceTypelessFormatter<T> : IMessagePackFormatter<T?>
+    {
+        public void Serialize(ref MessagePackWriter writer, T? value, MessagePackSerializerOptions options)
+        {
+            TypelessFormatter.Instance.Serialize(ref writer, (object?)value, options);
+        }
+
+        public T? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return (T?)TypelessFormatter.Instance.Deserialize(ref reader, options);
+        }
+    }
+
+#pragma warning restore SA1649 // File name should match first type name
+
+    /// <summary>
     /// For `object` field that holds derived from `object` value, ex: var arr = new object[] { 1, "a", new Model() };.
     /// </summary>
-    public sealed class TypelessFormatter : IMessagePackFormatter<object>
+    public sealed class TypelessFormatter : IMessagePackFormatter<object?>
     {
         private delegate void SerializeMethod(object dynamicContractlessFormatter, ref MessagePackWriter writer, object value, MessagePackSerializerOptions options);
 
@@ -28,13 +50,13 @@ namespace MessagePack.Formatters
         /// <summary>
         /// The singleton instance that can be used.
         /// </summary>
-        public static readonly IMessagePackFormatter<object> Instance = new TypelessFormatter();
+        public static readonly IMessagePackFormatter<object?> Instance = new TypelessFormatter();
 
-        private readonly ThreadsafeTypeKeyHashTable<SerializeMethod> serializers = new ThreadsafeTypeKeyHashTable<SerializeMethod>();
-        private readonly ThreadsafeTypeKeyHashTable<DeserializeMethod> deserializers = new ThreadsafeTypeKeyHashTable<DeserializeMethod>();
-        private readonly ThreadsafeTypeKeyHashTable<byte[]> fullTypeNameCache = new ThreadsafeTypeKeyHashTable<byte[]>();
-        private readonly ThreadsafeTypeKeyHashTable<byte[]> shortenedTypeNameCache = new ThreadsafeTypeKeyHashTable<byte[]>();
-        private readonly AsymmetricKeyHashTable<byte[], ArraySegment<byte>, Type> typeCache = new AsymmetricKeyHashTable<byte[], ArraySegment<byte>, Type>(new StringArraySegmentByteAscymmetricEqualityComparer());
+        private static readonly ThreadsafeTypeKeyHashTable<SerializeMethod> Serializers = new();
+        private static readonly ThreadsafeTypeKeyHashTable<DeserializeMethod> Deserializers = new();
+        private static readonly ThreadsafeTypeKeyHashTable<byte[]?> FullTypeNameCache = new();
+        private static readonly ThreadsafeTypeKeyHashTable<byte[]?> ShortenedTypeNameCache = new();
+        private static readonly AsymmetricKeyHashTable<byte[], ArraySegment<byte>, Type> TypeCache = new(new StringArraySegmentByteAscymmetricEqualityComparer());
 
         private static readonly HashSet<Type> UseBuiltinTypes = new HashSet<Type>
         {
@@ -81,23 +103,23 @@ namespace MessagePack.Formatters
             typeof(Double?),
         };
 
-        //ForceSizePrimitiveObjectResolver.Instance,
-        //ContractlessStandardResolverAllowPrivate.Instance);
+        ////ForceSizePrimitiveObjectResolver.Instance,
+        ////ContractlessStandardResolverAllowPrivate.Instance);
 
         // mscorlib or System.Private.CoreLib
-        private static readonly bool IsMscorlib = typeof(int).AssemblyQualifiedName.Contains("mscorlib");
+        private static readonly bool IsMscorlib = typeof(int).AssemblyQualifiedName!.Contains("mscorlib");
 
-        private TypelessFormatter()
+        static TypelessFormatter()
         {
-            this.serializers.TryAdd(typeof(object), _ => (object p1, ref MessagePackWriter p2, object p3, MessagePackSerializerOptions p4) => { });
-            this.deserializers.TryAdd(typeof(object), _ => (object p1, ref MessagePackReader p2, MessagePackSerializerOptions p3) => new object());
+            Serializers.TryAdd(typeof(object), _ => (object p1, ref MessagePackWriter p2, object p3, MessagePackSerializerOptions p4) => { });
+            Deserializers.TryAdd(typeof(object), _ => (object p1, ref MessagePackReader p2, MessagePackSerializerOptions p3) => new object());
         }
 
         private string BuildTypeName(Type type, MessagePackSerializerOptions options)
         {
             if (options.OmitAssemblyVersion)
             {
-                string full = type.AssemblyQualifiedName;
+                string full = type.AssemblyQualifiedName!;
 
                 var shortened = MessagePackSerializerOptions.AssemblyNameVersionSelectorRegex.Replace(full, string.Empty);
                 if (Type.GetType(shortened, false) == null)
@@ -110,11 +132,11 @@ namespace MessagePack.Formatters
             }
             else
             {
-                return type.AssemblyQualifiedName;
+                return type.AssemblyQualifiedName!;
             }
         }
 
-        public void Serialize(ref MessagePackWriter writer, object value, MessagePackSerializerOptions options)
+        public void Serialize(ref MessagePackWriter writer, object? value, MessagePackSerializerOptions options)
         {
             if (value == null)
             {
@@ -124,9 +146,8 @@ namespace MessagePack.Formatters
 
             Type type = value.GetType();
 
-            byte[] typeName;
-            var typeNameCache = options.OmitAssemblyVersion ? this.shortenedTypeNameCache : this.fullTypeNameCache;
-            if (!typeNameCache.TryGetValue(type, out typeName))
+            var typeNameCache = options.OmitAssemblyVersion ? ShortenedTypeNameCache : FullTypeNameCache;
+            if (!typeNameCache.TryGetValue(type, out byte[]? typeName))
             {
                 TypeInfo ti = type.GetTypeInfo();
                 if (ti.IsAnonymous() || UseBuiltinTypes.Contains(type))
@@ -150,12 +171,12 @@ namespace MessagePack.Formatters
             var formatter = options.Resolver.GetFormatterDynamicWithVerify(type);
 
             // don't use GetOrAdd for avoid closure capture.
-            if (!this.serializers.TryGetValue(type, out SerializeMethod serializeMethod))
+            if (!Serializers.TryGetValue(type, out SerializeMethod? serializeMethod))
             {
                 // double check locking...
-                lock (this.serializers)
+                lock (Serializers)
                 {
-                    if (!this.serializers.TryGetValue(type, out serializeMethod))
+                    if (!Serializers.TryGetValue(type, out serializeMethod))
                     {
                         TypeInfo ti = type.GetTypeInfo();
 
@@ -165,7 +186,7 @@ namespace MessagePack.Formatters
                         ParameterExpression param2 = Expression.Parameter(typeof(object), "value");
                         ParameterExpression param3 = Expression.Parameter(typeof(MessagePackSerializerOptions), "options");
 
-                        MethodInfo serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(MessagePackWriter).MakeByRefType(), type, typeof(MessagePackSerializerOptions) });
+                        MethodInfo serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(MessagePackWriter).MakeByRefType(), type, typeof(MessagePackSerializerOptions) })!;
 
                         MethodCallExpression body = Expression.Call(
                             Expression.Convert(param0, formatterType),
@@ -176,13 +197,13 @@ namespace MessagePack.Formatters
 
                         serializeMethod = Expression.Lambda<SerializeMethod>(body, param0, param1, param2, param3).Compile();
 
-                        this.serializers.TryAdd(type, serializeMethod);
+                        Serializers.TryAdd(type, serializeMethod);
                     }
                 }
             }
 
             // mark will be written at the end, when size is known
-            using (var scratchRental = SequencePool.Shared.Rent())
+            using (var scratchRental = options.SequencePool.Rent())
             {
                 MessagePackWriter scratchWriter = writer.Clone(scratchRental.Value);
                 scratchWriter.WriteString(typeName);
@@ -194,7 +215,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public object Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        public object? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
         {
             if (reader.TryReadNil())
             {
@@ -203,13 +224,16 @@ namespace MessagePack.Formatters
 
             if (reader.NextMessagePackType == MessagePackType.Extension)
             {
-                ExtensionHeader ext = reader.ReadExtensionFormatHeader();
+                MessagePackReader peekReader = reader.CreatePeekReader();
+                ExtensionHeader ext = peekReader.ReadExtensionFormatHeader();
                 if (ext.TypeCode == ThisLibraryExtensionTypeCodes.TypelessFormatter)
                 {
+                    reader = peekReader; // commit the experimental read made earlier.
+
                     // it has type name serialized
-                    ReadOnlySequence<byte> typeName = reader.ReadStringSequence().Value;
+                    ReadOnlySequence<byte> typeName = reader.ReadStringSequence() ?? throw MessagePackSerializationException.ThrowUnexpectedNilWhileDeserializing<object>();
                     ArraySegment<byte> typeNameArraySegment;
-                    byte[] rented = null;
+                    byte[]? rented = null;
                     if (!typeName.IsSingleSegment || !MemoryMarshal.TryGetArray(typeName.First, out typeNameArraySegment))
                     {
                         rented = ArrayPool<byte>.Shared.Rent((int)typeName.Length);
@@ -238,9 +262,10 @@ namespace MessagePack.Formatters
         /// </summary>
         private object DeserializeByTypeName(ArraySegment<byte> typeName, ref MessagePackReader byteSequence, MessagePackSerializerOptions options)
         {
+            Requires.Argument(typeName.Array is not null, nameof(typeName), "Array cannot be null.");
+
             // try get type with assembly name, throw if not found
-            Type type;
-            if (!this.typeCache.TryGetValue(typeName, out type))
+            if (!TypeCache.TryGetValue(typeName, out Type? type))
             {
                 var buffer = new byte[typeName.Count];
                 Buffer.BlockCopy(typeName.Array, typeName.Offset, buffer, 0, buffer.Length);
@@ -262,20 +287,25 @@ namespace MessagePack.Formatters
                     {
                         type = Type.GetType(str, true); // re-throw
                     }
+
+                    if (type is null)
+                    {
+                        throw MessagePackSerializationException.ThrowUnexpectedNilWhileDeserializing<Type>();
+                    }
                 }
 
-                this.typeCache.TryAdd(buffer, type);
+                TypeCache.TryAdd(buffer, type);
             }
 
             options.ThrowIfDeserializingTypeIsDisallowed(type);
 
             var formatter = options.Resolver.GetFormatterDynamicWithVerify(type);
 
-            if (!this.deserializers.TryGetValue(type, out DeserializeMethod deserializeMethod))
+            if (!Deserializers.TryGetValue(type, out DeserializeMethod? deserializeMethod))
             {
-                lock (this.deserializers)
+                lock (Deserializers)
                 {
-                    if (!this.deserializers.TryGetValue(type, out deserializeMethod))
+                    if (!Deserializers.TryGetValue(type, out deserializeMethod))
                     {
                         TypeInfo ti = type.GetTypeInfo();
 
@@ -284,7 +314,7 @@ namespace MessagePack.Formatters
                         ParameterExpression param1 = Expression.Parameter(typeof(MessagePackReader).MakeByRefType(), "reader");
                         ParameterExpression param2 = Expression.Parameter(typeof(MessagePackSerializerOptions), "options");
 
-                        MethodInfo deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(MessagePackReader).MakeByRefType(), typeof(MessagePackSerializerOptions) });
+                        MethodInfo deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(MessagePackReader).MakeByRefType(), typeof(MessagePackSerializerOptions) })!;
 
                         MethodCallExpression deserialize = Expression.Call(
                             Expression.Convert(param0, formatterType),
@@ -300,7 +330,7 @@ namespace MessagePack.Formatters
 
                         deserializeMethod = Expression.Lambda<DeserializeMethod>(body, param0, param1, param2).Compile();
 
-                        this.deserializers.TryAdd(type, deserializeMethod);
+                        Deserializers.TryAdd(type, deserializeMethod);
                     }
                 }
             }
