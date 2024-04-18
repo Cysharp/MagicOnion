@@ -37,7 +37,7 @@ jobs:
       # pack nuget
       - run: dotnet pack -c Release ./MagicOnion.Packaging.slnf  --include-symbols --include-source --no-build -o ./publish
       - run: cd ./publish/ && ls . | grep -P 'MagicOnion\.\d+\.\d+\.\d+\.snupkg' | xargs rm
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: nuget
           path: ./publish/
@@ -84,7 +84,7 @@ jobs:
           directory: src/MagicOnion.Client.Unity
 
       # Store artifacts.
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: MagicOnion.Client.Unity.unitypackage
           path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
