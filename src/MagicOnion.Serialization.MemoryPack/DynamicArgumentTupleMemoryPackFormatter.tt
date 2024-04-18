@@ -36,7 +36,7 @@ namespace MagicOnion.Serialization.MemoryPack
     {
         [global::MagicOnion.Serialization.MemoryPack.Preserve]
 #if UNITY_2021_3_OR_NEWER
-        public override void Serialize(ref MemoryPackWriter writer, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
+        public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
 #else
         public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref DynamicArgumentTuple<<#= dynamicArgumentTupleGenericArgs #>> value)
 #endif
