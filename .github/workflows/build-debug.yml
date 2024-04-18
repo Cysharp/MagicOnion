@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
 
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
       - run: dotnet test -c Debug MagicOnion.sln
       - run: dotnet test -c Release MagicOnion.sln
@@ -61,7 +61,7 @@ jobs:
           UNITY_PASSWORD: "op://GitHubActionsPublic/UNITY_LICENSE/credential"
           UNITY_SERIAL: "op://GitHubActionsPublic/UNITY_LICENSE/serial"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # todo: prepare runtime unit test
       # Execute scripts: RuntimeUnitTestToolkit
