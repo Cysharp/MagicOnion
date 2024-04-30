@@ -34,6 +34,7 @@ jobs:
         with:
           name: nuget
           path: ./publish/
+          retention-days: 1
 
   canary-push:
     needs: [canary-build]

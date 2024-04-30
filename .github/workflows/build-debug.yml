@@ -94,3 +94,4 @@ jobs:
         with:
           name: MagicOnion.Client.Unity.${{ matrix.unity }}.unitypackage
           path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+          retention-days: 1

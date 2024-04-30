@@ -41,6 +41,7 @@ jobs:
         with:
           name: nuget
           path: ./publish/
+          retention-days: 1
 
   build-unity:
     needs: [update-packagejson]
@@ -88,6 +89,7 @@ jobs:
         with:
           name: MagicOnion.Client.Unity.unitypackage
           path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+          retention-days: 1
 
   # release
   create-release:
