@@ -79,14 +79,14 @@ internal class MagicOnionRemoteSerializer : IRemoteSerializer
     }
 }
 
-internal class MagicOnionMulticastGroupProviderFactory(IInMemoryProxyFactory inMemoryProxyFactory, IRemoteProxyFactory remoteProxyFactory, IOptions<MagicOnionOptions> options)
+internal class MagicOnionMulticastGroupProviderFactory(IInMemoryProxyFactory inMemoryProxyFactory, IRemoteProxyFactory remoteProxyFactory, IOptions<MagicOnionOptions> options) : IMulticastGroupProviderFactory
 {
-    readonly ConcurrentDictionary<(string, Type), object> groupProviders = new();
+    readonly ConcurrentDictionary<Type, object> groupProviders = new();
 
-    public IMulticastGroupProvider<T> CreateProvider<T>(string methodHandlerName)
+    public IMulticastGroupProvider<T> CreateProvider<T>()
     {
         return (IMulticastGroupProvider<T>)groupProviders.GetOrAdd(
-            (methodHandlerName, typeof(T)),
+            typeof(T),
             _ => new RemoteCompositeGroupProvider<T>(
                 inMemoryProxyFactory,
                 remoteProxyFactory,
@@ -96,21 +96,22 @@ internal class MagicOnionMulticastGroupProviderFactory(IInMemoryProxyFactory inM
     }
 }
 
-public interface IGroup<T> : IMulticastGroup<T>
+public interface IGroup<T> : IMulticastAsyncGroup<T>
 {
     ValueTask RemoveAsync(ServiceContext context);
 }
 
 internal class Group<T> : IGroup<T>
 {
-    readonly IMulticastGroup<T> _group;
+    readonly IMulticastAsyncGroup<T> _group;
 
-    public Group(IMulticastGroup<T> group)
+    public Group(IMulticastAsyncGroup<T> group)
     {
         _group = group;
     }
 
-    public T All => _group.All;
+    public T All
+        => _group.All;
 
     public T Except(IReadOnlyList<Guid> excludes)
         => _group.Except(excludes);
@@ -127,14 +128,15 @@ internal class Group<T> : IGroup<T>
     public ValueTask RemoveAsync(Guid key)
         => _group.RemoveAsync(key);
 
-    public ValueTask<int> CountAsync() => _group.CountAsync();
+    public ValueTask<int> CountAsync()
+        => _group.CountAsync();
 }
 
-public class HubGroupRepository<T> : IMulticastGroupProvider<T>
+public class HubGroupRepository<T>
 {
     readonly StreamingServiceContext<byte[], byte[]> streamingContext;
     readonly IMulticastGroupProvider<T> groupProvider;
-    readonly ConcurrentBag<IMulticastGroup<T>> addedGroups = new();
+    readonly ConcurrentBag<IMulticastAsyncGroup<T>> addedGroups = new();
     readonly T client;
 
     internal HubGroupRepository(T remoteClient, StreamingServiceContext<byte[], byte[]> streamingContext)
@@ -143,7 +145,7 @@ public class HubGroupRepository<T> : IMulticastGroupProvider<T>
 
         this.client = remoteClient;
         this.streamingContext = streamingContext;
-        this.groupProvider = streamingContext.ServiceProvider.GetRequiredService<MagicOnionMulticastGroupProviderFactory>().CreateProvider<T>(streamingContext.MethodHandler.ToString());
+        this.groupProvider = new WrappedGroupProvider(streamingContext.ServiceProvider.GetRequiredService<IMulticastGroupProviderFactory>().CreateProvider<T>(), streamingContext.MethodHandler.ToString());
     }
 
     /// <summary>
@@ -151,7 +153,7 @@ public class HubGroupRepository<T> : IMulticastGroupProvider<T>
     /// </summary>
     public async ValueTask<IGroup<T>> AddAsync(string groupName)
     {
-        var group = groupProvider.GetOrAdd(groupName);
+        var group = groupProvider.GetOrAddGroup(groupName);
         await group.AddAsync(streamingContext.ContextId, client).ConfigureAwait(false);
         addedGroups.Add(group);
         return new Group<T>(group);
@@ -165,11 +167,24 @@ public class HubGroupRepository<T> : IMulticastGroupProvider<T>
         }
     }
 
-    IMulticastGroup<T> IMulticastGroupProvider<T>.GetOrAdd(string name)
-        => groupProvider.GetOrAdd(name);
+    class WrappedGroupProvider : IMulticastGroupProvider<T>
+    {
+        readonly IMulticastGroupProvider<T> inner;
+        readonly string prefix;
 
-    public IMulticastGroupProvider<T> AsMulticastGroupProvider()
-        => groupProvider;
+        public WrappedGroupProvider(IMulticastGroupProvider<T> inner, string prefix)
+        {
+            this.inner = inner;
+            this.prefix = prefix;
+        }
+
+        // NOTE: Add a prefix between each SteramingHubs to separate the groups.
+        public IMulticastAsyncGroup<T> GetOrAddGroup(string name)
+            => inner.GetOrAddGroup($"{prefix}/{name}");
+
+        public IMulticastSyncGroup<T> GetOrAddSynchronousGroup(string name)
+            => inner.GetOrAddSynchronousGroup($"{prefix}/{name}");
+    }
 }
 
 public interface IGroup

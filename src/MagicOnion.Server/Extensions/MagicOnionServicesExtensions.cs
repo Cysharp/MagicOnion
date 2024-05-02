@@ -52,10 +52,10 @@ public static class MagicOnionServicesExtensions
         services.AddMetrics();
         services.TryAddSingleton<MagicOnionMetrics>();
 
+        // Add: Multicaster
         services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
         services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
         services.TryAddSingleton<IMulticastGroupProviderFactory, MagicOnionMulticastGroupProviderFactory>();
-        services.TryAddSingleton(typeof(IMulticastGroupProvider<>), typeof(MulticastGroupProvider<>));
 
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
