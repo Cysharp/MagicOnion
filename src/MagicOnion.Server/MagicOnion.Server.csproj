@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Sandbox\Multicaster.Proto\Multicaster.Proto\Multicaster.Proto.csproj" />
     <ProjectReference Include="..\MagicOnion.Abstractions\MagicOnion.Abstractions.csproj" />
     <ProjectReference Include="..\MagicOnion.Serialization.MessagePack\MagicOnion.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\MagicOnion.Shared\MagicOnion.Shared.csproj" />

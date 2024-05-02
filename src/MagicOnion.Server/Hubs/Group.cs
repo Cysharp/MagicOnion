@@ -1,7 +1,19 @@
+using System.Buffers;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Grpc.Core;
+using MagicOnion.Internal;
+using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using MagicOnion.Server.Diagnostics;
+using MessagePack;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Multicaster;
+using Multicaster.InMemory;
+using Multicaster.Remoting;
+using SerializationContext = Multicaster.Remoting.SerializationContext;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -33,124 +45,131 @@ public interface IGroupRepository
     bool TryRemove(string groupName);
 }
 
-public class HubGroupRepository
+internal class MagicOnionRemoteReceiverWriter : IRemoteReceiverWriter
 {
-    readonly ServiceContext serviceContext;
-    readonly IGroupRepository repository;
-    readonly ConcurrentBag<IGroup> addedGroups = new ConcurrentBag<IGroup>();
+    readonly StreamingServiceContext<byte[], byte[]> writer;
 
-    public IGroupRepository RawGroupRepository => repository;
-
-
-    public HubGroupRepository(ServiceContext serviceContext, IGroupRepository repository)
+    public MagicOnionRemoteReceiverWriter(StreamingServiceContext<byte[], byte[]> writer)
     {
-        this.serviceContext = serviceContext;
-        this.repository = repository;
+        this.writer = writer;
+    }
+
+    public void Write(ReadOnlyMemory<byte> payload)
+    {
+        writer.QueueResponseStreamWrite(payload.ToArray());
+    }
+}
+
+internal class MagicOnionRemoteSerializer : IRemoteSerializer
+{
+    readonly IMagicOnionSerializer serializer;
+
+    public MagicOnionRemoteSerializer(IMagicOnionSerializer serializer)
+    {
+        this.serializer = serializer;
+    }
+
+    public void Serialize<T>(IBufferWriter<byte> bufferWriter, T value, SerializationContext ctx)
+    {
+        var writer = new MessagePackWriter(bufferWriter);
+        writer.WriteArrayHeader(2);
+        writer.WriteInt32(FNV1A32.GetHashCode(ctx.MethodName));
+        writer.Flush();
+        serializer.Serialize(bufferWriter, value);
+    }
+}
+
+internal class MagicOnionMulticastGroupProviderFactory(IInMemoryProxyFactory inMemoryProxyFactory, IRemoteProxyFactory remoteProxyFactory, IOptions<MagicOnionOptions> options)
+{
+    readonly ConcurrentDictionary<(string, Type), object> groupProviders = new();
+
+    public IMulticastGroupProvider<T> CreateProvider<T>(string methodHandlerName)
+    {
+        return (IMulticastGroupProvider<T>)groupProviders.GetOrAdd(
+            (methodHandlerName, typeof(T)),
+            _ => new RemoteCompositeGroupProvider<T>(
+                inMemoryProxyFactory,
+                remoteProxyFactory,
+                new MagicOnionRemoteSerializer(options.Value.MessageSerializer.Create(MethodType.DuplexStreaming, null))
+            )
+        );
+    }
+}
+
+public interface IGroup<T> : IMulticastGroup<T>
+{
+    ValueTask RemoveAsync(ServiceContext context);
+}
+
+internal class Group<T> : IGroup<T>
+{
+    readonly IMulticastGroup<T> _group;
+
+    public Group(IMulticastGroup<T> group)
+    {
+        _group = group;
+    }
+
+    public T All => _group.All;
+
+    public T Except(IReadOnlyList<Guid> excludes)
+        => _group.Except(excludes);
+
+    public T Only(IReadOnlyList<Guid> targets)
+        => _group.Only(targets);
+
+    public ValueTask RemoveAsync(ServiceContext context)
+        => _group.RemoveAsync(context.ContextId);
+
+    public ValueTask AddAsync(Guid key, T receiver)
+        => _group.AddAsync(key, receiver);
+
+    public ValueTask RemoveAsync(Guid key)
+        => _group.RemoveAsync(key);
+
+    public ValueTask<int> CountAsync() => _group.CountAsync();
+}
+
+public class HubGroupRepository<T> : IMulticastGroupProvider<T>
+{
+    readonly StreamingServiceContext<byte[], byte[]> streamingContext;
+    readonly IMulticastGroupProvider<T> groupProvider;
+    readonly ConcurrentBag<IMulticastGroup<T>> addedGroups = new();
+    readonly T client;
+
+    internal HubGroupRepository(T remoteClient, StreamingServiceContext<byte[], byte[]> streamingContext)
+    {
+        Debug.Assert(remoteClient is IRemoteSingleReceiverWriterAccessor singleReceiverWriterAccessor && singleReceiverWriterAccessor.TryGetSingleReceiver(out _));
+
+        this.client = remoteClient;
+        this.streamingContext = streamingContext;
+        this.groupProvider = streamingContext.ServiceProvider.GetRequiredService<MagicOnionMulticastGroupProviderFactory>().CreateProvider<T>(streamingContext.MethodHandler.ToString());
     }
 
     /// <summary>
     /// Add to group.
     /// </summary>
-    public async ValueTask<IGroup> AddAsync(string groupName)
+    public async ValueTask<IGroup<T>> AddAsync(string groupName)
     {
-        var group = repository.GetOrAdd(groupName);
-        await group.AddAsync(serviceContext).ConfigureAwait(false);
+        var group = groupProvider.GetOrAdd(groupName);
+        await group.AddAsync(streamingContext.ContextId, client).ConfigureAwait(false);
         addedGroups.Add(group);
-        return group;
-    }
-
-    /// <summary>
-    /// Add to group and use some limitations.
-    /// </summary>
-    public async ValueTask<(bool, IGroup?)> TryAddAsync(string groupName, int incluciveLimitCount, bool createIfEmpty)
-    {
-        // Note: require lock but currently not locked...
-        if (repository.TryGet(groupName, out var group))
-        {
-            var memberCount = await group.GetMemberCountAsync().ConfigureAwait(false);
-            if (memberCount >= incluciveLimitCount)
-            {
-                return (false, null);
-            }
-            else
-            {
-                await group.AddAsync(serviceContext).ConfigureAwait(false);
-                addedGroups.Add(group);
-                return (true, group);
-            }
-        }
-
-        if (createIfEmpty)
-        {
-            group = repository.GetOrAdd(groupName);
-            await group.AddAsync(serviceContext).ConfigureAwait(false);
-            addedGroups.Add(group);
-            return (true, group);
-        }
-        else
-        {
-            return (false, null);
-        }
-    }
-
-    /// <summary>
-    /// Add to group and add data to inmemory storage per group.
-    /// </summary>
-    public async ValueTask<(IGroup, IInMemoryStorage<TStorage>)> AddAsync<TStorage>(string groupName, TStorage data)
-        where TStorage : class
-    {
-        var group = repository.GetOrAdd(groupName);
-        await group.AddAsync(serviceContext).ConfigureAwait(false);
-        addedGroups.Add(group);
-
-        var storage = group.GetInMemoryStorage<TStorage>();
-        storage.Set(serviceContext.ContextId, data);
-
-        return (group, storage);
-    }
-
-    /// <summary>
-    /// Add to group(with use some limitations) and add data to inmemory storage per group.
-    /// </summary>
-    public async ValueTask<(bool, IGroup?, IInMemoryStorage<TStorage>?)> TryAddAsync<TStorage>(string groupName, int incluciveLimitCount, bool createIfEmpty, TStorage data)
-        where TStorage : class
-    {
-        // Note: require lock but currently not locked...
-        if (repository.TryGet(groupName, out var group))
-        {
-            var memberCount = await group.GetMemberCountAsync();
-            if (memberCount >= incluciveLimitCount)
-            {
-                return (false, null, null);
-            }
-            else
-            {
-                await group.AddAsync(serviceContext).ConfigureAwait(false);
-                addedGroups.Add(group);
-                var storage = group.GetInMemoryStorage<TStorage>();
-                storage.Set(serviceContext.ContextId, data);
-                return (true, group, storage);
-            }
-        }
-
-        if (createIfEmpty)
-        {
-            var (repo, stor) = await AddAsync(groupName, data);
-            return (true, repo, stor);
-        }
-        else
-        {
-            return (false, null, null);
-        }
+        return new Group<T>(group);
     }
 
     internal async ValueTask DisposeAsync()
     {
         foreach (var item in addedGroups)
         {
-            await item.RemoveAsync(serviceContext);
+            await item.RemoveAsync(streamingContext.ContextId);
         }
     }
+
+    IMulticastGroup<T> IMulticastGroupProvider<T>.GetOrAdd(string name)
+        => groupProvider.GetOrAdd(name);
+
+    public IMulticastGroupProvider<T> AsMulticastGroupProvider()
+        => groupProvider;
 }
 
 public interface IGroup

@@ -5,8 +5,55 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
+using Multicaster;
+using Multicaster.Remoting;
 
 namespace MagicOnion.Server.Hubs;
+
+public static class StreamingHubBroadcastExtensions
+{
+    // Broadcast Commands
+    public static TReceiver Broadcast<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.All;
+    }
+    public static TReceiver BroadcastExceptSelf<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.Except([hub.Context.ContextId]);
+    }
+    public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid except)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.Except([except]);
+    }
+
+    public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> excepts)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.Except(excepts);
+    }
+
+    public static TReceiver BroadcastToSelf<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return hub.Client;
+    }
+
+    public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid toConnectionId)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.Only([toConnectionId]);
+    }
+
+    public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> toConnectionIds)
+        where THubInterface : IStreamingHub<THubInterface, TReceiver>
+    {
+        return group.Only(toConnectionIds);
+    }
+}
 
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
@@ -23,63 +70,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
     static readonly byte[] MarkerResponseBytes = { 0x93, 0xff, 0x00, 0x0c }; // MsgPack: [-1, 0, nil]
 
-    public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
+    public HubGroupRepository<TReceiver> Group { get; private set; } = default!;
+    public TReceiver Client { get; private set; } = default!;
 
     internal StreamingServiceContext<byte[], byte[]> StreamingServiceContext
         => (StreamingServiceContext<byte[], byte[]>)Context;
 
     protected Guid ConnectionId
         => Context.ContextId;
-
-    // Broadcast Commands
-
-    [Ignore]
-    protected TReceiver Broadcast(IGroup group)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
-        return (TReceiver)Activator.CreateInstance(type, group)!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExceptSelf(IGroup group)
-    {
-        return BroadcastExcept(group, Context.ContextId);
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExcept(IGroup group, Guid except)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, except })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExcept(IGroup group, Guid[] excepts)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastToSelf(IGroup group)
-    {
-        return BroadcastTo(group, Context.ContextId);
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastTo(IGroup group, Guid toConnectionId)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToMany;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionIds })!;
-    }
-
+    
     /// <summary>
     /// Called before connect, instead of constructor.
     /// </summary>
@@ -111,8 +110,13 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
 
-        var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
-        this.Group = new HubGroupRepository(this.Context, group);
+        var remoteProxyFactory = streamingContext.ServiceContext.ServiceProvider.GetRequiredService<IRemoteProxyFactory>();
+        this.Client = remoteProxyFactory.CreateSingle<TReceiver>(
+            new MagicOnionRemoteReceiverWriter(StreamingServiceContext),
+            new MagicOnionRemoteSerializer(streamingContext.ServiceContext.MessageSerializer)
+        );
+        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext);
+
         try
         {
             await OnConnecting();

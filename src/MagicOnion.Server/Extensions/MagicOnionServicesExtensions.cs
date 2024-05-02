@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using Grpc.AspNetCore.Server.Model;
+using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Glue;
@@ -7,6 +9,9 @@ using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Multicaster;
+using Multicaster.InMemory;
+using Multicaster.Remoting;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -46,6 +51,11 @@ public static class MagicOnionServicesExtensions
 
         services.AddMetrics();
         services.TryAddSingleton<MagicOnionMetrics>();
+
+        services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
+        services.TryAddSingleton<IMulticastGroupProviderFactory, MagicOnionMulticastGroupProviderFactory>();
+        services.TryAddSingleton(typeof(IMulticastGroupProvider<>), typeof(MulticastGroupProvider<>));
 
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
