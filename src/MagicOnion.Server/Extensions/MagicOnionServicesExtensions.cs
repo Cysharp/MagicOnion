@@ -55,7 +55,11 @@ public static class MagicOnionServicesExtensions
         // Add: Multicaster
         services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
         services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
-        services.TryAddSingleton<IMulticastGroupProviderFactory, MagicOnionMulticastGroupProviderFactory>();
+        services.TryAddSingleton<IMulticastGroupProvider>(sp => new RemoteCompositeGroupProvider(
+            sp.GetRequiredService<IInMemoryProxyFactory>(),
+            sp.GetRequiredService<IRemoteProxyFactory>(),
+            new MagicOnionRemoteSerializer(sp.GetRequiredService<IOptions<MagicOnionOptions>>().Value.MessageSerializer.Create(MethodType.DuplexStreaming, null))
+        ));
 
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
