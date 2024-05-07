@@ -10,6 +10,7 @@ using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MagicOnion.Serialization;
 using Microsoft.Extensions.Logging;
+using Multicaster;
 
 namespace MagicOnion.Server;
 
@@ -39,6 +40,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     internal ILogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
+
     public IMagicOnionSerializer MessageSerializer => messageSerializer;
 
     public string ServiceName => metadata.ServiceInterface.Name;

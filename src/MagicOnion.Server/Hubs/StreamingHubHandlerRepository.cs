@@ -1,30 +1,35 @@
 using MagicOnion.Server.Internal;
+using Multicaster;
 
 namespace MagicOnion.Server.Hubs;
 
 // Global cache of Streaming Handler
-internal static class StreamingHubHandlerRepository
+internal class StreamingHubHandlerRepository
 {
-    static Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
-        = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(new MethodHandler.UniqueEqualityComparer());
+    readonly Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> handlersCache = new(new MethodHandler.UniqueEqualityComparer());
+    readonly Dictionary<MethodHandler, IMulticastGroupProvider> groupCache = new(new MethodHandler.UniqueEqualityComparer());
 
-    static Dictionary<MethodHandler, IGroupRepository> cacheGroup
-        = new Dictionary<MethodHandler, IGroupRepository>(new MethodHandler.UniqueEqualityComparer());
-
-    public static void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
+    public void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
     {
         var handlers = VerifyDuplicate(hubHandlers);
         var hashDict = new UniqueHashDictionary<StreamingHubHandler>(handlers);
 
-        lock (cache)
-        {
-            cache.Add(parent, hashDict);
-        }
+        handlersCache.Add(parent, hashDict);
     }
 
-    public static UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
+    public UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
     {
-        return cache[parent];
+        return handlersCache[parent];
+    }
+
+    public void RegisterGroupProvider(MethodHandler methodHandler, IMulticastGroupProvider groupProvider)
+    {
+        groupCache[methodHandler] = groupProvider;
+    }
+
+    public IMulticastGroupProvider GetGroupProvider(MethodHandler methodHandler)
+    {
+        return groupCache[methodHandler];
     }
 
     static (int, StreamingHubHandler)[] VerifyDuplicate(StreamingHubHandler[] hubHandlers)
@@ -43,18 +48,5 @@ internal static class StreamingHubHandlerRepository
         }
 
         return list.ToArray();
-    }
-
-    public static void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
-    {
-        lock (cacheGroup)
-        {
-            cacheGroup.Add(parent, repository);
-        }
-    }
-
-    public static IGroupRepository GetGroupRepository(MethodHandler parent)
-    {
-        return cacheGroup[parent];
     }
 }

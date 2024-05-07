@@ -109,13 +109,16 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
         var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
+        var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
-        var remoteProxyFactory = streamingContext.ServiceContext.ServiceProvider.GetRequiredService<IRemoteProxyFactory>();
+        var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         this.Client = remoteProxyFactory.CreateSingle<TReceiver>(
             new MagicOnionRemoteReceiverWriter(StreamingServiceContext),
             new MagicOnionRemoteSerializer(streamingContext.ServiceContext.MessageSerializer)
         );
-        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext);
+
+        var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
+        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
 
         try
         {
@@ -176,7 +179,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // eg: Send the current game state to the client.
         await OnConnected();
 
-        var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
+        var handlers = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetHandlers(Context.MethodHandler);
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.

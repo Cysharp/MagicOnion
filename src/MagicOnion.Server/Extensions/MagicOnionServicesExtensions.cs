@@ -44,22 +44,12 @@ public static class MagicOnionServicesExtensions
         var configName = Options.Options.DefaultName;
         var glueServiceType = MagicOnionGlueService.CreateType();
 
-        services.TryAddSingleton<IGroupRepositoryFactory, ImmutableArrayGroupRepositoryFactory>();
-
+        services.AddSingleton<StreamingHubHandlerRepository>();
         services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
         services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
 
         services.AddMetrics();
         services.TryAddSingleton<MagicOnionMetrics>();
-
-        // Add: Multicaster
-        services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
-        services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
-        services.TryAddSingleton<IMulticastGroupProvider>(sp => new RemoteCompositeGroupProvider(
-            sp.GetRequiredService<IInMemoryProxyFactory>(),
-            sp.GetRequiredService<IRemoteProxyFactory>(),
-            new MagicOnionRemoteSerializer(sp.GetRequiredService<IOptions<MagicOnionOptions>>().Value.MessageSerializer.Create(MethodType.DuplexStreaming, null))
-        ));
 
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
@@ -67,6 +57,12 @@ public static class MagicOnionServicesExtensions
                 configuration.GetSection(string.IsNullOrWhiteSpace(configName) ? "MagicOnion" : configName).Bind(o);
                 configureOptions?.Invoke(o);
             });
+
+        // Add: Multicaster
+        services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteSerializer>(sp => new MagicOnionRemoteSerializer(sp.GetRequiredService<IOptions<MagicOnionOptions>>().Value.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
+        services.TryAddSingleton<IMulticastGroupProvider, RemoteCompositeGroupProvider>();
 
         return new MagicOnionServerBuilder(services);
     }
