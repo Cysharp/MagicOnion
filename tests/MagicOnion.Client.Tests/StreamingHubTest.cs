@@ -421,9 +421,7 @@ public class StreamingHubTest
         client.Void_Parameter_Many(12345, "Hello", 0xfffffff1L, true, 128, 12.345, 'X');
 
         // Read a hub method request payload
-        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<DynamicArgumentTuple<int, string, long, bool, byte, double, char>>();
-        // Write a response to the stream
-        helper.WriteResponse(messageId, methodId, 456);
+        var (methodId, requestBody) = await helper.ReadFireAndForgetRequestAsync<DynamicArgumentTuple<int, string, long, bool, byte, double, char>>();
 
         Assert.Equal(12345, requestBody.Item1);
         Assert.Equal("Hello", requestBody.Item2);
