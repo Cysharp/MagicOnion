@@ -3,8 +3,6 @@ using MessagePack;
 using System.Collections.Concurrent;
 using MagicOnion.Internal;
 using Microsoft.Extensions.ObjectPool;
-using Grpc.Core;
-using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Hubs;
 
