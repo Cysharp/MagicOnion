@@ -28,22 +28,22 @@ namespace MagicOnion.Client
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
-        readonly AsyncLock asyncLock = new AsyncLock();
+        readonly AsyncLock asyncLock = new();
         readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
         readonly Dictionary<int, ITaskCompletion> responseFutures = new();
+        readonly TaskCompletionSource<bool> waitForDisconnect = new();
+        readonly CancellationTokenSource cancellationTokenSource = new();
+
+        int messageId = 0;
+        bool disposed;
 
         IClientStreamWriter<StreamingHubPayload> writer = default!;
         IAsyncStreamReader<StreamingHubPayload> reader = default!;
 
-        protected TReceiver receiver = default!;
         Task subscription = default!;
 
-        TaskCompletionSource<bool> waitForDisconnect = new TaskCompletionSource<bool>();
-
-        protected CancellationTokenSource cts = new CancellationTokenSource();
-        int messageId = 0;
-        bool disposed;
+        protected TReceiver receiver = default!;
 
         protected StreamingHubClientBase(string serviceName, CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         {
@@ -91,7 +91,7 @@ namespace MagicOnion.Client
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
             }
 
-            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
+            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token).Token);
             if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
                 // NOTE: Grpc.Net:
@@ -150,7 +150,7 @@ namespace MagicOnion.Client
                         }
                     }
 
-                    moveNext = reader.MoveNext(cts.Token);
+                    moveNext = reader.MoveNext(cancellationTokenSource.Token);
                 }
             }
             catch (Exception ex)
@@ -370,8 +370,8 @@ namespace MagicOnion.Client
             catch { } // ignore error?
             finally
             {
-                cts.Cancel();
-                cts.Dispose();
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
                 try
                 {
                     if (waitSubscription)
