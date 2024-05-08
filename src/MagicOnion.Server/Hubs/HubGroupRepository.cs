@@ -15,7 +15,7 @@ public class HubGroupRepository<T>
 
     internal HubGroupRepository(T remoteClient, StreamingServiceContext<byte[], byte[]> streamingContext, IMulticastGroupProvider multicastGroupProvider)
     {
-        Debug.Assert(remoteClient is IRemoteSingleReceiverWriterAccessor singleReceiverWriterAccessor && singleReceiverWriterAccessor.TryGetSingleReceiver(out _));
+        Debug.Assert(remoteClient is IRemoteDirectReceiverWriterAccessor directReceiverWriterAccessor && directReceiverWriterAccessor.TryGetDirectReceiverWriter(out _));
 
         this.client = remoteClient;
         this.streamingContext = streamingContext;

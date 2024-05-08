@@ -107,6 +107,7 @@ public class StaticStreamingHubClientGenerator
         EmitFireAndForget(ctx);
         EmitOnBroadcastEvent(ctx);
         EmitOnResponseEvent(ctx);
+        EmitOnClientInvokeEvent(ctx);
         ctx.Writer.AppendLine("""
                         }
             """);
@@ -261,7 +262,7 @@ public class StaticStreamingHubClientGenerator
                                 switch (methodId)
                                 {
             """);
-        foreach (var method in ctx.Hub.Receiver.Methods)
+        foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void))
         {
             var methodArgs = method.Parameters.Count switch
             {
@@ -314,6 +315,40 @@ public class StaticStreamingHubClientGenerator
             ctx.Writer.AppendLineWithFormat($$"""
                                     case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                         base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
+                                        break;
+            """);
+        }
+        ctx.Writer.AppendLine("""
+                                }
+                            }
+
+            """);
+    }
+
+    static void EmitOnClientInvokeEvent(StreamingHubClientBuildContext ctx)
+    {
+        ctx.Writer.AppendLine("""
+                            protected override async void OnClientInvokeEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ArraySegment<global::System.Byte> data)
+                            {
+                                switch (methodId)
+                                {
+            """);
+        foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void))
+        {
+            var methodArgs = method.Parameters.Count switch
+            {
+                0 => "",
+                1 => "value",
+                _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
+            };
+
+            ctx.Writer.AppendLineWithFormat($$"""
+                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                                        {
+                                            var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+                                            var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
+                                            await base.WriteClientResultMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                        }
                                         break;
             """);
         }

@@ -4,6 +4,7 @@ using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Multicaster;
 
 namespace ChatApp.Server;
 
@@ -13,8 +14,14 @@ namespace ChatApp.Server;
 /// </summary>
 public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 {
-    private IGroup room;
+    private IGroup<IChatHubReceiver> room;
     private string myName;
+    private readonly IMulticastSyncGroup<IChatHubReceiver> roomForAll;
+
+    public ChatHub(IMulticastGroupProvider groupProvider)
+    {
+        roomForAll = groupProvider.GetOrAddSynchronousGroup<IChatHubReceiver>("All");
+    }
 
     public async Task JoinAsync(JoinRequest request)
     {
@@ -22,7 +29,9 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 
         this.myName = request.UserName;
 
-        this.Broadcast(this.room).OnJoin(request.UserName);
+        this.room.All.OnJoin(request.UserName);
+
+        Console.WriteLine($"From Client: {await Client.HelloAsync("Cilent", 18)}");
     }
 
 
@@ -31,7 +40,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
         if (this.room is not null)
         {
             await this.room.RemoveAsync(this.Context);
-            this.Broadcast(this.room).OnLeave(this.myName);
+            this.room.All.OnLeave(this.myName);
         }
     }
 
@@ -39,8 +48,16 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
     {
         if (this.room is not null)
         {
-            var response = new MessageResponse { UserName = this.myName, Message = message };
-            this.Broadcast(this.room).OnSendMessage(response);
+            if (message.StartsWith("/global ", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var response = new MessageResponse { UserName = this.myName, Message = message.Substring("/global ".Length) };
+                this.roomForAll.All.OnSendMessage(response);
+            }
+            else
+            {
+                var response = new MessageResponse { UserName = this.myName, Message = message };
+                this.room.All.OnSendMessage(response);
+            }
         }
 
         await Task.CompletedTask;
@@ -61,6 +78,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
     {
         // handle connection if needed.
         Console.WriteLine($"client connected {this.Context.ContextId}");
+        roomForAll.Add(ConnectionId, Client);
         return CompletedTask;
     }
 
@@ -68,6 +86,7 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
     {
         // handle disconnection if needed.
         // on disconnecting, if automatically removed this connection from group.
+        roomForAll.Remove(ConnectionId);
         return CompletedTask;
     }
 }

@@ -58,6 +58,8 @@ public static class StreamingHubBroadcastExtensions
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
+    readonly IRemoteCallPendingMessageQueue remoteCallPendingQueue = new RemoteCallPendingMessageQueue();
+
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
 
@@ -112,10 +114,8 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
-        this.Client = remoteProxyFactory.CreateSingle<TReceiver>(
-            new MagicOnionRemoteReceiverWriter(StreamingServiceContext),
-            new MagicOnionRemoteSerializer(streamingContext.ServiceContext.MessageSerializer)
-        );
+        var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
+        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteCallPendingQueue);
 
         var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
         this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
@@ -186,10 +186,17 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         while (await reader.MoveNext(ct)) // must keep SyncContext.
         {
             var data = reader.Current;
-            var (methodId, messageId, offset) = FetchHeader(data);
+            var (methodId, messageId, clientResultMessageId, offset) = FetchHeader(data);
             var hasResponse = messageId != -1;
 
-            if (handlers.TryGetValue(methodId, out var handler))
+            if (clientResultMessageId is not null)
+            {
+                if (remoteCallPendingQueue.TryGetPendingMessage(clientResultMessageId.Value, out var pendingMessage))
+                {
+                    pendingMessage.SetResult(data.AsMemory(offset, data.Length - offset));
+                }
+            }
+            else if (handlers.TryGetValue(methodId, out var handler))
             {
                 // Create a context for each call to the hub method.
                 var context = new StreamingHubContext()
@@ -242,7 +249,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    static (int methodId, int messageId, int offset) FetchHeader(byte[] msgData)
+    static (int methodId, int messageId, Guid? clientResultMessageId, int offset) FetchHeader(byte[] msgData)
     {
         var messagePackReader = new MessagePackReader(msgData);
 
@@ -253,7 +260,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             var mid = messagePackReader.ReadInt32();
             var consumed = (int)messagePackReader.Consumed;
 
-            return (mid, -1, consumed);
+            return (mid, -1, default, consumed);
         }
         else if (length == 3)
         {
@@ -261,7 +268,17 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             var msgId = messagePackReader.ReadInt32();
             var metId = messagePackReader.ReadInt32();
             var consumed = (int)messagePackReader.Consumed;
-            return (metId, msgId, consumed);
+            return (metId, msgId, default, consumed);
+        }
+        else if (length == 4)
+        {
+            // [type, ...]
+            // [0, clientResultMessageId, methodId, result]
+            var type = messagePackReader.ReadByte();
+            var clientResultMessageId = MessagePackSerializer.Deserialize<Guid>(ref messagePackReader);
+            var methodId = messagePackReader.ReadInt32();
+            var consumed = (int)messagePackReader.Consumed;
+            return (methodId, -1, clientResultMessageId, consumed);
         }
         else
         {

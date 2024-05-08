@@ -12,6 +12,7 @@ using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
 using MessagePack;
+using System.Security.Cryptography;
 
 namespace MagicOnion.Client
 {
@@ -120,6 +121,7 @@ namespace MagicOnion.Client
 
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+        protected abstract void OnClientInvokeEvent(int methodId, Guid messageId, ArraySegment<byte> data);
 
         static Method<byte[], byte[]> CreateConnectMethod(string serviceName)
             => new Method<byte[], byte[]>(MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
@@ -195,6 +197,7 @@ namespace MagicOnion.Client
         // broadcast: [methodId, [argument]]
         // response:  [messageId, methodId, response]
         // error-response: [messageId, statusCode, detail, StringMessage]
+        // client-result call: [type(0), 0, methodId, messageId, [argument]]
         void ConsumeData(SynchronizationContext? syncContext, byte[] data)
         {
             var messagePackReader = new MessagePackReader(data);
@@ -240,6 +243,28 @@ namespace MagicOnion.Client
                     }
 
                     future.TrySetException(ex);
+                }
+            }
+            else if (arrayLength == 5)
+            {
+                var type = messagePackReader.ReadByte();
+                var dummy = messagePackReader.ReadByte();
+                var methodId = messagePackReader.ReadInt32();
+                var messageId = MessagePackSerializer.Deserialize<Guid>(ref messagePackReader);
+
+                var offset = (int)messagePackReader.Consumed;
+                if (syncContext != null)
+                {
+                    var tuple = Tuple.Create(methodId, messageId, data, offset, data.Length - offset);
+                    syncContext.Post(state =>
+                    {
+                        var t = (Tuple<int, Guid, byte[], int, int>)state!;
+                        OnClientInvokeEvent(t.Item1, t.Item2, new ArraySegment<byte>(t.Item3, t.Item4, t.Item5));
+                    }, tuple);
+                }
+                else
+                {
+                    OnClientInvokeEvent(methodId, messageId, new ArraySegment<byte>(data, offset, data.Length - offset));
                 }
             }
             else
@@ -324,6 +349,33 @@ namespace MagicOnion.Client
             }
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
+        }
+
+        protected async Task WriteClientResultMessageAsync<T>(int methodId, Guid clientResultMessageId, T result)
+        {
+            byte[] BuildMessage()
+            {
+                // [type, ...]
+                // client result call/response: [0, clientResultMessageId, methodId, result]
+                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
+                {
+                    var writer = new MessagePackWriter(buffer);
+                    writer.WriteArrayHeader(4);
+                    writer.WriteInt8(0);
+                    MessagePackSerializer.Serialize<Guid>(ref writer, clientResultMessageId);
+                    writer.Write(methodId);
+                    writer.Flush();
+                    Serialize(buffer, result);
+                    return buffer.WrittenSpan.ToArray();
+                }
+            }
+
+            var v = BuildMessage();
+            using (await asyncLock.LockAsync().ConfigureAwait(false))
+            {
+                Console.WriteLine($"WriteClientResultMessageAsync: {methodId}; {clientResultMessageId}");
+                await writer.WriteAsync(v).ConfigureAwait(false);
+            }
         }
 
         void ThrowIfDisposed()

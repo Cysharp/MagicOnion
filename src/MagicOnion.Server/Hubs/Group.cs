@@ -25,6 +25,9 @@ internal class Group<T> : IGroup<T>
     public T Only(IReadOnlyList<Guid> targets)
         => _group.Only(targets);
 
+    public T Single(Guid target)
+        => _group.Single(target);
+
     public ValueTask RemoveAsync(ServiceContext context)
         => _group.RemoveAsync(context.ContextId);
 
