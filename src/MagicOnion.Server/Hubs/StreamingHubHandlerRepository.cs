@@ -1,30 +1,57 @@
+#if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
 using MagicOnion.Server.Internal;
 
 namespace MagicOnion.Server.Hubs;
 
 // Global cache of Streaming Handler
-internal static class StreamingHubHandlerRepository
+internal class StreamingHubHandlerRepository
 {
-    static Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
-        = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(new MethodHandler.UniqueEqualityComparer());
+    bool frozen;
 
-    static Dictionary<MethodHandler, IGroupRepository> cacheGroup
-        = new Dictionary<MethodHandler, IGroupRepository>(new MethodHandler.UniqueEqualityComparer());
+    IDictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> cache
+        = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(MethodHandler.UniqueEqualityComparer.Instance);
 
-    public static void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
+    IDictionary<MethodHandler, IGroupRepository> cacheGroup
+        = new Dictionary<MethodHandler, IGroupRepository>(MethodHandler.UniqueEqualityComparer.Instance);
+
+    public void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
     {
+        ThrowIfFrozen();
+
         var handlers = VerifyDuplicate(hubHandlers);
         var hashDict = new UniqueHashDictionary<StreamingHubHandler>(handlers);
 
-        lock (cache)
-        {
-            cache.Add(parent, hashDict);
-        }
+        cache.Add(parent, hashDict);
     }
 
-    public static UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
+    public UniqueHashDictionary<StreamingHubHandler> GetHandlers(MethodHandler parent)
+        => cache[parent];
+
+    public void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
     {
-        return cache[parent];
+        ThrowIfFrozen();
+        cacheGroup.Add(parent, repository);
+    }
+
+    public IGroupRepository GetGroupRepository(MethodHandler parent)
+        => cacheGroup[parent];
+
+    public void Freeze()
+    {
+        ThrowIfFrozen();
+        frozen = true;
+
+#if NET8_0_OR_GREATER
+        cache = cache.ToFrozenDictionary(MethodHandler.UniqueEqualityComparer.Instance);
+        cacheGroup = cacheGroup.ToFrozenDictionary(MethodHandler.UniqueEqualityComparer.Instance);
+#endif
+    }
+
+    void ThrowIfFrozen()
+    {
+        if (frozen) throw new InvalidOperationException($"Cannot modify the {nameof(StreamingHubHandlerRepository)}. The instance is already frozen.");
     }
 
     static (int, StreamingHubHandler)[] VerifyDuplicate(StreamingHubHandler[] hubHandlers)
@@ -43,18 +70,5 @@ internal static class StreamingHubHandlerRepository
         }
 
         return list.ToArray();
-    }
-
-    public static void AddGroupRepository(MethodHandler parent, IGroupRepository repository)
-    {
-        lock (cacheGroup)
-        {
-            cacheGroup.Add(parent, repository);
-        }
-    }
-
-    public static IGroupRepository GetGroupRepository(MethodHandler parent)
-    {
-        return cacheGroup[parent];
     }
 }

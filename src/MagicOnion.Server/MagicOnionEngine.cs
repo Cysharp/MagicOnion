@@ -118,6 +118,9 @@ public static class MagicOnionEngine
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var loggerMagicOnionEngine = loggerFactory.CreateLogger(LoggerNameMagicOnionEngine);
         var loggerMethodHandler = loggerFactory.CreateLogger(LoggerNameMethodHandler);
+
+        var streamingHubHandlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
+
         MagicOnionServerLog.BeginBuildServiceDefinition(loggerMagicOnionEngine);
 
         var sw = Stopwatch.StartNew();
@@ -200,7 +203,7 @@ public static class MagicOnionEngine
                     }
 
                     streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-                    StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
+                    streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
                     IGroupRepositoryFactory factory;
                     var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                     if (attr != null)
@@ -211,7 +214,7 @@ public static class MagicOnionEngine
                     {
                         factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
                     }
-                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
+                    streamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
                 }
             }
         }
@@ -219,6 +222,8 @@ public static class MagicOnionEngine
         {
             ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
         }
+
+        streamingHubHandlerRepository.Freeze();
 
         var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 
