@@ -20,9 +20,9 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A(global::TempProject.MyGenericObject<global::System.Int32, global::TempProject.MyObject> a)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::System.Int32, global::TempProject.MyObject>, global::MessagePack.Nil>(-1005848884, a);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::System.Int32, global::TempProject.MyObject>, global::MessagePack.Nil>(-1005848884, a);
                 public global::System.Threading.Tasks.Task B(global::TempProject.MyGenericObject<global::TempProject.MyObject, global::System.Int32> a)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::TempProject.MyObject, global::System.Int32>, global::MessagePack.Nil>(-955516027, a);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::TempProject.MyObject, global::System.Int32>, global::MessagePack.Nil>(-955516027, a);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

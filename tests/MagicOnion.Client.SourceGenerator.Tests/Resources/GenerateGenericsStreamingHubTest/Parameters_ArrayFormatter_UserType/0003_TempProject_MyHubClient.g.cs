@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetValuesAsync(global::TempProject.MyResponse[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyResponse[], global::MessagePack.Nil>(-209315513, arg0);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyResponse[], global::MessagePack.Nil>(-209315513, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

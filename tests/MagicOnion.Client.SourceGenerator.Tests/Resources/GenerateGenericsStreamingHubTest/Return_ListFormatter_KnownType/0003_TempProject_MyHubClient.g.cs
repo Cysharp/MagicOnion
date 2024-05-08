@@ -20,9 +20,9 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::System.String>> GetStringValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.String>>(1774317884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.String>>(1774317884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::System.Int32>> GetIntValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.Int32>>(-400881550, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.Int32>>(-400881550, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

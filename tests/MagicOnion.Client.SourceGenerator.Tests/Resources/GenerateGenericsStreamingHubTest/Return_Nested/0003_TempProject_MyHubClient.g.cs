@@ -20,11 +20,11 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>> A()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>> B()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>>(-955516027, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>>(-955516027, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>> C()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>>(-972293646, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>>(-972293646, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::TempProject.MyObject> A(global::TempProject.MyObject a)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
