@@ -339,40 +339,6 @@ public interface IMyHubReceiver
     }
 
     [Fact]
-    public void ReturnType_NotSupported_Void()
-    {
-        // Arrange
-        var source = @"
-using System;
-using System.Threading.Tasks;
-using MagicOnion;
-using MessagePack;
-
-namespace MyNamespace;
-
-public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
-{
-    void MethodA();
-}
-
-public interface IMyHubReceiver
-{
-    void EventA();
-}
-";
-        var (compilation, semModel) = CompilationHelper.Create(source);
-        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
-        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
-
-        // Act
-        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
-
-        // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id);
-    }
-
-    [Fact]
     public void ReturnType_NotSupported_NotTaskOfT()
     {
         // Arrange
