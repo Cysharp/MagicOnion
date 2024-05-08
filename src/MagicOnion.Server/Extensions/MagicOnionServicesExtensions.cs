@@ -34,19 +34,27 @@ public static class MagicOnionServicesExtensions
         return services.AddMagicOnionCore(configureOptions);
     }
 
-    static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
+    // NOTE: `internal` is required for unit tests.
+    internal static IMagicOnionServerBuilder AddMagicOnionCore(this IServiceCollection services, Action<MagicOnionOptions>? configureOptions = null)
     {
         var configName = Options.Options.DefaultName;
-        var glueServiceType = MagicOnionGlueService.CreateType();
 
+        // Required services (ASP.NET Core, gRPC)
+        services.AddLogging();
+        services.AddGrpc();
+        services.AddMetrics();
+
+        // MagicOnion: Core services
+        var glueServiceType = MagicOnionGlueService.CreateType();
         services.TryAddSingleton<IGroupRepositoryFactory, ImmutableArrayGroupRepositoryFactory>();
 
         services.AddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
         services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IServiceMethodProvider<>).MakeGenericType(glueServiceType), typeof(MagicOnionGlueServiceMethodProvider<>).MakeGenericType(glueServiceType)));
 
-        services.AddMetrics();
+        // MagicOnion: Metrics
         services.TryAddSingleton<MagicOnionMetrics>();
 
+        // MagicOnion: Options
         services.AddOptions<MagicOnionOptions>(configName)
             .Configure<IConfiguration>((o, configuration) =>
             {
