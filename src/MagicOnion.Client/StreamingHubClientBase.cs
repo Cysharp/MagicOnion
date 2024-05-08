@@ -283,7 +283,7 @@ namespace MagicOnion.Client
 
             StreamingHubPayload BuildMessage()
             {
-                var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
                 var writer = new MessagePackWriter(buffer);
                 writer.WriteArrayHeader(2);
                 writer.Write(methodId);
@@ -327,7 +327,7 @@ namespace MagicOnion.Client
 
             StreamingHubPayload BuildMessage()
             {
-                var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
                 var writer = new MessagePackWriter(buffer);
                 writer.WriteArrayHeader(3);
                 writer.Write(mid);
