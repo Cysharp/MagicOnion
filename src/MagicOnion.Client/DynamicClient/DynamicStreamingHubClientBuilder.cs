@@ -133,9 +133,10 @@ namespace MagicOnion.Client.DynamicClient
                 if (returnTypeNonGenericOrOpenGeneric != typeof(ValueTask) &&
                     returnTypeNonGenericOrOpenGeneric != typeof(Task) &&
                     returnTypeNonGenericOrOpenGeneric != typeof(ValueTask<>) &&
-                    returnTypeNonGenericOrOpenGeneric != typeof(Task<>))
+                    returnTypeNonGenericOrOpenGeneric != typeof(Task<>) &&
+                    returnTypeNonGenericOrOpenGeneric != typeof(void))
                 {
-                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. {item.MethodInfo.Name}.");
+                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `void`, `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. {item.MethodInfo.Name}.");
                 }
 
                 item.MethodId = methodId;
@@ -247,6 +248,7 @@ namespace MagicOnion.Client.DynamicClient
                     var il = method.GetILGenerator();
 
                     var labels = definitions
+                        .Where(x => x.MethodInfo.ReturnType != typeof(void)) // If the return type if `void`, we always need to treat as fire-and-forget.
                         .Select(x => new { def = x, label = il.DefineLabel() })
                         .ToArray();
 
@@ -264,6 +266,7 @@ namespace MagicOnion.Client.DynamicClient
                     {
                         // SetResultForResponse<T>(taskCompletionSource, data);
                         Type responseType;
+
                         if (item.def.MethodInfo.ReturnType == typeof(Task) || item.def.MethodInfo.ReturnType == typeof(ValueTask))
                         {
                             // Task methods uses TaskCompletionSource<Nil>
@@ -416,6 +419,11 @@ namespace MagicOnion.Client.DynamicClient
                     var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
                     il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, typeof(Nil)));
                 }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    var mInfo = baseType.GetMethod("WriteMessageFireAndForgetAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, typeof(Nil)));
+                }
                 else
                 {
                     var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -431,6 +439,10 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                     il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
+                }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Pop);
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -515,7 +527,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
 
                 Type responseType;
-                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
+                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask) || def.MethodInfo.ReturnType == typeof(void))
                 {
                     responseType = typeof(Nil);
                 }
@@ -537,6 +549,10 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                     il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
+                }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Pop);
                 }
 
                 il.Emit(OpCodes.Ret);

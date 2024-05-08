@@ -275,7 +275,7 @@ public class GenerateStreamingHubTest
     }
 
     [Fact]
-    public async Task Invalid_Return_Void()
+    public async Task Return_Void()
     {
         var source = """
         using System;
@@ -289,7 +289,7 @@ public class GenerateStreamingHubTest
             public interface IMyHubReceiver { }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
-                void {|#0:A|}();
+                void A();
             }
         
             [MagicOnionClientGeneration(typeof(IMyHub))]
@@ -297,15 +297,7 @@ public class GenerateStreamingHubTest
         }
         """;
 
-        var verifierOptions = VerifierOptions.Default with
-        {
-            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
-            ExpectedDiagnostics = new[]
-            {
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0),
-            }
-        };
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
 
     [Fact]

@@ -59,13 +59,13 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         );
     }
 
-    public async Task<(int MessageId, int MethodId, T Requst)> ReadRequestAsync<T>()
+    public async Task<(int MessageId, int MethodId, T Request)> ReadRequestAsync<T>()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
         return ReadRequestPayload<T>(requestPayload);
     }
 
-    public async Task<(int MethodId, T Requst)> ReadFireAndForgetRequestAsync<T>()
+    public async Task<(int MethodId, T Request)> ReadFireAndForgetRequestAsync<T>()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
         return ReadFireAndForgetRequestPayload<T>(requestPayload);

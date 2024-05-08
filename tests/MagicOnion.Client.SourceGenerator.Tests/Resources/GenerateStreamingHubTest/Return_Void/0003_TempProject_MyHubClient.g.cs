@@ -19,8 +19,8 @@ namespace TempProject
                 {
                 }
 
-                public global::System.Threading.Tasks.Task A(global::TempProject.MyObject a)
-                    => this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-1005848884, a);
+                public void A()
+                    => this.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -37,8 +37,8 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task DisposeAsync() => throw new global::System.NotSupportedException();
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
-                    public global::System.Threading.Tasks.Task A(global::TempProject.MyObject a)
-                        => parent.WriteMessageFireAndForgetAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-1005848884, a);
+                    public void A()
+                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
 
                 }
 
@@ -46,12 +46,6 @@ namespace TempProject
                 {
                     switch (methodId)
                     {
-                        case -1262822265: // Void OnMessage(global::TempProject.MyObject arg0)
-                            {
-                                var value = base.Deserialize<global::TempProject.MyObject>(data);
-                                receiver.OnMessage(value);
-                            }
-                            break;
                     }
                 }
 
@@ -59,7 +53,7 @@ namespace TempProject
                 {
                     switch (methodId)
                     {
-                        case -1005848884: // Task A(global::TempProject.MyObject a)
+                        case -1005848884: // Void A()
                             base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                             break;
                     }

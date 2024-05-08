@@ -213,17 +213,19 @@ public class StaticStreamingHubClientGenerator
                 // new DynamicArgumentTuple(arg1, arg2, ...)
                 _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
             };
+            var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
+            var writeMessageTarget = isFireAndForget ? "parent" : "this";
             var writeMessageAsync = ctx.EnableStreamingHubDiagnosticHandler
-                ? isFireAndForget
-                    ? "parent.WriteMessageFireAndForgetDiagnosticAsync"
-                    : "this.WriteMessageWithResponseDiagnosticAsync"
-                : isFireAndForget
-                    ? "parent.WriteMessageFireAndForgetAsync"
-                    : "base.WriteMessageWithResponseAsync";
+                ? isFireAndForget || isReturnTypeVoid
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnosticAsync"
+                    : $"{writeMessageTarget}.WriteMessageWithResponseDiagnosticAsync"
+                : isFireAndForget || isReturnTypeVoid
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetAsync"
+                    : $"{writeMessageTarget}.WriteMessageWithResponseAsync";
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""
-                            public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                            public {(isReturnTypeVoid ? "void" : method.MethodReturnType.FullName)} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
             """);
 
             if (isFireAndForget) ctx.Writer.Append("    ");

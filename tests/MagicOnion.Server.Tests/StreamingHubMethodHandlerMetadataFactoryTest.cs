@@ -63,20 +63,6 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         ex.Should().NotBeNull();
         ex.Should().BeOfType<InvalidOperationException>();
     }
-    [Fact]
-    public void Invalid_Returns_Void()
-    {
-        // Arrange
-        var type = typeof(MyHub);
-        var methodInfo = type.GetMethod(nameof(MyHub.Invalid_Method_Returns_Void))!;
-
-        // Act
-        var ex = Record.Exception(() => MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo));
-
-        // Assert
-        ex.Should().NotBeNull();
-        ex.Should().BeOfType<InvalidOperationException>();
-    }
 
     [Fact]
     public void Invalid_Returns_Generic()
@@ -348,6 +334,26 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         metadata.ResponseType.Should().Be<int>();
     }
 
+    [Fact]
+    public void Void()
+    {
+        // Arrange
+        var type = typeof(MyHub);
+        var methodInfo = type.GetMethod(nameof(MyHub.Method_Void))!;
+
+        // Act
+        var metadata = MethodHandlerMetadataFactory.CreateStreamingHubMethodHandlerMetadata(type, methodInfo);
+
+        // Assert
+        metadata.StreamingHubImplementationType.Should().Be<MyHub>();
+        metadata.StreamingHubInterfaceType.Should().Be<IMyHub>();
+        metadata.InterfaceMethod.Should().BeSameAs(typeof(IMyHub).GetMethod(nameof(IMyHub.Method_Void)));
+        metadata.ImplementationMethod.Should().BeSameAs(methodInfo);
+        metadata.Parameters.Should().BeEmpty();
+        metadata.RequestType.Should().Be<Nil>();
+        metadata.ResponseType.Should().BeNull();
+    }
+
     interface IMyHubReceiver
     {}
 
@@ -357,12 +363,12 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         Task<int> Method_TaskOfValue();
         ValueTask Method_ValueTask();
         ValueTask<int> Method_ValueTaskOfValue();
+        void Method_Void();
 
         Task Method_Parameterless();
         Task Method_OneParameter(int arg0);
         Task Method_TwoParameters(int arg0, string arg1);
 
-        void Invalid_Method_Returns_Void(int arg0, string arg1);
         int Invalid_Method_Returns_Int(int arg0, string arg1);
         T Invalid_Method_Generic<T>(T arg0);
     }
@@ -375,6 +381,7 @@ public class StreamingHubMethodHandlerMetadataFactoryTest
         public Task Method_Parameterless() => throw new NotImplementedException();
         public Task Method_OneParameter(int arg0) => throw new NotImplementedException();
         public Task Method_TwoParameters(int arg0, string arg1) => throw new NotImplementedException();
+        public void Method_Void() => throw new NotImplementedException();
         public void Invalid_Method_Returns_Void(int arg0, string arg1) => throw new NotImplementedException();
         public int Invalid_Method_Returns_Int(int arg0, string arg1) => throw new NotImplementedException();
         public T Invalid_Method_Generic<T>(T arg0) => throw new NotImplementedException();

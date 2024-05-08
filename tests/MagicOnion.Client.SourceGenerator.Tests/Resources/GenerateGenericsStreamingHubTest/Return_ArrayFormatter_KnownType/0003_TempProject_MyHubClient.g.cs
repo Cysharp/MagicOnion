@@ -20,15 +20,15 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::System.String[]> GetStringValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.String[]>(1774317884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.String[]>(1774317884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Int32[]> GetIntValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32[]>(-400881550, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32[]>(-400881550, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Int32[]> GetInt32ValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32[]>(309063297, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Int32[]>(309063297, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Single[]> GetSingleValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Single[]>(702446639, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Single[]>(702446639, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Boolean[]> GetBooleanValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Boolean[]>(2082077357, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Boolean[]>(2082077357, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

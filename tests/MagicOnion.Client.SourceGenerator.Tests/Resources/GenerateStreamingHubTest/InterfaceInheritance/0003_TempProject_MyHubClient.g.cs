@@ -20,11 +20,11 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task C()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task B()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);

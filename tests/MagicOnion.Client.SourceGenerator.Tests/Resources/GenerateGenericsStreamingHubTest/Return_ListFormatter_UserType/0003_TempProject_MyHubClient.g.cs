@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::TempProject.MyResponse>> GetValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::TempProject.MyResponse>>(-209315513, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::TempProject.MyResponse>>(-209315513, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
