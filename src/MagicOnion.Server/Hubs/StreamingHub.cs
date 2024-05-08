@@ -5,6 +5,7 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -111,7 +112,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
 
-        var group = StreamingHubHandlerRepository.GetGroupRepository(Context.MethodHandler);
+        var group = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupRepository(Context.MethodHandler);
         this.Group = new HubGroupRepository(this.Context, group);
         try
         {
@@ -172,7 +173,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         // eg: Send the current game state to the client.
         await OnConnected();
 
-        var handlers = StreamingHubHandlerRepository.GetHandlers(Context.MethodHandler);
+        var handlers = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetHandlers(Context.MethodHandler);
 
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
