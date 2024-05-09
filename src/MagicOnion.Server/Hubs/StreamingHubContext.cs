@@ -145,58 +145,24 @@ public class StreamingHubContext
         ServiceContext.QueueResponseStreamWrite(payload);
     }
 
-    // MessageFormat:
-    // response:  [messageId, methodId, response]
     StreamingHubPayload BuildMessage()
     {
-        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-        {
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(3);
-            writer.Write(MessageId);
-            writer.Write(MethodId);
-            writer.WriteNil();
-            writer.Flush();
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-        }
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId);
+        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 
-    // MessageFormat:
-    // response:  [messageId, methodId, response]
     StreamingHubPayload BuildMessage<T>(T v)
     {
-        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-        {
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(3);
-            writer.Write(MessageId);
-            writer.Write(MethodId);
-            writer.Flush();
-            ServiceContext.MessageSerializer.Serialize(buffer, v);
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-        }
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, ServiceContext.MessageSerializer);
+        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 
-    // MessageFormat:
-    // error-response:  [messageId, statusCode, detail, StringMessage]
     StreamingHubPayload BuildMessageForError(int statusCode, string detail, Exception? ex, bool isReturnExceptionStackTraceInErrorDetail)
     {
-        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-        {
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(4);
-            writer.Write(MessageId);
-            writer.Write(statusCode);
-            writer.Write(detail);
-
-            var msg = (isReturnExceptionStackTraceInErrorDetail && ex != null)
-                ? ex.ToString()
-                : null;
-
-            writer.Write(msg);
-            writer.Flush();
-
-            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-        }
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        StreamingHubMessageWriter.WriteResponseMessageForError(buffer, MessageId, statusCode, detail, ex, isReturnExceptionStackTraceInErrorDetail);
+        return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 }

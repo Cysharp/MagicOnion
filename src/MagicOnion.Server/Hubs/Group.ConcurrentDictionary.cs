@@ -334,14 +334,8 @@ public class ConcurrentDictionaryGroup : IGroup
 
     ReadOnlyMemory<byte> BuildMessage<T>(int methodId, T value)
     {
-        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-        {
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(2);
-            writer.WriteInt32(methodId);
-            writer.Flush();
-            messageSerializer.Serialize(buffer, value);
-            return buffer.WrittenSpan.ToArray();
-        }
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        StreamingHubMessageWriter.WriteBroadcastMessage(buffer, methodId, value, messageSerializer);
+        return buffer.WrittenSpan.ToArray();
     }
 }

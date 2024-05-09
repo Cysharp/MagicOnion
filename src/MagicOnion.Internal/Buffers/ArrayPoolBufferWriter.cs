@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Diagnostics;
 
 namespace MagicOnion.Internal.Buffers
 {
@@ -15,7 +16,14 @@ namespace MagicOnion.Internal.Buffers
                 staticInstance = new ArrayPoolBufferWriter();
             }
             staticInstance.Prepare();
+
+#if DEBUG
+            var currentInstance = staticInstance;
+            staticInstance = null;
+            return currentInstance;
+#else
             return staticInstance;
+#endif
         }
 
         const int MinimumBufferSize = 32767; // use 32k buffer.
@@ -96,6 +104,11 @@ namespace MagicOnion.Internal.Buffers
 
             ArrayPool<byte>.Shared.Return(buffer);
             buffer = null;
+
+#if DEBUG
+            Debug.Assert(staticInstance is null);
+            staticInstance = this;
+#endif
         }
     }
 }

@@ -197,83 +197,78 @@ namespace MagicOnion.Client
         // error-response: [messageId, statusCode, detail, StringMessage]
         void ConsumeData(SynchronizationContext? syncContext, StreamingHubPayload payload)
         {
-            var data = payload.Memory;
-            var messagePackReader = new MessagePackReader(data);
-            var arrayLength = messagePackReader.ReadArrayHeader();
-            if (arrayLength == 3)
+            var messageReader = new StreamingHubClientMessageReader(payload.Memory);
+            switch (messageReader.ReadMessageType())
             {
-                // Hub method response
-                var messageId = messagePackReader.ReadInt32();
-                lock (responseFutures)
-                {
-                    if (responseFutures.TryGetValue(messageId, out var future))
+                case StreamingHubMessageType.Broadcast:
                     {
-                        responseFutures.Remove(messageId);
-                        var methodId = messagePackReader.ReadInt32();
-                        try
+                        var message = messageReader.ReadBroadcastMessage();
+                        if (syncContext != null)
                         {
-                            var offset = (int)messagePackReader.Consumed;
-                            OnResponseEvent(methodId, future, data.Slice(offset));
-                            StreamingHubPayloadPool.Shared.Return(payload);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (!future.TrySetException(ex))
+                            var tuple = Tuple.Create(this, message.MethodId, payload, message.Body);
+                            syncContext.Post(static state =>
                             {
-                                throw;
-                            }
-                        }
-                    }
-                }
-            }
-            else if (arrayLength == 4)
-            {
-                // Hub method error response
-                var messageId = messagePackReader.ReadInt32();
-                lock (responseFutures)
-                {
-                    if (responseFutures.TryGetValue(messageId, out var future))
-                    {
-                        responseFutures.Remove(messageId);
-
-                        var statusCode = messagePackReader.ReadInt32();
-                        var detail = messagePackReader.ReadString();
-                        var offset = (int)messagePackReader.Consumed;
-                        var error = messagePackReader.ReadString();
-                        var ex = default(RpcException);
-                        if (string.IsNullOrWhiteSpace(error))
-                        {
-                            ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty));
+                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, StreamingHubPayload, ReadOnlyMemory<byte>>)state!;
+                                t.Item1.OnBroadcastEvent(t.Item2, t.Item4);
+                                StreamingHubPayloadPool.Shared.Return(t.Item3);
+                            }, tuple);
                         }
                         else
                         {
-                            ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty), detail + Environment.NewLine + error);
+                            OnBroadcastEvent(message.MethodId, message.Body);
+                            StreamingHubPayloadPool.Shared.Return(payload);
                         }
 
-                        future.TrySetException(ex);
                     }
-                }
-            }
-            else
-            {
-                // Broadcast event
-                var methodId = messagePackReader.ReadInt32();
-                var offset = (int)messagePackReader.Consumed;
-                if (syncContext != null)
-                {
-                    var tuple = Tuple.Create(this, methodId, payload, offset);
-                    syncContext.Post(static state =>
+                    break;
+                case StreamingHubMessageType.Response:
                     {
-                        var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, StreamingHubPayload, int>)state!;
-                        t.Item1.OnBroadcastEvent(t.Item2, t.Item3.Memory.Slice(t.Item4));
-                        StreamingHubPayloadPool.Shared.Return(t.Item3);
-                    }, tuple);
-                }
-                else
-                {
-                    OnBroadcastEvent(methodId, payload.Memory.Slice(offset));
-                    StreamingHubPayloadPool.Shared.Return(payload);
-                }
+                        var message = messageReader.ReadResponseMessage();
+                        lock (responseFutures)
+                        {
+                            if (responseFutures.TryGetValue(message.MessageId, out var future))
+                            {
+                                responseFutures.Remove(message.MessageId);
+                                try
+                                {
+                                    OnResponseEvent(message.MethodId, future, message.Body);
+                                    StreamingHubPayloadPool.Shared.Return(payload);
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (!future.TrySetException(ex))
+                                    {
+                                        throw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case StreamingHubMessageType.ResponseWithError:
+                    {
+                        var message = messageReader.ReadResponseWithErrorMessage();
+                        lock (responseFutures)
+                        {
+                            if (responseFutures.TryGetValue(message.MessageId, out var future))
+                            {
+                                responseFutures.Remove(message.MessageId);
+
+                                RpcException ex;
+                                if (string.IsNullOrWhiteSpace(message.Error))
+                                {
+                                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
+                                }
+                                else
+                                {
+                                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
+                                }
+
+                                future.TrySetException(ex);
+                            }
+                        }
+                    }
+                    break;
             }
         }
 
@@ -281,18 +276,8 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-            StreamingHubPayload BuildMessage()
-            {
-                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-                var writer = new MessagePackWriter(buffer);
-                writer.WriteArrayHeader(2);
-                writer.Write(methodId);
-                writer.Flush();
-                Serialize(buffer, message);
-                return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-            }
+            var v = BuildMessage(methodId, message);
 
-            var v = BuildMessage();
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
                 await writer.WriteAsync(v).ConfigureAwait(false);
@@ -316,7 +301,7 @@ namespace MagicOnion.Client
             );
             responseFutures[mid] = tcs;
 
-            var v = BuildMessage();
+            var v = BuildMessage(methodId, messageId, message);
 
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
@@ -325,17 +310,6 @@ namespace MagicOnion.Client
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
 
-            StreamingHubPayload BuildMessage()
-            {
-                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-                var writer = new MessagePackWriter(buffer);
-                writer.WriteArrayHeader(3);
-                writer.Write(mid);
-                writer.Write(methodId);
-                writer.Flush();
-                Serialize(buffer, message);
-                return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
-            }
         }
 
         void ThrowIfDisposed()
@@ -412,6 +386,20 @@ namespace MagicOnion.Client
                     }
                 }
             }
+        }
+
+        StreamingHubPayload BuildMessage<T>(int methodId, T message)
+        {
+            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+            StreamingHubMessageWriter.WriteRequestMessageVoid(buffer, methodId, message, messageSerializer);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+        }
+
+        StreamingHubPayload BuildMessage<T>(int methodId, int messageId, T message)
+        {
+            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+            StreamingHubMessageWriter.WriteRequestMessage(buffer, methodId, messageId, message, messageSerializer);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
     }
 }
