@@ -190,7 +190,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             var payload = reader.Current;
 
-            await ProcessMessageAsync(payload, handlers);
+            await ProcessMessageAsync(payload, handlers, ct);
 
             // NOTE: DO NOT return the StreamingHubPayload to the pool here.
             //       Client requests may be pending at this point.
@@ -213,7 +213,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         }
     }
 
-    ValueTask ProcessMessageAsync(StreamingHubPayload payload, UniqueHashDictionary<StreamingHubHandler> handlers)
+    ValueTask ProcessMessageAsync(StreamingHubPayload payload, UniqueHashDictionary<StreamingHubHandler> handlers, CancellationToken cancellationToken)
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
         var messageType = reader.ReadMessageType();
@@ -222,13 +222,13 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             case StreamingHubMessageType.Request:
                 {
                     var requestMessage = reader.ReadRequest();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true));
+                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
                 }
                 break;
             case StreamingHubMessageType.RequestFireAndForget:
                 {
                     var requestMessage = reader.ReadRequestFireAndForget();
-                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false));
+                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
                 break;
             default:
