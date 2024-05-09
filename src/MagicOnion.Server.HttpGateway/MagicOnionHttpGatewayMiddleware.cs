@@ -139,7 +139,8 @@ public class MagicOnionHttpGatewayMiddleware
             handler.MessageSerializer.Serialize(bufferWriter, deserializedObject);
             var requestObject = bufferWriter.WrittenSpan.ToArray();
 
-            var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodName, MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+            var throughMarshaller = new Marshaller<byte[]>(x => x, x => x);
+            var method = new Method<byte[], byte[]>(MethodType.Unary, handler.ServiceName, handler.MethodName, throughMarshaller, throughMarshaller);
 
             // create header
             var metadata = new Metadata();

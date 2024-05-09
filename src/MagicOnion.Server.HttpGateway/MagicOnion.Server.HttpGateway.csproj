@@ -26,6 +26,8 @@
 
   <ItemGroup>
     <Compile Include="..\MagicOnion.Internal\MagicOnionMarshallers.cs" LinkBase="Internal.Shared" />
+    <Compile Include="..\MagicOnion.Internal\StreamingHubPayload.cs" LinkBase="Internal.Shared" />
+    <Compile Include="..\MagicOnion.Internal\StreamingHubPayloadPool.BuiltIn.cs" LinkBase="Internal.Shared" />
   </ItemGroup>
 
   <ItemGroup>

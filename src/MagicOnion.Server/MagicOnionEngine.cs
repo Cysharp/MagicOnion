@@ -196,7 +196,7 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
+                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect", BindingFlags.NonPublic | BindingFlags.Instance)!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
                     if (!handlers.Add(connectHandler))
                     {
                         throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");

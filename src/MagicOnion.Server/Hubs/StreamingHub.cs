@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Grpc.Core;
+using MagicOnion.Internal;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MessagePack;
@@ -22,12 +23,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     // response:  [messageId, methodId, response]
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
-    static readonly byte[] MarkerResponseBytes = { 0x93, 0xff, 0x00, 0x0c }; // MsgPack: [-1, 0, nil]
+    static ReadOnlySpan<byte> MarkerResponseBytes => [0x93, 0xff, 0x00, 0x0c]; // MsgPack: [-1, 0, nil]
 
     public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
-    internal StreamingServiceContext<byte[], byte[]> StreamingServiceContext
-        => (StreamingServiceContext<byte[], byte[]>)Context;
+    internal StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> StreamingServiceContext
+        => (StreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context;
 
     protected Guid ConnectionId
         => Context.ContextId;
@@ -106,11 +107,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         return CompletedTask;
     }
 
-    public async Task<DuplexStreamingResult<byte[], byte[]>> Connect()
+    internal async Task<DuplexStreamingResult<StreamingHubPayload, StreamingHubPayload>> Connect()
     {
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
-        var streamingContext = GetDuplexStreamingContext<byte[], byte[]>();
+        var streamingContext = GetDuplexStreamingContext<StreamingHubPayload, StreamingHubPayload>();
 
         var group = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupRepository(Context.MethodHandler);
         this.Group = new HubGroupRepository(this.Context, group);
@@ -166,7 +167,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         // Write a marker that is the beginning of the stream.
         // NOTE: To prevent buffering by AWS ALB or reverse-proxy.
-        await writer.WriteAsync(MarkerResponseBytes);
+        await writer.WriteAsync(StreamingHubPayloadPool.Shared.RentOrCreate(MarkerResponseBytes));
 
         // Call OnConnected after sending the headers and marker.
         // The server can send messages or broadcast to client after OnConnected.
@@ -180,22 +181,22 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         while (await reader.MoveNext(ct)) // must keep SyncContext.
         {
             var data = reader.Current;
-            var (methodId, messageId, offset) = FetchHeader(data);
+            var (methodId, messageId, offset) = FetchHeader(data.Memory);
             var hasResponse = messageId != -1;
 
             if (handlers.TryGetValue(methodId, out var handler))
             {
                 // Create a context for each call to the hub method.
-                var context = new StreamingHubContext()
-                {
-                    HubInstance = this,
-                    ServiceContext = (IStreamingServiceContext<byte[], byte[]>)Context,
-                    Request = data.AsMemory(offset, data.Length - offset),
-                    Path = handler.ToString(),
-                    MethodId = handler.MethodId,
-                    MessageId = messageId,
-                    Timestamp = DateTime.UtcNow
-                };
+                var context = StreamingHubContextPool.Shared.Get();
+                context.Initialize(
+                    serviceContext: (IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context,
+                    hubInstance: this,
+                    request: data.Memory.Slice(offset, data.Length - offset),
+                    path: handler.ToString(),
+                    methodId: methodId,
+                    messageId: messageId,
+                    timestamp: DateTime.UtcNow
+                );
 
                 var methodStartingTimestamp = Stopwatch.GetTimestamp();
                 var isErrorOrInterrupted = false;
@@ -225,18 +226,22 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 finally
                 {
                     var methodEndingTimestamp = Stopwatch.GetTimestamp();
-                    MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.responseSize, context.responseType, StopwatchHelper.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
+                    MagicOnionServerLog.EndInvokeHubMethod(Context.MethodHandler.Logger, context, context.ResponseSize, context.ResponseType, StopwatchHelper.GetElapsedTime(methodStartingTimestamp, methodEndingTimestamp).TotalMilliseconds, isErrorOrInterrupted);
                     Metrics.StreamingHubMethodCompleted(Context.Metrics, handler, methodStartingTimestamp, methodEndingTimestamp, isErrorOrInterrupted);
+
+                    StreamingHubContextPool.Shared.Return(context);
                 }
             }
             else
             {
                 throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
             }
+
+            StreamingHubPayloadPool.Shared.Return(data);
         }
     }
 
-    static (int methodId, int messageId, int offset) FetchHeader(byte[] msgData)
+    static (int methodId, int messageId, int offset) FetchHeader(ReadOnlyMemory<byte> msgData)
     {
         var messagePackReader = new MessagePackReader(msgData);
 

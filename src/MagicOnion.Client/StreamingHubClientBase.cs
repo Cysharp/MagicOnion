@@ -28,22 +28,22 @@ namespace MagicOnion.Client
         readonly CallInvoker callInvoker;
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
-        readonly AsyncLock asyncLock = new AsyncLock();
-        readonly Method<byte[], byte[]> duplexStreamingConnectMethod;
-
-        IClientStreamWriter<byte[]> writer = default!;
-        IAsyncStreamReader<byte[]> reader = default!;
-
-        protected TReceiver receiver = default!;
-        Task subscription = default!;
-
-        TaskCompletionSource<bool> waitForDisconnect = new TaskCompletionSource<bool>();
-
+        readonly AsyncLock asyncLock = new();
+        readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
-        ConcurrentDictionary<int, ITaskCompletion> responseFutures = new ConcurrentDictionary<int, ITaskCompletion>();
-        protected CancellationTokenSource cts = new CancellationTokenSource();
+        readonly Dictionary<int, ITaskCompletion> responseFutures = new();
+        readonly TaskCompletionSource<bool> waitForDisconnect = new();
+        readonly CancellationTokenSource cancellationTokenSource = new();
+
         int messageId = 0;
         bool disposed;
+
+        IClientStreamWriter<StreamingHubPayload> writer = default!;
+        IAsyncStreamReader<StreamingHubPayload> reader = default!;
+
+        Task subscription = default!;
+
+        protected TReceiver receiver = default!;
 
         protected StreamingHubClientBase(string serviceName, CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
         {
@@ -59,7 +59,7 @@ namespace MagicOnion.Client
         public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
-            var callResult = callInvoker.AsyncDuplexStreamingCall<byte[], byte[]>(duplexStreamingConnectMethod, host, option);
+            var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, host, option);
 
             this.writer = callResult.RequestStream;
             this.reader = callResult.ResponseStream;
@@ -91,7 +91,7 @@ namespace MagicOnion.Client
                 throw new RpcException(e.Status, $"Failed to connect to StreamingHub '{duplexStreamingConnectMethod.ServiceName}'. ({e.Status})");
             }
 
-            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token).Token);
+            var firstMoveNextTask = reader.MoveNext(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellationTokenSource.Token).Token);
             if (firstMoveNextTask.IsFaulted || messageVersion == null)
             {
                 // NOTE: Grpc.Net:
@@ -111,18 +111,18 @@ namespace MagicOnion.Client
         }
 
         // Helper methods to make building clients easy.
-        protected void SetResultForResponse<TResponse>(object taskCompletionSource, ArraySegment<byte> data)
+        protected void SetResultForResponse<TResponse>(object taskCompletionSource, ReadOnlyMemory<byte> data)
             => ((TaskCompletionSource<TResponse>)taskCompletionSource).TrySetResult(Deserialize<TResponse>(data));
         protected void Serialize<T>(IBufferWriter<byte> writer, in T value)
             => messageSerializer.Serialize<T>(writer, value);
-        protected T Deserialize<T>(ArraySegment<byte> bytes)
-            => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(bytes));
+        protected T Deserialize<T>(ReadOnlyMemory<byte> data)
+            => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(data));
 
-        protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
-        protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+        protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
+        protected abstract void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data);
 
-        static Method<byte[], byte[]> CreateConnectMethod(string serviceName)
-            => new Method<byte[], byte[]>(MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.ThroughMarshaller, MagicOnionMarshallers.ThroughMarshaller);
+        static Method<StreamingHubPayload, StreamingHubPayload> CreateConnectMethod(string serviceName)
+            => new (MethodType.DuplexStreaming, serviceName, "Connect", MagicOnionMarshallers.StreamingHubMarshaller, MagicOnionMarshallers.StreamingHubMarshaller);
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
         {
@@ -150,7 +150,7 @@ namespace MagicOnion.Client
                         }
                     }
 
-                    moveNext = reader.MoveNext(cts.Token);
+                    moveNext = reader.MoveNext(cancellationTokenSource.Token);
                 }
             }
             catch (Exception ex)
@@ -195,69 +195,84 @@ namespace MagicOnion.Client
         // broadcast: [methodId, [argument]]
         // response:  [messageId, methodId, response]
         // error-response: [messageId, statusCode, detail, StringMessage]
-        void ConsumeData(SynchronizationContext? syncContext, byte[] data)
+        void ConsumeData(SynchronizationContext? syncContext, StreamingHubPayload payload)
         {
+            var data = payload.Memory;
             var messagePackReader = new MessagePackReader(data);
             var arrayLength = messagePackReader.ReadArrayHeader();
             if (arrayLength == 3)
             {
+                // Hub method response
                 var messageId = messagePackReader.ReadInt32();
-                if (responseFutures.TryRemove(messageId, out var future))
+                lock (responseFutures)
                 {
-                    var methodId = messagePackReader.ReadInt32();
-                    try
+                    if (responseFutures.TryGetValue(messageId, out var future))
                     {
-                        var offset = (int)messagePackReader.Consumed;
-                        var rest = new ArraySegment<byte>(data, offset, data.Length - offset);
-                        OnResponseEvent(methodId, future, rest);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (!future.TrySetException(ex))
+                        responseFutures.Remove(messageId);
+                        var methodId = messagePackReader.ReadInt32();
+                        try
                         {
-                            throw;
+                            var offset = (int)messagePackReader.Consumed;
+                            OnResponseEvent(methodId, future, data.Slice(offset));
+                            StreamingHubPayloadPool.Shared.Return(payload);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!future.TrySetException(ex))
+                            {
+                                throw;
+                            }
                         }
                     }
                 }
             }
             else if (arrayLength == 4)
             {
+                // Hub method error response
                 var messageId = messagePackReader.ReadInt32();
-                if (responseFutures.TryRemove(messageId, out var future))
+                lock (responseFutures)
                 {
-                    var statusCode = messagePackReader.ReadInt32();
-                    var detail = messagePackReader.ReadString();
-                    var offset = (int)messagePackReader.Consumed;
-                    var error = messagePackReader.ReadString();
-                    var ex = default(RpcException);
-                    if (string.IsNullOrWhiteSpace(error))
+                    if (responseFutures.TryGetValue(messageId, out var future))
                     {
-                        ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty));
-                    }
-                    else
-                    {
-                        ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty), detail + Environment.NewLine + error);
-                    }
+                        responseFutures.Remove(messageId);
 
-                    future.TrySetException(ex);
+                        var statusCode = messagePackReader.ReadInt32();
+                        var detail = messagePackReader.ReadString();
+                        var offset = (int)messagePackReader.Consumed;
+                        var error = messagePackReader.ReadString();
+                        var ex = default(RpcException);
+                        if (string.IsNullOrWhiteSpace(error))
+                        {
+                            ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty));
+                        }
+                        else
+                        {
+                            ex = new RpcException(new Status((StatusCode)statusCode, detail ?? string.Empty), detail + Environment.NewLine + error);
+                        }
+
+                        future.TrySetException(ex);
+                    }
                 }
             }
             else
             {
+                // Broadcast event
                 var methodId = messagePackReader.ReadInt32();
                 var offset = (int)messagePackReader.Consumed;
                 if (syncContext != null)
                 {
-                    var tuple = Tuple.Create(methodId, data, offset, data.Length - offset);
-                    syncContext.Post(state =>
+                    var tuple = Tuple.Create(this, methodId, payload, offset);
+                    syncContext.Post(static state =>
                     {
-                        var t = (Tuple<int, byte[], int, int>)state!;
-                        OnBroadcastEvent(t.Item1, new ArraySegment<byte>(t.Item2, t.Item3, t.Item4));
+                        var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, StreamingHubPayload, int>)state!;
+                        t.Item1.OnBroadcastEvent(t.Item2, t.Item3.Memory.Slice(t.Item4));
+                        StreamingHubPayloadPool.Shared.Return(t.Item3);
                     }, tuple);
                 }
                 else
                 {
-                    OnBroadcastEvent(methodId, new ArraySegment<byte>(data, offset, data.Length - offset));
+                    OnBroadcastEvent(methodId, payload.Memory.Slice(offset));
+                    StreamingHubPayloadPool.Shared.Return(payload);
                 }
             }
         }
@@ -266,17 +281,15 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-            byte[] BuildMessage()
+            StreamingHubPayload BuildMessage()
             {
-                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-                {
-                    var writer = new MessagePackWriter(buffer);
-                    writer.WriteArrayHeader(2);
-                    writer.Write(methodId);
-                    writer.Flush();
-                    Serialize(buffer, message);
-                    return buffer.WrittenSpan.ToArray();
-                }
+                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                var writer = new MessagePackWriter(buffer);
+                writer.WriteArrayHeader(2);
+                writer.Write(methodId);
+                writer.Flush();
+                Serialize(buffer, message);
+                return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
             }
 
             var v = BuildMessage();
@@ -303,27 +316,26 @@ namespace MagicOnion.Client
             );
             responseFutures[mid] = tcs;
 
-            byte[] BuildMessage()
-            {
-                using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-                {
-                    var writer = new MessagePackWriter(buffer);
-                    writer.WriteArrayHeader(3);
-                    writer.Write(mid);
-                    writer.Write(methodId);
-                    writer.Flush();
-                    Serialize(buffer, message);
-                    return buffer.WrittenSpan.ToArray();
-                }
-            }
-
             var v = BuildMessage();
+
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
                 await writer.WriteAsync(v).ConfigureAwait(false);
             }
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
+
+            StreamingHubPayload BuildMessage()
+            {
+                using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+                var writer = new MessagePackWriter(buffer);
+                writer.WriteArrayHeader(3);
+                writer.Write(mid);
+                writer.Write(methodId);
+                writer.Flush();
+                Serialize(buffer, message);
+                return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+            }
         }
 
         void ThrowIfDisposed()
@@ -358,8 +370,8 @@ namespace MagicOnion.Client
             catch { } // ignore error?
             finally
             {
-                cts.Cancel();
-                cts.Dispose();
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
                 try
                 {
                     if (waitSubscription)
