@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="JetBrains.Profiler.Api" />
   </ItemGroup>
 
   <ItemGroup>

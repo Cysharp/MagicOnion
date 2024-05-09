@@ -2,7 +2,6 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <PropertyGroup>
     <GrpcVersion>2.57.0</GrpcVersion>
     <GrpcCCoreVersion>2.46.6</GrpcCCoreVersion>
@@ -11,7 +10,6 @@
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageVersion Include="Grpc" Version="$(GrpcCCoreVersion)" />
     <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
@@ -23,13 +21,11 @@
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
-
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageVersion Include="PolySharp" Version="1.13.2" />
     <PackageVersion Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
-
   <!-- for tests -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="3.1.2" />
@@ -44,11 +40,10 @@
     <PackageVersion Include="xunit" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
   </ItemGroup>
-
   <!-- for samples/perf -->
   <ItemGroup>
     <PackageVersion Include="ConsoleAppFramework" Version="4.2.2" />
-    <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.0" />
+    <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
   </ItemGroup>
 </Project>
