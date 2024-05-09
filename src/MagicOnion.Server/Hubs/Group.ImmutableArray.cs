@@ -363,18 +363,8 @@ public class ImmutableArrayGroup : IGroup
 
     ReadOnlyMemory<byte> BuildMessage<T>(int methodId, T value)
     {
-        using (var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter())
-        {
-            var writer = new MessagePackWriter(buffer);
-            writer.WriteArrayHeader(2);
-            writer.WriteInt32(methodId);
-            writer.Flush();
-            messageSerializer.Serialize(buffer, value);
-
-            var rentBuffer = ArrayPool<byte>.Shared.Rent(buffer.WrittenCount);
-            buffer.WrittenSpan.CopyTo(rentBuffer);
-
-            return buffer.WrittenSpan.ToArray().AsMemory();
-        }
+        using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+        StreamingHubMessageWriter.WriteBroadcastMessage(buffer, methodId, value, messageSerializer);
+        return buffer.WrittenMemory.ToArray();
     }
 }
