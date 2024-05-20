@@ -214,17 +214,19 @@ public class StaticStreamingHubClientGenerator
                 // new DynamicArgumentTuple(arg1, arg2, ...)
                 _ => $", {method.Parameters.ToNewDynamicArgumentTuple()}",
             };
+            var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
+            var writeMessageTarget = isFireAndForget ? "parent" : "this";
             var writeMessageAsync = ctx.EnableStreamingHubDiagnosticHandler
-                ? isFireAndForget
-                    ? "parent.WriteMessageFireAndForgetDiagnosticAsync"
-                    : "this.WriteMessageWithResponseDiagnosticAsync"
-                : isFireAndForget
-                    ? "parent.WriteMessageFireAndForgetAsync"
-                    : "base.WriteMessageWithResponseAsync";
+                ? isFireAndForget || isReturnTypeVoid
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnosticAsync"
+                    : $"{writeMessageTarget}.WriteMessageWithResponseDiagnosticAsync"
+                : isFireAndForget || isReturnTypeVoid
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetAsync"
+                    : $"{writeMessageTarget}.WriteMessageWithResponseAsync";
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""
-                            public {method.MethodReturnType.FullName} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
+                            public {(isReturnTypeVoid ? "void" : method.MethodReturnType.FullName)} {method.MethodName}({method.Parameters.ToMethodSignaturize()})
             """);
 
             if (isFireAndForget) ctx.Writer.Append("    ");
@@ -257,7 +259,7 @@ public class StaticStreamingHubClientGenerator
     static void EmitOnBroadcastEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
-                            protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                            protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
                                 switch (methodId)
                                 {
@@ -305,7 +307,7 @@ public class StaticStreamingHubClientGenerator
     static void EmitOnResponseEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
-                            protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                            protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
                                 switch (methodId)
                                 {

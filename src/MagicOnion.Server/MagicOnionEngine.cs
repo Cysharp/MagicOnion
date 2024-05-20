@@ -119,6 +119,9 @@ public static class MagicOnionEngine
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var loggerMagicOnionEngine = loggerFactory.CreateLogger(LoggerNameMagicOnionEngine);
         var loggerMethodHandler = loggerFactory.CreateLogger(LoggerNameMethodHandler);
+
+        var streamingHubHandlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
+
         MagicOnionServerLog.BeginBuildServiceDefinition(loggerMagicOnionEngine);
 
         var sw = Stopwatch.StartNew();
@@ -194,7 +197,7 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
+                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect", BindingFlags.NonPublic | BindingFlags.Instance)!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
                     if (!handlers.Add(connectHandler))
                     {
                         throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
@@ -224,6 +227,8 @@ public static class MagicOnionEngine
         {
             ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
         }
+
+        streamingHubHandlerRepository.Freeze();
 
         var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 

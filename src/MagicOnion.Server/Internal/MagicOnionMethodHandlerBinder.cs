@@ -62,14 +62,16 @@ internal class MagicOnionMethodHandlerBinder<TRequest, TResponse, TRawRequest, T
 
     public void BindStreamingHub(ServiceBinderBase binder, Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task> serverMethod, MethodHandler methodHandler, IMagicOnionSerializer messageSerializer)
     {
+        Debug.Assert(typeof(TRequest) == typeof(StreamingHubPayload));
+        Debug.Assert(typeof(TResponse) == typeof(StreamingHubPayload));
         // StreamingHub uses the special marshallers for streaming messages serialization.
-        // TODO: Currently, MagicOnion expects TRawRequest/TRawResponse to be raw-byte array (`bytes[]`).
+        // TODO: Currently, MagicOnion expects TRawRequest/TRawResponse to be raw-byte array (`StreamingHubPayload`).
         var method = new GrpcMethodHelper.MagicOnionMethod<TRequest, TResponse, TRawRequest, TRawResponse>(new Method<TRawRequest, TRawResponse>(
             MethodType.DuplexStreaming,
             methodHandler.ServiceName,
             methodHandler.MethodName,
-            (Marshaller<TRawRequest>)(object)Hubs.StreamingHubMarshaller.CreateForRequest(methodHandler, messageSerializer),
-            (Marshaller<TRawResponse>)(object)Hubs.StreamingHubMarshaller.CreateForResponse(methodHandler, messageSerializer)
+            (Marshaller<TRawRequest>)(object)MagicOnionMarshallers.StreamingHubMarshaller,
+            (Marshaller<TRawResponse>)(object)MagicOnionMarshallers.StreamingHubMarshaller
         ));
         binder.AddMethod(new MagicOnionServerMethod<TRawRequest, TRawResponse>(method.Method, methodHandler),
             async (request, response, context) => await serverMethod(

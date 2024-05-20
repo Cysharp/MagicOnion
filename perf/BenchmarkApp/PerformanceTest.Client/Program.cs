@@ -49,11 +49,15 @@ async Task Main(
             break;
     }
 
+    // Create a control channel
+    using var channelControl = GrpcChannel.ForAddress(config.Url);
+    var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
+    controlServiceClient.SetMemoryProfilerCollectAllocations(true);
+
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");
     {
-        using var channel = GrpcChannel.ForAddress(config.Url);
-        serverInfo = await MagicOnionClient.Create<IPerfTestService>(channel).GetServerInformationAsync();
+        serverInfo = await controlServiceClient.GetServerInformationAsync();
         WriteLog($"MagicOnion {serverInfo.MagicOnionVersion}");
         WriteLog($"grpc-dotnet {serverInfo.GrpcNetVersion}");
         WriteLog($"{nameof(ApplicationInformation.OSDescription)}: {serverInfo.OSDescription}");
@@ -71,7 +75,7 @@ async Task Main(
                 results = new List<PerformanceResult>();
                 resultsByScenario[scenario2] = results;
             }
-            results.Add(await RunScenarioAsync(scenario2, config));
+            results.Add(await RunScenarioAsync(scenario2, config, controlServiceClient));
         }
     }
 
@@ -125,7 +129,7 @@ async Task Main(
     }
 }
 
-async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config)
+async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioConfiguration config, IPerfTestControlService controlService)
 {
     Func<IScenario> scenarioFactory = scenario switch
     {
@@ -170,16 +174,19 @@ async Task<PerformanceResult> RunScenarioAsync(ScenarioType scenario, ScenarioCo
         }
     }
 
+    await controlService.CreateMemoryProfilerSnapshotAsync("Before Warmup");
     WriteLog("Warming up...");
     await Task.Delay(TimeSpan.FromSeconds(config.Warmup));
     ctx.Ready();
+    await controlService.CreateMemoryProfilerSnapshotAsync("After Warmup/Run");
     WriteLog("Warmup completed");
-    
+
     WriteLog("Running...");
     cts.CancelAfter(TimeSpan.FromSeconds(config.Duration));
     await Task.WhenAll(tasks);
     ctx.Complete();
     WriteLog("Completed.");
+    await controlService.CreateMemoryProfilerSnapshotAsync("Completed");
 
     var result = ctx.GetResult();
     WriteLog($"Requests per Second: {result.RequestsPerSecond:0.000} rps");

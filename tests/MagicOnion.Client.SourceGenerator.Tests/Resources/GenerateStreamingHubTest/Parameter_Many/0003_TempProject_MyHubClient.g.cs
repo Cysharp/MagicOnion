@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A(global::System.String arg0, global::System.Int32 arg1, global::System.Boolean arg2)
-                    => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
+                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -42,14 +42,14 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

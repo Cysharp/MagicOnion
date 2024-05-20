@@ -20,9 +20,9 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::System.String>> GetStringValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.String>>(1774317884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.String>>(1774317884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<global::System.Int32>> GetIntValuesAsync()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.Int32>>(-400881550, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::System.Collections.Generic.List<global::System.Int32>>(-400881550, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -46,14 +46,14 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

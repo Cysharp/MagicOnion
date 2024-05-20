@@ -20,15 +20,15 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetStringValuesAsync(global::System.String[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
+                    => this.WriteMessageWithResponseAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetIntValuesAsync(global::System.Int32[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
+                    => this.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetInt32ValuesAsync(global::System.Int32[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
+                    => this.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetSingleValuesAsync(global::System.Single[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
+                    => this.WriteMessageWithResponseAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetBooleanValuesAsync(global::System.Boolean[] arg0)
-                    => base.WriteMessageWithResponseAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
+                    => this.WriteMessageWithResponseAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -58,14 +58,14 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

@@ -20,15 +20,15 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A()
-                    => base.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task B(global::TempProject.MyObject a)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::MessagePack.Nil>(-955516027, a);
                 public global::System.Threading.Tasks.Task C(global::TempProject.MyObject a, global::System.String b)
-                    => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
+                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>, global::MessagePack.Nil>(-972293646, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String>(a, b));
                 public global::System.Threading.Tasks.Task D(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                    => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::MessagePack.Nil>(-1056181741, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
                 public global::System.Threading.Tasks.Task<global::System.Int32> E(global::TempProject.MyObject a, global::System.String b, global::System.Int32 c)
-                    => base.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
+                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>, global::System.Int32>(-1072959360, new global::MagicOnion.DynamicArgumentTuple<global::TempProject.MyObject, global::System.String, global::System.Int32>(a, b, c));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -58,7 +58,7 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
@@ -83,7 +83,7 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

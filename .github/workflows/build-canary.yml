@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - vNext
     tags:
       - "!*" # not a tag push
     paths-ignore:
@@ -30,10 +31,11 @@ jobs:
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
       # pack
       - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
-      - uses: actions/upload-artifact@v4
+      - uses: Cysharp/Actions/.github/actions/upload-artifact@main
         with:
           name: nuget
           path: ./publish/
+          retention-days: 1
 
   canary-push:
     needs: [canary-build]
@@ -50,7 +52,7 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN_PUBLIC }}
           VSS_NUGET_EXTERNAL_FEED_ENDPOINTS_PUBLIC_CANARY: "op://GitHubActionsPublic/VSS_NUGET_EXTERNAL_FEED_ENDPOINTS_PUBLIC_CANARY/credential"
-      - uses: actions/download-artifact@v4
+      - uses: Cysharp/Actions/.github/actions/download-artifact@main
       # Upload to NuGet
       - run: echo "VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=${FEED_ENDPOINTS}" >> $GITHUB_ENV
         env:

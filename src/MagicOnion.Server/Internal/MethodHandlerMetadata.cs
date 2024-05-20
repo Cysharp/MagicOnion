@@ -107,7 +107,7 @@ internal class MethodHandlerMetadataFactory
 
         if (!responseIsTaskOrValueTask)
         {
-            throw new InvalidOperationException($"A type of the StreamingHub method must be Task, Task<T>, ValueTask or ValueTask<T>. (Member:{serviceClass.Name}.{methodInfo.Name})");
+            throw new InvalidOperationException($"A type of the StreamingHub method must be void, Task, Task<T>, ValueTask or ValueTask<T>. (Member:{serviceClass.Name}.{methodInfo.Name})");
         }
 
         var methodId = interfaceMethodInfo.GetCustomAttribute<MethodIdAttribute>()?.MethodId ?? FNV1A32.GetHashCode(interfaceMethodInfo.Name);
@@ -187,19 +187,24 @@ internal class MethodHandlerMetadataFactory
         throw new InvalidOperationException($"The method '{methodInfo.Name}' has invalid return type. path:{methodInfo.DeclaringType!.Name + "/" + methodInfo.Name} type:{methodInfo.ReturnType.Name}");
     }
 
-    static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsTaskOrValueTask)
+    static Type? UnwrapStreamingHubResponseType(MethodInfo methodInfo, out bool responseIsVoidOrTaskOrValueTask)
     {
         var t = methodInfo.ReturnType;
 
         // Task<T>
         if (t.IsGenericType && (t.GetGenericTypeDefinition() == typeof(Task<>) || t.GetGenericTypeDefinition() == typeof(ValueTask<>)))
         {
-            responseIsTaskOrValueTask = true;
+            responseIsVoidOrTaskOrValueTask = true;
             return t.GetGenericArguments()[0];
         }
         else if (t == typeof(Task) || t == typeof(ValueTask))
         {
-            responseIsTaskOrValueTask = true;
+            responseIsVoidOrTaskOrValueTask = true;
+            return null;
+        }
+        else if (t == typeof(void))
+        {
+            responseIsVoidOrTaskOrValueTask = true;
             return null;
         }
 

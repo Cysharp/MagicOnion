@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject> A(global::TempProject.MyObject a)
-                    => new global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject>(base.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a));
+                    => new global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject>(this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -42,14 +42,14 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

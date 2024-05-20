@@ -73,7 +73,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
             return __ConnectAndSubscribeAsync(receiver, CancellationToken.None);
         }
 
-        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data)
+        protected override void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data)
         {
             if (FNV1A32.GetHashCode(nameof(MethodParameterless)) == methodId)
             {
@@ -85,7 +85,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
             }
         }
 
-        protected override void OnBroadcastEvent(int methodId, ArraySegment<byte> data)
+        protected override void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data)
         {
             if (FNV1A32.GetHashCode(nameof(IHandCraftedStreamingHubClientTestHubReceiver.OnMessage)) == methodId)
             {

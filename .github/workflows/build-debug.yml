@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - vNext
     tags:
       - "!*" # not a tag push
     paths-ignore:
@@ -13,6 +14,7 @@ on:
   pull_request:
     branches:
       - main
+      - vNext
     paths-ignore:
       - '**.md'
       - .github/**
@@ -90,7 +92,8 @@ jobs:
           directory: src/MagicOnion.Client.Unity
 
       # Store artifacts.
-      - uses: actions/upload-artifact@v4
+      - uses: Cysharp/Actions/.github/actions/upload-artifact@main
         with:
           name: MagicOnion.Client.Unity.${{ matrix.unity }}.unitypackage
           path: ./src/MagicOnion.Client.Unity/MagicOnion.Client.Unity.unitypackage
+          retention-days: 1

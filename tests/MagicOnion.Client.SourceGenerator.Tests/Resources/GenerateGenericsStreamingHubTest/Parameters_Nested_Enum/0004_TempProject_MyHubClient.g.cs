@@ -20,7 +20,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetEnumAsync(global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> arg0)
-                    => base.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil>(-1221306238, arg0);
+                    => this.WriteMessageWithResponseAsync<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>, global::MessagePack.Nil>(-1221306238, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -42,14 +42,14 @@ namespace TempProject
 
                 }
 
-                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ArraySegment<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {

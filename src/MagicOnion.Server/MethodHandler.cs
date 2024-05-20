@@ -493,6 +493,8 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     public class UniqueEqualityComparer : IEqualityComparer<MethodHandler>
     {
+        public static UniqueEqualityComparer Instance { get; } = new();
+
         public bool Equals(MethodHandler? x, MethodHandler? y)
         {
             return (x == null && y == null) || (x != null && y != null && x.methodHandlerId.Equals(y.methodHandlerId));
