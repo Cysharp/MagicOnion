@@ -217,6 +217,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
         var messageType = reader.ReadMessageType();
+
         switch (messageType)
         {
             case StreamingHubMessageType.Request:
@@ -224,13 +225,11 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     var requestMessage = reader.ReadRequest();
                     return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
                 }
-                break;
             case StreamingHubMessageType.RequestFireAndForget:
                 {
                     var requestMessage = reader.ReadRequestFireAndForget();
                     return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
-                break;
             default:
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }
