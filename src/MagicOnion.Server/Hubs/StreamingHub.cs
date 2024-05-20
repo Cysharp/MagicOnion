@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Server.Diagnostics;
@@ -25,6 +26,9 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     // response:  [messageId, methodId, response]
     // HACK: If the ID of the message is `-1`, the client will ignore the message.
     static ReadOnlySpan<byte> MarkerResponseBytes => [0x93, 0xff, 0x00, 0x0c]; // MsgPack: [-1, 0, nil]
+
+    readonly Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> requests
+        = Channel.CreateBounded<(StreamingHubPayload, UniqueHashDictionary<StreamingHubHandler>, int, int, ReadOnlyMemory<byte>, bool)>(10);
 
     public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
 
@@ -177,36 +181,55 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var handlers = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetHandlers(Context.MethodHandler);
 
+        // Starts a loop that consumes the request queue.
+        var consumeRequestsTask = ConsumeRequestQueueAsync(ct);
+
         // Main loop of StreamingHub.
         // Be careful to allocation and performance.
-        while (await reader.MoveNext(ct)) // must keep SyncContext.
+        while (await reader.MoveNext(ct))
         {
             var payload = reader.Current;
 
-            await ProcessMessageAsync(payload, handlers);
+            await ProcessMessageAsync(payload, handlers, ct);
 
-            StreamingHubPayloadPool.Shared.Return(payload);
+            // NOTE: DO NOT return the StreamingHubPayload to the pool here.
+            //       Client requests may be pending at this point.
         }
     }
 
-    ValueTask ProcessMessageAsync(StreamingHubPayload payload, UniqueHashDictionary<StreamingHubHandler> handlers)
+    async ValueTask ConsumeRequestQueueAsync(CancellationToken cancellationToken)
+    {
+        // We need to process client requests sequentially.
+        await foreach (var request in requests.Reader.ReadAllAsync(cancellationToken))
+        {
+            try
+            {
+                await ProcessRequestAsync(request.Handlers, request.MethodId, request.MessageId, request.Body, request.HasResponse);
+            }
+            finally
+            {
+                StreamingHubPayloadPool.Shared.Return(request.Payload);
+            }
+        }
+    }
+
+    ValueTask ProcessMessageAsync(StreamingHubPayload payload, UniqueHashDictionary<StreamingHubHandler> handlers, CancellationToken cancellationToken)
     {
         var reader = new StreamingHubServerMessageReader(payload.Memory);
         var messageType = reader.ReadMessageType();
+
         switch (messageType)
         {
             case StreamingHubMessageType.Request:
                 {
                     var requestMessage = reader.ReadRequest();
-                    return ProcessRequestAsync(handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, hasResponse: true);
+                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, requestMessage.MessageId, requestMessage.Body, true), cancellationToken);
                 }
-                break;
             case StreamingHubMessageType.RequestFireAndForget:
                 {
                     var requestMessage = reader.ReadRequestFireAndForget();
-                    return ProcessRequestAsync(handlers, requestMessage.MethodId, -1, requestMessage.Body, hasResponse: false);
+                    return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
-                break;
             default:
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }
@@ -268,6 +291,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             throw new InvalidOperationException("Handler not found in received methodId, methodId:" + methodId);
         }
     }
+
 
     // Interface methods for Client
 

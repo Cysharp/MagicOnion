@@ -601,6 +601,33 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         // Assert
         receiver.Received().Receiver_Test_Void_Parameter_Many(12345, "Hello✨", true);
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Process_Requests_Sequentially(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        var task1 = client.Delay(1, TimeSpan.FromSeconds(1.5));
+        var task2 = client.Delay(2, TimeSpan.FromSeconds(1));
+        var task3 = client.Delay(3, TimeSpan.FromSeconds(0.5));
+
+        // Assert
+        Assert.Equal(1, await task1);
+        Assert.False(task2.IsCompleted);
+        Assert.False(task3.IsCompleted);
+
+        Assert.Equal(2, await task2);
+        Assert.False(task3.IsCompleted);
+
+        Assert.Equal(3, await task3);
+    }
 }
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
 {
@@ -794,6 +821,12 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         await Task.Yield();
         return (arg0 * 100, arg1 + "-Result", !arg2);
     }
+
+    public async Task<int> Delay(int id, TimeSpan delay)
+    {
+        await Task.Delay(delay);
+        return id;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -854,4 +887,6 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     Task Throw();
 
     Task<(int Arg0, string Arg1, bool Arg2)> Concurrent(int arg0, string arg1, bool arg2);
+
+    Task<int> Delay(int id, TimeSpan delay);
 }
