@@ -16,50 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs;
 
-public static class StreamingHubBroadcastExtensions
-{
-    // Broadcast Commands
-    public static TReceiver Broadcast<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.All;
-    }
-    public static TReceiver BroadcastExceptSelf<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.Except(ImmutableArray<Guid>.Empty.Add(hub.Context.ContextId));
-    }
-    public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid except)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.Except(ImmutableArray<Guid>.Empty.Add(except));
-    }
-
-    public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> excepts)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.Except(excepts);
-    }
-
-    public static TReceiver BroadcastToSelf<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return hub.Client;
-    }
-
-    public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid toConnectionId)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.Only(ImmutableArray<Guid>.Empty.Add(toConnectionId));
-    }
-
-    public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> toConnectionIds)
-        where THubInterface : IStreamingHub<THubInterface, TReceiver>
-    {
-        return group.Only(toConnectionIds);
-    }
-}
-
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {

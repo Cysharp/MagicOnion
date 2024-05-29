@@ -135,7 +135,7 @@ public class RedisGroupFunctionalTestHub : StreamingHubBase<IRedisGroupFunctiona
 
     public Task CallAsync(int arg0)
     {
-        this.Broadcast(group!).OnMessage(arg0);
+        group!.All.OnMessage(arg0);
         return Task.CompletedTask;
     }
 }
