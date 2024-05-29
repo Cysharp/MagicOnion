@@ -1,6 +1,9 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
+using Cysharp.Runtime.Multicast;
+using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Server.Diagnostics;
@@ -8,9 +11,8 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
-using Multicaster;
-using Multicaster.Remoting;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -25,12 +27,12 @@ public static class StreamingHubBroadcastExtensions
     public static TReceiver BroadcastExceptSelf<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group)
         where THubInterface : IStreamingHub<THubInterface, TReceiver>
     {
-        return group.Except([hub.Context.ContextId]);
+        return group.Except(ImmutableArray<Guid>.Empty.Add(hub.Context.ContextId));
     }
     public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid except)
         where THubInterface : IStreamingHub<THubInterface, TReceiver>
     {
-        return group.Except([except]);
+        return group.Except(ImmutableArray<Guid>.Empty.Add(except));
     }
 
     public static TReceiver BroadcastExcept<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> excepts)
@@ -48,7 +50,7 @@ public static class StreamingHubBroadcastExtensions
     public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, Guid toConnectionId)
         where THubInterface : IStreamingHub<THubInterface, TReceiver>
     {
-        return group.Only([toConnectionId]);
+        return group.Only(ImmutableArray<Guid>.Empty.Add(toConnectionId));
     }
 
     public static TReceiver BroadcastTo<THubInterface, TReceiver>(this StreamingHubBase<THubInterface, TReceiver> hub, IMulticastGroup<TReceiver> group, IReadOnlyList<Guid> toConnectionIds)
@@ -61,7 +63,7 @@ public static class StreamingHubBroadcastExtensions
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
-    readonly IRemoteCallPendingMessageQueue remoteCallPendingQueue = new RemoteCallPendingMessageQueue();
+    readonly IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry();
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -121,7 +123,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
-        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteCallPendingQueue);
+        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
         var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
         this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
@@ -236,6 +238,24 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     var requestMessage = reader.ReadRequestFireAndForget();
                     return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
+            case StreamingHubMessageType.ClientResultResponse:
+                {
+                    var responseMessage = reader.ReadClientResultResponse();
+                    if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                    {
+                        pendingMessage.TrySetResult(responseMessage.Body);
+                    }
+                    return default;
+                }
+            case StreamingHubMessageType.ClientResultResponseWithError:
+            {
+                var responseMessage = reader.ReadClientResultResponseForError();
+                if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                {
+                    pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode, responseMessage.Message + (string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail))));
+                }
+                return default;
+            }
             default:
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }

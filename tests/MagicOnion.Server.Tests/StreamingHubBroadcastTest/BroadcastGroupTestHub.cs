@@ -1,5 +1,6 @@
 #pragma warning disable CS1998
 
+using Cysharp.Runtime.Multicast;
 using MagicOnion.Server.Hubs;
 
 namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest;
@@ -33,7 +34,7 @@ public interface IStreamingHubBroadcastTestHub : IStreamingHub<IStreamingHubBroa
 
 public class StreamingHubBroadcastTestHub : StreamingHubBase<IStreamingHubBroadcastTestHub, IStreamingHubBroadcastTestHubReceiver>, IStreamingHubBroadcastTestHub
 {
-    IGroup group;
+    IGroup<IStreamingHubBroadcastTestHubReceiver> group;
 
     public async Task<Guid> RegisterConnectionToGroup()
     {
@@ -43,31 +44,31 @@ public class StreamingHubBroadcastTestHub : StreamingHubBase<IStreamingHubBroadc
 
     public async Task CallBroadcastToSelfAsync()
     {
-        BroadcastToSelf(group).Call();
+        group.Single(ConnectionId).Call();
     }
 
     public async Task CallBroadcastExceptSelfAsync()
     {
-        BroadcastExceptSelf(group).Call();
+        group.Except([ConnectionId]).Call();
     }
 
     public async Task CallBroadcastExceptAsync(Guid connectionId)
     {
-        BroadcastExcept(group, connectionId).Call();
+        group.Except([connectionId]).Call();
     }
 
     public async Task CallBroadcastExceptManyAsync(Guid[] connectionIds)
     {
-        BroadcastExcept(group, connectionIds).Call();
+        group.Except([..connectionIds]).Call();
     }
 
     public async Task CallBroadcastToAsync(Guid connectionId)
     {
-        BroadcastTo(group, connectionId).Call();
+        group.Only([connectionId]).Call();
     }
 
     public async Task CallBroadcastToManyAsync(Guid[] connectionIds)
     {
-        BroadcastTo(group, connectionIds).Call();
+        group.Only([..connectionIds]).Call();
     }
 }

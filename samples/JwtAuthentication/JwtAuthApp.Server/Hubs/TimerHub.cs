@@ -6,10 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using JwtAuthApp.Shared;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Authorization;
-using Multicaster;
 
 namespace JwtAuthApp.Server.Hubs
 {
@@ -19,7 +17,7 @@ namespace JwtAuthApp.Server.Hubs
         private Task _timerLoopTask;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private TimeSpan _interval = TimeSpan.FromSeconds(1);
-        private IMulticastGroup<ITimerHubReceiver> _group;
+        private IGroup<ITimerHubReceiver> _group;
 
         public async Task SetAsync(TimeSpan interval)
         {

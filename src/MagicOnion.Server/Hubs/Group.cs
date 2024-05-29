@@ -1,42 +1,41 @@
-using Multicaster;
+using System.Collections.Immutable;
+using Cysharp.Runtime.Multicast;
 
 namespace MagicOnion.Server.Hubs;
 
-public interface IGroup<T> : IMulticastAsyncGroup<T>
+public interface IGroup<T> : IMulticastGroup<T>
 {
     ValueTask RemoveAsync(ServiceContext context);
+    ValueTask<int> CountAsync();
 }
 
 internal class Group<T> : IGroup<T>
 {
-    readonly IMulticastAsyncGroup<T> _group;
+    readonly IMulticastAsyncGroup<T> group;
 
-    public Group(IMulticastAsyncGroup<T> group)
+    internal string Name { get; }
+
+    public Group(IMulticastAsyncGroup<T> group, string name)
     {
-        _group = group;
+        this.group = group;
+        this.Name = name;
     }
 
     public T All
-        => _group.All;
+        => group.All;
 
-    public T Except(IReadOnlyList<Guid> excludes)
-        => _group.Except(excludes);
+    public T Except(ImmutableArray<Guid> excludes)
+        => group.Except(excludes);
 
-    public T Only(IReadOnlyList<Guid> targets)
-        => _group.Only(targets);
+    public T Only(ImmutableArray<Guid> targets)
+        => group.Only(targets);
 
     public T Single(Guid target)
-        => _group.Single(target);
+        => group.Single(target);
 
     public ValueTask RemoveAsync(ServiceContext context)
-        => _group.RemoveAsync(context.ContextId);
-
-    public ValueTask AddAsync(Guid key, T receiver)
-        => _group.AddAsync(key, receiver);
-
-    public ValueTask RemoveAsync(Guid key)
-        => _group.RemoveAsync(key);
+        => group.RemoveAsync(context.ContextId);
 
     public ValueTask<int> CountAsync()
-        => _group.CountAsync();
+        => group.CountAsync();
 }

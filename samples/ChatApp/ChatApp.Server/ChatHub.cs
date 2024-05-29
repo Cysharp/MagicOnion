@@ -4,7 +4,7 @@ using MagicOnion.Server.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Multicaster;
+using Cysharp.Runtime.Multicast;
 
 namespace ChatApp.Server;
 

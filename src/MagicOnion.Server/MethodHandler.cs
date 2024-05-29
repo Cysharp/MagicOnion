@@ -10,7 +10,6 @@ using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Internal;
 using MagicOnion.Serialization;
 using Microsoft.Extensions.Logging;
-using Multicaster;
 
 namespace MagicOnion.Server;
 

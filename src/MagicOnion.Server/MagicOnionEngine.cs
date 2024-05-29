@@ -2,11 +2,11 @@ using MagicOnion.Server.Hubs;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Cysharp.Runtime.Multicast;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Multicaster;
 
 namespace MagicOnion.Server;
 
@@ -205,7 +205,6 @@ public static class MagicOnionEngine
 
                     streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
 
-                    var streamingHubHandlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
                     streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
 
                     IMulticastGroupProvider groupProvider;

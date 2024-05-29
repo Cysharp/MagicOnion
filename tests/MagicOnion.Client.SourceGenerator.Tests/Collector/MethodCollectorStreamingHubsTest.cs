@@ -605,7 +605,7 @@ public interface IMyHubReceiver
     }
 
     [Fact]
-    public void Receiver_NonVoidReturnType()
+    public void Receiver_ReturnTypeIsNotVoidOrTask()
     {
         // Arrange
         var source = @"
@@ -636,6 +636,42 @@ public interface IMyHubReceiver
         // Assert
         diagnostics.Should().HaveCount(1);
         diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id);
+    }
+
+    [Fact]
+    public void Receiver_ReturnTypeIsTask()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    Task MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    Task<int> EventA();
+    ValueTask<int> EventB();
+    Task EventC();
+    ValueTask EventD();
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        diagnostics.Should().BeEmpty();
     }
 
     [Fact]

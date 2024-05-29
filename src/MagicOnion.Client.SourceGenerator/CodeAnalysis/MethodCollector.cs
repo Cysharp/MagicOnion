@@ -157,7 +157,11 @@ public static class MethodCollector
         var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
         if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void &&
-            (methodReturnType.HasGenericArguments && methodReturnType.GetGenericTypeDefinition() != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task))
+            methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
+            methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask &&
+            (!methodReturnType.HasGenericArguments ||
+                (methodReturnType.GetGenericTypeDefinition() != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
+                 methodReturnType.GetGenericTypeDefinition() != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)))
         {
             methodInfo = null;
             diagnostic = Diagnostic.Create(

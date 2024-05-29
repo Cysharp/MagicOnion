@@ -1,3 +1,5 @@
+using Cysharp.Runtime.Multicast;
+using Cysharp.Runtime.Multicast.Distributed.Redis;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,8 +23,8 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
         {
             builder.ConfigureServices(services =>
             {
-                services.RemoveAll<IGroupRepositoryFactory>();
-                services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
+                services.RemoveAll<IMulticastGroupProvider>();
+                services.TryAddSingleton<IMulticastGroupProvider, RedisGroupProvider>();
                 services.Configure<RedisGroupOptions>(options =>
                 {
                     options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(redisServer.GetConnectionString());
@@ -33,8 +35,8 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
         {
             builder.ConfigureServices(services =>
             {
-                services.RemoveAll<IGroupRepositoryFactory>();
-                services.TryAddSingleton<IGroupRepositoryFactory, RedisGroupRepositoryFactory>();
+                services.RemoveAll<IMulticastGroupProvider>();
+                services.TryAddSingleton<IMulticastGroupProvider, RedisGroupProvider>();
                 services.Configure<RedisGroupOptions>(options =>
                 {
                     options.ConnectionMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(redisServer.GetConnectionString());
@@ -68,34 +70,6 @@ public class RedisGroupFunctionalTest : IClassFixture<MagicOnionApplicationFacto
         // Assert
         receiver1.Received().OnMessage(12345);
         receiver2.Received().OnMessage(12345);
-    }
-
-    [Fact]
-    public async Task RemoveMemberFromInMemoryGroup_CounterKeyIsNotDeleted()
-    {
-        // Arrange
-        var groupName = nameof(RemoveMemberFromInMemoryGroup_CounterKeyIsNotDeleted);
-        // Client-1 on Server-1
-        var httpClient1 = factory.CreateDefaultClient();
-        var channel1 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient1 });
-        var receiver1 = Substitute.For<IRedisGroupFunctionalTestHubReceiver>();
-        var client1 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel1, receiver1);
-        await client1.JoinAsync(groupName);
-        // Client-2 on Server-2
-        var httpClient2 = factory2.CreateDefaultClient();
-        var channel2 = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient2 });
-        var receiver2 = Substitute.For<IRedisGroupFunctionalTestHubReceiver>();
-        var client2 = await StreamingHubClient.ConnectAsync<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>(channel2, receiver2);
-        await client2.JoinAsync(groupName);
-
-        // Act
-        var beforeCount = (await client1.GetMemberCountAsync());
-        await client2.LeaveAsync(); // Leave Client-2 from the group.
-        await Task.Delay(500); // Wait for broadcast queue to be consumed.
-
-        // Assert
-        beforeCount.Should().Be(2);
-        (await client1.GetMemberCountAsync()).Should().Be(1);
     }
 
     [Fact]
@@ -142,13 +116,11 @@ public interface IRedisGroupFunctionalTestHub : IStreamingHub<IRedisGroupFunctio
     Task JoinAsync(string groupName);
     Task LeaveAsync();
     Task CallAsync(int arg0);
-
-    Task<int> GetMemberCountAsync();
 }
 
 public class RedisGroupFunctionalTestHub : StreamingHubBase<IRedisGroupFunctionalTestHub, IRedisGroupFunctionalTestHubReceiver>, IRedisGroupFunctionalTestHub
 {
-    IGroup? group;
+    IGroup<IRedisGroupFunctionalTestHubReceiver>? group;
 
     public async Task JoinAsync(string groupName)
     {
@@ -163,13 +135,7 @@ public class RedisGroupFunctionalTestHub : StreamingHubBase<IRedisGroupFunctiona
 
     public Task CallAsync(int arg0)
     {
-        Broadcast(group!).OnMessage(arg0);
+        this.Broadcast(group!).OnMessage(arg0);
         return Task.CompletedTask;
-    }
-
-    public async Task<int> GetMemberCountAsync()
-    {
-        if (group is null) return 0;
-        return await group.GetMemberCountAsync();
     }
 }

@@ -15,11 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="StackExchange.Redis" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\MagicOnion.Internal\Buffers\ArrayPoolBufferWriter.cs" LinkBase="Internal.Shared\Buffers" />
+    <PackageReference Include="Multicaster.Distributed.Redis" />
   </ItemGroup>
 
   <ItemGroup>

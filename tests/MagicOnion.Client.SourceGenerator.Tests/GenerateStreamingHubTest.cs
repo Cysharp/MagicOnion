@@ -314,7 +314,7 @@ public class GenerateStreamingHubTest
         {
             public interface IMyHubReceiver
             {
-                Task {|#0:B|}();
+                int {|#0:B|}();
             }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {

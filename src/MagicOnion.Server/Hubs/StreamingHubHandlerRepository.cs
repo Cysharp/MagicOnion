@@ -1,8 +1,8 @@
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
+using Cysharp.Runtime.Multicast;
 using MagicOnion.Server.Internal;
-using Multicaster;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -10,8 +10,8 @@ namespace MagicOnion.Server.Hubs;
 internal class StreamingHubHandlerRepository
 {
     bool frozen;
-    readonly IDictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> handlersCache = new(MethodHandler.UniqueEqualityComparer.Instance);
-    readonly IDictionary<MethodHandler, IMulticastGroupProvider> groupCache = new(MethodHandler.UniqueEqualityComparer.Instance);
+    IDictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> handlersCache = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(MethodHandler.UniqueEqualityComparer.Instance);
+    IDictionary<MethodHandler, MagicOnionManagedGroupProvider> groupCache = new Dictionary<MethodHandler, MagicOnionManagedGroupProvider>(MethodHandler.UniqueEqualityComparer.Instance);
 
     public void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
     {
@@ -46,10 +46,10 @@ internal class StreamingHubHandlerRepository
     public void RegisterGroupProvider(MethodHandler methodHandler, IMulticastGroupProvider groupProvider)
     {
         ThrowIfFrozen();
-        groupCache[methodHandler] = groupProvider;
+        groupCache[methodHandler] = new MagicOnionManagedGroupProvider(groupProvider);
     }
 
-    public IMulticastGroupProvider GetGroupProvider(MethodHandler methodHandler)
+    public MagicOnionManagedGroupProvider GetGroupProvider(MethodHandler methodHandler)
     {
         return groupCache[methodHandler];
     }

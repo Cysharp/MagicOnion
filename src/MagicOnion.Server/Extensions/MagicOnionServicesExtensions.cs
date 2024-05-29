@@ -1,7 +1,8 @@
-using System.Collections.Concurrent;
 using System.Reflection;
+using Cysharp.Runtime.Multicast;
+using Cysharp.Runtime.Multicast.InMemory;
+using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.AspNetCore.Server.Model;
-using Grpc.Core;
 using MagicOnion.Server;
 using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Glue;
@@ -9,9 +10,6 @@ using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Multicaster;
-using Multicaster.InMemory;
-using Multicaster.Remoting;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -71,8 +69,9 @@ public static class MagicOnionServicesExtensions
         services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
         services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
         services.TryAddSingleton<IRemoteSerializer, MagicOnionRemoteSerializer>();
-        services.TryAddSingleton<IRemoteCallPendingMessageQueue, RemoteCallPendingMessageQueue>();
-        services.TryAddSingleton<IMulticastGroupProvider, RemoteCompositeGroupProvider>();
+        services.TryAddSingleton<IRemoteClientResultPendingTaskRegistry, RemoteClientResultPendingTaskRegistry>();
+        services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
+        services.TryAddSingleton<MagicOnionManagedGroupProvider>();
 
         return new MagicOnionServerBuilder(services);
     }

@@ -22,6 +22,7 @@ namespace MagicOnion.Internal
                 2 => StreamingHubMessageType.Broadcast,
                 3 => StreamingHubMessageType.Response,
                 4 => StreamingHubMessageType.ResponseWithError,
+                5 => StreamingHubMessageType.ClientResultRequest,
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
             };
         }
@@ -49,6 +50,17 @@ namespace MagicOnion.Internal
             var error = reader.ReadString();
 
             return (messageId, statusCode, detail, error);
+        }
+
+        public (Guid ClientResultRequestMessageId, int MethodId, ReadOnlyMemory<byte> Body) ReadClientResultRequestMessage()
+        {
+            var type = reader.ReadByte(); // reserved
+            _ = reader.ReadByte(); // dummy
+            var clientRequestMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+            var methodId = reader.ReadInt32();
+            var offset = (int)reader.Consumed;
+
+            return (clientRequestMessageId, methodId, data.Slice(offset));
         }
     }
 }

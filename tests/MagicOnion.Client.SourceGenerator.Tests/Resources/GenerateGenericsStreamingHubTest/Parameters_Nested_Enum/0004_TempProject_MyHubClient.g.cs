@@ -4,6 +4,7 @@
 #pragma warning disable CS0414 // The private field 'field' is assigned but its value is never used
 #pragma warning disable CS8019 // Unnecessary using directive.
 #pragma warning disable CS1522 // Empty switch block
+#pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously.
 
 namespace TempProject
 {
@@ -56,6 +57,13 @@ namespace TempProject
                         case -1221306238: // Task<Nil> GetEnumAsync(global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>> arg0)
                             base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
                             break;
+                    }
+                }
+
+                protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                {
+                    switch (methodId)
+                    {
                     }
                 }
 

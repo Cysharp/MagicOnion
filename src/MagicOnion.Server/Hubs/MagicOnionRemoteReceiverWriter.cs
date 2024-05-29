@@ -1,18 +1,19 @@
-using Multicaster.Remoting;
+using Cysharp.Runtime.Multicast.Remoting;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Server.Hubs;
 
 internal class MagicOnionRemoteReceiverWriter : IRemoteReceiverWriter
 {
-    readonly StreamingServiceContext<byte[], byte[]> writer;
+    readonly StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> writer;
 
-    public MagicOnionRemoteReceiverWriter(StreamingServiceContext<byte[], byte[]> writer)
+    public MagicOnionRemoteReceiverWriter(StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> writer)
     {
         this.writer = writer;
     }
 
     public void Write(ReadOnlyMemory<byte> payload)
     {
-        writer.QueueResponseStreamWrite(payload.ToArray());
+        writer.QueueResponseStreamWrite(StreamingHubPayloadPool.Shared.RentOrCreate(payload.Span));
     }
 }

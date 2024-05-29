@@ -1,20 +1,33 @@
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
-using Grpc.Core;
-using MagicOnion.Internal.Buffers;
 using MagicOnion.Serialization;
 using MessagePack;
 
 namespace MagicOnion.Internal
 {
     /// <remarks>
-    ///     <para>StreamingHub message formats:</para>
+    ///     <para>StreamingHub message formats (from Server to Client):</para>
     ///     <list type="bullet">
+    ///         <item>
+    ///             <term>Response: InvokeHubMethod (from server to client)</term>
+    ///             <description>[MessageId(int), MethodId(int), SerializedResponse]</description>
+    ///         </item>
+    ///         <item>
+    ///             <term>Response: InvokeHubMethod (from server to client; with Exception)</term>
+    ///             <description>[MessageId(int), StatusCode(int), Detail(string), Message(string)]</description>
+    ///         </item>
     ///         <item>
     ///             <term>Broadcast: from server to client</term>
     ///             <description>[MethodId(int), SerializedArgument]</description>
     ///         </item>
+    ///         <item>
+    ///             <term>ClientInvoke/Request: InvokeClientMethod (from server to client)</term>
+    ///             <description>[Type=0(byte), 0 (dummy), ClientResultMessageId(Guid), MethodId(int), SerializedArguments]</description>
+    ///         </item>
+    ///     </list>
+    ///     <para>StreamingHub message formats (from Client to Server):</para>
+    ///     <list type="bullet">
     ///         <item>
     ///             <term>Request: InvokeHubMethod (from client; void; fire-and-forget)</term>
     ///             <description>[MethodId(int), SerializedArguments]</description>
@@ -24,12 +37,12 @@ namespace MagicOnion.Internal
     ///             <description>[MessageId(int), MethodId(int), SerializedArguments]</description>
     ///         </item>
     ///         <item>
-    ///             <term>Response: InvokeHubMethod (from server to client)</term>
-    ///             <description>[MessageId(int), MethodId(int), SerializedResponse]</description>
+    ///             <term>ClientInvoke/Response: InvokeClientMethod (from client to server)</term>
+    ///             <description>[Type=0(byte), ClientResultMessageId(Guid), MethodId(int), SerializedResponse]</description>
     ///         </item>
     ///         <item>
-    ///             <term>Response: InvokeHubMethod (from server to client; with Exception)</term>
-    ///             <description>[MessageId(int), StatusCode(int), Detail(string), Message(string)]</description>
+    ///             <term>ClientInvoke/Response: InvokeClientMethod (from client to server; with Exception)</term>
+    ///             <description>[Type=1(byte), ClientResultMessageId(Guid), MethodId(int), [StatusCode(int), Detail(string), Message(string)]]</description>
     ///         </item>
     ///     </list>
     /// </remarks>
@@ -120,14 +133,69 @@ namespace MagicOnion.Internal
             writer.Write(msg);
             writer.Flush();
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteClientResultRequestMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, T request, IMagicOnionSerializer messageSerializer)
+        {
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(5);
+            writer.WriteInt8(0); // Dummy
+            writer.WriteInt8(0); // Dummy
+            MessagePackSerializer.Serialize(ref writer, messageId);
+            writer.Write(methodId);
+            writer.Flush();
+            messageSerializer.Serialize(bufferWriter, request);
+        }
+
+        /// <summary>
+        /// Writes a response message for client result.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteClientResultResponseMessage<T>(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, T response, IMagicOnionSerializer messageSerializer)
+        {
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(4);
+            writer.WriteInt8(0); // Result = 0 (success)
+            MessagePackSerializer.Serialize(ref writer, messageId);
+            writer.Write(methodId);
+            writer.Flush();
+            messageSerializer.Serialize(bufferWriter, response);
+        }
+
+        /// <summary>
+        /// Writes an error response message for client result.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteClientResultResponseMessageForError(IBufferWriter<byte> bufferWriter, int methodId, Guid messageId, int statusCode, string detail, Exception? ex, IMagicOnionSerializer messageSerializer)
+        {
+            var writer = new MessagePackWriter(bufferWriter);
+            writer.WriteArrayHeader(4);
+            writer.WriteInt8(1); // Result = 1 (failed)
+            MessagePackSerializer.Serialize(ref writer, messageId);
+            writer.Write(methodId);
+
+            writer.WriteArrayHeader(3);
+            {
+                writer.Write(statusCode);
+                writer.Write(detail);
+                writer.Write(ex?.ToString());
+            }
+            writer.Flush();
+        }
     }
 
     internal enum StreamingHubMessageType
     {
-        Broadcast,
+        // Client to Server
         Request,
         RequestFireAndForget,
         Response,
         ResponseWithError,
+
+        // Server to Client
+        Broadcast,
+        ClientResultRequest,
+        ClientResultResponse,
+        ClientResultResponseWithError,
     }
 }

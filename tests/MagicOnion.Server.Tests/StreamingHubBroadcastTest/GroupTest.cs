@@ -1,12 +1,16 @@
 namespace MagicOnion.Server.Tests.StreamingHubBroadcastTest;
 
-public abstract class GroupTestBase
+public class GroupTest : IClassFixture<GroupTest.CustomServerFixture>
 {
     readonly ServerFixture server;
 
-    public GroupTestBase(ServerFixture server)
+    public GroupTest(CustomServerFixture server)
     {
         this.server = server;
+    }
+
+    public class CustomServerFixture : ServerFixture<StreamingHubBroadcastTestHub>
+    {
     }
 
     [Fact]

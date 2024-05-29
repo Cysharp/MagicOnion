@@ -20,8 +20,6 @@ namespace TempProject
                 {
                 }
 
-                public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetValuesAsync(global::TempProject.MyResponse[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::TempProject.MyResponse[], global::MessagePack.Nil>(-209315513, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -38,8 +36,6 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task DisposeAsync() => throw new global::System.NotSupportedException();
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
-                    public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetValuesAsync(global::TempProject.MyResponse[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::TempProject.MyResponse[], global::MessagePack.Nil>(-209315513, arg0);
 
                 }
 
@@ -54,9 +50,6 @@ namespace TempProject
                 {
                     switch (methodId)
                     {
-                        case -209315513: // Task<Nil> GetValuesAsync(global::TempProject.MyResponse[] arg0)
-                            base.SetResultForResponse<global::MessagePack.Nil>(taskCompletionSource, data);
-                            break;
                     }
                 }
 
@@ -64,6 +57,20 @@ namespace TempProject
                 {
                     switch (methodId)
                     {
+                        case -955516027: // Task B()
+                            {
+                                try
+                                {
+                                    var value = base.Deserialize<global::MessagePack.Nil>(data);
+                                    var result = await receiver.B().ConfigureAwait(false);
+                                    await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                }
+                                catch (global::System.Exception ex)
+                                {
+                                    await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
+                                }
+                            }
+                            break;
                     }
                 }
 

@@ -46,7 +46,8 @@ public class StaticStreamingHubClientGenerator
             #pragma warning disable CS0414 // The private field 'field' is assigned but its value is never used
             #pragma warning disable CS8019 // Unnecessary using directive.
             #pragma warning disable CS1522 // Empty switch block
-
+            #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously.
+            
             """);
     }
 
@@ -330,7 +331,7 @@ public class StaticStreamingHubClientGenerator
     static void EmitOnClientInvokeEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
-                            protected override async void OnClientInvokeEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ArraySegment<global::System.Byte> data)
+                            protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
                                 switch (methodId)
                                 {
@@ -347,9 +348,16 @@ public class StaticStreamingHubClientGenerator
             ctx.Writer.AppendLineWithFormat($$"""
                                     case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                         {
-                                            var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
-                                            var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
-                                            await base.WriteClientResultMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                            try
+                                            {
+                                                var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+                                                var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
+                                                await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                            }
+                                            catch (global::System.Exception ex)
+                                            {
+                                                await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
+                                            }
                                         }
                                         break;
             """);

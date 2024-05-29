@@ -1,4 +1,4 @@
-using Multicaster;
+using Cysharp.Runtime.Multicast;
 
 namespace MagicOnion.Server.Hubs;
 

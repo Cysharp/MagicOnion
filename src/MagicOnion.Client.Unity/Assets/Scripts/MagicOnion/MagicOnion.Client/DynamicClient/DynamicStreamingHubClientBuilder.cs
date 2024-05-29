@@ -368,6 +368,17 @@ namespace MagicOnion.Client.DynamicClient
                     }
                 }
             }
+            // protected abstract void OnClientResultEvent(int methodId, Guid messageId, ReadOnlyMemory<byte> data);
+            {
+                var methodDefinitions = BroadcasterHelper.SearchDefinitions(receiverType);
+                BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
+
+                var method = typeBuilder.DefineMethod("OnClientResultEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(void), new[] { typeof(int), typeof(Guid), typeof(ReadOnlyMemory<byte>) });
+                var il = method.GetILGenerator();
+                il.Emit(OpCodes.Newobj, typeof(NotSupportedException).GetConstructor(Array.Empty<Type>())!);
+                il.Emit(OpCodes.Throw);
+            }
 
             // Proxy Methods
             for (int i = 0; i < definitions.Length; i++)
