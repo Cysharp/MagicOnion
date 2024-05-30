@@ -33,6 +33,7 @@ internal class StreamingHubContextPool
 
 public class StreamingHubContext
 {
+    IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> streamingServiceContext = default!;
     ConcurrentDictionary<string, object>? items;
 
     /// <summary>Object storage per invoke.</summary>
@@ -54,10 +55,9 @@ public class StreamingHubContext
     public string Path { get; private set; } = default!;
     public DateTime Timestamp { get; private set; }
 
-    public Guid ConnectionId => ServiceContext.ContextId;
+    public Guid ConnectionId => streamingServiceContext.ContextId;
 
-    /// <summary>Raw gRPC Context.</summary>
-    internal IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; private set; } = default!;
+    public IServiceContext ServiceContext => streamingServiceContext;
 
     internal int MessageId { get; private set; }
     internal int MethodId { get; private set; }
@@ -67,7 +67,7 @@ public class StreamingHubContext
 
     internal void Initialize(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, object hubInstance, ReadOnlyMemory<byte> request, string path, DateTime timestamp, int messageId, int methodId)
     {
-        ServiceContext = serviceContext;
+        streamingServiceContext = serviceContext;
         HubInstance = hubInstance;
         Request = request;
         Path = path;
@@ -78,7 +78,7 @@ public class StreamingHubContext
 
     internal void Uninitialize()
     {
-        ServiceContext = default!;
+        streamingServiceContext = default!;
         HubInstance = default!;
         Request = default!;
         Path = default!;
@@ -142,7 +142,7 @@ public class StreamingHubContext
     void WriteMessageCore(StreamingHubPayload payload)
     {
         ResponseSize = payload.Length; // NOTE: We cannot use the payload after QueueResponseStreamWrite.
-        ServiceContext.QueueResponseStreamWrite(payload);
+        streamingServiceContext.QueueResponseStreamWrite(payload);
     }
 
     StreamingHubPayload BuildMessage()
@@ -155,7 +155,7 @@ public class StreamingHubContext
     StreamingHubPayload BuildMessage<T>(T v)
     {
         using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, ServiceContext.MessageSerializer);
+        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, streamingServiceContext.MessageSerializer);
         return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 
