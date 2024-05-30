@@ -1,6 +1,9 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
+using Cysharp.Runtime.Multicast;
+using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.Core;
 using MagicOnion.Internal;
 using MagicOnion.Server.Diagnostics;
@@ -8,6 +11,7 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs;
@@ -15,6 +19,8 @@ namespace MagicOnion.Server.Hubs;
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
+    readonly IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry();
+
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
 
@@ -30,63 +36,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     readonly Channel<(StreamingHubPayload Payload, UniqueHashDictionary<StreamingHubHandler> Handlers, int MethodId, int MessageId, ReadOnlyMemory<byte> Body, bool HasResponse)> requests
         = Channel.CreateBounded<(StreamingHubPayload, UniqueHashDictionary<StreamingHubHandler>, int, int, ReadOnlyMemory<byte>, bool)>(10);
 
-    public HubGroupRepository Group { get; private set; } = default!; /* lateinit */
+    public HubGroupRepository<TReceiver> Group { get; private set; } = default!;
+    public TReceiver Client { get; private set; } = default!;
 
     internal StreamingServiceContext<StreamingHubPayload, StreamingHubPayload> StreamingServiceContext
         => (StreamingServiceContext<StreamingHubPayload, StreamingHubPayload>)Context;
 
     protected Guid ConnectionId
         => Context.ContextId;
-
-    // Broadcast Commands
-
-    [Ignore]
-    protected TReceiver Broadcast(IGroup group)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType;
-        return (TReceiver)Activator.CreateInstance(type, group)!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExceptSelf(IGroup group)
-    {
-        return BroadcastExcept(group, Context.ContextId);
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExcept(IGroup group, Guid except)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptOne;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, except })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastExcept(IGroup group, Guid[] excepts)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ExceptMany;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, excepts })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastToSelf(IGroup group)
-    {
-        return BroadcastTo(group, Context.ContextId);
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastTo(IGroup group, Guid toConnectionId)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToOne;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionId })!;
-    }
-
-    [Ignore]
-    protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)
-    {
-        var type = DynamicBroadcasterBuilder<TReceiver>.BroadcasterType_ToMany;
-        return (TReceiver)Activator.CreateInstance(type, new object[] { group, toConnectionIds })!;
-    }
-
+    
     /// <summary>
     /// Called before connect, instead of constructor.
     /// </summary>
@@ -117,9 +75,15 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         Metrics.StreamingHubConnectionIncrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
         var streamingContext = GetDuplexStreamingContext<StreamingHubPayload, StreamingHubPayload>();
+        var serviceProvider = streamingContext.ServiceContext.ServiceProvider;
 
-        var group = Context.ServiceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupRepository(Context.MethodHandler);
-        this.Group = new HubGroupRepository(this.Context, group);
+        var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
+        var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
+        this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
+
+        var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
+        this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
+
         try
         {
             await OnConnecting();
@@ -230,6 +194,24 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     var requestMessage = reader.ReadRequestFireAndForget();
                     return requests.Writer.WriteAsync((payload, handlers, requestMessage.MethodId, -1, requestMessage.Body, false), cancellationToken);
                 }
+            case StreamingHubMessageType.ClientResultResponse:
+                {
+                    var responseMessage = reader.ReadClientResultResponse();
+                    if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                    {
+                        pendingMessage.TrySetResult(responseMessage.Body);
+                    }
+                    return default;
+                }
+            case StreamingHubMessageType.ClientResultResponseWithError:
+            {
+                var responseMessage = reader.ReadClientResultResponseForError();
+                if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                {
+                    pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode, responseMessage.Message + (string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail))));
+                }
+                return default;
+            }
             default:
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }

@@ -123,7 +123,7 @@ public interface ISerializerTestHub : IStreamingHub<ISerializerTestHub, ISeriali
 
 public class SerializerTestHub : StreamingHubBase<ISerializerTestHub, ISerializerTestHubReceiver>, ISerializerTestHub
 {
-    IGroup? group;
+    IGroup<ISerializerTestHubReceiver>? group;
 
     protected override async ValueTask OnConnecting()
     {
@@ -137,7 +137,7 @@ public class SerializerTestHub : StreamingHubBase<ISerializerTestHub, ISerialize
 
     public Task<int> Callback(int arg0, string arg1)
     {
-        Broadcast(group!).OnMessage(arg0, arg1);
+        group!.All.OnMessage(arg0, arg1);
         return Task.FromResult(123);
     }
 }

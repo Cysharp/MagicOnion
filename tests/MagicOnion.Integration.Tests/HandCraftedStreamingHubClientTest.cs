@@ -94,6 +94,11 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
             }
         }
 
+        protected override void OnClientResultEvent(int methodId, Guid messageId, ReadOnlyMemory<byte> data)
+        {
+            throw new NotImplementedException();
+        }
+
         public IHandCraftedStreamingHubClientTestHub FireAndForget()
         {
             return new FireAndForgetClient(this);
@@ -191,7 +196,7 @@ public class HandCraftedStreamingHubClientTestHub : StreamingHubBase<IHandCrafte
     public async Task<int> Callback(int arg0, string arg1)
     {
         var group = await Group.AddAsync(Guid.NewGuid().ToString());
-        Broadcast(group).OnMessage(arg0, arg1);
+        group.All.OnMessage(arg0, arg1);
         return 123;
     }
 }

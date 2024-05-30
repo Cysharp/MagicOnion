@@ -21,6 +21,12 @@ namespace MagicOnion.Internal
             {
                 2 => StreamingHubMessageType.RequestFireAndForget,
                 3 => StreamingHubMessageType.Request,
+                4 => reader.ReadByte() switch
+                {
+                    0 => StreamingHubMessageType.ClientResultResponse,
+                    1 => StreamingHubMessageType.ClientResultResponseWithError,
+                    var subType => throw new InvalidOperationException($"Unknown client response message: {subType}"),
+                },
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
             };
         }
@@ -42,6 +48,31 @@ namespace MagicOnion.Internal
             var consumed = (int)reader.Consumed;
 
             return (messageId, methodId, data.Slice(consumed));
+        }
+
+        public (Guid ClientResultMessageId, int ClientMethodId, ReadOnlyMemory<byte> Body) ReadClientResultResponse()
+        {
+            // T: [0, clientResultMessageId, methodId, result]
+            var clientResultMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+            var clientMethodId = reader.ReadInt32();
+            var consumed = (int)reader.Consumed;
+
+            return (clientResultMessageId, clientMethodId, data.Slice(consumed));
+        }
+
+        public (Guid ClientResultMessageId, int ClientMethodId, int StatusCode, string Detail, string Message) ReadClientResultResponseForError()
+        {
+            // T: [1, clientResultMessageId, methodId, [statusCode, detail, message]]
+            var clientResultMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
+            var clientMethodId = reader.ReadInt32();
+            var bodyArray = reader.ReadArrayHeader();
+            if (bodyArray != 3) throw new InvalidOperationException($"Invalid ClientResponse: The BodyArray length is {bodyArray}");
+
+            var statusCode = reader.ReadInt32();
+            var detail = reader.ReadString() ?? string.Empty;
+            var message = reader.ReadString() ?? string.Empty;
+
+            return (clientResultMessageId, clientMethodId, statusCode, detail, message);
         }
     }
 }

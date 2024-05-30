@@ -46,7 +46,8 @@ public class StaticStreamingHubClientGenerator
             #pragma warning disable CS0414 // The private field 'field' is assigned but its value is never used
             #pragma warning disable CS8019 // Unnecessary using directive.
             #pragma warning disable CS1522 // Empty switch block
-
+            #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously.
+            
             """);
     }
 
@@ -107,6 +108,7 @@ public class StaticStreamingHubClientGenerator
         EmitFireAndForget(ctx);
         EmitOnBroadcastEvent(ctx);
         EmitOnResponseEvent(ctx);
+        EmitOnClientInvokeEvent(ctx);
         ctx.Writer.AppendLine("""
                         }
             """);
@@ -263,7 +265,7 @@ public class StaticStreamingHubClientGenerator
                                 switch (methodId)
                                 {
             """);
-        foreach (var method in ctx.Hub.Receiver.Methods)
+        foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void))
         {
             var methodArgs = method.Parameters.Count switch
             {
@@ -316,6 +318,47 @@ public class StaticStreamingHubClientGenerator
             ctx.Writer.AppendLineWithFormat($$"""
                                     case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                         base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
+                                        break;
+            """);
+        }
+        ctx.Writer.AppendLine("""
+                                }
+                            }
+
+            """);
+    }
+
+    static void EmitOnClientInvokeEvent(StreamingHubClientBuildContext ctx)
+    {
+        ctx.Writer.AppendLine("""
+                            protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                            {
+                                switch (methodId)
+                                {
+            """);
+        foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void))
+        {
+            var methodArgs = method.Parameters.Count switch
+            {
+                0 => "",
+                1 => "value",
+                _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
+            };
+
+            ctx.Writer.AppendLineWithFormat($$"""
+                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                                        {
+                                            try
+                                            {
+                                                var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+                                                var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
+                                                await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                            }
+                                            catch (global::System.Exception ex)
+                                            {
+                                                await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
+                                            }
+                                        }
                                         break;
             """);
         }

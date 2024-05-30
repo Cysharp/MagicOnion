@@ -54,7 +54,7 @@ public class TestObject
 
 public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
 {
-    IGroup group;
+    IGroup<IMessageReceiver> group;
 
     protected override async ValueTask OnConnecting()
     {
@@ -63,7 +63,7 @@ public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
 
     protected override async ValueTask OnConnected()
     {
-        BroadcastToSelf(group).VoidOnConnected(123, "foo", 12.3f);
+        group.Single(ConnectionId).VoidOnConnected(123, "foo", 12.3f);
     }
 
     protected override async ValueTask OnDisconnected()
@@ -74,25 +74,25 @@ public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
 
     public async Task MoreArgument(int x, string y, double z)
     {
-        BroadcastToSelf(group).VoidMoreArgument(x, y, z);
+        group.Single(ConnectionId).VoidMoreArgument(x, y, z);
         //await Broadcast(group).MoreArgument(x, y, z);
     }
 
     public async Task OneArgument(int x)
     {
-        Broadcast(group).VoidOneArgument(x);
+        group.All.VoidOneArgument(x);
         //            await Broadcast(group).OneArgument(x);
     }
 
     public async Task OneArgument2(TestObject x)
     {
-        Broadcast(group).VoidOneArgument2(x);
+        group.All.VoidOneArgument2(x);
         //await Broadcast(group).OneArgument2(x);
     }
 
     public async Task OneArgument3(TestObject[] x)
     {
-        Broadcast(group).VoidOneArgument3(x);
+        group.All.VoidOneArgument3(x);
         //await Broadcast(group).OneArgument3(x);
     }
 
@@ -123,7 +123,7 @@ public class TestHub : StreamingHubBase<ITestHub, IMessageReceiver>, ITestHub
 
     public async Task ZeroArgument()
     {
-        Broadcast(group).VoidZeroArgument();
+        group.All.VoidZeroArgument();
         //await Broadcast(group).ZeroArgument();
     }
 }

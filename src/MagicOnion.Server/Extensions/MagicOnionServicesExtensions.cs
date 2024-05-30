@@ -1,4 +1,7 @@
 using System.Reflection;
+using Cysharp.Runtime.Multicast;
+using Cysharp.Runtime.Multicast.InMemory;
+using Cysharp.Runtime.Multicast.Remoting;
 using Grpc.AspNetCore.Server.Model;
 using MagicOnion.Server;
 using MagicOnion.Server.Diagnostics;
@@ -46,7 +49,6 @@ public static class MagicOnionServicesExtensions
 
         // MagicOnion: Core services
         var glueServiceType = MagicOnionGlueService.CreateType();
-        services.TryAddSingleton<IGroupRepositoryFactory, ImmutableArrayGroupRepositoryFactory>();
 
         services.TryAddSingleton<StreamingHubHandlerRepository>();
         services.TryAddSingleton<MagicOnionServiceDefinitionGlueDescriptor>(sp => new MagicOnionServiceDefinitionGlueDescriptor(glueServiceType, sp.GetRequiredService<MagicOnionServiceDefinition>()));
@@ -62,6 +64,14 @@ public static class MagicOnionServicesExtensions
                 configuration.GetSection(string.IsNullOrWhiteSpace(configName) ? "MagicOnion" : configName).Bind(o);
                 configureOptions?.Invoke(o);
             });
+
+        // Add: Multicaster
+        services.TryAddSingleton<IInMemoryProxyFactory>(DynamicInMemoryProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteProxyFactory>(DynamicRemoteProxyFactory.Instance);
+        services.TryAddSingleton<IRemoteSerializer, MagicOnionRemoteSerializer>();
+        services.TryAddSingleton<IRemoteClientResultPendingTaskRegistry, RemoteClientResultPendingTaskRegistry>();
+        services.TryAddSingleton<IMulticastGroupProvider, RemoteGroupProvider>();
+        services.TryAddSingleton<MagicOnionManagedGroupProvider>();
 
         return new MagicOnionServerBuilder(services);
     }

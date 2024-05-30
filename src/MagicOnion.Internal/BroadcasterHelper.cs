@@ -58,10 +58,10 @@ namespace MagicOnion.Internal
                 }
                 map.Add(methodId, item);
 
-                if (!(item.MethodInfo.ReturnType == typeof(void)))
-                {
-                    throw new Exception($"Invalid definition, TReceiver's return type must only be `void`. {item.MethodInfo.Name}.");
-                }
+                //if (!(item.MethodInfo.ReturnType == typeof(void)))
+                //{
+                //    throw new Exception($"Invalid definition, TReceiver's return type must only be `void`. {item.MethodInfo.Name}.");
+                //}
 
                 item.MethodId = methodId;
             }

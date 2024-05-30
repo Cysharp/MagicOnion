@@ -2,6 +2,7 @@ using MagicOnion.Server.Hubs;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Cysharp.Runtime.Multicast;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
@@ -203,18 +204,21 @@ public static class MagicOnionEngine
                     }
 
                     streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
+
                     streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
-                    IGroupRepositoryFactory factory;
+
+                    IMulticastGroupProvider groupProvider;
                     var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                     if (attr != null)
                     {
-                        factory = (IGroupRepositoryFactory)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
+                        groupProvider = (IMulticastGroupProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
                     }
                     else
                     {
-                        factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
+                        groupProvider = serviceProvider.GetRequiredService<IMulticastGroupProvider>();
                     }
-                    streamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
+
+                    streamingHubHandlerRepository.RegisterGroupProvider(connectHandler, groupProvider);
                 }
             }
         }

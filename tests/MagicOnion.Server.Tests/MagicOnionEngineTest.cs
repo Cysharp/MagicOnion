@@ -3,6 +3,7 @@ using MagicOnion.Server.Diagnostics;
 using MagicOnion.Server.Hubs;
 using MagicOnionEngineTest;
 using MessagePack;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Tests;
@@ -14,6 +15,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{};
@@ -32,6 +34,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(NonService) };
@@ -50,6 +53,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyService) };
@@ -68,6 +72,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyHub) };
@@ -86,6 +91,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyService).Assembly };
@@ -104,6 +110,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyIgnoredService).Assembly };
@@ -122,6 +129,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyNonPublicService).Assembly };
@@ -140,6 +148,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyAbstractService).Assembly };
@@ -158,6 +167,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
@@ -176,6 +186,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var assemblies = new Assembly[]{ typeof(IMyGenericsService).Assembly };
@@ -196,6 +207,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyService), typeof(MyService) };
@@ -214,6 +226,7 @@ public class MagicOnionEngineTest
     {
         // Arrange
         var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(new ConfigurationManager());
         services.AddMagicOnionCore();
         var serviceProvider = services.BuildServiceProvider();
         var types = new Type[]{ typeof(MyHub), typeof(MyHub) };

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using JwtAuthApp.Shared;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using Microsoft.AspNetCore.Authorization;
 
@@ -18,7 +17,7 @@ namespace JwtAuthApp.Server.Hubs
         private Task _timerLoopTask;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private TimeSpan _interval = TimeSpan.FromSeconds(1);
-        private IGroup _group;
+        private IGroup<ITimerHubReceiver> _group;
 
         public async Task SetAsync(TimeSpan interval)
         {
@@ -33,7 +32,7 @@ namespace JwtAuthApp.Server.Hubs
                     await Task.Delay(_interval, _cancellationTokenSource.Token);
 
                     var userPrincipal = Context.CallContext.GetHttpContext().User;
-                    BroadcastToSelf(_group).OnTick($"UserId={userPrincipal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value}; Name={userPrincipal.Identity?.Name}");
+                    Client.OnTick($"UserId={userPrincipal.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value}; Name={userPrincipal.Identity?.Name}");
                 }
             });
         }

@@ -12,6 +12,7 @@ using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
 using MessagePack;
+using System.Security.Cryptography;
 
 namespace MagicOnion.Client
 {
@@ -35,7 +36,7 @@ namespace MagicOnion.Client
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
 
-        int messageId = 0;
+        int messageIdSequence = 0;
         bool disposed;
 
         IClientStreamWriter<StreamingHubPayload> writer = default!;
@@ -118,6 +119,7 @@ namespace MagicOnion.Client
         protected T Deserialize<T>(ReadOnlyMemory<byte> data)
             => messageSerializer.Deserialize<T>(new ReadOnlySequence<byte>(data));
 
+        protected abstract void OnClientResultEvent(int methodId, Guid messageId, ReadOnlyMemory<byte> data);
         protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
         protected abstract void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data);
 
@@ -269,6 +271,25 @@ namespace MagicOnion.Client
                         }
                     }
                     break;
+                case StreamingHubMessageType.ClientResultRequest:
+                    {
+                        var message = messageReader.ReadClientResultRequestMessage();
+
+                        if (syncContext != null)
+                        {
+                            var tuple = Tuple.Create(message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                            syncContext.Post(state =>
+                            {
+                                var t = (Tuple<int, Guid, ReadOnlyMemory<byte>>)state!;
+                                OnClientResultEvent(t.Item1, t.Item2, t.Item3);
+                            }, tuple);
+                        }
+                        else
+                        {
+                            OnClientResultEvent(message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                        }
+                    }
+                    break;
             }
         }
 
@@ -276,7 +297,7 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-            var v = BuildMessage(methodId, message);
+            var v = BuildRequestMessage(methodId, message);
 
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
@@ -290,7 +311,7 @@ namespace MagicOnion.Client
         {
             ThrowIfDisposed();
 
-            var mid = Interlocked.Increment(ref messageId);
+            var mid = Interlocked.Increment(ref messageIdSequence);
             // NOTE: The continuations (user code) should be executed asynchronously. (Except: Unity WebGL)
             //       This is because the continuation may block the thread, for example, Console.ReadLine().
             //       If the thread is blocked, it will no longer return to the message consuming loop.
@@ -301,7 +322,7 @@ namespace MagicOnion.Client
             );
             responseFutures[mid] = tcs;
 
-            var v = BuildMessage(methodId, messageId, message);
+            var v = BuildRequestMessage(methodId, mid, message);
 
             using (await asyncLock.LockAsync().ConfigureAwait(false))
             {
@@ -310,6 +331,28 @@ namespace MagicOnion.Client
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
 
+        }
+
+        protected async Task WriteClientResultResponseMessageAsync<T>(int methodId, Guid clientResultMessageId, T result)
+        {
+            var v = BuildClientResultResponseMessage(methodId, clientResultMessageId, result);
+            using (await asyncLock.LockAsync().ConfigureAwait(false))
+            {
+                await writer.WriteAsync(v).ConfigureAwait(false);
+            }
+        }
+
+        protected async Task WriteClientResultResponseMessageForErrorAsync(int methodId, Guid clientResultMessageId, Exception ex)
+        {
+            var statusCode = ex is RpcException rpcException
+                ? rpcException.StatusCode
+                : StatusCode.Internal;
+
+            var v = BuildClientResultResponseMessageForError(methodId, clientResultMessageId, (int)statusCode, ex.Message, ex);
+            using (await asyncLock.LockAsync().ConfigureAwait(false))
+            {
+                await writer.WriteAsync(v).ConfigureAwait(false);
+            }
         }
 
         void ThrowIfDisposed()
@@ -388,17 +431,31 @@ namespace MagicOnion.Client
             }
         }
 
-        StreamingHubPayload BuildMessage<T>(int methodId, T message)
+        StreamingHubPayload BuildRequestMessage<T>(int methodId, T message)
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
             StreamingHubMessageWriter.WriteRequestMessageVoid(buffer, methodId, message, messageSerializer);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
 
-        StreamingHubPayload BuildMessage<T>(int methodId, int messageId, T message)
+        StreamingHubPayload BuildRequestMessage<T>(int methodId, int messageId, T message)
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
             StreamingHubMessageWriter.WriteRequestMessage(buffer, methodId, messageId, message, messageSerializer);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+        }
+
+        StreamingHubPayload BuildClientResultResponseMessage<T>(int methodId, Guid messageId, T response)
+        {
+            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+            StreamingHubMessageWriter.WriteClientResultResponseMessage(buffer, methodId, messageId, response, messageSerializer);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+        }
+
+        StreamingHubPayload BuildClientResultResponseMessageForError(int methodId, Guid messageId, int statusCode, string detail, Exception? ex)
+        {
+            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+            StreamingHubMessageWriter.WriteClientResultResponseMessageForError(buffer, methodId, messageId, statusCode, detail, ex, messageSerializer);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
     }

@@ -631,7 +631,7 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 }
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
 {
-    IGroup group = default!;
+    IGroup<IStreamingHubTestHubReceiver> group = default!;
 
     protected override async ValueTask OnConnecting()
     {
@@ -678,19 +678,19 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public Task CallReceiver_Parameter_Zero()
     {
-        Broadcast(group).Receiver_Parameter_Zero();
+        group.All.Receiver_Parameter_Zero();
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_Parameter_One(int arg0)
     {
-        Broadcast(group).Receiver_Parameter_One(12345);
+        group.All.Receiver_Parameter_One(12345);
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_Parameter_Many(int arg0, string arg1, bool arg2)
     {
-        Broadcast(group).Receiver_Parameter_Many(12345, "Hello✨", true);
+        group.All.Receiver_Parameter_Many(12345, "Hello✨", true);
         return Task.CompletedTask;
     }
 
@@ -754,13 +754,13 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public void Void_Parameter_Zero()
     {
-        Broadcast(group).Receiver_Test_Void_Parameter_Zero();
+        group.All.Receiver_Test_Void_Parameter_Zero();
     }
 
     public void Void_Parameter_One(int arg0)
     {
         Debug.Assert(arg0 == 12345);
-        Broadcast(group).Receiver_Test_Void_Parameter_One(arg0);
+        group.All.Receiver_Test_Void_Parameter_One(arg0);
     }
 
     public void Void_Parameter_Many(int arg0, string arg1, bool arg2)
@@ -768,7 +768,7 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         Debug.Assert(arg0 == 12345);
         Debug.Assert(arg1 == "Hello✨");
         Debug.Assert(arg2 == true);
-        Broadcast(group).Receiver_Test_Void_Parameter_Many(arg0, arg1, arg2);
+        group.All.Receiver_Test_Void_Parameter_Many(arg0, arg1, arg2);
     }
 
     public Task<MyStreamingResponse> RefType(MyStreamingRequest request)
@@ -784,13 +784,13 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public Task CallReceiver_RefType(MyStreamingRequest request)
     {
-        Broadcast(group).Receiver_RefType(new MyStreamingResponse(request.Argument0 + request.Argument1));
+        group.All.Receiver_RefType(new MyStreamingResponse(request.Argument0 + request.Argument1));
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_RefType_Null()
     {
-        Broadcast(group).Receiver_RefType_Null(default);
+        group.All.Receiver_RefType_Null(default);
         return Task.CompletedTask;
     }
 
@@ -799,7 +799,7 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         _ = Task.Run(async () =>
         {
             await Task.Delay(milliseconds);
-            Broadcast(group).Receiver_Delay();
+            group.All.Receiver_Delay();
         });
 
         return Task.CompletedTask;
@@ -817,7 +817,7 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public async Task<(int, string, bool)> Concurrent(int arg0, string arg1, bool arg2)
     {
-        Broadcast(group).Receiver_Concurrent(arg0 * 10, arg1 + "-Receiver", !arg2);
+        group.All.Receiver_Concurrent(arg0 * 10, arg1 + "-Receiver", !arg2);
         await Task.Yield();
         return (arg0 * 100, arg1 + "-Result", !arg2);
     }
