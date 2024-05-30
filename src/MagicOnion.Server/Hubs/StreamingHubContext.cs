@@ -54,10 +54,12 @@ public class StreamingHubContext
     public string Path { get; private set; } = default!;
     public DateTime Timestamp { get; private set; }
 
-    public Guid ConnectionId => ServiceContext.ContextId;
+    public Guid ConnectionId => StreamingServiceContext.ContextId;
+
+    public IServiceContext ServiceContext => StreamingServiceContext;
 
     /// <summary>Raw gRPC Context.</summary>
-    internal IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> ServiceContext { get; private set; } = default!;
+    internal IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> StreamingServiceContext { get; private set; } = default!;
 
     internal int MessageId { get; private set; }
     internal int MethodId { get; private set; }
@@ -67,7 +69,7 @@ public class StreamingHubContext
 
     internal void Initialize(IStreamingServiceContext<StreamingHubPayload, StreamingHubPayload> serviceContext, object hubInstance, ReadOnlyMemory<byte> request, string path, DateTime timestamp, int messageId, int methodId)
     {
-        ServiceContext = serviceContext;
+        StreamingServiceContext = serviceContext;
         HubInstance = hubInstance;
         Request = request;
         Path = path;
@@ -78,7 +80,7 @@ public class StreamingHubContext
 
     internal void Uninitialize()
     {
-        ServiceContext = default!;
+        StreamingServiceContext = default!;
         HubInstance = default!;
         Request = default!;
         Path = default!;
@@ -142,7 +144,7 @@ public class StreamingHubContext
     void WriteMessageCore(StreamingHubPayload payload)
     {
         ResponseSize = payload.Length; // NOTE: We cannot use the payload after QueueResponseStreamWrite.
-        ServiceContext.QueueResponseStreamWrite(payload);
+        StreamingServiceContext.QueueResponseStreamWrite(payload);
     }
 
     StreamingHubPayload BuildMessage()
@@ -155,7 +157,7 @@ public class StreamingHubContext
     StreamingHubPayload BuildMessage<T>(T v)
     {
         using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
-        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, ServiceContext.MessageSerializer);
+        StreamingHubMessageWriter.WriteResponseMessage(buffer, MethodId, MessageId, v, StreamingServiceContext.MessageSerializer);
         return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
     }
 
