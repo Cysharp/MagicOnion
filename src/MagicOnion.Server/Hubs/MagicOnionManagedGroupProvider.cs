@@ -1,4 +1,5 @@
 using Cysharp.Runtime.Multicast;
+using System;
 
 namespace MagicOnion.Server.Hubs;
 
@@ -16,12 +17,12 @@ internal class MagicOnionManagedGroupProvider
     public async ValueTask<Group<T>> GetOrAddAsync<T>(string groupName, Guid contextId, T client)
     {
         var added = false;
-        var underlyingGroup = default(IMulticastAsyncGroup<T>);
+        var underlyingGroup = default(IMulticastAsyncGroup<Guid, T>);
 
         await @lock.WaitAsync();
         try
         {
-            underlyingGroup = underlyingGroupProvider.GetOrAddGroup<T>(groupName);
+            underlyingGroup = underlyingGroupProvider.GetOrAddGroup<Guid, T>(groupName);
 
             if (!groups.TryGetValue((groupName, typeof(T)), out var groupAndCounter))
             {
@@ -53,7 +54,7 @@ internal class MagicOnionManagedGroupProvider
         await @lock.WaitAsync();
         try
         {
-            var underlyingGroup = underlyingGroupProvider.GetOrAddGroup<T>(group.Name);
+            var underlyingGroup = underlyingGroupProvider.GetOrAddGroup<Guid, T>(group.Name);
 
             if (groups.TryGetValue((group.Name, typeof(T)), out var groupAndCounter))
             {

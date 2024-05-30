@@ -3,6 +3,7 @@ using Cysharp.Runtime.Multicast.Distributed.Redis;
 using MagicOnion.Server;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class MagicOnionServerBuilderRedisExtensions

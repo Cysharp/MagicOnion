@@ -20,9 +20,9 @@
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
-    <PackageVersion Include="Multicaster" Version="0.1.2" />
-    <PackageVersion Include="Multicaster.Distributed.Redis" Version="0.1.2" />
-    <PackageVersion Include="Multicaster.Distributed.Nats" Version="0.1.2" />
+    <PackageVersion Include="Multicaster" Version="0.1.3" />
+    <PackageVersion Include="Multicaster.Distributed.Redis" Version="0.1.3" />
+    <PackageVersion Include="Multicaster.Distributed.Nats" Version="0.1.3" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />

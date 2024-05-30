@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Immutable;
 using Cysharp.Runtime.Multicast;
 
 namespace MagicOnion.Server.Hubs;
 
-public interface IGroup<T> : IMulticastGroup<T>
+public interface IGroup<T> : IMulticastGroup<Guid, T>
 {
     ValueTask RemoveAsync(ServiceContext context);
     ValueTask<int> CountAsync();
@@ -11,11 +12,11 @@ public interface IGroup<T> : IMulticastGroup<T>
 
 internal class Group<T> : IGroup<T>
 {
-    readonly IMulticastAsyncGroup<T> group;
+    readonly IMulticastAsyncGroup<Guid, T> group;
 
     internal string Name { get; }
 
-    public Group(IMulticastAsyncGroup<T> group, string name)
+    public Group(IMulticastAsyncGroup<Guid, T> group, string name)
     {
         this.group = group;
         this.Name = name;

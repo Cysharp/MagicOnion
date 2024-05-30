@@ -16,11 +16,11 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 {
     private IGroup<IChatHubReceiver> room;
     private string myName;
-    private readonly IMulticastSyncGroup<IChatHubReceiver> roomForAll;
+    private readonly IMulticastSyncGroup<Guid, IChatHubReceiver> roomForAll;
 
     public ChatHub(IMulticastGroupProvider groupProvider)
     {
-        roomForAll = groupProvider.GetOrAddSynchronousGroup<IChatHubReceiver>("All");
+        roomForAll = groupProvider.GetOrAddSynchronousGroup<Guid, IChatHubReceiver>("All");
     }
 
     public async Task JoinAsync(JoinRequest request)
@@ -30,8 +30,6 @@ public class ChatHub : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
         this.myName = request.UserName;
 
         this.room.All.OnJoin(request.UserName);
-
-        Console.WriteLine($"From Client: {await Client.HelloAsync("Cilent", 18)}");
     }
 
 
