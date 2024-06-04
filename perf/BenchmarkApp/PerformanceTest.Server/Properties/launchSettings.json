@@ -6,7 +6,8 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:5000;https://localhost:5001",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Kestrel__Endpoints__Grpc__Url": "http://localhost:5000"
       }
     }
   }
