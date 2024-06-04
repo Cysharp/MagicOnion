@@ -1,0 +1,37 @@
+name: Benchmark
+
+on:
+  push:
+    branches:
+      - feature/perf
+
+env:
+  BUILD_CONFIG: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      # build
+      - name: Build Client
+        run: dotnet publish -c ${{ env.BUILD_CONFIG }} --runtime linux-x64 --self-contained true ./perf/BenchmarkApp/PerformanceTest.Client/PerformanceTest.Client.csproj -o ./perf/artifacts/PerformanceTest.Client
+      - name: Build Server
+        run: dotnet publish -c ${{ env.BUILD_CONFIG }} --runtime linux-x64 --self-contained true ./perf/BenchmarkApp/PerformanceTest.Server/PerformanceTest.Server.csproj -o ./perf/artifacts/PerformanceTest.Server
+      # upload
+      - uses: Cysharp/Actions/.github/actions/upload-artifact@main
+        with:
+          name: artifacts
+          path: ./perf/artifacts
+          if-no-files-found: error
+          retention-days: 1
+
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      # run
+      # get result
