@@ -47,7 +47,7 @@ public class StaticStreamingHubClientGenerator
             #pragma warning disable CS8019 // Unnecessary using directive.
             #pragma warning disable CS1522 // Empty switch block
             #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously.
-            
+
             """);
     }
 
@@ -108,7 +108,7 @@ public class StaticStreamingHubClientGenerator
         EmitFireAndForget(ctx);
         EmitOnBroadcastEvent(ctx);
         EmitOnResponseEvent(ctx);
-        EmitOnClientInvokeEvent(ctx);
+        EmitOnClientResultEvent(ctx);
         ctx.Writer.AppendLine("""
                         }
             """);
@@ -173,7 +173,7 @@ public class StaticStreamingHubClientGenerator
         ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.ServiceType.FullName}} FireAndForget()
                                 => new FireAndForgetClient(this);
-                                
+
                             [global::MagicOnion.Ignore]
                             class FireAndForgetClient : {{ctx.Hub.ServiceType.FullName}}
                             {
@@ -328,41 +328,58 @@ public class StaticStreamingHubClientGenerator
             """);
     }
 
-    static void EmitOnClientInvokeEvent(StreamingHubClientBuildContext ctx)
+    static void EmitOnClientResultEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
                             protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
-                                switch (methodId)
+                                try
                                 {
+                                    switch (methodId)
+                                    {
             """);
         foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void))
         {
             var methodArgs = method.Parameters.Count switch
             {
                 0 => "",
-                1 => "value",
-                _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
+                1 => method.Parameters[0].Type == MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken ? "default" : "value",
+                _ => string.Join(", ", method.Parameters.Select((x, i) => x.Type == MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken ? "default" : $"value.Item{i + 1}"))
             };
 
             ctx.Writer.AppendLineWithFormat($$"""
-                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                                        {
-                                            try
+                                        case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                             {
                                                 var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+            """);
+            if (method.MethodReturnType.HasGenericArguments)
+            {
+                // Task<T>, ValueTask<T>
+                ctx.Writer.AppendLineWithFormat($$"""
                                                 var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
+            """);
+            }
+            else
+            {
+                // Task, ValueTask
+                ctx.Writer.AppendLineWithFormat($$"""
+                                                var result = global::MessagePack.Nil.Default;
+                                                await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
+            """);
+
+            }
+            ctx.Writer.AppendLineWithFormat($$"""
                                                 await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
                                             }
-                                            catch (global::System.Exception ex)
-                                            {
-                                                await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
-                                            }
-                                        }
-                                        break;
+                                            break;
             """);
         }
         ctx.Writer.AppendLine("""
+                                    }
+                                }
+                                catch (global::System.Exception ex)
+                                {
+                                    await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
                                 }
                             }
 
