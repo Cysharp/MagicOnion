@@ -28,10 +28,11 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  run:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      # run
-      # get result
+#   run:
+#     needs: [build]
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 10
+#     steps:
+#       - uses: actions/checkout@v4
+#       # run
+#       # get result
