@@ -331,7 +331,7 @@ public class StaticStreamingHubClientGenerator
     static void EmitOnClientResultEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
-                            protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                            protected override void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
                                 try
                                 {
@@ -351,25 +351,7 @@ public class StaticStreamingHubClientGenerator
                                         case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                             {
                                                 var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
-            """);
-            if (method.MethodReturnType.HasGenericArguments)
-            {
-                // Task<T>, ValueTask<T>
-                ctx.Writer.AppendLineWithFormat($$"""
-                                                var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
-            """);
-            }
-            else
-            {
-                // Task, ValueTask
-                ctx.Writer.AppendLineWithFormat($$"""
-                                                var result = global::MessagePack.Nil.Default;
-                                                await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
-            """);
-
-            }
-            ctx.Writer.AppendLineWithFormat($$"""
-                                                await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                                base.AwaitAndWriteClientResultResponseMessage(methodId, messageId, receiver.{{method.MethodName}}({{methodArgs}}));
                                             }
                                             break;
             """);
@@ -379,7 +361,7 @@ public class StaticStreamingHubClientGenerator
                                 }
                                 catch (global::System.Exception ex)
                                 {
-                                    await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
+                                    base.WriteClientResultResponseMessageForError(methodId, messageId, ex);
                                 }
                             }
 

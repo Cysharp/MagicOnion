@@ -12,7 +12,7 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
 
     public static IEnumerable<object[]> EnumerateStreamingHubClientFactory()
     {
-        //yield return new[] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
+        yield return new[] { new TestStreamingHubClientFactory("Dynamic", DynamicStreamingHubClientFactoryProvider.Instance) };
         yield return new[] { new TestStreamingHubClientFactory("Static", MagicOnionGeneratedClientInitializer.StreamingHubClientFactoryProvider) };
     }
 
@@ -138,7 +138,7 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
-    public async Task Invoke_Parameter_Many_With_Cancellation_Optional(TestStreamingHubClientFactory clientFactory)
+    public async Task Parameter_Many_With_Cancellation_Optional(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
         var httpClient = factory.CreateDefaultClient();
