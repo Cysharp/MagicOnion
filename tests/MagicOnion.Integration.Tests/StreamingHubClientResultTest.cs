@@ -118,6 +118,46 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
 
     [Theory]
     [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_One_With_Cancellation(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Parameter_One_With_Cancellation();
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_One_With_Cancellation), ("Hello", CancellationToken.None) /* Always None */), receiver.Received[0]);
+        Assert.Equal($"System.Threading.Tasks.TaskCanceledException", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_One_With_Cancellation)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Parameter_One_With_Cancellation_Optional(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Parameter_One_With_Cancellation_Optional();
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Parameter_One_With_Cancellation_Optional), ("Hello", CancellationToken.None) /* Always None */), receiver.Received[0]);
+        Assert.Equal($"System.Threading.Tasks.TaskCanceledException", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_One_With_Cancellation_Optional)));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
     public async Task Parameter_Many_With_Cancellation(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
@@ -177,6 +217,13 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
         return $"{nameof(Parameter_Zero)}";
     }
 
+    public async Task<string> Parameter_One(string arg1)
+    {
+        Received.Add((nameof(Parameter_One), (arg1)));
+        await Task.Delay(10);
+        return $"{nameof(Parameter_One)}:{arg1}";
+    }
+
     public async Task<string> Parameter_Many(string arg1, int arg2, bool arg3)
     {
         Received.Add((nameof(Parameter_Many), (arg1, arg2, arg3)));
@@ -204,6 +251,20 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
         return $"{nameof(Parameter_Zero_With_Cancellation_Optional)}:{cancellationToken.CanBeCanceled}";
     }
 
+    public async Task<string> Parameter_One_With_Cancellation(string arg1, CancellationToken cancellationToken)
+    {
+        Received.Add((nameof(Parameter_One_With_Cancellation), (arg1, cancellationToken)));
+        await Task.Delay(1000);
+        return $"{nameof(Parameter_One_With_Cancellation)}:{arg1},{cancellationToken.CanBeCanceled}";
+    }
+
+    public async Task<string> Parameter_One_With_Cancellation_Optional(string arg1, CancellationToken cancellationToken = default)
+    {
+        Received.Add((nameof(Parameter_One_With_Cancellation_Optional), (arg1, cancellationToken)));
+        await Task.Delay(1000);
+        return $"{nameof(Parameter_One_With_Cancellation_Optional)}:{arg1},{cancellationToken.CanBeCanceled}";
+    }
+
     public async Task<string> Parameter_Many_With_Cancellation(string arg1, int arg2, bool arg3, CancellationToken cancellationToken)
     {
         Received.Add((nameof(Parameter_Many_With_Cancellation), (arg1, arg2, arg3, cancellationToken)));
@@ -224,10 +285,13 @@ public interface IStreamingHubClientResultTestHub : IStreamingHub<IStreamingHubC
 {
     Task Invoke_Parameter_Zero_NoResultValue();
     Task Invoke_Parameter_Zero();
+    Task Invoke_Parameter_One();
     Task Invoke_Parameter_Many();
     Task Invoke_Throw();
     Task Invoke_Parameter_Zero_With_Cancellation();
     Task Invoke_Parameter_Zero_With_Cancellation_Optional();
+    Task Invoke_Parameter_One_With_Cancellation();
+    Task Invoke_Parameter_One_With_Cancellation_Optional();
     Task Invoke_Parameter_Many_With_Cancellation();
     Task Invoke_Parameter_Many_With_Cancellation_Optional();
 }
@@ -236,10 +300,13 @@ public interface IStreamingHubClientResultTestHubReceiver
 {
     Task Parameter_Zero_NoResultValue();
     Task<string> Parameter_Zero();
+    Task<string> Parameter_One(string arg1);
     Task<string> Parameter_Many(string arg1, int arg2, bool arg3);
     Task<string> Throw();
     Task<string> Parameter_Zero_With_Cancellation(CancellationToken cancellationToken);
     Task<string> Parameter_Zero_With_Cancellation_Optional(CancellationToken cancellationToken = default);
+    Task<string> Parameter_One_With_Cancellation(string arg1, CancellationToken cancellationToken);
+    Task<string> Parameter_One_With_Cancellation_Optional(string arg1, CancellationToken cancellationToken = default);
     Task<string> Parameter_Many_With_Cancellation(string arg1, int arg2, bool arg3, CancellationToken cancellationToken);
     Task<string> Parameter_Many_With_Cancellation_Optional(string arg1, int arg2, bool arg3, CancellationToken cancellationToken = default);
 }
@@ -259,6 +326,12 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
     {
         var result = await Client.Parameter_Zero();
         Items.TryAdd(nameof(Invoke_Parameter_Zero), result);
+    }
+
+    public async Task Invoke_Parameter_One()
+    {
+        var result = await Client.Parameter_One("Hello");
+        Items.TryAdd(nameof(Invoke_Parameter_One), result);
     }
 
     public async Task Invoke_Parameter_Many()
@@ -304,6 +377,34 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
         catch (Exception e)
         {
             Items.TryAdd(nameof(Invoke_Parameter_Zero_With_Cancellation_Optional), (e.GetType().FullName!));
+        }
+    }
+
+    public async Task Invoke_Parameter_One_With_Cancellation()
+    {
+        var tcs = new CancellationTokenSource(250);
+        try
+        {
+            var result = await Client.Parameter_One_With_Cancellation("Hello", tcs.Token);
+            Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation), (result));
+        }
+        catch (Exception e)
+        {
+            Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation), (e.GetType().FullName!));
+        }
+    }
+
+    public async Task Invoke_Parameter_One_With_Cancellation_Optional()
+    {
+        var tcs = new CancellationTokenSource(250);
+        try
+        {
+            var result = await Client.Parameter_One_With_Cancellation_Optional("Hello", tcs.Token);
+            Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation_Optional), (result));
+        }
+        catch (Exception e)
+        {
+            Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation_Optional), (e.GetType().FullName!));
         }
     }
 

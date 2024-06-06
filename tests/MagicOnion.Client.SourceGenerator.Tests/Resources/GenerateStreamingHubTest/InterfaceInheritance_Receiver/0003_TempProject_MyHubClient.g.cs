@@ -23,7 +23,7 @@ namespace TempProject
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
-                    
+
                 [global::MagicOnion.Ignore]
                 class FireAndForgetClient : global::TempProject.IMyHub
                 {
@@ -45,19 +45,16 @@ namespace TempProject
                     {
                         case -1005848884: // Void A()
                             {
-                                var value = base.Deserialize<global::MessagePack.Nil>(data);
                                 receiver.A();
                             }
                             break;
                         case -972293646: // Void C()
                             {
-                                var value = base.Deserialize<global::MessagePack.Nil>(data);
                                 receiver.C();
                             }
                             break;
                         case -955516027: // Void B()
                             {
-                                var value = base.Deserialize<global::MessagePack.Nil>(data);
                                 receiver.B();
                             }
                             break;
@@ -71,13 +68,9 @@ namespace TempProject
                     }
                 }
 
-                protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
-                    switch (methodId)
-                    {
-                    }
                 }
-
             }
         }
     }
