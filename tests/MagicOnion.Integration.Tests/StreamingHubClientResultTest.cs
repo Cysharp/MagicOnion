@@ -266,7 +266,7 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
         await signalToClient.WaitAsync();
 
         // Assert
-        testOutputHelper.WriteLine(serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected) + "/Exception") + "");
+        //testOutputHelper.WriteLine(serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected) + "/Exception") + "");
         Assert.Empty(receiver.Received);
         Assert.Equal("System.Threading.Tasks.TaskCanceledException", (((string, string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected))!).Item1);
     }
@@ -475,7 +475,7 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
         try
         {
             await ((SemaphoreSlim)Items[nameof(Invoke_After_Disconnected) + "/Signal/FromClient"]).WaitAsync();
-            Context.CallContext.GetHttpContext().Abort();
+            //Context.CallContext.GetHttpContext().Abort();
             var result = await Client.Parameter_Zero();
         }
         catch (Exception e)
