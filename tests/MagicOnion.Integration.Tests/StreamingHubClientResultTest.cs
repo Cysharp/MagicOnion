@@ -267,6 +267,27 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
         Assert.Empty(receiver.Received);
         Assert.Equal("System.Threading.Tasks.TaskCanceledException", (((string, string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected))!).Item1);
     }
+
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task NotSingleTarget(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Not_SingleTarget();
+
+        // Assert
+        Assert.Empty(receiver.Received);
+        Assert.Equal("System.NotSupportedException", ((string)serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Not_SingleTarget))!));
+    }
 }
 
 file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResultTestHubReceiver
@@ -373,6 +394,7 @@ public interface IStreamingHubClientResultTestHub : IStreamingHub<IStreamingHubC
     Task Invoke_Parameter_Many_With_Cancellation();
     Task Invoke_Parameter_Many_With_Cancellation_Optional();
     Task Invoke_After_Disconnected();
+    Task Invoke_Not_SingleTarget();
 }
 
 public interface IStreamingHubClientResultTestHubReceiver
@@ -465,10 +487,10 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_Zero_With_Cancellation()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_Zero_With_Cancellation(tcs.Token);
+            var result = await Client.Parameter_Zero_With_Cancellation(cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_Zero_With_Cancellation), (result));
         }
         catch (Exception e)
@@ -479,10 +501,10 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_Zero_With_Cancellation_Optional()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_Zero_With_Cancellation_Optional(tcs.Token);
+            var result = await Client.Parameter_Zero_With_Cancellation_Optional(cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_Zero_With_Cancellation), (result));
         }
         catch (Exception e)
@@ -493,10 +515,10 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_One_With_Cancellation()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_One_With_Cancellation("Hello", tcs.Token);
+            var result = await Client.Parameter_One_With_Cancellation("Hello", cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation), (result));
         }
         catch (Exception e)
@@ -507,10 +529,10 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_One_With_Cancellation_Optional()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_One_With_Cancellation_Optional("Hello", tcs.Token);
+            var result = await Client.Parameter_One_With_Cancellation_Optional("Hello", cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_One_With_Cancellation_Optional), (result));
         }
         catch (Exception e)
@@ -521,10 +543,10 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_Many_With_Cancellation()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_Many_With_Cancellation("Hello", 12345, true, tcs.Token);
+            var result = await Client.Parameter_Many_With_Cancellation("Hello", 12345, true, cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_Many_With_Cancellation), (result));
         }
         catch (Exception e)
@@ -535,15 +557,30 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
 
     public async Task Invoke_Parameter_Many_With_Cancellation_Optional()
     {
-        var tcs = new CancellationTokenSource(250);
+        var cts = new CancellationTokenSource(250);
         try
         {
-            var result = await Client.Parameter_Many_With_Cancellation_Optional("Hello", 12345, true, tcs.Token);
+            var result = await Client.Parameter_Many_With_Cancellation_Optional("Hello", 12345, true, cts.Token);
             Items.TryAdd(nameof(Invoke_Parameter_Many_With_Cancellation_Optional), (result));
         }
         catch (Exception e)
         {
             Items.TryAdd(nameof(Invoke_Parameter_Many_With_Cancellation_Optional), (e.GetType().FullName!));
+        }
+    }
+
+    public async Task Invoke_Not_SingleTarget()
+    {
+        try
+        {
+            var group = await Group.AddAsync(nameof(Invoke_Not_SingleTarget) + Guid.NewGuid());
+
+            var result = await group.All.Parameter_Zero();
+            Items.TryAdd(nameof(Invoke_Not_SingleTarget), (result));
+        }
+        catch (Exception e)
+        {
+            Items.TryAdd(nameof(Invoke_Not_SingleTarget), (e.GetType().FullName!));
         }
     }
 }

@@ -483,7 +483,7 @@ namespace MagicOnion.Client.DynamicClient
                                 {
                                     // local0.ItemX
                                     il.Emit(OpCodes.Ldloc_S, local0);
-                                    il.Emit(OpCodes.Ldfld, deserializeType.GetField($"Item{itemIndex}"));
+                                    il.Emit(OpCodes.Ldfld, deserializeType.GetField($"Item{itemIndex}")!);
                                     itemIndex++;
                                 }
                             }
