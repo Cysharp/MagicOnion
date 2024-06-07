@@ -9,6 +9,7 @@
     <MessagePackVersion>2.5.129</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
+    <MulticasterVersion>0.1.9</MulticasterVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Grpc" Version="$(GrpcCCoreVersion)" />
@@ -20,9 +21,9 @@
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
-    <PackageVersion Include="Multicaster" Version="0.1.7" />
-    <PackageVersion Include="Multicaster.Distributed.Redis" Version="0.1.7" />
-    <PackageVersion Include="Multicaster.Distributed.Nats" Version="0.1.7" />
+    <PackageVersion Include="Multicaster" Version="$(MulticasterVersion)" />
+    <PackageVersion Include="Multicaster.Distributed.Redis" Version="$(MulticasterVersion)" />
+    <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />

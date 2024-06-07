@@ -196,6 +196,77 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
         Assert.Equal($"System.Threading.Tasks.TaskCanceledException", serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Parameter_Many_With_Cancellation_Optional)));
     }
 
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Throw(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Throw();
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Throw), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
+        Assert.Equal("Grpc.Core.RpcException", (((string,string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Throw))!).Item1);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Throw_With_StatusCode(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.Invoke_Throw_With_StatusCode();
+
+        // Assert
+        Assert.Equal((nameof(IStreamingHubClientResultTestHubReceiver.Throw_With_StatusCode), (FakeStreamingHubClientResultTestHubReceiver.ArgumentEmpty)), receiver.Received[0]);
+        Assert.Equal("Grpc.Core.RpcException", (((string, string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Throw_With_StatusCode))!).Item1);
+        Assert.Equal(StatusCode.Unauthenticated, ((StatusCode)serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_Throw_With_StatusCode) + "/StatusCode")!));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Invoke_After_Disconnected(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+        var serverItems = factory.Items;
+        var signalFromClient = new SemaphoreSlim(0);
+        var signalToClient = new SemaphoreSlim(0);
+        serverItems[nameof(Invoke_After_Disconnected) + "/Signal/FromClient"] = signalFromClient;
+        serverItems[nameof(Invoke_After_Disconnected) + "/Signal/ToClient"] = signalToClient;
+
+        var receiver = new FakeStreamingHubClientResultTestHubReceiver();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubClientResultTestHub, IStreamingHubClientResultTestHubReceiver>(channel, receiver);
+
+        // Act
+        _ = client.Invoke_After_Disconnected();
+        await Task.Delay(200);
+        await client.DisposeAsync();
+        channel.Dispose();
+        signalFromClient.Release();
+
+        // Wait for complete processing the request on the server.
+        await signalToClient.WaitAsync();
+
+        // Assert
+        Assert.Empty(receiver.Received);
+        Assert.Equal("System.Threading.Tasks.TaskCanceledException", (((string, string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected))!).Item1);
+    }
 }
 
 file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResultTestHubReceiver
@@ -235,6 +306,12 @@ file class FakeStreamingHubClientResultTestHubReceiver : IStreamingHubClientResu
     {
         Received.Add((nameof(Throw), (ArgumentEmpty)));
         throw new InvalidOperationException("Something went wrong.");
+    }
+
+    public Task<string> Throw_With_StatusCode()
+    {
+        Received.Add((nameof(Throw_With_StatusCode), (ArgumentEmpty)));
+        throw new RpcException(new Status(StatusCode.Unauthenticated, "Something went wrong."));
     }
 
     public async Task<string> Parameter_Zero_With_Cancellation(CancellationToken cancellationToken)
@@ -288,12 +365,14 @@ public interface IStreamingHubClientResultTestHub : IStreamingHub<IStreamingHubC
     Task Invoke_Parameter_One();
     Task Invoke_Parameter_Many();
     Task Invoke_Throw();
+    Task Invoke_Throw_With_StatusCode();
     Task Invoke_Parameter_Zero_With_Cancellation();
     Task Invoke_Parameter_Zero_With_Cancellation_Optional();
     Task Invoke_Parameter_One_With_Cancellation();
     Task Invoke_Parameter_One_With_Cancellation_Optional();
     Task Invoke_Parameter_Many_With_Cancellation();
     Task Invoke_Parameter_Many_With_Cancellation_Optional();
+    Task Invoke_After_Disconnected();
 }
 
 public interface IStreamingHubClientResultTestHubReceiver
@@ -303,6 +382,7 @@ public interface IStreamingHubClientResultTestHubReceiver
     Task<string> Parameter_One(string arg1);
     Task<string> Parameter_Many(string arg1, int arg2, bool arg3);
     Task<string> Throw();
+    Task<string> Throw_With_StatusCode();
     Task<string> Parameter_Zero_With_Cancellation(CancellationToken cancellationToken);
     Task<string> Parameter_Zero_With_Cancellation_Optional(CancellationToken cancellationToken = default);
     Task<string> Parameter_One_With_Cancellation(string arg1, CancellationToken cancellationToken);
@@ -349,6 +429,37 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
         catch (Exception e)
         {
            Items.TryAdd(nameof(Invoke_Throw), (e.GetType().FullName, e.Message));
+        }
+    }
+
+    public async Task Invoke_Throw_With_StatusCode()
+    {
+        try
+        {
+            var result = await Client.Throw_With_StatusCode();
+        }
+        catch (RpcException e)
+        {
+            Items.TryAdd(nameof(Invoke_Throw_With_StatusCode), (e.GetType().FullName, e.Message));
+            Items.TryAdd(nameof(Invoke_Throw_With_StatusCode) + "/StatusCode", e.StatusCode);
+        }
+    }
+
+    public async Task Invoke_After_Disconnected()
+    {
+        try
+        {
+            await ((SemaphoreSlim)Items[nameof(Invoke_After_Disconnected) + "/Signal/FromClient"]).WaitAsync();
+            Context.CallContext.GetHttpContext().Abort();
+            var result = await Client.Parameter_Zero();
+        }
+        catch (Exception e)
+        {
+            Items.TryAdd(nameof(Invoke_After_Disconnected), (e.GetType().FullName, e.Message));
+        }
+        finally
+        {
+            ((SemaphoreSlim)Items[nameof(Invoke_After_Disconnected) + "/Signal/ToClient"]).Release();
         }
     }
 

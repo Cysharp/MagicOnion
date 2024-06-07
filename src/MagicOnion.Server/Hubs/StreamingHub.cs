@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -11,7 +10,6 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Server.Hubs;
@@ -125,6 +123,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             StreamingServiceContext.CompleteStreamingHub();
             await OnDisconnected();
             await this.Group.DisposeAsync();
+            remoteClientResultPendingTasks.Dispose();
         }
 
         return streamingContext.Result();
