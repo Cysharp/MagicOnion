@@ -3,10 +3,12 @@ using Grpc.Net.Client;
 using MagicOnion.Client.DynamicClient;
 using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace MagicOnion.Integration.Tests;
 
-public class StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory) : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
+public class StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory, ITestOutputHelper testOutputHelper) : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
 {
     readonly MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory = factory;
 
@@ -264,6 +266,7 @@ public class StreamingHubClientResultTest(MagicOnionApplicationFactory<Streaming
         await signalToClient.WaitAsync();
 
         // Assert
+        testOutputHelper.WriteLine(serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected) + "/Exception") + "");
         Assert.Empty(receiver.Received);
         Assert.Equal("System.Threading.Tasks.TaskCanceledException", (((string, string))serverItems.GetValueOrDefault(nameof(IStreamingHubClientResultTestHub.Invoke_After_Disconnected))!).Item1);
     }
@@ -478,6 +481,7 @@ public class StreamingHubClientResultTestHub([FromKeyedServices(MagicOnionApplic
         catch (Exception e)
         {
             Items.TryAdd(nameof(Invoke_After_Disconnected), (e.GetType().FullName, e.Message));
+            Items.TryAdd(nameof(Invoke_After_Disconnected) + "/Exception", (e.ToString()));
         }
         finally
         {
