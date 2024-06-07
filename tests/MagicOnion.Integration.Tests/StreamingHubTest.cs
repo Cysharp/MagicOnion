@@ -2,10 +2,7 @@ using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Client.DynamicClient;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace MagicOnion.Integration.Tests;
 

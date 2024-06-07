@@ -74,12 +74,14 @@ namespace MagicOnion.Internal
             public Type ReceiverType { get; set; }
             public MethodInfo MethodInfo { get; set; }
             public int MethodId { get; set; }
+            public bool IsClientResult { get; set; }
 
             public MethodDefinition(Type receiverType, MethodInfo methodInfo, int methodId)
             {
                 ReceiverType = receiverType;
                 MethodInfo = methodInfo;
                 MethodId = methodId;
+                IsClientResult = methodInfo.ReturnType != typeof(void);
             }
         }
     }

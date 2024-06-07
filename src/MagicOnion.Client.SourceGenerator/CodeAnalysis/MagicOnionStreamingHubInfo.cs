@@ -77,13 +77,25 @@ public class MagicOnionStreamingHubInfo : IMagicOnionServiceInfo
         }
     }
 
+    [DebuggerDisplay("HubMethod: {MethodName,nq}; HubId={HubId,nq}; MethodReturnType={MethodReturnType,nq}; RequestType={RequestType,nq}; ResponseType={ResponseType,nq}; Parameters={Parameters.Count,nq}; IsClientResult={IsClientResult,nq}")]
+    public class MagicOnionHubReceiverMethodInfo : MagicOnionHubMethodInfo
+    {
+        public bool IsClientResult { get; }
+
+        public MagicOnionHubReceiverMethodInfo(int hubId, string methodName, IReadOnlyList<MagicOnionMethodParameterInfo> parameters, MagicOnionTypeInfo methodReturnType, MagicOnionTypeInfo requestType, MagicOnionTypeInfo responseType)
+            : base(hubId, methodName, parameters, methodReturnType, requestType, responseType)
+        {
+            IsClientResult = methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void;
+        }
+    }
+
     [DebuggerDisplay("StreamingHubReceiver: {ReceiverType,nq}; Methods={Methods.Count,nq}")]
     public class MagicOnionStreamingHubReceiverInfo
     {
         public MagicOnionTypeInfo ReceiverType { get; }
-        public IReadOnlyList<MagicOnionHubMethodInfo> Methods { get; }
+        public IReadOnlyList<MagicOnionHubReceiverMethodInfo> Methods { get; }
 
-        public MagicOnionStreamingHubReceiverInfo(MagicOnionTypeInfo receiverType, IReadOnlyList<MagicOnionHubMethodInfo> methods)
+        public MagicOnionStreamingHubReceiverInfo(MagicOnionTypeInfo receiverType, IReadOnlyList<MagicOnionHubReceiverMethodInfo> methods)
         {
             ReceiverType = receiverType;
             Methods = methods;

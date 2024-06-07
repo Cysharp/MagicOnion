@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -11,15 +10,15 @@ using MagicOnion.Server.Internal;
 using MessagePack;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace MagicOnion.Server.Hubs;
 
 public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<THubInterface>, IStreamingHub<THubInterface, TReceiver>
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
-    readonly IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry();
+    IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = default!;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -85,6 +84,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
         var remoteProxyFactory = serviceProvider.GetRequiredService<IRemoteProxyFactory>();
         var remoteSerializer = serviceProvider.GetRequiredService<IRemoteSerializer>();
+        this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value.ClientResultsDefaultTimeout);
         this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
         var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
@@ -125,6 +125,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
             StreamingServiceContext.CompleteStreamingHub();
             await OnDisconnected();
             await this.Group.DisposeAsync();
+            remoteClientResultPendingTasks.Dispose();
         }
 
         return streamingContext.Result();

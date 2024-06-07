@@ -47,7 +47,7 @@ public class StaticStreamingHubClientGenerator
             #pragma warning disable CS8019 // Unnecessary using directive.
             #pragma warning disable CS1522 // Empty switch block
             #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously.
-            
+
             """);
     }
 
@@ -108,7 +108,7 @@ public class StaticStreamingHubClientGenerator
         EmitFireAndForget(ctx);
         EmitOnBroadcastEvent(ctx);
         EmitOnResponseEvent(ctx);
-        EmitOnClientInvokeEvent(ctx);
+        EmitOnClientResultEvent(ctx);
         ctx.Writer.AppendLine("""
                         }
             """);
@@ -173,7 +173,7 @@ public class StaticStreamingHubClientGenerator
         ctx.Writer.AppendLineWithFormat($$"""
                             public {{ctx.Hub.ServiceType.FullName}} FireAndForget()
                                 => new FireAndForgetClient(this);
-                                
+
                             [global::MagicOnion.Ignore]
                             class FireAndForgetClient : {{ctx.Hub.ServiceType.FullName}}
                             {
@@ -274,29 +274,35 @@ public class StaticStreamingHubClientGenerator
                 _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
             };
 
+            ctx.Writer.AppendLineWithFormat($$"""
+                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                                        {
+            """);
+
             if (ctx.EnableStreamingHubDiagnosticHandler)
             {
                 ctx.Writer.AppendLineWithFormat($$"""
-                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                                        {
                                             var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
                                             diagnosticHandler?.OnBroadcastEvent(this, "{{method.MethodName}}", value);
                                             receiver.{{method.MethodName}}({{methodArgs}});
-                                        }
-                                        break;
             """);
             }
             else
             {
-                ctx.Writer.AppendLineWithFormat($$"""
-                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                                        {
+                if (method.Parameters.Count != 0)
+                {
+                    ctx.Writer.AppendLineWithFormat($$"""
                                             var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
+            """);
+                }
+                ctx.Writer.AppendLineWithFormat($$"""
                                             receiver.{{method.MethodName}}({{methodArgs}});
+            """);
+            }
+            ctx.Writer.AppendLine("""
                                         }
                                         break;
             """);
-            }
         }
         ctx.Writer.AppendLine("""
                                 }
@@ -328,41 +334,55 @@ public class StaticStreamingHubClientGenerator
             """);
     }
 
-    static void EmitOnClientInvokeEvent(StreamingHubClientBuildContext ctx)
+    static void EmitOnClientResultEvent(StreamingHubClientBuildContext ctx)
     {
-        ctx.Writer.AppendLine("""
-                            protected override async void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
-                            {
-                                switch (methodId)
-                                {
-            """);
-        foreach (var method in ctx.Hub.Receiver.Methods.Where(x => x.MethodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void))
+        var clientResultMethods = ctx.Hub.Receiver.Methods.Where(x => x.IsClientResult).ToArray();
+        if (clientResultMethods.Length == 0)
         {
-            var methodArgs = method.Parameters.Count switch
+            ctx.Writer.AppendLine("""
+                            protected override void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                            {
+                            }
+            """);
+            return;
+        }
+
+        ctx.Writer.AppendLine("""
+                            protected override void OnClientResultEvent(global::System.Int32 methodId, global::System.Guid messageId, global::System.ReadOnlyMemory<global::System.Byte> data)
+                            {
+                                try
+                                {
+                                    switch (methodId)
+                                    {
+            """);
+        foreach (var method in clientResultMethods)
+        {
+            var methodParameters = method.Parameters
+                .Select((x, i) => (Index: i, IsCancellationToken: x.Type == MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken, Type: x.Type))
+                .ToArray();
+
+            var methodArgs = methodParameters.Count(x => !x.IsCancellationToken) switch
             {
-                0 => "",
-                1 => "value",
-                _ => string.Join(", ", Enumerable.Range(1, method.Parameters.Count).Select(x => $"value.Item{x}"))
+                0 => string.Join(", ", methodParameters.Select(x => "default")),
+                1 => string.Join(", ", methodParameters.Select(x => x.IsCancellationToken ? "default" : "value")),
+                _ => string.Join(", ", methodParameters.Select(x => x.IsCancellationToken ? "default" : $"value.Item{x.Index + 1}")),
             };
 
             ctx.Writer.AppendLineWithFormat($$"""
-                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                                        {
-                                            try
+                                        case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
                                             {
                                                 var value = base.Deserialize<{{method.RequestType.FullName}}>(data);
-                                                var result = await receiver.{{method.MethodName}}({{methodArgs}}).ConfigureAwait(false);
-                                                await base.WriteClientResultResponseMessageAsync(methodId, messageId, result).ConfigureAwait(false);
+                                                base.AwaitAndWriteClientResultResponseMessage(methodId, messageId, receiver.{{method.MethodName}}({{methodArgs}}));
                                             }
-                                            catch (global::System.Exception ex)
-                                            {
-                                                await base.WriteClientResultResponseMessageForErrorAsync(methodId, messageId, ex).ConfigureAwait(false);
-                                            }
-                                        }
-                                        break;
+                                            break;
             """);
         }
         ctx.Writer.AppendLine("""
+                                    }
+                                }
+                                catch (global::System.Exception ex)
+                                {
+                                    base.WriteClientResultResponseMessageForError(methodId, messageId, ex);
                                 }
                             }
 

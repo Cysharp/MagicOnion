@@ -56,6 +56,10 @@ namespace MagicOnion.Client
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 
+        public void Dump(object v, CancellationToken ct)
+        {
+            var value = v;
+        }
         // call immediately after create.
         public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
         {
@@ -331,6 +335,50 @@ namespace MagicOnion.Client
 
             return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
 
+        }
+
+        protected void AwaitAndWriteClientResultResponseMessage(int methodId, Guid clientResultMessageId, Task task)
+            => AwaitAndWriteClientResultResponseMessage(methodId, clientResultMessageId, new ValueTask(task));
+
+        protected async void AwaitAndWriteClientResultResponseMessage(int methodId, Guid clientResultMessageId, ValueTask task)
+        {
+            try
+            {
+                await task.ConfigureAwait(false);
+                await WriteClientResultResponseMessageAsync(methodId, clientResultMessageId, MessagePack.Nil.Default).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                await WriteClientResultResponseMessageForErrorAsync(methodId, clientResultMessageId, e).ConfigureAwait(false);
+            }
+        }
+
+        protected void AwaitAndWriteClientResultResponseMessage<T>(int methodId, Guid clientResultMessageId, Task<T> task)
+            => AwaitAndWriteClientResultResponseMessage(methodId, clientResultMessageId, new ValueTask<T>(task));
+
+        protected async void AwaitAndWriteClientResultResponseMessage<T>(int methodId, Guid clientResultMessageId, ValueTask<T> task)
+        {
+            try
+            {
+                var result = await task.ConfigureAwait(false);
+                await WriteClientResultResponseMessageAsync(methodId, clientResultMessageId, result).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                await WriteClientResultResponseMessageForErrorAsync(methodId, clientResultMessageId, e).ConfigureAwait(false);
+            }
+        }
+
+        protected async void WriteClientResultResponseMessageForError(int methodId, Guid clientResultMessageId, Exception ex)
+        {
+            try
+            {
+                await WriteClientResultResponseMessageForErrorAsync(methodId, clientResultMessageId, ex).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Ignore Exception
+            }
         }
 
         protected async Task WriteClientResultResponseMessageAsync<T>(int methodId, Guid clientResultMessageId, T result)
