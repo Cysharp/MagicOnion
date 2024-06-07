@@ -56,10 +56,6 @@ namespace MagicOnion.Client
             this.logger = logger ?? NullMagicOnionClientLogger.Instance;
         }
 
-        public void Dump(object v, CancellationToken ct)
-        {
-            var value = v;
-        }
         // call immediately after create.
         public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
         {
