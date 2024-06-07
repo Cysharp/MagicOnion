@@ -33,6 +33,11 @@ public class MagicOnionOptions
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; set; }
 
     /// <summary>
+    /// Gets or sets the default timeout duration of client results. Default is 5 seconds.
+    /// </summary>
+    public TimeSpan ClientResultsDefaultTimeout { get; set; }
+
+    /// <summary>
     /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer.
     /// </summary>
     public MagicOnionOptions()
@@ -44,5 +49,6 @@ public class MagicOnionOptions
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;
+        this.ClientResultsDefaultTimeout = TimeSpan.FromSeconds(5);
     }
 }
