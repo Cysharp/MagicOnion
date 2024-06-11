@@ -60,6 +60,23 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         );
     }
 
+    public async Task<TStreamingHub> ConnectAsync(StreamingHubClientOptions options, CancellationToken cancellationToken = default)
+    {
+        return await StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(
+            callInvokerMock,
+            receiver,
+            options,
+            cancellationToken: cancellationToken,
+            factoryProvider: factoryProvider
+        );
+    }
+
+    public async Task<ReadOnlyMemory<byte>> ReadRequestRawAsync()
+    {
+        var requestPayload = await requestChannel.Reader.ReadAsync();
+        return requestPayload.Memory;
+    }
+
     public async Task<(int MessageId, int MethodId, T Request)> ReadRequestAsync<T>()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();

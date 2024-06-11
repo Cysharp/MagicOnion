@@ -431,6 +431,56 @@ public class StreamingHubTest
         Assert.Equal(12.345, requestBody.Item6);
         Assert.Equal('X', requestBody.Item7);
     }
+
+    [Fact]
+    public async Task Heartbeat_Interval()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(TimeSpan.FromMilliseconds(100));
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var t = client.Parameter_One(1234);
+        await Task.Delay(300);
+
+        // Assert
+        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
+        Assert.Equal(1234, requestBody);
+
+        var request1 = await helper.ReadRequestRawAsync();
+        var request2 = await helper.ReadRequestRawAsync();
+        var request3 = await helper.ReadRequestRawAsync();
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request2.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request3.ToArray());
+    }
+
+    [Fact]
+    public async Task Heartbeat_Respond()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable forcibly
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var t = client.Parameter_One(1234);
+        await Task.Delay(300);
+
+        // Assert
+        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
+        Assert.Equal(1234, requestBody);
+
+        var request1 = await helper.ReadRequestRawAsync();
+        var request2 = await helper.ReadRequestRawAsync();
+        var request3 = await helper.ReadRequestRawAsync();
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request2.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request3.ToArray());
+    }
 }
 
 public interface IGreeterHubReceiver
