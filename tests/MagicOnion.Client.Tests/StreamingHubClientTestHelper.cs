@@ -89,6 +89,11 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         return ReadFireAndForgetRequestPayload<T>(requestPayload.Memory);
     }
 
+    public void WriteResponseRaw(ReadOnlySpan<byte> data)
+    {
+        responseChannel.Writer.TryWrite(StreamingHubPayloadPool.Shared.RentOrCreate(data));
+    }
+
     public void WriteResponse<T>(int messageId, int methodId, T response)
     {
         responseChannel.Writer.TryWrite(BuildResponsePayload(messageId, methodId, response));
