@@ -21,36 +21,36 @@ namespace MagicOnion.Client
         public IMagicOnionClientLogger Logger { get; }
 
         public TimeSpan? HeartbeatInterval { get; }
-        public Action<ReadOnlyMemory<byte>>? HeartbeatReceived { get; }
+        public Action<ReadOnlyMemory<byte>>? HeartbeatReceivedFromServer { get; }
 
         public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
             : this(host, callOptions, serializerProvider, logger, default, default)
         {
         }
 
-        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? heartbeatInterval, Action<ReadOnlyMemory<byte>>? heartbeatReceived)
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? heartbeatInterval, Action<ReadOnlyMemory<byte>>? heartbeatReceivedFromServer)
         {
             Host = host;
             CallOptions = callOptions;
             SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             HeartbeatInterval = heartbeatInterval;
-            HeartbeatReceived = heartbeatReceived;
+            HeartbeatReceivedFromServer = heartbeatReceivedFromServer;
         }
 
         public static StreamingHubClientOptions CreateWithDefault(string? host = default, CallOptions callOptions = default, IMagicOnionSerializerProvider? serializerProvider = default, IMagicOnionClientLogger? logger = default)
             => new(host, callOptions, serializerProvider ?? MagicOnionSerializerProvider.Default, logger ?? NullMagicOnionClientLogger.Instance);
 
         public StreamingHubClientOptions WithHost(string? host)
-            => new(host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+            => new(host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
-            => new(Host, callOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+            => new(Host, callOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithSerializerProvider(IMagicOnionSerializerProvider serializerProvider)
-            => new(Host, CallOptions, serializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+            => new(Host, CallOptions, serializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
-            => new(Host, CallOptions, SerializerProvider, logger, HeartbeatInterval, HeartbeatReceived);
+            => new(Host, CallOptions, SerializerProvider, logger, HeartbeatInterval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithHeartbeatInterval(TimeSpan? interval)
-            => new(Host, CallOptions, SerializerProvider, Logger, interval, HeartbeatReceived);
+            => new(Host, CallOptions, SerializerProvider, Logger, interval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onHeartbeatReceived)
             => new(Host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, onHeartbeatReceived);
     }
@@ -338,7 +338,7 @@ namespace MagicOnion.Client
                 case StreamingHubMessageType.Heartbeat:
                     {
                         var metadata = messageReader.ReadHeartbeat();
-                        if (this.options.HeartbeatReceived is { } heartbeatReceived)
+                        if (this.options.HeartbeatReceivedFromServer is { } heartbeatReceived)
                         {
                             if (syncContext != null)
                             {

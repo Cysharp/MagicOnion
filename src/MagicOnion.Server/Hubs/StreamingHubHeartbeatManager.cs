@@ -37,7 +37,7 @@ internal class StreamingHubHeartbeatHandle : IDisposable
         timeoutToken.CancelAfter(timeoutDuration);
     }
 
-    public void PauseTimeoutTimer()
+    public void Ack()
     {
         if (disposed || timeoutDuration == Timeout.InfiniteTimeSpan) return;
         timeoutToken.CancelAfter(Timeout.InfiniteTimeSpan);
@@ -120,7 +120,6 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         var writer = new ArrayBufferWriter<byte>();
         while (await timer.WaitForNextTickAsync())
         {
-            // [255, 0, 0, 0, <Extras>]
             StreamingHubMessageWriter.WriteHeartbeatMessageForServerToClientHeader(writer);
             if (!(heartbeatMetadataProvider?.TryWriteMetadata(writer) ?? false))
             {
@@ -129,6 +128,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
 
             var payload = StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan);
 
+            MagicOnionServerLog.SendHeartbeat(this.logger);
             foreach (var (contextId, handle) in contexts)
             {
                 handle.RestartTimeoutTimer();

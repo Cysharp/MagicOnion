@@ -76,6 +76,9 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 12, Level = LogLevel.Debug, EventName = nameof(HeartbeatTimedOut), Message = nameof(HeartbeatTimedOut) + " handlerName:{handlerName}, connectionId:{connectionId}")]
     public static partial void HeartbeatTimedOut(ILogger logger, string handlerName, Guid connectionId);
 
+    [LoggerMessage(EventId = 13, Level = LogLevel.Debug, EventName = nameof(SendHeartbeat), Message = nameof(SendHeartbeat))]
+    public static partial void SendHeartbeat(ILogger logger);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 

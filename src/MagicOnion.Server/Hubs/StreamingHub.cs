@@ -226,7 +226,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                 }
             case StreamingHubMessageType.HeartbeatResponse:
                 {
-                    heartbeatHandle.PauseTimeoutTimer();
+                    heartbeatHandle.Ack();
                     return default;
                 }
             default:
