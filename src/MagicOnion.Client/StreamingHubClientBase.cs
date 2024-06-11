@@ -322,16 +322,18 @@ namespace MagicOnion.Client
 
                         if (syncContext != null)
                         {
-                            var tuple = Tuple.Create(this, message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                            var tuple = Tuple.Create(this, message.MethodId, message.ClientResultRequestMessageId, message.Body, payload);
                             syncContext.Post(static state =>
                             {
-                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, Guid, ReadOnlyMemory<byte>>)state!;
+                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, Guid, ReadOnlyMemory<byte>, StreamingHubPayload>)state!;
                                 t.Item1.OnClientResultEvent(t.Item2, t.Item3, t.Item4);
+                                StreamingHubPayloadPool.Shared.Return(t.Item5);
                             }, tuple);
                         }
                         else
                         {
                             OnClientResultEvent(message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                            StreamingHubPayloadPool.Shared.Return(payload);
                         }
                     }
                     break;
@@ -342,16 +344,18 @@ namespace MagicOnion.Client
                         {
                             if (syncContext != null)
                             {
-                                var tuple = Tuple.Create(heartbeatReceived, metadata);
+                                var tuple = Tuple.Create(heartbeatReceived, metadata, payload);
                                 syncContext.Post(static state =>
                                 {
-                                    var t = (Tuple<Action<ReadOnlyMemory<byte>>, ReadOnlyMemory<byte>>)state!;
+                                    var t = (Tuple<Action<ReadOnlyMemory<byte>>, ReadOnlyMemory<byte>, StreamingHubPayload>)state!;
                                     t.Item1(t.Item2);
+                                    StreamingHubPayloadPool.Shared.Return(t.Item3);
                                 }, tuple);
                             }
                             else
                             {
                                 heartbeatReceived(metadata);
+                                StreamingHubPayloadPool.Shared.Return(payload);
                             }
                         }
                         _ = WriteHeartbeatAsync();
