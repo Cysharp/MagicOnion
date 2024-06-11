@@ -191,20 +191,28 @@ namespace MagicOnion.Internal
             writer.Flush();
         }
 
+
+        // Array(5)[127, Nil, Nil, Nil, <Extra>]
+        static ReadOnlySpan<byte> HeartbeatMessageForServerToClientHeader => new byte[] { 0x95, 0x7f, 0xc0, 0xc0, 0xc0 };
+
         /// <summary>
         /// Writes a heartbeat message for sending from the server.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteHeartbeatMessageForServerToClientHeader(IBufferWriter<byte> bufferWriter)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(5);
-            writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
-            writer.WriteNil(); // Dummy
-            writer.WriteNil(); // Dummy
-            writer.WriteNil(); // Dummy
-            writer.Flush();
+            bufferWriter.Write(HeartbeatMessageForServerToClientHeader);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(5);
+            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.Flush();
         }
+
+        // Array(4)[127, Nil, Nil, Nil]
+        static ReadOnlySpan<byte> HeartbeatMessageForClientToServer => new byte[] { 0x94, 0x7f, 0xc0, 0xc0, 0xc0 };
 
         /// <summary>
         /// Writes a heartbeat message for sending from the client.
@@ -212,13 +220,14 @@ namespace MagicOnion.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteHeartbeatMessageForClientToServer(IBufferWriter<byte> bufferWriter)
         {
-            var writer = new MessagePackWriter(bufferWriter);
-            writer.WriteArrayHeader(4);
-            writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
-            writer.WriteNil(); // Dummy
-            writer.WriteNil(); // Dummy
-            writer.WriteNil(); // Dummy
-            writer.Flush();
+            bufferWriter.Write(HeartbeatMessageForClientToServer);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(4);
+            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.Flush();
         }
     }
 
