@@ -23,8 +23,9 @@ namespace MagicOnion.Internal
                 3 => StreamingHubMessageType.Request,
                 4 => reader.ReadByte() switch
                 {
-                    0 => StreamingHubMessageType.ClientResultResponse,
-                    1 => StreamingHubMessageType.ClientResultResponseWithError,
+                    0x00 => StreamingHubMessageType.ClientResultResponse,
+                    0x01 => StreamingHubMessageType.ClientResultResponseWithError,
+                    0x7f => StreamingHubMessageType.HeartbeatResponse,
                     var subType => throw new InvalidOperationException($"Unknown client response message: {subType}"),
                 },
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),

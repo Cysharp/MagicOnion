@@ -22,7 +22,12 @@ namespace MagicOnion.Internal
                 2 => StreamingHubMessageType.Broadcast,
                 3 => StreamingHubMessageType.Response,
                 4 => StreamingHubMessageType.ResponseWithError,
-                5 => StreamingHubMessageType.ClientResultRequest,
+                5 => reader.ReadByte() switch
+                {
+                    0x00 /* 0:ClientResultRequest */ => StreamingHubMessageType.ClientResultRequest,
+                    0x7f /* 127:Heartbeat */ => StreamingHubMessageType.Heartbeat,
+                    var x => throw new InvalidOperationException($"Unknown Type: {x}"),
+                },
                 _ => throw new InvalidOperationException($"Unknown message format: ArrayLength = {arrayLength}"),
             };
         }
@@ -54,13 +59,23 @@ namespace MagicOnion.Internal
 
         public (Guid ClientResultRequestMessageId, int MethodId, ReadOnlyMemory<byte> Body) ReadClientResultRequestMessage()
         {
-            var type = reader.ReadByte(); // reserved
-            _ = reader.ReadByte(); // dummy
+            //var type = reader.ReadByte(); // Type is already read by ReadMessageType
+            reader.Skip(); // Dummy
             var clientRequestMessageId = MessagePackSerializer.Deserialize<Guid>(ref reader);
             var methodId = reader.ReadInt32();
             var offset = (int)reader.Consumed;
 
             return (clientRequestMessageId, methodId, data.Slice(offset));
+        }
+
+        public ReadOnlyMemory<byte> ReadHeartbeat()
+        {
+            //var type = reader.ReadByte(); // Type is already read by ReadMessageType
+            reader.Skip(); // Dummy (1)
+            reader.Skip(); // Dummy (2)
+            reader.Skip(); // Dummy (3)
+
+            return data.Slice((int)reader.Consumed);
         }
     }
 }

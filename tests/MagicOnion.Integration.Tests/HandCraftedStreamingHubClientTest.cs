@@ -27,7 +27,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
 
         // Act
-        await client.ConnectAsync(receiver);
+        await client.ConnectAsync();
         var retVal = await client.MethodParameterless();
 
         // Assert
@@ -43,7 +43,7 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
         var client = new __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(receiver, channel.CreateCallInvoker(), string.Empty, new CallOptions(), MagicOnionSerializerProvider.Default, NullMagicOnionClientLogger.Instance);
 
         // Act
-        await client.ConnectAsync(receiver);
+        await client.ConnectAsync();
         var retVal = await client.Callback(1234, "FooBarBaz");
         await Task.Delay(500); // Wait for the broadcast queue to be consumed.
 
@@ -64,13 +64,13 @@ public class HandCraftedStreamingHubClientTest : IClassFixture<MagicOnionApplica
     class __HandCraftedClient__IHandCraftedStreamingHubClientTestHub : StreamingHubClientBase<IHandCraftedStreamingHubClientTestHub, IHandCraftedStreamingHubClientTestHubReceiver>, IHandCraftedStreamingHubClientTestHub
     {
         public __HandCraftedClient__IHandCraftedStreamingHubClientTestHub(IHandCraftedStreamingHubClientTestHubReceiver receiver, CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider messageSerializer, IMagicOnionClientLogger logger)
-            : base(nameof(IHandCraftedStreamingHubClientTestHub), callInvoker, host, option, messageSerializer, logger)
+            : base(nameof(IHandCraftedStreamingHubClientTestHub), receiver, callInvoker, new StreamingHubClientOptions(host, option, messageSerializer, logger))
         {
         }
 
-        public Task ConnectAsync(IHandCraftedStreamingHubClientTestHubReceiver receiver)
+        public Task ConnectAsync()
         {
-            return __ConnectAndSubscribeAsync(receiver, CancellationToken.None);
+            return __ConnectAndSubscribeAsync(CancellationToken.None);
         }
 
         protected override void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data)

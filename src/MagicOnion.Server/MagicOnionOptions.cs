@@ -37,6 +37,12 @@ public class MagicOnionOptions
     /// </summary>
     public TimeSpan ClientResultsDefaultTimeout { get; set; }
 
+    public bool EnableStreamingHubHeartbeat { get; set; }
+
+    public TimeSpan? StreamingHubHeartbeatInterval { get; set; }
+
+    public TimeSpan? StreamingHubHeartbeatTimeout { get; set; }
+
     /// <summary>
     /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer.
     /// </summary>
@@ -50,5 +56,8 @@ public class MagicOnionOptions
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;
         this.ClientResultsDefaultTimeout = TimeSpan.FromSeconds(5);
+        this.EnableStreamingHubHeartbeat = false;
+        this.StreamingHubHeartbeatInterval = null;
+        this.StreamingHubHeartbeatTimeout = null;
     }
 }

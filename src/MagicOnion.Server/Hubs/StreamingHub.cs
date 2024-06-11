@@ -19,6 +19,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
     where THubInterface : IStreamingHub<THubInterface, TReceiver>
 {
     IRemoteClientResultPendingTaskRegistry remoteClientResultPendingTasks = default!;
+    StreamingHubHeartbeatHandle heartbeatHandle = default!;
 
     protected static readonly Task<Nil> NilTask = Task.FromResult(Nil.Default);
     protected static readonly ValueTask CompletedTask = new ValueTask();
@@ -87,9 +88,12 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         this.remoteClientResultPendingTasks = new RemoteClientResultPendingTaskRegistry(serviceProvider.GetRequiredService<IOptions<MagicOnionOptions>>().Value.ClientResultsDefaultTimeout);
         this.Client = remoteProxyFactory.CreateDirect<TReceiver>(new MagicOnionRemoteReceiverWriter(StreamingServiceContext), remoteSerializer, remoteClientResultPendingTasks);
 
-        var groupProvider = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>().GetGroupProvider(Context.MethodHandler);
+        var handlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
+        var groupProvider = handlerRepository.GetGroupProvider(Context.MethodHandler);
         this.Group = new HubGroupRepository<TReceiver>(Client, StreamingServiceContext, groupProvider);
 
+        var heartbeatManager = handlerRepository.GetHeartbeatManager(Context.MethodHandler);
+        heartbeatHandle = heartbeatManager.Register(StreamingServiceContext);
         try
         {
             await OnConnecting();
@@ -122,6 +126,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
         {
             Metrics.StreamingHubConnectionDecrement(Context.Metrics, Context.MethodHandler.ServiceName);
 
+            heartbeatHandle.Dispose();
             StreamingServiceContext.CompleteStreamingHub();
             await OnDisconnected();
             await this.Group.DisposeAsync();
@@ -133,7 +138,7 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
 
     async Task HandleMessageAsync()
     {
-        var ct = Context.CallContext.CancellationToken;
+        var ct = CancellationTokenSource.CreateLinkedTokenSource(Context.CallContext.CancellationToken, heartbeatHandle.TimeoutToken).Token;
         var reader = StreamingServiceContext.RequestStream!;
         var writer = StreamingServiceContext.ResponseStream!;
 
@@ -211,14 +216,19 @@ public abstract class StreamingHubBase<THubInterface, TReceiver> : ServiceBase<T
                     return default;
                 }
             case StreamingHubMessageType.ClientResultResponseWithError:
-            {
-                var responseMessage = reader.ReadClientResultResponseForError();
-                if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
                 {
-                    pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode, responseMessage.Message + (string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail))));
+                    var responseMessage = reader.ReadClientResultResponseForError();
+                    if (remoteClientResultPendingTasks.TryGetAndUnregisterPendingTask(responseMessage.ClientResultMessageId, out var pendingMessage))
+                    {
+                        pendingMessage.TrySetException(new RpcException(new Status((StatusCode)responseMessage.StatusCode, responseMessage.Message + (string.IsNullOrEmpty(responseMessage.Detail) ? string.Empty : Environment.NewLine + responseMessage.Detail))));
+                    }
+                    return default;
                 }
-                return default;
-            }
+            case StreamingHubMessageType.HeartbeatResponse:
+                {
+                    heartbeatHandle.PauseTimeoutTimer();
+                    return default;
+                }
             default:
                 throw new InvalidOperationException($"Unknown MessageType: {messageType}");
         }

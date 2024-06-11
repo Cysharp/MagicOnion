@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +10,51 @@ using MagicOnion.Client.Internal.Threading.Tasks;
 using MagicOnion.Internal;
 using MagicOnion.Serialization;
 using MagicOnion.Internal.Buffers;
-using MessagePack;
-using System.Security.Cryptography;
 
 namespace MagicOnion.Client
 {
+    public class StreamingHubClientOptions
+    {
+        public string? Host { get; }
+        public CallOptions CallOptions { get; }
+        public IMagicOnionSerializerProvider SerializerProvider { get; }
+        public IMagicOnionClientLogger Logger { get; }
+
+        public TimeSpan? HeartbeatInterval { get; }
+        public Action<ReadOnlyMemory<byte>>? HeartbeatReceived { get; }
+
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+            : this(host, callOptions, serializerProvider, logger, default, default)
+        {
+        }
+
+        public StreamingHubClientOptions(string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger, TimeSpan? heartbeatInterval, Action<ReadOnlyMemory<byte>>? heartbeatReceived)
+        {
+            Host = host;
+            CallOptions = callOptions;
+            SerializerProvider = serializerProvider ?? throw new ArgumentNullException(nameof(serializerProvider));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            HeartbeatInterval = heartbeatInterval;
+            HeartbeatReceived = heartbeatReceived;
+        }
+
+        public static StreamingHubClientOptions CreateWithDefault(string? host = default, CallOptions callOptions = default, IMagicOnionSerializerProvider? serializerProvider = default, IMagicOnionClientLogger? logger = default)
+            => new(host, callOptions, serializerProvider ?? MagicOnionSerializerProvider.Default, logger ?? NullMagicOnionClientLogger.Instance);
+
+        public StreamingHubClientOptions WithHost(string? host)
+            => new(host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+        public StreamingHubClientOptions WithCallOptions(CallOptions callOptions)
+            => new(Host, callOptions, SerializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+        public StreamingHubClientOptions WithSerializerProvider(IMagicOnionSerializerProvider serializerProvider)
+            => new(Host, CallOptions, serializerProvider, Logger, HeartbeatInterval, HeartbeatReceived);
+        public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
+            => new(Host, CallOptions, SerializerProvider, logger, HeartbeatInterval, HeartbeatReceived);
+        public StreamingHubClientOptions WithHeartbeatInterval(TimeSpan? interval)
+            => new(Host, CallOptions, SerializerProvider, Logger, interval, HeartbeatReceived);
+        public StreamingHubClientOptions WithHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onHeartbeatReceived)
+            => new(Host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, onHeartbeatReceived);
+    }
+
     public abstract class StreamingHubClientBase<TStreamingHub, TReceiver>
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
@@ -24,9 +63,8 @@ namespace MagicOnion.Client
         const string StreamingHubVersionHeaderValue = "2";
 #pragma warning restore IDE1006 // Naming Styles
 
-        readonly string? host;
-        readonly CallOptions option;
         readonly CallInvoker callInvoker;
+        readonly StreamingHubClientOptions options;
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
         readonly AsyncLock asyncLock = new();
@@ -39,32 +77,34 @@ namespace MagicOnion.Client
         int messageIdSequence = 0;
         bool disposed;
 
+        Task? heartbeatTask;
+        DateTimeOffset lastHeartbeatSentAt;
+
         IClientStreamWriter<StreamingHubPayload> writer = default!;
         IAsyncStreamReader<StreamingHubPayload> reader = default!;
 
         Task subscription = default!;
 
-        protected TReceiver receiver = default!;
+        protected readonly TReceiver receiver;
 
-        protected StreamingHubClientBase(string serviceName, CallInvoker callInvoker, string? host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+        protected StreamingHubClientBase(string serviceName, TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
         {
+            this.callInvoker = callInvoker;
+            this.receiver = receiver;
+            this.options = options;
+            this.logger = options.Logger;
             this.duplexStreamingConnectMethod = CreateConnectMethod(serviceName);
-            this.callInvoker = callInvoker ?? throw new ArgumentNullException(nameof(callInvoker));
-            this.host = host;
-            this.option = option;
-            this.messageSerializer = serializerProvider?.Create(MethodType.DuplexStreaming, null) ?? throw new ArgumentNullException(nameof(serializerProvider));
-            this.logger = logger ?? NullMagicOnionClientLogger.Instance;
+            this.messageSerializer = options.SerializerProvider.Create(MethodType.DuplexStreaming, null);
         }
 
         // call immediately after create.
-        public async Task __ConnectAndSubscribeAsync(TReceiver receiver, CancellationToken cancellationToken)
+        public async Task __ConnectAndSubscribeAsync(CancellationToken cancellationToken)
         {
             var syncContext = SynchronizationContext.Current; // capture SynchronizationContext.
-            var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, host, option);
+            var callResult = callInvoker.AsyncDuplexStreamingCall(duplexStreamingConnectMethod, options.Host, options.CallOptions);
 
             this.writer = callResult.RequestStream;
             this.reader = callResult.ResponseStream;
-            this.receiver = receiver;
 
             // Establish StreamingHub connection between the client and the server.
             Metadata.Entry? messageVersion;
@@ -128,6 +168,11 @@ namespace MagicOnion.Client
 
         async Task StartSubscribe(SynchronizationContext? syncContext, Task<bool> firstMoveNext)
         {
+            if (options.HeartbeatInterval is { } heartbeatInterval)
+            {
+                heartbeatTask = RunHeartbeatLoopAsync(heartbeatInterval, cancellationTokenSource.Token);
+            }
+
             var reader = this.reader;
             try
             {
@@ -277,11 +322,11 @@ namespace MagicOnion.Client
 
                         if (syncContext != null)
                         {
-                            var tuple = Tuple.Create(message.MethodId, message.ClientResultRequestMessageId, message.Body);
-                            syncContext.Post(state =>
+                            var tuple = Tuple.Create(this, message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                            syncContext.Post(static state =>
                             {
-                                var t = (Tuple<int, Guid, ReadOnlyMemory<byte>>)state!;
-                                OnClientResultEvent(t.Item1, t.Item2, t.Item3);
+                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, Guid, ReadOnlyMemory<byte>>)state!;
+                                t.Item1.OnClientResultEvent(t.Item2, t.Item3, t.Item4);
                             }, tuple);
                         }
                         else
@@ -290,7 +335,56 @@ namespace MagicOnion.Client
                         }
                     }
                     break;
+                case StreamingHubMessageType.Heartbeat:
+                    {
+                        var metadata = messageReader.ReadHeartbeat();
+                        if (this.options.HeartbeatReceived is { } heartbeatReceived)
+                        {
+                            if (syncContext != null)
+                            {
+                                var tuple = Tuple.Create(heartbeatReceived, metadata);
+                                syncContext.Post(static state =>
+                                {
+                                    var t = (Tuple<Action<ReadOnlyMemory<byte>>, ReadOnlyMemory<byte>>)state!;
+                                    t.Item1(t.Item2);
+                                }, tuple);
+                            }
+                            else
+                            {
+                                heartbeatReceived(metadata);
+                            }
+                        }
+                        _ = WriteHeartbeatAsync();
+                    }
+                    break;
             }
+        }
+
+        async Task RunHeartbeatLoopAsync(TimeSpan heartbeatInterval, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await Task.Delay(heartbeatInterval, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if ((DateTimeOffset.UtcNow - lastHeartbeatSentAt) > heartbeatInterval)
+                {
+                    await WriteHeartbeatAsync().ConfigureAwait(false);
+                }
+            }
+        }
+
+        async Task WriteHeartbeatAsync()
+        {
+            if (disposed) return;
+            var v = BuildHeartbeatMessage();
+
+            using (await asyncLock.LockAsync().ConfigureAwait(false))
+            {
+                await writer.WriteAsync(v).ConfigureAwait(false);
+            }
+
+            lastHeartbeatSentAt = DateTimeOffset.UtcNow;
         }
 
         protected async Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
@@ -500,6 +594,13 @@ namespace MagicOnion.Client
         {
             using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
             StreamingHubMessageWriter.WriteClientResultResponseMessageForError(buffer, methodId, messageId, statusCode, detail, ex, messageSerializer);
+            return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
+        }
+
+        StreamingHubPayload BuildHeartbeatMessage()
+        {
+            using var buffer = ArrayPoolBufferWriter.RentThreadStaticWriter();
+            StreamingHubMessageWriter.WriteHeartbeatMessageForClientToServer(buffer);
             return StreamingHubPayloadPool.Shared.RentOrCreate(buffer.WrittenSpan);
         }
     }

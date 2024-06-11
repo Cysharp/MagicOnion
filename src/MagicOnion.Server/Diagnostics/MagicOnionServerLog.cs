@@ -67,6 +67,15 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 9, Level = LogLevel.Debug, EventName = nameof(InvokeHubBroadcast), Message = nameof(InvokeHubBroadcast) + " groupName:{groupName} size:{size} broadcastGroupCount:{broadcastGroupCount}")]
     public static partial void InvokeHubBroadcast(ILogger logger, string groupName, int size, int broadcastGroupCount);
 
+    [LoggerMessage(EventId = 10, Level = LogLevel.Debug, EventName = nameof(BeginHeartbeat), Message = nameof(BeginHeartbeat) + " handlerName:{handlerName}")]
+    public static partial void BeginHeartbeat(ILogger logger, string handlerName);
+
+    [LoggerMessage(EventId = 11, Level = LogLevel.Debug, EventName = nameof(ShutdownHeartbeat), Message = nameof(ShutdownHeartbeat) + " handlerName:{handlerName}")]
+    public static partial void ShutdownHeartbeat(ILogger logger, string handlerName);
+
+    [LoggerMessage(EventId = 12, Level = LogLevel.Debug, EventName = nameof(HeartbeatTimedOut), Message = nameof(HeartbeatTimedOut) + " handlerName:{handlerName}, connectionId:{connectionId}")]
+    public static partial void HeartbeatTimedOut(ILogger logger, string handlerName, Guid connectionId);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 

@@ -142,7 +142,7 @@ internal class MagicOnionInitializerGenerator
                 writer.AppendLineWithFormat($$"""
                                 if (typeof(TStreamingHub) == typeof({{hubInfo.ServiceType.FullName}}) && typeof(TReceiver) == typeof({{hubInfo.Receiver.ReceiverType.FullName}}))
                                 {
-                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, d, e, StreamingHubDiagnosticHandler)));
+                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, b, c) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, StreamingHubDiagnosticHandler)));
                                 }
             """);
             }
@@ -151,7 +151,7 @@ internal class MagicOnionInitializerGenerator
                 writer.AppendLineWithFormat($$"""
                                 if (typeof(TStreamingHub) == typeof({{hubInfo.ServiceType.FullName}}) && typeof(TReceiver) == typeof({{hubInfo.Receiver.ReceiverType.FullName}}))
                                 {
-                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c, d, e)));
+                                    factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<{{hubInfo.ServiceType.FullName}}, {{hubInfo.Receiver.ReceiverType.FullName}}>)((a, b, c) => new MagicOnionGeneratedClient.{{hubInfo.GetClientFullName()}}(a, b, c)));
                                 }
             """);
             }

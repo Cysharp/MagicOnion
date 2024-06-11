@@ -149,8 +149,8 @@ public class StaticStreamingHubClientGenerator
         if (ctx.EnableStreamingHubDiagnosticHandler)
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                            public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
-                                : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
+                            public {{ctx.Hub.GetClientFullName()}}({{ctx.Hub.Receiver.ReceiverType.FullName}} receiver, global::Grpc.Core.CallInvoker callInvoker, global::MagicOnion.Client.StreamingHubClientOptions options, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
+                                : base("{{ctx.Hub.ServiceType.Name}}", receiver, callInvoker, options)
                             {
                                 this.diagnosticHandler = diagnosticHandler;
                             }
@@ -159,8 +159,8 @@ public class StaticStreamingHubClientGenerator
         else
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                            public {{ctx.Hub.GetClientFullName()}}(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger)
-                                : base("{{ctx.Hub.ServiceType.Name}}", callInvoker, host, options, serializerProvider, logger)
+                            public {{ctx.Hub.GetClientFullName()}}({{ctx.Hub.Receiver.ReceiverType.FullName}} receiver, global::Grpc.Core.CallInvoker callInvoker, global::MagicOnion.Client.StreamingHubClientOptions options)
+                                : base("{{ctx.Hub.ServiceType.Name}}", receiver, callInvoker, options)
                             {
                             }
             """);
