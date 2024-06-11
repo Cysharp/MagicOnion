@@ -17,8 +17,8 @@ namespace TempProject
             {
                 readonly global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler;
 
-                public TempProject_MyHubClient(global::Grpc.Core.CallInvoker callInvoker, global::System.String host, global::Grpc.Core.CallOptions options, global::MagicOnion.Serialization.IMagicOnionSerializerProvider serializerProvider, global::MagicOnion.Client.IMagicOnionClientLogger logger, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
-                    : base("IMyHub", callInvoker, host, options, serializerProvider, logger)
+                public TempProject_MyHubClient(global::TempProject.IMyHubReceiver receiver, global::Grpc.Core.CallInvoker callInvoker, global::MagicOnion.Client.StreamingHubClientOptions options, global::MagicOnion.Client.IStreamingHubDiagnosticHandler diagnosticHandler)
+                    : base("IMyHub", receiver, callInvoker, options)
                 {
                     this.diagnosticHandler = diagnosticHandler;
                 }

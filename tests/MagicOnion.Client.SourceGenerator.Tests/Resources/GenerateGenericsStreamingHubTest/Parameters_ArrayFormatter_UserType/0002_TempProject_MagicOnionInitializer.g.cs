@@ -84,7 +84,7 @@ namespace TempProject
 
                     if (typeof(TStreamingHub) == typeof(global::TempProject.IMyHub) && typeof(TReceiver) == typeof(global::TempProject.IMyHubReceiver))
                     {
-                        factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::TempProject.IMyHub, global::TempProject.IMyHubReceiver>)((a, _, b, c, d, e) => new MagicOnionGeneratedClient.TempProject_MyHubClient(a, b, c, d, e)));
+                        factory = ((global::MagicOnion.Client.StreamingHubClientFactoryDelegate<global::TempProject.IMyHub, global::TempProject.IMyHubReceiver>)((a, b, c) => new MagicOnionGeneratedClient.TempProject_MyHubClient(a, b, c)));
                     }
 
                     Factory = (global::MagicOnion.Client.StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>)factory;
