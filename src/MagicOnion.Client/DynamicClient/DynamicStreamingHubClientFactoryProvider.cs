@@ -31,8 +31,7 @@ namespace MagicOnion.Client.DynamicClient
         static class Cache<TStreamingHub, TReceiver> where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
             public static readonly StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver> Factory
-                = (callInvoker, receiver, host, callOptions, serializerProvider, logger)
-                    => (TStreamingHub)Activator.CreateInstance(DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType, callInvoker, host, callOptions, serializerProvider, logger)!;
+                = (receiver, callInvoker, options) => (TStreamingHub)Activator.CreateInstance(DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>.ClientType, receiver, callInvoker, options)!;
         }
     }
 #endif

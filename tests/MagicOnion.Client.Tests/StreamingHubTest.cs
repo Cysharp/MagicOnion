@@ -431,6 +431,75 @@ public class StreamingHubTest
         Assert.Equal(12.345, requestBody.Item6);
         Assert.Equal('X', requestBody.Item7);
     }
+
+    [Fact]
+    public async Task Heartbeat_Interval()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(TimeSpan.FromMilliseconds(100));
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var t = client.Parameter_One(1234);
+        await Task.Delay(300);
+
+        // Assert
+        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
+        Assert.Equal(1234, requestBody);
+
+        var request1 = await helper.ReadRequestRawAsync();
+        var request2 = await helper.ReadRequestRawAsync();
+        var request3 = await helper.ReadRequestRawAsync();
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request2.ToArray());
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request3.ToArray());
+    }
+
+    [Fact]
+    public async Task Heartbeat_Respond()
+    {
+        // Arrange
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault().WithHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        var t = client.Parameter_One(1234);
+        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0xc0, 0xc0, 0xc0, 0xc0 /* Extra */]); // Simulate heartbeat from the server.
+        await Task.Delay(100);
+
+        // Assert
+        var (messageId, methodId, requestBody) = await helper.ReadRequestAsync<int>();
+        Assert.Equal(1234, requestBody);
+
+        var request1 = await helper.ReadRequestRawAsync();
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
+    }
+
+    [Fact]
+    public async Task Heartbeat_Extra()
+    {
+        // Arrange
+        var received = Array.Empty<byte>();
+        var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var helper = new StreamingHubClientTestHelper<IGreeterHub, IGreeterHubReceiver>(factoryProvider: DynamicStreamingHubClientFactoryProvider.Instance);
+        var options = StreamingHubClientOptions.CreateWithDefault()
+            .WithHeartbeatReceived(x => received = x.ToArray())
+            .WithHeartbeatInterval(Timeout.InfiniteTimeSpan); // Disable Heartbeat timer.
+        var client = await helper.ConnectAsync(options, timeout.Token);
+
+        // Act
+        helper.WriteResponseRaw([0x95 /* Array(5) */, 0x7f /* Type:127 */, 0xc0, 0xc0, 0xc0, .."Hello World"u8 /* Extra */]); // Simulate heartbeat from the server.
+        await Task.Delay(100);
+
+        // Assert
+        Assert.Equal([.. "Hello World"u8], received); // Respond to the heartbeat from the server.
+        var request1 = await helper.ReadRequestRawAsync();
+        Assert.Equal([0x94, 0x7f, 0xc0, 0xc0, 0xc0], request1.ToArray()); // Respond to the heartbeat from the server.
+    }
 }
 
 public interface IGreeterHubReceiver

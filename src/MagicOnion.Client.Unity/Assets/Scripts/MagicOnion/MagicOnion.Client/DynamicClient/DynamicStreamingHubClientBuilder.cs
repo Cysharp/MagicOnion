@@ -150,20 +150,18 @@ namespace MagicOnion.Client.DynamicClient
 
         static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
-            // .ctor(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger) :base(...)
+            // .ctor(TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options) : base("InterfaceName", receiver, callInvoker, options)
             {
-                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IMagicOnionSerializerProvider), typeof(IMagicOnionClientLogger) };
+                var argTypes = new[] { receiverType, typeof(CallInvoker), typeof(StreamingHubClientOptions) };
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 
-                // base(serviceName, callInvoker, host, option, serializerProvider, logger);
+                // base("InterfaceName", receiver, callInvoker, options);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldstr, interfaceType.Name);
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldarg_3);
-                il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Ldarg_S, (byte)5);
+                il.Emit(OpCodes.Ldarg_1); // receiver
+                il.Emit(OpCodes.Ldarg_2); // callInvoker
+                il.Emit(OpCodes.Ldarg_3); // options
                 il.Emit(OpCodes.Call, typeBuilder.BaseType!
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First());
 

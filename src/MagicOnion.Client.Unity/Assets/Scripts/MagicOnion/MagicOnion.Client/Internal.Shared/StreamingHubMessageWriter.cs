@@ -11,38 +11,46 @@ namespace MagicOnion.Internal
     ///     <list type="bullet">
     ///         <item>
     ///             <term>Response: InvokeHubMethod (from server to client)</term>
-    ///             <description>[MessageId(int), MethodId(int), SerializedResponse]</description>
+    ///             <description>Array(3): [MessageId(int), MethodId(int), SerializedResponse]</description>
     ///         </item>
     ///         <item>
     ///             <term>Response: InvokeHubMethod (from server to client; with Exception)</term>
-    ///             <description>[MessageId(int), StatusCode(int), Detail(string), Message(string)]</description>
+    ///             <description>Array(4): [MessageId(int), StatusCode(int), Detail(string), Message(string)]</description>
     ///         </item>
     ///         <item>
     ///             <term>Broadcast: from server to client</term>
-    ///             <description>[MethodId(int), SerializedArgument]</description>
+    ///             <description>Array(2): [MethodId(int), SerializedArgument]</description>
     ///         </item>
     ///         <item>
     ///             <term>ClientInvoke/Request: InvokeClientMethod (from server to client)</term>
-    ///             <description>[Type=0(byte), 0 (dummy), ClientResultMessageId(Guid), MethodId(int), SerializedArguments]</description>
+    ///             <description>Array(5): [Type=0x00, Nil, ClientResultMessageId(Guid), MethodId(int), SerializedArguments]</description>
+    ///         </item>
+    ///         <item>
+    ///             <term>Heartbeat:</term>
+    ///             <description>Array(5): [Type=0x7f, Nil, Nil, Nil, Extras]</description>
     ///         </item>
     ///     </list>
     ///     <para>StreamingHub message formats (from Client to Server):</para>
     ///     <list type="bullet">
     ///         <item>
     ///             <term>Request: InvokeHubMethod (from client; void; fire-and-forget)</term>
-    ///             <description>[MethodId(int), SerializedArguments]</description>
+    ///             <description>Array(2): [MethodId(int), SerializedArguments]</description>
     ///         </item>
     ///         <item>
     ///             <term>Request: InvokeHubMethod (from client; non-void)</term>
-    ///             <description>[MessageId(int), MethodId(int), SerializedArguments]</description>
+    ///             <description>Array(3): [MessageId(int), MethodId(int), SerializedArguments]</description>
     ///         </item>
     ///         <item>
     ///             <term>ClientInvoke/Response: InvokeClientMethod (from client to server)</term>
-    ///             <description>[Type=0(byte), ClientResultMessageId(Guid), MethodId(int), SerializedResponse]</description>
+    ///             <description>Array(4): [Type=0x00, ClientResultMessageId(Guid), MethodId(int), SerializedResponse]</description>
     ///         </item>
     ///         <item>
     ///             <term>ClientInvoke/Response: InvokeClientMethod (from client to server; with Exception)</term>
-    ///             <description>[Type=1(byte), ClientResultMessageId(Guid), MethodId(int), [StatusCode(int), Detail(string), Message(string)]]</description>
+    ///             <description>Array(4): [Type=0x01, ClientResultMessageId(Guid), MethodId(int), [StatusCode(int), Detail(string), Message(string)]]</description>
+    ///         </item>
+    ///         <item>
+    ///             <term>Heartbeat/Response:</term>
+    ///             <description>Array(4): [Type=0x7f, Nil, Nil, Nil]</description>
     ///         </item>
     ///     </list>
     /// </remarks>
@@ -139,8 +147,8 @@ namespace MagicOnion.Internal
         {
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(5);
-            writer.WriteInt8(0); // Dummy
-            writer.WriteInt8(0); // Dummy
+            writer.Write(0); // Type = ClientResultRequest (0)
+            writer.WriteNil(); // Dummy
             MessagePackSerializer.Serialize(ref writer, messageId);
             writer.Write(methodId);
             writer.Flush();
@@ -155,7 +163,7 @@ namespace MagicOnion.Internal
         {
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(4);
-            writer.WriteInt8(0); // Result = 0 (success)
+            writer.Write(0); // Result = 0 (success)
             MessagePackSerializer.Serialize(ref writer, messageId);
             writer.Write(methodId);
             writer.Flush();
@@ -170,7 +178,7 @@ namespace MagicOnion.Internal
         {
             var writer = new MessagePackWriter(bufferWriter);
             writer.WriteArrayHeader(4);
-            writer.WriteInt8(1); // Result = 1 (failed)
+            writer.Write(1); // Result = 1 (failed)
             MessagePackSerializer.Serialize(ref writer, messageId);
             writer.Write(methodId);
 
@@ -182,6 +190,45 @@ namespace MagicOnion.Internal
             }
             writer.Flush();
         }
+
+
+        // Array(5)[127, Nil, Nil, Nil, <Extra>]
+        static ReadOnlySpan<byte> HeartbeatMessageForServerToClientHeader => new byte[] { 0x95, 0x7f, 0xc0, 0xc0, 0xc0 };
+
+        /// <summary>
+        /// Writes a heartbeat message for sending from the server.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteHeartbeatMessageForServerToClientHeader(IBufferWriter<byte> bufferWriter)
+        {
+            bufferWriter.Write(HeartbeatMessageForServerToClientHeader);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(5);
+            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.Flush();
+        }
+
+        // Array(4)[127, Nil, Nil, Nil]
+        static ReadOnlySpan<byte> HeartbeatMessageForClientToServer => new byte[] { 0x94, 0x7f, 0xc0, 0xc0, 0xc0 };
+
+        /// <summary>
+        /// Writes a heartbeat message for sending from the client.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteHeartbeatMessageForClientToServer(IBufferWriter<byte> bufferWriter)
+        {
+            bufferWriter.Write(HeartbeatMessageForClientToServer);
+            //var writer = new MessagePackWriter(bufferWriter);
+            //writer.WriteArrayHeader(4);
+            //writer.Write(0x7f); // Type = 0x7f / 127 (Heartbeat)
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.WriteNil(); // Dummy
+            //writer.Flush();
+        }
     }
 
     internal enum StreamingHubMessageType
@@ -191,11 +238,13 @@ namespace MagicOnion.Internal
         RequestFireAndForget,
         Response,
         ResponseWithError,
+        HeartbeatResponse,
 
         // Server to Client
         Broadcast,
         ClientResultRequest,
         ClientResultResponse,
         ClientResultResponseWithError,
+        Heartbeat,
     }
 }

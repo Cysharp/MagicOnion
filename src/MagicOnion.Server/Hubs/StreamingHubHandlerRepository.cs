@@ -12,6 +12,7 @@ internal class StreamingHubHandlerRepository
     bool frozen;
     IDictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>> handlersCache = new Dictionary<MethodHandler, UniqueHashDictionary<StreamingHubHandler>>(MethodHandler.UniqueEqualityComparer.Instance);
     IDictionary<MethodHandler, MagicOnionManagedGroupProvider> groupCache = new Dictionary<MethodHandler, MagicOnionManagedGroupProvider>(MethodHandler.UniqueEqualityComparer.Instance);
+    IDictionary<MethodHandler, IStreamingHubHeartbeatManager> heartbeats = new Dictionary<MethodHandler, IStreamingHubHeartbeatManager>(MethodHandler.UniqueEqualityComparer.Instance);
 
     public void RegisterHandler(MethodHandler parent, StreamingHubHandler[] hubHandlers)
     {
@@ -35,6 +36,7 @@ internal class StreamingHubHandlerRepository
 #if NET8_0_OR_GREATER
         handlersCache = handlersCache.ToFrozenDictionary(MethodHandler.UniqueEqualityComparer.Instance);
         groupCache = groupCache.ToFrozenDictionary(MethodHandler.UniqueEqualityComparer.Instance);
+        heartbeats = heartbeats.ToFrozenDictionary(MethodHandler.UniqueEqualityComparer.Instance);
 #endif
     }
 
@@ -52,6 +54,17 @@ internal class StreamingHubHandlerRepository
     public MagicOnionManagedGroupProvider GetGroupProvider(MethodHandler methodHandler)
     {
         return groupCache[methodHandler];
+    }
+
+    public void RegisterHeartbeatManager(MethodHandler methodHandler, IStreamingHubHeartbeatManager heartbeatManager)
+    {
+        ThrowIfFrozen();
+        heartbeats[methodHandler] = heartbeatManager;
+    }
+
+    public IStreamingHubHeartbeatManager GetHeartbeatManager(MethodHandler methodHandler)
+    {
+        return heartbeats[methodHandler];
     }
 
     static (int, StreamingHubHandler)[] VerifyDuplicate(StreamingHubHandler[] hubHandlers)

@@ -1,6 +1,5 @@
 using Grpc.Core;
 using MagicOnion.Serialization;
-using MessagePack;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,10 +21,17 @@ namespace MagicOnion.Client
             return hubClient;
         }
 
-        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string? host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider? serializerProvider = null, IStreamingHubClientFactoryProvider? factoryProvider = null, IMagicOnionClientLogger? logger = null, CancellationToken cancellationToken = default)
+        public static Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, string? host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider? serializerProvider = null, IStreamingHubClientFactoryProvider? factoryProvider = null, IMagicOnionClientLogger? logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            var hubClient = await ConnectAsync<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, host, option, serializerProvider, factoryProvider, logger, cancellationToken);
+            var options = StreamingHubClientOptions.CreateWithDefault(host, option, serializerProvider, logger);
+            return ConnectAsync<TStreamingHub, TReceiver>(channel, receiver, options, factoryProvider, cancellationToken);
+        }
+
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(ChannelBase channel, TReceiver receiver, StreamingHubClientOptions options, IStreamingHubClientFactoryProvider? factoryProvider = null, CancellationToken cancellationToken = default)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var hubClient = await ConnectAsync<TStreamingHub, TReceiver>(channel.CreateCallInvoker(), receiver, options, factoryProvider, cancellationToken);
             // ReSharper disable once SuspiciousTypeConversion.Global
             if (channel is IMagicOnionAwareGrpcChannel magicOnionAwareGrpcChannel)
             {
@@ -38,11 +44,12 @@ namespace MagicOnion.Client
         public static TStreamingHub Connect<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider? serializerProvider = null, IStreamingHubClientFactoryProvider? factoryProvider = null, IMagicOnionClientLogger? logger = null)
              where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerProvider, factoryProvider, logger);
+            var options = StreamingHubClientOptions.CreateWithDefault(host, option);
+            var client = CreateClient<TStreamingHub, TReceiver>(receiver, callInvoker, options, factoryProvider);
 
             async void ConnectAndForget()
             {
-                var task = client.__ConnectAndSubscribeAsync(receiver, CancellationToken.None);
+                var task = client.__ConnectAndSubscribeAsync(CancellationToken.None);
                 try
                 {
                     await task.ConfigureAwait(false);
@@ -58,27 +65,32 @@ namespace MagicOnion.Client
             return (TStreamingHub)(object)client;
         }
 
-        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider? serializerProvider = null, IStreamingHubClientFactoryProvider? factoryProvider = null, IMagicOnionClientLogger? logger = null, CancellationToken cancellationToken = default)
+        public static Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host = null, CallOptions option = default(CallOptions), IMagicOnionSerializerProvider? serializerProvider = null, IStreamingHubClientFactoryProvider? factoryProvider = null, IMagicOnionClientLogger? logger = null, CancellationToken cancellationToken = default)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            var client = CreateClient<TStreamingHub, TReceiver>(callInvoker, receiver, host, option, serializerProvider, factoryProvider, logger);
-            await client.__ConnectAndSubscribeAsync(receiver, cancellationToken).ConfigureAwait(false);
+            var options = StreamingHubClientOptions.CreateWithDefault(host, option, serializerProvider, logger);
+            return ConnectAsync<TStreamingHub, TReceiver>(callInvoker, receiver, options, factoryProvider, cancellationToken);
+        }
+
+        public static async Task<TStreamingHub> ConnectAsync<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, StreamingHubClientOptions options, IStreamingHubClientFactoryProvider? factoryProvider = null, CancellationToken cancellationToken = default)
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+        {
+            var client = CreateClient<TStreamingHub, TReceiver>(receiver, callInvoker, options, factoryProvider);
+            await client.__ConnectAndSubscribeAsync(cancellationToken).ConfigureAwait(false);
             return (TStreamingHub)(object)client;
         }
 
-        static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host, CallOptions option, IMagicOnionSerializerProvider? serializerProvider, IStreamingHubClientFactoryProvider? factoryProvider, IMagicOnionClientLogger? logger)
+        static StreamingHubClientBase<TStreamingHub, TReceiver> CreateClient<TStreamingHub, TReceiver>(TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options, IStreamingHubClientFactoryProvider? factoryProvider)
             where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
         {
-            serializerProvider ??= MagicOnionSerializerProvider.Default;
             factoryProvider ??= StreamingHubClientFactoryProvider.Default;
-            logger ??= NullMagicOnionClientLogger.Instance;
 
             if (!factoryProvider.TryGetFactory<TStreamingHub, TReceiver>(out var factory))
             {
                 throw new NotSupportedException($"Unable to get client factory for StreamingHub type '{typeof(TStreamingHub).FullName}'.");
             }
 
-            return (StreamingHubClientBase<TStreamingHub, TReceiver>)(object)factory(callInvoker, receiver, host, option, serializerProvider, logger);
+            return (StreamingHubClientBase<TStreamingHub, TReceiver>)(object)factory(receiver, callInvoker, options);
         }
     }
 }

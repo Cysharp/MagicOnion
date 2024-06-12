@@ -7,6 +7,7 @@ using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace MagicOnion.Server;
 
@@ -204,9 +205,9 @@ public static class MagicOnionEngine
                     }
 
                     streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-
                     streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
 
+                    // Group Provider
                     IMulticastGroupProvider groupProvider;
                     var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                     if (attr != null)
@@ -219,6 +220,44 @@ public static class MagicOnionEngine
                     }
 
                     streamingHubHandlerRepository.RegisterGroupProvider(connectHandler, groupProvider);
+
+                    // Heartbeat
+                    var heartbeatEnable = options.EnableStreamingHubHeartbeat;
+                    var heartbeatInterval = options.StreamingHubHeartbeatInterval;
+                    var heartbeatTimeout = options.StreamingHubHeartbeatTimeout;
+                    var heartbeatMetadataProvider = default(IStreamingHubHeartbeatMetadataProvider);
+                    if (classType.GetCustomAttribute<HeartbeatAttribute>(inherit: true) is { } heartbeatAttr)
+                    {
+                        heartbeatEnable = heartbeatAttr.Enable;
+                        if (heartbeatAttr.Timeout != 0)
+                        {
+                            heartbeatTimeout = TimeSpan.FromMilliseconds(heartbeatAttr.Timeout);
+                        }
+                        if (heartbeatAttr.Interval != 0)
+                        {
+                            heartbeatInterval = TimeSpan.FromMilliseconds(heartbeatAttr.Interval);
+                        }
+                        if (heartbeatAttr.MetadataProvider != null)
+                        {
+                            heartbeatMetadataProvider = (IStreamingHubHeartbeatMetadataProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, heartbeatAttr.MetadataProvider);
+                        }
+                    }
+
+                    IStreamingHubHeartbeatManager heartbeatManager;
+                    if (!heartbeatEnable || heartbeatInterval is null)
+                    {
+                        heartbeatManager = NopStreamingHubHeartbeatManager.Instance;
+                    }
+                    else
+                    {
+                        heartbeatManager = new StreamingHubHeartbeatManager(
+                            heartbeatInterval.Value,
+                            heartbeatTimeout ?? Timeout.InfiniteTimeSpan,
+                            heartbeatMetadataProvider ?? serviceProvider.GetService<IStreamingHubHeartbeatMetadataProvider>(),
+                            serviceProvider.GetRequiredService<ILogger<StreamingHubHeartbeatManager>>()
+                        );
+                    }
+                    streamingHubHandlerRepository.RegisterHeartbeatManager(connectHandler, heartbeatManager);
                 }
             }
         }
