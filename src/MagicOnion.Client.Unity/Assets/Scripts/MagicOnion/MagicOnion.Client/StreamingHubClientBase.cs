@@ -49,8 +49,20 @@ namespace MagicOnion.Client
             => new(Host, CallOptions, serializerProvider, Logger, HeartbeatInterval, HeartbeatReceivedFromServer);
         public StreamingHubClientOptions WithLogger(IMagicOnionClientLogger logger)
             => new(Host, CallOptions, SerializerProvider, logger, HeartbeatInterval, HeartbeatReceivedFromServer);
+
+        /// <summary>
+        /// Sets a heartbeat interval. If a value is <see keyword="null"/>, the heartbeat from the client is disabled.
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
         public StreamingHubClientOptions WithHeartbeatInterval(TimeSpan? interval)
             => new(Host, CallOptions, SerializerProvider, Logger, interval, HeartbeatReceivedFromServer);
+
+        /// <summary>
+        /// Sets a heartbeat callback. If additional metadata is provided by the server in the heartbeat message, this metadata is provided as an argument.
+        /// </summary>
+        /// <param name="onHeartbeatReceived"></param>
+        /// <returns></returns>
         public StreamingHubClientOptions WithHeartbeatReceived(Action<ReadOnlyMemory<byte>>? onHeartbeatReceived)
             => new(Host, CallOptions, SerializerProvider, Logger, HeartbeatInterval, onHeartbeatReceived);
     }
