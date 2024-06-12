@@ -6,7 +6,7 @@ using MagicOnion.Server.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Testing;
 
-namespace MagicOnion.Server.Tests;
+namespace MagicOnion.Server.Tests.StreamingHubHeartbeat;
 
 public class StreamingHubHeartbeatManagerTest
 {
@@ -182,7 +182,7 @@ public class StreamingHubHeartbeatManagerTest
         var context1 = CreateFakeStreamingServiceContext();
         var context2 = CreateFakeStreamingServiceContext();
         var context3 = CreateFakeStreamingServiceContext();
-        byte[] expectedHeartbeatMessage = [..HeartbeatMessageHeader, .."Hello"u8];
+        byte[] expectedHeartbeatMessage = [.. HeartbeatMessageHeader, .. "Hello"u8];
 
         // Act
         using var handle1 = manager.Register(context1);

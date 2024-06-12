@@ -100,7 +100,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
                     {
                         timer = new PeriodicTimer(heartbeatInterval);
                         MagicOnionServerLog.BeginHeartbeat(this.logger, serviceContext.CallContext.Method);
-                        _ = StartHeartbeatAsync();
+                        _ = StartHeartbeatAsync(timer);
                     }
                 }
             }
@@ -113,12 +113,12 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         return contexts[serviceContext.ContextId];
     }
 
-    async Task StartHeartbeatAsync()
+    async Task StartHeartbeatAsync(PeriodicTimer runningTimer)
     {
-        Debug.Assert(timer != null);
+        Debug.Assert(runningTimer != null);
 
         var writer = new ArrayBufferWriter<byte>();
-        while (await timer.WaitForNextTickAsync())
+        while (await runningTimer.WaitForNextTickAsync())
         {
             StreamingHubMessageWriter.WriteHeartbeatMessageForServerToClientHeader(writer);
             if (!(heartbeatMetadataProvider?.TryWriteMetadata(writer) ?? false))
@@ -129,11 +129,15 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
             var payload = StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan);
 
             MagicOnionServerLog.SendHeartbeat(this.logger);
-            foreach (var (contextId, handle) in contexts)
+            try
             {
-                handle.RestartTimeoutTimer();
-                handle.ServiceContext.QueueResponseStreamWrite(payload);
+                foreach (var (contextId, handle) in contexts)
+                {
+                    handle.RestartTimeoutTimer();
+                    handle.ServiceContext.QueueResponseStreamWrite(payload);
+                }
             }
+            catch { /* Ignore */ }
 
             writer.Clear();
         }
