@@ -91,17 +91,13 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         var handle = new StreamingHubHeartbeatHandle(this, serviceContext, timeoutDuration);
         if (contexts.TryAdd(serviceContext.ContextId, handle))
         {
-            var timerTmp = Volatile.Read(ref timer);
             if (Interlocked.Increment(ref registeredCount) == 1)
             {
                 lock (timerGate)
                 {
-                    if (timerTmp is null && Volatile.Read(ref timer) is null)
-                    {
-                        timer = new PeriodicTimer(heartbeatInterval);
-                        MagicOnionServerLog.BeginHeartbeat(this.logger, serviceContext.CallContext.Method);
-                        _ = StartHeartbeatAsync(timer);
-                    }
+                    timer = new PeriodicTimer(heartbeatInterval);
+                    MagicOnionServerLog.BeginHeartbeatTimer(this.logger, serviceContext.CallContext.Method, heartbeatInterval, timeoutDuration);
+                    _ = StartHeartbeatAsync(timer, serviceContext.CallContext.Method);
                 }
             }
 
@@ -113,7 +109,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
         return contexts[serviceContext.ContextId];
     }
 
-    async Task StartHeartbeatAsync(PeriodicTimer runningTimer)
+    async Task StartHeartbeatAsync(PeriodicTimer runningTimer, string method)
     {
         Debug.Assert(runningTimer != null);
 
@@ -128,7 +124,7 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
 
             var payload = StreamingHubPayloadPool.Shared.RentOrCreate(writer.WrittenSpan);
 
-            MagicOnionServerLog.SendHeartbeat(this.logger);
+            MagicOnionServerLog.SendHeartbeat(this.logger, method);
             try
             {
                 foreach (var (contextId, handle) in contexts)
@@ -147,14 +143,13 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
     {
         if (contexts.TryRemove(serviceContext.ContextId, out _))
         {
-            var timerTmp = Volatile.Read(ref timer);
             if (Interlocked.Decrement(ref registeredCount) == 0)
             {
                 lock (timerGate)
                 {
-                    if (timer is not null && Volatile.Read(ref timer) == timerTmp)
+                    if (Volatile.Read(ref registeredCount) == 0 && timer is not null)
                     {
-                        MagicOnionServerLog.ShutdownHeartbeat(this.logger, serviceContext.CallContext.Method);
+                        MagicOnionServerLog.ShutdownHeartbeatTimer(this.logger, serviceContext.CallContext.Method);
                         timer.Dispose();
                         timer = null;
                     }
