@@ -95,9 +95,12 @@ internal class StreamingHubHeartbeatManager : IStreamingHubHeartbeatManager
             {
                 lock (timerGate)
                 {
-                    timer = new PeriodicTimer(heartbeatInterval);
-                    MagicOnionServerLog.BeginHeartbeatTimer(this.logger, serviceContext.CallContext.Method, heartbeatInterval, timeoutDuration);
-                    _ = StartHeartbeatAsync(timer, serviceContext.CallContext.Method);
+                    if (timer is null)
+                    {
+                        timer = new PeriodicTimer(heartbeatInterval);
+                        MagicOnionServerLog.BeginHeartbeatTimer(this.logger, serviceContext.CallContext.Method, heartbeatInterval, timeoutDuration);
+                        _ = StartHeartbeatAsync(timer, serviceContext.CallContext.Method);
+                    }
                 }
             }
 
