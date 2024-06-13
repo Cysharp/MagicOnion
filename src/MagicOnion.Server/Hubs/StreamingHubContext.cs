@@ -85,6 +85,7 @@ public class StreamingHubContext
         Timestamp = default!;
         MessageId = default!;
         MethodId = default!;
+        ResponseSize = -1;
         items?.Clear();
     }
 
