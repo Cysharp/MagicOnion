@@ -32,6 +32,11 @@ namespace MagicOnion.Internal
             };
         }
 
+        public (int MethodId, int Cosumed) ReadBroadcastMessageMethodId()
+        {
+            return (reader.ReadInt32(), (int)reader.Consumed);
+        }
+
         public (int MethodId, ReadOnlyMemory<byte> Body) ReadBroadcastMessage()
         {
             var methodId = reader.ReadInt32();
