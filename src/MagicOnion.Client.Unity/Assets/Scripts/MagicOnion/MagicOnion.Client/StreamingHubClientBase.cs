@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using Grpc.Core;
 using MagicOnion.Client.Internal.Threading;
 using MagicOnion.Client.Internal.Threading.Tasks;
@@ -79,10 +82,9 @@ namespace MagicOnion.Client
         readonly StreamingHubClientOptions options;
         readonly IMagicOnionClientLogger logger;
         readonly IMagicOnionSerializer messageSerializer;
-        readonly AsyncLock asyncLock = new();
         readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
-        readonly Dictionary<int, ITaskCompletion> responseFutures = new();
+        readonly ConcurrentDictionary<int, ITaskCompletion> responseFutures = new();
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -92,6 +94,8 @@ namespace MagicOnion.Client
         Task? heartbeatTask;
         DateTimeOffset lastHeartbeatSentAt;
 
+        readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = false });
+        Task? writerTask;
         IClientStreamWriter<StreamingHubPayload> writer = default!;
         IAsyncStreamReader<StreamingHubPayload> reader = default!;
 
@@ -184,6 +188,8 @@ namespace MagicOnion.Client
             {
                 heartbeatTask = RunHeartbeatLoopAsync(heartbeatInterval, cancellationTokenSource.Token);
             }
+
+            writerTask = RunWriterLoopAsync(cancellationTokenSource.Token);
 
             var reader = this.reader;
             try
@@ -283,22 +289,18 @@ namespace MagicOnion.Client
                 case StreamingHubMessageType.Response:
                     {
                         var message = messageReader.ReadResponseMessage();
-                        lock (responseFutures)
+                        if (responseFutures.Remove(message.MessageId, out var future))
                         {
-                            if (responseFutures.TryGetValue(message.MessageId, out var future))
+                            try
                             {
-                                responseFutures.Remove(message.MessageId);
-                                try
+                                OnResponseEvent(message.MethodId, future, message.Body);
+                                StreamingHubPayloadPool.Shared.Return(payload);
+                            }
+                            catch (Exception ex)
+                            {
+                                if (!future.TrySetException(ex))
                                 {
-                                    OnResponseEvent(message.MethodId, future, message.Body);
-                                    StreamingHubPayloadPool.Shared.Return(payload);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (!future.TrySetException(ex))
-                                    {
-                                        throw;
-                                    }
+                                    throw;
                                 }
                             }
                         }
@@ -307,24 +309,19 @@ namespace MagicOnion.Client
                 case StreamingHubMessageType.ResponseWithError:
                     {
                         var message = messageReader.ReadResponseWithErrorMessage();
-                        lock (responseFutures)
+                        if (responseFutures.Remove(message.MessageId, out var future))
                         {
-                            if (responseFutures.TryGetValue(message.MessageId, out var future))
+                            RpcException ex;
+                            if (string.IsNullOrWhiteSpace(message.Error))
                             {
-                                responseFutures.Remove(message.MessageId);
-
-                                RpcException ex;
-                                if (string.IsNullOrWhiteSpace(message.Error))
-                                {
-                                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
-                                }
-                                else
-                                {
-                                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
-                                }
-
-                                future.TrySetException(ex);
+                                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
                             }
+                            else
+                            {
+                                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
+                            }
+
+                            future.TrySetException(ex);
                         }
                     }
                     break;
@@ -370,7 +367,7 @@ namespace MagicOnion.Client
                                 StreamingHubPayloadPool.Shared.Return(payload);
                             }
                         }
-                        _ = WriteHeartbeatAsync();
+                        WriteHeartbeat();
                     }
                     break;
             }
@@ -385,39 +382,45 @@ namespace MagicOnion.Client
 
                 if ((DateTimeOffset.UtcNow - lastHeartbeatSentAt) > heartbeatInterval)
                 {
-                    await WriteHeartbeatAsync().ConfigureAwait(false);
+                    WriteHeartbeat();
                 }
             }
         }
 
-        async Task WriteHeartbeatAsync()
+        async Task RunWriterLoopAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (await writerQueue.Reader.WaitToReadAsync(default).ConfigureAwait(false))
+                {
+                    while (writerQueue.Reader.TryRead(out var payload))
+                    {
+                        await writer.WriteAsync(payload).ConfigureAwait(false);
+                    }
+                }
+            }
+        }
+
+        void WriteHeartbeat()
         {
             if (disposed) return;
             var v = BuildHeartbeatMessage();
-
-            using (await asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await writer.WriteAsync(v).ConfigureAwait(false);
-            }
+            _ = writerQueue.Writer.TryWrite(v);
 
             lastHeartbeatSentAt = DateTimeOffset.UtcNow;
         }
 
-        protected async Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
+        protected Task<TResponse> WriteMessageFireAndForgetAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
 
             var v = BuildRequestMessage(methodId, message);
+            _ = writerQueue.Writer.TryWrite(v);
 
-            using (await asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await writer.WriteAsync(v).ConfigureAwait(false);
-            }
-
-            return default!;
+            return Task.FromResult<TResponse>(default!);
         }
 
-        protected async Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
+        protected Task<TResponse> WriteMessageWithResponseAsync<TRequest, TResponse>(int methodId, TRequest message)
         {
             ThrowIfDisposed();
 
@@ -433,13 +436,9 @@ namespace MagicOnion.Client
             responseFutures[mid] = tcs;
 
             var v = BuildRequestMessage(methodId, mid, message);
+            _ = writerQueue.Writer.TryWrite(v);
 
-            using (await asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await writer.WriteAsync(v).ConfigureAwait(false);
-            }
-
-            return await tcs.Task.ConfigureAwait(false); // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
+            return tcs.Task; // wait until server return response(or error). if connection was closed, throws cancellation from DisposeAsyncCore.
 
         }
 
@@ -487,26 +486,23 @@ namespace MagicOnion.Client
             }
         }
 
-        protected async Task WriteClientResultResponseMessageAsync<T>(int methodId, Guid clientResultMessageId, T result)
+        protected Task WriteClientResultResponseMessageAsync<T>(int methodId, Guid clientResultMessageId, T result)
         {
             var v = BuildClientResultResponseMessage(methodId, clientResultMessageId, result);
-            using (await asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await writer.WriteAsync(v).ConfigureAwait(false);
-            }
+            _ = writerQueue.Writer.TryWrite(v);
+            return Task.CompletedTask;
         }
 
-        protected async Task WriteClientResultResponseMessageForErrorAsync(int methodId, Guid clientResultMessageId, Exception ex)
+        protected Task WriteClientResultResponseMessageForErrorAsync(int methodId, Guid clientResultMessageId, Exception ex)
         {
             var statusCode = ex is RpcException rpcException
                 ? rpcException.StatusCode
                 : StatusCode.Internal;
 
             var v = BuildClientResultResponseMessageForError(methodId, clientResultMessageId, (int)statusCode, ex.Message, ex);
-            using (await asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await writer.WriteAsync(v).ConfigureAwait(false);
-            }
+            _ = writerQueue.Writer.TryWrite(v);
+
+            return Task.CompletedTask;
         }
 
         void ThrowIfDisposed()
@@ -536,6 +532,7 @@ namespace MagicOnion.Client
 
             try
             {
+                writerQueue.Writer.Complete();
                 await writer.CompleteAsync().ConfigureAwait(false);
             }
             catch { } // ignore error?
