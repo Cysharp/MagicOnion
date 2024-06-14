@@ -88,6 +88,9 @@ namespace MagicOnion.Client
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
 
+        readonly Dictionary<int, SendOrPostCallback> postCallbackCache = new();
+        SendOrPostCallback? heartbeatCallbackCache;
+
         int messageIdSequence = 0;
         bool disposed;
 
@@ -266,112 +269,138 @@ namespace MagicOnion.Client
             switch (messageReader.ReadMessageType())
             {
                 case StreamingHubMessageType.Broadcast:
-                    {
-                        var message = messageReader.ReadBroadcastMessage();
-                        if (syncContext != null)
-                        {
-                            var tuple = Tuple.Create(this, message.MethodId, payload, message.Body);
-                            syncContext.Post(static state =>
-                            {
-                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, StreamingHubPayload, ReadOnlyMemory<byte>>)state!;
-                                t.Item1.OnBroadcastEvent(t.Item2, t.Item4);
-                                StreamingHubPayloadPool.Shared.Return(t.Item3);
-                            }, tuple);
-                        }
-                        else
-                        {
-                            OnBroadcastEvent(message.MethodId, message.Body);
-                            StreamingHubPayloadPool.Shared.Return(payload);
-                        }
-
-                    }
+                    ProcessBroadcast(syncContext, payload, ref messageReader);
                     break;
                 case StreamingHubMessageType.Response:
-                    {
-                        var message = messageReader.ReadResponseMessage();
-                        if (responseFutures.Remove(message.MessageId, out var future))
-                        {
-                            try
-                            {
-                                OnResponseEvent(message.MethodId, future, message.Body);
-                                StreamingHubPayloadPool.Shared.Return(payload);
-                            }
-                            catch (Exception ex)
-                            {
-                                if (!future.TrySetException(ex))
-                                {
-                                    throw;
-                                }
-                            }
-                        }
-                    }
+                    ProcessResponse(syncContext, payload, ref messageReader);
                     break;
                 case StreamingHubMessageType.ResponseWithError:
-                    {
-                        var message = messageReader.ReadResponseWithErrorMessage();
-                        if (responseFutures.Remove(message.MessageId, out var future))
-                        {
-                            RpcException ex;
-                            if (string.IsNullOrWhiteSpace(message.Error))
-                            {
-                                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
-                            }
-                            else
-                            {
-                                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
-                            }
-
-                            future.TrySetException(ex);
-                        }
-                    }
+                    ProcessResponseWithError(syncContext, payload, ref messageReader);
                     break;
                 case StreamingHubMessageType.ClientResultRequest:
-                    {
-                        var message = messageReader.ReadClientResultRequestMessage();
-
-                        if (syncContext != null)
-                        {
-                            var tuple = Tuple.Create(this, message.MethodId, message.ClientResultRequestMessageId, message.Body, payload);
-                            syncContext.Post(static state =>
-                            {
-                                var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, Guid, ReadOnlyMemory<byte>, StreamingHubPayload>)state!;
-                                t.Item1.OnClientResultEvent(t.Item2, t.Item3, t.Item4);
-                                StreamingHubPayloadPool.Shared.Return(t.Item5);
-                            }, tuple);
-                        }
-                        else
-                        {
-                            OnClientResultEvent(message.MethodId, message.ClientResultRequestMessageId, message.Body);
-                            StreamingHubPayloadPool.Shared.Return(payload);
-                        }
-                    }
+                    ProcessClientResultRequest(syncContext, payload, ref messageReader);
                     break;
                 case StreamingHubMessageType.Heartbeat:
-                    {
-                        var metadata = messageReader.ReadHeartbeat();
-                        if (this.options.HeartbeatReceivedFromServer is { } heartbeatReceived)
-                        {
-                            if (syncContext != null)
-                            {
-                                var tuple = Tuple.Create(heartbeatReceived, metadata, payload);
-                                syncContext.Post(static state =>
-                                {
-                                    var t = (Tuple<Action<ReadOnlyMemory<byte>>, ReadOnlyMemory<byte>, StreamingHubPayload>)state!;
-                                    t.Item1(t.Item2);
-                                    StreamingHubPayloadPool.Shared.Return(t.Item3);
-                                }, tuple);
-                            }
-                            else
-                            {
-                                heartbeatReceived(metadata);
-                                StreamingHubPayloadPool.Shared.Return(payload);
-                            }
-                        }
-                        WriteHeartbeat();
-                    }
+                    ProcessHeartbeat(syncContext, payload, ref messageReader);
                     break;
             }
         }
+
+        void ProcessBroadcast(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
+        {
+            if (syncContext is null)
+            {
+                var message = messageReader.ReadBroadcastMessage();
+                OnBroadcastEvent(message.MethodId, message.Body);
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
+            else
+            {
+                var (methodId, consumed) = messageReader.ReadBroadcastMessageMethodId();
+                if (!postCallbackCache.TryGetValue(methodId, out var postCallback))
+                {
+                    // Create and cache a callback delegate capturing `this` and the header size.
+                    postCallback = postCallbackCache[methodId] = CreateBroadcastCallback(methodId, consumed);
+                }
+                syncContext.Post(postCallback, payload);
+            }
+        }
+
+        SendOrPostCallback CreateBroadcastCallback(int methodId, int consumed)
+        {
+            return (state) =>
+            {
+                var p = (StreamingHubPayload)state!;
+                this.OnBroadcastEvent(methodId, p.Memory.Slice(consumed));
+                StreamingHubPayloadPool.Shared.Return(p);
+            };
+        }
+
+        void ProcessResponse(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
+        {
+            var message = messageReader.ReadResponseMessage();
+            if (responseFutures.Remove(message.MessageId, out var future))
+            {
+                try
+                {
+                    OnResponseEvent(message.MethodId, future, message.Body);
+                    StreamingHubPayloadPool.Shared.Return(payload);
+                }
+                catch (Exception ex)
+                {
+                    if (!future.TrySetException(ex))
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        void ProcessResponseWithError(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
+        {
+            var message = messageReader.ReadResponseWithErrorMessage();
+            if (responseFutures.Remove(message.MessageId, out var future))
+            {
+                RpcException ex;
+                if (string.IsNullOrWhiteSpace(message.Error))
+                {
+                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
+                }
+                else
+                {
+                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
+                }
+
+                future.TrySetException(ex);
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
+        }
+
+        void ProcessClientResultRequest(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
+        {
+            var message = messageReader.ReadClientResultRequestMessage();
+            if (syncContext is null)
+            {
+                OnClientResultEvent(message.MethodId, message.ClientResultRequestMessageId, message.Body);
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
+            else
+            {
+                var tuple = Tuple.Create(this, message.MethodId, message.ClientResultRequestMessageId, message.Body, payload);
+                syncContext.Post(static state =>
+                {
+                    var t = (Tuple<StreamingHubClientBase<TStreamingHub, TReceiver>, int, Guid, ReadOnlyMemory<byte>, StreamingHubPayload>)state!;
+                    t.Item1.OnClientResultEvent(t.Item2, t.Item3, t.Item4);
+                    StreamingHubPayloadPool.Shared.Return(t.Item5);
+                }, tuple);
+            }
+        }
+
+        void ProcessHeartbeat(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
+        {
+            var metadata = messageReader.ReadHeartbeat();
+            if (this.options.HeartbeatReceivedFromServer is { } heartbeatReceived)
+            {
+                if (syncContext is null)
+                {
+                    heartbeatReceived(metadata);
+                    StreamingHubPayloadPool.Shared.Return(payload);
+                }
+                else
+                {
+                    heartbeatCallbackCache ??= CreateHeartbeatCallback(heartbeatReceived);
+                    syncContext.Post(heartbeatCallbackCache, payload);
+                }
+            }
+            WriteHeartbeat();
+        }
+
+        SendOrPostCallback CreateHeartbeatCallback(Action<ReadOnlyMemory<byte>> heartbeatReceivedAction) => (state) =>
+        {
+            var p = (StreamingHubPayload)state!;
+            heartbeatReceivedAction(p.Memory.Slice(5));
+            StreamingHubPayloadPool.Shared.Return(p);
+        };
 
         async Task RunHeartbeatLoopAsync(TimeSpan heartbeatInterval, CancellationToken cancellationToken)
         {
