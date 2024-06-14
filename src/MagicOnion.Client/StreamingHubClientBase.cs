@@ -94,7 +94,7 @@ namespace MagicOnion.Client
         Task? heartbeatTask;
         DateTimeOffset lastHeartbeatSentAt;
 
-        readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = true });
+        readonly Channel<StreamingHubPayload> writerQueue = Channel.CreateUnbounded<StreamingHubPayload>(new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = false });
         Task? writerTask;
         IClientStreamWriter<StreamingHubPayload> writer = default!;
         IAsyncStreamReader<StreamingHubPayload> reader = default!;
