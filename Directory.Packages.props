@@ -12,6 +12,7 @@
     <MulticasterVersion>0.1.9</MulticasterVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageVersion Include="Grpc" Version="$(GrpcCCoreVersion)" />
     <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Server" Version="$(GrpcVersion)" />
@@ -25,6 +26,7 @@
     <PackageVersion Include="Multicaster.Distributed.Redis" Version="$(MulticasterVersion)" />
     <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+    <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageVersion Include="PolySharp" Version="1.13.2" />
