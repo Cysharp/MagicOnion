@@ -2,7 +2,8 @@ using BenchmarkDotNet.Running;
 using MagicOnion;
 using Microbenchmark.Client;
 
-BenchmarkRunner.Run<HubReceiverBroadcastBenchmarks>();
+//BenchmarkRunner.Run<HubReceiverBroadcastBenchmarks>();
+//BenchmarkRunner.Run<HubMethodBenchmarks>();
 
 class MySynchronizationContext : SynchronizationContext;
 
