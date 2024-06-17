@@ -2,9 +2,7 @@ using System.Diagnostics;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Client.DynamicClient;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicOnion.Integration.Tests;
 
@@ -485,29 +483,187 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
         ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
     }
 
-    [Fact]
-    public async Task Throw_WithServerStackTrace()
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Concurrency(TestStreamingHubClientFactory clientFactory)
     {
         // Arrange
-        var factory = this.factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.Configure<MagicOnionOptions>(options => options.IsReturnExceptionStackTraceInErrorDetail = true)));
-        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = factory.CreateDefaultClient() });
-        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
-        var client = await StreamingHubClient.ConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var cts = new CancellationTokenSource();
+        var tasks = Enumerable.Range(0, 10).Select(async x =>
+        {
+            var httpClient = factory.CreateDefaultClient();
+            var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+            var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+            var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+            await tcs.Task;
+
+            var semaphore = new SemaphoreSlim(0);
+            var results = new List<(int Index, (int Arg0, string Arg1, bool Arg2) Request, (int Arg0, string Arg1, bool Arg2) Response)>();
+            var receiverResults = new List<(int Arg0, string Arg1, bool Arg2)>();
+            receiver.When(x => x.Receiver_Concurrent(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<bool>()))
+                .Do(x =>
+                {
+                    receiverResults.Add((x.ArgAt<int>(0), x.ArgAt<string>(1), x.ArgAt<bool>(2)));
+                    semaphore.Release();
+                });
+
+            var count = 0;
+            while (!cts.IsCancellationRequested)
+            {
+                var response = await client.Concurrent((x * 100) + count, $"Task{x}-{count}", x % 2 == 0);
+                results.Add((Index: count, Request: ((x * 100) + count, $"Task{x}-{count}", x % 2 == 0), Response: response));
+                await semaphore.WaitAsync();
+
+                count++;
+            }
+
+            await Task.Delay(1000);
+
+            return (Sequence: x, Results: results, ReceiverResults: receiverResults);
+        });
 
         // Act
-        var ex = (RpcException?)await Record.ExceptionAsync(async () => await client.Throw());
+        tcs.TrySetResult();
+        cts.CancelAfter(TimeSpan.FromSeconds(5));
+        var allResults = await Task.WhenAll(tasks);
 
         // Assert
-        ex.Should().NotBeNull();
-        ex!.StatusCode.Should().Be(StatusCode.Internal);
-        ex.Message.Should().Contain("Something went wrong.");
-        ex.Status.Detail.Should().StartWith("An error occurred while processing handler");
+        Assert.All(allResults, x =>
+        {
+            Assert.Equal(x.Results.Count, x.ReceiverResults.Count);
+            Assert.All(x.Results, y => Assert.Equal((y.Request.Arg0 * 100, y.Request.Arg1 + "-Result", !y.Request.Arg2), y.Response));
+            for (var i = 0; i < x.ReceiverResults.Count; i++)
+            {
+                var request = x.Results[i];
+                Assert.Equal((request.Request.Arg0 * 10, request.Request.Arg1 + "-Receiver", !request.Request.Arg2), x.ReceiverResults[i]);
+            }
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_Zero(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_Zero();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_Zero();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_One(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_One(12345);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_One(12345);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Void_Parameter_Many(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        client.Void_Parameter_Many(12345, "Hello✨", true);
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_Test_Void_Parameter_Many(12345, "Hello✨", true);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task Process_Requests_Sequentially(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        var task1 = client.Delay(1, TimeSpan.FromSeconds(1.5));
+        var task2 = client.Delay(2, TimeSpan.FromSeconds(1));
+        var task3 = client.Delay(3, TimeSpan.FromSeconds(0.5));
+
+        // Assert
+        Assert.Equal(1, await task1);
+        Assert.False(task2.IsCompleted);
+        Assert.False(task3.IsCompleted);
+
+        Assert.Equal(2, await task2);
+        Assert.False(task3.IsCompleted);
+
+        Assert.Equal(3, await task3);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CustomMethodId(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act & Assert
+        await client.CustomMethodId();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CustomMethodId_Receiver(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.CallReceiver_CustomMethodId();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_CustomMethodId();
     }
 }
 
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
 {
-    IGroup group = default!;
+    IGroup<IStreamingHubTestHubReceiver> group = default!;
 
     protected override async ValueTask OnConnecting()
     {
@@ -554,19 +710,19 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public Task CallReceiver_Parameter_Zero()
     {
-        Broadcast(group).Receiver_Parameter_Zero();
+        group.All.Receiver_Parameter_Zero();
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_Parameter_One(int arg0)
     {
-        Broadcast(group).Receiver_Parameter_One(12345);
+        group.All.Receiver_Parameter_One(12345);
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_Parameter_Many(int arg0, string arg1, bool arg2)
     {
-        Broadcast(group).Receiver_Parameter_Many(12345, "Hello✨", true);
+        group.All.Receiver_Parameter_Many(12345, "Hello✨", true);
         return Task.CompletedTask;
     }
 
@@ -628,6 +784,25 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         return new ValueTask<int>(new TaskCompletionSource<int>().Task.WaitAsync(TimeSpan.FromMilliseconds(100)));
     }
 
+    public void Void_Parameter_Zero()
+    {
+        group.All.Receiver_Test_Void_Parameter_Zero();
+    }
+
+    public void Void_Parameter_One(int arg0)
+    {
+        Debug.Assert(arg0 == 12345);
+        group.All.Receiver_Test_Void_Parameter_One(arg0);
+    }
+
+    public void Void_Parameter_Many(int arg0, string arg1, bool arg2)
+    {
+        Debug.Assert(arg0 == 12345);
+        Debug.Assert(arg1 == "Hello✨");
+        Debug.Assert(arg2 == true);
+        group.All.Receiver_Test_Void_Parameter_Many(arg0, arg1, arg2);
+    }
+
     public Task<MyStreamingResponse> RefType(MyStreamingRequest request)
     {
         return Task.FromResult(new MyStreamingResponse(request.Argument0 + request.Argument1));
@@ -641,13 +816,13 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
 
     public Task CallReceiver_RefType(MyStreamingRequest request)
     {
-        Broadcast(group).Receiver_RefType(new MyStreamingResponse(request.Argument0 + request.Argument1));
+        group.All.Receiver_RefType(new MyStreamingResponse(request.Argument0 + request.Argument1));
         return Task.CompletedTask;
     }
 
     public Task CallReceiver_RefType_Null()
     {
-        Broadcast(group).Receiver_RefType_Null(default);
+        group.All.Receiver_RefType_Null(default);
         return Task.CompletedTask;
     }
 
@@ -656,9 +831,15 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         _ = Task.Run(async () =>
         {
             await Task.Delay(milliseconds);
-            Broadcast(group).Receiver_Delay();
+            group.All.Receiver_Delay();
         });
 
+        return Task.CompletedTask;
+    }
+
+    public Task CallReceiver_CustomMethodId()
+    {
+        group.All.Receiver_CustomMethodId();
         return Task.CompletedTask;
     }
 
@@ -671,6 +852,24 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
     {
         throw new InvalidOperationException("Something went wrong.");
     }
+
+    public async Task<(int, string, bool)> Concurrent(int arg0, string arg1, bool arg2)
+    {
+        group.All.Receiver_Concurrent(arg0 * 10, arg1 + "-Receiver", !arg2);
+        await Task.Yield();
+        return (arg0 * 100, arg1 + "-Result", !arg2);
+    }
+
+    public async Task<int> Delay(int id, TimeSpan delay)
+    {
+        await Task.Delay(delay);
+        return id;
+    }
+
+    public Task CustomMethodId()
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -681,6 +880,14 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_RefType(MyStreamingResponse request);
     void Receiver_RefType_Null(MyStreamingResponse? request);
     void Receiver_Delay();
+    void Receiver_Concurrent(int arg0, string arg1, bool arg2);
+
+    void Receiver_Test_Void_Parameter_Zero();
+    void Receiver_Test_Void_Parameter_One(int arg0);
+    void Receiver_Test_Void_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    [MethodId(54321)]
+    void Receiver_CustomMethodId();
 }
 
 public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
@@ -711,6 +918,10 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
     ValueTask ValueTask_Never();
     ValueTask<int> ValueTask_Never_With_Return();
 
+    void Void_Parameter_Zero();
+    void Void_Parameter_One(int arg0);
+    void Void_Parameter_Many(int arg0, string arg1, bool arg2);
+
     Task<MyStreamingResponse> RefType(MyStreamingRequest request);
     Task<MyStreamingResponse?> RefType_Null(MyStreamingRequest? request);
     Task CallReceiver_RefType(MyStreamingRequest request);
@@ -718,6 +929,15 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     Task CallReceiver_Delay(int milliseconds);
 
+    Task CallReceiver_CustomMethodId();
+
     Task ThrowReturnStatusException();
     Task Throw();
+
+    Task<(int Arg0, string Arg1, bool Arg2)> Concurrent(int arg0, string arg1, bool arg2);
+
+    Task<int> Delay(int id, TimeSpan delay);
+
+    [MethodId(12345)]
+    Task CustomMethodId();
 }

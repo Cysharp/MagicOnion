@@ -49,6 +49,7 @@ namespace MagicOnion.Client.DynamicClient
     internal
 #endif
         static class DynamicStreamingHubClientBuilder<TStreamingHub, TReceiver>
+            where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
         public static readonly Type ClientType;
         // static readonly Type ClientFireAndForgetType;
@@ -133,9 +134,10 @@ namespace MagicOnion.Client.DynamicClient
                 if (returnTypeNonGenericOrOpenGeneric != typeof(ValueTask) &&
                     returnTypeNonGenericOrOpenGeneric != typeof(Task) &&
                     returnTypeNonGenericOrOpenGeneric != typeof(ValueTask<>) &&
-                    returnTypeNonGenericOrOpenGeneric != typeof(Task<>))
+                    returnTypeNonGenericOrOpenGeneric != typeof(Task<>) &&
+                    returnTypeNonGenericOrOpenGeneric != typeof(void))
                 {
-                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. {item.MethodInfo.Name}.");
+                    throw new Exception($"Invalid definition, TStreamingHub's return type must only be `void`, `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. {item.MethodInfo.Name}.");
                 }
 
                 item.MethodId = methodId;
@@ -148,20 +150,18 @@ namespace MagicOnion.Client.DynamicClient
 
         static FieldInfo DefineConstructor(TypeBuilder typeBuilder, Type interfaceType, Type receiverType, ConstructorInfo fireAndForgetClientCtor)
         {
-            // .ctor(CallInvoker callInvoker, string host, CallOptions option, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger) :base(...)
+            // .ctor(TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options) : base("InterfaceName", receiver, callInvoker, options)
             {
-                var argTypes = new[] { typeof(CallInvoker), typeof(string), typeof(CallOptions), typeof(IMagicOnionSerializerProvider), typeof(IMagicOnionClientLogger) };
+                var argTypes = new[] { receiverType, typeof(CallInvoker), typeof(StreamingHubClientOptions) };
                 var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, argTypes);
                 var il = ctor.GetILGenerator();
 
-                // base(serviceName, callInvoker, host, option, serializerProvider, logger);
+                // base("InterfaceName", receiver, callInvoker, options);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldstr, interfaceType.Name);
-                il.Emit(OpCodes.Ldarg_1);
-                il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Ldarg_3);
-                il.Emit(OpCodes.Ldarg_S, (byte)4);
-                il.Emit(OpCodes.Ldarg_S, (byte)5);
+                il.Emit(OpCodes.Ldarg_1); // receiver
+                il.Emit(OpCodes.Ldarg_2); // callInvoker
+                il.Emit(OpCodes.Ldarg_3); // options
                 il.Emit(OpCodes.Call, typeBuilder.BaseType!
                     .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First());
 
@@ -240,13 +240,14 @@ namespace MagicOnion.Client.DynamicClient
 
             // receiver types borrow from DynamicBroadcastBuilder
             {
-                // protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ArraySegment<byte> data);
+                // protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory<byte> data);
                 {
                     var method = typeBuilder.DefineMethod("OnResponseEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                        null, new[] { typeof(int), typeof(object), typeof(ArraySegment<byte>) });
+                        null, new[] { typeof(int), typeof(object), typeof(ReadOnlyMemory<byte>) });
                     var il = method.GetILGenerator();
 
                     var labels = definitions
+                        .Where(x => x.MethodInfo.ReturnType != typeof(void)) // If the return type if `void`, we always need to treat as fire-and-forget.
                         .Select(x => new { def = x, label = il.DefineLabel() })
                         .ToArray();
 
@@ -264,6 +265,7 @@ namespace MagicOnion.Client.DynamicClient
                     {
                         // SetResultForResponse<T>(taskCompletionSource, data);
                         Type responseType;
+
                         if (item.def.MethodInfo.ReturnType == typeof(Task) || item.def.MethodInfo.ReturnType == typeof(ValueTask))
                         {
                             // Task methods uses TaskCompletionSource<Nil>
@@ -285,13 +287,13 @@ namespace MagicOnion.Client.DynamicClient
                         il.Emit(OpCodes.Ret);
                     }
                 }
-                // protected abstract void OnBroadcastEvent(int methodId, ArraySegment<byte> data);
+                // protected abstract void OnBroadcastEvent(int methodId, ReadOnlyMemory<byte> data);
                 {
                     var methodDefinitions = BroadcasterHelper.SearchDefinitions(receiverType);
                     BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
 
                     var method = typeBuilder.DefineMethod("OnBroadcastEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
-                        typeof(void), new[] { typeof(int), typeof(ArraySegment<byte>) });
+                        typeof(void), new[] { typeof(int), typeof(ReadOnlyMemory<byte>) });
                     var il = method.GetILGenerator();
 
                     var labels = methodDefinitions
@@ -314,7 +316,6 @@ namespace MagicOnion.Client.DynamicClient
                         // var value = Deserialize<DynamicArgumentTuple<int, string>>(data);
                         // receiver.OnMessage(value.Item1, value.Item2);
 
-                        var deserializeMethod = baseType.GetMethod("Deserialize", BindingFlags.Instance | BindingFlags.NonPublic)!;
                         var parameters = item.def.MethodInfo.GetParameters();
                         if (parameters.Length == 0)
                         {
@@ -332,7 +333,7 @@ namespace MagicOnion.Client.DynamicClient
                                 // this.Deserialize<T>(data)
                                 il.Emit(OpCodes.Ldarg_0); // this
                                 il.Emit(OpCodes.Ldarg_2); // data
-                                il.Emit(OpCodes.Call, deserializeMethod.MakeGenericMethod(parameters[0].ParameterType));
+                                il.Emit(OpCodes.Call, MethodInfoCache.StreamingHubClientBase_Deserialize.MakeGenericMethod(parameters[0].ParameterType));
                             }
                             il.Emit(OpCodes.Callvirt, item.def.MethodInfo);
                         }
@@ -346,7 +347,7 @@ namespace MagicOnion.Client.DynamicClient
                             {
                                 il.Emit(OpCodes.Ldarg_0); // this
                                 il.Emit(OpCodes.Ldarg_2); // data
-                                il.Emit(OpCodes.Call, deserializeMethod.MakeGenericMethod(deserializeType));
+                                il.Emit(OpCodes.Call, MethodInfoCache.StreamingHubClientBase_Deserialize.MakeGenericMethod(deserializeType));
                                 il.Emit(OpCodes.Stloc, lc);
                             }
 
@@ -363,6 +364,162 @@ namespace MagicOnion.Client.DynamicClient
                         // return;
                         il.Emit(OpCodes.Ret);
                     }
+                }
+            }
+            // protected abstract void OnClientResultEvent(int methodId, Guid messageId, ReadOnlyMemory<byte> data);
+            {
+                var methodDefinitions = BroadcasterHelper.SearchDefinitions(receiverType);
+                BroadcasterHelper.VerifyMethodDefinitions(methodDefinitions);
+
+                var method = typeBuilder.DefineMethod("OnClientResultEvent", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                    typeof(void), new[] { typeof(int), typeof(Guid), typeof(ReadOnlyMemory<byte>) });
+                {
+                    var il = method.GetILGenerator();
+                    var localEx = il.DeclareLocal(typeof(Exception));
+
+                    var clientResultMethods = methodDefinitions.Where(x => x.IsClientResult)
+                        .Select(x => (Label: il.DefineLabel(), Method: x)).ToArray();
+                    var labelReturn = il.DefineLabel();
+
+                    var localCtDefault = il.DeclareLocal(typeof(CancellationToken));
+                    {
+                        // var ctDefault = default(CancellationToken);
+                        il.Emit(OpCodes.Ldloca_S, localCtDefault!);
+                        il.Emit(OpCodes.Initobj, typeof(CancellationToken));
+                    }
+
+
+                    // try {
+                    il.BeginExceptionBlock();
+                    foreach (var (labelMethodBlock, methodClientResult) in clientResultMethods)
+                    {
+                        // if (methodId == ...) goto label;
+                        il.Emit(OpCodes.Ldarg_1); // methodId
+                        il.Emit(OpCodes.Ldc_I4, methodClientResult.MethodId);
+                        il.Emit(OpCodes.Beq, labelMethodBlock);
+                    }
+                    //     goto Return;
+                    il.Emit(OpCodes.Leave, labelReturn);
+
+                    foreach (var (labelMethodBlock, methodClientResult) in clientResultMethods)
+                    {
+                        var parameters = methodClientResult.MethodInfo.GetParameters().Where(x => x.ParameterType != typeof(CancellationToken)).ToArray();
+                        var deserializeType = parameters.Length switch
+                        {
+                            0 => typeof(MessagePack.Nil),
+                            1 => parameters[0].ParameterType,
+                            _ => BroadcasterHelper.DynamicArgumentTupleTypes[parameters.Length - 2].MakeGenericType(parameters.Select(x => x.ParameterType).ToArray())
+                        };
+
+                        // Method:
+                        //     {
+                        //         var local_0 = base.Deserialize<TRequest>(data);
+                        //         var task = this.SomeMethod(local0.Item1, local0.Item2);
+                        //         base.AwaitAndWriteClientResultResponseMessage(methodId, messageId, localTask);
+                        //         return;
+                        //     }
+                        //     break;
+
+                        // Method:
+                        il.MarkLabel(labelMethodBlock);
+                        //     var local0 = base.Deserialize<TRequest>(data);
+                        il.Emit(OpCodes.Ldarg_0); // base
+                        il.Emit(OpCodes.Ldarg_3); // data
+                        il.Emit(OpCodes.Call, MethodInfoCache.StreamingHubClientBase_Deserialize.MakeGenericMethod(deserializeType));
+                        var local0 = il.DeclareLocal(deserializeType);
+                        il.Emit(OpCodes.Stloc_S, local0);
+
+                        //     var task = receiver.SomeMethod(local0.Item1, local0.Item2);
+                        il.Emit(OpCodes.Ldarg_0); // receiver
+                        il.Emit(OpCodes.Ldfld, receiverField);
+
+                        if (parameters.Length == 0)
+                        {
+                            foreach (var p in methodClientResult.MethodInfo.GetParameters())
+                            {
+                                // default(CancellationToken)
+                                il.Emit(OpCodes.Ldloca_S, localCtDefault!);
+                                il.Emit(OpCodes.Initobj, typeof(CancellationToken));
+                                il.Emit(OpCodes.Ldloc_S, localCtDefault!);
+                            }
+                        }
+                        else if (parameters.Length == 1)
+                        {
+                            foreach (var p in methodClientResult.MethodInfo.GetParameters())
+                            {
+                                if (p.ParameterType == typeof(CancellationToken))
+                                {
+                                    // default(CancellationToken)
+                                    il.Emit(OpCodes.Ldloca_S, localCtDefault!);
+                                    il.Emit(OpCodes.Initobj, typeof(CancellationToken));
+                                    il.Emit(OpCodes.Ldloc_S, localCtDefault!);
+                                }
+                                else if (p == parameters[0])
+                                {
+                                    // local0
+                                    il.Emit(OpCodes.Ldloc_S, local0);
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var itemIndex = 1;
+                            foreach (var p in methodClientResult.MethodInfo.GetParameters())
+                            {
+                                if (p.ParameterType == typeof(CancellationToken))
+                                {
+                                    // default(CancellationToken)
+                                    il.Emit(OpCodes.Ldloca_S, localCtDefault!);
+                                    il.Emit(OpCodes.Initobj, typeof(CancellationToken));
+                                    il.Emit(OpCodes.Ldloc_S, localCtDefault!);
+                                }
+                                else
+                                {
+                                    // local0.ItemX
+                                    il.Emit(OpCodes.Ldloc_S, local0);
+                                    il.Emit(OpCodes.Ldfld, deserializeType.GetField($"Item{itemIndex}")!);
+                                    itemIndex++;
+                                }
+                            }
+                        }
+                        il.Emit(OpCodes.Callvirt, methodClientResult.MethodInfo);
+
+                        //     var localTask = task;
+                        var localTask = il.DeclareLocal(methodClientResult.MethodInfo.ReturnType);
+                        il.Emit(OpCodes.Stloc_S, localTask);
+
+                        //     base.AwaitAndWriteClientResultResponseMessage(methodId, messageId, localTask);
+                        il.Emit(OpCodes.Ldarg_0); // base
+                        il.Emit(OpCodes.Ldarg_1); // methodId
+                        il.Emit(OpCodes.Ldarg_2); // messageId
+                        il.Emit(OpCodes.Ldloc_S, localTask);
+                        il.Emit(OpCodes.Call, MethodInfoCache.GetStreamingHubClientBase_AwaitAndWriteClientResultResponseMessage(methodClientResult.MethodInfo.ReturnType));
+
+                        il.Emit(OpCodes.Leave, labelReturn);
+                    }
+                    // } catch (Exception ex) {
+                    il.BeginCatchBlock(typeof(Exception));
+                    il.Emit(OpCodes.Stloc_S, localEx);
+                    {
+                        // base.WriteClientResultResponseMessageForError(methodId, messageId, ex);
+                        il.Emit(OpCodes.Ldarg_0); // base
+                        il.Emit(OpCodes.Ldarg_1); // methodId
+                        il.Emit(OpCodes.Ldarg_2); // messageId
+                        il.Emit(OpCodes.Ldloc_S, localEx); // ex
+                        il.Emit(OpCodes.Call, MethodInfoCache.StreamingHubClientBase_WriteClientResultResponseMessageForError);
+                        il.Emit(OpCodes.Leave, labelReturn);
+                    }
+                    il.EndExceptionBlock();
+                    // }
+
+                    // Return:
+                    // return;
+                    il.MarkLabel(labelReturn);
+                    il.Emit(OpCodes.Ret);
                 }
             }
 
@@ -413,13 +570,15 @@ namespace MagicOnion.Client.DynamicClient
 
                 if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
                 {
-                    var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
-                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, typeof(Nil)));
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseAsync.MakeGenericMethod(callType, typeof(Nil)));
+                }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageFireAndForgetAsync.MakeGenericMethod(callType, typeof(Nil)));
                 }
                 else
                 {
-                    var mInfo = baseType.GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
-                    il.Emit(OpCodes.Callvirt, mInfo.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
+                    il.Emit(OpCodes.Callvirt, MethodInfoCache.StreamingHubClientBase_WriteMessageWithResponseAsync.MakeGenericMethod(callType, def.MethodInfo.ReturnType.GetGenericArguments()[0]));
                 }
 
                 // If the return type is `ValueTask`, the task must be wrapped as ValueTask.
@@ -431,6 +590,10 @@ namespace MagicOnion.Client.DynamicClient
                 {
                     var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                     il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
+                }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Pop);
                 }
 
                 il.Emit(OpCodes.Ret);
@@ -515,7 +678,7 @@ namespace MagicOnion.Client.DynamicClient
                 }
 
                 Type responseType;
-                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask))
+                if (def.MethodInfo.ReturnType == typeof(Task) || def.MethodInfo.ReturnType == typeof(ValueTask) || def.MethodInfo.ReturnType == typeof(void))
                 {
                     responseType = typeof(Nil);
                 }
@@ -538,11 +701,58 @@ namespace MagicOnion.Client.DynamicClient
                     var returnTypeOfT = def.MethodInfo.ReturnType.GetGenericArguments()[0];
                     il.Emit(OpCodes.Newobj, typeof(ValueTask<>).MakeGenericType(returnTypeOfT).GetConstructor(new [] { typeof(Task<>).MakeGenericType(returnTypeOfT) })!);
                 }
+                else if (def.MethodInfo.ReturnType == typeof(void))
+                {
+                    il.Emit(OpCodes.Pop);
+                }
 
                 il.Emit(OpCodes.Ret);
             }
         }
 
+        static class MethodInfoCache
+        {
+            // ReSharper disable StaticMemberInGenericType
+            // ReSharper disable InconsistentNaming
+#pragma warning disable IDE1006 // Naming Styles
+            public static readonly MethodInfo StreamingHubClientBase_Deserialize
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("Deserialize", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+            static readonly MethodInfo StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_Task;
+            static readonly MethodInfo StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_TaskOfT;
+            static readonly MethodInfo StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTask;
+            static readonly MethodInfo StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTaskOfT;
+
+            public static MethodInfo GetStreamingHubClientBase_AwaitAndWriteClientResultResponseMessage(Type t)
+                => t == typeof(Task) ? StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_Task
+                    : t == typeof(ValueTask) ? StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTask
+                    : t.GetGenericTypeDefinition() == typeof(Task<>) ? StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_TaskOfT.MakeGenericMethod(t.GetGenericArguments())
+                    : t.GetGenericTypeDefinition() == typeof(ValueTask<>) ? StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTaskOfT.MakeGenericMethod(t.GetGenericArguments())
+                    : throw new InvalidOperationException();
+
+            public static readonly MethodInfo StreamingHubClientBase_WriteClientResultResponseMessageForError
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteClientResultResponseMessageForError", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageWithResponseAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageWithResponseAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            public static readonly MethodInfo StreamingHubClientBase_WriteMessageFireAndForgetAsync
+                = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>).GetMethod("WriteMessageFireAndForgetAsync", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
+            // ReSharper restore StaticMemberInGenericType
+            // ReSharper restore InconsistentNaming
+#pragma warning restore IDE1006 // Naming Styles
+
+            static MethodInfoCache()
+            {
+                var methodsAwaitAndWriteClientResultResponseMessage = typeof(StreamingHubClientBase<TStreamingHub, TReceiver>)
+                    .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Where(x => x.Name == "AwaitAndWriteClientResultResponseMessage")
+                    .ToArray();
+
+                StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_Task = methodsAwaitAndWriteClientResultResponseMessage.Single(x => x.GetParameters()[2].ParameterType == typeof(Task));
+                StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_TaskOfT = methodsAwaitAndWriteClientResultResponseMessage.Single(x => x.GetParameters()[2].ParameterType is { IsGenericType: true } paramType && paramType.GetGenericTypeDefinition() == typeof(Task<>));
+                StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTask = methodsAwaitAndWriteClientResultResponseMessage.Single(x => x.GetParameters()[2].ParameterType == typeof(ValueTask));
+                StreamingHubClientBase_AwaitAndWriteClientResultResponseMessage_ValueTaskOfT = methodsAwaitAndWriteClientResultResponseMessage.Single(x => x.GetParameters()[2].ParameterType is { IsGenericType: true } paramType && paramType.GetGenericTypeDefinition() == typeof(ValueTask<>));
+            }
+        }
 
         class MethodDefinition
         {

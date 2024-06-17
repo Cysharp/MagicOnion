@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using MagicOnion.Client;
 using System.Security.Cryptography;
 using Grpc.Net.Client;
@@ -37,10 +39,15 @@ public static class RandomProvider
 
 public abstract class ServerFixture : IDisposable
 {
-    private Task hostTask;
-    private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+    Task hostTask;
+    readonly CancellationTokenSource cancellationTokenSource = new();
+    readonly TaskCompletionSource serverStartupWaiter = new();
 
     public GrpcChannel DefaultChannel { get; private set; }
+    public Task ServerStarted => serverStartupWaiter.Task;
+
+    public ConcurrentDictionary<string, object> Items { get; } = new();
+    public const string ItemsServiceKey = "ServerFixture.Items";
 
     public ServerFixture()
     {
@@ -49,7 +56,8 @@ public abstract class ServerFixture : IDisposable
 
     protected abstract IEnumerable<Type> GetServiceTypes();
 
-    protected virtual void PrepareServer()
+    [MemberNotNull(nameof(hostTask))]
+    void PrepareServer()
     {
         var port = RandomProvider.ThreadRandom.Next(10000, 30000);
 
@@ -60,6 +68,9 @@ public abstract class ServerFixture : IDisposable
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
+#if DEBUG
+                logging.AddFilter(x => true); // Disable all rules.
+#endif
                 logging.AddDebug();
             })
             .ConfigureWebHostDefaults(webBuilder =>
@@ -78,12 +89,35 @@ public abstract class ServerFixture : IDisposable
             .ConfigureServices(services =>
             {
                 services.AddMagicOnion(GetServiceTypes(), ConfigureMagicOnion);
+                services.AddKeyedSingleton(ItemsServiceKey, Items);
+
+                services.AddKeyedSingleton(HostStartupService.WaiterKey, serverStartupWaiter);
+                services.AddHostedService<HostStartupService>();
             })
             .ConfigureServices(ConfigureServices)
             .Build()
             .RunAsync(cancellationTokenSource.Token);
 
+        if (hostTask.IsFaulted) hostTask.GetAwaiter().GetResult();
+
         DefaultChannel = GrpcChannel.ForAddress($"http://localhost:{port}");
+    }
+
+    class HostStartupService([FromKeyedServices(HostStartupService.WaiterKey)] TaskCompletionSource waiter, IHostApplicationLifetime applicationLifetime) : IHostedService
+    {
+        public const string WaiterKey = $"{nameof(HostStartupService)}.Waiter";
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            applicationLifetime.ApplicationStarted.Register(() => waiter.SetResult());
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            waiter.TrySetCanceled();
+            return Task.CompletedTask;
+        }
     }
 
     protected virtual void ConfigureMagicOnion(MagicOnionOptions options)
@@ -117,15 +151,23 @@ public abstract class ServerFixture : IDisposable
         return MagicOnionClient.Create<T>(DefaultChannel);
     }
 
-    public TStreamingHub CreateStreamingHubClient<TStreamingHub, TReceiver>(TReceiver receiver)
+    public TStreamingHub CreateStreamingHubClient<TStreamingHub, TReceiver>(TReceiver receiver, StreamingHubClientOptions options = default)
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     {
-        return StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(DefaultChannel, receiver).GetAwaiter().GetResult();
+        return CreateStreamingHubClientAsync<TStreamingHub, TReceiver>(receiver, options).GetAwaiter().GetResult();
+    }
+
+    public Task<TStreamingHub> CreateStreamingHubClientAsync<TStreamingHub, TReceiver>(TReceiver receiver, StreamingHubClientOptions options = default)
+        where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
+    {
+        options ??= StreamingHubClientOptions.CreateWithDefault();
+        return StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(DefaultChannel, receiver, options);
     }
 
     public void Dispose()
     {
         try { DefaultChannel.ShutdownAsync().Wait(1000); } catch { }
+        try { DefaultChannel.Dispose(); } catch { }
 
         try { cancellationTokenSource.Cancel(); hostTask.Wait(); } catch { }
     }
@@ -134,22 +176,42 @@ public abstract class ServerFixture : IDisposable
 public class ServerFixture<TServiceOrHub> : ServerFixture
 {
     protected override IEnumerable<Type> GetServiceTypes()
-        => new [] { typeof(TServiceOrHub) };
+        => [typeof(TServiceOrHub)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2> : ServerFixture
 {
     protected override IEnumerable<Type> GetServiceTypes()
-        => new[] { typeof(TServiceOrHub1), typeof(TServiceOrHub2) };
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3> : ServerFixture
 {
     protected override IEnumerable<Type> GetServiceTypes()
-        => new[] { typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3) };
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3)];
 }
 public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4> : ServerFixture
 {
     protected override IEnumerable<Type> GetServiceTypes()
-        => new[] { typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4) };
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4)];
+}
+public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5> : ServerFixture
+{
+    protected override IEnumerable<Type> GetServiceTypes()
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5)];
+}
+public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6> : ServerFixture
+{
+    protected override IEnumerable<Type> GetServiceTypes()
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6)];
+}
+public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6, TServiceOrHub7> : ServerFixture
+{
+    protected override IEnumerable<Type> GetServiceTypes()
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6), typeof(TServiceOrHub7)];
+}
+public class ServerFixture<TServiceOrHub1, TServiceOrHub2, TServiceOrHub3, TServiceOrHub4, TServiceOrHub5, TServiceOrHub6, TServiceOrHub7, TServiceOrHub8> : ServerFixture
+{
+    protected override IEnumerable<Type> GetServiceTypes()
+        => [typeof(TServiceOrHub1), typeof(TServiceOrHub2), typeof(TServiceOrHub3), typeof(TServiceOrHub4), typeof(TServiceOrHub5), typeof(TServiceOrHub6), typeof(TServiceOrHub7), typeof(TServiceOrHub8)];
 }
 
 [CollectionDefinition(nameof(AllAssemblyGrpcServerFixture))]

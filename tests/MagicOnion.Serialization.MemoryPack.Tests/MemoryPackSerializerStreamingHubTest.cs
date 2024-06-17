@@ -233,7 +233,7 @@ public interface IMemoryPackSerializerTestHub : IStreamingHub<IMemoryPackSeriali
 
 public class MemoryPackSerializerTestHub : StreamingHubBase<IMemoryPackSerializerTestHub, IMemoryPackSerializerTestHubReceiver>, IMemoryPackSerializerTestHub
 {
-    IGroup? group;
+    IGroup<IMemoryPackSerializerTestHubReceiver>? group;
 
     protected override async ValueTask OnConnecting()
     {
@@ -249,13 +249,13 @@ public class MemoryPackSerializerTestHub : StreamingHubBase<IMemoryPackSerialize
 
     public Task<int> Callback(int arg0, string arg1)
     {
-        Broadcast(group!).OnMessage(arg0, arg1);
+        group!.All.OnMessage(arg0, arg1);
         return Task.FromResult(123);
     }
 
     public Task<int> CallbackCustomObject(MyRequestResponse arg0)
     {
-        Broadcast(group!).OnMessageCustomObject(new MyRequestResponse() { Item1 = arg0.Item1, Item2 = arg0.Item2 });
+        group!.All.OnMessageCustomObject(new MyRequestResponse() { Item1 = arg0.Item1, Item2 = arg0.Item2 });
         return Task.FromResult(123);
     }
 

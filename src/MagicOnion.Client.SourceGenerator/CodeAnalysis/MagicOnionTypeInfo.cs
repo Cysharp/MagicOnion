@@ -13,6 +13,7 @@ public class MagicOnionTypeInfo : IEquatable<MagicOnionTypeInfo>
         public static MagicOnionTypeInfo System_String { get; } = new MagicOnionTypeInfo("System", "String");
         public static MagicOnionTypeInfo System_Boolean { get; } = new MagicOnionTypeInfo("System", "Boolean", SubType.ValueType);
         public static MagicOnionTypeInfo MessagePack_Nil { get; } = new MagicOnionTypeInfo("MessagePack", "Nil", SubType.ValueType);
+        public static MagicOnionTypeInfo System_Threading_CancellationToken { get; } = new MagicOnionTypeInfo("System.Threading", "CancellationToken", SubType.ValueType);
         public static MagicOnionTypeInfo System_Threading_Tasks_Task { get; } = new MagicOnionTypeInfo("System.Threading.Tasks", "Task");
         public static MagicOnionTypeInfo System_Threading_Tasks_ValueTask { get; } = new MagicOnionTypeInfo("System.Threading.Tasks", "ValueTask", SubType.ValueType);
         public static MagicOnionTypeInfo MagicOnion_UnaryResult { get; } = new MagicOnionTypeInfo("MagicOnion", "UnaryResult", SubType.ValueType);

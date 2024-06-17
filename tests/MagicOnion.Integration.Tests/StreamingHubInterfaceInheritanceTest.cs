@@ -45,7 +45,7 @@ public class StreamingHubInterfaceInheritanceTest : IClassFixture<MagicOnionAppl
 
 public class StreamingHubInheritanceTestHub : StreamingHubBase<IStreamingHubInheritanceTestHub, IStreamingHubInheritanceTestHubReceiver>, IStreamingHubInheritanceTestHub
 {
-    IGroup group = default!;
+    IGroup<IStreamingHubInheritanceTestHubReceiver> group = default!;
 
     protected override async ValueTask OnConnecting()
     {
@@ -54,19 +54,19 @@ public class StreamingHubInheritanceTestHub : StreamingHubBase<IStreamingHubInhe
 
     public Task MethodA()
     {
-        Broadcast(group).Receiver_MethodA();
+        group.All.Receiver_MethodA();
         return Task.CompletedTask;
     }
 
     public Task MethodB()
     {
-        Broadcast(group).Receiver_MethodB();
+        group.All.Receiver_MethodB();
         return Task.CompletedTask;
     }
 
     public Task MethodC()
     {
-        Broadcast(group).Receiver_MethodC();
+        group.All.Receiver_MethodC();
         return Task.CompletedTask;
     }
 }

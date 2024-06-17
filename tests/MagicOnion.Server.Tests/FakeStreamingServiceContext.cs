@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Grpc.Core;
 using MagicOnion.Serialization;
+using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
@@ -10,13 +11,13 @@ class FakeStreamingServiceContext<TRequest, TResponse> : IStreamingServiceContex
     public bool IsStreamingHubCompleted { get; private set; }
     public List<TResponse> Responses { get; } = new List<TResponse>();
 
-    public Guid ContextId => Guid.Empty;
+    public Guid ContextId { get; } = Guid.NewGuid();
     public DateTime Timestamp => DateTime.UnixEpoch;
     public Type ServiceType { get; }
     public MethodInfo MethodInfo { get; }
     public ILookup<Type, Attribute> AttributeLookup { get; }
     public MethodType MethodType => MethodType.DuplexStreaming;
-    public ServerCallContext CallContext => throw new NotImplementedException();
+    public ServerCallContext CallContext { get; }
     public IMagicOnionSerializer MessageSerializer { get; }
     public IServiceProvider ServiceProvider { get; }
     public ConcurrentDictionary<string, object> Items { get; } = new ConcurrentDictionary<string, object>();
@@ -30,6 +31,10 @@ class FakeStreamingServiceContext<TRequest, TResponse> : IStreamingServiceContex
         ServiceProvider = serviceProvider;
 
         AttributeLookup = attributeLookup ?? (new (Type, Attribute)[0]).ToLookup(k => k.Item1, v => v.Item2);
+
+        var callContext = Substitute.For<ServerCallContext>();
+        callContext.Method.Returns(methodInfo.Name);
+        CallContext = callContext;
     }
 
 

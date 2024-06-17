@@ -2,10 +2,12 @@ using MagicOnion.Server.Hubs;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using Cysharp.Runtime.Multicast;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using MagicOnion.Server.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace MagicOnion.Server;
 
@@ -118,6 +120,9 @@ public static class MagicOnionEngine
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var loggerMagicOnionEngine = loggerFactory.CreateLogger(LoggerNameMagicOnionEngine);
         var loggerMethodHandler = loggerFactory.CreateLogger(LoggerNameMethodHandler);
+
+        var streamingHubHandlerRepository = serviceProvider.GetRequiredService<StreamingHubHandlerRepository>();
+
         MagicOnionServerLog.BeginBuildServiceDefinition(loggerMagicOnionEngine);
 
         var sw = Stopwatch.StartNew();
@@ -193,25 +198,66 @@ public static class MagicOnionEngine
 
                 if (isStreamingHub)
                 {
-                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect")!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
+                    var connectHandler = new MethodHandler(classType, classType.GetMethod("Connect", BindingFlags.NonPublic | BindingFlags.Instance)!, "Connect", methodHandlerOptions, serviceProvider, loggerMethodHandler, isStreamingHub: true);
                     if (!handlers.Add(connectHandler))
                     {
                         throw new InvalidOperationException($"Method does not allow overload, {className}.Connect");
                     }
 
                     streamingHubHandlers.AddRange(tempStreamingHubHandlers!);
-                    StreamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
-                    IGroupRepositoryFactory factory;
+                    streamingHubHandlerRepository.RegisterHandler(connectHandler, tempStreamingHubHandlers!.ToArray());
+
+                    // Group Provider
+                    IMulticastGroupProvider groupProvider;
                     var attr = classType.GetCustomAttribute<GroupConfigurationAttribute>(true);
                     if (attr != null)
                     {
-                        factory = (IGroupRepositoryFactory)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
+                        groupProvider = (IMulticastGroupProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, attr.FactoryType);
                     }
                     else
                     {
-                        factory = serviceProvider.GetRequiredService<IGroupRepositoryFactory>();
+                        groupProvider = serviceProvider.GetRequiredService<IMulticastGroupProvider>();
                     }
-                    StreamingHubHandlerRepository.AddGroupRepository(connectHandler, factory.CreateRepository(options.MessageSerializer.Create(MethodType.DuplexStreaming, null)));
+
+                    streamingHubHandlerRepository.RegisterGroupProvider(connectHandler, groupProvider);
+
+                    // Heartbeat
+                    var heartbeatEnable = options.EnableStreamingHubHeartbeat;
+                    var heartbeatInterval = options.StreamingHubHeartbeatInterval;
+                    var heartbeatTimeout = options.StreamingHubHeartbeatTimeout;
+                    var heartbeatMetadataProvider = default(IStreamingHubHeartbeatMetadataProvider);
+                    if (classType.GetCustomAttribute<HeartbeatAttribute>(inherit: true) is { } heartbeatAttr)
+                    {
+                        heartbeatEnable = heartbeatAttr.Enable;
+                        if (heartbeatAttr.Timeout != 0)
+                        {
+                            heartbeatTimeout = TimeSpan.FromMilliseconds(heartbeatAttr.Timeout);
+                        }
+                        if (heartbeatAttr.Interval != 0)
+                        {
+                            heartbeatInterval = TimeSpan.FromMilliseconds(heartbeatAttr.Interval);
+                        }
+                        if (heartbeatAttr.MetadataProvider != null)
+                        {
+                            heartbeatMetadataProvider = (IStreamingHubHeartbeatMetadataProvider)ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, heartbeatAttr.MetadataProvider);
+                        }
+                    }
+
+                    IStreamingHubHeartbeatManager heartbeatManager;
+                    if (!heartbeatEnable || heartbeatInterval is null)
+                    {
+                        heartbeatManager = NopStreamingHubHeartbeatManager.Instance;
+                    }
+                    else
+                    {
+                        heartbeatManager = new StreamingHubHeartbeatManager(
+                            heartbeatInterval.Value,
+                            heartbeatTimeout ?? Timeout.InfiniteTimeSpan,
+                            heartbeatMetadataProvider ?? serviceProvider.GetService<IStreamingHubHeartbeatMetadataProvider>(),
+                            serviceProvider.GetRequiredService<ILogger<StreamingHubHeartbeatManager>>()
+                        );
+                    }
+                    streamingHubHandlerRepository.RegisterHeartbeatManager(connectHandler, heartbeatManager);
                 }
             }
         }
@@ -219,6 +265,8 @@ public static class MagicOnionEngine
         {
             ExceptionDispatchInfo.Capture(agex.InnerExceptions[0]).Throw();
         }
+
+        streamingHubHandlerRepository.Freeze();
 
         var result = new MagicOnionServiceDefinition(handlers.ToArray(), streamingHubHandlers.ToArray());
 

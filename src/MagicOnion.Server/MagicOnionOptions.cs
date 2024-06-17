@@ -33,6 +33,26 @@ public class MagicOnionOptions
     public IList<StreamingHubFilterDescriptor> GlobalStreamingHubFilters { get; set; }
 
     /// <summary>
+    /// Gets or sets the default timeout duration of client results. Default is 5 seconds.
+    /// </summary>
+    public TimeSpan ClientResultsDefaultTimeout { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value whether the heartbeat feature of StreamingHub is enabled. Default is <see keyword="true"/>.
+    /// </summary>
+    public bool EnableStreamingHubHeartbeat { get; set; }
+
+    /// <summary>
+    /// Gets or sets a StreamingHub heartbeat interval. Default is <see keyword="null"/>. If the value is <see keyword="null"/>, the heartbeat is disabled.
+    /// </summary>
+    public TimeSpan? StreamingHubHeartbeatInterval { get; set; }
+
+    /// <summary>
+    /// Gets or sets a StreamingHub heartbeat timeout. Default is <see keyword="null"/>. If the value is <see keyword="null"/>, the server does not disconnect a client due to timeout.
+    /// </summary>
+    public TimeSpan? StreamingHubHeartbeatTimeout { get; set; }
+
+    /// <summary>
     /// Constructor can handle only error detail. If you want to set the other options, you can use object initializer.
     /// </summary>
     public MagicOnionOptions()
@@ -44,5 +64,9 @@ public class MagicOnionOptions
         this.GlobalFilters = new List<MagicOnionServiceFilterDescriptor>();
         this.GlobalStreamingHubFilters = new List<StreamingHubFilterDescriptor>();
         this.EnableCurrentContext = false;
+        this.ClientResultsDefaultTimeout = TimeSpan.FromSeconds(5);
+        this.EnableStreamingHubHeartbeat = false;
+        this.StreamingHubHeartbeatInterval = null;
+        this.StreamingHubHeartbeatTimeout = null;
     }
 }

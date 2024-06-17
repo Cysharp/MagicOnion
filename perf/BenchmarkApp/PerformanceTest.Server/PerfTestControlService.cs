@@ -25,7 +25,7 @@ public class PerfTestControlService : ServiceBase<IPerfTestControlService>, IPer
             ApplicationInformation.Current.IsAttached));
     }
 
-    public UnaryResult SetMemoryProfilerCollectAllocations(bool enable)
+    public UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable)
     {
         MemoryProfiler.CollectAllocations(enable);
         return UnaryResult.CompletedResult;

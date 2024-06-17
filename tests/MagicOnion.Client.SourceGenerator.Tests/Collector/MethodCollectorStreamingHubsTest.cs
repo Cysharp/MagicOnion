@@ -339,40 +339,6 @@ public interface IMyHubReceiver
     }
 
     [Fact]
-    public void ReturnType_NotSupported_Void()
-    {
-        // Arrange
-        var source = @"
-using System;
-using System.Threading.Tasks;
-using MagicOnion;
-using MessagePack;
-
-namespace MyNamespace;
-
-public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
-{
-    void MethodA();
-}
-
-public interface IMyHubReceiver
-{
-    void EventA();
-}
-";
-        var (compilation, semModel) = CompilationHelper.Create(source);
-        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
-        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
-
-        // Act
-        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
-
-        // Assert
-        diagnostics.Should().HaveCount(1);
-        diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id);
-    }
-
-    [Fact]
     public void ReturnType_NotSupported_NotTaskOfT()
     {
         // Arrange
@@ -547,6 +513,41 @@ public interface IMyHubReceiver
     }
 
     [Fact]
+    public void ReturnType_Void()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    void MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    void EventA();
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        serviceCollection.Hubs[0].Methods[0].MethodName.Should().Be("MethodA");
+        serviceCollection.Hubs[0].Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
+    }
+
+    [Fact]
     public void Receiver()
     {
         // Arrange
@@ -585,18 +586,21 @@ public interface IMyHubReceiver
         serviceCollection.Hubs[0].Receiver.Methods.Should().HaveCount(3);
         // void EventA();
         serviceCollection.Hubs[0].Receiver.Methods[0].MethodName.Should().Be("EventA");
+        serviceCollection.Hubs[0].Receiver.Methods[0].IsClientResult.Should().BeFalse();
         serviceCollection.Hubs[0].Receiver.Methods[0].Parameters.Should().BeEmpty();
         serviceCollection.Hubs[0].Receiver.Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
         // void EventB(Nil nil);
         serviceCollection.Hubs[0].Receiver.Methods[1].MethodName.Should().Be("EventB");
+        serviceCollection.Hubs[0].Receiver.Methods[1].IsClientResult.Should().BeFalse();
         serviceCollection.Hubs[0].Receiver.Methods[1].Parameters.Should().HaveCount(1);
         serviceCollection.Hubs[0].Receiver.Methods[1].RequestType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[1].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
         serviceCollection.Hubs[0].Receiver.Methods[1].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Void);
         // void EventB(Nil nil);
         serviceCollection.Hubs[0].Receiver.Methods[2].MethodName.Should().Be("EventC");
+        serviceCollection.Hubs[0].Receiver.Methods[2].IsClientResult.Should().BeFalse();
         serviceCollection.Hubs[0].Receiver.Methods[2].Parameters.Should().HaveCount(2);
         serviceCollection.Hubs[0].Receiver.Methods[2].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
         serviceCollection.Hubs[0].Receiver.Methods[2].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
@@ -604,7 +608,76 @@ public interface IMyHubReceiver
     }
 
     [Fact]
-    public void Receiver_NonVoidReturnType()
+    public void Receiver_ClientResult()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    Task MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    Task ClientResultA();
+    Task<int> ClientResultB(Nil nil);
+    Task<string> ClientResultC(string arg1, int arg2);
+    Task<string> ClientResultD(string arg1, int arg2, CancellationToken cancellationToken);
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        serviceCollection.Hubs.Should().HaveCount(1);
+        serviceCollection.Hubs[0].Methods.Should().HaveCount(1);
+        serviceCollection.Hubs[0].Receiver.Should().NotBeNull();
+        serviceCollection.Hubs[0].Receiver.Methods.Should().HaveCount(4);
+        // Task ClientResultA();
+        serviceCollection.Hubs[0].Receiver.Methods[0].MethodName.Should().Be("ClientResultA");
+        serviceCollection.Hubs[0].Receiver.Methods[0].IsClientResult.Should().BeTrue();
+        serviceCollection.Hubs[0].Receiver.Methods[0].Parameters.Should().BeEmpty();
+        serviceCollection.Hubs[0].Receiver.Methods[0].RequestType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Receiver.Methods[0].ResponseType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Receiver.Methods[0].MethodReturnType.Should().Be(MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task);
+        // Task<int> ClientResultB(Nil nil);
+        serviceCollection.Hubs[0].Receiver.Methods[1].MethodName.Should().Be("ClientResultB");
+        serviceCollection.Hubs[0].Receiver.Methods[1].IsClientResult.Should().BeTrue();
+        serviceCollection.Hubs[0].Receiver.Methods[1].Parameters.Should().HaveCount(1);
+        serviceCollection.Hubs[0].Receiver.Methods[1].RequestType.Should().Be(MagicOnionTypeInfo.KnownTypes.MessagePack_Nil);
+        serviceCollection.Hubs[0].Receiver.Methods[1].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<int>());
+        serviceCollection.Hubs[0].Receiver.Methods[1].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<int>>());
+        // Task<string> ClientResultC(string arg1, int arg2);
+        serviceCollection.Hubs[0].Receiver.Methods[2].MethodName.Should().Be("ClientResultC");
+        serviceCollection.Hubs[0].Receiver.Methods[2].IsClientResult.Should().BeTrue();
+        serviceCollection.Hubs[0].Receiver.Methods[2].Parameters.Should().HaveCount(2);
+        serviceCollection.Hubs[0].Receiver.Methods[2].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>());
+        serviceCollection.Hubs[0].Receiver.Methods[2].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
+        serviceCollection.Hubs[0].Receiver.Methods[2].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<string>>());
+        // Task<string> ClientResultD(string arg1, int arg2, CancellationToken cancellationToken);
+        serviceCollection.Hubs[0].Receiver.Methods[3].MethodName.Should().Be("ClientResultD");
+        serviceCollection.Hubs[0].Receiver.Methods[3].IsClientResult.Should().BeTrue();
+        serviceCollection.Hubs[0].Receiver.Methods[3].Parameters.Should().HaveCount(3);
+        serviceCollection.Hubs[0].Receiver.Methods[3].RequestType.Should().Be(MagicOnionTypeInfo.CreateFromType<DynamicArgumentTuple<string, int>>()); // Skip CancellationToken
+        serviceCollection.Hubs[0].Receiver.Methods[3].ResponseType.Should().Be(MagicOnionTypeInfo.CreateFromType<string>());
+        serviceCollection.Hubs[0].Receiver.Methods[3].MethodReturnType.Should().Be(MagicOnionTypeInfo.CreateFromType<Task<string>>());
+    }
+
+    [Fact]
+    public void Receiver_ReturnTypeIsNotVoidOrTask()
     {
         // Arrange
         var source = @"
@@ -635,6 +708,42 @@ public interface IMyHubReceiver
         // Assert
         diagnostics.Should().HaveCount(1);
         diagnostics[0].Id.Should().Be(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedReceiverMethodReturnType.Id);
+    }
+
+    [Fact]
+    public void Receiver_ReturnTypeIsTask()
+    {
+        // Arrange
+        var source = @"
+using System;
+using System.Threading.Tasks;
+using MagicOnion;
+using MessagePack;
+
+namespace MyNamespace;
+
+public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+{
+    Task MethodA();
+}
+
+public interface IMyHubReceiver
+{
+    Task<int> EventA();
+    ValueTask<int> EventB();
+    Task EventC();
+    ValueTask EventD();
+}
+";
+        var (compilation, semModel) = CompilationHelper.Create(source);
+        if (!ReferenceSymbols.TryCreate(compilation, out var referenceSymbols)) throw new InvalidOperationException("Cannot create the reference symbols.");
+        var interfaceSymbols = MethodCollectorTestHelper.Traverse(compilation.Assembly.GlobalNamespace).ToImmutableArray();
+
+        // Act
+        var (serviceCollection, diagnostics) = MethodCollector.Collect(interfaceSymbols, referenceSymbols, CancellationToken.None);
+
+        // Assert
+        diagnostics.Should().BeEmpty();
     }
 
     [Fact]

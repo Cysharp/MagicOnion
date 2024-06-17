@@ -39,6 +39,7 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     internal ILogger Logger { get; }
     internal bool IsReturnExceptionStackTraceInErrorDetail { get; }
+
     public IMagicOnionSerializer MessageSerializer => messageSerializer;
 
     public string ServiceName => metadata.ServiceInterface.Name;
@@ -491,6 +492,8 @@ public class MethodHandler : IEquatable<MethodHandler>
 
     public class UniqueEqualityComparer : IEqualityComparer<MethodHandler>
     {
+        public static UniqueEqualityComparer Instance { get; } = new();
+
         public bool Equals(MethodHandler? x, MethodHandler? y)
         {
             return (x == null && y == null) || (x != null && y != null && x.methodHandlerId.Equals(y.methodHandlerId));

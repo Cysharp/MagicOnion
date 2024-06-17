@@ -22,7 +22,7 @@ namespace MagicOnion.Client
 #endif
     }
 
-    public delegate TStreamingHub StreamingHubClientFactoryDelegate<out TStreamingHub, in TReceiver>(CallInvoker callInvoker, TReceiver receiver, string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+    public delegate TStreamingHub StreamingHubClientFactoryDelegate<out TStreamingHub, in TReceiver>(TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
         where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>;
 
     /// <summary>

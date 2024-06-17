@@ -1,4 +1,5 @@
-﻿using ChatApp.Shared.MessagePackObjects;
+using System.Threading.Tasks;
+using ChatApp.Shared.MessagePackObjects;
 
 namespace ChatApp.Shared.Hubs
 {
@@ -12,5 +13,8 @@ namespace ChatApp.Shared.Hubs
         void OnLeave(string name);
 
         void OnSendMessage(MessageResponse message);
+
+
+        Task<string> HelloAsync(string name, int age);
     }
 }

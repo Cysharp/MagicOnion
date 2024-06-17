@@ -1,6 +1,7 @@
 using Grpc.Core;
 using MessagePack;
 using System;
+using System.Buffers;
 using System.Linq;
 using System.Reflection;
 
@@ -15,7 +16,21 @@ namespace MagicOnion.Internal
             .OrderBy(x => x.GetGenericArguments().Length)
             .ToArray();
 
-        public static readonly Marshaller<byte[]> ThroughMarshaller = new Marshaller<byte[]>(x => x, x => x);
+        internal static Marshaller<StreamingHubPayload> StreamingHubMarshaller { get; } = new(
+            serializer: static (payload, context) =>
+            {
+                context.SetPayloadLength(payload.Length);
+                var bufferWriter = context.GetBufferWriter();
+                payload.Span.CopyTo(bufferWriter.GetSpan(payload.Length));
+                bufferWriter.Advance(payload.Length);
+                context.Complete();
+                StreamingHubPayloadPool.Shared.Return(payload);
+            },
+            deserializer: static context =>
+            {
+                return StreamingHubPayloadPool.Shared.RentOrCreate(context.PayloadAsReadOnlySequence());
+            }
+        );
 
         internal static Type CreateRequestType(ParameterInfo[] parameters)
         {

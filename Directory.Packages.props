@@ -9,8 +9,10 @@
     <MessagePackVersion>2.5.129</MessagePackVersion>
     <MicrosoftCodeAnalysisVersion>4.3.1</MicrosoftCodeAnalysisVersion>
     <MicrosoftCodeAnalysisVersionUnity>3.9.0</MicrosoftCodeAnalysisVersionUnity>
+    <MulticasterVersion>0.1.11</MulticasterVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageVersion Include="Grpc" Version="$(GrpcCCoreVersion)" />
     <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Server" Version="$(GrpcVersion)" />
@@ -20,7 +22,11 @@
     <PackageVersion Include="MessagePack" Version="$(MessagePackVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="8.0.0" />
+    <PackageVersion Include="Multicaster" Version="$(MulticasterVersion)" />
+    <PackageVersion Include="Multicaster.Distributed.Redis" Version="$(MulticasterVersion)" />
+    <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+    <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageVersion Include="PolySharp" Version="1.13.2" />

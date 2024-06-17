@@ -67,6 +67,18 @@ public static partial class MagicOnionServerLog
     [LoggerMessage(EventId = 9, Level = LogLevel.Debug, EventName = nameof(InvokeHubBroadcast), Message = nameof(InvokeHubBroadcast) + " groupName:{groupName} size:{size} broadcastGroupCount:{broadcastGroupCount}")]
     public static partial void InvokeHubBroadcast(ILogger logger, string groupName, int size, int broadcastGroupCount);
 
+    [LoggerMessage(EventId = 10, Level = LogLevel.Debug, EventName = nameof(BeginHeartbeatTimer), Message = nameof(BeginHeartbeatTimer) + " method:{method}, heartbeatInterval:{heartbeatInterval}, timeoutDuration:{timeoutDuration}")]
+    public static partial void BeginHeartbeatTimer(ILogger logger, string method, TimeSpan heartbeatInterval, TimeSpan timeoutDuration);
+
+    [LoggerMessage(EventId = 11, Level = LogLevel.Debug, EventName = nameof(ShutdownHeartbeatTimer), Message = nameof(ShutdownHeartbeatTimer) + " method:{method}")]
+    public static partial void ShutdownHeartbeatTimer(ILogger logger, string method);
+
+    [LoggerMessage(EventId = 12, Level = LogLevel.Debug, EventName = nameof(HeartbeatTimedOut), Message = nameof(HeartbeatTimedOut) + " method:{method}, connectionId:{connectionId}")]
+    public static partial void HeartbeatTimedOut(ILogger logger, string method, Guid connectionId);
+
+    [LoggerMessage(EventId = 13, Level = LogLevel.Debug, EventName = nameof(SendHeartbeat), Message = nameof(SendHeartbeat) + " method:{method}")]
+    public static partial void SendHeartbeat(ILogger logger, string method);
+
     [LoggerMessage(EventId = 90, Level = LogLevel.Error, EventName = nameof(ErrorOnServiceMethod), Message = "A service handler throws an exception occurred in {method}")]
     public static partial void ErrorOnServiceMethod(ILogger logger, Exception ex, string method);
 

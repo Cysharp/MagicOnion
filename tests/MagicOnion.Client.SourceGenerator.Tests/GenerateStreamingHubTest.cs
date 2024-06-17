@@ -275,7 +275,7 @@ public class GenerateStreamingHubTest
     }
 
     [Fact]
-    public async Task Invalid_Return_Void()
+    public async Task Return_Void()
     {
         var source = """
         using System;
@@ -289,7 +289,7 @@ public class GenerateStreamingHubTest
             public interface IMyHubReceiver { }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
-                void {|#0:A|}();
+                void A();
             }
         
             [MagicOnionClientGeneration(typeof(IMyHub))]
@@ -297,15 +297,7 @@ public class GenerateStreamingHubTest
         }
         """;
 
-        var verifierOptions = VerifierOptions.Default with
-        {
-            TestBehaviorsOverride = TestBehaviors.SkipGeneratedSourcesCheck,
-            ExpectedDiagnostics = new[]
-            {
-                new DiagnosticResult(MagicOnionDiagnosticDescriptors.StreamingHubUnsupportedMethodReturnType.Id, DiagnosticSeverity.Error).WithLocation(0),
-            }
-        };
-        await MagicOnionSourceGeneratorVerifier.RunAsync(source, verifierOptions: verifierOptions);
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
     }
 
     [Fact]
@@ -322,7 +314,7 @@ public class GenerateStreamingHubTest
         {
             public interface IMyHubReceiver
             {
-                Task {|#0:B|}();
+                int {|#0:B|}();
             }
             public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
             {
@@ -487,6 +479,270 @@ public class GenerateStreamingHubTest
                          public interface IExtraReceiverMethods2 : IExtraReceiverMethods
                          {
                              void C();
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Zero_NoReturnValue()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task A();
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_One_NoReturnValue()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task A(string arg1);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Many_NoReturnValue()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task A(string arg1, int arg2, bool arg3);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Zero()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A();
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_One()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A(string arg1);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Many()
+    {
+        var source = """
+                     using System;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A(string arg1, int arg2, bool arg3);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Zero_With_Cancellation()
+    {
+        var source = """
+                     using System;
+                     using System.Threading;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A(CancellationToken cancellationToken);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_One_With_Cancellation()
+    {
+        var source = """
+                     using System;
+                     using System.Threading;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A(string arg1, CancellationToken cancellationToken);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
+                         }
+                     
+                         [MagicOnionClientGeneration(typeof(IMyHub))]
+                         partial class MagicOnionInitializer {}
+                     }
+                     """;
+
+        await MagicOnionSourceGeneratorVerifier.RunAsync(source);
+    }
+
+    [Fact]
+    public async Task ClientResult_Parameter_Many_With_Cancellation()
+    {
+        var source = """
+                     using System;
+                     using System.Threading;
+                     using System.Threading.Tasks;
+                     using MessagePack;
+                     using MagicOnion;
+                     using MagicOnion.Client;
+
+                     namespace TempProject
+                     {
+                         public interface IMyHubReceiver
+                         {
+                             Task<string> A(string arg1, int arg2, bool arg3, CancellationToken cancellationToken);
+                         }
+                         
+                         public interface IMyHub : IStreamingHub<IMyHub, IMyHubReceiver>
+                         {
                          }
                      
                          [MagicOnionClientGeneration(typeof(IMyHub))]

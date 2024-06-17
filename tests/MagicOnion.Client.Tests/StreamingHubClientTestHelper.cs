@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Diagnostics;
 using System.Threading.Channels;
+using MagicOnion.Internal;
 
 namespace MagicOnion.Client.Tests;
 
@@ -8,8 +9,8 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
     where TStreamingHub : IStreamingHub<TStreamingHub, TReceiver>
     where TReceiver : class
 {
-    readonly Channel<byte[]> requestChannel;
-    readonly Channel<byte[]> responseChannel;
+    readonly Channel<StreamingHubPayload> requestChannel;
+    readonly Channel<StreamingHubPayload> responseChannel;
     readonly CallInvoker callInvokerMock;
     readonly TReceiver receiver;
     readonly IStreamingHubClientFactoryProvider? factoryProvider;
@@ -19,18 +20,18 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
 
     public StreamingHubClientTestHelper(IStreamingHubClientFactoryProvider? factoryProvider = null)
     {
-        requestChannel = Channel.CreateUnbounded<byte[]>();
-        var requestStream = new ChannelClientStreamWriter<byte[]>(requestChannel);
-        responseChannel = Channel.CreateUnbounded<byte[]>();
-        var responseStream = new ChannelAsyncStreamReader<byte[]>(responseChannel);
+        requestChannel = Channel.CreateUnbounded<StreamingHubPayload>();
+        var requestStream = new ChannelClientStreamWriter<StreamingHubPayload>(requestChannel);
+        responseChannel = Channel.CreateUnbounded<StreamingHubPayload>();
+        var responseStream = new ChannelAsyncStreamReader<StreamingHubPayload>(responseChannel);
 
         this.factoryProvider = factoryProvider;
 
         callInvokerMock = Substitute.For<CallInvoker>();
-        callInvokerMock.AsyncDuplexStreamingCall(default(Method<byte[], byte[]>)!, default, default)
+        callInvokerMock.AsyncDuplexStreamingCall(default(Method<StreamingHubPayload, StreamingHubPayload>)!, default, default)
         .ReturnsForAnyArgs(x =>
         {
-            return new AsyncDuplexStreamingCall<byte[], byte[]>(
+            return new AsyncDuplexStreamingCall<StreamingHubPayload, StreamingHubPayload>(
                 requestStream,
                 responseStream,
                 _ => Task.FromResult(new Metadata { { "x-magiconion-streaminghub-version", "2" } }),
@@ -59,16 +60,38 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         );
     }
 
-    public async Task<(int MessageId, int MethodId, T Requst)> ReadRequestAsync<T>()
+    public async Task<TStreamingHub> ConnectAsync(StreamingHubClientOptions options, CancellationToken cancellationToken = default)
     {
-        var requestPayload = await requestChannel.Reader.ReadAsync();
-        return ReadRequestPayload<T>(requestPayload);
+        return await StreamingHubClient.ConnectAsync<TStreamingHub, TReceiver>(
+            callInvokerMock,
+            receiver,
+            options,
+            cancellationToken: cancellationToken,
+            factoryProvider: factoryProvider
+        );
     }
 
-    public async Task<(int MethodId, T Requst)> ReadFireAndForgetRequestAsync<T>()
+    public async Task<ReadOnlyMemory<byte>> ReadRequestRawAsync()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
-        return ReadFireAndForgetRequestPayload<T>(requestPayload);
+        return requestPayload.Memory;
+    }
+
+    public async Task<(int MessageId, int MethodId, T Request)> ReadRequestAsync<T>()
+    {
+        var requestPayload = await requestChannel.Reader.ReadAsync();
+        return ReadRequestPayload<T>(requestPayload.Memory);
+    }
+
+    public async Task<(int MethodId, T Request)> ReadFireAndForgetRequestAsync<T>()
+    {
+        var requestPayload = await requestChannel.Reader.ReadAsync();
+        return ReadFireAndForgetRequestPayload<T>(requestPayload.Memory);
+    }
+
+    public void WriteResponseRaw(ReadOnlySpan<byte> data)
+    {
+        responseChannel.Writer.TryWrite(StreamingHubPayloadPool.Shared.RentOrCreate(data));
     }
 
     public void WriteResponse<T>(int messageId, int methodId, T response)
@@ -76,7 +99,7 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         responseChannel.Writer.TryWrite(BuildResponsePayload(messageId, methodId, response));
     }
 
-    static byte[] BuildResponsePayload<T>(int messageId, int methodId, T response)
+    static StreamingHubPayload BuildResponsePayload<T>(int messageId, int methodId, T response)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
         var messagePackWriter = new MessagePackWriter(bufferWriter);
@@ -85,7 +108,7 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         messagePackWriter.Write(methodId);
         MessagePackSerializer.Serialize(ref messagePackWriter, response);
         messagePackWriter.Flush();
-        return bufferWriter.WrittenSpan.ToArray();
+        return StreamingHubPayloadPool.Shared.RentOrCreate(bufferWriter.WrittenSpan);
     }
 
     static (int MessageId, int MethodId, T Body) ReadRequestPayload<T>(ReadOnlyMemory<byte> payload)

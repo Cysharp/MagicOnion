@@ -58,7 +58,7 @@ public static class MethodCollector
                 var receiverInterfaceSymbol = x.AllInterfaces.First(y => y.ConstructedFrom.ApproximatelyEqual(ctx.ReferenceSymbols.IStreamingHub)).TypeArguments[1];
                 var receiverType = ctx.GetOrCreateTypeInfoFromSymbol(receiverInterfaceSymbol);
 
-                var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo>();
+                var receiverMethods = new List<MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo>();
                 foreach (var methodSymbol in GetAllMethods(receiverInterfaceSymbol, ctx.ReferenceSymbols))
                 {
                     if (TryCreateHubReceiverMethodInfoFromMethodSymbol(ctx, serviceType, receiverType, methodSymbol, out var methodInfo, out var diagnostic))
@@ -122,6 +122,7 @@ public static class MethodCollector
         {
             case "global::System.Threading.Tasks.Task":
             case "global::System.Threading.Tasks.ValueTask":
+            case "global::System.Void":
                 //responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
                 break;
             case "global::System.Threading.Tasks.Task<>":
@@ -148,14 +149,19 @@ public static class MethodCollector
         diagnostic = null;
         return true;
     }
-    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo? methodInfo, out Diagnostic? diagnostic)
+    static bool TryCreateHubReceiverMethodInfoFromMethodSymbol(MethodCollectorContext ctx, MagicOnionTypeInfo interfaceType, MagicOnionTypeInfo receiverType, IMethodSymbol methodSymbol, [NotNullWhen(true)] out MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo? methodInfo, out Diagnostic? diagnostic)
     {
         var hubId = GetHubMethodIdFromMethodSymbol(methodSymbol);
         var methodReturnType = ctx.GetOrCreateTypeInfoFromSymbol(methodSymbol.ReturnType);
         var methodParameters = CreateParameterInfoListFromMethodSymbol(ctx, methodSymbol);
-        var requestType = CreateRequestTypeFromMethodParameters(methodParameters);
+        var requestType = CreateRequestTypeFromMethodParameters(methodParameters.Where(x => x.Type != MagicOnionTypeInfo.KnownTypes.System_Threading_CancellationToken).ToArray());
         var responseType = MagicOnionTypeInfo.KnownTypes.MessagePack_Nil;
-        if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void)
+        if (methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Void &&
+            methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
+            methodReturnType != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask &&
+            (!methodReturnType.HasGenericArguments ||
+                (methodReturnType.GetGenericTypeDefinition() != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_Task &&
+                 methodReturnType.GetGenericTypeDefinition() != MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)))
         {
             methodInfo = null;
             diagnostic = Diagnostic.Create(
@@ -164,8 +170,12 @@ public static class MethodCollector
                 $"{receiverType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace)}.{methodSymbol.Name}", methodReturnType.ToDisplayName(MagicOnionTypeInfo.DisplayNameFormat.Namespace));
             return false;
         }
+        else if (methodReturnType.HasGenericArguments)
+        {
+            responseType = methodReturnType.GenericArguments[0];
+        }
 
-        methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubMethodInfo(
+        methodInfo = new MagicOnionStreamingHubInfo.MagicOnionHubReceiverMethodInfo(
             hubId,
             methodSymbol.Name,
             methodParameters,
