@@ -116,6 +116,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginHeartbeatTimer_ILogger_System_String_TimeSpan_TimeSpan_">BeginHeartbeatTimer(ILogger, String, TimeSpan, TimeSpan)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginInvokeHubMethod_ILogger_MagicOnion_Server_Hubs_StreamingHubContext_ReadOnlyMemory_System_Byte__Type_">BeginInvokeHubMethod(ILogger, StreamingHubContext, ReadOnlyMemory&lt;Byte&gt;, Type)</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -194,6 +200,12 @@
       </tr>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_HeartbeatTimedOut_ILogger_System_String_Guid_">HeartbeatTimedOut(ILogger, String, Guid)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_ILogger_System_String_System_Int32_System_Int32_">InvokeHubBroadcast(ILogger, String, Int32, Int32)</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -207,6 +219,18 @@
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ReadFromStream_ILogger_System_String_System_String_System_Boolean_">ReadFromStream(ILogger, String, String, Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_SendHeartbeat_ILogger_System_String_">SendHeartbeat(ILogger, String)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Diagnostics.MagicOnionServerLog.html#MagicOnion_Server_Diagnostics_MagicOnionServerLog_ShutdownHeartbeatTimer_ILogger_System_String_">ShutdownHeartbeatTimer(ILogger, String)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -241,6 +265,42 @@
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginHeartbeatTimer_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginHeartbeatTimer*"></a>
+  <h4 id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_BeginHeartbeatTimer_ILogger_System_String_TimeSpan_TimeSpan_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.BeginHeartbeatTimer(ILogger,System.String,TimeSpan,TimeSpan)">BeginHeartbeatTimer(ILogger, String, TimeSpan, TimeSpan)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void BeginHeartbeatTimer(ILogger logger, string method, TimeSpan heartbeatInterval, TimeSpan timeoutDuration)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>method</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>heartbeatInterval</code></span> <span class="xref">TimeSpan</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>timeoutDuration</code></span> <span class="xref">TimeSpan</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -718,6 +778,40 @@
   
   </section>
   <section>
+  <a id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_HeartbeatTimedOut_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.HeartbeatTimedOut*"></a>
+  <h4 id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_HeartbeatTimedOut_ILogger_System_String_Guid_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.HeartbeatTimedOut(ILogger,System.String,Guid)">HeartbeatTimedOut(ILogger, String, Guid)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void HeartbeatTimedOut(ILogger logger, string method, Guid connectionId)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>method</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>connectionId</code></span> <span class="xref">Guid</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast*"></a>
   <h4 id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_InvokeHubBroadcast_ILogger_System_String_System_Int32_System_Int32_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.InvokeHubBroadcast(ILogger,System.String,System.Int32,System.Int32)">InvokeHubBroadcast(ILogger, String, Int32, Int32)</h4>
   <div class="markdown level1 summary"></div>
@@ -809,6 +903,70 @@
     <dt><span class="parametername"><code>method</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>complete</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_SendHeartbeat_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.SendHeartbeat*"></a>
+  <h4 id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_SendHeartbeat_ILogger_System_String_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.SendHeartbeat(ILogger,System.String)">SendHeartbeat(ILogger, String)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SendHeartbeat(ILogger logger, string method)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>method</code></span> <span class="xref">System.String</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_ShutdownHeartbeatTimer_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.ShutdownHeartbeatTimer*"></a>
+  <h4 id="MagicOnion_Server_Diagnostics_MagicOnionServerLog_ShutdownHeartbeatTimer_ILogger_System_String_" data-uid="MagicOnion.Server.Diagnostics.MagicOnionServerLog.ShutdownHeartbeatTimer(ILogger,System.String)">ShutdownHeartbeatTimer(ILogger, String)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void ShutdownHeartbeatTimer(ILogger logger, string method)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>method</code></span> <span class="xref">System.String</span></dt>
     <dd></dd>
   </dl>
   </section>

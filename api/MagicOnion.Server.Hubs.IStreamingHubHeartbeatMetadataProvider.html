@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>IInMemoryStorage&lt;T&gt; Interface
+    <title>IStreamingHubHeartbeatMetadataProvider Interface
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="IInMemoryStorage&lt;T&gt; Interface
+    <meta name="title" content="IStreamingHubHeartbeatMetadataProvider Interface
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,9 +71,9 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider">
   
-  <h1 id="MagicOnion_Server_Hubs_IInMemoryStorage_1" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1" class="text-break">IInMemoryStorage&lt;T&gt; Interface
+  <h1 id="MagicOnion_Server_Hubs_IStreamingHubHeartbeatMetadataProvider" data-uid="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider" class="text-break">IStreamingHubHeartbeatMetadataProvider Interface
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Hubs.html">MagicOnion.Server.Hubs</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public interface IInMemoryStorage&lt;T&gt; : IInMemoryStorage where T : class</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IStreamingHubHeartbeatMetadataProvider</code></pre>
   </div>
 
   
@@ -90,34 +90,9 @@
   
   
   
-  <section>
-  <h4 class="typeParameters">Type Parameters</h4>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>T</code></span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   
   <h3 id="members">Members</h3>
-  <h4>Properties
-  </h4>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.IInMemoryStorage-1.html#MagicOnion_Server_Hubs_IInMemoryStorage_1_AllValues">AllValues</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-    </tbody>
-  </table>
   <h4>Methods
   </h4>
   <table class="table table-condensed">
@@ -130,67 +105,29 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.IInMemoryStorage-1.html#MagicOnion_Server_Hubs_IInMemoryStorage_1_Get_Guid_">Get(Guid)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.IInMemoryStorage-1.html#MagicOnion_Server_Hubs_IInMemoryStorage_1_Set_Guid__0_">Set(Guid, T)</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider.html#MagicOnion_Server_Hubs_IStreamingHubHeartbeatMetadataProvider_TryWriteMetadata_IBufferWriter_System_Byte__">TryWriteMetadata(IBufferWriter&lt;Byte&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
     </tbody>
   </table>
   
-  <h3 id="properties">Properties
-  </h3>
-  <section>
-  <a id="MagicOnion_Server_Hubs_IInMemoryStorage_1_AllValues_" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.AllValues*"></a>
-  <h4 id="MagicOnion_Server_Hubs_IInMemoryStorage_1_AllValues" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.AllValues">AllValues</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">ICollection&lt;T&gt; AllValues { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ICollection</span>&lt;T&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Server_Hubs_IInMemoryStorage_1_Get_" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.Get*"></a>
-  <h4 id="MagicOnion_Server_Hubs_IInMemoryStorage_1_Get_Guid_" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.Get(Guid)">Get(Guid)</h4>
+  <a id="MagicOnion_Server_Hubs_IStreamingHubHeartbeatMetadataProvider_TryWriteMetadata_" data-uid="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider.TryWriteMetadata*"></a>
+  <h4 id="MagicOnion_Server_Hubs_IStreamingHubHeartbeatMetadataProvider_TryWriteMetadata_IBufferWriter_System_Byte__" data-uid="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider.TryWriteMetadata(IBufferWriter{System.Byte})">TryWriteMetadata(IBufferWriter&lt;Byte&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">T Get(Guid connectionId)</code></pre>
+    <pre><code class="lang-csharp hljs">bool TryWriteMetadata(IBufferWriter&lt;byte&gt; writer)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>connectionId</code></span> <span class="xref">Guid</span></dt>
+    <dt><span class="parametername"><code>writer</code></span> <span class="xref">IBufferWriter</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -198,42 +135,10 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">T</span></dt>
+    <dt><span class="xref">System.Boolean</span></dt>
     <dd></dd>
   </dl>
   </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_IInMemoryStorage_1_Set_" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.Set*"></a>
-  <h4 id="MagicOnion_Server_Hubs_IInMemoryStorage_1_Set_Guid__0_" data-uid="MagicOnion.Server.Hubs.IInMemoryStorage`1.Set(Guid,`0)">Set(Guid, T)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">void Set(Guid connectionId, T value)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>connectionId</code></span> <span class="xref">Guid</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>value</code></span> <span class="xref">T</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
   
   
   

@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>MagicOnionClientOptions Struct
+    <title>MagicOnionClientOptions Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="MagicOnionClientOptions Struct
+    <meta name="title" content="MagicOnionClientOptions Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -73,7 +73,7 @@
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="MagicOnion.Client.MagicOnionClientOptions">
   
-  <h1 id="MagicOnion_Client_MagicOnionClientOptions" data-uid="MagicOnion.Client.MagicOnionClientOptions" class="text-break">MagicOnionClientOptions Struct
+  <h1 id="MagicOnion_Client_MagicOnionClientOptions" data-uid="MagicOnion.Client.MagicOnionClientOptions" class="text-break">MagicOnionClientOptions Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Client.html">MagicOnion.Client</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Client.dll</h6>
@@ -82,9 +82,14 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly struct MagicOnionClientOptions</code></pre>
+    <pre><code class="lang-csharp hljs">public class MagicOnionClientOptions : object</code></pre>
   </div>
 
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <span><span class="xref">System.Object</span></span> → 
+    <span class="xref">MagicOnionClientOptions</span>
+  </div>
   
   
   
@@ -105,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_Nullable_System_String__CallOptions_IReadOnlyList_MagicOnion_Client_IClientFilter__">MagicOnionClientOptions(CallInvoker, Nullable&lt;String&gt;, CallOptions, IReadOnlyList&lt;IClientFilter&gt;)</a>
+          <a class="xref" href="MagicOnion.Client.MagicOnionClientOptions.html#MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_Nullable_System_String__CallOptions_System_Nullable_IReadOnlyList_MagicOnion_Client_IClientFilter___">MagicOnionClientOptions(CallInvoker, Nullable&lt;String&gt;, CallOptions, Nullable&lt;IReadOnlyList&lt;IClientFilter&gt;&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -182,12 +187,12 @@
   </h3>
   <section>
   <a id="MagicOnion_Client_MagicOnionClientOptions__ctor_" data-uid="MagicOnion.Client.MagicOnionClientOptions.#ctor*"></a>
-  <h4 id="MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_Nullable_System_String__CallOptions_IReadOnlyList_MagicOnion_Client_IClientFilter__" data-uid="MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,IReadOnlyList{MagicOnion.Client.IClientFilter})">MagicOnionClientOptions(CallInvoker, Nullable&lt;String&gt;, CallOptions, IReadOnlyList&lt;IClientFilter&gt;)</h4>
+  <h4 id="MagicOnion_Client_MagicOnionClientOptions__ctor_CallInvoker_System_Nullable_System_String__CallOptions_System_Nullable_IReadOnlyList_MagicOnion_Client_IClientFilter___" data-uid="MagicOnion.Client.MagicOnionClientOptions.#ctor(CallInvoker,System.Nullable{System.String},CallOptions,System.Nullable{IReadOnlyList{MagicOnion.Client.IClientFilter}})">MagicOnionClientOptions(CallInvoker, Nullable&lt;String&gt;, CallOptions, Nullable&lt;IReadOnlyList&lt;IClientFilter&gt;&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MagicOnionClientOptions(CallInvoker callInvoker, string? host, CallOptions callOptions, IReadOnlyList&lt;IClientFilter&gt; filters)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionClientOptions(CallInvoker callInvoker, string? host, CallOptions callOptions, IReadOnlyList&lt;IClientFilter&gt;? filters)</code></pre>
   </div>
 
   <section>
@@ -199,7 +204,7 @@
     <dd></dd>
     <dt><span class="parametername"><code>callOptions</code></span> <span class="xref">CallOptions</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>filters</code></span> <span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>&gt;</dt>
+    <dt><span class="parametername"><code>filters</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">IReadOnlyList</span>&lt;<a class="xref" href="MagicOnion.Client.IClientFilter.html">IClientFilter</a>&gt;&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -225,7 +230,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly CallInvoker CallInvoker { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public CallInvoker CallInvoker { get; }</code></pre>
   </div>
 
   
@@ -255,7 +260,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly CallOptions CallOptions { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public CallOptions CallOptions { get; }</code></pre>
   </div>
 
   
@@ -285,7 +290,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly IReadOnlyList&lt;IClientFilter&gt; Filters { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public IReadOnlyList&lt;IClientFilter&gt; Filters { get; }</code></pre>
   </div>
 
   
@@ -315,7 +320,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly string? Host { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public string? Host { get; }</code></pre>
   </div>
 
   
@@ -347,7 +352,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly MagicOnionClientOptions WithCallOptions(CallOptions callOptions)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionClientOptions WithCallOptions(CallOptions callOptions)</code></pre>
   </div>
 
   <section>
@@ -384,7 +389,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly MagicOnionClientOptions WithFilters(IReadOnlyList&lt;IClientFilter&gt; filters)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionClientOptions WithFilters(IReadOnlyList&lt;IClientFilter&gt; filters)</code></pre>
   </div>
 
   <section>
@@ -421,7 +426,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public readonly MagicOnionClientOptions WithHost(string? host)</code></pre>
+    <pre><code class="lang-csharp hljs">public MagicOnionClientOptions WithHost(string? host)</code></pre>
   </div>
 
   <section>

@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>StreamingHubContext Class
+    <title>HeartbeatAttribute Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="StreamingHubContext Class
+    <meta name="title" content="HeartbeatAttribute Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,24 +71,25 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Hubs.StreamingHubContext">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute">
   
-  <h1 id="MagicOnion_Server_Hubs_StreamingHubContext" data-uid="MagicOnion.Server.Hubs.StreamingHubContext" class="text-break">StreamingHubContext Class
+  <h1 id="MagicOnion_Server_Hubs_HeartbeatAttribute" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute" class="text-break">HeartbeatAttribute Class
   </h1>
   <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Hubs.html">MagicOnion.Server.Hubs</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Attribute for configuring the heartbeat of StreamingHub.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class StreamingHubContext : object</code></pre>
+    <pre><code class="lang-csharp hljs">public class HeartbeatAttribute : Attribute</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">StreamingHubContext</span>
+    <span class="xref">HeartbeatAttribute</span>
   </div>
   
   
@@ -98,6 +99,30 @@
   
   
   <h3 id="members">Members</h3>
+  <h4>Constructors
+  </h4>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute__ctor">HeartbeatAttribute()</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute__ctor_System_Boolean_">HeartbeatAttribute(Boolean)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+    </tbody>
+  </table>
   <h4>Properties
   </h4>
   <table class="table table-condensed">
@@ -110,121 +135,101 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_ConnectionId">ConnectionId</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute_Enable">Enable</a>
         </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_HubInstance">HubInstance</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_Items">Items</a>
-        </td>
-        <td class="markdown level1 summary"><p>Object storage per invoke.</p>
+        <td class="markdown level1 summary"><p>Gets or sets a value whether the heartbeat feature of StreamingHub is enabled.</p>
 </td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_Path">Path</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute_Interval">Interval</a>
         </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat interval (milliseconds).  If the value is <see cref="!:System.Threading.Timeout.Infinite"></see>, the heartbeat is disabled.</p>
+</td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_Request">Request</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute_MetadataProvider">MetadataProvider</a>
         </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Gets or sets an implementation type of <a class="xref" href="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider.html">IStreamingHubHeartbeatMetadataProvider</a>.</p>
+</td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_ServiceContext">ServiceContext</a>
+          <a class="xref" href="MagicOnion.Server.Hubs.HeartbeatAttribute.html#MagicOnion_Server_Hubs_HeartbeatAttribute_Timeout">Timeout</a>
         </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubContext.html#MagicOnion_Server_Hubs_StreamingHubContext_Timestamp">Timestamp</a>
-        </td>
-        <td class="markdown level1 summary"></td>
+        <td class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat timeout (milliseconds). If the value is <see cref="!:System.Threading.Timeout.Infinite"></see>, the server does not disconnect a client due to timeout.</p>
+</td>
       </tr>
     </tbody>
   </table>
   
+  <h3 id="constructors">Constructors
+  </h3>
+  <section>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute__ctor_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.#ctor*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute__ctor" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.#ctor">HeartbeatAttribute()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HeartbeatAttribute()</code></pre>
+  </div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute__ctor_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.#ctor*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute__ctor_System_Boolean_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.#ctor(System.Boolean)">HeartbeatAttribute(Boolean)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public HeartbeatAttribute(bool enable)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>enable</code></span> <span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
   <h3 id="properties">Properties
   </h3>
   <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_ConnectionId_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.ConnectionId*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_ConnectionId" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.ConnectionId">ConnectionId</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Guid ConnectionId { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Guid</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_HubInstance_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.HubInstance*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_HubInstance" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.HubInstance">HubInstance</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public object HubInstance { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Object</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_Items_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Items*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_Items" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Items">Items</h4>
-  <div class="markdown level1 summary"><p>Object storage per invoke.</p>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute_Enable_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Enable*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute_Enable" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Enable">Enable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value whether the heartbeat feature of StreamingHub is enabled.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ConcurrentDictionary&lt;string, object&gt; Items { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public bool Enable { get; set; }</code></pre>
   </div>
 
   
@@ -234,7 +239,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ConcurrentDictionary</span>&lt;<span class="xref">System.String</span>, <span class="xref">System.Object</span>&gt;</dt>
+    <dt><span class="xref">System.Boolean</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -248,13 +253,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_Path_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Path*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_Path" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Path">Path</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute_Interval_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Interval*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute_Interval" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Interval">Interval</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat interval (milliseconds).  If the value is <see cref="!:System.Threading.Timeout.Infinite"></see>, the heartbeat is disabled.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public string Path { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Interval { get; set; }</code></pre>
   </div>
 
   
@@ -264,7 +270,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.String</span></dt>
+    <dt><span class="xref">System.Int32</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -278,13 +284,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_Request_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Request*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_Request" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Request">Request</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute_MetadataProvider_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.MetadataProvider*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute_MetadataProvider" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.MetadataProvider">MetadataProvider</h4>
+  <div class="markdown level1 summary"><p>Gets or sets an implementation type of <a class="xref" href="MagicOnion.Server.Hubs.IStreamingHubHeartbeatMetadataProvider.html">IStreamingHubHeartbeatMetadataProvider</a>.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ReadOnlyMemory&lt;byte&gt; Request { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Type? MetadataProvider { get; set; }</code></pre>
   </div>
 
   
@@ -294,7 +301,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">Type</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -308,13 +315,14 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_ServiceContext_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.ServiceContext*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_ServiceContext" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.ServiceContext">ServiceContext</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="MagicOnion_Server_Hubs_HeartbeatAttribute_Timeout_" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Timeout*"></a>
+  <h4 id="MagicOnion_Server_Hubs_HeartbeatAttribute_Timeout" data-uid="MagicOnion.Server.Hubs.HeartbeatAttribute.Timeout">Timeout</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat timeout (milliseconds). If the value is <see cref="!:System.Threading.Timeout.Infinite"></see>, the server does not disconnect a client due to timeout.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IServiceContext ServiceContext { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Timeout { get; set; }</code></pre>
   </div>
 
   
@@ -324,37 +332,7 @@
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.IServiceContext.html">IServiceContext</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubContext_Timestamp_" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Timestamp*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubContext_Timestamp" data-uid="MagicOnion.Server.Hubs.StreamingHubContext.Timestamp">Timestamp</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DateTime Timestamp { get; }</code></pre>
-  </div>
-
-  
-  
-  
-  
-  <section>
-  <h5 class="propertyValue">Property Value</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">DateTime</span></dt>
+    <dt><span class="xref">System.Int32</span></dt>
     <dd></dd>
   </dl>
   </section>

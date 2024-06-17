@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>ImmutableArrayGroupRepository Class
+    <title>MemoryPoolBufferWriter Class
    | MagicOnion </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="ImmutableArrayGroupRepository Class
+    <meta name="title" content="MemoryPoolBufferWriter Class
    | MagicOnion ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -71,30 +71,26 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository">
+            <article class="content wrap" id="_content" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter">
   
-  <h1 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository" class="text-break">ImmutableArrayGroupRepository Class
+  <h1 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter" class="text-break">MemoryPoolBufferWriter Class
   </h1>
-  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Server.Hubs.html">MagicOnion.Server.Hubs</a></h6>
+  <h6><strong>Namespace</strong>: <a class="xref" href="MagicOnion.Internal.Buffers.html">MagicOnion.Internal.Buffers</a></h6>
   <h6><strong>Assembly</strong>: MagicOnion.Server.dll</h6>
   
   <div class="markdown level0 summary"></div>
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ImmutableArrayGroupRepository : object, IGroupRepository</code></pre>
+    <pre><code class="lang-csharp hljs">public class MemoryPoolBufferWriter : IBufferWriter&lt;byte&gt;</code></pre>
   </div>
 
   <div class="inheritance">
     <h5>Inheritance</h5>
     <span><span class="xref">System.Object</span></span> → 
-    <span class="xref">ImmutableArrayGroupRepository</span>
+    <span class="xref">MemoryPoolBufferWriter</span>
   </div>
   
-  <div classs="implements">
-    <h5>Implements</h5>
-    <div><a class="xref" href="MagicOnion.Server.Hubs.IGroupRepository.html">IGroupRepository</a></div>
-  </div>
   
   
   
@@ -114,7 +110,7 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_">ImmutableArrayGroupRepository(IMagicOnionSerializer, ILogger)</a>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter__ctor_MemoryPool_System_Byte__">MemoryPoolBufferWriter(MemoryPool&lt;Byte&gt;)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -132,19 +128,31 @@
     <tbody>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_GetOrAdd_System_String_">GetOrAdd(String)</a>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_Advance_System_Int32_">Advance(Int32)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryGet_System_String_MagicOnion_Server_Hubs_IGroup__">TryGet(String, out IGroup)</a>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetMemory_System_Int32_">GetMemory(Int32)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.html#MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryRemove_System_String_">TryRemove(String)</a>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetSpan_System_Int32_">GetSpan(Int32)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_RentThreadStaticWriter">RentThreadStaticWriter()</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html#MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_ToMemoryOwnerAndReturn">ToMemoryOwnerAndReturn()</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -154,21 +162,19 @@
   <h3 id="constructors">Constructors
   </h3>
   <section>
-  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor*"></a>
-  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository__ctor_MagicOnion_Serialization_IMagicOnionSerializer_ILogger_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.#ctor(MagicOnion.Serialization.IMagicOnionSerializer,ILogger)">ImmutableArrayGroupRepository(IMagicOnionSerializer, ILogger)</h4>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter__ctor_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter__ctor_MemoryPool_System_Byte__" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.#ctor(MemoryPool{System.Byte})">MemoryPoolBufferWriter(MemoryPool&lt;Byte&gt;)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ImmutableArrayGroupRepository(IMagicOnionSerializer messageSerializer, ILogger logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public MemoryPoolBufferWriter(MemoryPool&lt;byte&gt; memoryPool)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>messageSerializer</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializer.html">IMagicOnionSerializer</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <span class="xref">ILogger</span></dt>
+    <dt><span class="parametername"><code>memoryPool</code></span> <span class="xref">MemoryPool</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -188,19 +194,49 @@
   <h3 id="methods">Methods
   </h3>
   <section>
-  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_GetOrAdd_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.GetOrAdd*"></a>
-  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_GetOrAdd_System_String_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.GetOrAdd(System.String)">GetOrAdd(String)</h4>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_Advance_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_Advance_System_Int32_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.Advance(System.Int32)">Advance(Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public IGroup GetOrAdd(string groupName)</code></pre>
+    <pre><code class="lang-csharp hljs">public void Advance(int count)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>groupName</code></span> <span class="xref">System.String</span></dt>
+    <dt><span class="parametername"><code>count</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetMemory_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetMemory_System_Int32_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetMemory(System.Int32)">GetMemory(Int32)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Memory&lt;byte&gt; GetMemory(int sizeHint = 0)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>sizeHint</code></span> <span class="xref">System.Int32</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -208,7 +244,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
+    <dt><span class="xref">Memory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -225,21 +261,19 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryGet_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.TryGet*"></a>
-  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryGet_System_String_MagicOnion_Server_Hubs_IGroup__" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.TryGet(System.String,MagicOnion.Server.Hubs.IGroup@)">TryGet(String, out IGroup)</h4>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetSpan_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_GetSpan_System_Int32_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.GetSpan(System.Int32)">GetSpan(Int32)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool TryGet(string groupName, out IGroup group)</code></pre>
+    <pre><code class="lang-csharp hljs">public Span&lt;byte&gt; GetSpan(int sizeHint = 0)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>groupName</code></span> <span class="xref">System.String</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
+    <dt><span class="parametername"><code>sizeHint</code></span> <span class="xref">System.Int32</span></dt>
     <dd></dd>
   </dl>
   </section>
@@ -247,7 +281,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Boolean</span></dt>
+    <dt><span class="xref">Span</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -264,27 +298,50 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryRemove_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.TryRemove*"></a>
-  <h4 id="MagicOnion_Server_Hubs_ImmutableArrayGroupRepository_TryRemove_System_String_" data-uid="MagicOnion.Server.Hubs.ImmutableArrayGroupRepository.TryRemove(System.String)">TryRemove(String)</h4>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_RentThreadStaticWriter_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_RentThreadStaticWriter" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.RentThreadStaticWriter">RentThreadStaticWriter()</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool TryRemove(string groupName)</code></pre>
+    <pre><code class="lang-csharp hljs">public static MemoryPoolBufferWriter RentThreadStaticWriter()</code></pre>
   </div>
 
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>groupName</code></span> <span class="xref">System.String</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
   
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">System.Boolean</span></dt>
+    <dt><a class="xref" href="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.html">MemoryPoolBufferWriter</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_ToMemoryOwnerAndReturn_" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn*"></a>
+  <h4 id="MagicOnion_Internal_Buffers_MemoryPoolBufferWriter_ToMemoryOwnerAndReturn" data-uid="MagicOnion.Internal.Buffers.MemoryPoolBufferWriter.ToMemoryOwnerAndReturn">ToMemoryOwnerAndReturn()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public (IMemoryOwner&lt;byte&gt; Owner, int Written) ToMemoryOwnerAndReturn()</code></pre>
+  </div>
+
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.ValueTuple</span>&lt;<span class="xref">IMemoryOwner</span>&lt;<span class="xref">System.Byte</span>&gt;, <span class="xref">System.Int32</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -301,10 +358,6 @@
   
   </section>
   
-  <h3 id="implements">Implements</h3>
-  <div>
-      <a class="xref" href="MagicOnion.Server.Hubs.IGroupRepository.html">IGroupRepository</a>
-  </div>
   
   
 </article>

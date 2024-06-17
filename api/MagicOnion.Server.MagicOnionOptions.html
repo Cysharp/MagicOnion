@@ -129,9 +129,23 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_ClientResultsDefaultTimeout">ClientResultsDefaultTimeout</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets or sets the default timeout duration of client results. Default is 5 seconds.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_EnableCurrentContext">EnableCurrentContext</a>
         </td>
         <td class="markdown level1 summary"><p>Enable ServiceContext.Current option by AsyncLocal.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_EnableStreamingHubHeartbeat">EnableStreamingHubHeartbeat</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets or sets a value whether the heartbeat feature of StreamingHub is enabled. Default is <see keyword="true"></see>.</p>
 </td>
       </tr>
       <tr>
@@ -160,6 +174,20 @@
           <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_MessageSerializer">MessageSerializer</a>
         </td>
         <td class="markdown level1 summary"><p>Gets and sets the serializer that serializes the message. The default serializer is MagicOnionMessageSerializer.Default.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatInterval">StreamingHubHeartbeatInterval</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat interval. Default is <see keyword="null"></see>. If the value is <see keyword="null"></see>, the heartbeat is disabled.</p>
+</td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Server.MagicOnionOptions.html#MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatTimeout">StreamingHubHeartbeatTimeout</a>
+        </td>
+        <td class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat timeout. Default is <see keyword="null"></see>. If the value is <see keyword="null"></see>, the server does not disconnect a client due to timeout.</p>
 </td>
       </tr>
     </tbody>
@@ -194,6 +222,37 @@
   <h3 id="properties">Properties
   </h3>
   <section>
+  <a id="MagicOnion_Server_MagicOnionOptions_ClientResultsDefaultTimeout_" data-uid="MagicOnion.Server.MagicOnionOptions.ClientResultsDefaultTimeout*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionOptions_ClientResultsDefaultTimeout" data-uid="MagicOnion.Server.MagicOnionOptions.ClientResultsDefaultTimeout">ClientResultsDefaultTimeout</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the default timeout duration of client results. Default is 5 seconds.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan ClientResultsDefaultTimeout { get; set; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TimeSpan</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_MagicOnionOptions_EnableCurrentContext_" data-uid="MagicOnion.Server.MagicOnionOptions.EnableCurrentContext*"></a>
   <h4 id="MagicOnion_Server_MagicOnionOptions_EnableCurrentContext" data-uid="MagicOnion.Server.MagicOnionOptions.EnableCurrentContext">EnableCurrentContext</h4>
   <div class="markdown level1 summary"><p>Enable ServiceContext.Current option by AsyncLocal.</p>
@@ -202,6 +261,37 @@
   
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public bool EnableCurrentContext { get; set; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Boolean</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_MagicOnionOptions_EnableStreamingHubHeartbeat_" data-uid="MagicOnion.Server.MagicOnionOptions.EnableStreamingHubHeartbeat*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionOptions_EnableStreamingHubHeartbeat" data-uid="MagicOnion.Server.MagicOnionOptions.EnableStreamingHubHeartbeat">EnableStreamingHubHeartbeat</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value whether the heartbeat feature of StreamingHub is enabled. Default is <see keyword="true"></see>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool EnableStreamingHubHeartbeat { get; set; }</code></pre>
   </div>
 
   
@@ -336,6 +426,68 @@
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatInterval_" data-uid="MagicOnion.Server.MagicOnionOptions.StreamingHubHeartbeatInterval*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatInterval" data-uid="MagicOnion.Server.MagicOnionOptions.StreamingHubHeartbeatInterval">StreamingHubHeartbeatInterval</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat interval. Default is <see keyword="null"></see>. If the value is <see keyword="null"></see>, the heartbeat is disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan? StreamingHubHeartbeatInterval { get; set; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatTimeout_" data-uid="MagicOnion.Server.MagicOnionOptions.StreamingHubHeartbeatTimeout*"></a>
+  <h4 id="MagicOnion_Server_MagicOnionOptions_StreamingHubHeartbeatTimeout" data-uid="MagicOnion.Server.MagicOnionOptions.StreamingHubHeartbeatTimeout">StreamingHubHeartbeatTimeout</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a StreamingHub heartbeat timeout. Default is <see keyword="null"></see>. If the value is <see keyword="null"></see>, the server does not disconnect a client due to timeout.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TimeSpan? StreamingHubHeartbeatTimeout { get; set; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">System.Nullable</span>&lt;<span class="xref">TimeSpan</span>&gt;</dt>
     <dd></dd>
   </dl>
   </section>

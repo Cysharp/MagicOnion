@@ -151,6 +151,12 @@
     <tbody>
       <tr>
         <td>
+          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_Client">Client</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
           <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_ConnectionId">ConnectionId</a>
         </td>
         <td class="markdown level1 summary"></td>
@@ -173,54 +179,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_Broadcast_MagicOnion_Server_Hubs_IGroup_">Broadcast(IGroup)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_MagicOnion_Server_Hubs_IGroup_Guid_">BroadcastExcept(IGroup, Guid)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_MagicOnion_Server_Hubs_IGroup_Guid___">BroadcastExcept(IGroup, Guid[])</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExceptSelf_MagicOnion_Server_Hubs_IGroup_">BroadcastExceptSelf(IGroup)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_MagicOnion_Server_Hubs_IGroup_Guid_">BroadcastTo(IGroup, Guid)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_MagicOnion_Server_Hubs_IGroup_Guid___">BroadcastTo(IGroup, Guid[])</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastToSelf_MagicOnion_Server_Hubs_IGroup_">BroadcastToSelf(IGroup)</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
-      <tr>
-        <td>
-          <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_Connect">Connect()</a>
-        </td>
-        <td class="markdown level1 summary"></td>
-      </tr>
       <tr>
         <td>
           <a class="xref" href="MagicOnion.Server.Hubs.StreamingHubBase-2.html#MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected">OnConnected()</a>
@@ -327,6 +285,36 @@ Allow the server send message to the client or broadcast to group.</p>
   <h3 id="properties">Properties
   </h3>
   <section>
+  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_Client_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Client*"></a>
+  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_Client" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Client">Client</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public TReceiver Client { get; }</code></pre>
+  </div>
+
+  
+  
+  
+  
+  <section>
+  <h5 class="propertyValue">Property Value</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">TReceiver</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
   <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_ConnectionId_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.ConnectionId*"></a>
   <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_ConnectionId" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.ConnectionId">ConnectionId</h4>
   <div class="markdown level1 summary"></div>
@@ -363,7 +351,7 @@ Allow the server send message to the client or broadcast to group.</p>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public HubGroupRepository Group { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public HubGroupRepository&lt;TReceiver&gt; Group { get; }</code></pre>
   </div>
 
   
@@ -373,7 +361,7 @@ Allow the server send message to the client or broadcast to group.</p>
   <section>
   <h5 class="propertyValue">Property Value</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><a class="xref" href="MagicOnion.Server.Hubs.HubGroupRepository.html">HubGroupRepository</a></dt>
+    <dt><a class="xref" href="MagicOnion.Server.Hubs.HubGroupRepository-1.html">HubGroupRepository</a>&lt;TReceiver&gt;</dt>
     <dd></dd>
   </dl>
   </section>
@@ -388,303 +376,6 @@ Allow the server send message to the client or broadcast to group.</p>
   </section>
   <h3 id="methods">Methods
   </h3>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_Broadcast_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Broadcast*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_Broadcast_MagicOnion_Server_Hubs_IGroup_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Broadcast(MagicOnion.Server.Hubs.IGroup)">Broadcast(IGroup)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver Broadcast(IGroup group)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExcept*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_MagicOnion_Server_Hubs_IGroup_Guid_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExcept(MagicOnion.Server.Hubs.IGroup,Guid)">BroadcastExcept(IGroup, Guid)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastExcept(IGroup group, Guid except)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>except</code></span> <span class="xref">Guid</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExcept*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExcept_MagicOnion_Server_Hubs_IGroup_Guid___" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExcept(MagicOnion.Server.Hubs.IGroup,Guid[])">BroadcastExcept(IGroup, Guid[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastExcept(IGroup group, Guid[] excepts)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>excepts</code></span> <span class="xref">Guid</span>[]</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExceptSelf_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExceptSelf*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastExceptSelf_MagicOnion_Server_Hubs_IGroup_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastExceptSelf(MagicOnion.Server.Hubs.IGroup)">BroadcastExceptSelf(IGroup)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastExceptSelf(IGroup group)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastTo*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_MagicOnion_Server_Hubs_IGroup_Guid_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastTo(MagicOnion.Server.Hubs.IGroup,Guid)">BroadcastTo(IGroup, Guid)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastTo(IGroup group, Guid toConnectionId)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>toConnectionId</code></span> <span class="xref">Guid</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastTo*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastTo_MagicOnion_Server_Hubs_IGroup_Guid___" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastTo(MagicOnion.Server.Hubs.IGroup,Guid[])">BroadcastTo(IGroup, Guid[])</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastTo(IGroup group, Guid[] toConnectionIds)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>toConnectionIds</code></span> <span class="xref">Guid</span>[]</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastToSelf_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastToSelf*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_BroadcastToSelf_MagicOnion_Server_Hubs_IGroup_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.BroadcastToSelf(MagicOnion.Server.Hubs.IGroup)">BroadcastToSelf(IGroup)</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected TReceiver BroadcastToSelf(IGroup group)</code></pre>
-  </div>
-
-  <section>
-  <h5 class="parameters">Parameters</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>group</code></span> <a class="xref" href="MagicOnion.Server.Hubs.IGroup.html">IGroup</a></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">TReceiver</span></dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
-  <section>
-  <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_Connect_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Connect*"></a>
-  <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_Connect" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.Connect">Connect()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public async Task&lt;DuplexStreamingResult&lt;byte[], byte[]&gt;&gt; Connect()</code></pre>
-  </div>
-
-  
-  <section>
-  <h5 class="returns">Returns</h5>
-  <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;<a class="xref" href="MagicOnion.DuplexStreamingResult-2.html">DuplexStreamingResult</a>&lt;<span class="xref">System.Byte</span>[], <span class="xref">System.Byte</span>[]&gt;&gt;</dt>
-    <dd></dd>
-  </dl>
-  </section>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </section>
   <section>
   <a id="MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected_" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected*"></a>
   <h4 id="MagicOnion_Server_Hubs_StreamingHubBase_2_OnConnected" data-uid="MagicOnion.Server.Hubs.StreamingHubBase`2.OnConnected">OnConnected()</h4>

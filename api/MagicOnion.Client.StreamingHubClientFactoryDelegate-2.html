@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate TStreamingHub StreamingHubClientFactoryDelegate&lt;out TStreamingHub, in TReceiver&gt;(CallInvoker callInvoker, TReceiver receiver, string? host, CallOptions callOptions, IMagicOnionSerializerProvider serializerProvider, IMagicOnionClientLogger logger)
+    <pre><code class="lang-csharp hljs">public delegate TStreamingHub StreamingHubClientFactoryDelegate&lt;out TStreamingHub, in TReceiver&gt;(TReceiver receiver, CallInvoker callInvoker, StreamingHubClientOptions options)
     where TStreamingHub : IStreamingHub&lt;TStreamingHub, TReceiver&gt;;</code></pre>
   </div>
 
@@ -92,17 +92,11 @@
   <section>
   <h4 class="parameters">Parameters</h4>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>callInvoker</code></span> <span class="xref">CallInvoker</span></dt>
-    <dd></dd>
     <dt><span class="parametername"><code>receiver</code></span> <span class="xref">TReceiver</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>host</code></span> <span class="xref">System.Nullable</span>&lt;<span class="xref">System.String</span>&gt;</dt>
+    <dt><span class="parametername"><code>callInvoker</code></span> <span class="xref">CallInvoker</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>callOptions</code></span> <span class="xref">CallOptions</span></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>serializerProvider</code></span> <a class="xref" href="MagicOnion.Serialization.IMagicOnionSerializerProvider.html">IMagicOnionSerializerProvider</a></dt>
-    <dd></dd>
-    <dt><span class="parametername"><code>logger</code></span> <a class="xref" href="MagicOnion.Client.IMagicOnionClientLogger.html">IMagicOnionClientLogger</a></dt>
+    <dt><span class="parametername"><code>options</code></span> <a class="xref" href="MagicOnion.Client.StreamingHubClientOptions.html">StreamingHubClientOptions</a></dt>
     <dd></dd>
   </dl>
   </section>
