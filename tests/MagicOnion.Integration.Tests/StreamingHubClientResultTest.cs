@@ -8,7 +8,7 @@ using Xunit.Sdk;
 
 namespace MagicOnion.Integration.Tests;
 
-public class StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory, ITestOutputHelper testOutputHelper) : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
+public class StreamingHubClientResultTest(MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory) : IClassFixture<MagicOnionApplicationFactory<StreamingHubClientResultTestHub>>
 {
     readonly MagicOnionApplicationFactory<StreamingHubClientResultTestHub> factory = factory;
 
