@@ -6,6 +6,7 @@ using MagicOnion.Serialization.MessagePack;
 using MagicOnion.Server.Hubs;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 
 namespace MagicOnion.Server.Tests;
 
@@ -461,7 +462,6 @@ public class StreamingHubHandlerTest
         }
         fakeStreamingHubContext.Responses[0].Memory.ToArray().Should().Equal(BuildMessage());
     }
-
 
     interface IStreamingHubHandlerTestHubReceiver
     {
