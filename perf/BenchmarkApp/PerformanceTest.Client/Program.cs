@@ -52,7 +52,7 @@ async Task Main(
     // Create a control channel
     using var channelControl = GrpcChannel.ForAddress(config.Url);
     var controlServiceClient = MagicOnionClient.Create<IPerfTestControlService>(channelControl);
-    controlServiceClient.SetMemoryProfilerCollectAllocations(true);
+    await controlServiceClient.SetMemoryProfilerCollectAllocationsAsync(true);
 
     ServerInformation serverInfo;
     WriteLog("Gathering the server information...");

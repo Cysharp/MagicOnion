@@ -51,6 +51,7 @@ class ChatHubReceiver(Guid sessionId) : IChatHubReceiver
     public async Task<string> HelloAsync(string name, int age)
     {
         Console.WriteLine("HelloAsync called");
+        await Task.Delay(100);
         return $"Hello {name} ({age})!; {sessionId}";
     }
 }

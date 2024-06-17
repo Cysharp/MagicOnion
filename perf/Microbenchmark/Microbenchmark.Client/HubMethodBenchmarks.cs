@@ -44,9 +44,10 @@ public class HubMethodBenchmarks
     }
 
     [Benchmark]
-    public async Task Void_Parameter_Zero_NoReturn()
+    public Task Void_Parameter_Zero_NoReturn()
     {
         client.Void_Parameter_Zero_NoReturn();
+        return Task.CompletedTask;
     }
 
     [Benchmark]

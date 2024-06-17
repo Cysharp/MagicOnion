@@ -166,7 +166,9 @@ public class SwaggerDefinitionBuilder
                 {
                     BuildSchema(definitions, x.ParameterType);
                     refSchema = new Schema { @ref = BuildSchema(definitions, x.ParameterType) };
+#pragma warning disable SYSLIB0050
                     var unknownObj = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(x.ParameterType);
+#pragma warning restore SYSLIB0050
                     defaultObjectExample = JsonConvert.SerializeObject(unknownObj, new[] { new Newtonsoft.Json.Converters.StringEnumConverter() });
                     swaggerDataType = "string"; // object can not attach formData.
                 }

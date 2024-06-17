@@ -9,7 +9,7 @@ public interface IPerfTestControlService : IService<IPerfTestControlService>
 {
     UnaryResult<ServerInformation> GetServerInformationAsync();
 
-    UnaryResult SetMemoryProfilerCollectAllocations(bool enable);
+    UnaryResult SetMemoryProfilerCollectAllocationsAsync(bool enable);
     UnaryResult CreateMemoryProfilerSnapshotAsync(string name);
 }
 
