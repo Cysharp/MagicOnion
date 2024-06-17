@@ -3,7 +3,7 @@ using MagicOnion;
 using Microbenchmark.Client;
 
 //BenchmarkRunner.Run<HubReceiverBroadcastBenchmarks>();
-//BenchmarkRunner.Run<HubMethodBenchmarks>();
+BenchmarkRunner.Run<HubMethodBenchmarks>();
 
 #if FALSE
 var b = new HubMethodBenchmarks();
