@@ -625,7 +625,42 @@ public class StreamingHubTest : IClassFixture<MagicOnionApplicationFactory<Strea
 
         Assert.Equal(3, await task3);
     }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CustomMethodId(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act & Assert
+        await client.CustomMethodId();
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerateStreamingHubClientFactory))]
+    public async Task CustomMethodId_Receiver(TestStreamingHubClientFactory clientFactory)
+    {
+        // Arrange
+        var httpClient = factory.CreateDefaultClient();
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions() { HttpClient = httpClient });
+
+        var receiver = Substitute.For<IStreamingHubTestHubReceiver>();
+        var client = await clientFactory.CreateAndConnectAsync<IStreamingHubTestHub, IStreamingHubTestHubReceiver>(channel, receiver);
+
+        // Act
+        await client.CallReceiver_CustomMethodId();
+        await Task.Delay(500); // Wait for broadcast queue to be consumed.
+
+        // Assert
+        receiver.Received().Receiver_CustomMethodId();
+    }
 }
+
 public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStreamingHubTestHubReceiver>, IStreamingHubTestHub
 {
     IGroup<IStreamingHubTestHubReceiver> group = default!;
@@ -802,6 +837,12 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         return Task.CompletedTask;
     }
 
+    public Task CallReceiver_CustomMethodId()
+    {
+        group.All.Receiver_CustomMethodId();
+        return Task.CompletedTask;
+    }
+
     public Task ThrowReturnStatusException()
     {
         throw new ReturnStatusException(StatusCode.Unknown, "Detail-String");
@@ -824,6 +865,11 @@ public class StreamingHubTestHub : StreamingHubBase<IStreamingHubTestHub, IStrea
         await Task.Delay(delay);
         return id;
     }
+
+    public Task CustomMethodId()
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public interface IStreamingHubTestHubReceiver
@@ -839,6 +885,9 @@ public interface IStreamingHubTestHubReceiver
     void Receiver_Test_Void_Parameter_Zero();
     void Receiver_Test_Void_Parameter_One(int arg0);
     void Receiver_Test_Void_Parameter_Many(int arg0, string arg1, bool arg2);
+
+    [MethodId(54321)]
+    void Receiver_CustomMethodId();
 }
 
 public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStreamingHubTestHubReceiver>
@@ -880,10 +929,15 @@ public interface IStreamingHubTestHub : IStreamingHub<IStreamingHubTestHub, IStr
 
     Task CallReceiver_Delay(int milliseconds);
 
+    Task CallReceiver_CustomMethodId();
+
     Task ThrowReturnStatusException();
     Task Throw();
 
     Task<(int Arg0, string Arg1, bool Arg2)> Concurrent(int arg0, string arg1, bool arg2);
 
     Task<int> Delay(int id, TimeSpan delay);
+
+    [MethodId(12345)]
+    Task CustomMethodId();
 }
