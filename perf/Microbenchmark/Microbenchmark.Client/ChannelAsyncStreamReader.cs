@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Grpc.Core;
 
@@ -14,7 +15,13 @@ class ChannelAsyncStreamReader<T> : IAsyncStreamReader<T>
         reader = channel.Reader;
     }
 
-    public async Task<bool> MoveNext(CancellationToken cancellationToken)
+    public Task<bool> MoveNext(CancellationToken cancellationToken)
+    {
+        return MoveNextCore(cancellationToken).AsTask();
+    }
+
+    [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder<>))]
+    async ValueTask<bool> MoveNextCore(CancellationToken cancellationToken)
     {
         if (await reader.WaitToReadAsync())
         {
