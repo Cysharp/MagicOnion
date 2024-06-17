@@ -2,7 +2,14 @@ using BenchmarkDotNet.Running;
 using MagicOnion;
 using Microbenchmark.Client;
 
-BenchmarkRunner.Run<HubReceiverBroadcastBenchmarks>();
+//BenchmarkRunner.Run<HubReceiverBroadcastBenchmarks>();
+BenchmarkRunner.Run<HubMethodBenchmarks>();
+
+#if FALSE
+var b = new HubMethodBenchmarks();
+for (var i = 0; i < 1000000; i++)
+    await b.Parameter_Zero_Return_ValueType();
+#endif
 
 class MySynchronizationContext : SynchronizationContext;
 

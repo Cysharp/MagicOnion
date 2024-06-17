@@ -84,7 +84,7 @@ namespace MagicOnion.Client
         readonly IMagicOnionSerializer messageSerializer;
         readonly Method<StreamingHubPayload, StreamingHubPayload> duplexStreamingConnectMethod;
         // {messageId, TaskCompletionSource}
-        readonly ConcurrentDictionary<int, ITaskCompletion> responseFutures = new();
+        readonly Dictionary<int, ITaskCompletion> responseFutures = new();
         readonly TaskCompletionSource<bool> waitForDisconnect = new();
         readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -319,19 +319,26 @@ namespace MagicOnion.Client
         void ProcessResponse(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
         {
             var message = messageReader.ReadResponseMessage();
-            if (responseFutures.Remove(message.MessageId, out var future))
+
+            ITaskCompletion? future;
+            lock (responseFutures)
             {
-                try
+                if (!responseFutures.Remove(message.MessageId, out future))
                 {
-                    OnResponseEvent(message.MethodId, future, message.Body);
-                    StreamingHubPayloadPool.Shared.Return(payload);
+                    return;
                 }
-                catch (Exception ex)
+            }
+
+            try
+            {
+                OnResponseEvent(message.MethodId, future, message.Body);
+                StreamingHubPayloadPool.Shared.Return(payload);
+            }
+            catch (Exception ex)
+            {
+                if (!future.TrySetException(ex))
                 {
-                    if (!future.TrySetException(ex))
-                    {
-                        throw;
-                    }
+                    throw;
                 }
             }
         }
@@ -339,21 +346,28 @@ namespace MagicOnion.Client
         void ProcessResponseWithError(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
         {
             var message = messageReader.ReadResponseWithErrorMessage();
-            if (responseFutures.Remove(message.MessageId, out var future))
-            {
-                RpcException ex;
-                if (string.IsNullOrWhiteSpace(message.Error))
-                {
-                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
-                }
-                else
-                {
-                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
-                }
 
-                future.TrySetException(ex);
-                StreamingHubPayloadPool.Shared.Return(payload);
+            ITaskCompletion? future;
+            lock (responseFutures)
+            {
+                if (!responseFutures.Remove(message.MessageId, out future))
+                {
+                    return;
+                }
             }
+
+            RpcException ex;
+            if (string.IsNullOrWhiteSpace(message.Error))
+            {
+                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
+            }
+            else
+            {
+                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
+            }
+
+            future.TrySetException(ex);
+            StreamingHubPayloadPool.Shared.Return(payload);
         }
 
         void ProcessClientResultRequest(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
@@ -462,7 +476,10 @@ namespace MagicOnion.Client
                 TaskCreationOptions.RunContinuationsAsynchronously
 #endif
             );
-            responseFutures[mid] = tcs;
+            lock (responseFutures)
+            {
+                responseFutures[mid] = tcs;
+            }
 
             var v = BuildRequestMessage(methodId, mid, message);
             _ = writerQueue.Writer.TryWrite(v);

@@ -86,28 +86,49 @@ class StreamingHubClientTestHelper<TStreamingHub, TReceiver>
         );
     }
 
-    public async Task<ReadOnlyMemory<byte>> ReadRequestRawAsync()
+    public async ValueTask<ReadOnlyMemory<byte>> ReadRequestRawAsync()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
         return requestPayload.Memory;
     }
 
-    public async Task<(int MessageId, int MethodId, T Request)> ReadRequestAsync<T>()
+    public async ValueTask<(int MessageId, int MethodId, T Request)> ReadRequestAsync<T>()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
-        return ReadRequestPayload<T>(requestPayload.Memory);
+        try
+        {
+            return ReadRequestPayload<T>(requestPayload.Memory);
+        }
+        finally
+        {
+            StreamingHubPayloadPool.Shared.Return(requestPayload);
+        }
     }
 
-    public async Task<(int MessageId, int MethodId, ReadOnlyMemory<byte> Request)> ReadRequestNoDeserializeAsync()
+    public async ValueTask<(int MessageId, int MethodId, ReadOnlyMemory<byte> Request)> ReadRequestNoDeserializeAsync()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
-        return ReadRequestPayload(requestPayload.Memory);
+        try
+        {
+            return ReadRequestPayload(requestPayload.Memory);
+        }
+        finally
+        {
+            StreamingHubPayloadPool.Shared.Return(requestPayload);
+        }
     }
 
-    public async Task<(int MethodId, T Request)> ReadFireAndForgetRequestAsync<T>()
+    public async ValueTask<(int MethodId, T Request)> ReadFireAndForgetRequestAsync<T>()
     {
         var requestPayload = await requestChannel.Reader.ReadAsync();
-        return ReadFireAndForgetRequestPayload<T>(requestPayload.Memory);
+        try
+        {
+            return ReadFireAndForgetRequestPayload<T>(requestPayload.Memory);
+        }
+        finally
+        {
+            StreamingHubPayloadPool.Shared.Return(requestPayload);
+        }
     }
 
     public void WriteResponseRaw(ReadOnlySpan<byte> data)
