@@ -13,6 +13,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);CS2008</NoWarn>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
   </PropertyGroup>
 
   <ItemGroup>

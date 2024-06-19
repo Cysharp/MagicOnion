@@ -30,7 +30,7 @@ jobs:
       # build
       - run: dotnet build -c ${{ env.BUILD_CONFIG }} ./MagicOnion.sln
       # pack
-      - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf --include-symbols --include-source --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
+      - run: dotnet pack -c ${{ env.BUILD_CONFIG }} ./MagicOnion.Packaging.slnf --no-build -p:VersionSuffix=${MAGICONION_VERSION} -o ./publish
       - uses: Cysharp/Actions/.github/actions/upload-artifact@main
         with:
           name: nuget

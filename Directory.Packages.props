@@ -27,7 +27,7 @@
     <PackageVersion Include="Multicaster.Distributed.Nats" Version="$(MulticasterVersion)" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
     <PackageVersion Include="System.Threading.Channels" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageVersion Include="PolySharp" Version="1.13.2" />
     <PackageVersion Include="StackExchange.Redis" Version="2.0.601" />
