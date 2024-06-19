@@ -356,21 +356,18 @@ namespace MagicOnion.Client
                 }
             }
 
-            if (responseFutures.Remove(message.MessageId, out future))
+            RpcException ex;
+            if (string.IsNullOrWhiteSpace(message.Error))
             {
-                RpcException ex;
-                if (string.IsNullOrWhiteSpace(message.Error))
-                {
-                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
-                }
-                else
-                {
-                    ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
-                }
-
-                future.TrySetException(ex);
-                StreamingHubPayloadPool.Shared.Return(payload);
+                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty));
             }
+            else
+            {
+                ex = new RpcException(new Status((StatusCode)message.StatusCode, message.Detail ?? string.Empty), message.Detail + Environment.NewLine + message.Error);
+            }
+
+            future.TrySetException(ex);
+            StreamingHubPayloadPool.Shared.Return(payload);
         }
 
         void ProcessClientResultRequest(SynchronizationContext? syncContext, StreamingHubPayload payload, ref StreamingHubClientMessageReader messageReader)
