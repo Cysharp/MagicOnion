@@ -8,90 +8,82 @@ using System.Threading;
 
 namespace MagicOnion.Internal
 {
-    internal class StreamingHubPayloadPool
+    internal class ObjectPool<T> where T : class
     {
-        StreamingHubPayload? pool1;
-        StreamingHubPayload? pool2;
-        StreamingHubPayload? pool3;
-        StreamingHubPayload? pool4;
+        T? item1;
+        T? item2;
+        T? item3;
+        T? item4;
 
-        static StreamingHubPayloadPool pool = new();
-
-        public static StreamingHubPayloadPool Shared => pool;
-
-        public void Return(StreamingHubPayload payload)
+        protected T RentOrCreateCore(Func<T> factory)
         {
-            ((IStreamingHubPayload)payload).Uninitialize();
-
-            var pooled = TryReturn(ref pool1, payload) ||
-                         TryReturn(ref pool2, payload) ||
-                         TryReturn(ref pool3, payload) ||
-                         TryReturn(ref pool4, payload);
-        }
-
-        public StreamingHubPayload RentOrCreate(ReadOnlySequence<byte> data)
-        {
-            StreamingHubPayload? tmpPayload;
-            if (!(TryGet(ref pool1, out tmpPayload) ||
-                  TryGet(ref pool2, out tmpPayload) ||
-                  TryGet(ref pool3, out tmpPayload) ||
-                  TryGet(ref pool4, out tmpPayload)))
+            T? tmpItem;
+            if (!(TryGet(ref item1, out tmpItem) ||
+                  TryGet(ref item2, out tmpItem) ||
+                  TryGet(ref item3, out tmpItem) ||
+                  TryGet(ref item4, out tmpItem)))
             {
-                tmpPayload = new StreamingHubPayload();
+                tmpItem = factory();
             }
 
-            ((IStreamingHubPayload)tmpPayload).Initialize(data);
-
-            return tmpPayload;
+            return tmpItem;
         }
 
-        public StreamingHubPayload RentOrCreate(ReadOnlySpan<byte> data)
+        protected void ReturnCore(T item)
         {
-            StreamingHubPayload? tmpPayload;
-            if (!(TryGet(ref pool1, out tmpPayload) ||
-                  TryGet(ref pool2, out tmpPayload) ||
-                  TryGet(ref pool3, out tmpPayload) ||
-                  TryGet(ref pool4, out tmpPayload)))
-            {
-                tmpPayload = new StreamingHubPayload();
-            }
-
-            ((IStreamingHubPayload)tmpPayload).Initialize(data);
-
-            return tmpPayload;
-        }
-
-        public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data)
-        {
-            StreamingHubPayload? tmpPayload;
-            if (!(TryGet(ref pool1, out tmpPayload) ||
-                  TryGet(ref pool2, out tmpPayload) ||
-                  TryGet(ref pool3, out tmpPayload) ||
-                  TryGet(ref pool4, out tmpPayload)))
-            {
-                tmpPayload = new StreamingHubPayload();
-            }
-
-            ((IStreamingHubPayload)tmpPayload).Initialize(data);
-
-            return tmpPayload;
+            var pooled = TryReturn(ref item1, item) ||
+                         TryReturn(ref item2, item) ||
+                         TryReturn(ref item3, item) ||
+                         TryReturn(ref item4, item);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool TryReturn(ref StreamingHubPayload? field, StreamingHubPayload payload)
+        bool TryReturn(ref T? field, T payload)
             => Interlocked.CompareExchange(ref field, payload, null) == null;
 
-        bool TryGet(ref StreamingHubPayload? field, [NotNullWhen(true)] out StreamingHubPayload? payload)
+        bool TryGet(ref T? field, [NotNullWhen(true)] out T? item)
         {
             var tmp = field;
             if (tmp != null && Interlocked.CompareExchange(ref field, null, tmp) == tmp)
             {
-                payload = tmp;
+                item = tmp;
                 return true;
             }
 
-            payload = null;
+            item = null;
             return false;
+        }
+    }
+
+    internal class StreamingHubPayloadPool : ObjectPool<StreamingHubPayload>
+    {
+        public static StreamingHubPayloadPool Shared { get; } = new();
+
+        public void Return(StreamingHubPayload payload)
+        {
+            ((IStreamingHubPayload)payload).Uninitialize();
+            ReturnCore(payload);
+        }
+
+        public StreamingHubPayload RentOrCreate(ReadOnlySequence<byte> data)
+        {
+            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            ((IStreamingHubPayload)payload).Initialize(data);
+            return payload;
+        }
+
+        public StreamingHubPayload RentOrCreate(ReadOnlySpan<byte> data)
+        {
+            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            ((IStreamingHubPayload)payload).Initialize(data);
+            return payload;
+        }
+
+        public StreamingHubPayload RentOrCreate(ReadOnlyMemory<byte> data)
+        {
+            var payload = RentOrCreateCore(static () => new StreamingHubPayload());
+            ((IStreamingHubPayload)payload).Initialize(data);
+            return payload;
         }
     }
 }

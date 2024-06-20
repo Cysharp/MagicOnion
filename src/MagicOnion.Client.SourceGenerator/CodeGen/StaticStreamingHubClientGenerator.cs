@@ -120,24 +120,66 @@ public class StaticStreamingHubClientGenerator
         if (ctx.EnableStreamingHubDiagnosticHandler)
         {
             ctx.Writer.AppendLineWithFormat($$"""
-                            global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageWithResponseDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageWithResponseAsync<TRequest, TResponse>(methodId, message);
+                                    return base.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(methodId, message);
                                 }
 
-                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseAsync<TRequest, TResponse>);
+                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>).AsTask();
                             }
 
-                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            async global::System.Threading.Tasks.ValueTask WriteMessageWithResponseDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
                             {
                                 if (diagnosticHandler is null)
                                 {
-                                    return base.WriteMessageFireAndForgetAsync<TRequest, TResponse>(methodId, message);
+                                    await base.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(methodId, message);
+                                    return;
                                 }
 
-                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetAsync<TRequest, TResponse>);
+                                await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
+                            }
+
+                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageWithResponseDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    return base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                                }
+
+                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>);
+                            }
+
+                            global::System.Threading.Tasks.Task<TResponse> WriteMessageFireAndForgetDiagnosticTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    return base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                                }
+
+                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>).AsTask();
+                            }
+
+                            async global::System.Threading.Tasks.ValueTask WriteMessageFireAndForgetDiagnosticValueTaskAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    await base.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(methodId, message);
+                                    return;
+                                }
+
+                                await diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
+                            }
+
+                            global::System.Threading.Tasks.ValueTask<TResponse> WriteMessageFireAndForgetDiagnosticValueTaskOfTAsync<TRequest, TResponse>(int methodId, TRequest message, [global::System.Runtime.CompilerServices.CallerMemberName] string callerMemberName = default!)
+                            {
+                                if (diagnosticHandler is null)
+                                {
+                                    return base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(methodId, message);
+                                }
+                            
+                                return diagnosticHandler.OnMethodInvoke(this, methodId, callerMemberName, message, isFireAndForget: true, base.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>);
                             }
             """);
             ctx.Writer.AppendLine();
@@ -217,13 +259,13 @@ public class StaticStreamingHubClientGenerator
             };
             var isReturnTypeVoid = method.MethodReturnType == MagicOnionTypeInfo.KnownTypes.System_Void;
             var writeMessageTarget = isFireAndForget ? "parent" : "this";
-            var writeMessageAsync = ctx.EnableStreamingHubDiagnosticHandler
+            var writeMessageAsyncPrefix = ctx.EnableStreamingHubDiagnosticHandler
                 ? isFireAndForget || isReturnTypeVoid
-                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnosticAsync"
-                    : $"{writeMessageTarget}.WriteMessageWithResponseDiagnosticAsync"
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetDiagnostic"
+                    : $"{writeMessageTarget}.WriteMessageWithResponseDiagnostic"
                 : isFireAndForget || isReturnTypeVoid
-                    ? $"{writeMessageTarget}.WriteMessageFireAndForgetAsync"
-                    : $"{writeMessageTarget}.WriteMessageWithResponseAsync";
+                    ? $"{writeMessageTarget}.WriteMessageFireAndForget"
+                    : $"{writeMessageTarget}.WriteMessageWithResponse";
 
             if (isFireAndForget) ctx.Writer.Append("    ");
             ctx.Writer.AppendLineWithFormat($"""
@@ -235,21 +277,21 @@ public class StaticStreamingHubClientGenerator
             {
                 // ValueTask
                 ctx.Writer.AppendLineWithFormat($"""
-                                => new global::System.Threading.Tasks.ValueTask({writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                                => {writeMessageAsyncPrefix}ValueTaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
             else if (method.MethodReturnType.HasGenericArguments && method.MethodReturnType.GetGenericTypeDefinition() == MagicOnionTypeInfo.KnownTypes.System_Threading_Tasks_ValueTask)
             {
                 // ValueTask<T>
                 ctx.Writer.AppendLineWithFormat($"""
-                                => new global::System.Threading.Tasks.ValueTask<{method.ResponseType.FullName}>({writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters}));
+                                => {writeMessageAsyncPrefix}ValueTaskOfTAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
             else
             {
                 // Task, Task<T>
                 ctx.Writer.AppendLineWithFormat($"""
-                                => {writeMessageAsync}<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
+                                => {writeMessageAsyncPrefix}TaskAsync<{method.RequestType.FullName}, {method.ResponseType.FullName}>({method.HubId}{writeMessageParameters});
             """);
             }
         }
