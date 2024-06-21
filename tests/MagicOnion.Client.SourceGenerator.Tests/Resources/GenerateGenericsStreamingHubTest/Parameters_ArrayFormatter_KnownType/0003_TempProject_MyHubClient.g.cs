@@ -21,15 +21,15 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetStringValuesAsync(global::System.String[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetIntValuesAsync(global::System.Int32[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetInt32ValuesAsync(global::System.Int32[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetSingleValuesAsync(global::System.Single[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
                 public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetBooleanValuesAsync(global::System.Boolean[] arg0)
-                    => this.WriteMessageWithResponseAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -47,15 +47,15 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetStringValuesAsync(global::System.String[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.String[], global::MessagePack.Nil>(1774317884, arg0);
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetIntValuesAsync(global::System.Int32[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Int32[], global::MessagePack.Nil>(-400881550, arg0);
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetInt32ValuesAsync(global::System.Int32[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Int32[], global::MessagePack.Nil>(309063297, arg0);
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetSingleValuesAsync(global::System.Single[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Single[], global::MessagePack.Nil>(702446639, arg0);
                     public global::System.Threading.Tasks.Task<global::MessagePack.Nil> GetBooleanValuesAsync(global::System.Boolean[] arg0)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Boolean[], global::MessagePack.Nil>(2082077357, arg0);
 
                 }
 

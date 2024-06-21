@@ -21,11 +21,11 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task C()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
                 public global::System.Threading.Tasks.Task B()
-                    => this.WriteMessageWithResponseAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
+                    => this.WriteMessageWithResponseTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -43,11 +43,11 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task A()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-1005848884, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task C()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-972293646, global::MessagePack.Nil.Default);
                     public global::System.Threading.Tasks.Task B()
-                        => parent.WriteMessageFireAndForgetAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MessagePack.Nil, global::MessagePack.Nil>(-955516027, global::MessagePack.Nil.Default);
 
                 }
 

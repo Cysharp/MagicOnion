@@ -21,7 +21,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject> A(global::TempProject.MyObject a)
-                    => new global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject>(this.WriteMessageWithResponseAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a));
+                    => this.WriteMessageWithResponseValueTaskOfTAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -39,7 +39,7 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject> A(global::TempProject.MyObject a)
-                        => new global::System.Threading.Tasks.ValueTask<global::TempProject.MyObject>(parent.WriteMessageFireAndForgetAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a));
+                        => parent.WriteMessageFireAndForgetValueTaskOfTAsync<global::TempProject.MyObject, global::TempProject.MyObject>(-1005848884, a);
 
                 }
 

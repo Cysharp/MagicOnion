@@ -21,7 +21,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A(global::System.Int32 a)
-                    => this.WriteMessageWithResponseAsync<global::System.Int32, global::MessagePack.Nil>(-1005848884, a);
+                    => this.WriteMessageWithResponseTaskAsync<global::System.Int32, global::MessagePack.Nil>(-1005848884, a);
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -39,7 +39,7 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task A(global::System.Int32 a)
-                        => parent.WriteMessageFireAndForgetAsync<global::System.Int32, global::MessagePack.Nil>(-1005848884, a);
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::System.Int32, global::MessagePack.Nil>(-1005848884, a);
 
                 }
 

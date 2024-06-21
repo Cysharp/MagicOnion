@@ -21,7 +21,7 @@ namespace TempProject
                 }
 
                 public global::System.Threading.Tasks.Task A(global::System.String arg0, global::System.Int32 arg1, global::System.Boolean arg2)
-                    => this.WriteMessageWithResponseAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
+                    => this.WriteMessageWithResponseTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
 
                 public global::TempProject.IMyHub FireAndForget()
                     => new FireAndForgetClient(this);
@@ -39,7 +39,7 @@ namespace TempProject
                     public global::System.Threading.Tasks.Task WaitForDisconnect() => throw new global::System.NotSupportedException();
 
                     public global::System.Threading.Tasks.Task A(global::System.String arg0, global::System.Int32 arg1, global::System.Boolean arg2)
-                        => parent.WriteMessageFireAndForgetAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
+                        => parent.WriteMessageFireAndForgetTaskAsync<global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>, global::MessagePack.Nil>(-1005848884, new global::MagicOnion.DynamicArgumentTuple<global::System.String, global::System.Int32, global::System.Boolean>(arg0, arg1, arg2));
 
                 }
 
