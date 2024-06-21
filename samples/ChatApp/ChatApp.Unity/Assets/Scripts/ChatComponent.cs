@@ -258,6 +258,12 @@ namespace Assets.Scripts
         {
             this.ChatText.text += $"\n{message.UserName}：{message.Message}";
         }
+
+        Task<string> IChatHubReceiver.HelloAsync(string name, int age)
+        {
+            return Task.FromResult($"Hello {name} ({age}) from Client");
+        }
+
         #endregion
 
 
