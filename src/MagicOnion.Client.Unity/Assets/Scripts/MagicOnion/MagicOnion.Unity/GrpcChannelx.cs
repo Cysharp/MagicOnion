@@ -395,7 +395,7 @@ namespace MagicOnion
                         new Marshaller<TRequest>((request, context) =>
                         {
                             var wrapper = new SerializationContextWrapper(context);
-                            method.RequestMarshaller.ContextualSerializer(request, context);
+                            method.RequestMarshaller.ContextualSerializer(request, wrapper);
                             channelStats.AddSentBytes(wrapper.Written);
                         }, (context) => method.RequestMarshaller.ContextualDeserializer(context)),
                         new Marshaller<TResponse>((request, context) => method.ResponseMarshaller.ContextualSerializer(request, context), x =>
