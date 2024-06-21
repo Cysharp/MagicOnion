@@ -54,15 +54,15 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case 1774317884: // Task<List<String>> GetStringValuesAsync()
-                            base.SetResultForResponse<global::System.Collections.Generic.List<global::System.String>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Collections.Generic.List<global::System.String>>(taskSource, data);
                             break;
                         case -400881550: // Task<List<Int32>> GetIntValuesAsync()
-                            base.SetResultForResponse<global::System.Collections.Generic.List<global::System.Int32>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::System.Collections.Generic.List<global::System.Int32>>(taskSource, data);
                             break;
                     }
                 }

@@ -50,12 +50,12 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case -1221306238: // Task<MyGenericObject<MyGenericObject<MyEnum>>> GetEnumAsync()
-                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyEnum>>>(taskSource, data);
                             break;
                     }
                 }

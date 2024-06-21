@@ -304,6 +304,14 @@ public class StaticStreamingHubClientGenerator
         ctx.Writer.AppendLine("""
                             protected override void OnBroadcastEvent(global::System.Int32 methodId, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
+            """);
+        if (ctx.EnableStreamingHubDiagnosticHandler)
+        {
+            ctx.Writer.AppendLine("""
+                                diagnosticHandler?.OnBroadcastEventRaw(this, methodId, data);
+            """);
+        }
+        ctx.Writer.AppendLine("""
                                 switch (methodId)
                                 {
             """);
@@ -356,18 +364,31 @@ public class StaticStreamingHubClientGenerator
     static void EmitOnResponseEvent(StreamingHubClientBuildContext ctx)
     {
         ctx.Writer.AppendLine("""
-                            protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                            protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                             {
                                 switch (methodId)
                                 {
             """);
         foreach (var method in ctx.Hub.Methods)
         {
-            ctx.Writer.AppendLineWithFormat($$"""
+            if (ctx.EnableStreamingHubDiagnosticHandler)
+            {
+                ctx.Writer.AppendLineWithFormat($$"""
                                     case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
-                                        base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskCompletionSource, data);
+                                        diagnosticHandler?.OnResponseEvent<{{ctx.Hub.GetClientFullName()}}, {{method.ResponseType.FullName}}>(this, "{{method.MethodName}}", data);
+                                        base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskSource, data);
                                         break;
             """);
+            }
+            else
+            {
+                ctx.Writer.AppendLineWithFormat($$"""
+                                    case {{method.HubId}}: // {{method.MethodReturnType.ToDisplayName()}} {{method.MethodName}}({{method.Parameters.ToMethodSignaturize()}})
+                                        base.SetResultForResponse<{{method.ResponseType.FullName}}>(taskSource, data);
+                                        break;
+            """);
+
+            }
         }
         ctx.Writer.AppendLine("""
                                 }

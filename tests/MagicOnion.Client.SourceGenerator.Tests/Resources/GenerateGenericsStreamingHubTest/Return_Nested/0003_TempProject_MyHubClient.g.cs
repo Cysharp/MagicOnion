@@ -58,18 +58,18 @@ namespace TempProject
                     }
                 }
 
-                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskCompletionSource, global::System.ReadOnlyMemory<global::System.Byte> data)
+                protected override void OnResponseEvent(global::System.Int32 methodId, global::System.Object taskSource, global::System.ReadOnlyMemory<global::System.Byte> data)
                 {
                     switch (methodId)
                     {
                         case -1005848884: // Task<MyGenericObject<MyGenericObject<MyObject>>> A()
-                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>(taskSource, data);
                             break;
                         case -955516027: // Task<MyGenericObject<MyGenericObject<MyGenericObject<MyObject>>>> B()
-                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyObject>>>>(taskSource, data);
                             break;
                         case -972293646: // Task<MyGenericObject<MyGenericObject<MyGenericObject<Int32>>>> C()
-                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>>(taskCompletionSource, data);
+                            base.SetResultForResponse<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::TempProject.MyGenericObject<global::System.Int32>>>>(taskSource, data);
                             break;
                     }
                 }
