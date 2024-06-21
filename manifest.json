@@ -153,7 +153,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.IStreamingHubDiagnosticHandler.InvokeMethodDelegate-2.html",
-          "hash": "cjv1TDc7m7Teq9evHROhGOKFOOFI8WOsBm+MtB1Lcds="
+          "hash": "N08PvMd59Tk0KeFrtf6VLIXwW9GCQckH3dSirqwj1cc="
         }
       },
       "is_incremental": false,
@@ -165,7 +165,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.IStreamingHubDiagnosticHandler.html",
-          "hash": "Pbab1RADZ78LSMuEgEyxj1h5IISVcXuag4zTh0fPwUs="
+          "hash": "1jknE9UItgwXmsSMLx/SUsCcv/KhvBrzWtM0kCq07qQ="
         }
       },
       "is_incremental": false,
@@ -861,7 +861,7 @@
       "output": {
         ".html": {
           "relative_path": "api/MagicOnion.Client.StreamingHubClientBase-2.html",
-          "hash": "HCUi5YW2eb0KN8lofS1uERhkZ7vH2bec9LB7zd6Y6Jc="
+          "hash": "1E3+EYXPbLEipRVFE1Z4K2OeF01R+yxrHIOWlsNtLTk="
         }
       },
       "is_incremental": false,

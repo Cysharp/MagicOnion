@@ -251,13 +251,37 @@
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync__2_System_Int32___0_">WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetTaskAsync__2_System_Int32___0_">WriteMessageFireAndForgetTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
       <tr>
         <td>
-          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseAsync__2_System_Int32___0_">WriteMessageWithResponseAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskAsync__2_System_Int32___0_">WriteMessageFireAndForgetValueTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskOfTAsync__2_System_Int32___0_">WriteMessageFireAndForgetValueTaskOfTAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseTaskAsync__2_System_Int32___0_">WriteMessageWithResponseTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskAsync__2_System_Int32___0_">WriteMessageWithResponseValueTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
+        </td>
+        <td class="markdown level1 summary"></td>
+      </tr>
+      <tr>
+        <td>
+          <a class="xref" href="MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync__2_System_Int32___0_">WriteMessageWithResponseValueTaskOfTAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</a>
         </td>
         <td class="markdown level1 summary"></td>
       </tr>
@@ -669,7 +693,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected abstract void OnResponseEvent(int methodId, object taskCompletionSource, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
+    <pre><code class="lang-csharp hljs">protected abstract void OnResponseEvent(int methodId, object taskSource, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
   </div>
 
   <section>
@@ -677,7 +701,7 @@
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
     <dd></dd>
-    <dt><span class="parametername"><code>taskCompletionSource</code></span> <span class="xref">System.Object</span></dt>
+    <dt><span class="parametername"><code>taskSource</code></span> <span class="xref">System.Object</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>data</code></span> <span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
@@ -742,13 +766,13 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected void SetResultForResponse&lt;TResponse&gt;(object taskCompletionSource, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
+    <pre><code class="lang-csharp hljs">protected void SetResultForResponse&lt;TResponse&gt;(object taskSource, ReadOnlyMemory&lt;byte&gt; data)</code></pre>
   </div>
 
   <section>
   <h5 class="parameters">Parameters</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="parametername"><code>taskCompletionSource</code></span> <span class="xref">System.Object</span></dt>
+    <dt><span class="parametername"><code>taskSource</code></span> <span class="xref">System.Object</span></dt>
     <dd></dd>
     <dt><span class="parametername"><code>data</code></span> <span class="xref">ReadOnlyMemory</span>&lt;<span class="xref">System.Byte</span>&gt;</dt>
     <dd></dd>
@@ -928,13 +952,13 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync``2(System.Int32,``0)">WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetTaskAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetTaskAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync``2(System.Int32,``0)">WriteMessageFireAndForgetTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected Task&lt;TResponse&gt; WriteMessageFireAndForgetAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+    <pre><code class="lang-csharp hljs">protected Task&lt;TResponse&gt; WriteMessageFireAndForgetTaskAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
   </div>
 
   <section>
@@ -976,13 +1000,109 @@
   
   </section>
   <section>
-  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync*"></a>
-  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync``2(System.Int32,``0)">WriteMessageWithResponseAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync``2(System.Int32,``0)">WriteMessageFireAndForgetValueTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected Task&lt;TResponse&gt; WriteMessageWithResponseAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+    <pre><code class="lang-csharp hljs">protected ValueTask WriteMessageFireAndForgetValueTaskAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">TRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskOfTAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskOfTAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync``2(System.Int32,``0)">WriteMessageFireAndForgetValueTaskOfTAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ValueTask&lt;TResponse&gt; WriteMessageFireAndForgetValueTaskOfTAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">TRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseTaskAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseTaskAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync``2(System.Int32,``0)">WriteMessageWithResponseTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Task&lt;TResponse&gt; WriteMessageWithResponseTaskAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
   </div>
 
   <section>
@@ -999,6 +1119,102 @@
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
     <dt><span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync``2(System.Int32,``0)">WriteMessageWithResponseValueTaskAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ValueTask WriteMessageWithResponseValueTaskAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">TRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>TRequest</code></span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>TResponse</code></span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </section>
+  <section>
+  <a id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync*"></a>
+  <h4 id="MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync__2_System_Int32___0_" data-uid="MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync``2(System.Int32,``0)">WriteMessageWithResponseValueTaskOfTAsync&lt;TRequest, TResponse&gt;(Int32, TRequest)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected ValueTask&lt;TResponse&gt; WriteMessageWithResponseValueTaskOfTAsync&lt;TRequest, TResponse&gt;(int methodId, TRequest message)</code></pre>
+  </div>
+
+  <section>
+  <h5 class="parameters">Parameters</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="parametername"><code>methodId</code></span> <span class="xref">System.Int32</span></dt>
+    <dd></dd>
+    <dt><span class="parametername"><code>message</code></span> <span class="xref">TRequest</span></dt>
+    <dd></dd>
+  </dl>
+  </section>
+  
+  <section>
+  <h5 class="returns">Returns</h5>
+  <dl class="cysharpdocfx-valuedefinition">
+    <dt><span class="xref">ValueTask</span>&lt;TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>

@@ -175,7 +175,7 @@
   <div class="markdown level1 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">Task&lt;TResponse&gt; OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt; invokeMethod)</code></pre>
+    <pre><code class="lang-csharp hljs">ValueTask&lt;TResponse&gt; OnMethodInvoke&lt;THub, TRequest, TResponse&gt;(THub hubInstance, int methodId, string methodName, TRequest request, bool isFireAndForget, IStreamingHubDiagnosticHandler.InvokeMethodDelegate&lt;TRequest, TResponse&gt; invokeMethod)</code></pre>
   </div>
 
   <section>
@@ -199,7 +199,7 @@
   <section>
   <h5 class="returns">Returns</h5>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dt><span class="xref">ValueTask</span>&lt;TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>

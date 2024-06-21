@@ -4371,42 +4371,114 @@ references:
   fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteClientResultResponseMessageForErrorAsync
   nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteClientResultResponseMessageForErrorAsync
   nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteClientResultResponseMessageForErrorAsync
-- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync*
-  name: WriteMessageFireAndForgetAsync
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync_
-  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync*
+  name: WriteMessageFireAndForgetTaskAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetTaskAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync
   isSpec: "True"
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetAsync
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetAsync
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetAsync
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetAsync
-- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync``2(System.Int32,``0)
-  name: WriteMessageFireAndForgetAsync<TRequest, TResponse>(Int32, TRequest)
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetAsync__2_System_Int32___0_
-  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetAsync``2(System.Int32,``0)
-  name.vb: WriteMessageFireAndForgetAsync(Of TRequest, TResponse)(Int32, TRequest)
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetAsync<TRequest, TResponse>(System.Int32, TRequest)
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetAsync(Of TRequest, TResponse)(System.Int32, TRequest)
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetAsync<TRequest, TResponse>(Int32, TRequest)
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetAsync(Of TRequest, TResponse)(Int32, TRequest)
-- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync*
-  name: WriteMessageWithResponseAsync
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseAsync_
-  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetTaskAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetTaskAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetTaskAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetTaskAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync``2(System.Int32,``0)
+  name: WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetTaskAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetTaskAsync``2(System.Int32,``0)
+  name.vb: WriteMessageFireAndForgetTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetTaskAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync*
+  name: WriteMessageFireAndForgetValueTaskAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync
   isSpec: "True"
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseAsync
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseAsync
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseAsync
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseAsync
-- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync``2(System.Int32,``0)
-  name: WriteMessageWithResponseAsync<TRequest, TResponse>(Int32, TRequest)
-  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseAsync__2_System_Int32___0_
-  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseAsync``2(System.Int32,``0)
-  name.vb: WriteMessageWithResponseAsync(Of TRequest, TResponse)(Int32, TRequest)
-  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseAsync<TRequest, TResponse>(System.Int32, TRequest)
-  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseAsync(Of TRequest, TResponse)(System.Int32, TRequest)
-  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseAsync<TRequest, TResponse>(Int32, TRequest)
-  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync``2(System.Int32,``0)
+  name: WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskAsync``2(System.Int32,``0)
+  name.vb: WriteMessageFireAndForgetValueTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync*
+  name: WriteMessageFireAndForgetValueTaskOfTAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskOfTAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskOfTAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskOfTAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskOfTAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskOfTAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync``2(System.Int32,``0)
+  name: WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageFireAndForgetValueTaskOfTAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageFireAndForgetValueTaskOfTAsync``2(System.Int32,``0)
+  name.vb: WriteMessageFireAndForgetValueTaskOfTAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskOfTAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageFireAndForgetValueTaskOfTAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageFireAndForgetValueTaskOfTAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync*
+  name: WriteMessageWithResponseTaskAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseTaskAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseTaskAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseTaskAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseTaskAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseTaskAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync``2(System.Int32,``0)
+  name: WriteMessageWithResponseTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseTaskAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseTaskAsync``2(System.Int32,``0)
+  name.vb: WriteMessageWithResponseTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseTaskAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync*
+  name: WriteMessageWithResponseValueTaskAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync``2(System.Int32,``0)
+  name: WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskAsync``2(System.Int32,``0)
+  name.vb: WriteMessageWithResponseValueTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskAsync(Of TRequest, TResponse)(Int32, TRequest)
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync*
+  name: WriteMessageWithResponseValueTaskOfTAsync
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync_
+  commentId: Overload:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync
+  isSpec: "True"
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync
+- uid: MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync``2(System.Int32,``0)
+  name: WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(Int32, TRequest)
+  href: api/MagicOnion.Client.StreamingHubClientBase-2.html#MagicOnion_Client_StreamingHubClientBase_2_WriteMessageWithResponseValueTaskOfTAsync__2_System_Int32___0_
+  commentId: M:MagicOnion.Client.StreamingHubClientBase`2.WriteMessageWithResponseValueTaskOfTAsync``2(System.Int32,``0)
+  name.vb: WriteMessageWithResponseValueTaskOfTAsync(Of TRequest, TResponse)(Int32, TRequest)
+  fullName: MagicOnion.Client.StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(System.Int32, TRequest)
+  fullName.vb: MagicOnion.Client.StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync(Of TRequest, TResponse)(System.Int32, TRequest)
+  nameWithType: StreamingHubClientBase<TStreamingHub, TReceiver>.WriteMessageWithResponseValueTaskOfTAsync<TRequest, TResponse>(Int32, TRequest)
+  nameWithType.vb: StreamingHubClientBase(Of TStreamingHub, TReceiver).WriteMessageWithResponseValueTaskOfTAsync(Of TRequest, TResponse)(Int32, TRequest)
 - uid: MagicOnion.Client.StreamingHubClientFactoryDelegate`2
   name: StreamingHubClientFactoryDelegate<TStreamingHub, TReceiver>
   href: api/MagicOnion.Client.StreamingHubClientFactoryDelegate-2.html

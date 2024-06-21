@@ -82,7 +82,7 @@
   <div class="markdown level0 conceptual"></div>
   
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate Task&lt;TResponse&gt; InvokeMethodDelegate&lt;TRequest, TResponse&gt;(int methodId, TRequest value);</code></pre>
+    <pre><code class="lang-csharp hljs">public delegate ValueTask&lt;TResponse&gt; InvokeMethodDelegate&lt;TRequest, TResponse&gt;(int methodId, TRequest value);</code></pre>
   </div>
 
   
@@ -101,7 +101,7 @@
   <section>
   <h4 class="returns">Returns</h4>
   <dl class="cysharpdocfx-valuedefinition">
-    <dt><span class="xref">Task</span>&lt;TResponse&gt;</dt>
+    <dt><span class="xref">ValueTask</span>&lt;TResponse&gt;</dt>
     <dd></dd>
   </dl>
   </section>
